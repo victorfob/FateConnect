@@ -1,0 +1,119 @@
+/* Tokens só usados por app-typography; escalas base em :root (styles.scss). */
+:host {
+  display: contents;
+
+  --app-typography-display-size: 2rem;
+  --app-typography-display-size-narrow: 1.875rem;
+  --app-typography-display-weight: 700;
+  --app-typography-display-lh: 1.2;
+
+  --app-typography-lead-size: 1rem;
+  --app-typography-lead-weight: 500;
+  --app-typography-lead-lh: 1.5;
+
+  --app-typography-title-size: 1.5rem;
+  --app-typography-title-weight: 600;
+  --app-typography-title-lh: 1.3;
+
+  --app-typography-subtitle-size: var(--app-tamanho-subtitulo-fonte);
+  --app-typography-subtitle-weight: 600;
+  --app-typography-subtitle-lh: 1.3;
+
+  --app-typography-body-size: var(--app-tamanho-texto-fonte);
+  --app-typography-body-weight: 400;
+  --app-typography-body-lh: 1.4;
+
+  --app-typography-caption-size: var(--app-tamanho-tag-fonte);
+  --app-typography-caption-weight: 400;
+  --app-typography-caption-lh: 1.35;
+  --app-typography-tag-weight: 600;
+
+  --app-typography-brand-size: 1.3rem;
+  --app-typography-brand-weight: 600;
+  --app-typography-brand-lh: 1.2;
+
+  --app-typography-footer-body-size: 0.875rem;
+  --app-typography-footer-body-weight: 400;
+  --app-typography-footer-body-lh: 1.4;
+}
+
+.typography {
+  margin: 0;
+  font-family: inherit;
+}
+
+.typography--display {
+  font-size: var(--app-typography-display-size);
+  font-weight: var(--app-typography-display-weight);
+  line-height: var(--app-typography-display-lh);
+  color: var(--app-cor-principal);
+}
+
+.typography--lead {
+  font-size: var(--app-typography-lead-size);
+  font-weight: var(--app-typography-lead-weight);
+  line-height: var(--app-typography-lead-lh);
+  color: var(--app-texto-sobre-branco);
+  margin-bottom: 1rem;
+}
+
+.typography--title {
+  font-size: var(--app-typography-title-size);
+  font-weight: var(--app-typography-title-weight);
+  line-height: var(--app-typography-title-lh);
+  color: var(--app-cor-principal);
+}
+
+.typography--subtitle {
+  font-size: var(--app-typography-subtitle-size);
+  font-weight: var(--app-typography-subtitle-weight);
+  line-height: var(--app-typography-subtitle-lh);
+  color: var(--app-cor-principal);
+}
+
+.typography--body {
+  font-size: var(--app-typography-body-size);
+  font-weight: var(--app-typography-body-weight);
+  line-height: var(--app-typography-body-lh);
+  color: var(--app-texto-sobre-branco);
+}
+
+.typography--caption {
+  font-size: var(--app-typography-caption-size);
+  font-weight: var(--app-typography-caption-weight);
+  line-height: var(--app-typography-caption-lh);
+  color: var(--app-texto-sobre-branco);
+}
+
+.typography--tag {
+  font-size: var(--app-typography-caption-size);
+  font-weight: var(--app-typography-tag-weight);
+  line-height: var(--app-typography-caption-lh);
+  color: var(--app-cor-principal);
+}
+
+.typography--brand {
+  font-size: var(--app-typography-brand-size);
+  font-weight: var(--app-typography-brand-weight);
+  line-height: var(--app-typography-brand-lh);
+  color: var(--app-texto-fundo-forte);
+}
+
+.typography--footer-body {
+  font-size: var(--app-typography-footer-body-size);
+  font-weight: var(--app-typography-footer-body-weight);
+  line-height: var(--app-typography-footer-body-lh);
+  color: var(--app-texto-fundo-forte);
+}
+
+@media (max-width: 768px) {
+  .typography--display {
+    font-size: var(--app-typography-display-size-narrow);
+  }
+
+  :host-context(.copyright-container) .typography--footer-body,
+  :host-context(.contacts-container) .typography--footer-body,
+  :host-context(.contacts-container) .typography--title {
+    text-align: center;
+  }
+}
