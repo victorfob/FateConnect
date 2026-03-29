@@ -1,9 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Output,
   inject,
+  output,
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -61,7 +60,7 @@ export type RideFilterFormGroup = FormGroup<{
 export class RideFilterComponent {
   private readonly formBuilder = inject(FormBuilder);
 
-  @Output() filterTriggered = new EventEmitter<RideFilter>();
+  readonly rideFilterApply = output<RideFilter>();
 
   readonly filterForm: RideFilterFormGroup = this.formBuilder.group({
     departureDate: new FormControl<Date | null>(null),
@@ -107,6 +106,6 @@ export class RideFilterComponent {
       mergedFilters.rideType = formValue.rideType;
     }
 
-    this.filterTriggered.emit(mergedFilters);
+    this.rideFilterApply.emit(mergedFilters);
   }
 }
