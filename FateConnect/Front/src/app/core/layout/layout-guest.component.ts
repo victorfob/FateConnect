@@ -26,7 +26,7 @@ import { LandingAnchorService } from '../landing-anchor.service';
 export class LayoutGuestComponent {
   private readonly landingAnchor = inject(LandingAnchorService);
 
-  navigateFragment(drawer: MatSidenav, fragment: string): void {
+  closeDrawerAndGoToFragment(drawer: MatSidenav, fragment: string): void {
     drawer.close();
     this.landingAnchor.go(fragment);
   }

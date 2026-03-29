@@ -31,7 +31,7 @@ export class HeaderComponent {
 
   readonly drawer = input<MatSidenav | undefined>(undefined);
 
-  readonly iconeMenu = faBars;
+  readonly menuIcon = faBars;
 
   protected readonly landingAnchor = inject(LandingAnchorService);
 }

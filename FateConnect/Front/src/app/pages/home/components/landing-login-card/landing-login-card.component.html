@@ -20,7 +20,7 @@
         [attr.autocomplete]="hidePassword() ? 'current-password' : 'off'" />
       <button matIconSuffix mat-icon-button type="button" [attr.aria-pressed]="!hidePassword()"
         aria-label="Mostrar ou ocultar senha" (click)="togglePasswordVisibility()">
-        <fa-icon [icon]="hidePassword() ? faEye : faEyeSlash"></fa-icon>
+        <fa-icon [icon]="hidePassword() ? eyeIcon : eyeSlashIcon"></fa-icon>
       </button>
       @if (form.controls.password.hasError('required') && form.controls.password.touched) {
       <mat-error>Informe a senha</mat-error>

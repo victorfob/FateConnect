@@ -13,6 +13,6 @@ import { TypographyComponent } from '../../shared/ui/typography/typography';
   styleUrl: './menu.component.scss',
 })
 export class MenuComponent {
-  faSearch = faSearch;
-  faCar = faCar;
+  readonly searchIcon = faSearch;
+  readonly carIcon = faCar;
 }

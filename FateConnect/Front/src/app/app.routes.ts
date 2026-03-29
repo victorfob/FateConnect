@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 import { LayoutGuestComponent } from './core/layout/layout-guest.component';
 import { LayoutComponent } from './core/layout/layout.component';
-import { CaronasComponent } from './pages/caronas/caronas.component';
-import { BuscarCaronaComponent } from './pages/caronas/screens/buscar-carona/buscar-carona.component';
-import { OfertarCaronaComponent } from './pages/caronas/screens/ofertar-carona/ofertar-carona.component';
+import { RidesComponent } from './pages/rides/rides.component';
+import { SearchRideComponent } from './pages/rides/screens/search-ride/search-ride.component';
+import { OfferRideComponent } from './pages/rides/screens/offer-ride/offer-ride.component';
 import { HomeComponent } from './pages/home/home.component';
 import { MenuComponent } from './pages/menu/menu.component';
 
@@ -21,10 +21,10 @@ export const routes: Routes = [
       { path: 'menu', component: MenuComponent },
       {
         path: 'caronas',
-        component: CaronasComponent,
+        component: RidesComponent,
         children: [
-          { path: 'buscar', component: BuscarCaronaComponent },
-          { path: 'ofertar', component: OfertarCaronaComponent },
+          { path: 'buscar', component: SearchRideComponent },
+          { path: 'ofertar', component: OfferRideComponent },
           { path: '', redirectTo: 'buscar', pathMatch: 'full' },
         ],
       },

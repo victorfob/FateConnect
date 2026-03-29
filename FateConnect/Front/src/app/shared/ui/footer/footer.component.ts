@@ -12,7 +12,7 @@ import { TypographyComponent } from '../typography/typography';
 })
 export class FooterComponent {
   readonly contact = APP_CONTACT;
-  readonly faEnvelope = faEnvelope;
-  readonly faPhone = faPhone;
-  readonly faLocationDot = faLocationDot;
+  readonly envelopeIcon = faEnvelope;
+  readonly phoneIcon = faPhone;
+  readonly locationIcon = faLocationDot;
 }
