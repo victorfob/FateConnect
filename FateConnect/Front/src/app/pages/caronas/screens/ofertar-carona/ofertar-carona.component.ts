@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -8,6 +8,7 @@ import { TypographyComponent } from '../../../../shared/ui/typography/typography
 @Component({
   selector: 'app-ofertar-carona',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FontAwesomeModule, MatSnackBarModule, TypographyComponent],
   templateUrl: './ofertar-carona.component.html',
   styleUrl: './ofertar-carona.component.scss'

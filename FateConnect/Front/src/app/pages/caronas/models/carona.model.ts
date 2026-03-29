@@ -1,3 +1,5 @@
+import type { CaronaType } from './carona-type.model';
+
 export interface Carona {
   id: number;
   qtdVagas: number;
@@ -5,7 +7,7 @@ export interface Carona {
   dataPartida: string;
   horaPartida: string;
   dataCadastro: string;
-  tipoCarona: string;
+  tipoCarona: CaronaType;
   descricao: string;
   ativo: boolean;
 }

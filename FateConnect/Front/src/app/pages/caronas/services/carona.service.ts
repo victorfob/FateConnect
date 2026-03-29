@@ -1,18 +1,16 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 import { Carona } from '../models/carona.model';
 import { FiltroCarona } from '../models/filtro.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class CaronaService {
-  private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/caronas`;
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/caronas`;
 
-  listarCaronas(filtros?: FiltroCarona) : Observable<Carona[]>{
+  listarCaronas(filtros?: FiltroCarona): Observable<Carona[]> {
     let params = new HttpParams();
 
     if (filtros) {
@@ -28,8 +26,8 @@ export class CaronaService {
         params = params.set('HoraPartida', filtros.hora);
       }
 
-      if (filtros.tipoCarona) {
-        params = params.set('TipoCarona', filtros.tipoCarona);
+      if (filtros.caronaType) {
+        params = params.set('TipoCarona', filtros.caronaType);
       }
     }
 

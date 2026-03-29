@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, Input, Output, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -14,12 +22,14 @@ import {
   faUserGroup
 } from '@fortawesome/free-solid-svg-icons';
 import { Carona } from '../../models/carona.model';
+import { caronaTypeDisplayLabel, caronaTypeTagClass } from '../../models/carona-type.model';
 import { ConfirmDialogComponent } from '../../../../shared/ui/dialogs/confirm-dialog/confirm-dialog.component';
 import { TypographyComponent } from '../../../../shared/ui/typography/typography';
 
 @Component({
   selector: 'app-carona-card',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     MatCardModule,
@@ -45,12 +55,12 @@ export class CaronaCardComponent {
   protected readonly iconeEditar = faPenToSquare;
   protected readonly iconeDeletar = faTrash;
 
-  getCorTipoCarona(tipo: string): string {
-    return `tag ${tipo == "Filantropica" ? "verde" : "marrom"}`;
+  typeTagClass(value: string): string {
+    return caronaTypeTagClass(value);
   }
 
-  getTextoTipoCaronaCorrigido(tipo: string): string {
-    return tipo == "Filantropica" ? "Filantrópica" : "Igualitária";
+  typeDisplayLabel(value: string): string {
+    return caronaTypeDisplayLabel(value);
   }
 
   onEditar(): void {

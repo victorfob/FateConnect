@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -13,6 +20,8 @@ import { CaronaService } from '../../services/carona.service';
 
 @Component({
   selector: 'app-buscar-carona',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     CaronaCardComponent,
@@ -29,24 +38,24 @@ export class BuscarCaronaComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
 
-  listaCaronas: Carona[] = [];
-  isLoading = false;
+  readonly listaCaronas = signal<Carona[]>([]);
+  readonly isLoading = signal(false);
 
   ngOnInit(): void {
     this.buscarCaronas();
   }
 
-  buscarCaronas(filtros?: FiltroCarona) {
-    this.isLoading = true;
+  buscarCaronas(filtros?: FiltroCarona): void {
+    this.isLoading.set(true);
     this.caronaService
       .listarCaronas(filtros)
       .pipe(
-        finalize(() => (this.isLoading = false)),
+        finalize(() => this.isLoading.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: (dadosApi) => {
-          this.listaCaronas = dadosApi;
+          this.listaCaronas.set(dadosApi);
         },
         error: () => {
           this.snackBar.open('Erro ao carregar caronas. Tente novamente.', 'Fechar', {
@@ -66,17 +75,17 @@ export class BuscarCaronaComponent implements OnInit {
     });
   }
 
-  onExcluir(carona: Carona) {
-    this.isLoading = true;
+  onExcluir(carona: Carona): void {
+    this.isLoading.set(true);
     this.caronaService
       .excluirCarona(carona.id)
       .pipe(
-        finalize(() => (this.isLoading = false)),
+        finalize(() => this.isLoading.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: () => {
-          this.listaCaronas = this.listaCaronas.filter((c) => c.id !== carona.id);
+          this.listaCaronas.update((lista) => lista.filter((c) => c.id !== carona.id));
           this.snackBar.open('Carona excluída com sucesso.', 'OK', {
             duration: 3000,
             verticalPosition: 'top',

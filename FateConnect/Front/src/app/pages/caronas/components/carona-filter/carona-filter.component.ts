@@ -1,5 +1,11 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Output,
+  inject,
+} from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -21,10 +27,20 @@ import {
   faClock
 } from '@fortawesome/free-regular-svg-icons';
 import { FiltroCarona } from '../../models/filtro.model';
+import type { CaronaType } from '../../models/carona-type.model';
 import { TypographyComponent } from '../../../../shared/ui/typography/typography';
+
+export type CaronaFilterForm = FormGroup<{
+  data: FormControl<Date | null>;
+  hora: FormControl<string | null>;
+  destino: FormControl<string | null>;
+  caronaType: FormControl<CaronaType | null>;
+}>;
 
 @Component({
   selector: 'app-carona-filter',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     MatExpansionModule,
@@ -43,9 +59,16 @@ import { TypographyComponent } from '../../../../shared/ui/typography/typography
   styleUrls: ['./carona-filter.component.scss']
 })
 export class CaronaFilterComponent {
+  private readonly formBuilder = inject(FormBuilder);
+
   @Output() filterTriggered = new EventEmitter<FiltroCarona>();
 
-  filterForm: FormGroup;
+  readonly filterForm: CaronaFilterForm = this.formBuilder.group({
+    data: new FormControl<Date | null>(null),
+    hora: new FormControl<string | null>(null),
+    destino: new FormControl<string | null>(null),
+    caronaType: new FormControl<CaronaType | null>(null),
+  });
 
   protected readonly iconeFiltro = faFilter;
   protected readonly iconeLupa = faMagnifyingGlass;
@@ -53,39 +76,37 @@ export class CaronaFilterComponent {
   protected readonly iconeRelogio = faClock;
   protected readonly iconeAgenda = faCalendarDays;
 
-  tipoCarona = [
-    { value: '', viewValue: 'Todas' },
-    { value: 'filantropica', viewValue: 'Filantrópica' },
-    { value: 'igualitaria', viewValue: 'Igualitária' },
+  /** Values aligned with .NET `EnumTipoCarona` for query string binding. */
+  readonly caronaTypeOptions: { value: CaronaType | null; viewValue: string }[] = [
+    { value: null, viewValue: 'Todas' },
+    { value: 'Filantropica', viewValue: 'Filantrópica' },
+    { value: 'Igualitaria', viewValue: 'Igualitária' },
   ];
 
-  constructor(private fb: FormBuilder) {
-    this.filterForm = this.fb.group({
-      data: [null],
-      hora: [null],
-      destino: [null],
-      tipoCarona: [null]
-    });
-  }
+  applyFilters(): void {
+    const formValue = this.filterForm.getRawValue();
 
-  onFiltrar(): void {
-    const formValue = this.filterForm.value;
-
-    const filtrosSobrepostos: FiltroCarona = {};
+    const mergedFilters: FiltroCarona = {};
 
     if (formValue.data) {
-      const dataObjeto = new Date(formValue.data);
-      const ano = dataObjeto.getFullYear();
-      const mes = (dataObjeto.getMonth() + 1).toString().padStart(2, '0');
-      const dia = dataObjeto.getDate().toString().padStart(2, '0');
+      const dateValue = new Date(formValue.data);
+      const year = dateValue.getFullYear();
+      const month = (dateValue.getMonth() + 1).toString().padStart(2, '0');
+      const day = dateValue.getDate().toString().padStart(2, '0');
 
-      filtrosSobrepostos.data = `${ano}-${mes}-${dia}`;
+      mergedFilters.data = `${year}-${month}-${day}`;
     }
 
-    if (formValue.hora) filtrosSobrepostos.hora = formValue.hora;
-    if (formValue.destino) filtrosSobrepostos.destino = formValue.destino.trim();
-    if (formValue.tipoCarona) filtrosSobrepostos.tipoCarona = formValue.tipoCarona;
+    if (formValue.hora) {
+      mergedFilters.hora = formValue.hora;
+    }
+    if (formValue.destino) {
+      mergedFilters.destino = formValue.destino.trim();
+    }
+    if (formValue.caronaType) {
+      mergedFilters.caronaType = formValue.caronaType;
+    }
 
-    this.filterTriggered.emit(filtrosSobrepostos);
+    this.filterTriggered.emit(mergedFilters);
   }
 }

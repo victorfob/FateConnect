@@ -6,8 +6,8 @@
 
       <div class="right-side">
         <div class="tags desktop-only">
-          <span [class]="getCorTipoCarona(carona.tipoCarona)">
-            <app-typography variant="caption">{{ getTextoTipoCaronaCorrigido(carona.tipoCarona) }}</app-typography>
+          <span [class]="typeTagClass(carona.tipoCarona)">
+            <app-typography variant="caption">{{ typeDisplayLabel(carona.tipoCarona) }}</app-typography>
           </span>
         </div>
 
@@ -45,8 +45,8 @@
     </div>
 
     <div class="tags mobile-only">
-      <span [class]="getCorTipoCarona(carona.tipoCarona)">
-        <app-typography variant="caption">{{ getTextoTipoCaronaCorrigido(carona.tipoCarona) }}</app-typography>
+      <span [class]="typeTagClass(carona.tipoCarona)">
+        <app-typography variant="caption">{{ typeDisplayLabel(carona.tipoCarona) }}</app-typography>
       </span>
     </div>
 

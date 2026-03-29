@@ -7,7 +7,7 @@
     </mat-panel-title>
   </mat-expansion-panel-header>
 
-  <form [formGroup]="filterForm" (ngSubmit)="onFiltrar()">
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
 
     <div class="inputs-container">
 
@@ -55,11 +55,11 @@
           </mat-label>
           <mat-select
             id="carona-filter-tipo"
-            formControlName="tipoCarona"
+            formControlName="caronaType"
             placeholder="Selecione"
             panelClass="carona-filter-select-panel"
           >
-            @for (option of tipoCarona; track option.value) {
+            @for (option of caronaTypeOptions; track option.viewValue) {
               <mat-option [value]="option.value">
                 {{ option.viewValue }}
               </mat-option>

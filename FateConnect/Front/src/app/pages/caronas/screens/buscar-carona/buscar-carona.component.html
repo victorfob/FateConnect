@@ -3,7 +3,7 @@
 </div>
 
 <div class="lista-caronas">
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="loading-container">
       <mat-progress-spinner
         mode="indeterminate"
@@ -11,8 +11,8 @@
       </mat-progress-spinner>
     </div>
   } @else {
-    @if (listaCaronas.length > 0) {
-      @for (item of listaCaronas; track item.id) {
+    @if (listaCaronas().length > 0) {
+      @for (item of listaCaronas(); track item.id) {
         <app-carona-card [carona]="item" (editar)="onEditar($event)" (excluir)="onExcluir($event)"></app-carona-card>
       }
     } @else {
