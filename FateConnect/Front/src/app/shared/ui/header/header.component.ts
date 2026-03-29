@@ -29,7 +29,7 @@ export class HeaderComponent {
   /**
    * Quando `true`, exibe a barra “após login” (menu, caronas, contato).
    * Quando `false`, exibe a navegação da landing (`/inicio` + fragmentos).
-   * Com autenticação real, amarrar este input ao estado de sessão.
+   * TODO - Atribuir este input ao estado de sessão com autenticação real.
    */
   readonly isLoggedIn = input(true);
 
