@@ -15,7 +15,7 @@ mat-toolbar {
   align-items: center;
   justify-content: space-between;
   padding: 0 7vw;
-
+  box-shadow: var(--app-sombra-componentes);
   color: var(--app-texto-fundo-forte);
 
   &.sem-sombra {
