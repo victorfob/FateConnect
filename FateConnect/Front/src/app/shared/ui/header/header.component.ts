@@ -26,7 +26,11 @@ import { TypographyComponent } from '../typography/typography';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent {
-  /** Quando `false`, exibe navegação da landing (rotas em `/inicio` com fragmentos). */
+  /**
+   * Quando `true`, exibe a barra “após login” (menu, caronas, contato).
+   * Quando `false`, exibe a navegação da landing (`/inicio` + fragmentos).
+   * Com autenticação real, amarrar este input ao estado de sessão.
+   */
   readonly isLoggedIn = input(true);
 
   readonly drawer = input<MatSidenav | undefined>(undefined);
