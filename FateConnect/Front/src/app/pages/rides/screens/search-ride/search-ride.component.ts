@@ -10,7 +10,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { finalize } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { RideCardComponent } from '../../components/ride-card/ride-card.component';
 import { RideFilterComponent } from '../../components/ride-filter/ride-filter.component';
 import { TypographyComponent } from '../../../../shared/ui/typography/typography';
@@ -37,34 +38,39 @@ export class SearchRideComponent implements OnInit {
   private readonly rideService = inject(RideService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly listTrigger$ = new Subject<RideFilter | undefined>();
 
   readonly rideList = signal<Ride[]>([]);
   readonly isLoading = signal(false);
+
+  constructor() {
+    this.listTrigger$
+      .pipe(
+        tap(() => this.isLoading.set(true)),
+        switchMap((filters) =>
+          this.rideService.listRides(filters).pipe(
+            finalize(() => this.isLoading.set(false)),
+            catchError(() => {
+              this.snackBar.open('Erro ao carregar caronas. Tente novamente.', 'Fechar', {
+                duration: 4000,
+                verticalPosition: 'top',
+                panelClass: ['snackbar-error'],
+              });
+              return of([] as Ride[]);
+            })
+          )
+        ),
+        takeUntilDestroyed()
+      )
+      .subscribe((data) => this.rideList.set(data));
+  }
 
   ngOnInit(): void {
     this.loadRides();
   }
 
   loadRides(filters?: RideFilter): void {
-    this.isLoading.set(true);
-    this.rideService
-      .listRides(filters)
-      .pipe(
-        finalize(() => this.isLoading.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (data) => {
-          this.rideList.set(data);
-        },
-        error: () => {
-          this.snackBar.open('Erro ao carregar caronas. Tente novamente.', 'Fechar', {
-            duration: 4000,
-            verticalPosition: 'top',
-            panelClass: ['snackbar-error'],
-          });
-        },
-      });
+    this.listTrigger$.next(filters);
   }
 
   onEdit(_ride: Ride): void {

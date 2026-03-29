@@ -3,10 +3,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  EventEmitter,
-  Input,
-  Output,
   inject,
+  input,
+  output,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -45,9 +44,9 @@ import { TypographyComponent } from '../../../../shared/ui/typography/typography
 export class RideCardComponent {
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
-  @Input({ required: true }) ride!: Ride;
-  @Output() edit = new EventEmitter<Ride>();
-  @Output() delete = new EventEmitter<Ride>();
+  readonly ride = input.required<Ride>();
+  readonly edit = output<Ride>();
+  readonly delete = output<Ride>();
 
   protected readonly calendarIcon = faCalendar;
   protected readonly clockIcon = faClock;
@@ -64,7 +63,7 @@ export class RideCardComponent {
   }
 
   onEdit(): void {
-    this.edit.emit(this.ride);
+    this.edit.emit(this.ride());
   }
 
   confirmDelete(): void {
@@ -72,7 +71,7 @@ export class RideCardComponent {
       data: {
         title: 'Confirmar Exclusão',
         messagePrefix: 'Tem certeza que deseja excluir a carona para ',
-        messageEmphasis: this.ride.destino,
+        messageEmphasis: this.ride().destino,
         messageSuffix: '?',
         cancelText: 'Cancelar',
         confirmText: 'Excluir',
@@ -84,7 +83,7 @@ export class RideCardComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((confirmed) => {
         if (confirmed) {
-          this.delete.emit(this.ride);
+          this.delete.emit(this.ride());
         }
       });
   }
