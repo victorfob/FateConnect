@@ -1,7 +1,13 @@
 <mat-dialog-content>
   <app-typography variant="h2">{{ data.title || 'Confirmar ação' }}</app-typography>
   <app-typography variant="subtitle">
-    <span class="message" [innerHTML]="data.message || 'Tem certeza que deseja continuar?'"></span>
+    <span class="message">
+      @if (useEmphasis()) {
+        {{ data.messagePrefix }}<strong>{{ data.messageEmphasis }}</strong>{{ data.messageSuffix }}
+      } @else {
+        {{ data.message ?? fallbackMessage }}
+      }
+    </span>
   </app-typography>
 </mat-dialog-content>
 <mat-dialog-actions>

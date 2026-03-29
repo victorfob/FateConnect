@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, Output, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,7 +34,9 @@ import { TypographyComponent } from '../../../../shared/ui/typography/typography
 })
 export class CaronaCardComponent {
   private readonly dialog = inject(MatDialog);
+  private readonly destroyRef = inject(DestroyRef);
   @Input({ required: true }) carona!: Carona;
+  @Output() editar = new EventEmitter<Carona>();
   @Output() excluir = new EventEmitter<Carona>();
 
   protected readonly iconeCalendario = faCalendar;
@@ -50,20 +53,29 @@ export class CaronaCardComponent {
     return tipo == "Filantropica" ? "Filantrópica" : "Igualitária";
   }
 
+  onEditar(): void {
+    this.editar.emit(this.carona);
+  }
+
   confirmarExclusao(): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Confirmar Exclusão',
-        message: `Tem certeza que deseja excluir a carona para <strong>${this.carona.destino}</strong>?`,
+        messagePrefix: 'Tem certeza que deseja excluir a carona para ',
+        messageEmphasis: this.carona.destino,
+        messageSuffix: '?',
         cancelText: 'Cancelar',
         confirmText: 'Excluir',
       }
     });
 
-    dialogRef.afterClosed().subscribe((confirmado) => {
-      if (confirmado) {
-        this.excluir.emit(this.carona);
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((confirmado) => {
+        if (confirmado) {
+          this.excluir.emit(this.carona);
+        }
+      });
   }
 }

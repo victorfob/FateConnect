@@ -173,6 +173,9 @@ app-confirm-dialog {
 .mat-mdc-snack-bar-container.snackbar-error .mdc-snackbar__surface {
   background-color: var(--app-alerta-fundo);
 }
+.mat-mdc-snack-bar-container.snackbar-warning .mdc-snackbar__surface {
+  background-color: var(--app-warning-fundo);
+}
 
 .mat-mdc-dialog-container .mdc-dialog__surface {
   border-radius: var(--app-borda-componentes);

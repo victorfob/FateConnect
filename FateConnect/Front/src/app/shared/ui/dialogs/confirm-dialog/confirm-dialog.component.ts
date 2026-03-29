@@ -7,6 +7,9 @@ import { TypographyComponent } from '../../typography/typography';
 export interface ConfirmDialogData {
   title?: string;
   message?: string;
+  messageEmphasis?: string;
+  messagePrefix?: string;
+  messageSuffix?: string;
   confirmText?: string;
   cancelText?: string;
 }
@@ -19,6 +22,7 @@ export interface ConfirmDialogData {
   styleUrl: './confirm-dialog.component.scss'
 })
 export class ConfirmDialogComponent {
+  readonly fallbackMessage = 'Tem certeza que deseja continuar?';
 
   constructor(
     private readonly dialogRef: MatDialogRef<ConfirmDialogComponent, boolean>,
@@ -31,5 +35,10 @@ export class ConfirmDialogComponent {
 
   onConfirm(): void {
     this.dialogRef.close(true);
+  }
+
+  useEmphasis(): boolean {
+    const e = this.data.messageEmphasis;
+    return typeof e === 'string' && e.length > 0;
   }
 }

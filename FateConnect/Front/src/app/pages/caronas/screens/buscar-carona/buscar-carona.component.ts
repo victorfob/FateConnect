@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { finalize } from 'rxjs/operators';
@@ -26,6 +27,7 @@ import { CaronaService } from '../../services/carona.service';
 export class BuscarCaronaComponent implements OnInit {
   private readonly caronaService = inject(CaronaService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
 
   listaCaronas: Carona[] = [];
   isLoading = false;
@@ -38,22 +40,40 @@ export class BuscarCaronaComponent implements OnInit {
     this.isLoading = true;
     this.caronaService
       .listarCaronas(filtros)
-      .pipe(finalize(() => (this.isLoading = false)))
+      .pipe(
+        finalize(() => (this.isLoading = false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: (dadosApi) => {
           this.listaCaronas = dadosApi;
         },
-        error: (erro) => {
-          console.error('Erro ao buscar caronas:', erro);
+        error: () => {
+          this.snackBar.open('Erro ao carregar caronas. Tente novamente.', 'Fechar', {
+            duration: 4000,
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error'],
+          });
         },
       });
+  }
+
+  onEditar(_carona: Carona): void {
+    this.snackBar.open('Edição de carona em breve.', 'OK', {
+      duration: 3500,
+      verticalPosition: 'top',
+      panelClass: ['snackbar-warning'],
+    });
   }
 
   onExcluir(carona: Carona) {
     this.isLoading = true;
     this.caronaService
       .excluirCarona(carona.id)
-      .pipe(finalize(() => (this.isLoading = false)))
+      .pipe(
+        finalize(() => (this.isLoading = false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: () => {
           this.listaCaronas = this.listaCaronas.filter((c) => c.id !== carona.id);

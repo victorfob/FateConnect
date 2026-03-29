@@ -13,7 +13,7 @@
   } @else {
     @if (listaCaronas.length > 0) {
       @for (item of listaCaronas; track item.id) {
-        <app-carona-card [carona]="item" (excluir)="onExcluir($event)"></app-carona-card>
+        <app-carona-card [carona]="item" (editar)="onEditar($event)" (excluir)="onExcluir($event)"></app-carona-card>
       }
     } @else {
       <app-typography variant="subtitle">Nenhuma carona encontrada.</app-typography>
