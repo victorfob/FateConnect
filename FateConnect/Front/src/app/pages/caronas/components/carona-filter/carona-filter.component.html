@@ -12,45 +12,49 @@
     <div class="inputs-container">
 
       <div class="input-wrapper">
-        <label class="custom-label">
-          <app-typography variant="subtitle-bold">Data</app-typography>
-        </label>
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <input matInput [matDatepicker]="picker" formControlName="data" placeholder="mm/dd/aaaa">
+          <mat-label class="custom-field-label">
+            <app-typography variant="subtitle-bold">Data</app-typography>
+          </mat-label>
+          <input matInput id="carona-filter-data" [matDatepicker]="picker" formControlName="data"
+            placeholder="mm/dd/aaaa" autocomplete="off">
           <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
       </div>
 
       <div class="input-wrapper">
-        <label class="custom-label">
-          <app-typography variant="subtitle-bold">Hora</app-typography>
-        </label>
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <input matInput type="time" formControlName="hora" #horaInput>
+          <mat-label class="custom-field-label">
+            <app-typography variant="subtitle-bold">Hora</app-typography>
+          </mat-label>
+          <input matInput id="carona-filter-hora" type="time" formControlName="hora" #horaInput autocomplete="off">
 
-          <mat-icon matIconSuffix class="time-icon" (click)="horaInput.showPicker()">
-            schedule
-          </mat-icon>
+          <button type="button" matIconSuffix mat-icon-button class="time-picker-trigger"
+            aria-label="Abrir seletor de horário" (click)="horaInput.showPicker()">
+            <mat-icon>schedule</mat-icon>
+          </button>
         </mat-form-field>
       </div>
 
       <div class="input-wrapper">
-        <label class="custom-label">
-          <app-typography variant="subtitle-bold">Destino</app-typography>
-        </label>
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <input matInput placeholder="Digite o destino" formControlName="destino">
+          <mat-label class="custom-field-label">
+            <app-typography variant="subtitle-bold">Destino</app-typography>
+          </mat-label>
+          <input matInput id="carona-filter-destino" placeholder="Digite o destino" formControlName="destino"
+            autocomplete="off">
         </mat-form-field>
       </div>
 
       <div class="input-wrapper">
-        <label class="custom-label">
-          <app-typography variant="subtitle-bold">Tipo</app-typography>
-          <fa-icon [icon]="iconeInfo" class="info-icon" matTooltip="Filtrar por tipo de carona: Filantrópica, com caronas totalmente gratuitas, ou Igualitária, em que os participantes dividem os custos."></fa-icon>
-        </label>
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label class="custom-field-label">
+            <app-typography variant="subtitle-bold">Tipo</app-typography>
+            <fa-icon [icon]="iconeInfo" class="info-icon" matTooltip="Filtrar por tipo de carona: Filantrópica, com caronas totalmente gratuitas, ou Igualitária, em que os participantes dividem os custos."></fa-icon>
+          </mat-label>
           <mat-select
+            id="carona-filter-tipo"
             formControlName="tipoCarona"
             placeholder="Selecione"
             panelClass="carona-filter-select-panel"
@@ -65,7 +69,8 @@
       </div>
 
       <div class="input-wrapper button-wrapper">
-        <label class="custom-label mobile-hidden">&nbsp;</label> <button mat-raised-button color="warn" type="submit" class="btn-filtrar">
+        <div class="filter-button-align-spacer mobile-hidden" aria-hidden="true"></div>
+        <button mat-raised-button color="warn" type="submit" class="btn-filtrar">
           <fa-icon [icon]="iconeLupa"></fa-icon>
           <app-typography variant="subtitle-bold">Filtrar</app-typography>
         </button>

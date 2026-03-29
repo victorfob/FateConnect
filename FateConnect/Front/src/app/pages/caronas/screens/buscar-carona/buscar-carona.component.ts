@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { finalize } from 'rxjs/operators';
@@ -23,7 +23,7 @@ import { CaronaService } from '../../services/carona.service';
   templateUrl: './buscar-carona.component.html',
   styleUrl: './buscar-carona.component.scss',
 })
-export class BuscarCaronaComponent {
+export class BuscarCaronaComponent implements OnInit {
   private readonly caronaService = inject(CaronaService);
   private readonly snackBar = inject(MatSnackBar);
 

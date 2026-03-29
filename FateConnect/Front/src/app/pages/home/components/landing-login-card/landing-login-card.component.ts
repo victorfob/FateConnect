@@ -80,6 +80,7 @@ export class LandingLoginCardComponent implements AfterViewInit {
 
   onSubmit(): void {
     if (this.form.valid) {
+      this.router.navigate(['/menu']);
       /* UI only (#11): autenticação real virá com a API. */
     } else {
       this.form.markAllAsTouched();

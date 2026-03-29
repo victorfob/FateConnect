@@ -43,7 +43,7 @@ import { TypographyComponent } from '../../../../shared/ui/typography/typography
   styleUrls: ['./carona-filter.component.scss']
 })
 export class CaronaFilterComponent {
-  @Output() filterTriggered = new EventEmitter<any>();
+  @Output() filterTriggered = new EventEmitter<FiltroCarona>();
 
   filterForm: FormGroup;
 

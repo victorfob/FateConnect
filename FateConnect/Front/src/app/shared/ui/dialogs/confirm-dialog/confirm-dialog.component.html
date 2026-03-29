@@ -5,6 +5,6 @@
   </app-typography>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button extended mat-raised-button color="primary" (click)="onCancel()">{{ data.cancelText || 'Cancelar' }}</button>
-  <button extended mat-raised-button color="accent" (click)="onConfirm()">{{ data.confirmText || 'Confirmar' }}</button>
+  <button type="button" extended mat-raised-button color="primary" (click)="onCancel()">{{ data.cancelText || 'Cancelar' }}</button>
+  <button type="button" extended mat-raised-button color="accent" (click)="onConfirm()">{{ data.confirmText || 'Confirmar' }}</button>
 </mat-dialog-actions>
