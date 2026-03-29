@@ -11,6 +11,7 @@
     class="tab left"
     routerLink="buscar"
     routerLinkActive="active"
+    ariaCurrentWhenActive="page"
     [routerLinkActiveOptions]="{ exact: true }"
   >
     <fa-icon [icon]="searchIcon"></fa-icon>
@@ -20,6 +21,7 @@
     class="tab right"
     routerLink="ofertar"
     routerLinkActive="active"
+    ariaCurrentWhenActive="page"
   >
     <fa-icon [icon]="addIcon"></fa-icon>
     <app-typography variant="subtitle-bold">Ofertar Carona</app-typography>
