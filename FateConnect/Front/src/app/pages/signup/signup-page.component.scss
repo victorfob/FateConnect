@@ -60,6 +60,8 @@ app-typography#signup-title {
   grid-template-columns: 1fr;
   gap: 1rem;
   margin-top: 1rem;
+  /* Evita que campos na mesma linha estiquem quando um vizinho exibe mat-error (altura dinâmica). */
+  align-items: start;
 }
 
 .signup-form__field {
