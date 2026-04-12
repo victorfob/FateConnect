@@ -8,6 +8,7 @@ import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { provideEnvironmentNgxMask } from 'ngx-mask';
 import { PtBrDateAdapter } from './core/date/pt-br-date.adapter';
 import { routes } from './app.routes';
 
@@ -26,7 +27,8 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: 'enabled',
       })
     ),
-    provideHttpClient(withFetch())
+    provideHttpClient(withFetch()),
+    provideEnvironmentNgxMask()
   ]
 };
 

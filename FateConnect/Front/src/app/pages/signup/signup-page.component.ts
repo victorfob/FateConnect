@@ -18,9 +18,11 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { NgxMaskDirective } from 'ngx-mask';
 import { EMPTY, catchError, debounceTime, distinctUntilChanged, filter, finalize, map, switchMap } from 'rxjs';
 import { CepLookupService } from '../../core/services/cep-lookup.service';
 import { TypographyComponent } from '../../shared/ui/typography/typography';
+import { BirthDateSlashMaskDirective } from './birth-date-slash-mask.directive';
 import { BRAZILIAN_STATES } from './brazilian-states.constant';
 import { GENDER_OPTIONS, type GenderValue } from './gender-options.constant';
 
@@ -49,6 +51,8 @@ function brazilianPhoneValidator(control: AbstractControl): ValidationErrors | n
     MatProgressSpinnerModule,
     FontAwesomeModule,
     TypographyComponent,
+    NgxMaskDirective,
+    BirthDateSlashMaskDirective,
   ],
   templateUrl: './signup-page.component.html',
   styleUrl: './signup-page.component.scss',
