@@ -38,6 +38,11 @@ app-typography#signup-title {
   flex-direction: column;
 }
 
+.signup-form__cep-spinner {
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
 .signup-form-divider {
   width: 100%;
   height: 1px;

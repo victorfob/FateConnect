@@ -90,7 +90,11 @@
         class="signup-form__field signup-form__field--third">
         <mat-label>CEP</mat-label>
         <input matInput id="signup-zip" type="text" name="zipCode" formControlName="zipCode" inputmode="numeric"
-          autocomplete="postal-code" placeholder="00000-000" maxlength="9" />
+          autocomplete="postal-code" placeholder="00000-000" maxlength="9"
+          [attr.aria-busy]="cepLookupLoading()" />
+        @if (cepLookupLoading()) {
+        <mat-spinner matSuffix class="signup-form__cep-spinner" diameter="20" aria-label="Consultando CEP" />
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" subscriptSizing="dynamic"
