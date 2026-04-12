@@ -67,7 +67,12 @@ export class SignupPageComponent {
   readonly genderOptions = GENDER_OPTIONS;
   readonly brazilianStates = BRAZILIAN_STATES;
 
-  readonly maxBirthDate = new Date();
+  /** Última data de nascimento permitida: quem completa 18 anos hoje ainda pode se cadastrar. */
+  readonly maxBirthDate = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 18);
+    return d;
+  })();
   readonly minBirthDate = new Date(1900, 0, 1);
 
   readonly form = this.fb.nonNullable.group({

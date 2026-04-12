@@ -44,7 +44,7 @@
         <mat-error>Informe a data de nascimento</mat-error>
         }
         @if (form.controls.birthDate.hasError('matDatepickerMax') && form.controls.birthDate.touched) {
-        <mat-error>Data não pode ser futura</mat-error>
+        <mat-error>É necessário ter pelo menos 18 anos</mat-error>
         }
         @if (form.controls.birthDate.hasError('matDatepickerMin') && form.controls.birthDate.touched) {
         <mat-error>Data inválida</mat-error>
