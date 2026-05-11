@@ -7,10 +7,12 @@ namespace FateConnect.Api.Infrastructure.Middlewares
     public class GlobalExceptionMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<GlobalExceptionMiddleware> _logger;
 
-        public GlobalExceptionMiddleware(RequestDelegate next)
+        public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -21,6 +23,8 @@ namespace FateConnect.Api.Infrastructure.Middlewares
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Ocorreu uma exceção não tratada durante o processamento da requisição.");
+
                 await HandleExceptionAsync(context, ex);
             }
         }

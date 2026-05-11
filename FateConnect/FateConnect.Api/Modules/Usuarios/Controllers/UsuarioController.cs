@@ -28,6 +28,6 @@ public class UsuarioController : ControllerBase
     {
         UsuarioResponseDto resposta = await _usuarioService.CadastrarAsync(dto);
 
-        return CreatedAtAction(nameof(CadastrarAsync), new { id = resposta.Id }, resposta);
+        return StatusCode(StatusCodes.Status201Created, resposta);
     }
 }
