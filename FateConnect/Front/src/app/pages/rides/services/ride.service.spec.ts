@@ -1,6 +1,6 @@
+import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { RideService } from './ride.service';
 
@@ -8,7 +8,7 @@ describe('RideService', () => {
   let service: RideService;
   let httpMock: HttpTestingController;
 
-  const baseUrl = `${environment.apiUrl}/caronas`;
+  const baseUrl = `${environment.rideApiUrl}/caronas`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  ViewChild,
   inject,
   signal,
 } from '@angular/core';
@@ -13,11 +14,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { filter } from 'rxjs/operators';
 import { TypographyComponent } from '../../../../shared/ui/typography/typography';
+import { Login } from './models/login.model';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-landing-login-card',
@@ -39,8 +43,11 @@ import { TypographyComponent } from '../../../../shared/ui/typography/typography
 export class LandingLoginCardComponent implements AfterViewInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
-  private readonly host = inject(ElementRef<HTMLElement>);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly authService = inject(AuthService);
+  private readonly snackBar = inject(MatSnackBar);
+
+  @ViewChild('emailInput') emailInputRef!: ElementRef<HTMLInputElement>;
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -50,13 +57,41 @@ export class LandingLoginCardComponent implements AfterViewInit {
   readonly hidePassword = signal(true);
   readonly eyeIcon = faEye;
   readonly eyeSlashIcon = faEyeSlash;
+  readonly isLoading = signal(false);
 
   ngAfterViewInit(): void {
+    this.setupFocusListener();
+  }
+
+  togglePasswordVisibility(): void {
+    this.hidePassword.update((v) => !v);
+  }
+
+  onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.form.disable();
+    this.isLoading.set(true);
+
+    const formValue = this.form.getRawValue();
+
+    const payload: Login = {
+      emailFatec: formValue.email,
+      senha: formValue.password,
+    };
+
+    this.authService.login(payload).subscribe({
+      next: (response) => this.handleSuccessfulLogin(response),
+      error: (err) => this.handleFailedLogin(err),
+    });
+  }
+
+  private setupFocusListener(): void {
     const focusEmail = (): void => {
-      const input = this.host.nativeElement.querySelector('#landing-login-email') as
-        | HTMLInputElement
-        | null;
-      input?.focus();
+      this.emailInputRef?.nativeElement.focus();
     };
 
     this.router.events
@@ -75,16 +110,30 @@ export class LandingLoginCardComponent implements AfterViewInit {
     }
   }
 
-  togglePasswordVisibility(): void {
-    this.hidePassword.update((v) => !v);
+  private handleSuccessfulLogin(response: any): void {
+    this.snackBar.open(`Bem-vindo(a), ${response.nomeCompleto}!`, 'OK', {
+      duration: 3000,
+      verticalPosition: 'top',
+      panelClass: ['snackbar-success'],
+    });
+
+    this.router.navigate(['/menu']);
   }
 
-  onSubmit(): void {
-    if (this.form.valid) {
-      this.router.navigate(['/menu']);
-      /* Somente UI (#11): autenticação real virá com a API. */
-    } else {
-      this.form.markAllAsTouched();
+  private handleFailedLogin(err: any): void {
+    this.form.enable();
+    this.isLoading.set(false);
+
+    let msgErro = 'Erro ao realizar login. Tente novamente.';
+
+    if (err.status === 401) {
+      msgErro = 'E-mail ou senha inválidos.';
     }
+
+    this.snackBar.open(msgErro, 'OK', {
+      duration: 5000,
+      verticalPosition: 'top',
+      panelClass: ['snackbar-error'],
+    });
   }
 }
