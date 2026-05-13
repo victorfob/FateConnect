@@ -2,13 +2,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { Ride } from '../models/ride.model';
 import { RideFilter } from '../models/ride-filter.model';
+import { Ride } from '../models/ride.model';
 
 @Injectable({ providedIn: 'root' })
 export class RideService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/caronas`;
+  private readonly rideApiUrl = `${environment.rideApiUrl}/caronas`;
 
   listRides(filters?: RideFilter): Observable<Ride[]> {
     let params = new HttpParams();
@@ -31,10 +31,10 @@ export class RideService {
       }
     }
 
-    return this.http.get<Ride[]>(this.apiUrl, { params });
+    return this.http.get<Ride[]>(this.rideApiUrl, { params });
   }
 
   deleteRide(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.rideApiUrl}/${id}`);
   }
 }
