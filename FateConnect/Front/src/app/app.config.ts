@@ -1,16 +1,19 @@
+import { registerLocaleData } from '@angular/common';
+import { provideHttpClient, withFetch } from '@angular/common/http';
+import localePt from '@angular/common/locales/pt';
 import {
   ApplicationConfig,
   LOCALE_ID,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
-
-import { provideHttpClient, withFetch } from '@angular/common/http';
 import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideEnvironmentNgxMask } from 'ngx-mask';
-import { PtBrDateAdapter } from './core/date/pt-br-date.adapter';
 import { routes } from './app.routes';
+import { PtBrDateAdapter } from './core/date/pt-br-date.adapter';
+
+registerLocaleData(localePt, 'pt-BR');
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -31,4 +34,3 @@ export const appConfig: ApplicationConfig = {
     provideEnvironmentNgxMask()
   ]
 };
-
