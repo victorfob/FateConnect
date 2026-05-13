@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -15,16 +15,20 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { NgxMaskDirective } from 'ngx-mask';
 import { EMPTY, catchError, debounceTime, distinctUntilChanged, filter, finalize, map, switchMap } from 'rxjs';
+
 import { CepLookupService } from '../../core/services/cep-lookup.service';
 import { TypographyComponent } from '../../shared/ui/typography/typography';
 import { BirthDateSlashMaskDirective } from './birth-date-slash-mask.directive';
 import { BRAZILIAN_STATES } from './brazilian-states.constant';
 import { GENDER_OPTIONS, type GenderValue } from './gender-options.constant';
+import { UserResponse } from './models/user.model';
+import { SignupService } from './services/signup.service';
+import { mapSignupFormToDto } from './signup.mappert';
 
 function brazilianPhoneValidator(control: AbstractControl): ValidationErrors | null {
   const raw = String(control.value ?? '').replaceAll(/\D/g, '');
@@ -57,10 +61,12 @@ function brazilianPhoneValidator(control: AbstractControl): ValidationErrors | n
   templateUrl: './signup-page.component.html',
   styleUrl: './signup-page.component.scss',
 })
-export class SignupPageComponent {
+export class SignupPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
   private readonly cepLookup = inject(CepLookupService);
+  private readonly signupService = inject(SignupService);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly hidePassword = signal(true);
@@ -98,52 +104,8 @@ export class SignupPageComponent {
     acceptMarketing: [false],
   });
 
-  constructor() {
-    this.form.controls.zipCode.valueChanges
-      .pipe(
-        map((value) => String(value ?? '').replaceAll(/\D/g, '')),
-        debounceTime(400),
-        distinctUntilChanged(),
-        filter((digits) => digits.length === 8),
-        switchMap((digits) => {
-          this.cepLookupLoading.set(true);
-          return this.cepLookup.lookup(digits).pipe(
-            catchError(() => {
-              this.snackBar.open('Não foi possível consultar o CEP. Tente novamente.', 'OK', {
-                duration: 5000,
-                verticalPosition: 'top',
-                panelClass: ['snackbar-error'],
-              });
-              return EMPTY;
-            }),
-            finalize(() => this.cepLookupLoading.set(false))
-          );
-        }),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((data) => {
-        if (data.erro === 'true') {
-          this.form.patchValue(
-            { street: '', city: '', state: '' },
-            { emitEvent: false }
-          );
-          this.snackBar.open('CEP não encontrado.', 'OK', {
-            duration: 5000,
-            verticalPosition: 'top',
-            panelClass: ['snackbar-warning'],
-          });
-          return;
-        }
-        this.form.patchValue(
-          {
-            zipCode: data.cep ?? '',
-            street: data.logradouro ?? '',
-            city: data.localidade ?? '',
-            state: data.uf ?? '',
-          },
-          { emitEvent: false }
-        );
-      });
+  ngOnInit(): void {
+    this.setupCepListener();
   }
 
   togglePasswordVisibility(): void {
@@ -153,15 +115,13 @@ export class SignupPageComponent {
   notifyLegalSoon(event: Event, kind: 'terms' | 'privacy'): void {
     event.preventDefault();
     event.stopPropagation();
+
     const message =
       kind === 'terms'
         ? 'Termos de uso estarão disponíveis em breve.'
         : 'Política de privacidade estará disponível em breve.';
-    this.snackBar.open(message, 'OK', {
-      duration: 5000,
-      verticalPosition: 'top',
-      panelClass: ['snackbar-warning'],
-    });
+
+    this.showSnackbar(message, 'snackbar-warning');
   }
 
   onSubmit(): void {
@@ -169,11 +129,83 @@ export class SignupPageComponent {
       this.form.markAllAsTouched();
       return;
     }
-    this.snackBar.open('Cadastro será integrado à API em breve.', 'OK', {
+
+    this.form.disable();
+
+    const payload = mapSignupFormToDto(this.form.getRawValue());
+
+    this.signupService.signup(payload).subscribe({
+      next: (response) => this.handleSuccessfulSignup(response),
+      error: (err) => this.handleFailedSignup(err),
+    });
+  }
+
+
+  private setupCepListener(): void {
+    this.form.controls.zipCode.valueChanges
+      .pipe(
+        map((value) => String(value ?? '').replaceAll(/\D/g, '')),
+        debounceTime(400),
+        distinctUntilChanged(),
+        filter((digits) => digits.length === 8),
+        switchMap((digits) => this.fetchCepData(digits)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((data) => this.patchAddressData(data));
+  }
+
+  private fetchCepData(digits: string) {
+    this.cepLookupLoading.set(true);
+
+    return this.cepLookup.lookup(digits).pipe(
+      catchError(() => {
+        this.showSnackbar('Não foi possível consultar o CEP. Tente novamente.', 'snackbar-error');
+        return EMPTY;
+      }),
+      finalize(() => this.cepLookupLoading.set(false))
+    );
+  }
+
+  private patchAddressData(data: any): void {
+    if (data.erro === 'true') {
+      this.form.patchValue({ street: '', city: '', state: '' }, { emitEvent: false });
+      this.showSnackbar('CEP não encontrado.', 'snackbar-warning');
+
+      return;
+    }
+
+    this.form.patchValue(
+      {
+        zipCode: data.cep ?? '',
+        street: data.logradouro ?? '',
+        city: data.localidade ?? '',
+        state: data.uf ?? '',
+      },
+      { emitEvent: false }
+    );
+  }
+
+  private handleSuccessfulSignup(response: UserResponse): void {
+    this.showSnackbar(`Conta criada com sucesso, ${response.nomeCompleto}!`, 'snackbar-success');
+    this.router.navigate(['/inicio'], { fragment: 'login' });
+  }
+
+  private handleFailedSignup(error: any): void {
+    this.form.enable();
+
+    let msgErro = 'Erro ao realizar cadastro. Tente novamente.';
+
+    if (error.status === 409) msgErro = 'Este e-mail já está em uso.';
+    if (error.status === 400) msgErro = 'Dados inválidos. Verifique os campos preenchidos.';
+
+    this.showSnackbar(msgErro, 'snackbar-error');
+  }
+
+  private showSnackbar(message: string, panelClass: string): void {
+    this.snackBar.open(message, 'OK', {
       duration: 5000,
       verticalPosition: 'top',
-      panelClass: ['snackbar-warning'],
+      panelClass: [panelClass],
     });
-    /* UI antecipada: persistência e auth virão com o backend. */
   }
 }
