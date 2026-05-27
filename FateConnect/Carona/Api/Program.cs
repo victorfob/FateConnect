@@ -40,7 +40,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET");
 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
 var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
 
