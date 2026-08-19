@@ -2,6 +2,7 @@ import type { Theme as AppTheme } from '@mui/material/styles';
 
 export { css, keyframes } from '@emotion/react';
 export { default as styled } from '@emotion/styled';
+export { darken, lighten, alpha } from '@mui/material/styles';
 
 /**
  * O `styled` do Emotion tipa `theme` como `Theme` do `@emotion/react`, que é
@@ -12,3 +13,12 @@ declare module '@emotion/react' {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   export interface Theme extends AppTheme {}
 }
+
+import type { ElementType } from 'react';
+
+/**
+ * O `styled` do Emotion não preserva a assinatura polimórfica do `Box`, então a
+ * prop `component` some da tipagem. Declarar este genérico devolve a prop:
+ * `styled(Box)<PolymorphicProps>({ ... })`.
+ */
+export type PolymorphicProps = { component?: ElementType };

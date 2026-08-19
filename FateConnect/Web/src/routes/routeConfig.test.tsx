@@ -14,7 +14,7 @@ function renderRoute(initialPath: string) {
 
 describe('routeConfig', () => {
   it.each([
-    [RoutePath.LANDING, 'Início'],
+    [RoutePath.LANDING, 'Conectando a Comunidade Acadêmica'],
     [RoutePath.SIGNUP, 'Cadastro'],
     [RoutePath.MENU, 'Menu'],
     [RoutePath.LOST_AND_FOUND, 'Achados e Perdidos'],

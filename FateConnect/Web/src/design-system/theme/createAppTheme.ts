@@ -2,7 +2,8 @@ import { ptBR as corePtBR } from '@mui/material/locale';
 import { createTheme, type Theme } from '@mui/material/styles';
 import { ptBR as pickersPtBR } from '@mui/x-date-pickers/locales';
 
-import { colorTokens, fontFamily, typographyTokens } from '../tokens';
+import { fontFamily, typographyTokens } from '../tokens';
+import { darkPalette, lightPalette } from './palettes';
 import { components } from './components';
 
 /** Acima deste ponto o `h1` usa o tamanho cheio; abaixo, o reduzido. */
@@ -33,22 +34,16 @@ declare module '@mui/material/Typography' {
   }
 }
 
-export function createAppTheme(): Theme {
+export type ThemeMode = 'light' | 'dark';
+
+/** Modo claro é o padrão; o escuro segue o sistema de cor do Material Design. */
+export function createAppTheme(mode: ThemeMode = 'light'): Theme {
   const base = createTheme();
 
   return createTheme(
     {
       components,
-      palette: {
-        primary: { main: colorTokens.primary, contrastText: colorTokens.textOnAccent },
-        secondary: { main: colorTokens.accent, contrastText: colorTokens.textOnAccent },
-        error: { main: colorTokens.dangerText },
-        success: { main: colorTokens.successText },
-        warning: { main: colorTokens.warningText },
-        background: { default: colorTokens.surfaceGray, paper: colorTokens.surfaceWhite },
-        text: { primary: colorTokens.primary, secondary: colorTokens.textMuted },
-        divider: colorTokens.divider,
-      },
+      palette: mode === 'dark' ? darkPalette : lightPalette,
       typography: {
         fontFamily,
         h1: {

@@ -2,7 +2,9 @@ import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 
 import { styled } from '../../styled';
-import { colorTokens } from '../../tokens';
+import { chromeSurface, onChromeSurface } from '../../theme/chromeSurface';
+import Stack from '@mui/material/Stack';
+import type { PolymorphicProps } from '../../styled';
 
 /** Largura do menu lateral no produto. */
 const DRAWER_WIDTH_PX = 300;
@@ -15,18 +17,18 @@ const LOGO_INSET = '3vw';
 const ITEM_MIN_HEIGHT_PX = 48;
 const ITEM_INLINE_PADDING_PX = 16;
 
-export const DrawerRoot = styled(Drawer)({
+export const DrawerRoot = styled(Drawer)(({ theme }) => ({
   '& .MuiDrawer-paper': {
     width: `${DRAWER_WIDTH_PX}px`,
-    backgroundColor: colorTokens.primary,
-    color: colorTokens.textOnAccent,
+    backgroundColor: chromeSurface(theme),
+    color: onChromeSurface(theme),
     padding: `${DRAWER_VERTICAL_PADDING} 0`,
     overflowX: 'hidden',
   },
-});
+}));
 
-export const DrawerHeader = styled('div')({
-  display: 'flex',
+export const DrawerHeader = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+  flexDirection: 'row',
   justifyContent: 'start',
   alignItems: 'center',
   width: '100%',
@@ -35,12 +37,12 @@ export const DrawerHeader = styled('div')({
 
   '& a': {
     textDecoration: 'none',
-    color: colorTokens.textOnAccent,
+    color: onChromeSurface(theme),
     cursor: 'pointer',
   },
-});
+}));
 
-export const DrawerList = styled(List)({
+export const DrawerList = styled(List)(({ theme }) => ({
   paddingLeft: 0,
 
   '& .MuiListItemButton-root': {
@@ -48,10 +50,10 @@ export const DrawerList = styled(List)({
     paddingLeft: `${ITEM_INLINE_PADDING_PX}px`,
     paddingRight: `${ITEM_INLINE_PADDING_PX}px`,
   },
-  '& .MuiListItemButton-root:hover': { backgroundColor: colorTokens.surfaceHover },
+  '& .MuiListItemButton-root:hover': { backgroundColor: theme.palette.action.hover },
   '& .MuiListItemText-primary': {
-    color: colorTokens.textOnAccent,
+    color: onChromeSurface(theme),
     fontSize: '1rem',
     fontWeight: 400,
   },
-});
+}));

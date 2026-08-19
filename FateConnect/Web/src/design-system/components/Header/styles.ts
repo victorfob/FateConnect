@@ -2,7 +2,11 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 
 import { styled } from '../../styled';
-import { colorTokens, mobileMedia, shadowTokens, spacingScale } from '../../tokens';
+import { onChromeSurface } from '../../theme/chromeSurface';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import type { PolymorphicProps } from '../../styled';
+import { mobileMedia, shadowTokens, spacingScale } from '../../tokens';
 import { spacing } from '../../theme/helpers/spacing';
 
 const { xs } = spacingScale;
@@ -15,53 +19,65 @@ const NAV_FONT_SIZE = '1rem';
 const NAV_FONT_WEIGHT = 500;
 const CTA_FONT_WEIGHT = 400;
 
+/** Espaço horizontal entre os itens do topo — vale também entre a navegação e as ações. */
+const NAV_COLUMN_GAP = '1.5vw';
+
 export const HeaderBar = styled(AppBar)({
   boxShadow: shadowTokens.component,
 });
 
-export const HeaderToolbar = styled(Toolbar)({
+export const HeaderToolbar = styled(Toolbar)(({ theme }) => ({
   height: `${HEADER_HEIGHT_PX}px`,
   minHeight: `${HEADER_HEIGHT_PX}px`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: '0 7vw',
-  color: colorTokens.textOnAccent,
-});
+  color: onChromeSurface(theme),
+}));
 
 /** Marca: sem sublinhado e herdando a cor da barra, como no produto. */
-export const LogoSlot = styled('span')({
+export const LogoSlot = styled(Box)<PolymorphicProps>(({ theme }) => ({
   '& a': {
     textDecoration: 'none',
-    color: colorTokens.textOnAccent,
+    color: onChromeSurface(theme),
     cursor: 'pointer',
     transition: 'opacity 0.3s ease',
   },
   '& a:hover': { opacity: 0.8 },
-});
+}));
 
-export const DesktopNav = styled('nav')({
-  display: 'flex',
+export const DesktopNav = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+  flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'center',
-  gap: `${spacing(xs)} 1.5vw`,
+  gap: `${spacing(xs)} ${NAV_COLUMN_GAP}`,
+  // Empurra navegação e ações para a direita, mantendo só a marca à esquerda.
+  // Sem isso, o `space-between` distribui os três blocos e centraliza a navegação.
+  marginLeft: 'auto',
 
   '& .MuiButton-root': {
     fontSize: NAV_FONT_SIZE,
     fontWeight: NAV_FONT_WEIGHT,
-    color: colorTokens.textOnAccent,
+    color: onChromeSurface(theme),
   },
   // O destaque não recebe o peso reforçado, como no produto.
   '& .MuiButton-contained': { fontWeight: CTA_FONT_WEIGHT },
 
   [mobileMedia]: { display: 'none' },
+}));
+
+export const ActionsSlot = styled(Stack)<PolymorphicProps>({
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginLeft: NAV_COLUMN_GAP,
 });
 
-export const MenuButtonSlot = styled('span')({
+export const MenuButtonSlot = styled(Stack)<PolymorphicProps>({
   display: 'none',
 
   [mobileMedia]: {
-    display: 'flex',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     width: '48px',
