@@ -6,7 +6,7 @@ import { LandingNavButton } from '@app/components/LandingNavButton';
 import { APP_CONTACT, FOOTER_COPYRIGHT_LINES, FOOTER_TITLE } from '@app/constants/appContact';
 import { LANDING_LINKS } from '@app/constants/navigation';
 import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { Footer, Header, NavigationDrawer, ThemeToggleButton, Typography } from '@design-system';
 import * as S from '../shell.styles';
 
@@ -20,7 +20,7 @@ export function GuestLayout() {
   const handleMenuClick = useCallback(() => setDrawerOpen(true), []);
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);
   const handleSectionSelect = useCallback(
-    (section: LandingSection) => {
+    (section: LandingSectionEnum) => {
       setDrawerOpen(false);
       goToSection(section);
     },
@@ -28,7 +28,7 @@ export function GuestLayout() {
   );
 
   const logo = (
-    <RouterLink to={RoutePath.LANDING} aria-label="FateConnect">
+    <RouterLink to={RoutePathEnum.LANDING} aria-label="FateConnect">
       <Typography variant="logo" color="inherit">
         FateConnect
       </Typography>
@@ -69,7 +69,7 @@ export function GuestLayout() {
       </S.ShellContent>
 
       <Footer
-        anchorId={LandingSection.CONTACT}
+        anchorId={LandingSectionEnum.CONTACT}
         title={FOOTER_TITLE}
         contact={APP_CONTACT}
         copyrightLines={FOOTER_COPYRIGHT_LINES}

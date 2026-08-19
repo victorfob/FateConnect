@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router';
 
 import { useNotification } from '@app/hooks/useNotification';
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { login } from '@app/services/auth/authService';
 import type { ApiError } from '@app/services/httpClient';
 import { Button, IconButton, InputAdornment, TextField, Typography } from '@design-system';
@@ -45,7 +45,7 @@ export function LandingLoginCard() {
 
   // Chegando na landing pela âncora de login, o campo de e-mail recebe o foco.
   useEffect(() => {
-    if (hash !== `#${LandingSection.LOGIN}`) return;
+    if (hash !== `#${LandingSectionEnum.LOGIN}`) return;
 
     emailInputRef.current?.focus();
   }, [hash]);
@@ -56,7 +56,7 @@ export function LandingLoginCard() {
     meta: { notifiesErrorItself: true },
     onSuccess: (response) => {
       notifySuccess(welcomeMessage(response.nomeCompleto));
-      navigate(RoutePath.MENU);
+      navigate(RoutePathEnum.MENU);
     },
     onError: (error: ApiError) => {
       if (error.status === UNAUTHORIZED) {
@@ -135,7 +135,7 @@ export function LandingLoginCard() {
 
       <S.SignupRow component="p">
         <Typography variant="caption">{SIGNUP_PROMPT}</Typography>
-        <RouterLink to={RoutePath.SIGNUP}>
+        <RouterLink to={RoutePathEnum.SIGNUP}>
           <Typography variant="captionBold">{SIGNUP_LINK_LABEL}</Typography>
         </RouterLink>
       </S.SignupRow>

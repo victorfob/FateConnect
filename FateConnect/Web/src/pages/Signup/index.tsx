@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { Link as RouterLink, useNavigate } from 'react-router';
 
 import { useNotification } from '@app/hooks/useNotification';
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import type { ApiError } from '@app/services/httpClient';
 import { signup } from '@app/services/signup/signupService';
 import { Button, Typography } from '@design-system';
@@ -30,7 +30,7 @@ import * as S from './styles';
 const TITLE_ID = 'signup-title';
 const CONFLICT = 409;
 const BAD_REQUEST = 400;
-const LOGIN_ANCHOR = `${RoutePath.LANDING}#${LandingSection.LOGIN}`;
+const LOGIN_ANCHOR = `${RoutePathEnum.LANDING}#${LandingSectionEnum.LOGIN}`;
 
 function errorMessageFor(status?: number): string {
   if (status === CONFLICT) return SIGNUP_ERROR_MESSAGES.emailTaken;

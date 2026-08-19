@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
 import { deleteRide, listRides } from './ridesService';
-import { RideType } from './types';
+import { RideTypeEnum } from './types';
 
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
 
@@ -21,13 +21,13 @@ describe('ridesService', () => {
       destination: 'Sorocaba',
       departureDate: '2026-08-20',
       departureTime: '07:30',
-      rideType: RideType.EGALITARIAN,
+      rideType: RideTypeEnum.EGALITARIAN,
     });
 
     expect(received!.get('Destino')).toBe('Sorocaba');
     expect(received!.get('DataPartida')).toBe('2026-08-20');
     expect(received!.get('HoraPartida')).toBe('07:30');
-    expect(received!.get('TipoCarona')).toBe(RideType.EGALITARIAN);
+    expect(received!.get('TipoCarona')).toBe(RideTypeEnum.EGALITARIAN);
   });
 
   it('should omit parameters that were not filled in', async () => {

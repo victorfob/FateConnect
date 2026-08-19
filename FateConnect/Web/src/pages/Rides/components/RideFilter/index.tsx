@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import type { ChangeEvent, SubmitEvent } from 'react';
 
-import type { RideFilter as RideFilterValues, RideType } from '@app/services/rides/types';
+import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
 import {
   Button,
   DatePicker,
@@ -21,7 +21,7 @@ import {
   FILTER_SUBMIT_LABEL,
   RIDE_TYPE_HELP,
   RIDE_TYPE_OPTIONS,
-  RideTypeFilter,
+  RideTypeFilterEnum,
   TIME_PICKER_LABEL,
 } from './constants';
 import { toApiDate } from './helpers/toApiDate';
@@ -33,7 +33,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
   const [departureDate, setDepartureDate] = useState<Date | null>(null);
   const [departureTime, setDepartureTime] = useState('');
   const [destination, setDestination] = useState('');
-  const [rideType, setRideType] = useState<string>(RideTypeFilter.ALL);
+  const [rideType, setRideType] = useState<string>(RideTypeFilterEnum.ALL);
   const timeInputRef = useRef<HTMLInputElement>(null);
 
   const handleOpenTimePicker = useCallback(() => timeInputRef.current?.showPicker(), []);
@@ -59,7 +59,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
       if (departureDate) filters.departureDate = toApiDate(departureDate);
       if (departureTime) filters.departureTime = departureTime;
       if (destination.trim()) filters.destination = destination.trim();
-      if (rideType) filters.rideType = rideType as RideType;
+      if (rideType) filters.rideType = rideType as RideTypeEnum;
 
       onApply(filters);
     },

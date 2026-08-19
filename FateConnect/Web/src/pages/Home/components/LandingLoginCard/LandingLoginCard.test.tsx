@@ -3,7 +3,7 @@ import { RouterProvider, createMemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { LandingLoginCard } from '.';
 import { LOGIN_ERROR_MESSAGES, PASSWORD_TOGGLE_LABEL, SUBMIT_LABEL } from './constants';
@@ -11,11 +11,11 @@ import { LOGIN_MESSAGES } from './schema';
 
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
 
-function renderCard(initialPath: string = RoutePath.LANDING) {
+function renderCard(initialPath: string = RoutePathEnum.LANDING) {
   const router = createMemoryRouter(
     [
-      { path: RoutePath.LANDING, element: <LandingLoginCard /> },
-      { path: RoutePath.MENU, element: <div>menu</div> },
+      { path: RoutePathEnum.LANDING, element: <LandingLoginCard /> },
+      { path: RoutePathEnum.MENU, element: <div>menu</div> },
     ],
     { initialEntries: [initialPath] },
   );
@@ -82,7 +82,7 @@ describe('LandingLoginCard', () => {
     await userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
 
     expect(await screen.findByText('Bem-vindo(a), Fulano de Tal!')).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe(RoutePath.MENU);
+    expect(router.state.location.pathname).toBe(RoutePathEnum.MENU);
   });
 
   it('should report invalid credentials when the api answers unauthorized', async () => {
@@ -132,7 +132,7 @@ describe('LandingLoginCard', () => {
   });
 
   it('should focus the email field when the page is opened at the login anchor', async () => {
-    renderCard(`${RoutePath.LANDING}#${LandingSection.LOGIN}`);
+    renderCard(`${RoutePathEnum.LANDING}#${LandingSectionEnum.LOGIN}`);
 
     expect(screen.getByLabelText(/E-mail/)).toHaveFocus();
   });

@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { RideType } from '@app/services/rides/types';
+import { RideTypeEnum } from '@app/services/rides/types';
 import { parseRideType, rideTypeDisplayLabel, rideTypeTone } from './rideType';
 
 describe('parseRideType', () => {
   it.each([
-    ['Filantropica', RideType.PHILANTHROPIC],
-    ['filantropica', RideType.PHILANTHROPIC],
-    ['Igualitaria', RideType.EGALITARIAN],
-    ['igualitaria', RideType.EGALITARIAN],
+    ['Filantropica', RideTypeEnum.PHILANTHROPIC],
+    ['filantropica', RideTypeEnum.PHILANTHROPIC],
+    ['Igualitaria', RideTypeEnum.EGALITARIAN],
+    ['igualitaria', RideTypeEnum.EGALITARIAN],
   ])('should read %s as a canonical value', (raw, expected) => {
     expect(parseRideType(raw)).toBe(expected);
   });

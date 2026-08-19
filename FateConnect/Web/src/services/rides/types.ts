@@ -1,5 +1,5 @@
 /** Valores canônicos alinhados à serialização do backend. */
-export enum RideType {
+export enum RideTypeEnum {
   PHILANTHROPIC = 'Filantropica',
   EGALITARIAN = 'Igualitaria',
 }
@@ -12,7 +12,7 @@ export type Ride = {
   dataPartida: string;
   horaPartida: string;
   dataCadastro: string;
-  tipoCarona: RideType;
+  tipoCarona: RideTypeEnum;
   descricao: string;
   ativo: boolean;
 };
@@ -22,5 +22,5 @@ export type RideFilter = {
   destination?: string;
   departureDate?: string;
   departureTime?: string;
-  rideType?: RideType;
+  rideType?: RideTypeEnum;
 };

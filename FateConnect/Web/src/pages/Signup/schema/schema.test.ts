@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { formatBirthDate, latestBirthDate } from '../helpers/birthDate';
 import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from '.';
-import { GenderValue } from '../@types';
+import { GenderValueEnum } from '../@types';
 
 const ONE_DAY_MS = 86_400_000;
 
@@ -11,7 +11,7 @@ const VALID: SignupFormValues = {
   fullName: 'Maria Silva',
   fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
   birthDate: '22/05/1999',
-  gender: GenderValue.FEMALE,
+  gender: GenderValueEnum.FEMALE,
   password: 'segredo123',
   phone: '(11) 91234-5678',
   contactEmail: 'maria@exemplo.com',

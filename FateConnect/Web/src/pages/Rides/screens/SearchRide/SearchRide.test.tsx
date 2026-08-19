@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
-import { RideType } from '@app/services/rides/types';
+import { RideTypeEnum } from '@app/services/rides/types';
 import type { Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { SearchRide } from '.';
@@ -24,7 +24,7 @@ const RIDE: Ride = {
   dataPartida: '2026-05-22T00:00:00',
   horaPartida: '07:30:00',
   dataCadastro: '2026-05-01T00:00:00',
-  tipoCarona: RideType.PHILANTHROPIC,
+  tipoCarona: RideTypeEnum.PHILANTHROPIC,
   descricao: 'Saída do centro, com parada no terminal.',
   ativo: true,
 };

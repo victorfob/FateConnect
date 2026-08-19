@@ -1,4 +1,4 @@
-import { RideType } from '@app/services/rides/types';
+import { RideTypeEnum } from '@app/services/rides/types';
 
 export const FILTER_PANEL_TITLE = 'Filtros';
 export const FILTER_SUBMIT_LABEL = 'Filtrar';
@@ -18,12 +18,12 @@ export const RIDE_TYPE_HELP =
   'Filtrar por tipo de carona: Filantrópica, com caronas totalmente gratuitas, ou Igualitária, em que os participantes dividem os custos.';
 
 /** `ALL` é sentinela do formulário: não vai para a requisição. */
-export enum RideTypeFilter {
+export enum RideTypeFilterEnum {
   ALL = '',
 }
 
 export const RIDE_TYPE_OPTIONS: readonly { value: string; label: string }[] = [
-  { value: RideTypeFilter.ALL, label: 'Todas' },
-  { value: RideType.PHILANTHROPIC, label: 'Filantrópica' },
-  { value: RideType.EGALITARIAN, label: 'Igualitária' },
+  { value: RideTypeFilterEnum.ALL, label: 'Todas' },
+  { value: RideTypeEnum.PHILANTHROPIC, label: 'Filantrópica' },
+  { value: RideTypeEnum.EGALITARIAN, label: 'Igualitária' },
 ];

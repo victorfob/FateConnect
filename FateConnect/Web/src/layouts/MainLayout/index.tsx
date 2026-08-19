@@ -3,7 +3,7 @@ import { Link as RouterLink, Outlet } from 'react-router';
 
 import { APP_CONTACT, FOOTER_COPYRIGHT_LINES, FOOTER_TITLE } from '@app/constants/appContact';
 import { APP_LINKS } from '@app/constants/navigation';
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import {
   Button,
   Footer,
@@ -26,7 +26,7 @@ export function MainLayout() {
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);
 
   const logo = (
-    <RouterLink to={RoutePath.MENU} aria-label="FateConnect">
+    <RouterLink to={RoutePathEnum.MENU} aria-label="FateConnect">
       <Typography variant="logo" color="inherit">
         FateConnect
       </Typography>
@@ -60,7 +60,7 @@ export function MainLayout() {
       </S.ShellContent>
 
       <Footer
-        anchorId={LandingSection.CONTACT}
+        anchorId={LandingSectionEnum.CONTACT}
         title={FOOTER_TITLE}
         contact={APP_CONTACT}
         copyrightLines={FOOTER_COPYRIGHT_LINES}

@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router';
 
-import { RoutePath } from '@app/routes/paths';
+import { RoutePathEnum } from '@app/routes/paths';
 import { Typography } from '@design-system';
 import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
 
@@ -14,7 +14,7 @@ export function Rides() {
       <S.RidesHeader>
         <S.PageTitle variant="h1">{RIDES_TITLE}</S.PageTitle>
 
-        <S.BackButton component={NavLink} to={RoutePath.MENU}>
+        <S.BackButton component={NavLink} to={RoutePathEnum.MENU}>
           <ArrowBackIcon fontSize="small" />
           <Typography variant="subtitleBold" color="inherit">
             {BACK_LABEL}
@@ -23,14 +23,14 @@ export function Rides() {
       </S.RidesHeader>
 
       <S.TabList component="nav">
-        <S.Tab component={NavLink} to={RoutePath.RIDES_SEARCH} end>
+        <S.Tab component={NavLink} to={RoutePathEnum.RIDES_SEARCH} end>
           <SearchIcon fontSize="small" />
           <Typography variant="subtitleBold" color="inherit">
             {SEARCH_TAB_LABEL}
           </Typography>
         </S.Tab>
 
-        <S.Tab component={NavLink} to={RoutePath.RIDES_OFFER}>
+        <S.Tab component={NavLink} to={RoutePathEnum.RIDES_OFFER}>
           <AddIcon fontSize="small" />
           <Typography variant="subtitleBold" color="inherit">
             {OFFER_TAB_LABEL}

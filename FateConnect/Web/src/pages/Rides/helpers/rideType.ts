@@ -1,25 +1,25 @@
-import { RideType } from '@app/services/rides/types';
+import { RideTypeEnum } from '@app/services/rides/types';
 import type { StatusTagTone } from '@design-system';
 
-const LOWERCASE_TO_RIDE_TYPE: Readonly<Record<string, RideType>> = {
-  filantropica: RideType.PHILANTHROPIC,
-  igualitaria: RideType.EGALITARIAN,
+const LOWERCASE_TO_RIDE_TYPE: Readonly<Record<string, RideTypeEnum>> = {
+  filantropica: RideTypeEnum.PHILANTHROPIC,
+  igualitaria: RideTypeEnum.EGALITARIAN,
 };
 
-const RIDE_TYPE_LABEL: Readonly<Record<RideType, string>> = {
-  [RideType.PHILANTHROPIC]: 'Filantrópica',
-  [RideType.EGALITARIAN]: 'Igualitária',
+const RIDE_TYPE_LABEL: Readonly<Record<RideTypeEnum, string>> = {
+  [RideTypeEnum.PHILANTHROPIC]: 'Filantrópica',
+  [RideTypeEnum.EGALITARIAN]: 'Igualitária',
 };
 
-const RIDE_TYPE_TONE: Readonly<Record<RideType, StatusTagTone>> = {
-  [RideType.PHILANTHROPIC]: 'success',
-  [RideType.EGALITARIAN]: 'warning',
+const RIDE_TYPE_TONE: Readonly<Record<RideTypeEnum, StatusTagTone>> = {
+  [RideTypeEnum.PHILANTHROPIC]: 'success',
+  [RideTypeEnum.EGALITARIAN]: 'warning',
 };
 
 const UNKNOWN_LABEL = '—';
 
 /** Interpreta o valor da API (PascalCase) ou de query em minúsculas. */
-export function parseRideType(raw: string | null | undefined): RideType | null {
+export function parseRideType(raw: string | null | undefined): RideTypeEnum | null {
   if (!raw) return null;
 
   return LOWERCASE_TO_RIDE_TYPE[raw.trim().toLowerCase()] ?? null;

@@ -3,7 +3,7 @@ import { RouterProvider, createMemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { Signup } from '.';
 import {
@@ -34,10 +34,10 @@ const VALID_SIGNUP = {
 function renderSignup() {
   const router = createMemoryRouter(
     [
-      { path: RoutePath.SIGNUP, element: <Signup /> },
-      { path: RoutePath.LANDING, element: <div>landing</div> },
+      { path: RoutePathEnum.SIGNUP, element: <Signup /> },
+      { path: RoutePathEnum.LANDING, element: <div>landing</div> },
     ],
-    { initialEntries: [RoutePath.SIGNUP] },
+    { initialEntries: [RoutePathEnum.SIGNUP] },
   );
   render(<RouterProvider router={router} />);
 
@@ -252,8 +252,8 @@ describe('Signup', () => {
     await submit();
 
     expect(await screen.findByText(signupSuccessMessage('Maria Silva'))).toBeInTheDocument();
-    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePath.LANDING));
-    expect(router.state.location.hash).toBe(`#${LandingSection.LOGIN}`);
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING));
+    expect(router.state.location.hash).toBe(`#${LandingSectionEnum.LOGIN}`);
   });
 
   it('should send the payload in the contract the backend expects', async () => {

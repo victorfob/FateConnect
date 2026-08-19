@@ -4,14 +4,14 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
 import { routeConfig } from '@app/routes/routeConfig';
-import { RoutePath } from '@app/routes/paths';
+import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
 import { BACK_LABEL, OFFER_TAB_LABEL, RIDES_TITLE, SEARCH_TAB_LABEL } from './constants';
 import { OFFER_TITLE } from './screens/OfferRide/constants';
 
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
 
-function renderRides(initialPath: string = RoutePath.RIDES_SEARCH) {
+function renderRides(initialPath: string = RoutePathEnum.RIDES_SEARCH) {
   const router = createMemoryRouter(routeConfig, { initialEntries: [initialPath] });
   render(<RouterProvider router={router} />);
 
@@ -27,7 +27,10 @@ describe('Rides', () => {
     renderRides();
 
     expect(screen.getByRole('heading', { name: RIDES_TITLE })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: BACK_LABEL })).toHaveAttribute('href', RoutePath.MENU);
+    expect(screen.getByRole('link', { name: BACK_LABEL })).toHaveAttribute(
+      'href',
+      RoutePathEnum.MENU,
+    );
   });
 
   it('should mark the current tab for assistive technology', () => {
@@ -45,13 +48,13 @@ describe('Rides', () => {
 
     await userEvent.click(screen.getByRole('link', { name: OFFER_TAB_LABEL }));
 
-    expect(router.state.location.pathname).toBe(RoutePath.RIDES_OFFER);
+    expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES_OFFER);
     expect(await screen.findByRole('heading', { name: OFFER_TITLE })).toBeInTheDocument();
   });
 
   it('should send the bare rides path to the search screen', () => {
-    const router = renderRides(RoutePath.RIDES);
+    const router = renderRides(RoutePathEnum.RIDES);
 
-    expect(router.state.location.pathname).toBe(RoutePath.RIDES_SEARCH);
+    expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES_SEARCH);
   });
 });
