@@ -1,9 +1,13 @@
-import { Drawer, List, colorTokens, styled } from '@design-system';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+
+import { styled } from '../../styled';
+import { colorTokens } from '../../tokens';
 
 /** Largura do menu lateral no produto. */
 const DRAWER_WIDTH_PX = 300;
 
-/** Recuo do conteúdo dentro do menu, em `vw`, como no original. */
+/** Recuos do conteúdo dentro do menu, em `vw`, como no original. */
 const DRAWER_VERTICAL_PADDING = '7vw';
 const LOGO_INSET = '3vw';
 
@@ -44,9 +48,7 @@ export const DrawerList = styled(List)({
     paddingLeft: `${ITEM_INLINE_PADDING_PX}px`,
     paddingRight: `${ITEM_INLINE_PADDING_PX}px`,
   },
-  '& .MuiListItemButton-root:hover': {
-    backgroundColor: colorTokens.surfaceHover,
-  },
+  '& .MuiListItemButton-root:hover': { backgroundColor: colorTokens.surfaceHover },
   '& .MuiListItemText-primary': {
     color: colorTokens.textOnAccent,
     fontSize: '1rem',

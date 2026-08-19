@@ -1,5 +1,4 @@
-import { HEADER_HEIGHT_PX } from '@app/components/Header/styles';
-import { styled } from '@design-system';
+import { HEADER_HEIGHT_PX, styled } from '@design-system';
 
 /**
  * Casca comum às duas rotas. O topo é fixo, então o conteúdo reserva a altura

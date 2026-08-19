@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 
-import type { LandingSection } from '@app/routes/paths';
 import { ListItemButton, ListItemText } from '@design-system';
+
+import type { LandingSection } from '@app/routes/paths';
 
 type DrawerSectionItemProps = {
   section: LandingSection;

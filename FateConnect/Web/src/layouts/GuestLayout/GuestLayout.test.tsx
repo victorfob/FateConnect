@@ -52,4 +52,21 @@ describe('GuestLayout', () => {
     expect(router.state.location.hash).toBe('');
     expect(document.getElementById(LandingSection.SERVICES)).not.toBeInTheDocument();
   });
+
+  it('should point the logo to the landing page', () => {
+    renderLayout();
+
+    expect(screen.getAllByRole('link', { name: 'FateConnect' })[0]).toHaveAttribute(
+      'href',
+      RoutePath.LANDING,
+    );
+  });
+
+  it('should navigate to the landing section when a header button is clicked', async () => {
+    const router = renderLayout();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Serviços' }));
+
+    expect(router.state.location.hash).toBe('');
+  });
 });

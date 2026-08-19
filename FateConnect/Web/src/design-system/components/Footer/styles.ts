@@ -1,11 +1,13 @@
-import { colorTokens, mobileMedia, spacing, spacingScale, styled } from '@design-system';
+import { styled } from '../../styled';
+import { colorTokens, mobileMedia, spacingScale } from '../../tokens';
+import { spacing } from '../../theme/helpers/spacing';
 
-const { md } = spacingScale;
+const { md, xs } = spacingScale;
 
 /**
  * Porte fiel do rodapé do produto: linha no desktop (contatos à esquerda,
  * assinatura à direita, divisor vertical entre eles) e coluna centralizada
- * abaixo de 768px. Paddings em `vw`, como no original.
+ * abaixo do breakpoint mobile. Paddings em `vw`, como no original.
  */
 export const FooterRoot = styled('footer')({
   display: 'flex',
@@ -31,16 +33,14 @@ export const ContactsContainer = styled('div')({
   gap: spacing(md),
   width: '100%',
 
-  [mobileMedia]: {
-    alignItems: 'center',
-  },
+  [mobileMedia]: { alignItems: 'center' },
 });
 
 export const ContactItem = styled('div')({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: spacing(spacingScale.xs),
+  gap: spacing(xs),
 });
 
 /** Vertical no desktop, horizontal no mobile. */
@@ -49,10 +49,7 @@ export const FooterDivider = styled('div')({
   height: 'auto',
   backgroundColor: colorTokens.divider,
 
-  [mobileMedia]: {
-    width: '100%',
-    height: '1px',
-  },
+  [mobileMedia]: { width: '100%', height: '1px' },
 });
 
 export const CopyrightContainer = styled('div')({
@@ -63,7 +60,5 @@ export const CopyrightContainer = styled('div')({
   gap: spacing(md),
   width: '100%',
 
-  [mobileMedia]: {
-    alignItems: 'center',
-  },
+  [mobileMedia]: { alignItems: 'center' },
 });

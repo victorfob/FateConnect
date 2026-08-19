@@ -7,6 +7,11 @@
 export * from './ui';
 export { styled, css, keyframes } from './styled';
 
+export { Header } from './components/Header';
+export { HEADER_HEIGHT_PX } from './components/Header/styles';
+export { Footer } from './components/Footer';
+export { NavigationDrawer } from './components/NavigationDrawer';
+
 export { ThemeProvider } from './ThemeProvider';
 export { GlobalStyles } from './GlobalStyles';
 export { createAppTheme, spacing, radius, components } from './theme';
