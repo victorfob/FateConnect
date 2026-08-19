@@ -4,14 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
 import { LandingSection, RoutePath } from '@app/routes/paths';
-import { render, screen, userEvent } from '@app/test/testing-library';
+import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { LandingLoginCard } from '.';
-import {
-  LOGIN_ERROR_MESSAGES,
-  PASSWORD_TOGGLE_LABEL,
-  SUBMIT_LABEL,
-  SUBMIT_LOADING_LABEL,
-} from './constants';
+import { LOGIN_ERROR_MESSAGES, PASSWORD_TOGGLE_LABEL, SUBMIT_LABEL } from './constants';
 import { LOGIN_MESSAGES } from './schema';
 
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
@@ -110,7 +105,7 @@ describe('LandingLoginCard', () => {
     expect(await screen.findByText(LOGIN_ERROR_MESSAGES.generic)).toBeInTheDocument();
   });
 
-  it('should show the loading label while the request is in flight', async () => {
+  it('should show the loading indicator while the request is in flight', async () => {
     // A resposta só chega quando o teste soltar: espera por tempo torna o caso
     // instável, porque a requisição pode terminar antes da verificação.
     let respond: VoidFunction = () => {};
@@ -129,7 +124,9 @@ describe('LandingLoginCard', () => {
 
     await userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
 
-    expect(await screen.findByRole('button', { name: SUBMIT_LOADING_LABEL })).toBeDisabled();
+    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
+    await waitFor(() => expect(submitButton).toBeDisabled());
+    expect(within(submitButton).getByRole('progressbar')).toBeInTheDocument();
 
     respond();
   });

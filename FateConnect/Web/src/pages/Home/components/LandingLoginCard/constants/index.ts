@@ -2,7 +2,6 @@ export const LOGIN_CARD_TITLE = 'Acesse sua conta';
 export const EMAIL_LABEL = 'E-mail';
 export const PASSWORD_LABEL = 'Senha';
 export const SUBMIT_LABEL = 'Entrar';
-export const SUBMIT_LOADING_LABEL = 'Entrando...';
 export const PASSWORD_TOGGLE_LABEL = 'Mostrar ou ocultar senha';
 export const SIGNUP_PROMPT = 'Não tem conta?';
 export const SIGNUP_LINK_LABEL = 'Cadastre-se';
