@@ -8,7 +8,7 @@ import { LANDING_LINKS } from '@app/constants/navigation';
 import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
 import { LandingSection, RoutePath } from '@app/routes/paths';
 import { Footer, Header, NavigationDrawer, Typography } from '@design-system';
-import { ShellContent, ShellRoot } from '../shell.styles';
+import * as S from '../shell.styles';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
@@ -36,7 +36,7 @@ export function GuestLayout() {
   );
 
   return (
-    <ShellRoot>
+    <S.ShellRoot>
       <Header
         logo={logo}
         menuButtonLabel={MENU_BUTTON_LABEL}
@@ -63,9 +63,9 @@ export function GuestLayout() {
         ))}
       </NavigationDrawer>
 
-      <ShellContent>
+      <S.ShellContent>
         <Outlet />
-      </ShellContent>
+      </S.ShellContent>
 
       <Footer
         anchorId={LandingSection.CONTACT}
@@ -73,6 +73,6 @@ export function GuestLayout() {
         contact={APP_CONTACT}
         copyrightLines={FOOTER_COPYRIGHT_LINES}
       />
-    </ShellRoot>
+    </S.ShellRoot>
   );
 }

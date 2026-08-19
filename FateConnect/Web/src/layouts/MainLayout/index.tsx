@@ -13,7 +13,7 @@ import {
   NavigationDrawer,
   Typography,
 } from '@design-system';
-import { ShellContent, ShellRoot } from '../shell.styles';
+import * as S from '../shell.styles';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
@@ -33,7 +33,7 @@ export function MainLayout() {
   );
 
   return (
-    <ShellRoot>
+    <S.ShellRoot>
       <Header
         logo={logo}
         menuButtonLabel={MENU_BUTTON_LABEL}
@@ -53,9 +53,9 @@ export function MainLayout() {
         ))}
       </NavigationDrawer>
 
-      <ShellContent>
+      <S.ShellContent>
         <Outlet />
-      </ShellContent>
+      </S.ShellContent>
 
       <Footer
         anchorId={LandingSection.CONTACT}
@@ -63,6 +63,6 @@ export function MainLayout() {
         contact={APP_CONTACT}
         copyrightLines={FOOTER_COPYRIGHT_LINES}
       />
-    </ShellRoot>
+    </S.ShellRoot>
   );
 }

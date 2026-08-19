@@ -3,13 +3,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import Typography from '@mui/material/Typography';
 
-import {
-  ContactItem,
-  ContactsContainer,
-  CopyrightContainer,
-  FooterDivider,
-  FooterRoot,
-} from './styles';
+import * as S from './styles';
 
 type FooterProps = {
   /** Id da âncora usada pela navegação da aplicação. */
@@ -21,33 +15,33 @@ type FooterProps = {
 
 export function Footer({ anchorId, title, contact, copyrightLines }: FooterProps) {
   return (
-    <FooterRoot>
-      <ContactsContainer id={anchorId}>
+    <S.FooterRoot>
+      <S.ContactsContainer id={anchorId}>
         <Typography variant="h2">{title}</Typography>
 
-        <ContactItem>
+        <S.ContactItem>
           <EmailIcon fontSize="small" />
           <Typography variant="caption">{contact.email}</Typography>
-        </ContactItem>
-        <ContactItem>
+        </S.ContactItem>
+        <S.ContactItem>
           <PhoneIcon fontSize="small" />
           <Typography variant="caption">{contact.phone}</Typography>
-        </ContactItem>
-        <ContactItem>
+        </S.ContactItem>
+        <S.ContactItem>
           <LocationOnIcon fontSize="small" />
           <Typography variant="caption">{contact.address}</Typography>
-        </ContactItem>
-      </ContactsContainer>
+        </S.ContactItem>
+      </S.ContactsContainer>
 
-      <FooterDivider />
+      <S.FooterDivider />
 
-      <CopyrightContainer>
+      <S.CopyrightContainer>
         {copyrightLines.map((line) => (
           <Typography key={line} variant="caption">
             {line}
           </Typography>
         ))}
-      </CopyrightContainer>
-    </FooterRoot>
+      </S.CopyrightContainer>
+    </S.FooterRoot>
   );
 }

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 
-import { DesktopNav, HeaderBar, HeaderToolbar, LogoSlot, MenuButtonSlot } from './styles';
+import * as S from './styles';
 
 type HeaderProps = {
   /** Marca à esquerda. A aplicação decide para onde ela navega. */
@@ -20,18 +20,18 @@ type HeaderProps = {
  */
 export function Header({ logo, navigation, onMenuClick, menuButtonLabel }: HeaderProps) {
   return (
-    <HeaderBar position="fixed">
-      <HeaderToolbar disableGutters>
-        <LogoSlot>{logo}</LogoSlot>
+    <S.HeaderBar position="fixed">
+      <S.HeaderToolbar disableGutters>
+        <S.LogoSlot>{logo}</S.LogoSlot>
 
-        <DesktopNav>{navigation}</DesktopNav>
+        <S.DesktopNav>{navigation}</S.DesktopNav>
 
-        <MenuButtonSlot>
+        <S.MenuButtonSlot>
           <IconButton color="inherit" aria-label={menuButtonLabel} onClick={onMenuClick}>
             <MenuIcon />
           </IconButton>
-        </MenuButtonSlot>
-      </HeaderToolbar>
-    </HeaderBar>
+        </S.MenuButtonSlot>
+      </S.HeaderToolbar>
+    </S.HeaderBar>
   );
 }

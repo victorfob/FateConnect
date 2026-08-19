@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { DrawerHeader, DrawerList, DrawerRoot } from './styles';
+import * as S from './styles';
 
 type NavigationDrawerProps = {
   open: boolean;
@@ -12,9 +12,9 @@ type NavigationDrawerProps = {
 /** Menu lateral. Quem usa monta o cabeçalho e os itens. */
 export function NavigationDrawer({ open, onClose, header, children }: NavigationDrawerProps) {
   return (
-    <DrawerRoot anchor="right" open={open} onClose={onClose}>
-      <DrawerHeader>{header}</DrawerHeader>
-      <DrawerList>{children}</DrawerList>
-    </DrawerRoot>
+    <S.DrawerRoot anchor="right" open={open} onClose={onClose}>
+      <S.DrawerHeader>{header}</S.DrawerHeader>
+      <S.DrawerList>{children}</S.DrawerList>
+    </S.DrawerRoot>
   );
 }
