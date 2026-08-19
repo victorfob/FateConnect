@@ -111,9 +111,16 @@ describe('LandingLoginCard', () => {
   });
 
   it('should show the loading label while the request is in flight', async () => {
+    // A resposta só chega quando o teste soltar: espera por tempo torna o caso
+    // instável, porque a requisição pode terminar antes da verificação.
+    let respond: VoidFunction = () => {};
+    const held = new Promise<void>((resolve) => {
+      respond = resolve;
+    });
     server.use(
       http.post(LOGIN_URL, async () => {
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        await held;
+
         return HttpResponse.json({ token: 'abc', nomeCompleto: 'Fulano' });
       }),
     );
@@ -123,6 +130,8 @@ describe('LandingLoginCard', () => {
     await userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
 
     expect(await screen.findByRole('button', { name: SUBMIT_LOADING_LABEL })).toBeDisabled();
+
+    respond();
   });
 
   it('should focus the email field when the page is opened at the login anchor', async () => {
