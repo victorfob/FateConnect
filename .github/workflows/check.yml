@@ -37,7 +37,8 @@ jobs:
       - name: Lint
         run: yarn lint
 
-      - name: Testes
+      # `test:ci` roda com cobertura e reprova abaixo do limite definido em vite.config.ts.
+      - name: Testes e cobertura
         run: yarn test:ci
 
       - name: Build

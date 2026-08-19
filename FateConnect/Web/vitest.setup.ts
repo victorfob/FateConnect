@@ -6,3 +6,6 @@ process.env.TZ = 'America/Sao_Paulo';
 if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = function scrollIntoView() {};
 }
+
+// jsdom não implementa scrollTo; o ScrollRestoration do roteador o chama a cada navegação.
+window.scrollTo = () => {};
