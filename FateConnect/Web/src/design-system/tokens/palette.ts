@@ -26,7 +26,10 @@ export const colorTokens = {
   dangerText: '#CF2E2E',
   dangerBackground: '#FFDFDF',
 
-  divider: 'rgba(255, 255, 255, 0.5)',
+  /** Divisor sobre superfície neutra — linha do formulário de cadastro. */
+  divider: '#D9D9D9',
+  /** Divisor sobre o cromo colorido (rodapé), onde a linha precisa ser clara. */
+  chromeDivider: 'rgba(255, 255, 255, 0.5)',
 };
 
 /** Sombra padrão de componente elevado. */

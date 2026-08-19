@@ -14,6 +14,7 @@ export { Footer } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
 
 export { ThemeProvider } from './ThemeProvider';
+export { DateLocalizationProvider } from './DateLocalizationProvider';
 export { useThemeMode } from './ThemeProvider/context/ThemeModeContext';
 export { ThemeToggleButton } from './components/ThemeToggleButton';
 export { GlobalStyles } from './GlobalStyles';
@@ -30,5 +31,6 @@ export {
   TABLET_MAX_WIDTH_PX,
   mobileMedia,
   tabletMedia,
+  desktopMedia,
 } from './tokens';
 export type { SpacingToken, RadiusToken, TypographyToken } from './tokens';
