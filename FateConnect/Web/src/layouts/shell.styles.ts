@@ -1,19 +1,20 @@
 import { styled } from '@mui/material/styles';
 
-import { spacingScale } from '@ds';
+import { HEADER_HEIGHT_PX } from '@app/components/Header/styles';
 
-const { none } = spacingScale;
-
-/** Casca comum aos dois layouts: ocupa a altura toda e empilha topo, conteúdo e rodapé. */
+/**
+ * Casca comum às duas rotas. O topo é fixo, então o conteúdo reserva a altura
+ * dele — mesmo comportamento do produto.
+ */
 export const ShellRoot = styled('div')({
-  minHeight: '100%',
+  minHeight: '100vh',
+  paddingTop: `${HEADER_HEIGHT_PX}px`,
   display: 'flex',
   flexDirection: 'column',
 });
 
-export const ShellContent = styled('main')(({ theme }) => ({
-  flex: 1,
+export const ShellContent = styled('main')({
   display: 'flex',
+  flex: 1,
   flexDirection: 'column',
-  padding: theme.spacing(none),
-}));
+});

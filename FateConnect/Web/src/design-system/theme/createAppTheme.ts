@@ -4,7 +4,6 @@ import { ptBR as pickersPtBR } from '@mui/x-date-pickers/locales';
 
 import { colorTokens, fontFamily, typographyTokens } from '../tokens';
 import { components } from './components';
-import { spacing } from './helpers/spacing';
 
 /** Acima deste ponto o `h1` usa o tamanho cheio; abaixo, o reduzido. */
 const NARROW_BREAKPOINT = 'sm';
@@ -39,7 +38,6 @@ export function createAppTheme(): Theme {
 
   return createTheme(
     {
-      spacing,
       components,
       palette: {
         primary: { main: colorTokens.primary, contrastText: colorTokens.textOnAccent },

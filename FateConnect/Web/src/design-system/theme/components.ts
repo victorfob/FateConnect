@@ -7,35 +7,19 @@ import { radius } from './helpers/radius';
 export const components: Components<Theme> = {
   MuiButton: {
     defaultProps: { disableElevation: true },
-    styleOverrides: {
-      root: {
-        textTransform: 'none',
-        borderRadius: radius(radiusScale.component),
-      },
-    },
+    styleOverrides: { root: { textTransform: 'none' } },
   },
   MuiCard: {
     styleOverrides: {
-      root: {
-        borderRadius: radius(radiusScale.lg),
-        boxShadow: shadowTokens.component,
-      },
+      root: { borderRadius: radius(radiusScale.lg), boxShadow: shadowTokens.component },
     },
   },
   MuiOutlinedInput: {
-    styleOverrides: {
-      root: { borderRadius: radius(radiusScale.component) },
-    },
+    styleOverrides: { root: { borderRadius: radius(radiusScale.component) } },
   },
-  MuiDialog: {
-    styleOverrides: {
-      paper: { borderRadius: radius(radiusScale.lg) },
-    },
-  },
+  MuiDialog: { styleOverrides: { paper: { borderRadius: radius(radiusScale.lg) } } },
   MuiAppBar: {
     defaultProps: { elevation: 0 },
-    styleOverrides: {
-      root: { backgroundColor: colorTokens.primary },
-    },
+    styleOverrides: { root: { backgroundColor: colorTokens.primary } },
   },
 };
