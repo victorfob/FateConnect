@@ -21,8 +21,8 @@
     "noUncheckedIndexedAccess": true,
 
     "paths": {
-      "@ds": ["./src/design-system/index.ts"],
-      "@ds/*": ["./src/design-system/*"],
+      "@design-system": ["./src/design-system/index.ts"],
+      "@design-system/*": ["./src/design-system/*"],
       "@app/*": ["./src/*"]
     }
   },

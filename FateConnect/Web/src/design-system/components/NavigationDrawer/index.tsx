@@ -9,7 +9,7 @@ type NavigationDrawerProps = {
   children: ReactNode;
 };
 
-/** Menu lateral das duas cascas. Cada layout monta os próprios itens. */
+/** Menu lateral. Quem usa monta o cabeçalho e os itens. */
 export function NavigationDrawer({ open, onClose, header, children }: NavigationDrawerProps) {
   return (
     <DrawerRoot anchor="right" open={open} onClose={onClose}>

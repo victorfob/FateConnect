@@ -43,4 +43,13 @@ describe('MainLayout', () => {
 
     expect(router.state.location.pathname).toBe(RoutePath.RIDES);
   });
+
+  it('should point the logo to the menu', () => {
+    renderLayout();
+
+    expect(screen.getAllByRole('link', { name: 'FateConnect' })[0]).toHaveAttribute(
+      'href',
+      RoutePath.MENU,
+    );
+  });
 });

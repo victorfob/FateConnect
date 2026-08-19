@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@ds': fileURLToPath(new URL('./src/design-system', import.meta.url)),
+      '@design-system': fileURLToPath(new URL('./src/design-system', import.meta.url)),
       '@app': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },

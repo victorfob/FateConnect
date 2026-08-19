@@ -1,7 +1,7 @@
-import Button from '@mui/material/Button';
 import { useCallback } from 'react';
 
 import type { LandingSection } from '@app/routes/paths';
+import { Button } from '@design-system';
 
 type LandingNavButtonProps = {
   section: LandingSection;

@@ -1,7 +1,7 @@
 import { SnackbarProvider } from 'notistack';
 import type { ReactNode } from 'react';
 
-import { ThemeProvider } from '@ds';
+import { ThemeProvider } from '@design-system';
 import { NOTIFICATION_AUTO_HIDE_MS } from '@app/hooks/useNotification';
 import { QueryProvider } from './QueryProvider';
 
