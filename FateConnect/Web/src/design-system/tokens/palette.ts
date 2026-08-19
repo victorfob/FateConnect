@@ -3,6 +3,13 @@ export const colorTokens = {
   primary: '#43545C',
   accent: '#CF2E2E',
 
+  /**
+   * Vermelho do botão de acesso na landing. **Não é o acento do produto.**
+   * O front atual usa a paleta `warn` do Material sem configurá-la, então herda
+   * o vermelho padrão da biblioteca. Mantido aqui por paridade visual.
+   */
+  inheritedWarn: '#F44336',
+
   surfaceGray: '#F0F2F4',
   surfaceWhite: '#FFFFFF',
   surfaceHover: 'rgba(255, 255, 255, 0.6)',
