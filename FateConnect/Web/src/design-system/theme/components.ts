@@ -8,10 +8,8 @@ export const components: Components<Theme> = {
   MuiButton: {
     defaultProps: { disableElevation: true },
     styleOverrides: {
-      root: {
-        textTransform: 'none',
-        borderRadius: radius(radiusScale.component),
-      },
+      // Sem override de raio: o produto usa o padrão do Material nos botões.
+      root: { textTransform: 'none' },
     },
   },
   MuiCard: {
