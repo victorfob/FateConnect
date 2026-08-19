@@ -1,20 +1,10 @@
 import { useCallback, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import {
-  IconButton,
-  InputAdornment,
-  TextField,
-  VisibilityIcon,
-  VisibilityOffIcon,
-} from '@design-system';
+import { IconButton, InputAdornment, TextField } from '@design-system';
+import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
-import {
-  FIELD_LABELS,
-  FIELD_PLACEHOLDERS,
-  GENDER_OPTIONS,
-  PASSWORD_TOGGLE_LABEL,
-} from '../../constants';
+import * as C from '../../constants';
 import type { SignupFormValues } from '../../schema';
 import * as S from '../../styles';
 import { BirthDateField } from '../BirthDateField';
@@ -35,7 +25,7 @@ export function AccountSection() {
       <S.FullWidthCell>
         <TextField
           {...register('fullName')}
-          label={FIELD_LABELS.fullName}
+          label={C.FIELD_LABELS.fullName}
           required
           fullWidth
           type="text"
@@ -48,7 +38,7 @@ export function AccountSection() {
       <S.ThirdWidthCell>
         <TextField
           {...register('nickname')}
-          label={FIELD_LABELS.nickname}
+          label={C.FIELD_LABELS.nickname}
           fullWidth
           type="text"
           autoComplete="nickname"
@@ -58,12 +48,12 @@ export function AccountSection() {
       <S.ThirdWidthCell>
         <TextField
           {...register('fatecEmail')}
-          label={FIELD_LABELS.fatecEmail}
+          label={C.FIELD_LABELS.fatecEmail}
           required
           fullWidth
           type="email"
           autoComplete="work email"
-          placeholder={FIELD_PLACEHOLDERS.fatecEmail}
+          placeholder={C.FIELD_PLACEHOLDERS.fatecEmail}
           error={Boolean(errors.fatecEmail)}
           helperText={errors.fatecEmail?.message}
         />
@@ -76,8 +66,8 @@ export function AccountSection() {
       <S.ThirdWidthCell>
         <SelectField
           name="gender"
-          label={FIELD_LABELS.gender}
-          options={GENDER_OPTIONS}
+          label={C.FIELD_LABELS.gender}
+          options={C.GENDER_OPTIONS}
           autoComplete="sex"
           required
         />
@@ -86,7 +76,7 @@ export function AccountSection() {
       <S.ThirdWidthCell>
         <TextField
           {...register('password')}
-          label={FIELD_LABELS.password}
+          label={C.FIELD_LABELS.password}
           required
           fullWidth
           type={passwordHidden ? 'password' : 'text'}
@@ -99,7 +89,7 @@ export function AccountSection() {
                 <InputAdornment position="end">
                   <IconButton
                     type="button"
-                    aria-label={PASSWORD_TOGGLE_LABEL}
+                    aria-label={C.PASSWORD_TOGGLE_LABEL}
                     aria-pressed={!passwordHidden}
                     onClick={handleTogglePassword}
                   >

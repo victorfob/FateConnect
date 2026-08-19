@@ -2,12 +2,12 @@ import type { ReactNode } from 'react';
 
 import * as S from './styles';
 
-type NavigationDrawerProps = {
+type NavigationDrawerProps = Readonly<{
   open: boolean;
   onClose: VoidFunction;
   header: ReactNode;
   children: ReactNode;
-};
+}>;
 
 /** Menu lateral. Quem usa monta o cabeçalho e os itens. */
 export function NavigationDrawer({ open, onClose, header, children }: NavigationDrawerProps) {

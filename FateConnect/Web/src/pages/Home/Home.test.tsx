@@ -1,7 +1,7 @@
 import { RouterProvider, createMemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, within } from '@app/test/testing-library';
 import { Home } from '.';
 import {
@@ -12,8 +12,8 @@ import { HOW_IT_WORKS_STEPS, HOW_IT_WORKS_TITLE } from './components/LandingHowI
 import { SERVICE_CARDS, SERVICES_TITLE } from './components/LandingServices/constants';
 
 function renderHome() {
-  const router = createMemoryRouter([{ path: RoutePath.LANDING, element: <Home /> }], {
-    initialEntries: [RoutePath.LANDING],
+  const router = createMemoryRouter([{ path: RoutePathEnum.LANDING, element: <Home /> }], {
+    initialEntries: [RoutePathEnum.LANDING],
   });
   render(<RouterProvider router={router} />);
 }
@@ -53,7 +53,11 @@ describe('Home', () => {
   it('should expose the anchors targeted by the header navigation', () => {
     renderHome();
 
-    [LandingSection.SERVICES, LandingSection.HOW_IT_WORKS, LandingSection.LOGIN].forEach((id) => {
+    [
+      LandingSectionEnum.SERVICES,
+      LandingSectionEnum.HOW_IT_WORKS,
+      LandingSectionEnum.LOGIN,
+    ].forEach((id) => {
       expect(document.getElementById(id)).toBeInTheDocument();
     });
   });

@@ -8,7 +8,7 @@ type ExternallyFilledField = Extract<
   'birthDate' | 'zipCode' | 'street' | 'city'
 >;
 
-type FloatingLabelProps = { shrink?: true };
+type FloatingLabelProps = Readonly<{ shrink?: true }>;
 
 /**
  * Mantém o rótulo no alto quando o valor chega de fora — preenchimento por CEP

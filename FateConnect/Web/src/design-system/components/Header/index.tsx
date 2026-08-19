@@ -5,7 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 import * as S from './styles';
 
-type HeaderProps = {
+type HeaderProps = Readonly<{
   /** Marca à esquerda. A aplicação decide para onde ela navega. */
   logo: ReactNode;
   /** Navegação exibida acima do breakpoint mobile. */
@@ -14,7 +14,7 @@ type HeaderProps = {
   actions?: ReactNode;
   onMenuClick: VoidFunction;
   menuButtonLabel: string;
-};
+}>;
 
 /**
  * Cromo do topo: barra fixa, faixa de navegação responsiva e botão de menu.

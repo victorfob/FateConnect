@@ -2,13 +2,13 @@ import { useCallback } from 'react';
 
 import { ListItemButton, ListItemText } from '@design-system';
 
-import type { LandingSection } from '@app/routes/paths';
+import type { LandingSectionEnum } from '@app/routes/paths';
 
-type DrawerSectionItemProps = {
-  section: LandingSection;
+type DrawerSectionItemProps = Readonly<{
+  section: LandingSectionEnum;
   label: string;
-  onSelect: (section: LandingSection) => void;
-};
+  onSelect: (section: LandingSectionEnum) => void;
+}>;
 
 /** Item do menu lateral que rola até uma seção da landing. */
 export function DrawerSectionItem({ section, label, onSelect }: DrawerSectionItemProps) {

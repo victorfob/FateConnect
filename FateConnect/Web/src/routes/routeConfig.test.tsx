@@ -1,9 +1,13 @@
+import { http, HttpResponse } from 'msw';
 import { RouterProvider, createMemoryRouter } from 'react-router';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+
+import { server } from '@app/mocks/server';
 
 import { render, screen } from '@app/test/testing-library';
+import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
-import { RoutePath } from './paths';
+import { RoutePathEnum } from './paths';
 import { routeConfig } from './routeConfig';
 
 function renderRoute(initialPath: string) {
@@ -14,14 +18,19 @@ function renderRoute(initialPath: string) {
 }
 
 describe('routeConfig', () => {
+  // A tela de busca lista caronas assim que monta.
+  beforeEach(() => {
+    server.use(http.get('https://rides.fateconnect.test/caronas', () => HttpResponse.json([])));
+  });
+
   it.each([
-    [RoutePath.LANDING, 'Conectando a Comunidade Acadêmica'],
-    [RoutePath.SIGNUP, SIGNUP_TITLE],
-    [RoutePath.MENU, 'Menu'],
-    [RoutePath.LOST_AND_FOUND, 'Achados e Perdidos'],
-    [RoutePath.CONTACT, 'Contato'],
-    [RoutePath.RIDES_SEARCH, 'Buscar carona'],
-    [RoutePath.RIDES_OFFER, 'Ofertar carona'],
+    [RoutePathEnum.LANDING, 'Conectando a Comunidade Acadêmica'],
+    [RoutePathEnum.SIGNUP, SIGNUP_TITLE],
+    [RoutePathEnum.MENU, 'Menu'],
+    [RoutePathEnum.LOST_AND_FOUND, 'Achados e Perdidos'],
+    [RoutePathEnum.CONTACT, 'Contato'],
+    [RoutePathEnum.RIDES_SEARCH, RIDES_TITLE],
+    [RoutePathEnum.RIDES_OFFER, RIDES_TITLE],
   ])('should resolve %s', (path, title) => {
     renderRoute(path);
 
@@ -29,20 +38,20 @@ describe('routeConfig', () => {
   });
 
   it('should redirect the root path to the landing page', () => {
-    const router = renderRoute(RoutePath.ROOT);
+    const router = renderRoute(RoutePathEnum.ROOT);
 
-    expect(router.state.location.pathname).toBe(RoutePath.LANDING);
+    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
   });
 
   it('should redirect /caronas to the search screen', () => {
-    const router = renderRoute(RoutePath.RIDES);
+    const router = renderRoute(RoutePathEnum.RIDES);
 
-    expect(router.state.location.pathname).toBe(RoutePath.RIDES_SEARCH);
+    expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES_SEARCH);
   });
 
   it('should send an unknown route to the landing page', () => {
     const router = renderRoute('/rota-que-nao-existe');
 
-    expect(router.state.location.pathname).toBe(RoutePath.LANDING);
+    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
   });
 });

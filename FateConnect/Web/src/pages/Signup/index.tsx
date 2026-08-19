@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { Link as RouterLink, useNavigate } from 'react-router';
 
 import { useNotification } from '@app/hooks/useNotification';
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import type { ApiError } from '@app/services/httpClient';
 import { signup } from '@app/services/signup/signupService';
 import { Button, Typography } from '@design-system';
@@ -13,16 +13,7 @@ import { AccountSection } from './components/AccountSection';
 import { AddressSection } from './components/AddressSection';
 import { ConsentSection } from './components/ConsentSection';
 import { ContactSection } from './components/ContactSection';
-import {
-  ADDRESS_SECTION_TITLE,
-  CONTACT_SECTION_TITLE,
-  LOGIN_LINK_LABEL,
-  LOGIN_PROMPT,
-  SIGNUP_ERROR_MESSAGES,
-  SIGNUP_TITLE,
-  SUBMIT_LABEL,
-  signupSuccessMessage,
-} from './constants';
+import * as C from './constants';
 import { toSignupRequest } from './helpers/mapper';
 import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from './schema';
 import * as S from './styles';
@@ -30,13 +21,13 @@ import * as S from './styles';
 const TITLE_ID = 'signup-title';
 const CONFLICT = 409;
 const BAD_REQUEST = 400;
-const LOGIN_ANCHOR = `${RoutePath.LANDING}#${LandingSection.LOGIN}`;
+const LOGIN_ANCHOR = `${RoutePathEnum.LANDING}#${LandingSectionEnum.LOGIN}`;
 
 function errorMessageFor(status?: number): string {
-  if (status === CONFLICT) return SIGNUP_ERROR_MESSAGES.emailTaken;
-  if (status === BAD_REQUEST) return SIGNUP_ERROR_MESSAGES.invalidData;
+  if (status === CONFLICT) return C.SIGNUP_ERROR_MESSAGES.emailTaken;
+  if (status === BAD_REQUEST) return C.SIGNUP_ERROR_MESSAGES.invalidData;
 
-  return SIGNUP_ERROR_MESSAGES.generic;
+  return C.SIGNUP_ERROR_MESSAGES.generic;
 }
 
 export function Signup() {
@@ -45,8 +36,10 @@ export function Signup() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: signup,
+    // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
+    meta: { notifiesErrorItself: true },
     onSuccess: (response) => {
-      notifySuccess(signupSuccessMessage(response.nomeCompleto));
+      notifySuccess(C.signupSuccessMessage(response.nomeCompleto));
       navigate(LOGIN_ANCHOR);
     },
     onError: (error: ApiError) => notifyError(errorMessageFor(error.status)),
@@ -65,7 +58,7 @@ export function Signup() {
     <S.PageRoot>
       <S.SignupCard component="article" aria-labelledby={TITLE_ID}>
         <S.CardTitle variant="h2" id={TITLE_ID}>
-          {SIGNUP_TITLE}
+          {C.SIGNUP_TITLE}
         </S.CardTitle>
 
         <FormProvider {...form}>
@@ -73,11 +66,11 @@ export function Signup() {
             <AccountSection />
 
             <S.SectionDivider />
-            <S.SectionTitle variant="subtitleBold">{ADDRESS_SECTION_TITLE}</S.SectionTitle>
+            <S.SectionTitle variant="subtitleBold">{C.ADDRESS_SECTION_TITLE}</S.SectionTitle>
             <AddressSection />
 
             <S.SectionDivider />
-            <S.SectionTitle variant="subtitleBold">{CONTACT_SECTION_TITLE}</S.SectionTitle>
+            <S.SectionTitle variant="subtitleBold">{C.CONTACT_SECTION_TITLE}</S.SectionTitle>
             <ContactSection />
 
             <S.SectionDivider />
@@ -85,13 +78,13 @@ export function Signup() {
 
             <S.SubmitContainer>
               <Button type="submit" variant="contained" color="error" loading={isPending}>
-                {SUBMIT_LABEL}
+                {C.SUBMIT_LABEL}
               </Button>
 
               <S.LoginRow component="p">
-                <Typography variant="caption">{LOGIN_PROMPT}</Typography>
+                <Typography variant="caption">{C.LOGIN_PROMPT}</Typography>
                 <RouterLink to={LOGIN_ANCHOR}>
-                  <Typography variant="captionBold">{LOGIN_LINK_LABEL}</Typography>
+                  <Typography variant="captionBold">{C.LOGIN_LINK_LABEL}</Typography>
                 </RouterLink>
               </S.LoginRow>
             </S.SubmitContainer>

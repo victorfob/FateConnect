@@ -11,7 +11,7 @@ import { Rides } from '@app/pages/Rides';
 import { OfferRide } from '@app/pages/Rides/screens/OfferRide';
 import { SearchRide } from '@app/pages/Rides/screens/SearchRide';
 import { Signup } from '@app/pages/Signup';
-import { RoutePath } from './paths';
+import { RoutePathEnum } from './paths';
 
 /**
  * Mesma topologia do front Angular: duas cascas (visitante e interna) e as
@@ -21,32 +21,32 @@ export const routeConfig: RouteObject[] = [
   {
     element: <RootLayout />,
     children: [
-      { path: RoutePath.ROOT, element: <Navigate to={RoutePath.LANDING} replace /> },
+      { path: RoutePathEnum.ROOT, element: <Navigate to={RoutePathEnum.LANDING} replace /> },
       {
         element: <GuestLayout />,
         children: [
-          { path: RoutePath.LANDING, element: <Home /> },
-          { path: RoutePath.SIGNUP, element: <Signup /> },
+          { path: RoutePathEnum.LANDING, element: <Home /> },
+          { path: RoutePathEnum.SIGNUP, element: <Signup /> },
         ],
       },
       {
         element: <MainLayout />,
         children: [
-          { path: RoutePath.MENU, element: <Menu /> },
-          { path: RoutePath.LOST_AND_FOUND, element: <LostAndFound /> },
-          { path: RoutePath.CONTACT, element: <Contact /> },
+          { path: RoutePathEnum.MENU, element: <Menu /> },
+          { path: RoutePathEnum.LOST_AND_FOUND, element: <LostAndFound /> },
+          { path: RoutePathEnum.CONTACT, element: <Contact /> },
           {
-            path: RoutePath.RIDES,
+            path: RoutePathEnum.RIDES,
             element: <Rides />,
             children: [
-              { index: true, element: <Navigate to={RoutePath.RIDES_SEARCH} replace /> },
-              { path: RoutePath.RIDES_SEARCH, element: <SearchRide /> },
-              { path: RoutePath.RIDES_OFFER, element: <OfferRide /> },
+              { index: true, element: <Navigate to={RoutePathEnum.RIDES_SEARCH} replace /> },
+              { path: RoutePathEnum.RIDES_SEARCH, element: <SearchRide /> },
+              { path: RoutePathEnum.RIDES_OFFER, element: <OfferRide /> },
             ],
           },
         ],
       },
-      { path: '*', element: <Navigate to={RoutePath.LANDING} replace /> },
+      { path: '*', element: <Navigate to={RoutePathEnum.LANDING} replace /> },
     ],
   },
 ];

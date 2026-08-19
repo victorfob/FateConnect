@@ -8,13 +8,13 @@ import type { SelectOption } from '../../@types';
 
 type SelectFieldName = Extract<keyof SignupFormValues, 'gender' | 'state'>;
 
-type SelectFieldProps = {
+type SelectFieldProps = Readonly<{
   name: SelectFieldName;
   label: string;
   options: readonly SelectOption[];
   autoComplete: string;
   required?: boolean;
-};
+}>;
 
 /**
  * Campo de seleção ligado ao formulário por `Controller`. O `select` do MUI
