@@ -4,7 +4,7 @@ import { colorTokens, spacingScale, typographyTokens } from '../tokens';
 import { createAppTheme } from './createAppTheme';
 
 describe('createAppTheme', () => {
-  it('usa a escala de tokens em rem, e não o multiplicador de 8px padrão do MUI', () => {
+  it('should use the token scale in rem instead of the default 8px multiplier', () => {
     const theme = createAppTheme();
 
     // Sem o override, theme.spacing(16) devolveria '128px' e o layout ficaria 8x errado.
@@ -13,7 +13,7 @@ describe('createAppTheme', () => {
     expect(theme.spacing(spacingScale.md)).not.toBe('128px');
   });
 
-  it('expõe as variantes de tipografia do produto com os valores da escala atual', () => {
+  it('should expose the product typography variants with the current scale values', () => {
     const { typography } = createAppTheme();
 
     expect(typography.h2).toMatchObject(typographyTokens.h2);
@@ -24,14 +24,14 @@ describe('createAppTheme', () => {
     expect(typography.logo).toMatchObject(typographyTokens.logo);
   });
 
-  it('reduz o h1 em tela estreita, mantendo peso e altura de linha', () => {
+  it('should shrink h1 on narrow screens keeping weight and line height', () => {
     const { typography } = createAppTheme();
 
     expect(typography.h1.fontSize).toBe(typographyTokens.h1.fontSize);
     expect(JSON.stringify(typography.h1)).toContain(typographyTokens.h1Narrow.fontSize);
   });
 
-  it('aplica a paleta do produto', () => {
+  it('should apply the product palette', () => {
     const { palette } = createAppTheme();
 
     expect(palette.primary.main).toBe(colorTokens.primary);
