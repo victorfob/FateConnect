@@ -1,7 +1,8 @@
 import { NavLink, Outlet } from 'react-router';
 
 import { RoutePath } from '@app/routes/paths';
-import { AddIcon, ArrowBackIcon, SearchIcon, Typography } from '@design-system';
+import { Typography } from '@design-system';
+import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
 
 import { BACK_LABEL, OFFER_TAB_LABEL, RIDES_TITLE, SEARCH_TAB_LABEL } from './constants';
 import * as S from './styles';

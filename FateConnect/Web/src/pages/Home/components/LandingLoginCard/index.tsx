@@ -8,15 +8,8 @@ import { useNotification } from '@app/hooks/useNotification';
 import { LandingSection, RoutePath } from '@app/routes/paths';
 import { login } from '@app/services/auth/authService';
 import type { ApiError } from '@app/services/httpClient';
-import {
-  Button,
-  IconButton,
-  InputAdornment,
-  TextField,
-  Typography,
-  VisibilityIcon,
-  VisibilityOffIcon,
-} from '@design-system';
+import { Button, IconButton, InputAdornment, TextField, Typography } from '@design-system';
+import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
 import {
   EMAIL_LABEL,

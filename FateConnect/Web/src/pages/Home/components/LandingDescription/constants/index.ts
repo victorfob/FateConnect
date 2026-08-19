@@ -4,7 +4,7 @@ import {
   SearchIcon,
   SecurityIcon,
   type SvgIconComponent,
-} from '@design-system';
+} from '@design-system/icons';
 
 export type DescriptionHighlight = { label: string; Icon: SvgIconComponent };
 

@@ -5,17 +5,14 @@ import type { RideFilter as RideFilterValues, RideType } from '@app/services/rid
 import {
   Button,
   DatePicker,
-  FilterAltIcon,
   IconButton,
-  InfoIcon,
   InputAdornment,
   MenuItem,
-  ScheduleIcon,
-  SearchIcon,
   TextField,
   Tooltip,
   Typography,
 } from '@design-system';
+import { FilterAltIcon, InfoIcon, ScheduleIcon, SearchIcon } from '@design-system/icons';
 
 import {
   FILTER_LABELS,

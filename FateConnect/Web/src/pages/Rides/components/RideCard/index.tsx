@@ -2,17 +2,14 @@ import { format, parseISO } from 'date-fns';
 import { useCallback, useState } from 'react';
 
 import type { Ride } from '@app/services/rides/types';
+import { ConfirmDialog, IconButton, StatusTag, Typography } from '@design-system';
 import {
   AccessTimeIcon,
   CalendarTodayIcon,
-  ConfirmDialog,
   DeleteIcon,
   EditIcon,
   GroupsIcon,
-  IconButton,
-  StatusTag,
-  Typography,
-} from '@design-system';
+} from '@design-system/icons';
 
 import { DELETE_DIALOG, RIDE_CARD_LABELS, seatsLabel } from '../../constants';
 import { rideTypeDisplayLabel, rideTypeTone } from '../../helpers/rideType';

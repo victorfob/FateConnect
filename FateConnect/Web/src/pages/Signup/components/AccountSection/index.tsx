@@ -1,13 +1,8 @@
 import { useCallback, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import {
-  IconButton,
-  InputAdornment,
-  TextField,
-  VisibilityIcon,
-  VisibilityOffIcon,
-} from '@design-system';
+import { IconButton, InputAdornment, TextField } from '@design-system';
+import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
 import {
   FIELD_LABELS,

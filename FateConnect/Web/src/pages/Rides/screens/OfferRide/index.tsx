@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 
 import { useNotification } from '@app/hooks/useNotification';
-import { AddIcon, Typography } from '@design-system';
+import { Typography } from '@design-system';
+import { AddIcon } from '@design-system/icons';
 
 import { OFFER_BUTTON_LABEL, OFFER_SOON_MESSAGE, OFFER_SUBTITLE, OFFER_TITLE } from './constants';
 import * as S from './styles';

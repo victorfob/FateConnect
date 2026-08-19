@@ -4,14 +4,8 @@ import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
 import { maskBirthDate } from '@app/utils/masks/birthDateMask';
-import {
-  CalendarTodayIcon,
-  DateCalendar,
-  IconButton,
-  InputAdornment,
-  Popover,
-  TextField,
-} from '@design-system';
+import { DateCalendar, IconButton, InputAdornment, Popover, TextField } from '@design-system';
+import { CalendarTodayIcon } from '@design-system/icons';
 
 import {
   EARLIEST_BIRTH_DATE,
