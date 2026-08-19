@@ -15,6 +15,8 @@ export default tseslint.config(
     languageOptions: {
       ecmaVersion: 2022,
       globals: { ...globals.browser, ...globals.node },
+      // Informação de tipo: é o que permite ao lint enxergar `@deprecated`.
+      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
     },
     plugins: {
       react: reactPlugin,
@@ -29,6 +31,8 @@ export default tseslint.config(
       ...jsxA11y.flatConfigs.recommended.rules,
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
+      // API marcada como obsoleta não entra: quando ela sair, o build quebra.
+      '@typescript-eslint/no-deprecated': 'error',
     },
   },
 
@@ -104,6 +108,22 @@ export default tseslint.config(
     ignores: ['src/**/*.test.{ts,tsx}', 'src/test/**'],
     rules: {
       'react-hooks/exhaustive-deps': 'error',
+      // Número solto no meio do código não diz o que mede. Vira constante nomeada.
+      // Tokens e tabelas de dados ficam de fora: são objetos (`detectObjects: false`).
+      '@typescript-eslint/no-magic-numbers': [
+        'error',
+        {
+          ignore: [0, 1, -1],
+          ignoreArrayIndexes: true,
+          ignoreDefaultValues: true,
+          ignoreEnums: true,
+          ignoreNumericLiteralTypes: true,
+          ignoreReadonlyClassProperties: true,
+          ignoreTypeIndexes: true,
+          enforceConst: true,
+          detectObjects: false,
+        },
+      ],
       'no-restricted-syntax': [
         'error',
         {

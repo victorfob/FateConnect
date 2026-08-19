@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-import type { ThemeMode } from '../theme';
+import type { ThemeMode } from '../../theme';
 
 type ThemeModeContextValue = {
   mode: ThemeMode;

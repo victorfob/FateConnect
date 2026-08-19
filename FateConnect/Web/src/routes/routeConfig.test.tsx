@@ -2,6 +2,7 @@ import { RouterProvider, createMemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
 import { render, screen } from '@app/test/testing-library';
+import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
 import { RoutePath } from './paths';
 import { routeConfig } from './routeConfig';
 
@@ -15,7 +16,7 @@ function renderRoute(initialPath: string) {
 describe('routeConfig', () => {
   it.each([
     [RoutePath.LANDING, 'Conectando a Comunidade Acadêmica'],
-    [RoutePath.SIGNUP, 'Cadastro'],
+    [RoutePath.SIGNUP, SIGNUP_TITLE],
     [RoutePath.MENU, 'Menu'],
     [RoutePath.LOST_AND_FOUND, 'Achados e Perdidos'],
     [RoutePath.CONTACT, 'Contato'],

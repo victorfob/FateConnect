@@ -16,6 +16,8 @@ export const colorTokens = {
   surfaceHover: 'rgba(255, 255, 255, 0.6)',
 
   textOnGray: '#747D84',
+  /** Borda do campo de formulário — o mesmo 38% que o produto desenha hoje. */
+  inputOutline: 'rgba(0, 0, 0, 0.38)',
   textMuted: '#6C757D',
   textOnAccent: 'rgba(255, 255, 255, 0.9)',
 
@@ -26,7 +28,10 @@ export const colorTokens = {
   dangerText: '#CF2E2E',
   dangerBackground: '#FFDFDF',
 
-  divider: 'rgba(255, 255, 255, 0.5)',
+  /** Divisor sobre superfície neutra — linha do formulário de cadastro. */
+  divider: '#D9D9D9',
+  /** Divisor sobre o cromo colorido (rodapé), onde a linha precisa ser clara. */
+  chromeDivider: 'rgba(255, 255, 255, 0.5)',
 };
 
 /** Sombra padrão de componente elevado. */
