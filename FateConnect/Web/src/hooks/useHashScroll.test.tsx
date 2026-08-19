@@ -1,5 +1,5 @@
 import { RouterProvider, createMemoryRouter } from 'react-router';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { LandingSection, RoutePath } from '@app/routes/paths';
 import { render } from '@app/test/testing-library';
@@ -19,7 +19,7 @@ function renderAt(initialPath: string) {
 }
 
 describe('useHashScroll', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
