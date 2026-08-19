@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 
-import { ThemeProvider } from '@ds';
+import { AppProviders } from '@app/providers/AppProviders';
 import { routeConfig } from '@app/routes';
 
 const container = document.getElementById('root');
@@ -12,8 +12,8 @@ const router = createBrowserRouter(routeConfig);
 
 createRoot(container).render(
   <StrictMode>
-    <ThemeProvider>
+    <AppProviders>
       <RouterProvider router={router} />
-    </ThemeProvider>
+    </AppProviders>
   </StrictMode>,
 );
