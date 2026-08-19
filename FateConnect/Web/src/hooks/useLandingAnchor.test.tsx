@@ -1,5 +1,5 @@
 import { RouterProvider, createMemoryRouter } from 'react-router';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { LandingSection, RoutePath } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
@@ -29,7 +29,7 @@ function renderAt(initialPath: string) {
 }
 
 describe('useLandingAnchor', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 

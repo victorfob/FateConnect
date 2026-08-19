@@ -9,6 +9,7 @@ export function useHashScroll(): void {
 
   useEffect(() => {
     if (!hash) return;
-    scrollToSection(hash.slice(1));
+
+    return scrollToSection(hash.slice(1));
   }, [hash]);
 }

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { RoutePath } from '@app/routes/paths';
@@ -12,6 +12,9 @@ import { scrollToSection } from '@app/utils/scrollToSection';
 export function useLandingAnchor(): (sectionId: string) => void {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const cancelPendingScroll = useRef<VoidFunction>(undefined);
+
+  useEffect(() => () => cancelPendingScroll.current?.(), []);
 
   return useCallback(
     (sectionId: string) => {
@@ -20,7 +23,8 @@ export function useLandingAnchor(): (sectionId: string) => void {
         return;
       }
 
-      scrollToSection(sectionId);
+      cancelPendingScroll.current?.();
+      cancelPendingScroll.current = scrollToSection(sectionId);
     },
     [navigate, pathname],
   );
