@@ -2,6 +2,7 @@ import type { Theme as AppTheme } from '@mui/material/styles';
 
 export { css, keyframes } from '@emotion/react';
 export { default as styled } from '@emotion/styled';
+export { darken, lighten, alpha } from '@mui/material/styles';
 
 /**
  * O `styled` do Emotion tipa `theme` como `Theme` do `@emotion/react`, que é

@@ -5,7 +5,7 @@
  * é o que mantém barato extrair esta camada para um pacote no futuro.
  */
 export * from './ui';
-export { styled, css, keyframes } from './styled';
+export { styled, css, keyframes, darken, lighten, alpha } from './styled';
 
 export { Header } from './components/Header';
 export { HEADER_HEIGHT_PX } from './components/Header/styles';
@@ -24,6 +24,8 @@ export {
   fontFamily,
   typographyTokens,
   MOBILE_MAX_WIDTH_PX,
+  TABLET_MAX_WIDTH_PX,
   mobileMedia,
+  tabletMedia,
 } from './tokens';
 export type { SpacingToken, RadiusToken, TypographyToken } from './tokens';
