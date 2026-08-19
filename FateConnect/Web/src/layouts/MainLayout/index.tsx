@@ -11,6 +11,7 @@ import {
   ListItemButton,
   ListItemText,
   NavigationDrawer,
+  ThemeToggleButton,
   Typography,
 } from '@design-system';
 import * as S from '../shell.styles';
@@ -36,6 +37,7 @@ export function MainLayout() {
     <S.ShellRoot>
       <Header
         logo={logo}
+        actions={<ThemeToggleButton />}
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
         navigation={APP_LINKS.map(({ path, label }) => (
@@ -53,7 +55,7 @@ export function MainLayout() {
         ))}
       </NavigationDrawer>
 
-      <S.ShellContent>
+      <S.ShellContent component="main">
         <Outlet />
       </S.ShellContent>
 

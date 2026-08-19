@@ -15,7 +15,7 @@ type FooterProps = {
 
 export function Footer({ anchorId, title, contact, copyrightLines }: FooterProps) {
   return (
-    <S.FooterRoot>
+    <S.FooterRoot component="footer">
       <S.ContactsContainer id={anchorId}>
         <Typography variant="h2">{title}</Typography>
 
