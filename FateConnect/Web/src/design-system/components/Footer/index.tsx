@@ -5,13 +5,13 @@ import Typography from '@mui/material/Typography';
 
 import * as S from './styles';
 
-type FooterProps = {
+type FooterProps = Readonly<{
   /** Id da âncora usada pela navegação da aplicação. */
   anchorId: string;
   title: string;
   contact: { email: string; phone: string; address: string };
   copyrightLines: string[];
-};
+}>;
 
 export function Footer({ anchorId, title, contact, copyrightLines }: FooterProps) {
   return (

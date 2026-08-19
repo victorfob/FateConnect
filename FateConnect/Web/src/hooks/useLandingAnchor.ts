@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { RoutePath } from '@app/routes/paths';
+import { RoutePathEnum } from '@app/routes/paths';
 import { scrollToSection } from '@app/utils/scrollToSection';
 
 /**
@@ -18,8 +18,8 @@ export function useLandingAnchor(): (sectionId: string) => void {
 
   return useCallback(
     (sectionId: string) => {
-      if (pathname !== RoutePath.LANDING) {
-        navigate(`${RoutePath.LANDING}#${sectionId}`);
+      if (pathname !== RoutePathEnum.LANDING) {
+        navigate(`${RoutePathEnum.LANDING}#${sectionId}`);
         return;
       }
 

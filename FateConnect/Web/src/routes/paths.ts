@@ -2,7 +2,7 @@
  * Caminhos das rotas. Permanecem em **pt-BR e idênticos** aos do front Angular:
  * trocar um segmento quebra link salvo pelo usuário.
  */
-export enum RoutePath {
+export enum RoutePathEnum {
   ROOT = '/',
   LANDING = '/inicio',
   SIGNUP = '/cadastro',
@@ -15,7 +15,7 @@ export enum RoutePath {
 }
 
 /** Fragmentos das seções da landing, usados na navegação por âncora. */
-export enum LandingSection {
+export enum LandingSectionEnum {
   SERVICES = 'servicos',
   HOW_IT_WORKS = 'como-funciona',
   CONTACT = 'contato',

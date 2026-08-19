@@ -41,6 +41,8 @@ describe('light theme contrast', () => {
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
     ['content on the error colour', palette.error.contrastText, palette.error.main],
     ['content on the app chrome', onChromeSurface(lightTheme), chromeSurface(lightTheme)],
+    ['a success tag', palette.success.main, palette.success.light],
+    ['a warning tag', palette.warning.main, palette.warning.light],
   ])('should meet AA for %s', (_, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
   });
@@ -57,6 +59,8 @@ describe('dark theme contrast', () => {
     ['the secondary colour on the background', palette.secondary.main, palette.background.default],
     ['the error colour on the background', palette.error.main, palette.background.default],
     ['content on the app chrome', onChromeSurface(darkTheme), chromeSurface(darkTheme)],
+    ['a success tag', palette.success.main, palette.success.light],
+    ['a warning tag', palette.warning.main, palette.warning.light],
   ])('should meet AA for %s', (_, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
   });

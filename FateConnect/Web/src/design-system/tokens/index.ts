@@ -11,6 +11,8 @@ export {
 } from './palette';
 export { fontFamily, typographyTokens } from './typography';
 export {
+  COMPACT_MAX_WIDTH_PX,
+  compactMedia,
   MOBILE_MAX_WIDTH_PX,
   TABLET_MAX_WIDTH_PX,
   mobileMedia,

@@ -1,6 +1,6 @@
 import { Typography } from '@design-system';
 
-import { LandingSection } from '@app/routes/paths';
+import { LandingSectionEnum } from '@app/routes/paths';
 import { SERVICE_CARDS, SERVICES_TITLE } from './constants';
 import * as S from './styles';
 
@@ -10,7 +10,7 @@ export function LandingServices() {
   return (
     <S.ServicesSection
       component="section"
-      id={LandingSection.SERVICES}
+      id={LandingSectionEnum.SERVICES}
       aria-labelledby={HEADING_ID}
     >
       <S.SectionTitle>

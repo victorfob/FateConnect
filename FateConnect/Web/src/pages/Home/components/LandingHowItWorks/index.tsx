@@ -1,6 +1,6 @@
 import { Typography } from '@design-system';
 
-import { LandingSection } from '@app/routes/paths';
+import { LandingSectionEnum } from '@app/routes/paths';
 import { HOW_IT_WORKS_STEPS, HOW_IT_WORKS_TITLE } from './constants';
 import * as S from './styles';
 
@@ -8,7 +8,11 @@ const HEADING_ID = 'como-funciona-heading';
 
 export function LandingHowItWorks() {
   return (
-    <S.HowSection component="section" id={LandingSection.HOW_IT_WORKS} aria-labelledby={HEADING_ID}>
+    <S.HowSection
+      component="section"
+      id={LandingSectionEnum.HOW_IT_WORKS}
+      aria-labelledby={HEADING_ID}
+    >
       <S.SectionTitle>
         <Typography variant="h1" id={HEADING_ID}>
           {HOW_IT_WORKS_TITLE}

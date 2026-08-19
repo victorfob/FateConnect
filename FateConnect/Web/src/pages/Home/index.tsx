@@ -1,4 +1,4 @@
-import { LandingSection } from '@app/routes/paths';
+import { LandingSectionEnum } from '@app/routes/paths';
 import { LandingDescription } from './components/LandingDescription';
 import { LandingHowItWorks } from './components/LandingHowItWorks';
 import { LandingLoginCard } from './components/LandingLoginCard';
@@ -10,7 +10,7 @@ export function Home() {
     <S.HomeRoot>
       <S.DescriptionContainer component="section" aria-label="Apresentação e acesso">
         <LandingDescription />
-        <S.LoginAnchor id={LandingSection.LOGIN}>
+        <S.LoginAnchor id={LandingSectionEnum.LOGIN}>
           <LandingLoginCard />
         </S.LoginAnchor>
       </S.DescriptionContainer>

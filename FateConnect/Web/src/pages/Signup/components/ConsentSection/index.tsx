@@ -5,14 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import { useNotification } from '@app/hooks/useNotification';
 import { Checkbox, FormControlLabel } from '@design-system';
 
-import {
-  CONSENT_MARKETING_LABEL,
-  CONSENT_PRIVACY_LINK,
-  CONSENT_TERMS_LINK,
-  CONSENT_TERMS_PREFIX,
-  CONSENT_TERMS_SEPARATOR,
-  LEGAL_SOON_MESSAGES,
-} from '../../constants';
+import * as C from '../../constants';
 import type { SignupFormValues } from '../../schema';
 import * as S from './styles';
 
@@ -29,7 +22,7 @@ export function ConsentSection() {
     (event: MouseEvent<HTMLElement>) => {
       event.preventDefault();
       event.stopPropagation();
-      notifyWarning(LEGAL_SOON_MESSAGES.terms);
+      notifyWarning(C.LEGAL_SOON_MESSAGES.terms);
     },
     [notifyWarning],
   );
@@ -38,7 +31,7 @@ export function ConsentSection() {
     (event: MouseEvent<HTMLElement>) => {
       event.preventDefault();
       event.stopPropagation();
-      notifyWarning(LEGAL_SOON_MESSAGES.privacy);
+      notifyWarning(C.LEGAL_SOON_MESSAGES.privacy);
     },
     [notifyWarning],
   );
@@ -49,13 +42,13 @@ export function ConsentSection() {
         control={<Checkbox {...register('acceptTerms')} />}
         label={
           <span>
-            {CONSENT_TERMS_PREFIX}{' '}
+            {C.CONSENT_TERMS_PREFIX}{' '}
             <S.InlineLink component="button" type="button" onClick={handleTermsClick}>
-              {CONSENT_TERMS_LINK}
+              {C.CONSENT_TERMS_LINK}
             </S.InlineLink>{' '}
-            {CONSENT_TERMS_SEPARATOR}{' '}
+            {C.CONSENT_TERMS_SEPARATOR}{' '}
             <S.InlineLink component="button" type="button" onClick={handlePrivacyClick}>
-              {CONSENT_PRIVACY_LINK}
+              {C.CONSENT_PRIVACY_LINK}
             </S.InlineLink>
           </span>
         }
@@ -69,7 +62,7 @@ export function ConsentSection() {
 
       <FormControlLabel
         control={<Checkbox {...register('acceptMarketing')} />}
-        label={CONSENT_MARKETING_LABEL}
+        label={C.CONSENT_MARKETING_LABEL}
       />
     </S.ConsentGroup>
   );

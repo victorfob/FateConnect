@@ -1,7 +1,7 @@
 import { RouterProvider, createMemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render } from '@app/test/testing-library';
 import { useHashScroll } from './useHashScroll';
 
@@ -12,9 +12,10 @@ function ScreenWithHash() {
 }
 
 function renderAt(initialPath: string) {
-  const router = createMemoryRouter([{ path: RoutePath.LANDING, element: <ScreenWithHash /> }], {
-    initialEntries: [initialPath],
-  });
+  const router = createMemoryRouter(
+    [{ path: RoutePathEnum.LANDING, element: <ScreenWithHash /> }],
+    { initialEntries: [initialPath] },
+  );
   render(<RouterProvider router={router} />);
 }
 
@@ -26,10 +27,10 @@ describe('useHashScroll', () => {
   it('should scroll to the section when the URL carries a fragment', () => {
     const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
     const section = document.createElement('section');
-    section.id = LandingSection.LOGIN;
+    section.id = LandingSectionEnum.LOGIN;
     document.body.appendChild(section);
 
-    renderAt(`${RoutePath.LANDING}#${LandingSection.LOGIN}`);
+    renderAt(`${RoutePathEnum.LANDING}#${LandingSectionEnum.LOGIN}`);
 
     expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
 
@@ -39,7 +40,7 @@ describe('useHashScroll', () => {
   it('should not scroll when the URL has no fragment', () => {
     const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
 
-    renderAt(RoutePath.LANDING);
+    renderAt(RoutePathEnum.LANDING);
 
     expect(scrollIntoView).not.toHaveBeenCalled();
   });

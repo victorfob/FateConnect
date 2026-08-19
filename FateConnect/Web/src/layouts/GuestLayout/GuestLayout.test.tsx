@@ -1,7 +1,7 @@
 import { RouterProvider, createMemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
-import { LandingSection, RoutePath } from '@app/routes/paths';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
 import { GuestLayout } from '.';
 
@@ -10,10 +10,10 @@ function renderLayout() {
     [
       {
         element: <GuestLayout />,
-        children: [{ path: RoutePath.LANDING, element: <div>landing</div> }],
+        children: [{ path: RoutePathEnum.LANDING, element: <div>landing</div> }],
       },
     ],
-    { initialEntries: [RoutePath.LANDING] },
+    { initialEntries: [RoutePathEnum.LANDING] },
   );
   render(<RouterProvider router={router} />);
 
@@ -50,7 +50,7 @@ describe('GuestLayout', () => {
     await userEvent.click(within(drawer).getByRole('button', { name: 'Serviços' }));
 
     expect(router.state.location.hash).toBe('');
-    expect(document.getElementById(LandingSection.SERVICES)).not.toBeInTheDocument();
+    expect(document.getElementById(LandingSectionEnum.SERVICES)).not.toBeInTheDocument();
   });
 
   it('should point the logo to the landing page', () => {
@@ -58,7 +58,7 @@ describe('GuestLayout', () => {
 
     expect(screen.getAllByRole('link', { name: 'FateConnect' })[0]).toHaveAttribute(
       'href',
-      RoutePath.LANDING,
+      RoutePathEnum.LANDING,
     );
   });
 

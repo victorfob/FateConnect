@@ -1,2 +1,2 @@
 export { routeConfig } from './routeConfig';
-export { RoutePath, LandingSection } from './paths';
+export { RoutePathEnum, LandingSectionEnum } from './paths';

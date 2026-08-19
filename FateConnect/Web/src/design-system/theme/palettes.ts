@@ -30,6 +30,7 @@ export const lightPalette: PaletteOptions = {
     dark: colorVariants.errorDark,
     contrastText: colorTokens.surfaceWhite,
   },
+  // `light` é o fundo da etiqueta de estado e `main` o texto sobre ele.
   success: { main: colorTokens.successText, light: colorTokens.successBackground },
   warning: { main: colorTokens.warningText, light: colorTokens.warningBackground },
   background: { default: colorTokens.surfaceGray, paper: colorTokens.surfaceWhite },
@@ -56,8 +57,10 @@ export const darkPalette: PaletteOptions = {
     main: darkColorTokens.error,
     contrastText: darkColorTokens.surface,
   },
-  success: { main: colorTokens.successBackground },
-  warning: { main: colorTokens.warningBackground },
+  // `light` é o fundo da etiqueta e `main` o texto sobre ele — mesmo contrato
+  // do tema claro, com o par invertido para continuar legível no escuro.
+  success: { light: darkColorTokens.successTagBackground, main: darkColorTokens.successTagText },
+  warning: { light: darkColorTokens.warningTagBackground, main: darkColorTokens.warningTagText },
   background: {
     default: darkColorTokens.surface,
     paper: darkColorTokens.surfaceElevated,

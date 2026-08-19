@@ -1,7 +1,7 @@
 import { RouterProvider, createMemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
-import { RoutePath } from '@app/routes/paths';
+import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
 import { MainLayout } from '.';
 
@@ -11,12 +11,12 @@ function renderLayout() {
       {
         element: <MainLayout />,
         children: [
-          { path: RoutePath.MENU, element: <div>menu</div> },
-          { path: RoutePath.RIDES, element: <div>caronas</div> },
+          { path: RoutePathEnum.MENU, element: <div>menu</div> },
+          { path: RoutePathEnum.RIDES, element: <div>caronas</div> },
         ],
       },
     ],
-    { initialEntries: [RoutePath.MENU] },
+    { initialEntries: [RoutePathEnum.MENU] },
   );
   render(<RouterProvider router={router} />);
 
@@ -41,7 +41,7 @@ describe('MainLayout', () => {
     const drawer = screen.getByRole('presentation');
     await userEvent.click(within(drawer).getByRole('link', { name: 'Caronas' }));
 
-    expect(router.state.location.pathname).toBe(RoutePath.RIDES);
+    expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES);
   });
 
   it('should point the logo to the menu', () => {
@@ -49,7 +49,7 @@ describe('MainLayout', () => {
 
     expect(screen.getAllByRole('link', { name: 'FateConnect' })[0]).toHaveAttribute(
       'href',
-      RoutePath.MENU,
+      RoutePathEnum.MENU,
     );
   });
 });

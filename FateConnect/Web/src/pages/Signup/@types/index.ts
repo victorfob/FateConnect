@@ -1,5 +1,5 @@
 /** Gênero como o formulário o carrega: o `select` trabalha com texto. */
-export enum GenderValue {
+export enum GenderValueEnum {
   MALE = '0',
   FEMALE = '1',
   UNDISCLOSED = '2',

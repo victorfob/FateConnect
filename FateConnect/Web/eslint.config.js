@@ -51,8 +51,10 @@ export default tseslint.config(
                 'Importe pelo barrel: `@design-system`. Se o componente ainda não é exportado, adicione-o ao barrel.',
             },
             {
-              group: ['@design-system/*'],
-              message: 'Importe do barrel `@design-system`, nunca de um caminho interno dele.',
+              // `@design-system/icons` é o segundo barrel público; o resto continua interno.
+              group: ['@design-system/*', '!@design-system/icons'],
+              message:
+                'Importe do barrel `@design-system` (ou `@design-system/icons`), nunca de um caminho interno dele.',
             },
             {
               group: ['@emotion/*'],

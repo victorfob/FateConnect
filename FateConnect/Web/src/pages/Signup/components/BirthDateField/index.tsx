@@ -4,14 +4,8 @@ import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
 import { maskBirthDate } from '@app/utils/masks/birthDateMask';
-import {
-  CalendarTodayIcon,
-  DateCalendar,
-  IconButton,
-  InputAdornment,
-  Popover,
-  TextField,
-} from '@design-system';
+import { DateCalendar, IconButton, InputAdornment, Popover, TextField } from '@design-system';
+import { CalendarTodayIcon } from '@design-system/icons';
 
 import {
   EARLIEST_BIRTH_DATE,
@@ -19,7 +13,7 @@ import {
   latestBirthDate,
   parseBirthDate,
 } from '../../helpers/birthDate';
-import { CALENDAR_TOGGLE_LABEL, FIELD_LABELS, FIELD_PLACEHOLDERS } from '../../constants';
+import * as C from '../../constants';
 import { useFilledLabel } from '../../hooks/useFilledLabel';
 import type { SignupFormValues } from '../../schema';
 
@@ -69,13 +63,13 @@ export function BirthDateField() {
     <>
       <TextField
         {...birthDateField}
-        label={FIELD_LABELS.birthDate}
+        label={C.FIELD_LABELS.birthDate}
         required
         fullWidth
         type="text"
         inputMode="numeric"
         autoComplete="bday"
-        placeholder={FIELD_PLACEHOLDERS.birthDate}
+        placeholder={C.FIELD_PLACEHOLDERS.birthDate}
         error={Boolean(errors.birthDate)}
         helperText={errors.birthDate?.message}
         slotProps={{
@@ -86,7 +80,7 @@ export function BirthDateField() {
               <InputAdornment position="end">
                 <IconButton
                   type="button"
-                  aria-label={CALENDAR_TOGGLE_LABEL}
+                  aria-label={C.CALENDAR_TOGGLE_LABEL}
                   onClick={handleOpenCalendar}
                 >
                   <CalendarTodayIcon fontSize="small" />

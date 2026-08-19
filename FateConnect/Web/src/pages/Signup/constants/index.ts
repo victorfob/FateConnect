@@ -1,4 +1,4 @@
-import { GenderValue, type SelectOption } from '../@types';
+import { GenderValueEnum, type SelectOption } from '../@types';
 
 export const SIGNUP_TITLE = 'Crie sua Conta';
 export const ADDRESS_SECTION_TITLE = 'Endereço';
@@ -64,9 +64,9 @@ export const signupSuccessMessage = (fullName: string): string =>
   `Conta criada com sucesso, ${fullName}!`;
 
 export const GENDER_OPTIONS: readonly SelectOption[] = [
-  { value: GenderValue.MALE, label: 'Masculino' },
-  { value: GenderValue.FEMALE, label: 'Feminino' },
-  { value: GenderValue.UNDISCLOSED, label: 'Prefiro não informar' },
+  { value: GenderValueEnum.MALE, label: 'Masculino' },
+  { value: GenderValueEnum.FEMALE, label: 'Feminino' },
+  { value: GenderValueEnum.UNDISCLOSED, label: 'Prefiro não informar' },
 ];
 
 /** Unidades federativas (sigla + nome em pt-BR). */

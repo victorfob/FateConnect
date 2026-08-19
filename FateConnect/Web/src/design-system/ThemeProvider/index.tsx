@@ -6,11 +6,11 @@ import { GlobalStyles } from '../GlobalStyles';
 import { createAppTheme, type ThemeMode } from '../theme';
 import { ThemeModeContext } from './context/ThemeModeContext';
 
-type ThemeProviderProps = {
+type ThemeProviderProps = Readonly<{
   children: ReactNode;
   /** Modo inicial; o usuário alterna a partir daí. */
   defaultMode?: ThemeMode;
-};
+}>;
 
 /** Único ponto onde o tema é criado e injetado na árvore. */
 export function ThemeProvider({ children, defaultMode = 'light' }: ThemeProviderProps) {
