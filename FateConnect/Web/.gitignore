@@ -1,0 +1,16 @@
+# Build
+/dist
+/coverage
+
+# Node
+/node_modules
+npm-debug.log
+
+# Variáveis de ambiente — só o exemplo é versionado
+.env
+.env.*
+!.env.example
+
+# Sistema
+.DS_Store
+Thumbs.db
