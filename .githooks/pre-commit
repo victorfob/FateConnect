@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Roda lint-staged no front React (FateConnect/Web) sobre os arquivos staged.
+# O repo usa core.hooksPath=.githooks (junto dos hooks do git-lfs), por isso não usamos husky:
+# instalar husky reaponta core.hooksPath para .husky e desliga os hooks de LFS.
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+WEB="$ROOT/FateConnect/Web"
+
+# Nada staged em Web/ => nada a fazer.
+if ! git diff --cached --name-only --diff-filter=ACMR | grep -q '^FateConnect/Web/.*\.tsx\?$'; then
+  exit 0
+fi
+
+if [[ ! -d "$WEB/node_modules" ]]; then
+  echo "pre-commit: dependências de FateConnect/Web ausentes — rode 'yarn' nessa pasta" >&2
+  exit 1
+fi
+
+cd "$WEB"
+npx --no-install lint-staged
