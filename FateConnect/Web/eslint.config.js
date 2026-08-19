@@ -97,5 +97,72 @@ export default tseslint.config(
     rules: { 'no-restricted-imports': 'off' },
   },
 
+  // Convenções de estilo aplicadas, não apenas documentadas.
+  // Testes ficam de fora: eles precisam citar as APIs que o código de produção evita.
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/**/*.test.{ts,tsx}', 'src/test/**'],
+    rules: {
+      'react-hooks/exhaustive-deps': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "JSXAttribute[name.name='sx']",
+          message:
+            'Sem `sx` inline. Declare o estilo em `styles.ts` com `styled(...)` e use `<S.Componente>`.',
+        },
+        {
+          selector:
+            "CallExpression[callee.object.name='theme'][callee.property.name='spacing']",
+          message:
+            'Use o helper `spacing()` do design system. O `theme.spacing` é do MUI e sobrescrevê-lo encolhe os componentes dele (as gutters do Toolbar viraram 3px).',
+        },
+        {
+          selector: "CallExpression[callee.name='styled'] > Literal:first-child",
+          message:
+            'Sem tag HTML crua: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
+        },
+      ],
+    },
+  },
+
+  // Cor literal só pode existir nos tokens.
+  {
+    files: ['src/**/styles.ts', 'src/**/*.styles.ts', 'src/**/GlobalStyles.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
+          message: 'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
+        },
+        {
+          selector: 'Literal[value=/^rgba?\\(/]',
+          message: 'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
+        },
+      ],
+    },
+  },
+
+  // O design system não conhece a aplicação — é o que o mantém extraível.
+  {
+    files: ['src/design-system/**/*.{ts,tsx}'],
+    ignores: ['src/design-system/**/*.test.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@app/*'],
+              message:
+                'O design system não importa da aplicação. Receba o que precisa por propriedade ou slot.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   prettierRecommended,
 );
