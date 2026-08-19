@@ -1,4 +1,3 @@
-import Typography from '@mui/material/Typography';
 import { useCallback, useState } from 'react';
 import { Link as RouterLink, Outlet } from 'react-router';
 
@@ -10,6 +9,7 @@ import { RoutePath, type LandingSection } from '@app/routes/paths';
 import { NavigationDrawer } from '../NavigationDrawer';
 import { ShellContent, ShellRoot } from '../shell.styles';
 import { DrawerSectionItem } from './DrawerSectionItem';
+import { Typography } from '@design-system';
 
 /** Casca das rotas públicas (`/inicio`, `/cadastro`). */
 export function GuestLayout() {

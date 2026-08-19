@@ -1,6 +1,3 @@
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
 import { useCallback, useState } from 'react';
 import { Link as RouterLink, Outlet } from 'react-router';
 
@@ -10,6 +7,7 @@ import { APP_LINKS } from '@app/components/Header/constants';
 import { RoutePath } from '@app/routes/paths';
 import { NavigationDrawer } from '../NavigationDrawer';
 import { ShellContent, ShellRoot } from '../shell.styles';
+import { ListItemButton, ListItemText, Typography } from '@design-system';
 
 /** Casca das rotas internas (`/menu`, `/caronas`, …). */
 export function MainLayout() {

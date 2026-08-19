@@ -1,7 +1,3 @@
-import MenuIcon from '@mui/icons-material/Menu';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router';
 
 import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
@@ -9,6 +5,7 @@ import { RoutePath } from '@app/routes/paths';
 import { APP_LINKS, LANDING_LINKS } from './constants';
 import { LandingNavButton } from './LandingNavButton';
 import { DesktopNav, HeaderBar, HeaderToolbar, LogoLink, MenuButtonSlot } from './styles';
+import { Button, IconButton, MenuIcon, Typography } from '@design-system';
 
 type HeaderProps = {
   /**

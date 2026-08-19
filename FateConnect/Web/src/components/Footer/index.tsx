@@ -1,10 +1,6 @@
-import EmailIcon from '@mui/icons-material/Email';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import PhoneIcon from '@mui/icons-material/Phone';
-import Typography from '@mui/material/Typography';
-
 import { APP_CONTACT } from '@app/constants/appContact';
 import { LandingSection } from '@app/routes/paths';
+import { EmailIcon, LocationOnIcon, PhoneIcon, Typography } from '@design-system';
 import {
   ContactItem,
   ContactsContainer,

@@ -1,8 +1,4 @@
-import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import { styled } from '@mui/material/styles';
-
-import { colorTokens } from '@design-system';
+import { Drawer, List, colorTokens, styled } from '@design-system';
 
 /** Largura do menu lateral no produto. */
 const DRAWER_WIDTH_PX = 300;

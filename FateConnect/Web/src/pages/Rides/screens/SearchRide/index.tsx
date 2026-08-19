@@ -1,4 +1,4 @@
-import Typography from '@mui/material/Typography';
+import { Typography } from '@design-system';
 
 /** Placeholder — a tela é migrada na #55. */
 export function SearchRide() {
