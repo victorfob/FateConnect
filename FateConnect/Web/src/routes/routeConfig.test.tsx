@@ -21,25 +21,25 @@ describe('routeConfig', () => {
     [RoutePath.CONTACT, 'Contato'],
     [RoutePath.RIDES_SEARCH, 'Buscar carona'],
     [RoutePath.RIDES_OFFER, 'Ofertar carona'],
-  ])('resolve %s', (path, titulo) => {
+  ])('should resolve %s', (path, title) => {
     renderRoute(path);
 
-    expect(screen.getByRole('heading', { name: titulo })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: title })).toBeInTheDocument();
   });
 
-  it('redireciona a raiz para a landing', () => {
+  it('should redirect the root path to the landing page', () => {
     const router = renderRoute(RoutePath.ROOT);
 
     expect(router.state.location.pathname).toBe(RoutePath.LANDING);
   });
 
-  it('redireciona /caronas para a busca', () => {
+  it('should redirect /caronas to the search screen', () => {
     const router = renderRoute(RoutePath.RIDES);
 
     expect(router.state.location.pathname).toBe(RoutePath.RIDES_SEARCH);
   });
 
-  it('manda rota desconhecida para a landing', () => {
+  it('should send an unknown route to the landing page', () => {
     const router = renderRoute('/rota-que-nao-existe');
 
     expect(router.state.location.pathname).toBe(RoutePath.LANDING);
