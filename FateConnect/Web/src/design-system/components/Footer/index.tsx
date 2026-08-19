@@ -3,8 +3,6 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import Typography from '@mui/material/Typography';
 
-import { APP_CONTACT } from '@app/constants/appContact';
-import { LandingSection } from '@app/routes/paths';
 import {
   ContactItem,
   ContactsContainer,
@@ -13,31 +11,42 @@ import {
   FooterRoot,
 } from './styles';
 
-export function Footer() {
+type FooterProps = {
+  /** Id da âncora usada pela navegação da aplicação. */
+  anchorId: string;
+  title: string;
+  contact: { email: string; phone: string; address: string };
+  copyrightLines: string[];
+};
+
+export function Footer({ anchorId, title, contact, copyrightLines }: FooterProps) {
   return (
     <FooterRoot>
-      <ContactsContainer id={LandingSection.CONTACT}>
-        <Typography variant="h2">Entre em contato</Typography>
+      <ContactsContainer id={anchorId}>
+        <Typography variant="h2">{title}</Typography>
 
         <ContactItem>
           <EmailIcon fontSize="small" />
-          <Typography variant="caption">{APP_CONTACT.email}</Typography>
+          <Typography variant="caption">{contact.email}</Typography>
         </ContactItem>
         <ContactItem>
           <PhoneIcon fontSize="small" />
-          <Typography variant="caption">{APP_CONTACT.phone}</Typography>
+          <Typography variant="caption">{contact.phone}</Typography>
         </ContactItem>
         <ContactItem>
           <LocationOnIcon fontSize="small" />
-          <Typography variant="caption">{APP_CONTACT.address}</Typography>
+          <Typography variant="caption">{contact.address}</Typography>
         </ContactItem>
       </ContactsContainer>
 
       <FooterDivider />
 
       <CopyrightContainer>
-        <Typography variant="caption">© 2026 FateConnect. Todos os direitos reservados.</Typography>
-        <Typography variant="caption">Desenvolvido para facilitar a vida do Fatecano.</Typography>
+        {copyrightLines.map((line) => (
+          <Typography key={line} variant="caption">
+            {line}
+          </Typography>
+        ))}
       </CopyrightContainer>
     </FooterRoot>
   );

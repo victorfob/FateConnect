@@ -1,8 +1,9 @@
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import { styled } from '@mui/material/styles';
 
-import { colorTokens, mobileMedia, shadowTokens, spacing, spacingScale } from '@ds';
+import { styled } from '../../styled';
+import { colorTokens, mobileMedia, shadowTokens, spacingScale } from '../../tokens';
+import { spacing } from '../../theme/helpers/spacing';
 
 const { xs } = spacingScale;
 
@@ -28,6 +29,17 @@ export const HeaderToolbar = styled(Toolbar)({
   color: colorTokens.textOnAccent,
 });
 
+/** Marca: sem sublinhado e herdando a cor da barra, como no produto. */
+export const LogoSlot = styled('span')({
+  '& a': {
+    textDecoration: 'none',
+    color: colorTokens.textOnAccent,
+    cursor: 'pointer',
+    transition: 'opacity 0.3s ease',
+  },
+  '& a:hover': { opacity: 0.8 },
+});
+
 export const DesktopNav = styled('nav')({
   display: 'flex',
   flexWrap: 'wrap',
@@ -40,13 +52,9 @@ export const DesktopNav = styled('nav')({
     color: colorTokens.textOnAccent,
   },
   // O destaque não recebe o peso reforçado, como no produto.
-  '& .MuiButton-contained': {
-    fontWeight: CTA_FONT_WEIGHT,
-  },
+  '& .MuiButton-contained': { fontWeight: CTA_FONT_WEIGHT },
 
-  [mobileMedia]: {
-    display: 'none',
-  },
+  [mobileMedia]: { display: 'none' },
 });
 
 export const MenuButtonSlot = styled('span')({
@@ -57,18 +65,5 @@ export const MenuButtonSlot = styled('span')({
     alignItems: 'center',
     justifyContent: 'center',
     width: '48px',
-  },
-});
-
-/** Marca: sem sublinhado e herdando a cor da barra, como no produto. */
-export const LogoLink = styled('span')({
-  '& a': {
-    textDecoration: 'none',
-    color: colorTokens.textOnAccent,
-    cursor: 'pointer',
-    transition: 'opacity 0.3s ease',
-  },
-  '& a:hover': {
-    opacity: 0.8,
   },
 });

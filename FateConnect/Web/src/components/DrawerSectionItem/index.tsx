@@ -1,6 +1,6 @@
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import { useCallback } from 'react';
+
+import { ListItemButton, ListItemText } from '@design-system';
 
 import type { LandingSection } from '@app/routes/paths';
 
