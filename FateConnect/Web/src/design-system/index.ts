@@ -1,8 +1,10 @@
 /**
- * Ponto de entrada público do design system.
+ * Ponto de entrada público do design system — componentes, estilo e os tokens
+ * que a aplicação de fato consome. Os ícones têm o seu próprio barrel, em
+ * `@design-system/icons`.
  *
- * A aplicação importa **apenas daqui** (`@ds`), nunca de um caminho interno —
- * é o que mantém barato extrair esta camada para um pacote no futuro.
+ * Aqui só entra o que pode ser usado direto na aplicação: o que é matéria-prima
+ * do tema — paleta, tipografia, fábrica do tema — fica interno de propósito.
  */
 export * from './ui';
 export { styled, css, keyframes, darken, lighten, alpha } from './styled';
@@ -24,20 +26,14 @@ export { DateLocalizationProvider } from './DateLocalizationProvider';
 export { useThemeMode } from './ThemeProvider/context/ThemeModeContext';
 export { ThemeToggleButton } from './components/ThemeToggleButton';
 export { GlobalStyles } from './GlobalStyles';
-export { createAppTheme, spacing, radius, components } from './theme';
+export { spacing, radius } from './theme';
 export {
   spacingScale,
   radiusScale,
   shadowTokens,
   iconSizeTokens,
-  fontFamily,
-  typographyTokens,
-  MOBILE_MAX_WIDTH_PX,
-  TABLET_MAX_WIDTH_PX,
-  COMPACT_MAX_WIDTH_PX,
   compactMedia,
   mobileMedia,
   tabletMedia,
   desktopMedia,
 } from './tokens';
-export type { SpacingToken, RadiusToken, TypographyToken } from './tokens';
