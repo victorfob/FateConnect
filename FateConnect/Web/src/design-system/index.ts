@@ -14,7 +14,7 @@ export { Footer } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
 
 export { ThemeProvider } from './ThemeProvider';
-export { useThemeMode } from './ThemeProvider/ThemeModeContext';
+export { useThemeMode } from './ThemeProvider/context/ThemeModeContext';
 export { ThemeToggleButton } from './components/ThemeToggleButton';
 export { GlobalStyles } from './GlobalStyles';
 export { createAppTheme, spacing, radius, components } from './theme';
