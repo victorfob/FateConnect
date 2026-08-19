@@ -6,6 +6,7 @@
  */
 export * from './ui';
 export { styled, css, keyframes, darken, lighten, alpha } from './styled';
+export type { PolymorphicProps } from './styled';
 
 export { Header } from './components/Header';
 export { HEADER_HEIGHT_PX } from './components/Header/styles';
@@ -13,6 +14,8 @@ export { Footer } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
 
 export { ThemeProvider } from './ThemeProvider';
+export { useThemeMode } from './ThemeProvider/ThemeModeContext';
+export { ThemeToggleButton } from './components/ThemeToggleButton';
 export { GlobalStyles } from './GlobalStyles';
 export { createAppTheme, spacing, radius, components } from './theme';
 export {

@@ -5,6 +5,7 @@
  * envolver, substituir ou restringir um componente sem varrer o app inteiro.
  */
 export { default as AppBar } from '@mui/material/AppBar';
+export { default as Box } from '@mui/material/Box';
 export { default as Button } from '@mui/material/Button';
 export { default as Drawer } from '@mui/material/Drawer';
 export { default as InputAdornment } from '@mui/material/InputAdornment';
@@ -12,6 +13,7 @@ export { default as IconButton } from '@mui/material/IconButton';
 export { default as List } from '@mui/material/List';
 export { default as ListItemButton } from '@mui/material/ListItemButton';
 export { default as ListItemText } from '@mui/material/ListItemText';
+export { default as Stack } from '@mui/material/Stack';
 export { default as TextField } from '@mui/material/TextField';
 export { default as Toolbar } from '@mui/material/Toolbar';
 export { default as Typography } from '@mui/material/Typography';
@@ -19,9 +21,12 @@ export { default as Typography } from '@mui/material/Typography';
 export type { ButtonProps } from '@mui/material/Button';
 export type { TypographyProps } from '@mui/material/Typography';
 export type { SvgIconComponent } from '@mui/icons-material';
+export type { BoxProps } from '@mui/material/Box';
 
 export { default as DirectionsCarIcon } from '@mui/icons-material/DirectionsCar';
+export { default as DarkModeIcon } from '@mui/icons-material/DarkMode';
 export { default as EmailIcon } from '@mui/icons-material/Email';
+export { default as LightModeIcon } from '@mui/icons-material/LightMode';
 export { default as GroupsIcon } from '@mui/icons-material/Groups';
 export { default as LocationOnIcon } from '@mui/icons-material/LocationOn';
 export { default as MenuIcon } from '@mui/icons-material/Menu';
