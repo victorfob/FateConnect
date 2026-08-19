@@ -8,6 +8,9 @@ export function GlobalStyles() {
     <GlobalStylesBase
       styles={{
         '*, *::before, *::after': { boxSizing: 'border-box' },
+        html: { scrollBehavior: 'smooth' },
+        // Compensa o topo fixo ao rolar até uma seção pelo fragmento da URL.
+        '[id]': { scrollMarginTop: '5rem' },
         'html, body, #root': { height: '100%' },
         body: {
           margin: 0,

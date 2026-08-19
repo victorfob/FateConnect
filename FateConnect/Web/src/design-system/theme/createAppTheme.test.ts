@@ -2,15 +2,21 @@ import { describe, expect, it } from 'vitest';
 
 import { colorTokens, spacingScale, typographyTokens } from '../tokens';
 import { createAppTheme } from './createAppTheme';
+import { spacing } from './helpers/spacing';
 
 describe('createAppTheme', () => {
-  it('should use the token scale in rem instead of the default 8px multiplier', () => {
+  it('should keep the mui spacing untouched so its own components are not shrunk', () => {
     const theme = createAppTheme();
 
-    // Sem o override, theme.spacing(16) devolveria '128px' e o layout ficaria 8x errado.
-    expect(theme.spacing(spacingScale.md)).toBe('1rem');
-    expect(theme.spacing(spacingScale.xs)).toBe('0.5rem');
-    expect(theme.spacing(spacingScale.md)).not.toBe('128px');
+    // O MUI chama theme.spacing(1..3) internamente — gutters do Toolbar, padding
+    // de Dialog e de Card. Sobrescrever isso encolhia as gutters de 24px para 3px.
+    expect(theme.spacing(1)).toBe('8px');
+    expect(theme.spacing(3)).toBe('24px');
+  });
+
+  it('should convert our px tokens to rem through the design system helper', () => {
+    expect(spacing(spacingScale.md)).toBe('1rem');
+    expect(spacing(spacingScale.xs)).toBe('0.5rem');
   });
 
   it('should expose the product typography variants with the current scale values', () => {
