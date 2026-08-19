@@ -11,9 +11,11 @@ export const LANDING_LINKS: LandingLink[] = [
   { section: LandingSection.LOGIN, label: 'Entrar', highlighted: true },
 ];
 
-/** Navegação da área logada. */
+/**
+ * Navegação da área logada. Sem "Entre em Contato": a tela de contato existe
+ * como âncora na landing, não como rota de quem já entrou.
+ */
 export const APP_LINKS: AppLink[] = [
   { path: RoutePath.LOST_AND_FOUND, label: 'Achados & Perdidos' },
   { path: RoutePath.RIDES, label: 'Caronas' },
-  { path: RoutePath.CONTACT, label: 'Entre em Contato' },
 ];
