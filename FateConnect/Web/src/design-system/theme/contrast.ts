@@ -1,59 +1,111 @@
+/**
+ * Constantes da definição de luminância relativa da WCAG 2.1. Os nomes seguem
+ * o papel de cada número na fórmula — a especificação não os batiza.
+ */
+const CHANNEL_MAX = 255;
+const LINEAR_SEGMENT_THRESHOLD = 0.03928;
+const LINEAR_SEGMENT_DIVISOR = 12.92;
+const GAMMA_OFFSET = 0.055;
+const GAMMA_DIVISOR = 1.055;
+const GAMMA_EXPONENT = 2.4;
+const RED_WEIGHT = 0.2126;
+const GREEN_WEIGHT = 0.7152;
+const BLUE_WEIGHT = 0.0722;
+/** Evita divisão por zero quando uma das cores é preto puro. */
+const CONTRAST_OFFSET = 0.05;
+
+const HEX_RADIX = 16;
+const HEX_CHANNEL_LENGTH = 2;
+const RED_POSITION = 0;
+const GREEN_POSITION = 1;
+const BLUE_POSITION = 2;
+const ALPHA_POSITION = 3;
+const OPAQUE = 1;
+
+type Rgb = { red: number; green: number; blue: number };
+
 /** Canal linearizado, conforme a definição de luminância relativa da WCAG. */
-function canalLinear(valor: number): number {
-  const normalizado = valor / 255;
+function toLinearChannel(value: number): number {
+  const normalized = value / CHANNEL_MAX;
 
-  if (normalizado <= 0.03928) return normalizado / 12.92;
-  return ((normalizado + 0.055) / 1.055) ** 2.4;
+  if (normalized <= LINEAR_SEGMENT_THRESHOLD) return normalized / LINEAR_SEGMENT_DIVISOR;
+
+  return ((normalized + GAMMA_OFFSET) / GAMMA_DIVISOR) ** GAMMA_EXPONENT;
 }
 
-function canaisDe(texto: string): number[] {
-  return texto.split(',').map((parte) => Number(parte));
+function toNumbers(text: string): number[] {
+  return text.split(',').map((part) => Number(part));
 }
 
-function toRgb(color: string): [number, number, number] {
+function fromHex(hex: string): Rgb {
+  const channelAt = (position: number): number => {
+    const start = position * HEX_CHANNEL_LENGTH;
+
+    return parseInt(hex.slice(start, start + HEX_CHANNEL_LENGTH), HEX_RADIX);
+  };
+
+  return {
+    red: channelAt(RED_POSITION),
+    green: channelAt(GREEN_POSITION),
+    blue: channelAt(BLUE_POSITION),
+  };
+}
+
+function toRgb(color: string): Rgb {
   const hex = /^#([0-9a-f]{6})$/i.exec(color.trim())?.[1];
-  if (hex) {
-    const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
-    return [r ?? 0, g ?? 0, b ?? 0];
-  }
+  if (hex) return fromHex(hex);
 
-  const conteudo = /rgba?\(([^)]+)\)/.exec(color)?.[1];
-  if (!conteudo) throw new Error(`Cor não reconhecida: ${color}`);
+  const channels = /rgba?\(([^)]+)\)/.exec(color)?.[1];
+  if (!channels) throw new Error(`Cor não reconhecida: ${color}`);
 
-  const [r, g, b] = canaisDe(conteudo);
-  return [r ?? 0, g ?? 0, b ?? 0];
+  const values = toNumbers(channels);
+
+  return {
+    red: values[RED_POSITION] ?? 0,
+    green: values[GREEN_POSITION] ?? 0,
+    blue: values[BLUE_POSITION] ?? 0,
+  };
 }
 
 /**
  * Achata uma cor com transparência sobre um fundo opaco. As "on colors" do
  * tema escuro usam alfa, e o contraste precisa ser medido na cor resultante.
  */
-function achatar(color: string, background: string): [number, number, number] {
-  const conteudo = /rgba\(([^)]+)\)/.exec(color)?.[1];
-  if (!conteudo) return toRgb(color);
+function flatten(color: string, background: string): Rgb {
+  const channels = /rgba\(([^)]+)\)/.exec(color)?.[1];
+  if (!channels) return toRgb(color);
 
-  const partes = canaisDe(conteudo);
-  const alfa = partes[3] ?? 1;
-  const fundo = toRgb(background);
-  const [r, g, b] = [0, 1, 2].map((i) => (partes[i] ?? 0) * alfa + (fundo[i] ?? 0) * (1 - alfa));
+  const values = toNumbers(channels);
+  const alpha = values[ALPHA_POSITION] ?? OPAQUE;
+  const backdrop = toRgb(background);
+  const blend = (value: number, backdropValue: number): number =>
+    value * alpha + backdropValue * (OPAQUE - alpha);
 
-  return [r ?? 0, g ?? 0, b ?? 0];
+  return {
+    red: blend(values[RED_POSITION] ?? 0, backdrop.red),
+    green: blend(values[GREEN_POSITION] ?? 0, backdrop.green),
+    blue: blend(values[BLUE_POSITION] ?? 0, backdrop.blue),
+  };
 }
 
 export function relativeLuminance(color: string, background = '#FFFFFF'): number {
-  const [r, g, b] = achatar(color, background);
+  const { red, green, blue } = flatten(color, background);
 
-  return 0.2126 * canalLinear(r) + 0.7152 * canalLinear(g) + 0.0722 * canalLinear(b);
+  return (
+    RED_WEIGHT * toLinearChannel(red) +
+    GREEN_WEIGHT * toLinearChannel(green) +
+    BLUE_WEIGHT * toLinearChannel(blue)
+  );
 }
 
 /** Razão de contraste da WCAG entre duas cores, de 1:1 a 21:1. */
 export function contrastRatio(foreground: string, background: string): number {
-  const luminanciaTexto = relativeLuminance(foreground, background);
-  const luminanciaFundo = relativeLuminance(background, background);
-  const clara = Math.max(luminanciaTexto, luminanciaFundo);
-  const escura = Math.min(luminanciaTexto, luminanciaFundo);
+  const foregroundLuminance = relativeLuminance(foreground, background);
+  const backgroundLuminance = relativeLuminance(background, background);
+  const lighter = Math.max(foregroundLuminance, backgroundLuminance);
+  const darker = Math.min(foregroundLuminance, backgroundLuminance);
 
-  return (clara + 0.05) / (escura + 0.05);
+  return (lighter + CONTRAST_OFFSET) / (darker + CONTRAST_OFFSET);
 }
 
 /** Mínimos da WCAG nível AA. */
