@@ -2,6 +2,7 @@ export type TypographyToken = {
   fontSize: string;
   fontWeight: number;
   lineHeight: number;
+  letterSpacing?: string;
 };
 
 export const fontFamily = "'Inter', 'Helvetica Neue', sans-serif";
@@ -19,4 +20,12 @@ export const typographyTokens = {
   caption: { fontSize: '0.875rem', fontWeight: 400, lineHeight: 1.4 },
   captionBold: { fontSize: '0.875rem', fontWeight: 700, lineHeight: 1.4 },
   logo: { fontSize: '1.3rem', fontWeight: 600, lineHeight: 1.2 },
+  /**
+   * Rótulo de botão. O padrão do MUI é menor e mais pesado que o do produto
+   * (0.875rem/500, com espaçamento entre letras), o que mudaria o texto de
+   * todos os botões da aplicação.
+   */
+  button: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.5, letterSpacing: 'normal' },
+  /** Mensagem sob o campo. Acompanha o corpo do campo, como no produto. */
+  formHelper: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.25 },
 } satisfies Record<string, TypographyToken>;

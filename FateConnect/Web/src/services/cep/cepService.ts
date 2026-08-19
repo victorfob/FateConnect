@@ -10,13 +10,20 @@ const FALLBACK_PROVIDER = 'https://opencep.com/v1';
  * secundário. Usa `axios` direto, sem o client da aplicação: são serviços
  * externos, que não recebem o token nem o tratamento de erro da nossa API.
  */
-export async function lookupCep(zipDigits: string): Promise<CepAddress> {
+export async function lookupCep(zipDigits: string, signal?: AbortSignal): Promise<CepAddress> {
   try {
-    const { data } = await axios.get<CepAddress>(`${PRIMARY_PROVIDER}/${zipDigits}/json/`);
+    const { data } = await axios.get<CepAddress>(`${PRIMARY_PROVIDER}/${zipDigits}/json/`, {
+      signal,
+    });
 
     return data;
-  } catch {
-    const { data } = await axios.get<CepAddress>(`${FALLBACK_PROVIDER}/${zipDigits}.json`);
+  } catch (error) {
+    // Consulta cancelada não é falha do provedor: não vale tentar o secundário.
+    if (axios.isCancel(error)) throw error;
+
+    const { data } = await axios.get<CepAddress>(`${FALLBACK_PROVIDER}/${zipDigits}.json`, {
+      signal,
+    });
 
     return data;
   }

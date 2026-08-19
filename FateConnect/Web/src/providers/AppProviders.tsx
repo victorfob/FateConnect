@@ -1,7 +1,7 @@
 import { SnackbarProvider } from 'notistack';
 import type { ReactNode } from 'react';
 
-import { ThemeProvider } from '@design-system';
+import { DateLocalizationProvider, ThemeProvider } from '@design-system';
 import { NOTIFICATION_AUTO_HIDE_MS } from '@app/hooks/useNotification';
 import { QueryProvider } from './QueryProvider';
 
@@ -16,7 +16,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
         autoHideDuration={NOTIFICATION_AUTO_HIDE_MS}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <DateLocalizationProvider>{children}</DateLocalizationProvider>
+        </QueryProvider>
       </SnackbarProvider>
     </ThemeProvider>
   );

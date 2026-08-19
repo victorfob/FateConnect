@@ -27,7 +27,6 @@ import {
   SIGNUP_LINK_LABEL,
   SIGNUP_PROMPT,
   SUBMIT_LABEL,
-  SUBMIT_LOADING_LABEL,
   welcomeMessage,
 } from './constants';
 import { loginSchema, type LoginFormValues } from './schema';
@@ -133,8 +132,8 @@ export function LandingLoginCard() {
         />
 
         <S.SubmitRow>
-          <Button type="submit" variant="contained" color="error" disabled={isPending}>
-            {isPending ? SUBMIT_LOADING_LABEL : SUBMIT_LABEL}
+          <Button type="submit" variant="contained" color="error" loading={isPending}>
+            {SUBMIT_LABEL}
           </Button>
         </S.SubmitRow>
       </S.Form>

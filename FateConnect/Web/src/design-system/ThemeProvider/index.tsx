@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react';
 
 import { GlobalStyles } from '../GlobalStyles';
 import { createAppTheme, type ThemeMode } from '../theme';
-import { ThemeModeContext } from './ThemeModeContext';
+import { ThemeModeContext } from './context/ThemeModeContext';
 
 type ThemeProviderProps = {
   children: ReactNode;

@@ -56,6 +56,7 @@ export function createAppTheme(mode: ThemeMode = 'light'): Theme {
         caption: typographyTokens.caption,
         captionBold: typographyTokens.captionBold,
         logo: typographyTokens.logo,
+        button: typographyTokens.button,
       },
     },
     corePtBR,

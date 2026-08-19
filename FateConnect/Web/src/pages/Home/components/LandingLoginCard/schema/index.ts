@@ -8,7 +8,7 @@ export const LOGIN_MESSAGES = {
 };
 
 export const loginSchema = z.object({
-  email: z.string().min(1, LOGIN_MESSAGES.emailRequired).email(LOGIN_MESSAGES.emailInvalid),
+  email: z.string().min(1, LOGIN_MESSAGES.emailRequired).pipe(z.email(LOGIN_MESSAGES.emailInvalid)),
   password: z.string().min(1, LOGIN_MESSAGES.passwordRequired),
 });
 

@@ -1,5 +1,5 @@
 import { styled } from '../../styled';
-import { chromeSurface, onChromeSurface } from '../../theme/chromeSurface';
+import { chromeDivider, chromeSurface, onChromeSurface } from '../../theme/chromeSurface';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import type { PolymorphicProps } from '../../styled';
@@ -48,7 +48,7 @@ export const ContactItem = styled(Stack)<PolymorphicProps>({
 export const FooterDivider = styled(Box)<PolymorphicProps>(({ theme }) => ({
   width: '1px',
   height: 'auto',
-  backgroundColor: theme.palette.divider,
+  backgroundColor: chromeDivider(theme),
 
   [mobileMedia]: { width: '100%', height: '1px' },
 }));

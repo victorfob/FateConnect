@@ -55,6 +55,9 @@ export const SignupRow = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   color: theme.palette.text.secondary,
 
   '& a': {
+    // Sem `inline-flex` a âncora impõe a entrelinha do corpo (24px) e a linha
+    // fica mais alta que a do produto, que segue a altura do próprio texto.
+    display: 'inline-flex',
     color: theme.palette.secondary.main,
     textDecoration: 'none',
   },
