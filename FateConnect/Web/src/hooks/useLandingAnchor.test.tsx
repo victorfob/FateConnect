@@ -5,7 +5,7 @@ import { LandingSection, RoutePath } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
 import { useLandingAnchor } from './useLandingAnchor';
 
-function BotaoDeSecao() {
+function SectionButton() {
   const goToSection = useLandingAnchor();
 
   return (
@@ -15,11 +15,11 @@ function BotaoDeSecao() {
   );
 }
 
-function renderEm(initialPath: string) {
+function renderAt(initialPath: string) {
   const router = createMemoryRouter(
     [
-      { path: RoutePath.LANDING, element: <BotaoDeSecao /> },
-      { path: RoutePath.CONTACT, element: <BotaoDeSecao /> },
+      { path: RoutePath.LANDING, element: <SectionButton /> },
+      { path: RoutePath.CONTACT, element: <SectionButton /> },
     ],
     { initialEntries: [initialPath] },
   );
@@ -33,8 +33,8 @@ describe('useLandingAnchor', () => {
     vi.restoreAllMocks();
   });
 
-  it('estando em outra rota, navega para a landing com o fragmento', async () => {
-    const router = renderEm(RoutePath.CONTACT);
+  it('should navigate to the landing page with the fragment when on another route', async () => {
+    const router = renderAt(RoutePath.CONTACT);
 
     await userEvent.click(screen.getByRole('button', { name: 'Serviços' }));
 
@@ -42,18 +42,18 @@ describe('useLandingAnchor', () => {
     expect(router.state.location.hash).toBe(`#${LandingSection.SERVICES}`);
   });
 
-  it('já estando na landing, rola até a seção sem navegar', async () => {
+  it('should scroll to the section without navigating when already on the landing page', async () => {
     const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
-    const secao = document.createElement('section');
-    secao.id = LandingSection.SERVICES;
-    document.body.appendChild(secao);
+    const section = document.createElement('section');
+    section.id = LandingSection.SERVICES;
+    document.body.appendChild(section);
 
-    const router = renderEm(RoutePath.LANDING);
+    const router = renderAt(RoutePath.LANDING);
     await userEvent.click(screen.getByRole('button', { name: 'Serviços' }));
 
     expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
     expect(router.state.location.hash).toBe('');
 
-    secao.remove();
+    section.remove();
   });
 });

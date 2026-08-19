@@ -4,12 +4,12 @@ import { describe, expect, it } from 'vitest';
 import { render, screen } from '@app/test/testing-library';
 
 describe('ThemeProvider', () => {
-  it('entrega o tema para os componentes da árvore', () => {
+  it('should provide the theme to components in the tree', () => {
     render(<Typography variant="logo">FateConnect</Typography>);
 
-    const elemento = screen.getByText('FateConnect');
+    const element = screen.getByText('FateConnect');
 
-    expect(elemento).toBeInTheDocument();
-    expect(getComputedStyle(elemento).fontSize).toBe('1.3rem');
+    expect(element).toBeInTheDocument();
+    expect(getComputedStyle(element).fontSize).toBe('1.3rem');
   });
 });
