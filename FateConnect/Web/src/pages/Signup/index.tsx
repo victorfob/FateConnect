@@ -45,6 +45,8 @@ export function Signup() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: signup,
+    // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
+    meta: { notifiesErrorItself: true },
     onSuccess: (response) => {
       notifySuccess(signupSuccessMessage(response.nomeCompleto));
       navigate(LOGIN_ANCHOR);

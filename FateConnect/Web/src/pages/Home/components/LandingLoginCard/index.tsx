@@ -59,6 +59,8 @@ export function LandingLoginCard() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: login,
+    // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
+    meta: { notifiesErrorItself: true },
     onSuccess: (response) => {
       notifySuccess(welcomeMessage(response.nomeCompleto));
       navigate(RoutePath.MENU);
