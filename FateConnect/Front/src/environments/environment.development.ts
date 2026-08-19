@@ -1,4 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://191.252.210.114:5000/api'
+
+  rideApiUrl: 'http://localhost:5240/api',
+  apiUrl: 'http://localhost:5011/api'
 };
