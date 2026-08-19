@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles';
 
-import { colorTokens, mobileMedia, spacing, spacingScale } from '@ds';
+import { colorTokens, mobileMedia, spacing, spacingScale } from '@design-system';
 
 const { md } = spacingScale;
 

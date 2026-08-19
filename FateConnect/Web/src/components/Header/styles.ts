@@ -2,7 +2,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { styled } from '@mui/material/styles';
 
-import { colorTokens, mobileMedia, shadowTokens, spacing, spacingScale } from '@ds';
+import { colorTokens, mobileMedia, shadowTokens, spacing, spacingScale } from '@design-system';
 
 const { xs } = spacingScale;
 
