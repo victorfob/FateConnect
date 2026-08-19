@@ -1,5 +1,9 @@
 import { styled } from '../../styled';
-import { colorTokens, mobileMedia, spacingScale } from '../../tokens';
+import { chromeSurface, onChromeSurface } from '../../theme/chromeSurface';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import type { PolymorphicProps } from '../../styled';
+import { mobileMedia, spacingScale } from '../../tokens';
 import { spacing } from '../../theme/helpers/spacing';
 
 const { md, xs } = spacingScale;
@@ -9,12 +13,11 @@ const { md, xs } = spacingScale;
  * assinatura à direita, divisor vertical entre eles) e coluna centralizada
  * abaixo do breakpoint mobile. Paddings em `vw`, como no original.
  */
-export const FooterRoot = styled('footer')({
-  display: 'flex',
+export const FooterRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
-  backgroundColor: colorTokens.primary,
-  color: colorTokens.textOnAccent,
+  backgroundColor: chromeSurface(theme),
+  color: onChromeSurface(theme),
   padding: '3vw 7vw',
   gap: spacing(md),
   width: '100%',
@@ -24,10 +27,9 @@ export const FooterRoot = styled('footer')({
     alignItems: 'center',
     padding: '7vw',
   },
-});
+}));
 
-export const ContactsContainer = styled('div')({
-  display: 'flex',
+export const ContactsContainer = styled(Stack)<PolymorphicProps>({
   flexDirection: 'column',
   justifyContent: 'center',
   gap: spacing(md),
@@ -36,24 +38,22 @@ export const ContactsContainer = styled('div')({
   [mobileMedia]: { alignItems: 'center' },
 });
 
-export const ContactItem = styled('div')({
-  display: 'flex',
+export const ContactItem = styled(Stack)<PolymorphicProps>({
   flexDirection: 'row',
   alignItems: 'center',
   gap: spacing(xs),
 });
 
 /** Vertical no desktop, horizontal no mobile. */
-export const FooterDivider = styled('div')({
+export const FooterDivider = styled(Box)<PolymorphicProps>(({ theme }) => ({
   width: '1px',
   height: 'auto',
-  backgroundColor: colorTokens.divider,
+  backgroundColor: theme.palette.divider,
 
   [mobileMedia]: { width: '100%', height: '1px' },
-});
+}));
 
-export const CopyrightContainer = styled('div')({
-  display: 'flex',
+export const CopyrightContainer = styled(Stack)<PolymorphicProps>({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'flex-end',

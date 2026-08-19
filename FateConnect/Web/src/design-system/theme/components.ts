@@ -1,6 +1,7 @@
 import type { Components, Theme } from '@mui/material/styles';
 
-import { colorTokens, radiusScale, shadowTokens } from '../tokens';
+import { radiusScale, shadowTokens } from '../tokens';
+import { chromeSurface } from './chromeSurface';
 import { radius } from './helpers/radius';
 
 /** Overrides de componente do MUI alinhados ao visual já implementado no produto. */
@@ -20,6 +21,8 @@ export const components: Components<Theme> = {
   MuiDialog: { styleOverrides: { paper: { borderRadius: radius(radiusScale.lg) } } },
   MuiAppBar: {
     defaultProps: { elevation: 0 },
-    styleOverrides: { root: { backgroundColor: colorTokens.primary } },
+    styleOverrides: {
+      root: ({ theme }) => ({ backgroundColor: chromeSurface(theme) }),
+    },
   },
 };
