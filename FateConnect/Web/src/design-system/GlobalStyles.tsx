@@ -7,7 +7,8 @@ export function GlobalStyles() {
   return (
     <GlobalStylesBase
       styles={{
-        '*, *::before, *::after': { boxSizing: 'border-box' },
+        // Mesmo reset do produto: zera margem e recuo de todo elemento.
+        '*, *::before, *::after': { boxSizing: 'border-box', margin: 0, padding: 0 },
         html: { scrollBehavior: 'smooth' },
         // Compensa o topo fixo ao rolar até uma seção pelo fragmento da URL.
         '[id]': { scrollMarginTop: '5rem' },
