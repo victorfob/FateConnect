@@ -1,6 +1,25 @@
-import { Typography } from '@design-system';
+import { LandingSection } from '@app/routes/paths';
+import { LandingDescription } from './components/LandingDescription';
+import { LandingHowItWorks } from './components/LandingHowItWorks';
+import { LandingLoginCard } from './components/LandingLoginCard';
+import { LandingServices } from './components/LandingServices';
+import * as S from './styles';
 
-/** Placeholder — a tela é migrada na #53. */
 export function Home() {
-  return <Typography variant="h1">Início</Typography>;
+  return (
+    <S.HomeRoot>
+      <S.DescriptionContainer aria-label="Apresentação e acesso">
+        <LandingDescription />
+        <S.LoginAnchor id={LandingSection.LOGIN}>
+          <LandingLoginCard />
+        </S.LoginAnchor>
+      </S.DescriptionContainer>
+
+      <S.ServicesContainer aria-label="Nossos Serviços">
+        <LandingServices />
+      </S.ServicesContainer>
+
+      <LandingHowItWorks />
+    </S.HomeRoot>
+  );
 }
