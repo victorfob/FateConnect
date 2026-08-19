@@ -4,7 +4,7 @@ import { RoutePathEnum } from '@app/routes/paths';
 import { Typography } from '@design-system';
 import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
 
-import { BACK_LABEL, OFFER_TAB_LABEL, RIDES_TITLE, SEARCH_TAB_LABEL } from './constants';
+import * as C from './constants';
 import * as S from './styles';
 
 /** Casca das caronas: título, volta para o menu e as duas abas de rota. */
@@ -12,12 +12,12 @@ export function Rides() {
   return (
     <S.RidesRoot>
       <S.RidesHeader>
-        <S.PageTitle variant="h1">{RIDES_TITLE}</S.PageTitle>
+        <S.PageTitle variant="h1">{C.RIDES_TITLE}</S.PageTitle>
 
         <S.BackButton component={NavLink} to={RoutePathEnum.MENU}>
           <ArrowBackIcon fontSize="small" />
           <Typography variant="subtitleBold" color="inherit">
-            {BACK_LABEL}
+            {C.BACK_LABEL}
           </Typography>
         </S.BackButton>
       </S.RidesHeader>
@@ -26,14 +26,14 @@ export function Rides() {
         <S.Tab component={NavLink} to={RoutePathEnum.RIDES_SEARCH} end>
           <SearchIcon fontSize="small" />
           <Typography variant="subtitleBold" color="inherit">
-            {SEARCH_TAB_LABEL}
+            {C.SEARCH_TAB_LABEL}
           </Typography>
         </S.Tab>
 
         <S.Tab component={NavLink} to={RoutePathEnum.RIDES_OFFER}>
           <AddIcon fontSize="small" />
           <Typography variant="subtitleBold" color="inherit">
-            {OFFER_TAB_LABEL}
+            {C.OFFER_TAB_LABEL}
           </Typography>
         </S.Tab>
       </S.TabList>

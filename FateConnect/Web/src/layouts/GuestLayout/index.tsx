@@ -3,7 +3,7 @@ import { Link as RouterLink, Outlet } from 'react-router';
 
 import { DrawerSectionItem } from '@app/components/DrawerSectionItem';
 import { LandingNavButton } from '@app/components/LandingNavButton';
-import { APP_CONTACT, FOOTER_COPYRIGHT_LINES, FOOTER_TITLE } from '@app/constants/appContact';
+import * as C from '@app/constants/appContact';
 import { LANDING_LINKS } from '@app/constants/navigation';
 import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
@@ -70,9 +70,9 @@ export function GuestLayout() {
 
       <Footer
         anchorId={LandingSectionEnum.CONTACT}
-        title={FOOTER_TITLE}
-        contact={APP_CONTACT}
-        copyrightLines={FOOTER_COPYRIGHT_LINES}
+        title={C.FOOTER_TITLE}
+        contact={C.APP_CONTACT}
+        copyrightLines={C.FOOTER_COPYRIGHT_LINES}
       />
     </S.ShellRoot>
   );

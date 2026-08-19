@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Link as RouterLink, Outlet } from 'react-router';
 
-import { APP_CONTACT, FOOTER_COPYRIGHT_LINES, FOOTER_TITLE } from '@app/constants/appContact';
+import * as C from '@app/constants/appContact';
 import { APP_LINKS } from '@app/constants/navigation';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import {
@@ -61,9 +61,9 @@ export function MainLayout() {
 
       <Footer
         anchorId={LandingSectionEnum.CONTACT}
-        title={FOOTER_TITLE}
-        contact={APP_CONTACT}
-        copyrightLines={FOOTER_COPYRIGHT_LINES}
+        title={C.FOOTER_TITLE}
+        contact={C.APP_CONTACT}
+        copyrightLines={C.FOOTER_COPYRIGHT_LINES}
       />
     </S.ShellRoot>
   );

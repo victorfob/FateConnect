@@ -6,7 +6,7 @@ import { server } from '@app/mocks/server';
 import { routeConfig } from '@app/routes/routeConfig';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
-import { BACK_LABEL, OFFER_TAB_LABEL, RIDES_TITLE, SEARCH_TAB_LABEL } from './constants';
+import * as C from './constants';
 import { OFFER_TITLE } from './screens/OfferRide/constants';
 
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
@@ -26,8 +26,8 @@ describe('Rides', () => {
   it('should render the title and the way back to the menu', () => {
     renderRides();
 
-    expect(screen.getByRole('heading', { name: RIDES_TITLE })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: BACK_LABEL })).toHaveAttribute(
+    expect(screen.getByRole('heading', { name: C.RIDES_TITLE })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: C.BACK_LABEL })).toHaveAttribute(
       'href',
       RoutePathEnum.MENU,
     );
@@ -36,17 +36,19 @@ describe('Rides', () => {
   it('should mark the current tab for assistive technology', () => {
     renderRides();
 
-    expect(screen.getByRole('link', { name: SEARCH_TAB_LABEL })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: C.SEARCH_TAB_LABEL })).toHaveAttribute(
       'aria-current',
       'page',
     );
-    expect(screen.getByRole('link', { name: OFFER_TAB_LABEL })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link', { name: C.OFFER_TAB_LABEL })).not.toHaveAttribute(
+      'aria-current',
+    );
   });
 
   it('should move to the offer screen through the tab', async () => {
     const router = renderRides();
 
-    await userEvent.click(screen.getByRole('link', { name: OFFER_TAB_LABEL }));
+    await userEvent.click(screen.getByRole('link', { name: C.OFFER_TAB_LABEL }));
 
     expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES_OFFER);
     expect(await screen.findByRole('heading', { name: OFFER_TITLE })).toBeInTheDocument();

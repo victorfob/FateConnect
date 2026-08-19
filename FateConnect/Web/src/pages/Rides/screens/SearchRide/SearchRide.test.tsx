@@ -6,13 +6,7 @@ import { RideTypeEnum } from '@app/services/rides/types';
 import type { Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { SearchRide } from '.';
-import {
-  DELETE_DIALOG,
-  EMPTY_LIST_MESSAGE,
-  RIDE_CARD_LABELS,
-  RIDE_LIST_MESSAGES,
-  seatsLabel,
-} from '../../constants';
+import * as C from '../../constants';
 import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from '../../components/RideFilter/constants';
 
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
@@ -47,7 +41,7 @@ describe('SearchRide', () => {
     expect(await screen.findByText(RIDE.destino)).toBeInTheDocument();
     expect(screen.getByText('22/05/2026')).toBeInTheDocument();
     expect(screen.getByText('07:30')).toBeInTheDocument();
-    expect(screen.getByText(seatsLabel(RIDE.qtdVagas))).toBeInTheDocument();
+    expect(screen.getByText(C.seatsLabel(RIDE.qtdVagas))).toBeInTheDocument();
     // A etiqueta existe duas vezes: uma no cabeçalho e outra no rodapé do
     // cartão, alternadas por media query — que o jsdom não avalia.
     expect(screen.getAllByText('Filantrópica')).toHaveLength(2);
@@ -57,7 +51,7 @@ describe('SearchRide', () => {
     listReturning([]);
     render(<SearchRide />);
 
-    expect(await screen.findByText(EMPTY_LIST_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
   });
 
   it('should report a failure to load the list', async () => {
@@ -66,7 +60,7 @@ describe('SearchRide', () => {
 
     // O cliente tenta a requisição de novo antes de desistir.
     expect(
-      await screen.findByText(RIDE_LIST_MESSAGES.loadFailed, undefined, { timeout: 5000 }),
+      await screen.findByText(C.RIDE_LIST_MESSAGES.loadFailed, undefined, { timeout: 5000 }),
     ).toBeInTheDocument();
   });
 
@@ -74,7 +68,7 @@ describe('SearchRide', () => {
     server.use(http.get(RIDES_URL, () => new HttpResponse(null, { status: 500 })));
     render(<SearchRide />);
 
-    await screen.findByText(RIDE_LIST_MESSAGES.loadFailed, undefined, { timeout: 5000 });
+    await screen.findByText(C.RIDE_LIST_MESSAGES.loadFailed, undefined, { timeout: 5000 });
 
     expect(screen.getAllByRole('alert')).toHaveLength(1);
   });
@@ -85,7 +79,7 @@ describe('SearchRide', () => {
       requestUrl = url;
     });
     render(<SearchRide />);
-    await screen.findByText(EMPTY_LIST_MESSAGE);
+    await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
     await userEvent.type(screen.getByLabelText(FILTER_LABELS.destination), 'Sorocaba');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
@@ -98,13 +92,13 @@ describe('SearchRide', () => {
     render(<SearchRide />);
     await screen.findByText(RIDE.destino);
 
-    await userEvent.click(screen.getByRole('button', { name: RIDE_CARD_LABELS.delete }));
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
 
     const dialog = within(await screen.findByRole('dialog'));
-    expect(dialog.getByRole('heading', { name: DELETE_DIALOG.title })).toBeInTheDocument();
+    expect(dialog.getByRole('heading', { name: C.DELETE_DIALOG.title })).toBeInTheDocument();
     expect(dialog.getByText(RIDE.destino)).toBeInTheDocument();
 
-    await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.cancelLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: C.DELETE_DIALOG.cancelLabel }));
 
     // O cartão só volta a ser alcançável quando o diálogo termina de fechar.
     expect(within(await screen.findByRole('article')).getByText(RIDE.destino)).toBeInTheDocument();
@@ -123,12 +117,12 @@ describe('SearchRide', () => {
     render(<SearchRide />);
     await screen.findByText(RIDE.destino);
 
-    await userEvent.click(screen.getByRole('button', { name: RIDE_CARD_LABELS.delete }));
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
     const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.confirmLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: C.DELETE_DIALOG.confirmLabel }));
 
-    expect(await screen.findByText(RIDE_LIST_MESSAGES.deleteSucceeded)).toBeInTheDocument();
-    expect(await screen.findByText(EMPTY_LIST_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.deleteSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
   });
 
   it('should report a failure to delete', async () => {
@@ -137,11 +131,11 @@ describe('SearchRide', () => {
     render(<SearchRide />);
     await screen.findByText(RIDE.destino);
 
-    await userEvent.click(screen.getByRole('button', { name: RIDE_CARD_LABELS.delete }));
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
     const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.confirmLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: C.DELETE_DIALOG.confirmLabel }));
 
-    expect(await screen.findByText(RIDE_LIST_MESSAGES.deleteFailed)).toBeInTheDocument();
+    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.deleteFailed)).toBeInTheDocument();
   });
 
   it('should announce that editing is not available yet', async () => {
@@ -149,8 +143,8 @@ describe('SearchRide', () => {
     render(<SearchRide />);
     await screen.findByText(RIDE.destino);
 
-    await userEvent.click(screen.getByRole('button', { name: RIDE_CARD_LABELS.edit }));
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.edit }));
 
-    expect(await screen.findByText(RIDE_LIST_MESSAGES.editSoon)).toBeInTheDocument();
+    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.editSoon)).toBeInTheDocument();
   });
 });

@@ -11,7 +11,7 @@ import {
   GroupsIcon,
 } from '@design-system/icons';
 
-import { DELETE_DIALOG, RIDE_CARD_LABELS, seatsLabel } from '../../constants';
+import * as C from '../../constants';
 import { rideTypeDisplayLabel, rideTypeTone } from '../../helpers/rideType';
 import * as S from './styles';
 
@@ -50,12 +50,12 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
           </S.WideOnlyTag>
 
           <S.ActionButtons>
-            <IconButton type="button" aria-label={RIDE_CARD_LABELS.edit} onClick={handleEdit}>
+            <IconButton type="button" aria-label={C.RIDE_CARD_LABELS.edit} onClick={handleEdit}>
               <EditIcon />
             </IconButton>
             <IconButton
               type="button"
-              aria-label={RIDE_CARD_LABELS.delete}
+              aria-label={C.RIDE_CARD_LABELS.delete}
               onClick={handleAskDelete}
             >
               <DeleteIcon />
@@ -82,7 +82,7 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
         <S.InfoItem>
           <GroupsIcon />
           <Typography variant="caption" color="inherit">
-            {seatsLabel(ride.qtdVagas)}
+            {C.seatsLabel(ride.qtdVagas)}
           </Typography>
         </S.InfoItem>
       </S.InfoRow>
@@ -101,14 +101,14 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
         open={confirmingDelete}
         onCancel={handleCancelDelete}
         onConfirm={handleConfirmDelete}
-        title={DELETE_DIALOG.title}
-        confirmLabel={DELETE_DIALOG.confirmLabel}
-        cancelLabel={DELETE_DIALOG.cancelLabel}
+        title={C.DELETE_DIALOG.title}
+        confirmLabel={C.DELETE_DIALOG.confirmLabel}
+        cancelLabel={C.DELETE_DIALOG.cancelLabel}
       >
         <ConfirmDialog.Message
-          prefix={DELETE_DIALOG.messagePrefix}
+          prefix={C.DELETE_DIALOG.messagePrefix}
           emphasis={ride.destino}
-          suffix={DELETE_DIALOG.messageSuffix}
+          suffix={C.DELETE_DIALOG.messageSuffix}
         />
       </ConfirmDialog>
     </S.CardRoot>

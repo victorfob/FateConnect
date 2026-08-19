@@ -6,7 +6,7 @@ import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { LandingLoginCard } from '.';
-import { LOGIN_ERROR_MESSAGES, PASSWORD_TOGGLE_LABEL, SUBMIT_LABEL } from './constants';
+import * as C from './constants';
 import { LOGIN_MESSAGES } from './schema';
 
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
@@ -33,7 +33,7 @@ describe('LandingLoginCard', () => {
   it('should show the required messages when submitting an empty form', async () => {
     renderCard();
 
-    await userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
     expect(await screen.findByText(LOGIN_MESSAGES.emailRequired)).toBeInTheDocument();
     expect(screen.getByText(LOGIN_MESSAGES.passwordRequired)).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('LandingLoginCard', () => {
     renderCard();
     await preencher('nao-e-email', 'segredo123');
 
-    await userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
     expect(await screen.findByText(LOGIN_MESSAGES.emailInvalid)).toBeInTheDocument();
   });
@@ -54,7 +54,7 @@ describe('LandingLoginCard', () => {
 
     expect(campoSenha).toHaveAttribute('type', 'password');
 
-    await userEvent.click(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: C.PASSWORD_TOGGLE_LABEL }));
 
     expect(campoSenha).toHaveAttribute('type', 'text');
   });
@@ -65,7 +65,7 @@ describe('LandingLoginCard', () => {
     // Senha oculta: olho cortado. O ícone mostra o estado, não a ação.
     expect(screen.getByTestId('VisibilityOffIcon')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: C.PASSWORD_TOGGLE_LABEL }));
 
     expect(screen.getByTestId('VisibilityIcon')).toBeInTheDocument();
   });
@@ -79,7 +79,7 @@ describe('LandingLoginCard', () => {
     const router = renderCard();
     await preencher('aluno@fatec.sp.gov.br', 'segredo123');
 
-    await userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
     expect(await screen.findByText('Bem-vindo(a), Fulano de Tal!')).toBeInTheDocument();
     expect(router.state.location.pathname).toBe(RoutePathEnum.MENU);
@@ -90,9 +90,9 @@ describe('LandingLoginCard', () => {
     renderCard();
     await preencher('aluno@fatec.sp.gov.br', 'segredo-errado');
 
-    await userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
-    expect(await screen.findByText(LOGIN_ERROR_MESSAGES.invalidCredentials)).toBeInTheDocument();
+    expect(await screen.findByText(C.LOGIN_ERROR_MESSAGES.invalidCredentials)).toBeInTheDocument();
   });
 
   it('should report a generic failure for other api errors', async () => {
@@ -100,9 +100,9 @@ describe('LandingLoginCard', () => {
     renderCard();
     await preencher('aluno@fatec.sp.gov.br', 'segredo123');
 
-    await userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
-    expect(await screen.findByText(LOGIN_ERROR_MESSAGES.generic)).toBeInTheDocument();
+    expect(await screen.findByText(C.LOGIN_ERROR_MESSAGES.generic)).toBeInTheDocument();
   });
 
   it('should show the loading indicator while the request is in flight', async () => {
@@ -122,9 +122,9 @@ describe('LandingLoginCard', () => {
     renderCard();
     await preencher('aluno@fatec.sp.gov.br', 'segredo123');
 
-    await userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
-    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
+    const submitButton = screen.getByRole('button', { name: C.SUBMIT_LABEL });
     await waitFor(() => expect(submitButton).toBeDisabled());
     expect(within(submitButton).getByRole('progressbar')).toBeInTheDocument();
 

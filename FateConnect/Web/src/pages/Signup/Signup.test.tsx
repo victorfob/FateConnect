@@ -6,17 +6,7 @@ import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { Signup } from '.';
-import {
-  CALENDAR_TOGGLE_LABEL,
-  FIELD_LABELS,
-  LEGAL_SOON_MESSAGES,
-  PASSWORD_TOGGLE_LABEL,
-  SELECT_PLACEHOLDER,
-  SIGNUP_ERROR_MESSAGES,
-  SUBMIT_LABEL,
-  ZIP_LOOKUP_MESSAGES,
-  signupSuccessMessage,
-} from './constants';
+import * as C from './constants';
 import { SIGNUP_MESSAGES } from './schema';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/usuario/cadastro';
@@ -51,7 +41,7 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText(/^Senha/), VALID_SIGNUP.password);
   await userEvent.type(screen.getByLabelText(/Telefone/), VALID_SIGNUP.phone);
   await userEvent.type(screen.getByLabelText(/E-mail para contato/), VALID_SIGNUP.contactEmail);
-  await selectOption(FIELD_LABELS.gender, 'Feminino');
+  await selectOption(C.FIELD_LABELS.gender, 'Feminino');
   await userEvent.click(screen.getByRole('checkbox', { name: /Termos de Uso/ }));
 }
 
@@ -68,7 +58,7 @@ function labelOf(field: HTMLElement): HTMLElement | null {
 }
 
 function submit() {
-  return userEvent.click(screen.getByRole('button', { name: SUBMIT_LABEL }));
+  return userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 }
 
 describe('Signup', () => {
@@ -152,7 +142,7 @@ describe('Signup', () => {
   it('should toggle the password visibility and show the current state in the icon', async () => {
     renderSignup();
     const password = screen.getByLabelText(/^Senha/);
-    const toggle = screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL });
+    const toggle = screen.getByRole('button', { name: C.PASSWORD_TOGGLE_LABEL });
 
     expect(password).toHaveAttribute('type', 'password');
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
@@ -190,7 +180,7 @@ describe('Signup', () => {
 
     await userEvent.type(screen.getByLabelText(/CEP/), '00000000');
 
-    expect(await screen.findByText(ZIP_LOOKUP_MESSAGES.notFound)).toBeInTheDocument();
+    expect(await screen.findByText(C.ZIP_LOOKUP_MESSAGES.notFound)).toBeInTheDocument();
     expect(screen.getByLabelText(/Cidade/)).toHaveValue('');
   });
 
@@ -203,7 +193,7 @@ describe('Signup', () => {
 
     await userEvent.type(screen.getByLabelText(/CEP/), '01001000');
 
-    expect(await screen.findByText(ZIP_LOOKUP_MESSAGES.failed)).toBeInTheDocument();
+    expect(await screen.findByText(C.ZIP_LOOKUP_MESSAGES.failed)).toBeInTheDocument();
   });
 
   it('should announce that the legal documents are not available yet', async () => {
@@ -211,11 +201,11 @@ describe('Signup', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Termos de Uso' }));
 
-    expect(await screen.findByText(LEGAL_SOON_MESSAGES.terms)).toBeInTheDocument();
+    expect(await screen.findByText(C.LEGAL_SOON_MESSAGES.terms)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Política de Privacidade' }));
 
-    expect(await screen.findByText(LEGAL_SOON_MESSAGES.privacy)).toBeInTheDocument();
+    expect(await screen.findByText(C.LEGAL_SOON_MESSAGES.privacy)).toBeInTheDocument();
   });
 
   it('should not toggle the consent when the legal link is clicked', async () => {
@@ -233,7 +223,7 @@ describe('Signup', () => {
     await userEvent.click(screen.getByRole('combobox', { name: /Gênero/ }));
 
     const options = within(screen.getByRole('listbox')).getAllByRole('option');
-    expect(options[0]).toHaveTextContent(SELECT_PLACEHOLDER);
+    expect(options[0]).toHaveTextContent(C.SELECT_PLACEHOLDER);
   });
 
   it('should create the account and send the user to the login anchor', async () => {
@@ -251,7 +241,7 @@ describe('Signup', () => {
 
     await submit();
 
-    expect(await screen.findByText(signupSuccessMessage('Maria Silva'))).toBeInTheDocument();
+    expect(await screen.findByText(C.signupSuccessMessage('Maria Silva'))).toBeInTheDocument();
     await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING));
     expect(router.state.location.hash).toBe(`#${LandingSectionEnum.LOGIN}`);
   });
@@ -281,9 +271,9 @@ describe('Signup', () => {
   });
 
   it.each([
-    [409, SIGNUP_ERROR_MESSAGES.emailTaken],
-    [400, SIGNUP_ERROR_MESSAGES.invalidData],
-    [500, SIGNUP_ERROR_MESSAGES.generic],
+    [409, C.SIGNUP_ERROR_MESSAGES.emailTaken],
+    [400, C.SIGNUP_ERROR_MESSAGES.invalidData],
+    [500, C.SIGNUP_ERROR_MESSAGES.generic],
   ])('should report the failure for status %s', async (status, message) => {
     server.use(http.post(SIGNUP_URL, () => new HttpResponse(null, { status })));
     renderSignup();
@@ -292,7 +282,7 @@ describe('Signup', () => {
     await submit();
 
     expect(await screen.findByText(message)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: SUBMIT_LABEL })).toBeEnabled();
+    expect(screen.getByRole('button', { name: C.SUBMIT_LABEL })).toBeEnabled();
   });
 
   it('should disable the form while the account is being created', async () => {
@@ -314,7 +304,7 @@ describe('Signup', () => {
 
     await submit();
 
-    const submitButton = screen.getByRole('button', { name: SUBMIT_LABEL });
+    const submitButton = screen.getByRole('button', { name: C.SUBMIT_LABEL });
     await waitFor(() => expect(submitButton).toBeDisabled());
     expect(within(submitButton).getByRole('progressbar')).toBeInTheDocument();
     expect(screen.getByLabelText(/Nome completo/)).toBeDisabled();
@@ -327,7 +317,7 @@ describe('Signup', () => {
     const birthDate = screen.getByLabelText(/Data de nascimento/);
     await userEvent.type(birthDate, '22051999');
 
-    await userEvent.click(screen.getByRole('button', { name: CALENDAR_TOGGLE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: C.CALENDAR_TOGGLE_LABEL }));
     const calendar = await screen.findByRole('grid');
     await userEvent.click(within(calendar).getByRole('gridcell', { name: '10' }));
 

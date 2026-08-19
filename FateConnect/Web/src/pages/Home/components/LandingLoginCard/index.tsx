@@ -11,17 +11,7 @@ import type { ApiError } from '@app/services/httpClient';
 import { Button, IconButton, InputAdornment, TextField, Typography } from '@design-system';
 import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
-import {
-  EMAIL_LABEL,
-  LOGIN_CARD_TITLE,
-  LOGIN_ERROR_MESSAGES,
-  PASSWORD_LABEL,
-  PASSWORD_TOGGLE_LABEL,
-  SIGNUP_LINK_LABEL,
-  SIGNUP_PROMPT,
-  SUBMIT_LABEL,
-  welcomeMessage,
-} from './constants';
+import * as C from './constants';
 import { loginSchema, type LoginFormValues } from './schema';
 import * as S from './styles';
 
@@ -55,16 +45,16 @@ export function LandingLoginCard() {
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
     onSuccess: (response) => {
-      notifySuccess(welcomeMessage(response.nomeCompleto));
+      notifySuccess(C.welcomeMessage(response.nomeCompleto));
       navigate(RoutePathEnum.MENU);
     },
     onError: (error: ApiError) => {
       if (error.status === UNAUTHORIZED) {
-        notifyError(LOGIN_ERROR_MESSAGES.invalidCredentials);
+        notifyError(C.LOGIN_ERROR_MESSAGES.invalidCredentials);
         return;
       }
 
-      notifyError(LOGIN_ERROR_MESSAGES.generic);
+      notifyError(C.LOGIN_ERROR_MESSAGES.generic);
     },
   });
 
@@ -80,7 +70,7 @@ export function LandingLoginCard() {
     <S.CardRoot component="article" aria-labelledby="landing-login-title">
       <S.CardTitle>
         <Typography variant="h2" id="landing-login-title">
-          {LOGIN_CARD_TITLE}
+          {C.LOGIN_CARD_TITLE}
         </Typography>
       </S.CardTitle>
 
@@ -91,7 +81,7 @@ export function LandingLoginCard() {
             emailFieldRef(element);
             emailInputRef.current = element;
           }}
-          label={EMAIL_LABEL}
+          label={C.EMAIL_LABEL}
           required
           type="email"
           autoComplete="username"
@@ -101,7 +91,7 @@ export function LandingLoginCard() {
 
         <TextField
           {...register('password')}
-          label={PASSWORD_LABEL}
+          label={C.PASSWORD_LABEL}
           required
           type={passwordHidden ? 'password' : 'text'}
           autoComplete={passwordHidden ? 'current-password' : 'off'}
@@ -113,7 +103,7 @@ export function LandingLoginCard() {
                 <InputAdornment position="end">
                   <IconButton
                     type="button"
-                    aria-label={PASSWORD_TOGGLE_LABEL}
+                    aria-label={C.PASSWORD_TOGGLE_LABEL}
                     aria-pressed={!passwordHidden}
                     onClick={handleTogglePassword}
                   >
@@ -128,15 +118,15 @@ export function LandingLoginCard() {
 
         <S.SubmitRow>
           <Button type="submit" variant="contained" color="error" loading={isPending}>
-            {SUBMIT_LABEL}
+            {C.SUBMIT_LABEL}
           </Button>
         </S.SubmitRow>
       </S.Form>
 
       <S.SignupRow component="p">
-        <Typography variant="caption">{SIGNUP_PROMPT}</Typography>
+        <Typography variant="caption">{C.SIGNUP_PROMPT}</Typography>
         <RouterLink to={RoutePathEnum.SIGNUP}>
-          <Typography variant="captionBold">{SIGNUP_LINK_LABEL}</Typography>
+          <Typography variant="captionBold">{C.SIGNUP_LINK_LABEL}</Typography>
         </RouterLink>
       </S.SignupRow>
     </S.CardRoot>

@@ -4,7 +4,7 @@ import { useNotification } from '@app/hooks/useNotification';
 import { Typography } from '@design-system';
 import { AddIcon } from '@design-system/icons';
 
-import { OFFER_BUTTON_LABEL, OFFER_SOON_MESSAGE, OFFER_SUBTITLE, OFFER_TITLE } from './constants';
+import * as C from './constants';
 import * as S from './styles';
 
 /**
@@ -14,18 +14,18 @@ import * as S from './styles';
 export function OfferRide() {
   const { notifyWarning } = useNotification();
 
-  const handleOfferClick = useCallback(() => notifyWarning(OFFER_SOON_MESSAGE), [notifyWarning]);
+  const handleOfferClick = useCallback(() => notifyWarning(C.OFFER_SOON_MESSAGE), [notifyWarning]);
 
   return (
     <S.OfferWrapper>
       <S.OfferCard>
-        <Typography variant="h2">{OFFER_TITLE}</Typography>
-        <Typography variant="subtitle">{OFFER_SUBTITLE}</Typography>
+        <Typography variant="h2">{C.OFFER_TITLE}</Typography>
+        <Typography variant="subtitle">{C.OFFER_SUBTITLE}</Typography>
 
         <S.OfferButton component="button" type="button" onClick={handleOfferClick}>
           <AddIcon fontSize="small" />
           <Typography variant="subtitleBold" color="inherit">
-            {OFFER_BUTTON_LABEL}
+            {C.OFFER_BUTTON_LABEL}
           </Typography>
         </S.OfferButton>
       </S.OfferCard>

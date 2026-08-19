@@ -14,16 +14,7 @@ import {
 } from '@design-system';
 import { FilterAltIcon, InfoIcon, ScheduleIcon, SearchIcon } from '@design-system/icons';
 
-import {
-  FILTER_LABELS,
-  FILTER_PANEL_TITLE,
-  FILTER_PLACEHOLDERS,
-  FILTER_SUBMIT_LABEL,
-  RIDE_TYPE_HELP,
-  RIDE_TYPE_OPTIONS,
-  RideTypeFilterEnum,
-  TIME_PICKER_LABEL,
-} from './constants';
+import * as C from './constants';
 import { toApiDate } from './helpers/toApiDate';
 import * as S from './styles';
 
@@ -33,7 +24,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
   const [departureDate, setDepartureDate] = useState<Date | null>(null);
   const [departureTime, setDepartureTime] = useState('');
   const [destination, setDestination] = useState('');
-  const [rideType, setRideType] = useState<string>(RideTypeFilterEnum.ALL);
+  const [rideType, setRideType] = useState<string>(C.RideTypeFilterEnum.ALL);
   const timeInputRef = useRef<HTMLInputElement>(null);
 
   const handleOpenTimePicker = useCallback(() => timeInputRef.current?.showPicker(), []);
@@ -71,7 +62,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
       <S.FilterHeader>
         <FilterAltIcon />
         <Typography variant="subtitleBold" color="inherit">
-          {FILTER_PANEL_TITLE}
+          {C.FILTER_PANEL_TITLE}
         </Typography>
       </S.FilterHeader>
 
@@ -83,7 +74,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
                 label={
                   <S.FieldLabel component="span">
                     <Typography variant="subtitleBold" color="inherit">
-                      {FILTER_LABELS.departureDate}
+                      {C.FILTER_LABELS.departureDate}
                     </Typography>
                   </S.FieldLabel>
                 }
@@ -98,7 +89,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
                 label={
                   <S.FieldLabel component="span">
                     <Typography variant="subtitleBold" color="inherit">
-                      {FILTER_LABELS.departureTime}
+                      {C.FILTER_LABELS.departureTime}
                     </Typography>
                   </S.FieldLabel>
                 }
@@ -114,7 +105,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
                       <InputAdornment position="end">
                         <IconButton
                           type="button"
-                          aria-label={TIME_PICKER_LABEL}
+                          aria-label={C.TIME_PICKER_LABEL}
                           onClick={handleOpenTimePicker}
                         >
                           <ScheduleIcon />
@@ -131,12 +122,12 @@ export function RideFilter({ onApply }: RideFilterProps) {
                 label={
                   <S.FieldLabel component="span">
                     <Typography variant="subtitleBold" color="inherit">
-                      {FILTER_LABELS.destination}
+                      {C.FILTER_LABELS.destination}
                     </Typography>
                   </S.FieldLabel>
                 }
                 fullWidth
-                placeholder={FILTER_PLACEHOLDERS.destination}
+                placeholder={C.FILTER_PLACEHOLDERS.destination}
                 value={destination}
                 onChange={handleDestinationChange}
               />
@@ -148,9 +139,9 @@ export function RideFilter({ onApply }: RideFilterProps) {
                 label={
                   <S.FieldLabel component="span">
                     <Typography variant="subtitleBold" color="inherit">
-                      {FILTER_LABELS.rideType}
+                      {C.FILTER_LABELS.rideType}
                     </Typography>
-                    <Tooltip title={RIDE_TYPE_HELP}>
+                    <Tooltip title={C.RIDE_TYPE_HELP}>
                       <InfoIcon fontSize="small" />
                     </Tooltip>
                   </S.FieldLabel>
@@ -160,7 +151,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
                 onChange={handleRideTypeChange}
                 slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}
               >
-                {RIDE_TYPE_OPTIONS.map(({ value, label }) => (
+                {C.RIDE_TYPE_OPTIONS.map(({ value, label }) => (
                   <MenuItem key={label} value={value}>
                     {label}
                   </MenuItem>
@@ -172,7 +163,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
               <Button type="submit" variant="contained" color="error" fullWidth>
                 <SearchIcon fontSize="small" />
                 <Typography variant="subtitleBold" color="inherit">
-                  {FILTER_SUBMIT_LABEL}
+                  {C.FILTER_SUBMIT_LABEL}
                 </Typography>
               </Button>
             </S.SubmitCell>
