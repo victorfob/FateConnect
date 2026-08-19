@@ -54,7 +54,7 @@ export const signupSchema = z.object({
   fatecEmail: z
     .string()
     .min(1, SIGNUP_MESSAGES.fatecEmailRequired)
-    .email(SIGNUP_MESSAGES.emailInvalid),
+    .pipe(z.email(SIGNUP_MESSAGES.emailInvalid)),
   birthDate: z
     .string()
     .min(1, SIGNUP_MESSAGES.birthDateRequired)
@@ -78,7 +78,7 @@ export const signupSchema = z.object({
   contactEmail: z
     .string()
     .min(1, SIGNUP_MESSAGES.contactEmailRequired)
-    .email(SIGNUP_MESSAGES.emailInvalid),
+    .pipe(z.email(SIGNUP_MESSAGES.emailInvalid)),
   acceptTerms: z.boolean().refine((accepted) => accepted, SIGNUP_MESSAGES.termsRequired),
   acceptMarketing: z.boolean(),
 });

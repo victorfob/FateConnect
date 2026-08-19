@@ -15,6 +15,8 @@ export default tseslint.config(
     languageOptions: {
       ecmaVersion: 2022,
       globals: { ...globals.browser, ...globals.node },
+      // Informação de tipo: é o que permite ao lint enxergar `@deprecated`.
+      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
     },
     plugins: {
       react: reactPlugin,
@@ -29,6 +31,8 @@ export default tseslint.config(
       ...jsxA11y.flatConfigs.recommended.rules,
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
+      // API marcada como obsoleta não entra: quando ela sair, o build quebra.
+      '@typescript-eslint/no-deprecated': 'error',
     },
   },
 
