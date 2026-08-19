@@ -4,11 +4,12 @@ export const colorTokens = {
   accent: '#CF2E2E',
 
   /**
-   * Vermelho do botão de acesso na landing. **Não é o acento do produto.**
-   * O front atual usa a paleta `warn` do Material sem configurá-la, então herda
-   * o vermelho padrão da biblioteca. Mantido aqui por paridade visual.
+   * Segundo vermelho do produto, usado no botão de acesso — papel de **erro**.
+   * Escurecido em relação ao herdado (`#F44336`) para alcançar 4.5:1 com texto
+   * branco; o tom original fica como `error.light`.
    */
-  inheritedWarn: '#F44336',
+  error: '#E81C0D',
+  errorInherited: '#F44336',
 
   surfaceGray: '#F0F2F4',
   surfaceWhite: '#FFFFFF',
@@ -33,9 +34,51 @@ export const shadowTokens = {
   component: '0 2px 5px rgba(0, 0, 0, 0.08)',
 };
 
-/** Tamanhos de ícone em pixels. */
+/**
+ * Tamanhos de ícone em pixels.
+ *
+ * `sm` e `lg` acompanham a **largura renderizada** dos ícones do produto, não a
+ * altura: os glifos da biblioteca original são mais largos que altos (20x16 e
+ * 40x32), enquanto os nossos são quadrados. Igualar pela largura mantém a massa
+ * visual equivalente.
+ */
 export const iconSizeTokens = {
-  sm: 16,
+  sm: 20,
   md: 24,
-  lg: 32,
+  lg: 40,
+};
+
+/**
+ * Variantes de cada cor de marca, seguindo a mesma regra do tema atual do
+ * produto: `light` é a base clareada 25% e `dark` é a base escurecida 20%.
+ */
+export const colorVariants = {
+  primaryLight: '#68828F',
+  primaryDark: '#36434A',
+  secondaryLight: '#DC6161',
+  secondaryDark: '#A62525',
+  errorLight: '#F77268',
+  /** Escurecido até alcançar 4.5:1 com texto branco — ver `contrast.test.ts`. */
+  errorDark: '#E81C0D',
+};
+
+/**
+ * Tokens do tema escuro, conforme o sistema de cor do Material Design:
+ * superfície `#121212`, cores de marca dessaturadas para alcançar contraste, e
+ * "on colors" brancos por nível de ênfase (alta 87%, média 60%, desabilitado 38%).
+ */
+export const darkColorTokens = {
+  primary: '#68828E',
+  secondary: '#D84E4E',
+  error: '#F44336',
+
+  surface: '#121212',
+  /** Superfície elevada: sobreposição branca de 5%, como o M2 prescreve para 1dp. */
+  surfaceElevated: '#1E1E1E',
+
+  onSurfaceHigh: 'rgba(255, 255, 255, 0.87)',
+  onSurfaceMedium: 'rgba(255, 255, 255, 0.60)',
+  onSurfaceDisabled: 'rgba(255, 255, 255, 0.38)',
+  divider: 'rgba(255, 255, 255, 0.12)',
+  hover: 'rgba(255, 255, 255, 0.08)',
 };
