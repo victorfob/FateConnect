@@ -4,6 +4,9 @@
  * A aplicação importa **apenas daqui** (`@ds`), nunca de um caminho interno —
  * é o que mantém barato extrair esta camada para um pacote no futuro.
  */
+export * from './ui';
+export { styled, css, keyframes } from './styled';
+
 export { ThemeProvider } from './ThemeProvider';
 export { GlobalStyles } from './GlobalStyles';
 export { createAppTheme, spacing, radius, components } from './theme';
