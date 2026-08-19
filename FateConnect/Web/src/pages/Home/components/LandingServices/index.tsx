@@ -8,7 +8,11 @@ const HEADING_ID = 'servicos-heading';
 
 export function LandingServices() {
   return (
-    <S.ServicesSection id={LandingSection.SERVICES} aria-labelledby={HEADING_ID}>
+    <S.ServicesSection
+      component="section"
+      id={LandingSection.SERVICES}
+      aria-labelledby={HEADING_ID}
+    >
       <S.SectionTitle>
         <Typography variant="h1" id={HEADING_ID}>
           {SERVICES_TITLE}
@@ -17,7 +21,7 @@ export function LandingServices() {
 
       <S.CardsGrid>
         {SERVICE_CARDS.map(({ title, description, Icon }) => (
-          <S.ServiceCardRoot key={title}>
+          <S.ServiceCardRoot component="article" key={title}>
             <S.IconContainer aria-hidden="true">
               <Icon />
             </S.IconContainer>

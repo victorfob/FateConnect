@@ -8,7 +8,7 @@ const HEADING_ID = 'como-funciona-heading';
 
 export function LandingHowItWorks() {
   return (
-    <S.HowSection id={LandingSection.HOW_IT_WORKS} aria-labelledby={HEADING_ID}>
+    <S.HowSection component="section" id={LandingSection.HOW_IT_WORKS} aria-labelledby={HEADING_ID}>
       <S.SectionTitle>
         <Typography variant="h1" id={HEADING_ID}>
           {HOW_IT_WORKS_TITLE}
@@ -17,8 +17,10 @@ export function LandingHowItWorks() {
 
       <S.StepsGrid>
         {HOW_IT_WORKS_STEPS.map(({ number, title, description }) => (
-          <S.StepCard key={number}>
-            <S.StepBadge aria-hidden="true">{number}</S.StepBadge>
+          <S.StepCard component="article" key={number}>
+            <S.StepBadge component="span" aria-hidden="true">
+              {number}
+            </S.StepBadge>
             <S.StepBody>
               <S.StepTitle>
                 <Typography variant="h2">{title}</Typography>

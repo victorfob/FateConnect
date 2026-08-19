@@ -1,26 +1,17 @@
-import {
-  colorTokens,
-  darken,
-  radius,
-  radiusScale,
-  shadowTokens,
-  styled,
-  tabletMedia,
-} from '@design-system';
+import { Box, Stack, radius, radiusScale, shadowTokens, styled, tabletMedia } from '@design-system';
+import type { FormHTMLAttributes } from 'react';
+
+import type { PolymorphicProps } from '@design-system';
 
 const CARD_WIDTH_PX = 360;
 const SUBMIT_HEIGHT_PX = 40;
 
-/** Mesma proporção que o MUI usa para derivar o estado de hover. */
-const HOVER_DARKEN_RATIO = 0.2;
-
-export const CardRoot = styled('article')({
-  display: 'flex',
+export const CardRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   flexDirection: 'column',
   gap: '1.25rem',
   padding: '1.75rem',
   width: `${CARD_WIDTH_PX}px`,
-  background: colorTokens.surfaceWhite,
+  background: theme.palette.background.paper,
   borderRadius: radius(radiusScale.component),
   boxShadow: shadowTokens.component,
 
@@ -28,50 +19,47 @@ export const CardRoot = styled('article')({
     justifySelf: 'center',
     maxWidth: '24rem',
   },
-});
+}));
 
-export const CardTitle = styled('div')({
-  color: colorTokens.primary,
+export const CardTitle = styled(Box)<PolymorphicProps>(({ theme }) => ({
+  color: theme.palette.text.primary,
   textAlign: 'center',
-});
+}));
 
-export const Form = styled('form')({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
+export const Form = styled(Stack)<PolymorphicProps & FormHTMLAttributes<HTMLFormElement>>(
+  ({ theme }) => ({
+    flexDirection: 'column',
+    gap: '1rem',
 
-  '& svg': { color: colorTokens.textMuted },
-});
+    '& svg': { color: theme.palette.text.secondary },
+  }),
+);
 
-export const SubmitRow = styled('div')({
+export const SubmitRow = styled(Box)<PolymorphicProps>({
   marginTop: '0.5rem',
 
   '& .MuiButton-root': {
     width: '100%',
     height: `${SUBMIT_HEIGHT_PX}px`,
     borderRadius: radius(radiusScale.component),
-    backgroundColor: colorTokens.inheritedWarn,
-  },
-  '& .MuiButton-root:hover': {
-    backgroundColor: darken(colorTokens.inheritedWarn, HOVER_DARKEN_RATIO),
   },
 });
 
-export const SignupRow = styled('p')({
-  display: 'flex',
+export const SignupRow = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+  flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'baseline',
   gap: '0.35rem',
   justifyContent: 'center',
   textAlign: 'center',
-  color: colorTokens.textMuted,
+  color: theme.palette.text.secondary,
 
   '& a': {
-    color: colorTokens.accent,
+    color: theme.palette.secondary.main,
     textDecoration: 'none',
   },
   '& a:hover': {
     textDecoration: 'underline',
-    textDecorationColor: colorTokens.accent,
+    textDecorationColor: theme.palette.secondary.main,
   },
-});
+}));

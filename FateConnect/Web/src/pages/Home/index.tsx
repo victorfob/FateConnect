@@ -8,14 +8,14 @@ import * as S from './styles';
 export function Home() {
   return (
     <S.HomeRoot>
-      <S.DescriptionContainer aria-label="Apresentação e acesso">
+      <S.DescriptionContainer component="section" aria-label="Apresentação e acesso">
         <LandingDescription />
         <S.LoginAnchor id={LandingSection.LOGIN}>
           <LandingLoginCard />
         </S.LoginAnchor>
       </S.DescriptionContainer>
 
-      <S.ServicesContainer aria-label="Nossos Serviços">
+      <S.ServicesContainer component="section" aria-label="Nossos Serviços">
         <LandingServices />
       </S.ServicesContainer>
 

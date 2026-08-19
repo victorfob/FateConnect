@@ -83,14 +83,14 @@ export function LandingLoginCard() {
   const { ref: emailFieldRef, ...emailField } = register('email');
 
   return (
-    <S.CardRoot aria-labelledby="landing-login-title">
+    <S.CardRoot component="article" aria-labelledby="landing-login-title">
       <S.CardTitle>
         <Typography variant="h2" id="landing-login-title">
           {LOGIN_CARD_TITLE}
         </Typography>
       </S.CardTitle>
 
-      <S.Form onSubmit={onSubmit} noValidate>
+      <S.Form component="form" onSubmit={onSubmit} noValidate>
         <TextField
           {...emailField}
           inputRef={(element: HTMLInputElement | null) => {
@@ -98,6 +98,7 @@ export function LandingLoginCard() {
             emailInputRef.current = element;
           }}
           label={EMAIL_LABEL}
+          required
           type="email"
           autoComplete="username"
           error={Boolean(errors.email)}
@@ -107,6 +108,7 @@ export function LandingLoginCard() {
         <TextField
           {...register('password')}
           label={PASSWORD_LABEL}
+          required
           type={passwordHidden ? 'password' : 'text'}
           autoComplete={passwordHidden ? 'current-password' : 'off'}
           error={Boolean(errors.password)}
@@ -121,7 +123,8 @@ export function LandingLoginCard() {
                     aria-pressed={!passwordHidden}
                     onClick={handleTogglePassword}
                   >
-                    {passwordHidden ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                    {/* O ícone mostra o estado atual: olho aberto = senha visível. */}
+                    {passwordHidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -130,13 +133,13 @@ export function LandingLoginCard() {
         />
 
         <S.SubmitRow>
-          <Button type="submit" variant="contained" color="secondary" disabled={isPending}>
+          <Button type="submit" variant="contained" color="error" disabled={isPending}>
             {isPending ? SUBMIT_LOADING_LABEL : SUBMIT_LABEL}
           </Button>
         </S.SubmitRow>
       </S.Form>
 
-      <S.SignupRow>
+      <S.SignupRow component="p">
         <Typography variant="caption">{SIGNUP_PROMPT}</Typography>
         <RouterLink to={RoutePath.SIGNUP}>
           <Typography variant="captionBold">{SIGNUP_LINK_LABEL}</Typography>

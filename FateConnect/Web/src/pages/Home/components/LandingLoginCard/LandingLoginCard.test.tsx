@@ -30,8 +30,8 @@ function renderCard(initialPath: string = RoutePath.LANDING) {
 }
 
 async function preencher(email: string, senha: string) {
-  await userEvent.type(screen.getByLabelText('E-mail'), email);
-  await userEvent.type(screen.getByLabelText('Senha'), senha);
+  await userEvent.type(screen.getByLabelText(/E-mail/), email);
+  await userEvent.type(screen.getByLabelText(/Senha/), senha);
 }
 
 describe('LandingLoginCard', () => {
@@ -55,13 +55,24 @@ describe('LandingLoginCard', () => {
 
   it('should toggle the password visibility', async () => {
     renderCard();
-    const campoSenha = screen.getByLabelText('Senha');
+    const campoSenha = screen.getByLabelText(/Senha/);
 
     expect(campoSenha).toHaveAttribute('type', 'password');
 
     await userEvent.click(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL }));
 
     expect(campoSenha).toHaveAttribute('type', 'text');
+  });
+
+  it('should show an icon that reflects whether the password is visible', async () => {
+    renderCard();
+
+    // Senha oculta: olho cortado. O ícone mostra o estado, não a ação.
+    expect(screen.getByTestId('VisibilityOffIcon')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL }));
+
+    expect(screen.getByTestId('VisibilityIcon')).toBeInTheDocument();
   });
 
   it('should greet the user and go to the menu after a successful login', async () => {
@@ -117,6 +128,6 @@ describe('LandingLoginCard', () => {
   it('should focus the email field when the page is opened at the login anchor', async () => {
     renderCard(`${RoutePath.LANDING}#${LandingSection.LOGIN}`);
 
-    expect(screen.getByLabelText('E-mail')).toHaveFocus();
+    expect(screen.getByLabelText(/E-mail/)).toHaveFocus();
   });
 });

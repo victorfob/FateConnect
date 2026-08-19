@@ -10,14 +10,14 @@ export function LandingDescription() {
         <Typography variant="h1">{DESCRIPTION_TITLE}</Typography>
       </S.TitleContainer>
 
-      <S.Lead>
+      <S.Lead component="p">
         <Typography variant="subtitle">{DESCRIPTION_LEAD}</Typography>
       </S.Lead>
 
-      <S.HighlightList aria-label="Destaques do FateConnect">
+      <S.HighlightList component="ul" aria-label="Destaques do FateConnect">
         {DESCRIPTION_HIGHLIGHTS.map(({ label, Icon }) => (
-          <S.HighlightItem key={label}>
-            <S.IconDisc aria-hidden="true">
+          <S.HighlightItem component="li" key={label}>
+            <S.IconDisc component="span" aria-hidden="true">
               <Icon />
             </S.IconDisc>
             <Typography variant="subtitleBold">{label}</Typography>
