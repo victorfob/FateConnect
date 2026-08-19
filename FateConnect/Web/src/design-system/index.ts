@@ -12,6 +12,12 @@ export { Header } from './components/Header';
 export { HEADER_HEIGHT_PX } from './components/Header/styles';
 export { Footer } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
+export { ConfirmDialog } from './components/ConfirmDialog';
+export { StatusTag } from './components/StatusTag';
+export type { StatusTagProps } from './components/StatusTag';
+export type { StatusTagTone } from './components/StatusTag/types';
+export type { ConfirmDialogProps } from './components/ConfirmDialog';
+export type { DialogMessageProps } from './components/ConfirmDialog/DialogMessage';
 
 export { ThemeProvider } from './ThemeProvider';
 export { DateLocalizationProvider } from './DateLocalizationProvider';
@@ -22,13 +28,14 @@ export { createAppTheme, spacing, radius, components } from './theme';
 export {
   spacingScale,
   radiusScale,
-  colorTokens,
   shadowTokens,
   iconSizeTokens,
   fontFamily,
   typographyTokens,
   MOBILE_MAX_WIDTH_PX,
   TABLET_MAX_WIDTH_PX,
+  COMPACT_MAX_WIDTH_PX,
+  compactMedia,
   mobileMedia,
   tabletMedia,
   desktopMedia,
