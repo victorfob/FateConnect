@@ -1,0 +1,71 @@
+name: Check Pull Request
+
+# Sem filtro de branch de destino: PR empilhado (base em outra feature branch)
+# também precisa ser validado.
+on: pull_request
+
+# Push novo na mesma PR cancela a execução anterior.
+concurrency:
+  group: check-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: Front React (Web)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FateConnect/Web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: FateConnect/Web/.nvmrc
+          cache: yarn
+          cache-dependency-path: FateConnect/Web/yarn.lock
+
+      - name: Instalar dependências
+        run: yarn install --frozen-lockfile
+
+      - name: Tipos
+        run: yarn typecheck
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Testes
+        run: yarn test:ci
+
+      - name: Build
+        run: yarn build
+
+  front-angular:
+    name: Front Angular (legado)
+    # Remover este job junto com FateConnect/Front na issue #58.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FateConnect/Front
+    env:
+      CHROME_BIN: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: FateConnect/Front/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Testes
+        run: npm run test:ci
+
+      - name: Build
+        run: npm run build
