@@ -13,15 +13,17 @@ const SELECT_OPTION_MIN_HEIGHT_PX = 48;
 /** Overrides de componente do MUI alinhados ao visual já implementado no produto. */
 export const components: Components<Theme> = {
   MuiButton: {
-    defaultProps: { disableElevation: true },
     styleOverrides: {
-      // O produto escurece **qualquer** botão com um véu preto a 4% sob o
-      // cursor, por overlay, em vez de trocar a cor de fundo por variante.
+      // Retorno visual do botão, como no produto, em duas partes.
       //
-      // Sem isso não há retorno visual: no botão preenchido o MUI só muda a
-      // sombra, que `disableElevation` já removeu; e no botão de texto do topo
-      // ele deriva de `text.primary`, que é a própria cor da marca — 4% dela
-      // sobre o header da cor da marca não aparece.
+      // 1. Véu preto a 4% por cima sob o cursor, para qualquer variante. Sem
+      //    ele o botão de texto do topo não reage: o MUI deriva o realce de
+      //    `text.primary`, que é a própria cor da marca, e 4% dela sobre o
+      //    header da mesma cor não aparece.
+      //
+      // 2. Elevação ligada (sem `disableElevation`): o CTA do produto é
+      //    `mat-raised-button`, com sombra em repouso e sombra maior no hover.
+      //    A escala do MUI — 2, 4 e 8 — é exatamente a do Material.
       root: ({ theme, ownerState }) => {
         const veil: CSSObject = {
           textTransform: 'none',
