@@ -25,7 +25,6 @@ export const colorTokens = {
   successBackground: '#D4EDDA',
   warningText: '#856404',
   warningBackground: '#FFF3CD',
-  dangerText: '#CF2E2E',
   dangerBackground: '#FFDFDF',
 
   /** Divisor sobre superfície neutra — linha do formulário de cadastro. */
@@ -82,14 +81,17 @@ export const darkColorTokens = {
   surfaceElevated: '#1E1E1E',
 
   /**
-   * Etiquetas de estado. No tema claro elas são fundo claro com texto escuro;
-   * no escuro isso se inverte, senão o texto some no próprio fundo. Os fundos
-   * são a cor de estado a 16% já achatada sobre a superfície elevada.
+   * Estados sobre superfície escura — servem à etiqueta e ao aviso. No tema
+   * claro são fundo claro com texto escuro; no escuro isso se inverte, senão o
+   * texto some no próprio fundo. Os fundos são a cor de estado a 16% já
+   * achatada sobre a superfície elevada.
    */
   successTagBackground: '#3B3F3C',
   successTagText: '#A5D6A7',
   warningTagBackground: '#424038',
   warningTagText: '#FFE082',
+  dangerTagBackground: '#402422',
+  dangerTagText: '#EF9A9A',
 
   onSurfaceHigh: 'rgba(255, 255, 255, 0.87)',
   onSurfaceMedium: 'rgba(255, 255, 255, 0.60)',

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { AA_NORMAL_TEXT, contrastRatio } from './contrast';
 import { chromeSurface, onChromeSurface } from './chromeSurface';
+import { notificationSurface, onNotificationSurface } from './notificationSurface';
 import { createAppTheme } from './createAppTheme';
 
 const lightTheme = createAppTheme('light');
@@ -43,6 +44,21 @@ describe('light theme contrast', () => {
     ['content on the app chrome', onChromeSurface(lightTheme), chromeSurface(lightTheme)],
     ['a success tag', palette.success.main, palette.success.light],
     ['a warning tag', palette.warning.main, palette.warning.light],
+    [
+      'a success notification',
+      onNotificationSurface(lightTheme, 'success'),
+      notificationSurface(lightTheme, 'success'),
+    ],
+    [
+      'an error notification',
+      onNotificationSurface(lightTheme, 'error'),
+      notificationSurface(lightTheme, 'error'),
+    ],
+    [
+      'a warning notification',
+      onNotificationSurface(lightTheme, 'warning'),
+      notificationSurface(lightTheme, 'warning'),
+    ],
   ])('should meet AA for %s', (_, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
   });
@@ -61,6 +77,21 @@ describe('dark theme contrast', () => {
     ['content on the app chrome', onChromeSurface(darkTheme), chromeSurface(darkTheme)],
     ['a success tag', palette.success.main, palette.success.light],
     ['a warning tag', palette.warning.main, palette.warning.light],
+    [
+      'a success notification',
+      onNotificationSurface(darkTheme, 'success'),
+      notificationSurface(darkTheme, 'success'),
+    ],
+    [
+      'an error notification',
+      onNotificationSurface(darkTheme, 'error'),
+      notificationSurface(darkTheme, 'error'),
+    ],
+    [
+      'a warning notification',
+      onNotificationSurface(darkTheme, 'warning'),
+      notificationSurface(darkTheme, 'warning'),
+    ],
   ])('should meet AA for %s', (_, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
   });

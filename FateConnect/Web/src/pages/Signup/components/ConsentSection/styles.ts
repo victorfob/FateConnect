@@ -51,10 +51,11 @@ export const InlineLink = styled(Box)<PolymorphicProps & ButtonHTMLAttributes<HT
   }),
 );
 
+/** O produto pinta este aviso com o vermelho de destaque, não com o de erro. */
 export const ConsentError = styled(Box)<PolymorphicProps>(({ theme }) => ({
   fontSize: CONSENT_ERROR_FONT_SIZE_MOBILE,
   lineHeight: 'normal',
-  color: theme.palette.error.main,
+  color: theme.palette.secondary.main,
   paddingLeft: spacing(md),
 
   [desktopMedia]: { fontSize: CONSENT_ERROR_FONT_SIZE_DESKTOP },
