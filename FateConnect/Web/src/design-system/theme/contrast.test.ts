@@ -73,6 +73,7 @@ describe('dark theme contrast', () => {
     ['secondary text on the page background', palette.text.secondary, palette.background.default],
     ['the primary colour on the background', palette.primary.main, palette.background.default],
     ['the secondary colour on the background', palette.secondary.main, palette.background.default],
+    ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
     ['the error colour on the background', palette.error.main, palette.background.default],
     ['content on the app chrome', onChromeSurface(darkTheme), chromeSurface(darkTheme)],
     ['a success tag', palette.success.main, palette.success.light],
