@@ -1,6 +1,6 @@
 # FateConnect — Web
 
-Front-end do FateConnect em React + Vite. Substitui gradualmente o front Angular em `FateConnect/Front`, acompanhado pela issue [#47](https://github.com/victorfob/FateConnect/issues/47).
+Front-end do FateConnect em React + Vite. Substituiu o front Angular, migrado pela issue [#47](https://github.com/victorfob/FateConnect/issues/47).
 
 ## Requisitos
 
@@ -112,8 +112,8 @@ O CI só roda quando o PR toca `FateConnect/Web/**` — mudança de backend não
 
 Não há envio de cobertura para o GitHub: o Code Quality exige repositório de organização em plano Team ou Enterprise Cloud, e este é de conta pessoal. Quem reprova por cobertura é o limite de **90%** do Vitest dentro do `test:ci` — vale igual na máquina e no CI.
 
-## Paridade visual
+## Estilo
 
-Enquanto o front Angular existir, **toda tela migrada precisa provar paridade por medição**: comparar `getComputedStyle` dos elementos equivalentes nos dois apps, em 1440px e 700px, e registrar a tabela no corpo do PR. Captura de tela não conta como prova — ela esconde diferenças de poucos pixels.
+Valor visual novo se justifica contra o que já existe na aplicação — a escala tipográfica, os tokens e as telas vizinhas. Nada de escrever de memória nem de copiar px de export de protótipo.
 
-Estilo de tela migrada se traduz do arquivo de origem, valor a valor. Nada de escrever de memória.
+Durante a migração, cada tela provou paridade com o front Angular medindo `getComputedStyle` nos dois apps, em 1440px e 700px, com a tabela no corpo do PR. As tabelas ficam no histórico dos PRs #74 a #83; a referência em si não existe mais.
