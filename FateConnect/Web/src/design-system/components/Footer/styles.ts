@@ -29,13 +29,18 @@ export const FooterRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   },
 }));
 
+/**
+ * No mobile o produto centraliza também as linhas de texto, não só as caixas:
+ * o alinhamento fica no contêiner e é herdado, no lugar do `:host-context` que
+ * a tipografia usava para alcançar o pai.
+ */
 export const ContactsContainer = styled(Stack)<PolymorphicProps>({
   flexDirection: 'column',
   justifyContent: 'center',
   gap: spacing(md),
   width: '100%',
 
-  [mobileMedia]: { alignItems: 'center' },
+  [mobileMedia]: { alignItems: 'center', textAlign: 'center' },
 });
 
 export const ContactItem = styled(Stack)<PolymorphicProps>({
@@ -60,5 +65,5 @@ export const CopyrightContainer = styled(Stack)<PolymorphicProps>({
   gap: spacing(md),
   width: '100%',
 
-  [mobileMedia]: { alignItems: 'center' },
+  [mobileMedia]: { alignItems: 'center', textAlign: 'center' },
 });
