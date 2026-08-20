@@ -1,10 +1,15 @@
 name: Check Pull Request
 
-# Sem filtro de branch de destino: PR empilhado (base em outra feature branch)
-# também precisa ser validado.
-on: pull_request
+# Só o front React é validado aqui, e só quando a mudança toca nele: PR de
+# backend não tem por que pagar a suíte de front. Sem filtro de branch de
+# destino no PR, porque PR empilhado (base em outra feature branch) também
+# precisa ser validado.
+on:
+  pull_request:
+    paths:
+      - 'FateConnect/Web/**'
 
-# Push novo na mesma PR cancela a execução anterior.
+# Execução nova na mesma ref cancela a anterior.
 concurrency:
   group: check-${{ github.head_ref }}
   cancel-in-progress: true
@@ -14,7 +19,7 @@ permissions:
 
 jobs:
   web:
-    name: Front React (Web)
+    name: React front (Web)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -28,45 +33,25 @@ jobs:
           cache: yarn
           cache-dependency-path: FateConnect/Web/yarn.lock
 
-      - name: Instalar dependências
+      - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Tipos
+      - name: Types
         run: yarn typecheck
 
       - name: Lint
         run: yarn lint
 
-      # `test:ci` roda com cobertura e reprova abaixo do limite definido em vite.config.ts.
-      - name: Testes e cobertura
+      # Suíte inteira: os limites de cobertura são globais, então medi-los sobre
+      # um recorte reprovaria código saudável. O recorte por arquivo alterado
+      # fica no hook de pre-push, onde o objetivo é velocidade.
+      #
+      # Não há envio ao GitHub Code Quality: o recurso exige repositório de
+      # organização em plano Team ou Enterprise Cloud, e este é de conta pessoal
+      # — a API responde 404. Quem reprova por cobertura é o limite do Vitest,
+      # aplicado dentro do `test:ci`.
+      - name: Tests and coverage
         run: yarn test:ci
 
       - name: Build
         run: yarn build
-
-  front-angular:
-    name: Front Angular (legado)
-    # Remover este job junto com FateConnect/Front na issue #58.
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: FateConnect/Front
-    env:
-      CHROME_BIN: /usr/bin/google-chrome
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '20'
-          cache: npm
-          cache-dependency-path: FateConnect/Front/package-lock.json
-
-      - name: Instalar dependências
-        run: npm ci
-
-      - name: Testes
-        run: npm run test:ci
-
-      - name: Build
-        run: npm run build

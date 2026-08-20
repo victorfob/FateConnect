@@ -22,14 +22,14 @@ Nenhum endereço de API é versionado — só o `.env.example`, com as chaves va
 
 ## Scripts
 
-| Comando | O que faz |
-| ------- | --------- |
-| `yarn dev` | Sobe o servidor de desenvolvimento |
-| `yarn build` | Verifica tipos e gera o pacote de produção |
-| `yarn typecheck` | Só a checagem de tipos |
-| `yarn lint` / `yarn lint:fix` | Lint (é o gate de estilo de código) |
-| `yarn test` | Testes em modo observador |
-| `yarn test:ci` | Testes com cobertura — **reprova abaixo de 80%** |
+| Comando                       | O que faz                                        |
+| ----------------------------- | ------------------------------------------------ |
+| `yarn dev`                    | Sobe o servidor de desenvolvimento               |
+| `yarn build`                  | Verifica tipos e gera o pacote de produção       |
+| `yarn typecheck`              | Só a checagem de tipos                           |
+| `yarn lint` / `yarn lint:fix` | Lint (é o gate de estilo de código)              |
+| `yarn test`                   | Testes em modo observador                        |
+| `yarn test:ci`                | Testes com cobertura — **reprova abaixo de 90%** |
 
 ## Estrutura
 
@@ -48,7 +48,10 @@ src/
   hooks/  utils/     hooks e funções auxiliares
   routes/            caminhos e configuração de rotas
   test/              render de teste com os providers da aplicação
+scripts/             apoio à automação (recorte de testes por mudança)
 ```
+
+Dois aliases: `@design-system` para a UI (com `@design-system/icons` para ícones) e `@app` para `src/`.
 
 ## Convenções
 
@@ -92,6 +95,22 @@ Claro e escuro, construídos a partir do sistema de cor do Material Design. O se
 Vitest, Testing Library e MSW. Sempre `screen.*`, consultas por papel de acessibilidade, descrições em inglês no padrão `should …`.
 
 Use o `render` de `@app/test/testing-library`, que já monta tema, rotas e cache — importar `@testing-library/react` direto reprova no lint.
+
+## Automação
+
+| Onde         | O que roda                                          | Cobertura |
+| ------------ | --------------------------------------------------- | --------- |
+| `pre-commit` | `lint-staged` sobre os arquivos preparados          | —         |
+| `pre-push`   | só os testes **relacionados** aos arquivos enviados | —         |
+| CI (no PR)   | tipos, lint, **suíte inteira**, build               | mede      |
+
+O `pre-push` usa `scripts/test-changed.sh`, que segue o grafo de imports com `vitest related`: mudar uma tela roda os testes que a alcançam, não a suíte inteira. Ele cai na suíte inteira quando a mudança sai de `src/` ou remove arquivo — nesses casos o grafo não alcança o efeito, e `vitest related vite.config.ts` sairia com sucesso sem rodar teste nenhum.
+
+Nenhum dos hooks mede cobertura: o limite é global e medi-lo sobre um recorte reprova código saudável. Quem mede é o CI, sobre a suíte inteira.
+
+O CI só roda quando o PR toca `FateConnect/Web/**` — mudança de backend não paga a suíte de front.
+
+Não há envio de cobertura para o GitHub: o Code Quality exige repositório de organização em plano Team ou Enterprise Cloud, e este é de conta pessoal. Quem reprova por cobertura é o limite de **90%** do Vitest dentro do `test:ci` — vale igual na máquina e no CI.
 
 ## Paridade visual
 
