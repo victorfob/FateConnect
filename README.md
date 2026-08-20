@@ -29,7 +29,7 @@ package.json          a versão do projeto, e nada mais
 
 Branch base é a **`develop`**, e o nome da branch sai da issue: `<tipo>/<número>` — `chore/48`, `feat/56`. Toda alteração começa por uma issue no GitHub, e o número dela alimenta a branch, o título e o corpo do PR.
 
-Release sobe por `develop` → `release/x.y.z` → `main`.
+Release sobe por `develop` → `release/x.y.z` → `main`, e a `main` volta para a `develop` sozinha depois do merge.
 
 Os hooks não vêm habilitados no clone, porque o repositório usa `core.hooksPath` em vez de instalar um gerenciador de hooks — o que reapontaria o caminho e desligaria os hooks do Git LFS:
 
@@ -47,12 +47,16 @@ A validação consulta as tags no **remoto**. Consultar localmente aprovaria qua
 
 ## Integração contínua
 
-| Workflow    | Quando                                       | O que faz                                             |
-| ----------- | -------------------------------------------- | ----------------------------------------------------- |
-| `check.yml` | PR que toca `FateConnect/Web/**` ou a versão | valida a versão, tipos, lint, testes e build do front |
-| `tag.yml`   | push na `main`                               | cria a tag da versão publicada                        |
+| Workflow      | Quando                                       | O que faz                                                          |
+| ------------- | -------------------------------------------- | ------------------------------------------------------------------ |
+| `check.yml`   | PR que toca `FateConnect/Web/**` ou a versão | valida a versão, tipos, lint, testes e build do front              |
+| `release.yml` | push na `main`                               | cria a tag da versão publicada e devolve a `main` para a `develop` |
 
 O `check.yml` não roda em PR que não mexe no front: mudança de back-end não tem por que pagar a suíte de front. O `package.json` da raiz entra no filtro por causa da validação de versão — mudança de versão não pode escapar dela.
+
+Os dois passos da release moram no mesmo workflow porque acontecem no mesmo evento: o push que a `main` recebe quando a release entra. Eles não dependem um do outro — falha ao marcar a tag não impede a sincronização, e vice-versa.
+
+O job de back-merge do `release.yml` empurra **direto na `develop`**, sem PR: a ruleset da `develop` concede bypass a uma **deploy key** de escrita, que o workflow usa no checkout, e a da `main` não concede a ninguém — a release continua exigindo PR e review. Bypass para o app GitHub Actions resolveria sem chave nenhuma, mas ele exige repositório de organização: em conta pessoal a API recusa o ator. O caminho comum é fast-forward, porque a `develop` normalmente não andou desde o corte da release. Quando andou, o job faz o merge de verdade; se conflitar, ele para e reporta, porque escolher qual lado vale é decisão humana.
 
 Não há envio de cobertura para o GitHub: o Code Quality exige repositório de organização em plano Team ou Enterprise Cloud, e este é de conta pessoal. Quem reprova por cobertura é o limite do Vitest, dentro do `test:ci`.
 
