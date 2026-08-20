@@ -1,0 +1,38 @@
+---
+description: Front — pt-BR para UI e URLs; inglês para código TypeScript e estrutura; domínio Ride e contrato da API Caronas
+paths:
+  - "FateConnect/Web/**"
+---
+
+# FateConnect — idioma da interface vs idioma do código
+
+Separar o que é **experiência do usuário (pt-BR)** do que é **base de código (inglês)**.
+
+## O que fica em **pt-BR**
+
+- **Copy de produto:** texto de tela, notificação, diálogo, placeholder, `aria-label` quando é mensagem ao usuário, e o erro de bootstrap em `main.tsx`.
+- **URLs visíveis:** segmentos de rota e fragmentos de âncora (`inicio`, `cadastro`, `menu`, `achados-perdidos`, `caronas`, `buscar`, `ofertar`, `servicos`, `contato`, `login`). Trocar um segmento quebra link salvo — só com decisão de produto.
+- **`index.html`:** `lang="pt-BR"`, alinhado à interface.
+- **Comentário e JSDoc:** português, citando nome de API em inglês quando necessário.
+
+## O que fica em **inglês** (código)
+
+- **TypeScript:** tipos, enums, funções, props, hooks, variáveis, nomes de pasta e de arquivo.
+- **Domínio "carona" no código é `Ride`:** `Ride`, `RideFilter`, `listRides`, `pages/Rides/`. **Nunca** *Carona* em nome de tipo, arquivo ou função.
+- **`id` e seletor** usados só pelo código (não copy): inglês.
+- **Tokens** do design system: inglês (`primary`, `surfaceWhite`, `textMuted`).
+- **Teste:** `describe` e `it` em inglês, no padrão `should <fazer algo>`. O código dentro do teste também é inglês. Copy de produto em asserção continua em pt-BR, porque é o texto real da tela.
+
+## Contrato com a **API Caronas**
+
+O idioma do contrato vem do backend, não da nossa convenção:
+
+- Caminho HTTP **`/caronas`**, query params (`Destino`, `DataPartida`, `HoraPartida`, `TipoCarona`) e propriedades do JSON (`destino`, `dataPartida`, `tipoCarona`, …) ficam como o backend expõe.
+- O que é **só nosso** usa inglês: `RideFilter` tem `destination`, `departureDate`, `departureTime`, `rideType`, e o serviço traduz na borda.
+- Valores do enum na serialização: `Filantropica` | `Igualitaria`.
+
+## Referência no repositório
+
+- Feature de exemplo: [`FateConnect/Web/src/pages/Rides/`](FateConnect/Web/src/pages/Rides/)
+- Rotas: [`FateConnect/Web/src/routes/paths.ts`](FateConnect/Web/src/routes/paths.ts)
+- Tradução na borda: [`FateConnect/Web/src/services/rides/ridesService.ts`](FateConnect/Web/src/services/rides/ridesService.ts)
