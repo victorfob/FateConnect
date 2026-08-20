@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
@@ -25,6 +26,21 @@ describe('lookupCep', () => {
     const address = await lookupCep('18000000');
 
     expect(address.localidade).toBe('Sorocaba');
+  });
+
+  // Cancelamento não é falha do provedor: cair no secundário seria disparar uma
+  // requisição que o chamador acabou de abortar.
+  it('should not try the secondary provider when the lookup was cancelled', async () => {
+    server.use(
+      http.get(PRIMARY_URL, () => HttpResponse.json({ localidade: 'Sorocaba' })),
+      http.get(FALLBACK_URL, () => {
+        throw new Error('o provedor secundário não deveria ser consultado');
+      }),
+    );
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(lookupCep('18000000', controller.signal)).rejects.toSatisfy(axios.isCancel);
   });
 
   it('should flag a zip code the primary provider reports as missing', () => {
