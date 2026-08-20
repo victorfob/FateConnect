@@ -1,0 +1,112 @@
+name: Release
+
+# Todo push na main é uma release. A versão do projeto é a do `package.json` da
+# raiz — o front tem versão própria, que não diz nada sobre a release.
+on:
+  push:
+    branches:
+      - main
+
+# Duas releases em sequência não podem correr juntas: a segunda leria o
+# repositório antes de a primeira ter empurrado.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+# Cada job pede o que precisa; nada é concedido por padrão.
+permissions:
+  contents: read
+
+jobs:
+  # O passo de versão do check já barrou versão repetida no PR, então aqui não
+  # sobra decisão: só marcar o commit que foi publicado.
+  tag:
+    name: Create version tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Create tag
+        run: |
+          set -euo pipefail
+
+          version=$(jq -r .version package.json)
+
+          # Push na main sem bump — correção de documentação, ajuste que não
+          # muda o produto — não é erro: a tag já está lá e o job encerra verde.
+          # É também o que segura o caso da tag criada à mão.
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
+            echo "A versão $version já está publicada na tag v$version — nada a fazer."
+            exit 0
+          fi
+
+          # Tag anotada, não leve: guarda data e autoria, então o histórico
+          # registra quando a versão saiu, não só onde ela caiu.
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag --annotate "v$version" --message "Version $version"
+          git push origin "v$version"
+
+          echo "Tag v$version criada em $GITHUB_SHA."
+
+  # Independente do job da tag de propósito. A release entra pela main, mas o
+  # trabalho continua na develop: sem trazer o merge de volta, a próxima release
+  # nasce de uma base que não conhece a anterior, e o primeiro PR depois dela já
+  # vem com conflito de changelog e versão. Falha em um dos dois jobs não tem por
+  # que impedir o outro — os dois são corrigíveis à mão.
+  back-merge:
+    name: Sync develop with main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Histórico completo: o job compara as duas branches, e um checkout
+          # raso não tem os commits para contar.
+          fetch-depth: 0
+          # A deploy key é o que faz o push na develop passar — é a ela que a
+          # ruleset da develop concede bypass. Bypass para o app GitHub Actions
+          # não serve aqui: ele exige repositório de organização, e a API recusa
+          # em conta pessoal.
+          ssh-key: ${{ secrets.BACK_MERGE_SSH_KEY }}
+
+      - name: Sync develop
+        run: |
+          set -euo pipefail
+
+          git fetch --quiet origin main develop
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          behind=$(git rev-list --count origin/develop..origin/main)
+          ahead=$(git rev-list --count origin/main..origin/develop)
+
+          if [ "$behind" -eq 0 ]; then
+            echo "A develop já contém a main — nada a sincronizar."
+            exit 0
+          fi
+
+          git checkout -B develop origin/develop
+
+          # Caso comum: a develop não andou desde o corte da release, então a
+          # sincronização é fast-forward e não inventa commit nenhum.
+          if [ "$ahead" -eq 0 ]; then
+            git merge --ff-only origin/main
+            git push origin develop
+            echo "develop avançada $behind commit(s) até $(git rev-parse --short HEAD), sem merge."
+            exit 0
+          fi
+
+          # A develop andou por conta própria — feature mergeada enquanto a
+          # release estava aberta. Aí o merge é de verdade.
+          if git merge --no-edit origin/main; then
+            git push origin develop
+            echo "main mergeada na develop em $(git rev-parse --short HEAD) ($ahead commit(s) próprios preservados)."
+            exit 0
+          fi
+
+          # Conflito é decisão humana: a automação não escolhe qual lado vale.
+          git merge --abort
+          echo "::error::Conflito ao trazer a main para a develop. Resolva localmente: git checkout develop && git merge origin/main"
+          exit 1
