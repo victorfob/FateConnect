@@ -39,7 +39,7 @@ export const lightPalette: PaletteOptions = {
     secondary: colorTokens.textMuted,
     disabled: colorTokens.textOnGray,
   },
-  action: { hover: colorTokens.surfaceHover },
+  action: { hover: colorTokens.hover },
   divider: colorTokens.divider,
 };
 

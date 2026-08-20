@@ -2,7 +2,7 @@ import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 
 import { styled } from '../../styled';
-import { chromeSurface, onChromeSurface } from '../../theme/chromeSurface';
+import { chromeSurface, onChromeSurface, chromeHover } from '../../theme/chromeSurface';
 import Stack from '@mui/material/Stack';
 import type { PolymorphicProps } from '../../styled';
 
@@ -50,7 +50,7 @@ export const DrawerList = styled(List)(({ theme }) => ({
     paddingLeft: `${ITEM_INLINE_PADDING_PX}px`,
     paddingRight: `${ITEM_INLINE_PADDING_PX}px`,
   },
-  '& .MuiListItemButton-root:hover': { backgroundColor: theme.palette.action.hover },
+  '& .MuiListItemButton-root:hover': { backgroundColor: chromeHover(theme) },
   '& .MuiListItemText-primary': {
     color: onChromeSurface(theme),
     fontSize: '1rem',

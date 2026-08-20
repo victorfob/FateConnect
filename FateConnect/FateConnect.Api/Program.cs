@@ -26,7 +26,7 @@ public class Program
 
         string localUrl = "http://localhost:4200";
         string serverUrl = "http://191.252.210.114:8080";
-        string corsPolicy = "AllowFrontendAngular";
+        string corsPolicy = "AllowFrontend";
 
         builder.Services.AddCors(options =>
         {

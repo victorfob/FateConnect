@@ -1,6 +1,6 @@
 /**
- * Caminhos das rotas. Permanecem em **pt-BR e idênticos** aos do front Angular:
- * trocar um segmento quebra link salvo pelo usuário.
+ * Caminhos das rotas, em **pt-BR**. Trocar um segmento quebra link que o
+ * usuário salvou.
  */
 export enum RoutePathEnum {
   ROOT = '/',

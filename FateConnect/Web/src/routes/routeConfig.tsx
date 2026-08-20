@@ -14,9 +14,9 @@ import { Signup } from '@app/pages/Signup';
 import { RoutePathEnum } from './paths';
 
 /**
- * Duas cascas (visitante e interna) e as telas de carona aninhadas sob
- * `/caronas`, como no front Angular. A exceção é `/contato`: o contato existe
- * só como seção da landing, então a rota não é portada e cai no curinga.
+ * Duas cascas — visitante e interna — e as telas de carona aninhadas sob
+ * `/caronas`. Não existe rota `/contato`: o contato é uma seção da landing,
+ * então um link antigo cai no curinga.
  */
 export const routeConfig: RouteObject[] = [
   {
