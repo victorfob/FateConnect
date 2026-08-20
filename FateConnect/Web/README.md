@@ -2,6 +2,8 @@
 
 Front-end do FateConnect em React + Vite.
 
+Estrutura do repositório, fluxo de trabalho, integração contínua e a versão do projeto — que mora no `package.json` da raiz, não neste — estão no [README da raiz](../../README.md).
+
 ## Requisitos
 
 - **Node** na versão do `.nvmrc` (`nvm use` na pasta resolve)
@@ -106,36 +108,8 @@ Use o `render` de `@app/test/testing-library`, que já monta tema, rotas e cache
 
 O `pre-push` usa `scripts/test-changed.sh`, que segue o grafo de imports com `vitest related`: mudar uma tela roda os testes que a alcançam, não a suíte inteira. Ele cai na suíte inteira quando a mudança sai de `src/` ou remove arquivo — nesses casos o grafo não alcança o efeito, e `vitest related vite.config.ts` sairia com sucesso sem rodar teste nenhum.
 
-Nenhum dos hooks mede cobertura: o limite é global e medi-lo sobre um recorte reprova código saudável. Quem mede é o CI, sobre a suíte inteira.
-
-O CI só roda quando o PR toca `FateConnect/Web/**` — mudança de backend não paga a suíte de front.
-
-Não há envio de cobertura para o GitHub: o Code Quality exige repositório de organização em plano Team ou Enterprise Cloud, e este é de conta pessoal. Quem reprova por cobertura é o limite de **90%** do Vitest dentro do `test:ci` — vale igual na máquina e no CI.
-
-### Versão e tag
-
-A versão do projeto é a do `package.json` da **raiz do repositório** — não a deste pacote, que tem versão própria e não é publicado. PR para a `main` reprova quando a versão da raiz já tem tag: ou o bump foi esquecido, ou a versão foi reaproveitada, e nos dois casos a release entraria sem tag nova. Depois do merge, o push na `main` cria a tag `vX.Y.Z` anotada no commit publicado, sem passo manual.
+Nenhum dos hooks mede cobertura: o limite é global e medi-lo sobre um recorte reprova código saudável. Quem mede é o CI, sobre a suíte inteira, contra o limite de **90%** que o Vitest aplica dentro do `test:ci` — o mesmo limite vale ao rodar o comando na máquina.
 
 ## Estilo
 
 Valor visual novo se justifica contra o que já existe na aplicação — a escala tipográfica, os tokens e as telas vizinhas. Nada de escrever de memória nem de copiar px de export de protótipo. Mudança de aparência se comprova medindo `getComputedStyle` em 1440px e 700px, com a tabela no corpo do PR: captura de tela esconde diferença de poucos pixels.
-
-## Configuração do agente de código
-
-A pasta **`.claude/`**, na raiz do repositório, guarda o contexto que um agente de código carrega ao trabalhar aqui. Ela é **versionada de propósito**: a orientação vale igual para quem clonar o repo, e mudar uma regra passa por review no PR como qualquer código.
-
-| Artefato            | O que é                                                               | Quando carrega                                                         |
-| ------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `CLAUDE.md`         | Instruções do repositório: idioma, fluxo de trabalho, stack, comandos | sempre                                                                 |
-| `rules/*.md`        | Padrão que vale para uma área do código                               | pelo `paths:` do arquivo — ao abrir um arquivo que casa                |
-| `skills/*/SKILL.md` | Procedimento sob demanda, com passos                                  | quando a tarefa casa com a `description`, ou pelo nome (`/pr-creator`) |
-
-As skills de hoje: **`pr-creator`** (abrir e atualizar PR), **`write-commit`** (mensagem de commit e agrupamento em commits), **`changelog-writer`** (entrada do `CHANGELOG.md`) e **`fateconnect-create-component`** (criar componente no front).
-
-### Como mexer nela
-
-- **Escope a rule pelo `paths:`.** Sem ele a rule carrega em toda sessão e custa contexto para sempre, inclusive nas que não tocam aquela pasta.
-- **A rule anda junto com o código.** Padrão novo e a regra que o descreve entram no mesmo PR — separar os dois é como eles divergem.
-- **É conteúdo público.** Vale a mesma restrição do resto do repositório: nada de nome de empregador, repositório interno, pacote privado ou ferramenta corporativa. Quando a orientação vier de fonte interna, registre só a decisão e a justificativa.
-
-O raciocínio completo — quando uma correção merece virar regra, e onde cada coisa mora — está em `.claude/rules/harness-evolution.md`.
