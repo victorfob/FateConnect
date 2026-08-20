@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { colorTokens, spacingScale, typographyTokens } from '../tokens';
+import { colorTokens, mobileMedia, spacingScale, typographyTokens } from '../tokens';
+import type { TypographyToken } from '../tokens';
 import { createAppTheme } from './createAppTheme';
 import { spacing } from './helpers/spacing';
 
@@ -30,11 +31,15 @@ describe('createAppTheme', () => {
     expect(typography.logo).toMatchObject(typographyTokens.logo);
   });
 
-  it('should shrink h1 on narrow screens keeping weight and line height', () => {
+  // A consulta precisa ser a do produto (768px). Com o `sm` do MUI (600px) o
+  // título ficava grande entre os dois pontos, e o teste antigo — que só
+  // procurava o tamanho reduzido em algum lugar do objeto — não acusava.
+  it('should shrink h1 at the product breakpoint keeping weight and line height', () => {
     const { typography } = createAppTheme();
+    const h1 = typography.h1 as unknown as Record<string, TypographyToken>;
 
     expect(typography.h1.fontSize).toBe(typographyTokens.h1.fontSize);
-    expect(JSON.stringify(typography.h1)).toContain(typographyTokens.h1Narrow.fontSize);
+    expect(h1[mobileMedia]).toMatchObject(typographyTokens.h1Narrow);
   });
 
   it('should apply the product palette', () => {
