@@ -115,3 +115,23 @@ Não há envio de cobertura para o GitHub: o Code Quality exige repositório de 
 ## Estilo
 
 Valor visual novo se justifica contra o que já existe na aplicação — a escala tipográfica, os tokens e as telas vizinhas. Nada de escrever de memória nem de copiar px de export de protótipo. Mudança de aparência se comprova medindo `getComputedStyle` em 1440px e 700px, com a tabela no corpo do PR: captura de tela esconde diferença de poucos pixels.
+
+## Configuração do agente de código
+
+A pasta **`.claude/`**, na raiz do repositório, guarda o contexto que um agente de código carrega ao trabalhar aqui. Ela é **versionada de propósito**: a orientação vale igual para quem clonar o repo, e mudar uma regra passa por review no PR como qualquer código.
+
+| Artefato            | O que é                                                               | Quando carrega                                                         |
+| ------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `CLAUDE.md`         | Instruções do repositório: idioma, fluxo de trabalho, stack, comandos | sempre                                                                 |
+| `rules/*.md`        | Padrão que vale para uma área do código                               | pelo `paths:` do arquivo — ao abrir um arquivo que casa                |
+| `skills/*/SKILL.md` | Procedimento sob demanda, com passos                                  | quando a tarefa casa com a `description`, ou pelo nome (`/pr-creator`) |
+
+As skills de hoje: **`pr-creator`** (abrir e atualizar PR), **`write-commit`** (mensagem de commit e agrupamento em commits) e **`fateconnect-create-component`** (criar componente no front).
+
+### Como mexer nela
+
+- **Escope a rule pelo `paths:`.** Sem ele a rule carrega em toda sessão e custa contexto para sempre, inclusive nas que não tocam aquela pasta.
+- **A rule anda junto com o código.** Padrão novo e a regra que o descreve entram no mesmo PR — separar os dois é como eles divergem.
+- **É conteúdo público.** Vale a mesma restrição do resto do repositório: nada de nome de empregador, repositório interno, pacote privado ou ferramenta corporativa. Quando a orientação vier de fonte interna, registre só a decisão e a justificativa.
+
+O raciocínio completo — quando uma correção merece virar regra, e onde cada coisa mora — está em `.claude/rules/harness-evolution.md`.
