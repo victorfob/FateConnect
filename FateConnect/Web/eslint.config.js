@@ -33,6 +33,8 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       // API marcada como obsoleta não entra: quando ela sair, o build quebra.
       '@typescript-eslint/no-deprecated': 'error',
+      // Nenhum console solto no código: sobra de depuração vaza para produção.
+      'no-console': 'error',
     },
   },
 
