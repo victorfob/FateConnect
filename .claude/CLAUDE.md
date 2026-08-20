@@ -17,7 +17,7 @@ Planejamento e rastreio ficam no **GitHub** (issues + Project board do repositó
 ## Organização desta configuração
 
 - `.claude/rules/` — regras do projeto. Sem `paths:` carregam sempre; com `paths:` carregam quando um arquivo que casa é lido.
-- `.claude/skills/` — fluxos sob demanda: `pr-creator` (abrir/atualizar PR), `write-commit` (mensagem de commit e agrupamento em commits) e `fateconnect-create-component` (criar componente no front).
+- `.claude/skills/` — fluxos sob demanda: `pr-creator` (abrir/atualizar PR), `write-commit` (mensagem de commit e agrupamento em commits), `changelog-writer` (entrada do CHANGELOG) e `fateconnect-create-component` (criar componente no front).
 - `.claude/` é **versionada**: rule e skill passam por review no PR como qualquer código, e valem igual para quem clonar o repo. Por isso a restrição do repositório acima se aplica a elas também.
 
 ## Fluxo de trabalho
@@ -25,6 +25,7 @@ Planejamento e rastreio ficam no **GitHub** (issues + Project board do repositó
 - Branch base: **`develop`**. Nomear branch como `<tipo>/<número-da-issue>` (ex.: `chore/48`).
 - Toda correção ou alteração começa por uma **issue no GitHub** — o número dela alimenta a branch, o título do PR e o corpo do PR.
 - Abrir PR: usar a skill `pr-creator`. Commitar: usar a skill `write-commit` — e **pedir confirmação antes de qualquer comando git**.
+- ⛔ **Nunca escrever changelog à mão** — usar a skill `changelog-writer`. À mão sai um bullet por commit, que é o oposto do formato: uma entrada principal descrevendo o efeito para quem usa. O formato está em `.claude/rules/changelog-format.md`.
 - ⛔ **Não criar artefato de processo por conta própria** — issue, branch, PR, label, milestone. A regra "toda alteração começa por uma issue" vale para o que o usuário tratou como **tarefa**, não para todo ajuste solto. Pedido pequeno e avulso ("adiciona o codeowner pra mim") entra na tarefa em andamento ou na próxima, em **commit separado**. Na dúvida, perguntar: uma pergunta custa menos que fechar issue, branch e PR depois.
 
 ## Comandos
