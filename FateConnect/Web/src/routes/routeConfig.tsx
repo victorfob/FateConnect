@@ -1,5 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router';
 
+import { ErrorBoundary } from '@app/components/ErrorBoundary';
 import { GuestLayout } from '@app/layouts/GuestLayout';
 import { MainLayout } from '@app/layouts/MainLayout';
 import { RootLayout } from '@app/layouts/RootLayout';
@@ -20,6 +21,7 @@ import { RoutePathEnum } from './paths';
 export const routeConfig: RouteObject[] = [
   {
     element: <RootLayout />,
+    errorElement: <ErrorBoundary />,
     children: [
       { path: RoutePathEnum.ROOT, element: <Navigate to={RoutePathEnum.LANDING} replace /> },
       {
