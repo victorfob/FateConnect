@@ -19,6 +19,9 @@ const NAV_FONT_SIZE = '1rem';
 const NAV_FONT_WEIGHT = 500;
 const CTA_FONT_WEIGHT = 400;
 
+/** Largura do botão de menu no mobile, como no produto. */
+const MENU_BUTTON_WIDTH = '48px';
+
 /** Espaço horizontal entre os itens do topo — vale também entre a navegação e as ações. */
 const NAV_COLUMN_GAP = '1.5vw';
 
@@ -73,13 +76,19 @@ export const ActionsSlot = styled(Stack)<PolymorphicProps>({
   marginLeft: NAV_COLUMN_GAP,
 });
 
+/**
+ * Só existe abaixo do breakpoint mobile. O `display: flex` na consulta é o que
+ * volta a exibir o botão: sem ele o `display: none` da base vale em toda
+ * largura e o ícone de menu nunca aparece.
+ */
 export const MenuButtonSlot = styled(Stack)<PolymorphicProps>({
   display: 'none',
 
   [mobileMedia]: {
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '48px',
+    width: MENU_BUTTON_WIDTH,
   },
 });

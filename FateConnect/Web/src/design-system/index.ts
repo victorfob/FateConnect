@@ -15,6 +15,8 @@ export { HEADER_HEIGHT_PX } from './components/Header/styles';
 export { Footer } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
 export { ConfirmDialog } from './components/ConfirmDialog';
+export { PageMessage } from './components/PageMessage';
+export type { PageMessageProps } from './components/PageMessage';
 export { StatusTag } from './components/StatusTag';
 export type { StatusTagProps } from './components/StatusTag';
 export type { StatusTagTone } from './components/StatusTag/types';

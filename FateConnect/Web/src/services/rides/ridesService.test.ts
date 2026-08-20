@@ -52,6 +52,12 @@ describe('ridesService', () => {
     expect(rides).toHaveLength(1);
   });
 
+  it('should fail when the response is not a list', async () => {
+    server.use(http.get(RIDES_URL, () => HttpResponse.text('<!doctype html><html></html>')));
+
+    await expect(listRides()).rejects.toThrow(/não é uma lista/);
+  });
+
   it('should delete a ride by id', async () => {
     let deletedId: string | undefined;
     server.use(

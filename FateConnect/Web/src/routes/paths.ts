@@ -8,7 +8,6 @@ export enum RoutePathEnum {
   SIGNUP = '/cadastro',
   MENU = '/menu',
   LOST_AND_FOUND = '/achados-perdidos',
-  CONTACT = '/contato',
   RIDES = '/caronas',
   RIDES_SEARCH = '/caronas/buscar',
   RIDES_OFFER = '/caronas/ofertar',

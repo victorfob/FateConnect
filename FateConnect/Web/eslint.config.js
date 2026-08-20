@@ -33,6 +33,8 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       // API marcada como obsoleta não entra: quando ela sair, o build quebra.
       '@typescript-eslint/no-deprecated': 'error',
+      // Nenhum console solto no código: sobra de depuração vaza para produção.
+      'no-console': 'error',
     },
   },
 
@@ -134,8 +136,7 @@ export default tseslint.config(
             'Sem `sx` inline. Declare o estilo em `styles.ts` com `styled(...)` e use `<S.Componente>`.',
         },
         {
-          selector:
-            "CallExpression[callee.object.name='theme'][callee.property.name='spacing']",
+          selector: "CallExpression[callee.object.name='theme'][callee.property.name='spacing']",
           message:
             'Use o helper `spacing()` do design system. O `theme.spacing` é do MUI e sobrescrevê-lo encolhe os componentes dele (as gutters do Toolbar viraram 3px).',
         },
@@ -156,11 +157,13 @@ export default tseslint.config(
         'error',
         {
           selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
-          message: 'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
+          message:
+            'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
         },
         {
           selector: 'Literal[value=/^rgba?\\(/]',
-          message: 'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
+          message:
+            'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
         },
       ],
     },
