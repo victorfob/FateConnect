@@ -25,7 +25,6 @@ export const colorTokens = {
   successBackground: '#D4EDDA',
   warningText: '#856404',
   warningBackground: '#FFF3CD',
-  dangerText: '#CF2E2E',
   dangerBackground: '#FFDFDF',
 
   /** Divisor sobre superfície neutra — linha do formulário de cadastro. */
