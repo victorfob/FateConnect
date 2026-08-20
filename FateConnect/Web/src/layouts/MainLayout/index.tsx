@@ -11,9 +11,9 @@ import {
   ListItemButton,
   ListItemText,
   NavigationDrawer,
-  ThemeToggleButton,
   Typography,
 } from '@design-system';
+import { HeaderActions } from './components/HeaderActions';
 import * as S from '../shell.styles';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
@@ -37,7 +37,7 @@ export function MainLayout() {
     <S.ShellRoot>
       <Header
         logo={logo}
-        actions={<ThemeToggleButton />}
+        actions={<HeaderActions />}
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
         navigation={APP_LINKS.map(({ path, label }) => (
