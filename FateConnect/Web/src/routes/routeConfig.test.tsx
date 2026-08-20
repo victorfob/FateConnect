@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
 
-import { render, screen } from '@app/test/testing-library';
+import { render, screen, within } from '@app/test/testing-library';
+import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
 import { RoutePathEnum } from './paths';
@@ -27,14 +28,18 @@ describe('routeConfig', () => {
     [RoutePathEnum.LANDING, 'Conectando a Comunidade Acadêmica'],
     [RoutePathEnum.SIGNUP, SIGNUP_TITLE],
     [RoutePathEnum.MENU, 'Menu'],
-    [RoutePathEnum.LOST_AND_FOUND, 'Achados e Perdidos'],
+    [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
     [RoutePathEnum.CONTACT, 'Contato'],
     [RoutePathEnum.RIDES_SEARCH, RIDES_TITLE],
     [RoutePathEnum.RIDES_OFFER, RIDES_TITLE],
+    // Dentro de `main`: o título da tela vive na área de conteúdo, não no cromo.
+    // Buscar na página toda casaria com um título do rodapé de mesmo texto.
   ])('should resolve %s', (path, title) => {
     renderRoute(path);
 
-    expect(screen.getByRole('heading', { name: title })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('main')).getByRole('heading', { name: title }),
+    ).toBeInTheDocument();
   });
 
   it('should redirect the root path to the landing page', () => {
