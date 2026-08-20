@@ -112,6 +112,10 @@ O CI só roda quando o PR toca `FateConnect/Web/**` — mudança de backend não
 
 Não há envio de cobertura para o GitHub: o Code Quality exige repositório de organização em plano Team ou Enterprise Cloud, e este é de conta pessoal. Quem reprova por cobertura é o limite de **90%** do Vitest dentro do `test:ci` — vale igual na máquina e no CI.
 
+### Versão e tag
+
+A versão do projeto é a do `package.json` da **raiz do repositório** — não a deste pacote, que tem versão própria e não é publicado. PR para a `main` reprova quando a versão da raiz já tem tag: ou o bump foi esquecido, ou a versão foi reaproveitada, e nos dois casos a release entraria sem tag nova. Depois do merge, o push na `main` cria a tag `vX.Y.Z` anotada no commit publicado, sem passo manual.
+
 ## Estilo
 
 Valor visual novo se justifica contra o que já existe na aplicação — a escala tipográfica, os tokens e as telas vizinhas. Nada de escrever de memória nem de copiar px de export de protótipo. Mudança de aparência se comprova medindo `getComputedStyle` em 1440px e 700px, com a tabela no corpo do PR: captura de tela esconde diferença de poucos pixels.
