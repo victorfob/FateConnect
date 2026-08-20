@@ -1,20 +1,54 @@
 #!/usr/bin/env bash
-# Runs Front unit tests (Karma, Chrome headless) before each push.
-# Enable for this clone: git config core.hooksPath .githooks
+# Roda os testes do front que estão relacionados ao que está sendo enviado.
+# Habilitar neste clone: git config core.hooksPath .githooks
+#
+# `scripts/test-changed.sh` segue o grafo de imports com `vitest related`, então
+# mudar uma tela roda os testes que a alcançam, não a suíte inteira. A suíte
+# completa com cobertura fica no CI.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
-FRONT="$ROOT/FateConnect/Front"
+WEB="$ROOT/FateConnect/Web"
 
-if [[ ! -f "$FRONT/package.json" ]]; then
-  echo "pre-push: expected $FRONT/package.json" >&2
+# Ref vazia (branch sendo deletada) vem como SHA de zeros.
+EMPTY_SHA="$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')"
+
+changed="$(mktemp)"
+trap 'rm -f "$changed"' EXIT
+
+changed_files() {
+  local local_sha="$1" remote_sha="$2" base
+
+  # Branch nova no remoto: compara com a base em vez de um commit inexistente.
+  if [ "$remote_sha" = "$EMPTY_SHA" ]; then
+    base="$(git merge-base "$local_sha" origin/develop 2>/dev/null || true)"
+    if [ -z "$base" ]; then
+      # Sem base conhecida não dá para restringir: devolve a árvore toda.
+      git ls-tree -r --name-only "$local_sha"
+      return
+    fi
+    git diff --name-only "$base" "$local_sha"
+    return
+  fi
+
+  git diff --name-only "$remote_sha" "$local_sha"
+}
+
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ "$local_sha" = "$EMPTY_SHA" ] && continue
+  changed_files "$local_sha" "$remote_sha" >> "$changed"
+done
+
+sort -u -o "$changed" "$changed"
+
+if ! grep -q '^FateConnect/Web/' "$changed"; then
+  echo "pre-push: nada em FateConnect/Web — nada a testar."
+  exit 0
+fi
+
+if [ ! -d "$WEB/node_modules" ]; then
+  echo "pre-push: dependências de FateConnect/Web ausentes — rode 'yarn' nessa pasta" >&2
   exit 1
 fi
 
-if ! command -v npm >/dev/null 2>&1; then
-  echo "pre-push: npm not found on PATH" >&2
-  exit 1
-fi
-
-cd "$FRONT"
-npm run test:ci
+grep '^FateConnect/Web/' "$changed" | tr '\n' '\0' | xargs -0 "$WEB/scripts/test-changed.sh"

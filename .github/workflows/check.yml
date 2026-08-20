@@ -1,0 +1,88 @@
+name: Check Pull Request
+
+# Só o front React é validado aqui, e só quando a mudança toca nele: PR de
+# backend não tem por que pagar a suíte de front. Sem filtro de branch de
+# destino no PR, porque PR empilhado (base em outra feature branch) também
+# precisa ser validado.
+#
+# O `package.json` da raiz entra no filtro por causa do passo de versão: é lá
+# que a versão do projeto mora, e mudança de versão não pode escapar da
+# validação.
+on:
+  pull_request:
+    paths:
+      - 'FateConnect/Web/**'
+      - 'package.json'
+
+# Execução nova na mesma ref cancela a anterior.
+concurrency:
+  group: check-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: React front (Web)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FateConnect/Web
+    steps:
+      - uses: actions/checkout@v5
+
+      # A tag da release nasce da versão do `package.json` da raiz, então PR para
+      # a main é a última chance de pegar versão repetida: ou o bump foi
+      # esquecido, ou a versão já foi publicada. Nos dois casos a release
+      # entraria sem tag nova.
+      #
+      # Só o PR para a main é validado — a versão que vale é a que está sendo
+      # publicada. Em PR de feature a versão é a da última release, e a tag dela
+      # existe: validar ali reprovaria toda feature.
+      #
+      # A busca é no remoto, não em `git tag -l`: o checkout traz um commit e
+      # nenhuma tag, então a busca local não acharia nada nunca e o passo
+      # aprovaria tudo em silêncio.
+      - name: Version
+        if: github.base_ref == 'main'
+        run: |
+          set -euo pipefail
+
+          version=$(jq -r .version "$GITHUB_WORKSPACE/package.json")
+
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
+            echo "::error::A versão $version já foi publicada (tag v$version). Atualize a versão no package.json da raiz e abra a seção correspondente no CHANGELOG.md."
+            exit 1
+          fi
+
+          echo "Versão $version disponível para publicação."
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: FateConnect/Web/.nvmrc
+          cache: yarn
+          cache-dependency-path: FateConnect/Web/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Types
+        run: yarn typecheck
+
+      - name: Lint
+        run: yarn lint
+
+      # Suíte inteira: os limites de cobertura são globais, então medi-los sobre
+      # um recorte reprovaria código saudável. O recorte por arquivo alterado
+      # fica no hook de pre-push, onde o objetivo é velocidade.
+      #
+      # Não há envio ao GitHub Code Quality: o recurso exige repositório de
+      # organização em plano Team ou Enterprise Cloud, e este é de conta pessoal
+      # — a API responde 404. Quem reprova por cobertura é o limite do Vitest,
+      # aplicado dentro do `test:ci`.
+      - name: Tests and coverage
+        run: yarn test:ci
+
+      - name: Build
+        run: yarn build
