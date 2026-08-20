@@ -6,6 +6,7 @@ import { server } from '@app/mocks/server';
 
 import { render, screen, within } from '@app/test/testing-library';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
+import { MENU_TITLE } from '@app/pages/Menu/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
 import { RoutePathEnum } from './paths';
@@ -27,7 +28,7 @@ describe('routeConfig', () => {
   it.each([
     [RoutePathEnum.LANDING, 'Conectando a Comunidade Acadêmica'],
     [RoutePathEnum.SIGNUP, SIGNUP_TITLE],
-    [RoutePathEnum.MENU, 'Menu'],
+    [RoutePathEnum.MENU, MENU_TITLE],
     [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
     [RoutePathEnum.RIDES_SEARCH, RIDES_TITLE],
     [RoutePathEnum.RIDES_OFFER, RIDES_TITLE],
