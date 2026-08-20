@@ -19,7 +19,7 @@ function renderAt(initialPath: string) {
   const router = createMemoryRouter(
     [
       { path: RoutePathEnum.LANDING, element: <SectionButton /> },
-      { path: RoutePathEnum.CONTACT, element: <SectionButton /> },
+      { path: RoutePathEnum.MENU, element: <SectionButton /> },
     ],
     { initialEntries: [initialPath] },
   );
@@ -34,7 +34,7 @@ describe('useLandingAnchor', () => {
   });
 
   it('should navigate to the landing page with the fragment when on another route', async () => {
-    const router = renderAt(RoutePathEnum.CONTACT);
+    const router = renderAt(RoutePathEnum.MENU);
 
     await userEvent.click(screen.getByRole('button', { name: 'Serviços' }));
 

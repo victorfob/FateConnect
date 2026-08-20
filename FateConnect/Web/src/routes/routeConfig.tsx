@@ -3,7 +3,6 @@ import { Navigate, type RouteObject } from 'react-router';
 import { GuestLayout } from '@app/layouts/GuestLayout';
 import { MainLayout } from '@app/layouts/MainLayout';
 import { RootLayout } from '@app/layouts/RootLayout';
-import { Contact } from '@app/pages/Contact';
 import { Home } from '@app/pages/Home';
 import { LostAndFound } from '@app/pages/LostAndFound';
 import { Menu } from '@app/pages/Menu';
@@ -14,8 +13,9 @@ import { Signup } from '@app/pages/Signup';
 import { RoutePathEnum } from './paths';
 
 /**
- * Mesma topologia do front Angular: duas cascas (visitante e interna) e as
- * telas de carona aninhadas sob `/caronas`.
+ * Duas cascas (visitante e interna) e as telas de carona aninhadas sob
+ * `/caronas`, como no front Angular. A exceção é `/contato`: o contato existe
+ * só como seção da landing, então a rota não é portada e cai no curinga.
  */
 export const routeConfig: RouteObject[] = [
   {
@@ -34,7 +34,6 @@ export const routeConfig: RouteObject[] = [
         children: [
           { path: RoutePathEnum.MENU, element: <Menu /> },
           { path: RoutePathEnum.LOST_AND_FOUND, element: <LostAndFound /> },
-          { path: RoutePathEnum.CONTACT, element: <Contact /> },
           {
             path: RoutePathEnum.RIDES,
             element: <Rides />,

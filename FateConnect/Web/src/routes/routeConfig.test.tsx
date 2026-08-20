@@ -29,7 +29,6 @@ describe('routeConfig', () => {
     [RoutePathEnum.SIGNUP, SIGNUP_TITLE],
     [RoutePathEnum.MENU, 'Menu'],
     [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
-    [RoutePathEnum.CONTACT, 'Contato'],
     [RoutePathEnum.RIDES_SEARCH, RIDES_TITLE],
     [RoutePathEnum.RIDES_OFFER, RIDES_TITLE],
     // Dentro de `main`: o título da tela vive na área de conteúdo, não no cromo.
@@ -52,6 +51,12 @@ describe('routeConfig', () => {
     const router = renderRoute(RoutePathEnum.RIDES);
 
     expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES_SEARCH);
+  });
+
+  it('should send the dropped contact route to the landing page', () => {
+    const router = renderRoute('/contato');
+
+    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
   });
 
   it('should send an unknown route to the landing page', () => {
