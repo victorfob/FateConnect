@@ -1,28 +1,30 @@
-name: Tag Release
+name: Release
 
-# Todo push na main é uma release, e a versão do projeto é a do `package.json`
-# da raiz — o front tem versão própria, que não diz nada sobre a release. O passo
-# de versão do check já barrou versão repetida no PR, então aqui não sobra
-# decisão: só marcar o commit que foi publicado.
+# Todo push na main é uma release. A versão do projeto é a do `package.json` da
+# raiz — o front tem versão própria, que não diz nada sobre a release.
 on:
   push:
     branches:
       - main
 
 # Duas releases em sequência não podem correr juntas: a segunda leria o
-# repositório antes de a primeira ter criado a tag.
+# repositório antes de a primeira ter empurrado.
 concurrency:
-  group: tag-release
+  group: release
   cancel-in-progress: false
 
-# Criar tag é escrita no repositório.
+# Cada job pede o que precisa; nada é concedido por padrão.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
+  # O passo de versão do check já barrou versão repetida no PR, então aqui não
+  # sobra decisão: só marcar o commit que foi publicado.
   tag:
     name: Create version tag
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v5
 
