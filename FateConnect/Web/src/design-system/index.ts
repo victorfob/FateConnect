@@ -14,6 +14,7 @@ export { Header } from './components/Header';
 export { HEADER_HEIGHT_PX } from './components/Header/styles';
 export { Footer } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
+export { InitialsAvatar } from './components/InitialsAvatar';
 export { ConfirmDialog } from './components/ConfirmDialog';
 export { NotificationProvider } from './components/NotificationProvider';
 export { PageMessage } from './components/PageMessage';

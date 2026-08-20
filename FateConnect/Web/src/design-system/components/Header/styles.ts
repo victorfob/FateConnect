@@ -73,6 +73,9 @@ export const DesktopNav = styled(Stack)<PolymorphicProps>(({ theme }) => ({
 export const ActionsSlot = styled(Stack)<PolymorphicProps>({
   flexDirection: 'row',
   alignItems: 'center',
+  // Separa uma ação da outra. Com um filho só isso não aparecia, e duas
+  // ações adjacentes ficavam encostadas.
+  gap: spacing(xs),
   marginLeft: NAV_COLUMN_GAP,
 });
 
