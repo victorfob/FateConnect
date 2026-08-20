@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
-# Roda a suíte do front que está sendo enviado, antes de cada push.
+# Roda os testes do front que estão relacionados ao que está sendo enviado.
 # Habilitar neste clone: git config core.hooksPath .githooks
 #
-# Durante a janela de migração os dois fronts convivem e cada push mexe em um só,
-# então cada suíte roda apenas quando a sua pasta aparece no que está sendo
-# enviado. No front React a corrida é ainda mais estreita: `scripts/test-changed.sh`
-# limita aos testes que alcançam os arquivos alterados. O Karma do Angular não tem
-# modo equivalente, então lá a suíte é inteira.
+# `scripts/test-changed.sh` segue o grafo de imports com `vitest related`, então
+# mudar uma tela roda os testes que a alcançam, não a suíte inteira. A suíte
+# completa com cobertura fica no CI.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
 WEB="$ROOT/FateConnect/Web"
-FRONT="$ROOT/FateConnect/Front"
 
 # Ref vazia (branch sendo deletada) vem como SHA de zeros.
 EMPTY_SHA="$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')"
@@ -44,30 +41,14 @@ done
 
 sort -u -o "$changed" "$changed"
 
-if ! grep -q '^FateConnect/\(Web\|Front\)/' "$changed"; then
-  echo "pre-push: nada em FateConnect/Web nem em FateConnect/Front — nada a testar."
+if ! grep -q '^FateConnect/Web/' "$changed"; then
+  echo "pre-push: nada em FateConnect/Web — nada a testar."
   exit 0
 fi
 
-if grep -q '^FateConnect/Web/' "$changed"; then
-  if [ ! -d "$WEB/node_modules" ]; then
-    echo "pre-push: dependências de FateConnect/Web ausentes — rode 'yarn' nessa pasta" >&2
-    exit 1
-  fi
-  echo "pre-push: front React (FateConnect/Web)"
-  grep '^FateConnect/Web/' "$changed" | tr '\n' '\0' \
-    | xargs -0 "$WEB/scripts/test-changed.sh"
+if [ ! -d "$WEB/node_modules" ]; then
+  echo "pre-push: dependências de FateConnect/Web ausentes — rode 'yarn' nessa pasta" >&2
+  exit 1
 fi
 
-if grep -q '^FateConnect/Front/' "$changed"; then
-  if [ ! -f "$FRONT/package.json" ]; then
-    echo "pre-push: esperava $FRONT/package.json" >&2
-    exit 1
-  fi
-  if ! command -v npm >/dev/null 2>&1; then
-    echo "pre-push: npm não encontrado no PATH" >&2
-    exit 1
-  fi
-  echo "pre-push: front Angular (FateConnect/Front) — suíte inteira, o Karma não tem modo related"
-  (cd "$FRONT" && npm run test:ci)
-fi
+grep '^FateConnect/Web/' "$changed" | tr '\n' '\0' | xargs -0 "$WEB/scripts/test-changed.sh"

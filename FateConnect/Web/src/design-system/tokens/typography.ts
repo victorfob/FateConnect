@@ -7,10 +7,7 @@ export type TypographyToken = {
 
 export const fontFamily = "'Inter', 'Helvetica Neue', sans-serif";
 
-/**
- * Escala tipográfica do produto. Os valores são os mesmos já implementados —
- * a migração não altera a escala, só onde ela vive.
- */
+/** Escala tipográfica do produto. */
 export const typographyTokens = {
   h1: { fontSize: '2rem', fontWeight: 700, lineHeight: 1.2 },
   h1Narrow: { fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2 },
