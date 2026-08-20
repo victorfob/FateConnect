@@ -13,7 +13,13 @@ export const colorTokens = {
 
   surfaceGray: '#F0F2F4',
   surfaceWhite: '#FFFFFF',
-  surfaceHover: 'rgba(255, 255, 255, 0.6)',
+  /** Realce sobre o cromo colorido — menu lateral. Some sobre superfície clara. */
+  chromeHover: 'rgba(255, 255, 255, 0.6)',
+  /**
+   * Realce genérico sobre superfície clara: o produto usa a cor de conteúdo a
+   * 4%, que é o que o Material desenha na opção do `select`.
+   */
+  hover: 'rgba(0, 0, 0, 0.035)',
 
   textOnGray: '#747D84',
   /** Borda do campo de formulário — o mesmo 38% que o produto desenha hoje. */

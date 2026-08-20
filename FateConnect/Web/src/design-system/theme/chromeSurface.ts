@@ -47,3 +47,13 @@ export function inputOutline(theme: Theme): string {
 
   return colorTokens.inputOutline;
 }
+
+/**
+ * Realce do item de cromo sob o cursor. Não pode sair de `palette.action.hover`:
+ * aquele é o realce de superfície clara, e sobre a cor de marca ele desaparece.
+ */
+export function chromeHover(theme: Theme): string {
+  if (theme.palette.mode === 'dark') return darkColorTokens.hover;
+
+  return colorTokens.chromeHover;
+}

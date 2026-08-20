@@ -1,4 +1,4 @@
-import type { Components, Theme } from '@mui/material/styles';
+import type { CSSObject, Components, Theme } from '@mui/material/styles';
 
 import { radiusScale, shadowTokens, spacingScale, typographyTokens } from '../tokens';
 import { chromeSurface, inputOutline } from './chromeSurface';
@@ -14,7 +14,45 @@ const SELECT_OPTION_MIN_HEIGHT_PX = 48;
 export const components: Components<Theme> = {
   MuiButton: {
     defaultProps: { disableElevation: true },
-    styleOverrides: { root: { textTransform: 'none' } },
+    styleOverrides: {
+      // O produto escurece **qualquer** botão com um véu preto a 4% sob o
+      // cursor, por overlay, em vez de trocar a cor de fundo por variante.
+      //
+      // Sem isso não há retorno visual: no botão preenchido o MUI só muda a
+      // sombra, que `disableElevation` já removeu; e no botão de texto do topo
+      // ele deriva de `text.primary`, que é a própria cor da marca — 4% dela
+      // sobre o header da cor da marca não aparece.
+      root: ({ theme, ownerState }) => {
+        const veil: CSSObject = {
+          textTransform: 'none',
+          position: 'relative',
+
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 'inherit',
+            backgroundColor: theme.palette.action.hover,
+            opacity: 0,
+            transition: theme.transitions.create('opacity'),
+            pointerEvents: 'none',
+          },
+
+          // Em toque não existe cursor: o véu ficaria preso depois do toque.
+          '@media (hover: hover)': {
+            '&:hover::after': { opacity: 1 },
+          },
+        };
+
+        // O MUI troca o fundo do botão preenchido pelo tom `dark` no hover, o
+        // que somado ao véu escurece o dobro do produto. Fixar o fundo na cor
+        // base deixa o véu ser o único escurecimento.
+        if (ownerState.variant !== 'contained') return veil;
+        if (ownerState.color !== 'secondary' && ownerState.color !== 'error') return veil;
+
+        return { ...veil, '&:hover': { backgroundColor: theme.palette[ownerState.color].main } };
+      },
+    },
   },
   MuiCard: {
     styleOverrides: {
