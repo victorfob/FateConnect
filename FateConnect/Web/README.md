@@ -126,7 +126,7 @@ A pasta **`.claude/`**, na raiz do repositório, guarda o contexto que um agente
 | `rules/*.md`        | Padrão que vale para uma área do código                               | pelo `paths:` do arquivo — ao abrir um arquivo que casa                |
 | `skills/*/SKILL.md` | Procedimento sob demanda, com passos                                  | quando a tarefa casa com a `description`, ou pelo nome (`/pr-creator`) |
 
-As skills de hoje: **`pr-creator`** (abrir e atualizar PR), **`write-commit`** (mensagem de commit e agrupamento em commits) e **`fateconnect-create-component`** (criar componente no front).
+As skills de hoje: **`pr-creator`** (abrir e atualizar PR), **`write-commit`** (mensagem de commit e agrupamento em commits), **`changelog-writer`** (entrada do `CHANGELOG.md`) e **`fateconnect-create-component`** (criar componente no front).
 
 ### Como mexer nela
 
