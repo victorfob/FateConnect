@@ -38,6 +38,14 @@ export default tseslint.config(
     },
   },
 
+  // O único console permitido: o relator de erro global, que existe justamente
+  // para o que escapa do React não desaparecer sem rastro. O teste dele entra na
+  // exceção porque precisa afirmar a chamada que verifica.
+  {
+    files: ['src/utils/reportUncaughtErrors.ts', 'src/utils/reportUncaughtErrors.test.ts'],
+    rules: { 'no-console': 'off' },
+  },
+
   // A aplicação fala com a UI por uma porta só: o barrel do design system.
   {
     files: ['src/**/*.{ts,tsx}'],
