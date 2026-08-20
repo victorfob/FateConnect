@@ -7,6 +7,9 @@ import { spacing } from './helpers/spacing';
 
 const { xxs, md } = spacingScale;
 
+/** Altura da linha no painel do `select`, como no produto. */
+const SELECT_OPTION_MIN_HEIGHT_PX = 48;
+
 /** Overrides de componente do MUI alinhados ao visual já implementado no produto. */
 export const components: Components<Theme> = {
   MuiButton: {
@@ -44,6 +47,25 @@ export const components: Components<Theme> = {
     styleOverrides: {
       root: { marginLeft: 0, marginRight: 0 },
       label: { paddingLeft: spacing(xxs) },
+    },
+  },
+  // A opção do painel do `select` no produto tem 48px de altura e recuo só na
+  // horizontal; o padrão do MUI é mais baixo, o que encurtava todo dropdown do
+  // app — com 27 opções no estado, a diferença compõe.
+  //
+  // O valor precisa ser repetido dentro do breakpoint: o MUI declara os mesmos
+  // 48px e **desfaz** num `@media (min-width:600px)` com `minHeight: 'auto'`.
+  // Sobrescrever só a base deixa a linha encolher no desktop — e, sem o recuo
+  // vertical dele, ela colapsa na altura do texto.
+  MuiMenuItem: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
+        padding: spacing(0, md),
+        [theme.breakpoints.up('sm')]: {
+          minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
+        },
+      }),
     },
   },
   MuiDialog: { styleOverrides: { paper: { borderRadius: radius(radiusScale.lg) } } },
