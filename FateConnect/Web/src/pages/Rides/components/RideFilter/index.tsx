@@ -1,18 +1,9 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { ChangeEvent, SubmitEvent } from 'react';
 
 import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
-import {
-  Button,
-  DatePicker,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@design-system';
-import { FilterAltIcon, InfoIcon, ScheduleIcon, SearchIcon } from '@design-system/icons';
+import { Button, Input, Typography } from '@design-system';
+import { FilterAltIcon, SearchIcon } from '@design-system/icons';
 
 import * as C from './constants';
 import { toApiDate } from './helpers/toApiDate';
@@ -25,9 +16,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
   const [departureTime, setDepartureTime] = useState('');
   const [destination, setDestination] = useState('');
   const [rideType, setRideType] = useState<string>(C.RideTypeFilterEnum.ALL);
-  const timeInputRef = useRef<HTMLInputElement>(null);
 
-  const handleOpenTimePicker = useCallback(() => timeInputRef.current?.showPicker(), []);
   const handleTimeChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => setDepartureTime(event.target.value),
     [],
@@ -70,62 +59,26 @@ export function RideFilter({ onApply }: RideFilterProps) {
         <S.FilterForm component="form" onSubmit={handleSubmit}>
           <S.FieldsRow>
             <S.FieldCell>
-              <DatePicker
-                label={
-                  <S.FieldLabel component="span">
-                    <Typography variant="subtitleBold" color="inherit">
-                      {C.FILTER_LABELS.departureDate}
-                    </Typography>
-                  </S.FieldLabel>
-                }
+              <Input.Date
+                label={C.FILTER_LABELS.departureDate}
                 value={departureDate}
                 onChange={setDepartureDate}
-                slotProps={{ textField: { fullWidth: true } }}
               />
             </S.FieldCell>
 
             <S.FieldCell>
-              <TextField
-                label={
-                  <S.FieldLabel component="span">
-                    <Typography variant="subtitleBold" color="inherit">
-                      {C.FILTER_LABELS.departureTime}
-                    </Typography>
-                  </S.FieldLabel>
-                }
+              <Input
+                label={C.FILTER_LABELS.departureTime}
                 type="time"
                 fullWidth
                 value={departureTime}
                 onChange={handleTimeChange}
-                inputRef={timeInputRef}
-                slotProps={{
-                  inputLabel: { shrink: true },
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          type="button"
-                          aria-label={C.TIME_PICKER_LABEL}
-                          onClick={handleOpenTimePicker}
-                        >
-                          <ScheduleIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
-                }}
               />
             </S.FieldCell>
 
             <S.FieldCell>
-              <TextField
-                label={
-                  <S.FieldLabel component="span">
-                    <Typography variant="subtitleBold" color="inherit">
-                      {C.FILTER_LABELS.destination}
-                    </Typography>
-                  </S.FieldLabel>
-                }
+              <Input
+                label={C.FILTER_LABELS.destination}
                 fullWidth
                 placeholder={C.FILTER_PLACEHOLDERS.destination}
                 value={destination}
@@ -134,29 +87,16 @@ export function RideFilter({ onApply }: RideFilterProps) {
             </S.FieldCell>
 
             <S.FieldCell>
-              <TextField
-                select
+              <Input.Select
                 label={
-                  <S.FieldLabel component="span">
-                    <Typography variant="subtitleBold" color="inherit">
-                      {C.FILTER_LABELS.rideType}
-                    </Typography>
-                    <Tooltip title={C.RIDE_TYPE_HELP}>
-                      <InfoIcon fontSize="small" />
-                    </Tooltip>
-                  </S.FieldLabel>
+                  <Input.HelpLabel helpText={C.RIDE_TYPE_HELP}>
+                    {C.FILTER_LABELS.rideType}
+                  </Input.HelpLabel>
                 }
-                fullWidth
+                options={C.RIDE_TYPE_OPTIONS}
                 value={rideType}
                 onChange={handleRideTypeChange}
-                slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}
-              >
-                {C.RIDE_TYPE_OPTIONS.map(({ value, label }) => (
-                  <MenuItem key={label} value={value}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </TextField>
+              />
             </S.FieldCell>
 
             <S.SubmitCell>
