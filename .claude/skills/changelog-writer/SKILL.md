@@ -51,6 +51,12 @@ gh pr view --json number --jq .number
 
 Se o PR ainda não foi aberto, escreva `(#?)` e **avise na resposta** que precisa ser trocado antes do merge.
 
+### O commit do changelog é o último da branch
+
+⛔ **Sempre deixe o changelog no último commit**, depois de todos os outros. É o que permite trocar o `(#?)` pelo número real com `git commit --amend` assim que o PR abrir.
+
+Changelog no meio da branch obriga a um **commit novo** só para corrigir o número — e um commit chamado "aponta o changelog para o PR" é ruído no histórico, além de deixar de ser o último quando algo mais entra depois. Aconteceu no PR #94: a entrada saiu dentro do commit da funcionalidade e o número virou um quinto commit.
+
 ## 5. Reler antes de entregar
 
 Confira linha por linha — é o que a review pega:
