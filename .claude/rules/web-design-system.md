@@ -24,6 +24,14 @@ paths:
 - **A prop fala em termos visuais, não em termos do domínio.** A etiqueta de estado recebe `tone="success"`, não `tipo="filantropica"`: quem traduz o domínio para o tom é a tela. Foi o que permitiu o mesmo `StatusTag` servir caronas sem o design system saber o que é uma carona.
 - **Subcomponente interno vai numa pasta dentro do pai**, com o seu `index` (`ConfirmDialog/DialogMessage/`). Se ele faz sentido para quem consome, expor por composição — `ConfirmDialog.Message` — em vez de repassar props do filho pelo pai.
 
+## Diálogo: existe **um** esqueleto
+
+- Toda a aplicação usa o `Dialog` do design system, com conteúdo por composição — `Dialog.Body` para o miolo, `Dialog.Footer` para as ações. **Quem precisa de diálogo monta os slots; não escreve outro.** Foi assim que a confirmação de exclusão e o contato da carona passaram a dividir o mesmo cromo.
+- O `Dialog`, o `DialogActions` e o `DialogContent` do MUI **não** estão no barrel: o diálogo da aplicação é o nosso, e o da biblioteca fica atrás da fronteira.
+- ⛔ **O diálogo não tem botão de fechar, e isso é decisão de produto.** `Esc` e clique fora já dispensam, inclusive em toque. Não adicionar um X achando que é melhoria de acessibilidade.
+- ⛔ **Título sempre centralizado**, em qualquer largura.
+- **Conteúdo com um consumidor só não é design system.** Antes de criar componente aqui, conte os consumidores: um só ⇒ ele mora na pasta da tela que o usa. Slot ou token sem consumidor real é o mesmo cheiro.
+
 ## Tokens — proibições
 
 - **Nunca cor literal** (hex, rgb, rgba, hsl, nome de cor) em componente. Só token de `@design-system`.

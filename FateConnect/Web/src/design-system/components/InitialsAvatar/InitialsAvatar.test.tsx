@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { render, screen } from '@app/test/testing-library';
-import { InitialsAvatar } from '.';
+import { InitialsAvatar, type InitialsAvatarProps } from '.';
 
-const DEFAULT_PROPS = { initials: 'MS', label: 'Maria Silva' };
+const DEFAULT_PROPS: InitialsAvatarProps = { initials: 'MS', label: 'Maria Silva' };
 
 const renderComponent = (props = DEFAULT_PROPS) => render(<InitialsAvatar {...props} />);
 
@@ -15,6 +15,15 @@ describe('InitialsAvatar', () => {
 
     expect(avatar).toBeInTheDocument();
     expect(avatar).toHaveTextContent('MS');
+  });
+
+  it('should grow the circle when the avatar is the subject of the screen', () => {
+    renderComponent({ ...DEFAULT_PROPS, size: 'large' });
+
+    expect(screen.getByRole('img', { name: 'Maria Silva' })).toHaveStyle({
+      width: '48px',
+      height: '48px',
+    });
   });
 
   it('should paint the circle with the accent colour of the theme', () => {

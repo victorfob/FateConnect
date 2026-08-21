@@ -34,6 +34,8 @@ Vale para pasta de componente e de tela. Pastas que **já são** dedicadas por n
 - **Interno** (não faz sentido fora do pai): pasta dentro do pai — `ConfirmDialog/DialogMessage/index.tsx`. Quando forem vários, agrupar em `components/`.
 - **Reutilizável a partir do design system**: expor por composição — `ConfirmDialog` e `ConfirmDialog.Message` — em vez de um segundo export solto do mesmo arquivo.
 
+⛔ **Constante com JSX no corpo do pai é corpo do pai.** A regra não é sobre a palavra `function` — é sobre onde o JSX mora. As ações do topo montadas como `const actions = (<>…</>)` dentro do `MainLayout` são um componente escondido numa variável, refeita a cada render: virou `HeaderActions`, com pasta e `index`. Se o trecho tem condição, estado ou hook, é componente com pasta — não variável no meio do pai.
+
 ## Tipagem e imports
 
 - **Props de componente sempre em `Readonly`**: `type RideCardProps = Readonly<{ ride: Ride; onEdit: (ride: Ride) => void }>`. Props não são para mutar.

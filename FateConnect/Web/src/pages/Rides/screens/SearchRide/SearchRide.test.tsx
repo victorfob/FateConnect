@@ -1,13 +1,16 @@
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import type { Mock } from 'vitest';
 
 import { server } from '@app/mocks/server';
+import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { RideTypeEnum } from '@app/services/rides/types';
 import type { Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
-import { SearchRide } from '.';
-import * as C from '../../constants';
+
 import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from '../../components/RideFilter/constants';
+import { RIDE_DRIVER } from '../../helpers/rideDriver';
+import * as C from '../../constants';
+import { SearchRide } from '.';
 
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
 
@@ -34,6 +37,23 @@ function listReturning(rides: Ride[], onRequest?: (url: URL) => void) {
 }
 
 describe('SearchRide', () => {
+  // O jsdom não implementa a área de transferência; os casos de cópia observam
+  // esta escrita, e a instância nasce a cada caso para a rejeição não vazar.
+  let clipboardWrite: Mock;
+
+  beforeEach(() => {
+    clipboardWrite = vi.fn(() => Promise.resolve());
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: clipboardWrite },
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
+  });
+
   it('should show the rides the list returns', async () => {
     listReturning([RIDE]);
     render(<SearchRide />);
@@ -136,6 +156,87 @@ describe('SearchRide', () => {
     await userEvent.click(dialog.getByRole('button', { name: C.DELETE_DIALOG.confirmLabel }));
 
     expect(await screen.findByText(C.RIDE_LIST_MESSAGES.deleteFailed)).toBeInTheDocument();
+  });
+
+  it('should show the contact of whoever offered the ride', async () => {
+    listReturning([RIDE]);
+    render(<SearchRide />);
+    await screen.findByText(RIDE.destino);
+
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+
+    const dialog = within(await screen.findByRole('dialog'));
+    expect(dialog.getByText(RIDE_DRIVER.name)).toBeInTheDocument();
+    expect(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` })).toBeInTheDocument();
+  });
+
+  it('should copy the email and say so', async () => {
+    listReturning([RIDE]);
+    render(<SearchRide />);
+    await screen.findByText(RIDE.destino);
+
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+    const dialog = within(await screen.findByRole('dialog'));
+    await userEvent.click(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` }));
+
+    expect(await screen.findByText(C.CONTACT_DIALOG.emailCopied)).toBeInTheDocument();
+    expect(clipboardWrite).toHaveBeenCalledWith(RIDE_DRIVER.email);
+  });
+
+  it('should report a refused copy instead of claiming success', async () => {
+    // O navegador nega a escrita fora de contexto seguro ou sem permissão.
+    clipboardWrite.mockRejectedValueOnce(new Error('denied'));
+    listReturning([RIDE]);
+    render(<SearchRide />);
+    await screen.findByText(RIDE.destino);
+
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+    const dialog = within(await screen.findByRole('dialog'));
+    await userEvent.click(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` }));
+
+    expect(await screen.findByText(C.CONTACT_DIALOG.emailCopyFailed)).toBeInTheDocument();
+  });
+
+  it('should open the conversation already mentioning the destination of the ride', async () => {
+    listReturning([RIDE]);
+    render(<SearchRide />);
+    await screen.findByText(RIDE.destino);
+
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+
+    const dialog = within(await screen.findByRole('dialog'));
+    const conversation = dialog.getByRole('link', { name: RIDE_DRIVER.phone });
+
+    expect(conversation).toHaveAttribute(
+      'href',
+      expect.stringContaining(encodeURIComponent(RIDE.destino)),
+    );
+  });
+
+  it('should give the card back when the contact is dismissed', async () => {
+    listReturning([RIDE]);
+    render(<SearchRide />);
+    await screen.findByText(RIDE.destino);
+
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+    await screen.findByRole('dialog');
+
+    // Por tecla, e não pelo botão: o caso é sobre o cartão voltar quando o
+    // diálogo fecha, seja qual for o gesto que o fechou.
+    await userEvent.keyboard('{Escape}');
+
+    expect(within(await screen.findByRole('article')).getByText(RIDE.destino)).toBeInTheDocument();
+  });
+
+  it('should not offer contact on a ride offered by the logged user', async () => {
+    tokenStorage.save('token', RIDE_DRIVER.name);
+    listReturning([RIDE]);
+    render(<SearchRide />);
+    await screen.findByText(RIDE.destino);
+
+    expect(
+      screen.queryByRole('button', { name: C.RIDE_CARD_LABELS.contact }),
+    ).not.toBeInTheDocument();
   });
 
   it('should announce that editing is not available yet', async () => {
