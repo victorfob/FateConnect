@@ -7,6 +7,7 @@ import { AccessTimeIcon, CalendarTodayIcon, EditIcon, GroupsIcon } from '@design
 
 import { rideTypeDisplayLabel, rideTypeTone } from '../../helpers/rideType';
 import { RideDeleteConfirmation } from './RideDeleteConfirmation';
+import { RideDriverContact } from './RideDriverContact';
 import * as C from '../../constants';
 import * as S from './styles';
 
@@ -37,6 +38,8 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
           </S.WideOnlyTag>
 
           <S.ActionButtons>
+            <RideDriverContact destination={ride.destino} />
+
             <IconButton type="button" aria-label={C.RIDE_CARD_LABELS.edit} onClick={handleEdit}>
               <EditIcon />
             </IconButton>
