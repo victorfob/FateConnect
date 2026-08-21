@@ -1,10 +1,10 @@
 import Stack from '@mui/material/Stack';
 
-import { styled } from '../../../styled';
-import type { PolymorphicProps } from '../../../styled';
-import { radius } from '../../../theme/helpers/radius';
-import { spacing } from '../../../theme/helpers/spacing';
-import { mobileMedia, radiusScale, spacingScale } from '../../../tokens';
+import { styled } from '@src-ds/styled';
+import type { PolymorphicProps } from '@src-ds/styled';
+import { radius } from '@src-ds/theme/helpers/radius';
+import { spacing } from '@src-ds/theme/helpers/spacing';
+import { mobileMedia, radiusScale, spacingScale } from '@src-ds/tokens';
 
 const { xs } = spacingScale;
 
