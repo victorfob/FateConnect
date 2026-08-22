@@ -13,6 +13,11 @@ const VALID: SignupFormValues = {
   birthDate: '22/05/1999',
   gender: GenderValueEnum.FEMALE,
   password: 'segredo123',
+  zipCode: '18000-000',
+  state: 'SP',
+  city: 'Sorocaba',
+  street: 'Rua das Flores',
+  streetNumber: '100',
   phone: '(11) 91234-5678',
   contactEmail: 'maria@exemplo.com',
   acceptTerms: true,
@@ -34,7 +39,7 @@ describe('signupSchema', () => {
   });
 
   it('should accept the form without the optional fields', () => {
-    const result = parse({ nickname: '', complement: '', zipCode: '', acceptMarketing: false });
+    const result = parse({ nickname: '', complement: '', acceptMarketing: false });
 
     expect(result.success).toBe(true);
   });

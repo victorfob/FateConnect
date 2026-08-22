@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
+import { FATEC_EMAIL_MESSAGE, FATEC_EMAIL_PATTERN } from '@app/constants/fatecEmail';
 import { onlyDigits } from '@app/utils/masks/caret';
 import { EARLIEST_BIRTH_DATE, latestBirthDate, parseBirthDate } from '../helpers/birthDate';
 
 const MIN_PASSWORD_LENGTH = 8;
 const MIN_PHONE_DIGITS = 10;
+const ZIP_CODE_DIGITS = 8;
 const MAX_PHONE_DIGITS = 11;
 
 /** Mensagens iguais às do produto. */
@@ -21,6 +23,12 @@ export const SIGNUP_MESSAGES = {
   phoneRequired: 'Informe o telefone',
   phoneInvalid: 'Telefone com DDD: 10 ou 11 dígitos',
   contactEmailRequired: 'Informe o e-mail',
+  zipCodeRequired: 'Informe o CEP',
+  zipCodeIncomplete: 'CEP incompleto',
+  stateRequired: 'Selecione o estado',
+  cityRequired: 'Informe a cidade',
+  streetRequired: 'Informe o logradouro',
+  streetNumberRequired: 'Informe o número',
   termsRequired: 'É necessário aceitar os termos de uso e política de privacidade para continuar.',
 };
 
@@ -41,6 +49,10 @@ function isOldEnough(value: string): boolean {
   return parsed <= latestBirthDate();
 }
 
+function isCompleteZipCode(value: string): boolean {
+  return onlyDigits(value).length === ZIP_CODE_DIGITS;
+}
+
 function hasBrazilianPhoneLength(value: string): boolean {
   const digits = onlyDigits(value);
   if (digits.length === 0) return true;
@@ -54,7 +66,7 @@ export const signupSchema = z.object({
   fatecEmail: z
     .string()
     .min(1, SIGNUP_MESSAGES.fatecEmailRequired)
-    .pipe(z.email(SIGNUP_MESSAGES.emailInvalid)),
+    .regex(FATEC_EMAIL_PATTERN, FATEC_EMAIL_MESSAGE),
   birthDate: z
     .string()
     .min(1, SIGNUP_MESSAGES.birthDateRequired)
@@ -65,11 +77,14 @@ export const signupSchema = z.object({
     .string()
     .min(1, SIGNUP_MESSAGES.passwordRequired)
     .min(MIN_PASSWORD_LENGTH, SIGNUP_MESSAGES.passwordTooShort),
-  zipCode: z.string(),
-  state: z.string(),
-  city: z.string(),
-  street: z.string(),
-  streetNumber: z.string(),
+  zipCode: z
+    .string()
+    .min(1, SIGNUP_MESSAGES.zipCodeRequired)
+    .refine(isCompleteZipCode, SIGNUP_MESSAGES.zipCodeIncomplete),
+  state: z.string().min(1, SIGNUP_MESSAGES.stateRequired),
+  city: z.string().min(1, SIGNUP_MESSAGES.cityRequired),
+  street: z.string().min(1, SIGNUP_MESSAGES.streetRequired),
+  streetNumber: z.string().min(1, SIGNUP_MESSAGES.streetNumberRequired),
   complement: z.string(),
   phone: z
     .string()
