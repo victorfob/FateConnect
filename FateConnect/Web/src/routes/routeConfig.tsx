@@ -8,15 +8,11 @@ import { Home } from '@app/pages/Home';
 import { LostAndFound } from '@app/pages/LostAndFound';
 import { Menu } from '@app/pages/Menu';
 import { Rides } from '@app/pages/Rides';
-import { OfferRide } from '@app/pages/Rides/screens/OfferRide';
-import { SearchRide } from '@app/pages/Rides/screens/SearchRide';
 import { Signup } from '@app/pages/Signup';
 import { RoutePathEnum } from './paths';
 
 /**
- * Duas cascas — visitante e interna — e as telas de carona aninhadas sob
- * `/caronas`. Não existe rota `/contato`: o contato é uma seção da landing,
- * então um link antigo cai no curinga.
+ * Duas cascas — visitante e interna —, com uma rota por tela.
  */
 export const routeConfig: RouteObject[] = [
   {
@@ -36,15 +32,7 @@ export const routeConfig: RouteObject[] = [
         children: [
           { path: RoutePathEnum.MENU, element: <Menu /> },
           { path: RoutePathEnum.LOST_AND_FOUND, element: <LostAndFound /> },
-          {
-            path: RoutePathEnum.RIDES,
-            element: <Rides />,
-            children: [
-              { index: true, element: <Navigate to={RoutePathEnum.RIDES_SEARCH} replace /> },
-              { path: RoutePathEnum.RIDES_SEARCH, element: <SearchRide /> },
-              { path: RoutePathEnum.RIDES_OFFER, element: <OfferRide /> },
-            ],
-          },
+          { path: RoutePathEnum.RIDES, element: <Rides /> },
         ],
       },
       { path: '*', element: <Navigate to={RoutePathEnum.LANDING} replace /> },
