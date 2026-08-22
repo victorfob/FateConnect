@@ -6,7 +6,7 @@ import { Button, Input, Typography } from '@design-system';
 import { FilterAltIcon, SearchIcon } from '@design-system/icons';
 
 import * as C from './constants';
-import { toApiDate } from './helpers/toApiDate';
+import { toApiDate } from '../../helpers/apiDate';
 import * as S from './styles';
 
 type RideFilterProps = Readonly<{ onApply: (filters: RideFilterValues) => void }>;
