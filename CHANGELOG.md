@@ -25,6 +25,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige a comunicação com a API, que falhava por divergência de caminho e por origem bloqueada (#99) [Backend]
 - Corrige a recusa de carona marcada para as próximas horas, tratada como data passada (#99) [Backend]
 - Corrige ofertar e editar carona, que falhavam quando a hora vinha sem os segundos (#99) [Backend]
+- Corrige a atualização de carona, que apagava a descrição quando o campo não era reenviado (#101) [Backend]
 
 ## [0.2.0] - 2026-08-20
 
