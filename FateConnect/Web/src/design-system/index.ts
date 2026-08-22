@@ -26,7 +26,7 @@ export { PageShell } from './components/PageShell';
 export type { PageShellProps } from './components/PageShell';
 export { StatusTag } from './components/StatusTag';
 export type { StatusTagProps } from './components/StatusTag';
-export type { StatusTagTone } from './components/StatusTag/types';
+export type { StatusTagTone } from './theme/statusTagSurface';
 export type { DialogProps } from './components/Dialog';
 
 export { ThemeProvider } from './ThemeProvider';

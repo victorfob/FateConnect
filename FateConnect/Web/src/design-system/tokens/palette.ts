@@ -32,6 +32,9 @@ export const colorTokens = {
   warningText: '#856404',
   warningBackground: '#FFF3CD',
   dangerBackground: '#FFDFDF',
+  /** Estado em repouso: cinza da mesma família dos pastéis acima. */
+  mutedText: '#383D41',
+  mutedBackground: '#E2E3E5',
 
   /** Divisor sobre superfície neutra — linha do formulário de cadastro. */
   divider: '#D9D9D9',
@@ -98,6 +101,8 @@ export const darkColorTokens = {
   warningTagText: '#FFE082',
   dangerTagBackground: '#402422',
   dangerTagText: '#EF9A9A',
+  mutedTagBackground: '#37393B',
+  mutedTagText: '#CFD8DC',
 
   onSurfaceHigh: 'rgba(255, 255, 255, 0.87)',
   onSurfaceMedium: 'rgba(255, 255, 255, 0.60)',
