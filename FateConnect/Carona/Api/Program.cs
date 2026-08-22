@@ -7,6 +7,7 @@ using Application.Interfaces;
 using Application.Services;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
+using Api.Converters;
 using Api.Filters;
 using Api.Middleware;
 using System.Text.Json.Serialization;
@@ -76,6 +77,7 @@ builder.Services.AddControllers(options =>
 }).AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
 });
 
 builder.Services.AddEndpointsApiExplorer();
