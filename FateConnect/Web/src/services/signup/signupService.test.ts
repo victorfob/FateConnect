@@ -8,11 +8,11 @@ import type { SignupRequest } from './types';
 const SIGNUP_URL = 'https://api.fateconnect.test/usuario/cadastro';
 
 const PAYLOAD: SignupRequest = {
-  emailFatec: 'aluno@fatec.sp.gov.br',
+  emailFatec: 'aluno.teste@aluno.cps.sp.gov.br',
   senha: 'segredo123',
   nomeCompleto: 'Fulano de Tal',
-  dataNascimento: '2000-01-01',
-  genero: 1,
+  dataNascimento: '2000-01-01T00:00:00Z',
+  genero: 'Feminino',
   enderecos: [],
   contatos: [],
 };

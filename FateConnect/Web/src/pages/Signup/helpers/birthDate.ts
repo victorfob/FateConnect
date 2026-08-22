@@ -1,6 +1,7 @@
 import { format, isValid, parse } from 'date-fns';
 
 const BIRTH_DATE_FORMAT = 'dd/MM/yyyy';
+const API_DATE_FORMAT = 'yyyy-MM-dd';
 const MINIMUM_AGE_YEARS = 18;
 const EARLIEST_BIRTH_YEAR = 1900;
 
@@ -29,4 +30,13 @@ export function parseBirthDate(value: string): Date | null {
 
 export function formatBirthDate(date: Date): string {
   return format(date, BIRTH_DATE_FORMAT);
+}
+
+/**
+ * Meia-noite em UTC montada a partir das partes da data. `toISOString()` sobre
+ * a data local carrega o deslocamento do fuso — e a leste de Greenwich isso
+ * muda o dia de nascimento.
+ */
+export function toApiBirthDate(date: Date): string {
+  return `${format(date, API_DATE_FORMAT)}T00:00:00Z`;
 }

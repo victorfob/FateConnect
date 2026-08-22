@@ -7,6 +7,7 @@ using Application.Interfaces;
 using Application.Services;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
+using Api.Converters;
 using Api.Filters;
 using Api.Middleware;
 using System.Text.Json.Serialization;
@@ -31,7 +32,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", cors =>
     {
         cors.WithOrigins(
-            "http://localhost:4200",
+            "http://localhost:5173",
             "http://191.252.210.114:8080"
         )
         .AllowAnyHeader()
@@ -76,6 +77,7 @@ builder.Services.AddControllers(options =>
 }).AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
 });
 
 builder.Services.AddEndpointsApiExplorer();

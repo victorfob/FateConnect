@@ -14,7 +14,11 @@ const SPINNER_SIZE_PX = 20;
 
 /** Endereço, preenchido pelo CEP quando ele está completo. */
 export function AddressSection() {
-  const { control, register } = useFormContext<SignupFormValues>();
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<SignupFormValues>();
   const { isLookingUpZipCode } = useAddressAutofill();
   const zipCodeField = useMaskedField(register('zipCode'), maskZipCode);
   const isZipCodeFilled = useFilledLabel('zipCode');
@@ -27,6 +31,8 @@ export function AddressSection() {
         <Input
           {...zipCodeField}
           label={C.FIELD_LABELS.zipCode}
+          required
+          error={errors.zipCode?.message}
           fullWidth
           type="text"
           inputMode="numeric"
@@ -52,6 +58,8 @@ export function AddressSection() {
               label={C.FIELD_LABELS.state}
               options={C.STATE_SELECT_OPTIONS}
               autoComplete="address-level1"
+              required
+              error={errors.state?.message}
             />
           )}
         />
@@ -61,6 +69,8 @@ export function AddressSection() {
         <Input
           {...register('city')}
           label={C.FIELD_LABELS.city}
+          required
+          error={errors.city?.message}
           fullWidth
           type="text"
           autoComplete="address-level2"
@@ -72,6 +82,8 @@ export function AddressSection() {
         <Input
           {...register('street')}
           label={C.FIELD_LABELS.street}
+          required
+          error={errors.street?.message}
           fullWidth
           type="text"
           autoComplete="address-line1"
@@ -83,6 +95,8 @@ export function AddressSection() {
         <Input
           {...register('streetNumber')}
           label={C.FIELD_LABELS.streetNumber}
+          required
+          error={errors.streetNumber?.message}
           fullWidth
           type="text"
           autoComplete="off"

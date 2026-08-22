@@ -1,6 +1,8 @@
-# --- Arquivos de Segredos ---
+# --- Arquivos de Segredos - só o exemplo é versionado ---
 # NUNCA ENVIE ESTE ARQUIVO!
 .env
+.env.*
+!.env.example
 
 # --- Pastas de Build do Visual Studio/VS Code ---
 # Arquivos gerados pelo compilador

@@ -24,7 +24,7 @@ public class Program
         Env.Load();
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        string localUrl = "http://localhost:4200";
+        string localUrl = "http://localhost:5173";
         string serverUrl = "http://191.252.210.114:8080";
         string corsPolicy = "AllowFrontend";
 
