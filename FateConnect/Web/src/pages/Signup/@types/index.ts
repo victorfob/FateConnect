@@ -4,8 +4,3 @@ export enum GenderValueEnum {
   FEMALE = '1',
   UNDISCLOSED = '2',
 }
-
-export type SelectOption = {
-  readonly value: string;
-  readonly label: string;
-};

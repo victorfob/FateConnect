@@ -8,6 +8,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@design-system': fileURLToPath(new URL('./src/design-system', import.meta.url)),
+      // Uso interno do design system, para os arquivos fundos não subirem por `../`.
+      '@src-ds': fileURLToPath(new URL('./src/design-system', import.meta.url)),
       '@app': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },

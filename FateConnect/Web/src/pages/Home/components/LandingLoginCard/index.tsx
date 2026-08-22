@@ -8,7 +8,7 @@ import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { login } from '@app/services/auth/authService';
 import type { ApiError } from '@app/services/httpClient';
-import { Button, IconButton, InputAdornment, TextField, Typography } from '@design-system';
+import { Button, IconButton, Input, Typography } from '@design-system';
 import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
 import * as C from './constants';
@@ -64,7 +64,16 @@ export function LandingLoginCard() {
     mutate({ emailFatec: email, senha: password });
   });
 
-  const { ref: emailFieldRef, ...emailField } = register('email');
+  const { ref: registerEmailRef, ...emailField } = register('email');
+
+  // Dois donos: o formulário, que registrou o campo, e a âncora de login.
+  const setEmailRef = useCallback(
+    (element: HTMLInputElement | null) => {
+      registerEmailRef(element);
+      emailInputRef.current = element;
+    },
+    [registerEmailRef],
+  );
 
   return (
     <S.CardRoot component="article" aria-labelledby="landing-login-title">
@@ -75,45 +84,34 @@ export function LandingLoginCard() {
       </S.CardTitle>
 
       <S.Form component="form" onSubmit={onSubmit} noValidate>
-        <TextField
+        <Input
           {...emailField}
-          inputRef={(element: HTMLInputElement | null) => {
-            emailFieldRef(element);
-            emailInputRef.current = element;
-          }}
+          ref={setEmailRef}
           label={C.EMAIL_LABEL}
           required
           type="email"
           autoComplete="username"
-          error={Boolean(errors.email)}
-          helperText={errors.email?.message}
+          error={errors.email?.message}
         />
 
-        <TextField
+        <Input
           {...register('password')}
           label={C.PASSWORD_LABEL}
           required
           type={passwordHidden ? 'password' : 'text'}
           autoComplete={passwordHidden ? 'current-password' : 'off'}
-          error={Boolean(errors.password)}
-          helperText={errors.password?.message}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    type="button"
-                    aria-label={C.PASSWORD_TOGGLE_LABEL}
-                    aria-pressed={!passwordHidden}
-                    onClick={handleTogglePassword}
-                  >
-                    {/* O ícone mostra o estado atual: olho aberto = senha visível. */}
-                    {passwordHidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
+          error={errors.password?.message}
+          endAdornment={
+            <IconButton
+              type="button"
+              aria-label={C.PASSWORD_TOGGLE_LABEL}
+              aria-pressed={!passwordHidden}
+              onClick={handleTogglePassword}
+            >
+              {/* O ícone mostra o estado atual: olho aberto = senha visível. */}
+              {passwordHidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </IconButton>
+          }
         />
 
         <S.SubmitRow>
