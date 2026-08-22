@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FateConnect.Api.Modules.Auth.Controllers
 {
     [ApiController]
-    [Route("auth")]
+    [Route("[controller]")]
     [Produces("application/json")]
     public class AuthController : ControllerBase
     {
