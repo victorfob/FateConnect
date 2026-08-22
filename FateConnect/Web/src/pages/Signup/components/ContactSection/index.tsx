@@ -2,7 +2,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
 import { maskPhone } from '@app/utils/masks/phoneMask';
-import { TextField } from '@design-system';
+import { Input } from '@design-system';
 
 import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '../../constants';
 import type { SignupFormValues } from '../../schema';
@@ -19,7 +19,7 @@ export function ContactSection() {
   return (
     <S.FieldGrid>
       <S.HalfWidthCell>
-        <TextField
+        <Input
           {...phoneField}
           label={FIELD_LABELS.phone}
           required
@@ -28,21 +28,19 @@ export function ContactSection() {
           inputMode="tel"
           autoComplete="home tel"
           placeholder={FIELD_PLACEHOLDERS.phone}
-          error={Boolean(errors.phone)}
-          helperText={errors.phone?.message}
+          error={errors.phone?.message}
         />
       </S.HalfWidthCell>
 
       <S.HalfWidthCell>
-        <TextField
+        <Input
           {...register('contactEmail')}
           label={FIELD_LABELS.contactEmail}
           required
           fullWidth
           type="email"
           autoComplete="home email"
-          error={Boolean(errors.contactEmail)}
-          helperText={errors.contactEmail?.message}
+          error={errors.contactEmail?.message}
         />
       </S.HalfWidthCell>
     </S.FieldGrid>

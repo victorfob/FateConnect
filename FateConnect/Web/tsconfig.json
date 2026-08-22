@@ -23,6 +23,7 @@
     "paths": {
       "@design-system": ["./src/design-system/index.ts"],
       "@design-system/*": ["./src/design-system/*"],
+      "@src-ds/*": ["./src/design-system/*"],
       "@app/*": ["./src/*"]
     }
   },

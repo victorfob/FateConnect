@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
 import { maskBirthDate } from '@app/utils/masks/birthDateMask';
-import { DateCalendar, IconButton, InputAdornment, Popover, TextField } from '@design-system';
+import { DateCalendar, IconButton, Input, Popover } from '@design-system';
 import { CalendarTodayIcon } from '@design-system/icons';
 
 import {
@@ -36,7 +36,7 @@ export function BirthDateField() {
   const [calendarAnchor, setCalendarAnchor] = useState<HTMLElement | null>(null);
   const [pickedDate, setPickedDate] = useState<Date | null>(null);
   const birthDateField = useMaskedField(register('birthDate'), maskBirthDate);
-  const birthDateLabel = useFilledLabel('birthDate');
+  const isBirthDateFilled = useFilledLabel('birthDate');
 
   const handleOpenCalendar = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -61,7 +61,7 @@ export function BirthDateField() {
 
   return (
     <>
-      <TextField
+      <Input
         {...birthDateField}
         label={C.FIELD_LABELS.birthDate}
         required
@@ -70,25 +70,18 @@ export function BirthDateField() {
         inputMode="numeric"
         autoComplete="bday"
         placeholder={C.FIELD_PLACEHOLDERS.birthDate}
-        error={Boolean(errors.birthDate)}
-        helperText={errors.birthDate?.message}
-        slotProps={{
-          inputLabel: birthDateLabel,
-          htmlInput: { maxLength: MASKED_DATE_LENGTH },
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  type="button"
-                  aria-label={C.CALENDAR_TOGGLE_LABEL}
-                  onClick={handleOpenCalendar}
-                >
-                  <CalendarTodayIcon fontSize="small" />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
+        error={errors.birthDate?.message}
+        shrinkLabel={isBirthDateFilled}
+        maxLength={MASKED_DATE_LENGTH}
+        endAdornment={
+          <IconButton
+            type="button"
+            aria-label={C.CALENDAR_TOGGLE_LABEL}
+            onClick={handleOpenCalendar}
+          >
+            <CalendarTodayIcon fontSize="small" />
+          </IconButton>
+        }
       />
 
       <Popover

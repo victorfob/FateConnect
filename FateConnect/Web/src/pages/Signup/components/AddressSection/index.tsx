@@ -1,31 +1,30 @@
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
-import { CircularProgress, InputAdornment, TextField } from '@design-system';
+import { useMaskedField } from '@app/hooks/useMaskedField';
+import { maskZipCode } from '@app/utils/masks/zipCodeMask';
+import { CircularProgress, Input } from '@design-system';
 
 import * as C from '../../constants';
 import { useAddressAutofill } from '../../hooks/useAddressAutofill';
 import { useFilledLabel } from '../../hooks/useFilledLabel';
-import { SelectField } from '../SelectField';
 import type { SignupFormValues } from '../../schema';
 import * as S from '../../styles';
-import { useMaskedField } from '@app/hooks/useMaskedField';
-import { maskZipCode } from '@app/utils/masks/zipCodeMask';
 
 const SPINNER_SIZE_PX = 20;
 
 /** Endereço, preenchido pelo CEP quando ele está completo. */
 export function AddressSection() {
-  const { register } = useFormContext<SignupFormValues>();
+  const { control, register } = useFormContext<SignupFormValues>();
   const { isLookingUpZipCode } = useAddressAutofill();
   const zipCodeField = useMaskedField(register('zipCode'), maskZipCode);
-  const zipCodeLabel = useFilledLabel('zipCode');
-  const streetLabel = useFilledLabel('street');
-  const cityLabel = useFilledLabel('city');
+  const isZipCodeFilled = useFilledLabel('zipCode');
+  const isStreetFilled = useFilledLabel('street');
+  const isCityFilled = useFilledLabel('city');
 
   return (
     <S.FieldGrid>
       <S.ThirdWidthCell>
-        <TextField
+        <Input
           {...zipCodeField}
           label={C.FIELD_LABELS.zipCode}
           fullWidth
@@ -34,52 +33,54 @@ export function AddressSection() {
           autoComplete="postal-code"
           placeholder={C.FIELD_PLACEHOLDERS.zipCode}
           aria-busy={isLookingUpZipCode}
-          slotProps={{
-            inputLabel: zipCodeLabel,
-            input: {
-              endAdornment: isLookingUpZipCode ? (
-                <InputAdornment position="end">
-                  <CircularProgress size={SPINNER_SIZE_PX} aria-label={C.ZIP_LOOKUP_LABEL} />
-                </InputAdornment>
-              ) : null,
-            },
-          }}
+          shrinkLabel={isZipCodeFilled}
+          endAdornment={
+            isLookingUpZipCode ? (
+              <CircularProgress size={SPINNER_SIZE_PX} aria-label={C.ZIP_LOOKUP_LABEL} />
+            ) : null
+          }
         />
       </S.ThirdWidthCell>
 
       <S.ThirdWidthCell>
-        <SelectField
+        <Controller
           name="state"
-          label={C.FIELD_LABELS.state}
-          options={C.BRAZILIAN_STATES}
-          autoComplete="address-level1"
+          control={control}
+          render={({ field }) => (
+            <Input.Select
+              {...field}
+              label={C.FIELD_LABELS.state}
+              options={C.STATE_SELECT_OPTIONS}
+              autoComplete="address-level1"
+            />
+          )}
         />
       </S.ThirdWidthCell>
 
       <S.ThirdWidthCell>
-        <TextField
+        <Input
           {...register('city')}
           label={C.FIELD_LABELS.city}
           fullWidth
           type="text"
           autoComplete="address-level2"
-          slotProps={{ inputLabel: cityLabel }}
+          shrinkLabel={isCityFilled}
         />
       </S.ThirdWidthCell>
 
       <S.StreetCell>
-        <TextField
+        <Input
           {...register('street')}
           label={C.FIELD_LABELS.street}
           fullWidth
           type="text"
           autoComplete="address-line1"
-          slotProps={{ inputLabel: streetLabel }}
+          shrinkLabel={isStreetFilled}
         />
       </S.StreetCell>
 
       <S.StreetNumberCell>
-        <TextField
+        <Input
           {...register('streetNumber')}
           label={C.FIELD_LABELS.streetNumber}
           fullWidth
@@ -89,7 +90,7 @@ export function AddressSection() {
       </S.StreetNumberCell>
 
       <S.FullWidthCell>
-        <TextField
+        <Input
           {...register('complement')}
           label={C.FIELD_LABELS.complement}
           fullWidth

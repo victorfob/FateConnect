@@ -1,4 +1,6 @@
-import { GenderValueEnum, type SelectOption } from '../@types';
+import type { SelectOption } from '@design-system';
+
+import { GenderValueEnum } from '../@types';
 
 export const SIGNUP_TITLE = 'Crie sua Conta';
 export const ADDRESS_SECTION_TITLE = 'Endereço';
@@ -98,4 +100,15 @@ export const BRAZILIAN_STATES: readonly SelectOption[] = [
   { value: 'SP', label: 'São Paulo' },
   { value: 'SE', label: 'Sergipe' },
   { value: 'TO', label: 'Tocantins' },
+];
+
+/** As escolhas que o campo oferece, já com a opção vazia na frente. */
+export const GENDER_SELECT_OPTIONS: readonly SelectOption[] = [
+  { value: '', label: SELECT_PLACEHOLDER },
+  ...GENDER_OPTIONS,
+];
+
+export const STATE_SELECT_OPTIONS: readonly SelectOption[] = [
+  { value: '', label: SELECT_PLACEHOLDER },
+  ...BRAZILIAN_STATES,
 ];

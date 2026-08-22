@@ -15,14 +15,11 @@ export { default as CircularProgress } from '@mui/material/CircularProgress';
 export { default as Drawer } from '@mui/material/Drawer';
 export { default as FormControlLabel } from '@mui/material/FormControlLabel';
 export { default as IconButton } from '@mui/material/IconButton';
-export { default as InputAdornment } from '@mui/material/InputAdornment';
 export { default as List } from '@mui/material/List';
 export { default as ListItemButton } from '@mui/material/ListItemButton';
 export { default as ListItemText } from '@mui/material/ListItemText';
-export { default as MenuItem } from '@mui/material/MenuItem';
 export { default as Popover } from '@mui/material/Popover';
 export { default as Stack } from '@mui/material/Stack';
-export { default as TextField } from '@mui/material/TextField';
 export { default as Toolbar } from '@mui/material/Toolbar';
 export { default as Tooltip } from '@mui/material/Tooltip';
 export { default as Typography } from '@mui/material/Typography';
@@ -31,6 +28,5 @@ export type { BoxProps } from '@mui/material/Box';
 export type { ButtonProps } from '@mui/material/Button';
 export type { TypographyProps } from '@mui/material/Typography';
 
-/** Componentes de data. O locale vem do `DateLocalizationProvider`. */
+/** Calendário avulso; o do campo de data mora dentro do `Input`. */
 export { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-export { DatePicker } from '@mui/x-date-pickers/DatePicker';
