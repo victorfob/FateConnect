@@ -19,8 +19,7 @@ export type Ride = {
 
 /**
  * Corpo de criação e de atualização — a API aceita o mesmo conjunto de campos
- * nos dois verbos. Vai sempre completo: na atualização o backend atribui a
- * descrição sem checar nulo, então omitir o campo apagaria o que estava lá.
+ * nos dois verbos.
  */
 export type RideInput = Omit<Ride, 'id' | 'dataCadastro' | 'ativo'>;
 
