@@ -58,7 +58,7 @@ Quando a pasta que uma rule descreve deixa de existir, a rule é **deletada, nã
   - **Nenhum budget de token como justificativa.** Rodar script antes de editar à mão é certo por ser completo e repetível — justifique assim. Agente instruído a economizar token começa a pular etapa.
   - **Nenhuma hedge condicional.** Sem "se disponível" ou "senão use como fallback". Nomeie a ferramenta: `AskUserQuestion` para perguntar, `Grep`/`Glob`/`Read` para inspecionar.
 - **Não deixe origem interna vazar do harness para o repo.** O harness é local, mas o que sai dele — código, commit, issue, PR, comentário — é **público**. Quando a orientação vier de fonte interna, registre no repo apenas a **decisão e a justificativa autônoma**, nunca a fonte, o nome do empregador, repositório interno, pacote privado ou ferramenta corporativa.
-- **Não crie artefato de processo para mudar o harness.** Editar `.claude/` não abre issue nem PR — vale o mesmo `⛔` do `CLAUDE.md`.
+- **Não abra issue para mudar o harness — mas o PR é obrigatório.** A dispensa é só da issue. Editar `.claude/` é editar o repositório: sai numa branch a partir da `develop` e volta por PR, como qualquer código. ⛔ **Nada vai direto para a `develop`**, nem uma linha de rule. Já commitei rule e skill direto na `develop` achando que "harness não abre PR" me liberava disso; liberava da issue, e só.
 
 ## Como escrever
 
