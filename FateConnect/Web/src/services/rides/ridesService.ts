@@ -1,5 +1,5 @@
 import { rideApiClient } from '../httpClient';
-import type { Ride, RideFilter } from './types';
+import type { Ride, RideFilter, RideInput } from './types';
 
 const RIDES_PATH = '/caronas';
 
@@ -29,6 +29,18 @@ export async function listRides(filters?: RideFilter): Promise<Ride[]> {
   return data;
 }
 
-export async function deleteRide(rideId: number): Promise<void> {
+export async function createRide(input: RideInput): Promise<Ride> {
+  const { data } = await rideApiClient.post<Ride>(RIDES_PATH, input);
+
+  return data;
+}
+
+export async function updateRide(rideId: string, input: RideInput): Promise<Ride> {
+  const { data } = await rideApiClient.put<Ride>(`${RIDES_PATH}/${rideId}`, input);
+
+  return data;
+}
+
+export async function deleteRide(rideId: string): Promise<void> {
   await rideApiClient.delete(`${RIDES_PATH}/${rideId}`);
 }

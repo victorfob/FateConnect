@@ -8,6 +8,7 @@ import type { Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from '../../components/RideFilter/constants';
+import { EDIT_MODE, RIDE_FORM_LABELS } from '../../components/RideFormDialog/constants';
 import { RIDE_DRIVER } from '../../helpers/rideDriver';
 import * as C from '../../constants';
 import { SearchRide } from '.';
@@ -15,7 +16,7 @@ import { SearchRide } from '.';
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
 
 const RIDE: Ride = {
-  id: 7,
+  id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
   qtdVagas: 3,
   destino: 'Fatec Sorocaba',
   dataPartida: '2026-05-22T00:00:00',
@@ -64,7 +65,7 @@ describe('SearchRide', () => {
     expect(screen.getByText(C.seatsLabel(RIDE.qtdVagas))).toBeInTheDocument();
     // A etiqueta existe duas vezes: uma no cabeçalho e outra no rodapé do
     // cartão, alternadas por media query — que o jsdom não avalia.
-    expect(screen.getAllByText('Filantrópica')).toHaveLength(2);
+    expect(screen.getAllByText('Solidária')).toHaveLength(2);
   });
 
   it('should tell the user when no ride matches', async () => {
@@ -239,13 +240,16 @@ describe('SearchRide', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('should announce that editing is not available yet', async () => {
+  it('should open the edit dialog already filled with the ride', async () => {
     listReturning([RIDE]);
     render(<SearchRide />);
     await screen.findByText(RIDE.destino);
 
     await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.edit }));
 
-    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.editSoon)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
+    expect(
+      screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.destination) }),
+    ).toHaveValue(RIDE.destino);
   });
 });

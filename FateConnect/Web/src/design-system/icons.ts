@@ -23,6 +23,7 @@ export { default as LocationOnIcon } from '@mui/icons-material/LocationOn';
 export { default as MenuIcon } from '@mui/icons-material/Menu';
 export { default as PhoneIcon } from '@mui/icons-material/Phone';
 export { default as ScheduleIcon } from '@mui/icons-material/Schedule';
+export { default as SaveIcon } from '@mui/icons-material/Save';
 export { default as SearchIcon } from '@mui/icons-material/Search';
 export { default as SecurityIcon } from '@mui/icons-material/Security';
 export { default as VisibilityIcon } from '@mui/icons-material/Visibility';
