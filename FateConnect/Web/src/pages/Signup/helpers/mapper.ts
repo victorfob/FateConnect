@@ -1,6 +1,6 @@
 import type { SignupRequest } from '@app/services/signup/types';
 import { onlyDigits } from '@app/utils/masks/caret';
-import { parseBirthDate } from './birthDate';
+import { parseBirthDate, toApiBirthDate } from './birthDate';
 import type { SignupFormValues } from '../schema';
 
 /** Campo opcional: o backend prefere a ausência da chave a uma string vazia. */
@@ -10,6 +10,14 @@ function optionalText(value: string): string | undefined {
   return value;
 }
 
+/** O schema já garantiu a data; o vazio só existe para o tipo fechar. */
+function toApiBirthDateOrEmpty(value: string): string {
+  const parsed = parseBirthDate(value);
+  if (!parsed) return '';
+
+  return toApiBirthDate(parsed);
+}
+
 /** Traduz o formulário para o contrato do backend, que fala pt-BR. */
 export function toSignupRequest(values: SignupFormValues): SignupRequest {
   return {
@@ -17,11 +25,11 @@ export function toSignupRequest(values: SignupFormValues): SignupRequest {
     apelido: optionalText(values.nickname),
     emailFatec: values.fatecEmail,
     senha: values.password,
-    dataNascimento: parseBirthDate(values.birthDate)?.toISOString() ?? '',
-    genero: Number(values.gender),
+    dataNascimento: toApiBirthDateOrEmpty(values.birthDate),
+    genero: values.gender,
     enderecos: [
       {
-        cep: onlyDigits(values.zipCode),
+        cep: values.zipCode,
         logradouro: values.street,
         numero: values.streetNumber,
         complemento: values.complement,

@@ -43,7 +43,7 @@ Reescrever algo por dentro sem mudar o que o usuário vê é `Changed`, não `Ad
 
 ## 4. Escrever
 
-Uma entrada principal, imperativo, linha curta, terminando no número do PR:
+Uma entrada principal, imperativo, linha curta, terminando no número do PR e no lado que mudou — `[Frontend]` ou `[Backend]`:
 
 ```bash
 gh pr view --json number --jq .number
@@ -64,6 +64,7 @@ Confira linha por linha — é o que a review pega:
 - [ ] começa com verbo no imperativo (`Adiciona`, `Corrige`, `Remove`, `Reescreve`)
 - [ ] descreve o **efeito**, não a implementação: sem nome de arquivo, de componente ou de camada
 - [ ] termina com `(#<número do PR>)` — o PR, nunca a issue
+- [ ] fecha com `[Frontend]` ou `[Backend]`, **depois** do número do PR; os dois quando a mudança exige os dois lados
 - [ ] a seção existe e tem mudança de verdade; seção vazia não fica no arquivo
 - [ ] é **uma** entrada para a tarefa, não uma por commit
 

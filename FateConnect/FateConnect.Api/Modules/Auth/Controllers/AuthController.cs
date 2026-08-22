@@ -3,26 +3,25 @@ using FateConnect.Api.Modules.Usuarios.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FateConnect.Api.Modules.Auth.Controllers
+namespace FateConnect.Api.Modules.Auth.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+[Produces("application/json")]
+public class AuthController : ControllerBase
 {
-    [ApiController]
-    [Route("api/auth")]
-    [Produces("application/json")]
-    public class AuthController : ControllerBase
+    private readonly IAuthService _authService;
+
+    public AuthController(IAuthService authService)
     {
-        private readonly IAuthService _authService;
+        _authService = authService;
+    }
 
-        public AuthController(IAuthService authService)
-        {
-            _authService = authService;
-        }
-
-        [HttpPost("login")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
-        {
-            var resposta = await _authService.LoginAsync(dto);
-            return Ok(resposta);
-        }
+    [HttpPost("login")]
+    [AllowAnonymous]
+    public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
+    {
+        var resposta = await _authService.LoginAsync(dto);
+        return Ok(resposta);
     }
 }

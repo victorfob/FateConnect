@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { RouterProvider, createMemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
+import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
@@ -45,7 +46,7 @@ describe('LandingLoginCard', () => {
 
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
-    expect(await screen.findByText(LOGIN_MESSAGES.emailInvalid)).toBeInTheDocument();
+    expect(await screen.findByText(FATEC_EMAIL_MESSAGE)).toBeInTheDocument();
   });
 
   it('should toggle the password visibility', async () => {
@@ -77,7 +78,7 @@ describe('LandingLoginCard', () => {
       ),
     );
     const router = renderCard();
-    await preencher('aluno@fatec.sp.gov.br', 'segredo123');
+    await preencher('aluno.teste@aluno.cps.sp.gov.br', 'segredo123');
 
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
@@ -88,7 +89,7 @@ describe('LandingLoginCard', () => {
   it('should report invalid credentials when the api answers unauthorized', async () => {
     server.use(http.post(LOGIN_URL, () => new HttpResponse(null, { status: 401 })));
     renderCard();
-    await preencher('aluno@fatec.sp.gov.br', 'segredo-errado');
+    await preencher('aluno.teste@aluno.cps.sp.gov.br', 'segredo-errado');
 
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
@@ -98,7 +99,7 @@ describe('LandingLoginCard', () => {
   it('should report a generic failure for other api errors', async () => {
     server.use(http.post(LOGIN_URL, () => new HttpResponse(null, { status: 500 })));
     renderCard();
-    await preencher('aluno@fatec.sp.gov.br', 'segredo123');
+    await preencher('aluno.teste@aluno.cps.sp.gov.br', 'segredo123');
 
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
@@ -120,7 +121,7 @@ describe('LandingLoginCard', () => {
       }),
     );
     renderCard();
-    await preencher('aluno@fatec.sp.gov.br', 'segredo123');
+    await preencher('aluno.teste@aluno.cps.sp.gov.br', 'segredo123');
 
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
