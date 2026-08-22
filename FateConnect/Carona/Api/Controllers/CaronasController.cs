@@ -6,7 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [SwaggerTag("Gerenciamento de Caronas")]
     public class CaronasController : ControllerBase
     {
