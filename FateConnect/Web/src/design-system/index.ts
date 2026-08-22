@@ -22,6 +22,8 @@ export type { SelectOption } from './components/Input/components/SelectInput/typ
 export { NotificationProvider } from './components/NotificationProvider';
 export { PageMessage } from './components/PageMessage';
 export type { PageMessageProps } from './components/PageMessage';
+export { PageShell } from './components/PageShell';
+export type { PageShellProps } from './components/PageShell';
 export { StatusTag } from './components/StatusTag';
 export type { StatusTagProps } from './components/StatusTag';
 export type { StatusTagTone } from './components/StatusTag/types';
