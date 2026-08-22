@@ -31,4 +31,10 @@ export const CONTACT_DIALOG = {
     `Olá! Vi no FateConnect a sua carona para ${destination} e queria saber se ainda tem vaga.`,
 };
 
-export const seatsLabel = (seats: number): string => `${seats} vagas`;
+const SINGLE_SEAT = 1;
+
+export function seatsLabel(seats: number): string {
+  if (seats === SINGLE_SEAT) return `${seats} vaga`;
+
+  return `${seats} vagas`;
+}
