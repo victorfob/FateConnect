@@ -1,0 +1,22 @@
+import { Button, radius, radiusScale, spacing, spacingScale, Stack, styled } from '@design-system';
+import type { PolymorphicProps } from '@design-system';
+import type { FormHTMLAttributes } from 'react';
+
+const { xs, lg } = spacingScale;
+
+/**
+ * O formulário entra entre o título e o rodapé do esqueleto, no lugar que seria
+ * dos slots. Por isso ele repete o comportamento de filho flexível: é quem cede
+ * altura para o miolo rolar quando a tela é baixa.
+ */
+export const RideForm = styled(Stack)<PolymorphicProps<FormHTMLAttributes<HTMLFormElement>>>({
+  flexDirection: 'column',
+  gap: spacing(lg),
+  flexGrow: 1,
+  minHeight: 0,
+});
+
+export const SubmitButton = styled(Button)({
+  gap: spacing(xs),
+  borderRadius: radius(radiusScale.component),
+});

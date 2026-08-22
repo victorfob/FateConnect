@@ -8,16 +8,18 @@ import { CircularProgress, Typography } from '@design-system';
 
 import { RideCard } from '../../components/RideCard';
 import { RideFilter } from '../../components/RideFilter';
-import { EMPTY_LIST_MESSAGE, RIDE_LIST_MESSAGES } from '../../constants';
+import { RideFormDialog } from '../../components/RideFormDialog';
+import { EMPTY_LIST_MESSAGE, RIDE_LIST_MESSAGES, RIDES_QUERY_KEY } from '../../constants';
 import * as S from './styles';
 
 const SPINNER_SIZE_PX = 60;
-const RIDES_QUERY_KEY = 'rides';
 
 export function SearchRide() {
   const queryClient = useQueryClient();
-  const { notifySuccess, notifyWarning } = useNotification();
+  const { notifySuccess } = useNotification();
   const [filters, setFilters] = useState<RideFilterValues>({});
+  const [editingRide, setEditingRide] = useState<Ride | undefined>(undefined);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { data: rides = [], isPending } = useQuery({
     queryKey: [RIDES_QUERY_KEY, filters],
@@ -35,8 +37,16 @@ export function SearchRide() {
   });
 
   const handleApplyFilters = useCallback((applied: RideFilterValues) => setFilters(applied), []);
-  const handleEdit = useCallback(() => notifyWarning(RIDE_LIST_MESSAGES.editSoon), [notifyWarning]);
   const handleDelete = useCallback((ride: Ride) => removeRide(ride), [removeRide]);
+
+  const handleEdit = useCallback((ride: Ride) => {
+    setEditingRide(ride);
+    setIsEditing(true);
+  }, []);
+
+  // A carona fica onde está enquanto o diálogo se fecha: zerar agora trocaria o
+  // título para o de ofertar bem na frente de quem está vendo a saída.
+  const handleCloseEdit = useCallback(() => setIsEditing(false), []);
 
   const isLoading = isPending || isRemoving;
 
@@ -60,6 +70,8 @@ export function SearchRide() {
             <RideCard key={ride.id} ride={ride} onEdit={handleEdit} onDelete={handleDelete} />
           ))}
       </S.RideList>
+
+      <RideFormDialog open={isEditing} onClose={handleCloseEdit} ride={editingRide} />
     </>
   );
 }

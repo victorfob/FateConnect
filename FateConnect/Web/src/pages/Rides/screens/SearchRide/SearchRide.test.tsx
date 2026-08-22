@@ -8,6 +8,7 @@ import type { Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from '../../components/RideFilter/constants';
+import { EDIT_MODE, RIDE_FORM_LABELS } from '../../components/RideFormDialog/constants';
 import { RIDE_DRIVER } from '../../helpers/rideDriver';
 import * as C from '../../constants';
 import { SearchRide } from '.';
@@ -239,13 +240,16 @@ describe('SearchRide', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('should announce that editing is not available yet', async () => {
+  it('should open the edit dialog already filled with the ride', async () => {
     listReturning([RIDE]);
     render(<SearchRide />);
     await screen.findByText(RIDE.destino);
 
     await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.edit }));
 
-    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.editSoon)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
+    expect(
+      screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.destination) }),
+    ).toHaveValue(RIDE.destino);
   });
 });
