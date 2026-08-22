@@ -1,8 +1,8 @@
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import type { StatusTagTone } from '@src-ds/theme/statusTagSurface';
 
 import * as S from './styles';
-import type { StatusTagTone } from './types';
 
 export type StatusTagProps = Readonly<{ tone?: StatusTagTone; children: ReactNode }>;
 
