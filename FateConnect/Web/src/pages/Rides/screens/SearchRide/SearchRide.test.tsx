@@ -15,7 +15,7 @@ import { SearchRide } from '.';
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
 
 const RIDE: Ride = {
-  id: 7,
+  id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
   qtdVagas: 3,
   destino: 'Fatec Sorocaba',
   dataPartida: '2026-05-22T00:00:00',

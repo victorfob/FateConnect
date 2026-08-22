@@ -4,16 +4,16 @@ export enum RideTypeEnum {
   EGALITARIAN = 'Igualitaria',
 }
 
-/** Entidade como a API devolve (campos em pt-BR). */
+/** Entidade como a API devolve (campos em pt-BR). O id é o `Guid` do backend. */
 export type Ride = {
-  id: number;
+  id: string;
   qtdVagas: number;
   destino: string;
   dataPartida: string;
   horaPartida: string;
   dataCadastro: string;
   tipoCarona: RideTypeEnum;
-  descricao: string;
+  descricao: string | null;
   ativo: boolean;
 };
 

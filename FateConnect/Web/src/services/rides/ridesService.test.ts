@@ -67,7 +67,7 @@ describe('ridesService', () => {
       }),
     );
 
-    await deleteRide(7);
+    await deleteRide('7');
 
     expect(deletedId).toBe('7');
   });

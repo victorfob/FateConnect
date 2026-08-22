@@ -29,6 +29,6 @@ export async function listRides(filters?: RideFilter): Promise<Ride[]> {
   return data;
 }
 
-export async function deleteRide(rideId: number): Promise<void> {
+export async function deleteRide(rideId: string): Promise<void> {
   await rideApiClient.delete(`${RIDES_PATH}/${rideId}`);
 }
