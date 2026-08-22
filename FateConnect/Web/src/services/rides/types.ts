@@ -4,18 +4,25 @@ export enum RideTypeEnum {
   EGALITARIAN = 'Igualitaria',
 }
 
-/** Entidade como a API devolve (campos em pt-BR). */
+/** Entidade como a API devolve (campos em pt-BR). O id é o `Guid` do backend. */
 export type Ride = {
-  id: number;
+  id: string;
   qtdVagas: number;
   destino: string;
   dataPartida: string;
   horaPartida: string;
   dataCadastro: string;
   tipoCarona: RideTypeEnum;
-  descricao: string;
+  descricao: string | null;
   ativo: boolean;
 };
+
+/**
+ * Corpo de criação e de atualização — a API aceita o mesmo conjunto de campos
+ * nos dois verbos. Vai sempre completo: na atualização o backend atribui a
+ * descrição sem checar nulo, então omitir o campo apagaria o que estava lá.
+ */
+export type RideInput = Omit<Ride, 'id' | 'dataCadastro' | 'ativo'>;
 
 /** Filtros do front, em inglês; o serviço traduz para os parâmetros da API. */
 export type RideFilter = {
