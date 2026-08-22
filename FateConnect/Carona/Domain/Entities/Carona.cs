@@ -56,7 +56,9 @@ namespace Domain.Entities
             if (tipoCarona.HasValue)
                 TipoCarona = tipoCarona.Value;
 
-            Descricao = descricao;
+            // Ausente mantém o texto atual; string vazia é como a edição o apaga.
+            if (descricao is not null)
+                Descricao = descricao;
         }
 
         public void AlterarDataPartida(DateOnly? dataPartida, TimeOnly? horaPartida)
