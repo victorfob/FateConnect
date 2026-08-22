@@ -93,7 +93,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
                     {C.FILTER_LABELS.rideType}
                   </Input.HelpLabel>
                 }
-                options={C.RIDE_TYPE_OPTIONS}
+                options={C.RIDE_TYPE_FILTER_OPTIONS}
                 value={rideType}
                 onChange={handleRideTypeChange}
               />

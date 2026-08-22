@@ -7,7 +7,7 @@ const LOWERCASE_TO_RIDE_TYPE: Readonly<Record<string, RideTypeEnum>> = {
 };
 
 const RIDE_TYPE_LABEL: Readonly<Record<RideTypeEnum, string>> = {
-  [RideTypeEnum.PHILANTHROPIC]: 'Filantrópica',
+  [RideTypeEnum.PHILANTHROPIC]: 'Solidária',
   [RideTypeEnum.EGALITARIAN]: 'Igualitária',
 };
 
@@ -17,6 +17,12 @@ const RIDE_TYPE_TONE: Readonly<Record<RideTypeEnum, StatusTagTone>> = {
 };
 
 const UNKNOWN_LABEL = '—';
+
+/** Escolhas de tipo — uma fonte só, servindo o filtro e o formulário de carona. */
+export const RIDE_TYPE_OPTIONS: readonly { value: RideTypeEnum; label: string }[] = [
+  { value: RideTypeEnum.PHILANTHROPIC, label: RIDE_TYPE_LABEL[RideTypeEnum.PHILANTHROPIC] },
+  { value: RideTypeEnum.EGALITARIAN, label: RIDE_TYPE_LABEL[RideTypeEnum.EGALITARIAN] },
+];
 
 /** Interpreta o valor da API (PascalCase) ou de query em minúsculas. */
 export function parseRideType(raw: string | null | undefined): RideTypeEnum | null {

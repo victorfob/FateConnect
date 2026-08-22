@@ -64,7 +64,7 @@ describe('SearchRide', () => {
     expect(screen.getByText(C.seatsLabel(RIDE.qtdVagas))).toBeInTheDocument();
     // A etiqueta existe duas vezes: uma no cabeçalho e outra no rodapé do
     // cartão, alternadas por media query — que o jsdom não avalia.
-    expect(screen.getAllByText('Filantrópica')).toHaveLength(2);
+    expect(screen.getAllByText('Solidária')).toHaveLength(2);
   });
 
   it('should tell the user when no ride matches', async () => {
