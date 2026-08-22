@@ -17,7 +17,7 @@ Planejamento e rastreio ficam no **GitHub** (issues + Project board do repositó
 ## Organização desta configuração
 
 - `.claude/rules/` — regras do projeto. Sem `paths:` carregam sempre; com `paths:` carregam quando um arquivo que casa é lido.
-- `.claude/skills/` — fluxos sob demanda: `pr-creator` (abrir/atualizar PR), `write-commit` (mensagem de commit e agrupamento em commits), `changelog-writer` (entrada do CHANGELOG) e `fateconnect-create-component` (criar componente no front).
+- `.claude/skills/` — fluxos sob demanda: `spec-issue` (especificar uma issue e dividir em sub-issues), `pr-creator` (abrir/atualizar PR), `write-commit` (mensagem de commit e agrupamento em commits), `changelog-writer` (entrada do CHANGELOG) e `fateconnect-create-component` (criar componente no front).
 - `.claude/` é **versionada**: rule e skill passam por review no PR como qualquer código, e valem igual para quem clonar o repo. Por isso a restrição do repositório acima se aplica a elas também.
 
 ## Fluxo de trabalho
