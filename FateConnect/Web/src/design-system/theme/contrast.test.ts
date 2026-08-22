@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { AA_NORMAL_TEXT, contrastRatio } from './contrast';
 import { chromeSurface, onChromeSurface } from './chromeSurface';
 import { notificationSurface, onNotificationSurface } from './notificationSurface';
+import { onStatusTagSurface, statusTagSurface } from './statusTagSurface';
 import { createAppTheme } from './createAppTheme';
 
 const lightTheme = createAppTheme('light');
@@ -42,8 +43,22 @@ describe('light theme contrast', () => {
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
     ['content on the error colour', palette.error.contrastText, palette.error.main],
     ['content on the app chrome', onChromeSurface(lightTheme), chromeSurface(lightTheme)],
-    ['a success tag', palette.success.main, palette.success.light],
-    ['a warning tag', palette.warning.main, palette.warning.light],
+    ['a muted tag', onStatusTagSurface(lightTheme, 'muted'), statusTagSurface(lightTheme, 'muted')],
+    [
+      'a success tag',
+      onStatusTagSurface(lightTheme, 'success'),
+      statusTagSurface(lightTheme, 'success'),
+    ],
+    [
+      'a warning tag',
+      onStatusTagSurface(lightTheme, 'warning'),
+      statusTagSurface(lightTheme, 'warning'),
+    ],
+    [
+      'a danger tag',
+      onStatusTagSurface(lightTheme, 'danger'),
+      statusTagSurface(lightTheme, 'danger'),
+    ],
     [
       'a success notification',
       onNotificationSurface(lightTheme, 'success'),
@@ -76,8 +91,22 @@ describe('dark theme contrast', () => {
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
     ['the error colour on the background', palette.error.main, palette.background.default],
     ['content on the app chrome', onChromeSurface(darkTheme), chromeSurface(darkTheme)],
-    ['a success tag', palette.success.main, palette.success.light],
-    ['a warning tag', palette.warning.main, palette.warning.light],
+    ['a muted tag', onStatusTagSurface(darkTheme, 'muted'), statusTagSurface(darkTheme, 'muted')],
+    [
+      'a success tag',
+      onStatusTagSurface(darkTheme, 'success'),
+      statusTagSurface(darkTheme, 'success'),
+    ],
+    [
+      'a warning tag',
+      onStatusTagSurface(darkTheme, 'warning'),
+      statusTagSurface(darkTheme, 'warning'),
+    ],
+    [
+      'a danger tag',
+      onStatusTagSurface(darkTheme, 'danger'),
+      statusTagSurface(darkTheme, 'danger'),
+    ],
     [
       'a success notification',
       onNotificationSurface(darkTheme, 'success'),
