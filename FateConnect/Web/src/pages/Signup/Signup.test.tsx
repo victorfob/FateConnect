@@ -265,7 +265,8 @@ describe('Signup', () => {
       nomeCompleto: VALID_SIGNUP.fullName,
       emailFatec: VALID_SIGNUP.fatecEmail,
       senha: VALID_SIGNUP.password,
-      genero: 1,
+      genero: 'Feminino',
+      dataNascimento: '1999-05-22T00:00:00Z',
       contatos: [{ telefone: '11912345678', emailContato: VALID_SIGNUP.contactEmail }],
     });
   });

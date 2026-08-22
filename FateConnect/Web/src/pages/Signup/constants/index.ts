@@ -68,7 +68,7 @@ export const signupSuccessMessage = (fullName: string): string =>
 export const GENDER_OPTIONS: readonly SelectOption[] = [
   { value: GenderValueEnum.MALE, label: 'Masculino' },
   { value: GenderValueEnum.FEMALE, label: 'Feminino' },
-  { value: GenderValueEnum.UNDISCLOSED, label: 'Prefiro não informar' },
+  { value: GenderValueEnum.OTHER, label: 'Prefiro não informar' },
 ];
 
 /** Unidades federativas (sigla + nome em pt-BR). */
