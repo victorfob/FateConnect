@@ -20,7 +20,7 @@ function renderRoute(initialPath: string) {
 }
 
 describe('routeConfig', () => {
-  // A tela de busca lista caronas assim que monta.
+  // A tela de caronas lista assim que monta.
   beforeEach(() => {
     server.use(http.get('https://rides.fateconnect.test/caronas', () => HttpResponse.json([])));
   });
@@ -30,8 +30,7 @@ describe('routeConfig', () => {
     [RoutePathEnum.SIGNUP, SIGNUP_TITLE],
     [RoutePathEnum.MENU, MENU_TITLE],
     [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
-    [RoutePathEnum.RIDES_SEARCH, RIDES_TITLE],
-    [RoutePathEnum.RIDES_OFFER, RIDES_TITLE],
+    [RoutePathEnum.RIDES, RIDES_TITLE],
     // Dentro de `main`: o título da tela vive na área de conteúdo, não no cromo.
     // Buscar na página toda casaria com um título do rodapé de mesmo texto.
   ])('should resolve %s', (path, title) => {
@@ -48,10 +47,10 @@ describe('routeConfig', () => {
     expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
   });
 
-  it('should redirect /caronas to the search screen', () => {
-    const router = renderRoute(RoutePathEnum.RIDES);
+  it('should send the dropped rides sub-routes to the landing page', () => {
+    const router = renderRoute('/caronas/ofertar');
 
-    expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES_SEARCH);
+    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
   });
 
   it('should send the dropped contact route to the landing page', () => {
