@@ -25,7 +25,8 @@ Só as seções com mudança de verdade aparecem. Seção vazia não fica no arq
 - **Uma linha curta por mudança.** Sem lista de arquivo, camada ou nome interno.
 - **Termina no número do PR**, entre parênteses: `(#84)`. **Sempre o PR, nunca a issue** — o link precisa cair no diff e no review, não no planejamento. Se o PR ainda não existe, use `(#?)` e troque antes do merge.
 - **Fecha com o lado que mudou:** `[Frontend]` ou `[Backend]`, **depois** do número do PR. O repositório guarda o front e dois serviços .NET, e quem lê a release precisa saber o que precisa subir. Mudança que só funciona com os dois lados leva os dois marcadores, nessa ordem — e se cada lado produzir um efeito diferente, são duas entradas, não uma com dois marcadores.
-- **Item puramente interno não entra.** Remoção de helper morto, refactor sem efeito externo, ajuste de teste: isso vive no histórico de commit, não no changelog.
+- **Correção entra mesmo sem efeito visível hoje.** O changelog é registro de alteração, não nota de divulgação: defeito corrigido em serviço publicado entra ainda que nenhum cliente atual chegue nele — e o marcador de lado é o que avisa quem precisa subir. Descreva o defeito **como ele era**, sem sugerir que alguém o sofreu quando ninguém sofreu.
+- **Item que não muda comportamento não entra.** Remoção de helper morto, refactor sem efeito externo, ajuste de teste, configuração de lint ou de CI: isso vive no histórico de commit, não no changelog.
 
 ### Faça
 
@@ -47,6 +48,7 @@ Só as seções com mudança de verdade aparecem. Seção vazia não fica no arq
 - Adiciona a tela de menu (#78)                                   <- é a issue, não o PR
 - Adiciona a tela de menu (#81)                                   <- falta o lado que mudou
 - Adiciona a tela de menu [Frontend] (#81)                        <- o marcador vem depois do PR
+- Corrige a perda de descrição sofrida por quem editava carona    <- defeito que ninguém alcançou; não invente a vítima
 ```
 
 ## Um bullet por commit é o sintoma

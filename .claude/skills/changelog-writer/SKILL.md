@@ -22,11 +22,15 @@ O diff e os commits dizem **o que** foi tocado. A entrada precisa dizer **o efei
 
 ## 2. Decidir se a mudança entra
 
-Entra quando alguém que usa a aplicação percebe: tela nova, comportamento diferente, correção visível, remoção de funcionalidade.
+Entra toda alteração de comportamento do produto: tela nova, comportamento diferente, defeito corrigido, remoção de funcionalidade.
 
-**Não entra:** refactor sem efeito externo, remoção de código morto, ajuste de teste, mudança de configuração de lint ou de CI. Isso vive no histórico de commit.
+**Correção entra mesmo que nenhum usuário chegue nela hoje.** O changelog é registro do que foi alterado. Defeito de API que só outro cliente alcançaria continua sendo correção feita — e o marcador de lado é o que avisa qual serviço precisa subir.
 
-Na dúvida, a pergunta é: *alguém que não leu o PR se importaria?*
+**Não entra** o que não muda comportamento: refactor sem efeito externo, remoção de código morto, ajuste de teste, mudança de configuração de lint ou de CI. Isso vive no histórico de commit.
+
+Na dúvida, a pergunta é: *o comportamento mudou?* — não *o usuário perceberia?*
+
+⛔ Aconteceu na #100: o `PUT` de carona apagava a descrição quando o corpo não trazia o campo, e eu recomendei deixar de fora porque a tela sempre envia o campo, então ninguém via o defeito. Correção do Victor: *"ele é um registro de alterações feitas, mesmo que não afete usuários hoje é uma correção que foi feita então vale entrar"*. Daquela análise sobrevive só o cuidado com a **frase**: descreva o defeito como ele era, sem inventar uma vítima que não existiu.
 
 ## 3. Escolher a seção
 
