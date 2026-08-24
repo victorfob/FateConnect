@@ -12,11 +12,7 @@ import {
 
 const REQUIRED = 1;
 
-/**
- * Só se cadastra o que já aconteceu. Campo vazio ou ilegível passa: quem reclama
- * disso é a regra de obrigatoriedade, e acumular as duas mensagens no mesmo
- * lugar só confunde quem está preenchendo.
- */
+/** Campo vazio passa de propósito: quem reclama disso é a obrigatoriedade. */
 function hasAlreadyHappened(value: string): boolean {
   if (!value) return true;
 
@@ -26,7 +22,6 @@ function hasAlreadyHappened(value: string): boolean {
   return !isAfter(startOfDay(occurred), startOfDay(new Date()));
 }
 
-/** A foto é opcional, então não escolher nenhuma é um estado válido. */
 function isAcceptedPhotoFormat(photo: File | null): boolean {
   if (!photo) return true;
 
@@ -45,8 +40,6 @@ export const lostItemFormSchema = z.object({
     .trim()
     .min(LOST_ITEM_LIMITS.minName, LOST_ITEM_FORM_MESSAGES.nameTooShort)
     .max(LOST_ITEM_LIMITS.maxName, LOST_ITEM_FORM_MESSAGES.nameTooLong),
-  // O predicado estreita a saída: o formulário guarda texto, o schema entrega
-  // `LostItemKindEnum`, e o mapeamento para a requisição não precisa converter.
   kind: z.string().refine(isLostItemKind, LOST_ITEM_FORM_MESSAGES.kindRequired),
   place: z
     .string()
@@ -61,8 +54,6 @@ export const lostItemFormSchema = z.object({
     .string()
     .trim()
     .max(LOST_ITEM_LIMITS.maxDescription, LOST_ITEM_FORM_MESSAGES.descriptionTooLong),
-  // A validação já é a do servidor: enquanto a #106 não guarda o arquivo, ela é
-  // o que impede o usuário de escolher algo que depois seria recusado.
   photo: z
     .instanceof(File)
     .nullable()
@@ -70,9 +61,7 @@ export const lostItemFormSchema = z.object({
     .refine(isWithinPhotoSize, LOST_ITEM_FORM_MESSAGES.photoTooLarge),
 });
 
-/** O que os campos guardam: texto, mais o arquivo escolhido. */
 export type LostItemFormInput = z.input<typeof lostItemFormSchema>;
-/** O que sai validado, já com o tipo do item estreitado. */
 export type LostItemFormValues = z.output<typeof lostItemFormSchema>;
 
 export const EMPTY_LOST_ITEM_FORM: LostItemFormInput = {

@@ -37,7 +37,6 @@ export const PhotoPreview = styled('img')({
   borderRadius: radius(radiusScale.md),
 });
 
-/** Empilhadas, as duas ações saem com a mesma largura e não disputam a linha. */
 export const PhotoActions = styled(Stack)<PolymorphicProps>({
   flexDirection: 'column',
   gap: spacing(xs),
@@ -48,7 +47,7 @@ export const PhotoActionButton = styled(Button)({
   borderRadius: radius(radiusScale.component),
 });
 
-/** Fora da vista, mas ainda focável e rotulado: o botão é quem o aciona. */
+/** Fora da vista, mas focável e rotulado: quem o aciona é o botão. */
 export const HiddenFileInput = styled('input')({
   position: 'absolute',
   width: '1px',

@@ -9,14 +9,12 @@ import * as C from '../constants';
 import { LostItemPhotoField } from './LostItemPhotoField';
 import * as S from './styles';
 
-/** Os seis campos do item: duas colunas, descrição e foto na linha inteira. */
 export function LostItemFormFields() {
   const {
     control,
     register,
     formState: { errors },
   } = useFormContext<LostItemFormInput, unknown, LostItemFormValues>();
-  // Item achado ou perdido só pode ter ocorrido até hoje.
   const today = useMemo(() => new Date(), []);
 
   return (

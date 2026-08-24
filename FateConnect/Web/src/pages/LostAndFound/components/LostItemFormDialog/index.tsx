@@ -23,11 +23,9 @@ import * as S from './styles';
 export type LostItemFormDialogProps = Readonly<{
   open: boolean;
   onClose: VoidFunction;
-  /** Ausente, o diálogo cadastra um item novo; presente, edita o informado. */
   item?: LostItem;
 }>;
 
-/** Cadastrar e editar são o mesmo formulário: só mudam os textos e o verbo HTTP. */
 export function LostItemFormDialog({ open, onClose, item }: LostItemFormDialogProps) {
   const queryClient = useQueryClient();
   const { notifySuccess } = useNotification();
@@ -49,8 +47,7 @@ export function LostItemFormDialog({ open, onClose, item }: LostItemFormDialogPr
       onClose();
       await queryClient.invalidateQueries({ queryKey: [LOST_ITEMS_QUERY_KEY] });
     },
-    // Sem fechar no erro: refazer o formulário inteiro por causa de uma falha de
-    // rede seria punir quem já digitou tudo.
+    // Não fecha no erro: refazer o formulário inteiro puniria quem já digitou.
     meta: { errorMessage: mode.failed },
   });
 
@@ -61,7 +58,6 @@ export function LostItemFormDialog({ open, onClose, item }: LostItemFormDialogPr
   });
   const { reset } = form;
 
-  // Abrir mostra o item de agora, não o que sobrou da vez anterior.
   useEffect(() => {
     if (!open) return;
 

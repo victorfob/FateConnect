@@ -20,7 +20,6 @@ import * as S from './styles';
 
 const SPINNER_SIZE_PX = 60;
 
-/** O mural abre nos itens em aberto; as outras situações vêm pelo filtro. */
 const INITIAL_FILTERS: LostItemFilterValues = { status: LostItemStatusEnum.OPEN };
 
 export function LostAndFound() {
@@ -44,11 +43,9 @@ export function LostAndFound() {
     setIsFormOpen(true);
   }, []);
 
-  // O item fica onde está enquanto o diálogo se fecha: zerar agora trocaria o
-  // título para o de cadastrar bem na frente de quem está vendo a saída.
+  // O item fica até o diálogo fechar: zerar agora trocaria o título na frente de quem olha.
   const handleCloseForm = useCallback(() => setIsFormOpen(false), []);
 
-  // A aba só acende quando foi ela que abriu o diálogo — editar vem do cartão.
   const isRegistering = isFormOpen && !editingItem;
 
   return (

@@ -13,11 +13,7 @@ import {
 
 const { xs, lg } = spacingScale;
 
-/**
- * O formulário entra entre o título e o rodapé do esqueleto, no lugar que seria
- * dos slots. Por isso ele repete o comportamento de filho flexível: é quem cede
- * altura para o miolo rolar quando a tela é baixa.
- */
+/** Filho flexível: é ele que cede altura para o miolo rolar na tela baixa. */
 export const LostItemForm = styled(Stack)<PolymorphicProps<FormHTMLAttributes<HTMLFormElement>>>({
   flexDirection: 'column',
   gap: spacing(lg),

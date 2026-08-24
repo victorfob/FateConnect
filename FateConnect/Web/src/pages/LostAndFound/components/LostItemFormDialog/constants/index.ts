@@ -4,7 +4,6 @@ import { AddIcon, SaveIcon } from '@design-system/icons';
 
 import type { LostItemFormMode } from '../@types';
 
-/** Limites do contrato do módulo, espelhados no front. */
 export const LOST_ITEM_LIMITS = {
   minName: 3,
   maxName: 100,
@@ -12,21 +11,19 @@ export const LOST_ITEM_LIMITS = {
   maxPlace: 100,
   maxDescription: 300,
   maxPhotoMegabytes: 5,
-  /** `File.size` vem em bytes, e o limite de produto é falado em megabytes. */
   bytesPerMegabyte: 1_048_576,
 };
 
 export const MAX_PHOTO_BYTES =
   LOST_ITEM_LIMITS.maxPhotoMegabytes * LOST_ITEM_LIMITS.bytesPerMegabyte;
 
-/** A mesma regra que o servidor vai repetir quando a #106 guardar o arquivo. */
 export const ACCEPTED_PHOTO_TYPES: ReadonlySet<string> = new Set([
   'image/jpeg',
   'image/png',
   'image/webp',
 ]);
 
-/** O que o seletor do sistema oferece; o schema não confia nisso. */
+/** Só filtra o seletor do sistema; quem valida o formato é o schema. */
 export const PHOTO_ACCEPT_ATTRIBUTE = [...ACCEPTED_PHOTO_TYPES].join(',');
 
 export const REGISTER_MODE: LostItemFormMode = {
@@ -74,7 +71,6 @@ export const PHOTO_HINT = `JPG, PNG ou WebP, até ${LOST_ITEM_LIMITS.maxPhotoMeg
 
 const EMPTY_CHOICE: SelectOption = { value: '', label: LOST_ITEM_FORM_PLACEHOLDERS.select };
 
-/** As escolhas do campo, já com a opção vazia na frente. */
 export const LOST_ITEM_KIND_SELECT_OPTIONS: readonly SelectOption[] = [
   EMPTY_CHOICE,
   ...LOST_ITEM_KIND_OPTIONS,

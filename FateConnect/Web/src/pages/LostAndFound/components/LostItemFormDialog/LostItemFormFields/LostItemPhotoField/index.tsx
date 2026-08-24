@@ -8,11 +8,6 @@ import type { LostItemFormInput, LostItemFormValues } from '../../schema';
 import * as C from '../../constants';
 import * as S from './styles';
 
-/**
- * Enquanto a API não guarda o arquivo, a prévia sai de `URL.createObjectURL` e
- * vive só enquanto a página estiver aberta. A validação de formato e tamanho já
- * é a regra que o servidor vai repetir.
- */
 export function LostItemPhotoField() {
   const {
     control,
@@ -22,8 +17,6 @@ export function LostItemPhotoField() {
   const photo = useWatch({ control, name: 'photo' });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // O endereço é derivado do arquivo, não guardado em estado: assim ele nunca
-  // sobrevive à foto que o descreve — nem quando o formulário é reiniciado.
   const previewUrl = useMemo(() => {
     if (!photo) return null;
 
@@ -42,8 +35,7 @@ export function LostItemPhotoField() {
     (event: ChangeEvent<HTMLInputElement>) => {
       const [chosen] = event.target.files ?? [];
       setValue('photo', chosen ?? null, { shouldValidate: true });
-      // Zerar o campo faz o mesmo arquivo, escolhido de novo depois de removido,
-      // voltar a disparar a troca.
+      // Zerar o campo deixa o mesmo arquivo, escolhido de novo, disparar a troca.
       event.target.value = '';
     },
     [setValue],
