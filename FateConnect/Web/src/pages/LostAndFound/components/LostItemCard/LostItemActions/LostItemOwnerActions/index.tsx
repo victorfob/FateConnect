@@ -31,7 +31,7 @@ export function LostItemOwnerActions({ item, onEdit, onCancel }: LostItemOwnerAc
       </Tooltip>
 
       <LostItemConfirmAction
-        label={C.LOST_ITEM_ACTION_LABELS.cancel}
+        label={C.LOST_ITEM_ACTION_LABELS.delete}
         icon={<DeleteIcon />}
         iconOnly
         dialogTitle={C.DELETE_DIALOG.title}
