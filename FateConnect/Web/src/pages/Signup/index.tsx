@@ -13,9 +13,9 @@ import { AccountSection } from './components/AccountSection';
 import { AddressSection } from './components/AddressSection';
 import { ConsentSection } from './components/ConsentSection';
 import { ContactSection } from './components/ContactSection';
-import * as C from './constants';
 import { toSignupRequest } from './helpers/mapper';
 import { SIGNUP_DEFAULT_VALUES, type SignupFormValues, signupSchema } from './schema';
+import * as C from './constants';
 import * as S from './styles';
 
 const TITLE_ID = 'signup-title';

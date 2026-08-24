@@ -6,9 +6,9 @@ import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
-import { LandingLoginCard } from '.';
-import * as C from './constants';
 import { LOGIN_MESSAGES } from './schema';
+import * as C from './constants';
+import { LandingLoginCard } from '.';
 
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
 

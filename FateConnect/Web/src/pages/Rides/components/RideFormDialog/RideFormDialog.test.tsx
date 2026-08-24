@@ -6,8 +6,8 @@ import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import { type Ride, type RideInput, RideTypeEnum } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
 
-import { RideFormDialog, type RideFormDialogProps } from '.';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './constants';
+import { RideFormDialog, type RideFormDialogProps } from '.';
 
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
 

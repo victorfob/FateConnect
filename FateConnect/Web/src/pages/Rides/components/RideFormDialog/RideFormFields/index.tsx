@@ -3,8 +3,8 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { fromFormDate, toFormDate } from '@app/pages/Rides/helpers/apiDate';
 import { Input } from '@design-system';
 
-import * as C from '../constants';
 import type { RideFormInput, RideFormValues } from '../schema';
+import * as C from '../constants';
 import * as S from './styles';
 
 /** Os seis campos da carona: duas colunas, descrição ocupando a linha inteira. */

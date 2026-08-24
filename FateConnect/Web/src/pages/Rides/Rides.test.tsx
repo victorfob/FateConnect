@@ -8,13 +8,13 @@ import { RideTypeEnum } from '@app/services/rides/types';
 import type { Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
-import { Rides } from '.';
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
 import { CONTACT_DIALOG } from './components/RideCard/RideDriverContact/constants';
 import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
-import * as C from './constants';
 import { RIDE_DRIVER } from './helpers/rideDriver';
+import * as C from './constants';
+import { Rides } from '.';
 
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
 

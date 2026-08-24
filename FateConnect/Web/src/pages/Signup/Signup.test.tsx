@@ -6,12 +6,12 @@ import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
-import { Signup } from '.';
 import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
 import { CALENDAR_TOGGLE_LABEL } from './components/BirthDateField/constants';
 import { LEGAL_SOON_MESSAGES } from './components/ConsentSection/constants';
-import * as C from './constants';
 import { SIGNUP_MESSAGES } from './schema';
+import * as C from './constants';
+import { Signup } from '.';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/usuario/cadastro';
 const ZIP_URL = 'https://viacep.com.br/ws/:zipCode/json/';

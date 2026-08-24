@@ -9,10 +9,10 @@ import { createRide, updateRide } from '@app/services/rides/ridesService';
 import type { Ride, RideInput } from '@app/services/rides/types';
 import { Dialog, Typography } from '@design-system';
 
-import * as C from './constants';
 import { toFormValues, toRideInput } from './helpers/mapper';
 import { RideFormFields } from './RideFormFields';
 import { EMPTY_RIDE_FORM, type RideFormInput, rideFormSchema, type RideFormValues } from './schema';
+import * as C from './constants';
 import * as S from './styles';
 
 export type RideFormDialogProps = Readonly<{

@@ -11,8 +11,8 @@ import type { ApiError } from '@app/services/httpClient';
 import { Button, IconButton, Input, Typography } from '@design-system';
 import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
-import * as C from './constants';
 import { type LoginFormValues, loginSchema } from './schema';
+import * as C from './constants';
 import * as S from './styles';
 
 const UNAUTHORIZED = 401;

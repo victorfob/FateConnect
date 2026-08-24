@@ -3,13 +3,13 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, within } from '@app/test/testing-library';
 
-import { Home } from '.';
 import {
   DESCRIPTION_HIGHLIGHTS,
   DESCRIPTION_TITLE,
 } from './components/LandingDescription/constants';
 import { HOW_IT_WORKS_STEPS, HOW_IT_WORKS_TITLE } from './components/LandingHowItWorks/constants';
 import { SERVICE_CARDS, SERVICES_TITLE } from './components/LandingServices/constants';
+import { Home } from '.';
 
 function renderHome() {
   const router = createMemoryRouter([{ path: RoutePathEnum.LANDING, element: <Home /> }], {

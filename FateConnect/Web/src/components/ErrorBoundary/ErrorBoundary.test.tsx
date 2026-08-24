@@ -3,8 +3,8 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
 
-import { ErrorBoundary } from '.';
 import * as C from './constants';
+import { ErrorBoundary } from '.';
 
 function ExplodingScreen(): never {
   throw new Error('falha proposital');

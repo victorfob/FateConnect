@@ -3,8 +3,8 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
 
-import { LostAndFound } from '.';
 import * as C from './constants';
+import { LostAndFound } from '.';
 
 function renderComponent() {
   const router = createMemoryRouter(

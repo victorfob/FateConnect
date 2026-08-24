@@ -2,8 +2,8 @@ import { createRef } from 'react';
 
 import { render, screen, userEvent } from '@app/test/testing-library';
 
-import { Input, type InputProps } from '.';
 import { TIME_PICKER_LABEL } from './constants';
+import { Input, type InputProps } from '.';
 
 const DEFAULT_PROPS: InputProps = { label: 'Destino' };
 
