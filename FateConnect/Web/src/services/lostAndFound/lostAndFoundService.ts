@@ -1,5 +1,10 @@
 import { apiClient } from '../httpClient';
-import type { LostItem, LostItemFilter, LostItemInput } from './types';
+import {
+  LostItemStatusEnum,
+  type LostItem,
+  type LostItemFilter,
+  type LostItemInput,
+} from './types';
 
 const LOST_AND_FOUND_PATH = '/achado';
 
@@ -39,4 +44,22 @@ export async function updateLostItem(itemId: string, input: LostItemInput): Prom
   const { data } = await apiClient.put<LostItem>(`${LOST_AND_FOUND_PATH}/${itemId}`, input);
 
   return data;
+}
+
+/** Recurso próprio: um `PUT` exigiria reenviar campos que a ação não toca. */
+async function changeLostItemStatus(itemId: string, status: LostItemStatusEnum): Promise<void> {
+  await apiClient.patch(`${LOST_AND_FOUND_PATH}/${itemId}/situacao`, { situacao: status });
+}
+
+export async function resolveLostItem(itemId: string): Promise<void> {
+  await changeLostItemStatus(itemId, LostItemStatusEnum.RESOLVED);
+}
+
+export async function reopenLostItem(itemId: string): Promise<void> {
+  await changeLostItemStatus(itemId, LostItemStatusEnum.OPEN);
+}
+
+/** Exclusão lógica: o servidor marca Cancelado e registra o motivo. */
+export async function cancelLostItem(itemId: string): Promise<void> {
+  await apiClient.delete(`${LOST_AND_FOUND_PATH}/${itemId}`);
 }
