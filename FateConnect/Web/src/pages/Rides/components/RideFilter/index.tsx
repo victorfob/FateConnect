@@ -1,7 +1,7 @@
 import { useCallback, useState, type ChangeEvent, type SubmitEvent } from 'react';
 
-import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
+import { toApiDate } from '@app/utils/apiDate';
 import { Button, Input, Typography } from '@design-system';
 import { FilterAltIcon, SearchIcon } from '@design-system/icons';
 
