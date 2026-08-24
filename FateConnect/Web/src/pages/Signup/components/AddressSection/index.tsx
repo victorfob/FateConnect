@@ -1,13 +1,15 @@
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
-import * as C from '@app/pages/Signup/constants';
+import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
 import { useAddressAutofill } from '@app/pages/Signup/hooks/useAddressAutofill';
 import { useFilledLabel } from '@app/pages/Signup/hooks/useFilledLabel';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
-import * as S from '@app/pages/Signup/styles';
 import { maskZipCode } from '@app/utils/masks/zipCodeMask';
 import { CircularProgress, Input } from '@design-system';
+
+import { STATE_SELECT_OPTIONS, ZIP_LOOKUP_LABEL } from './constants';
+import * as S from './styles';
 
 const SPINNER_SIZE_PX = 20;
 
@@ -25,23 +27,23 @@ export function AddressSection() {
   const isCityFilled = useFilledLabel('city');
 
   return (
-    <S.FieldGrid>
+    <>
       <S.ThirdWidthCell>
         <Input
           {...zipCodeField}
-          label={C.FIELD_LABELS.zipCode}
+          label={FIELD_LABELS.zipCode}
           required
           error={errors.zipCode?.message}
           fullWidth
           type="text"
           inputMode="numeric"
           autoComplete="postal-code"
-          placeholder={C.FIELD_PLACEHOLDERS.zipCode}
+          placeholder={FIELD_PLACEHOLDERS.zipCode}
           aria-busy={isLookingUpZipCode}
           shrinkLabel={isZipCodeFilled}
           endAdornment={
             isLookingUpZipCode ? (
-              <CircularProgress size={SPINNER_SIZE_PX} aria-label={C.ZIP_LOOKUP_LABEL} />
+              <CircularProgress size={SPINNER_SIZE_PX} aria-label={ZIP_LOOKUP_LABEL} />
             ) : null
           }
         />
@@ -54,8 +56,8 @@ export function AddressSection() {
           render={({ field }) => (
             <Input.Select
               {...field}
-              label={C.FIELD_LABELS.state}
-              options={C.STATE_SELECT_OPTIONS}
+              label={FIELD_LABELS.state}
+              options={STATE_SELECT_OPTIONS}
               autoComplete="address-level1"
               required
               error={errors.state?.message}
@@ -67,7 +69,7 @@ export function AddressSection() {
       <S.ThirdWidthCell>
         <Input
           {...register('city')}
-          label={C.FIELD_LABELS.city}
+          label={FIELD_LABELS.city}
           required
           error={errors.city?.message}
           fullWidth
@@ -80,7 +82,7 @@ export function AddressSection() {
       <S.StreetCell>
         <Input
           {...register('street')}
-          label={C.FIELD_LABELS.street}
+          label={FIELD_LABELS.street}
           required
           error={errors.street?.message}
           fullWidth
@@ -93,7 +95,7 @@ export function AddressSection() {
       <S.StreetNumberCell>
         <Input
           {...register('streetNumber')}
-          label={C.FIELD_LABELS.streetNumber}
+          label={FIELD_LABELS.streetNumber}
           required
           error={errors.streetNumber?.message}
           fullWidth
@@ -105,12 +107,12 @@ export function AddressSection() {
       <S.FullWidthCell>
         <Input
           {...register('complement')}
-          label={C.FIELD_LABELS.complement}
+          label={FIELD_LABELS.complement}
           fullWidth
           type="text"
           autoComplete="address-line2"
         />
       </S.FullWidthCell>
-    </S.FieldGrid>
+    </>
   );
 }

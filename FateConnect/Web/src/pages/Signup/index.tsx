@@ -63,15 +63,21 @@ export function Signup() {
 
         <FormProvider {...form}>
           <S.SignupForm component="form" onSubmit={handleSubmit} noValidate>
-            <AccountSection />
+            <S.FieldGrid>
+              <AccountSection />
+            </S.FieldGrid>
 
             <S.SectionDivider />
             <S.SectionTitle variant="subtitleBold">{C.ADDRESS_SECTION_TITLE}</S.SectionTitle>
-            <AddressSection />
+            <S.FieldGrid>
+              <AddressSection />
+            </S.FieldGrid>
 
             <S.SectionDivider />
             <S.SectionTitle variant="subtitleBold">{C.CONTACT_SECTION_TITLE}</S.SectionTitle>
-            <ContactSection />
+            <S.FieldGrid>
+              <ContactSection />
+            </S.FieldGrid>
 
             <S.SectionDivider />
             <ConsentSection />

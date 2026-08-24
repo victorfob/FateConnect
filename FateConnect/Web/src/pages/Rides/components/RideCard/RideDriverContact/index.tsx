@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { useNotification } from '@app/hooks/useNotification';
-import * as C from '@app/pages/Rides/constants';
+import { RIDE_CARD_LABELS } from '@app/pages/Rides/constants';
 import { isOwnRide, RIDE_DRIVER } from '@app/pages/Rides/helpers/rideDriver';
 import { copyToClipboard } from '@app/utils/clipboard';
 import { getInitials } from '@app/utils/initials';
@@ -10,6 +10,7 @@ import { Dialog, IconButton } from '@design-system';
 import { ContactPageIcon } from '@design-system/icons';
 
 import { ContactDetails } from '../ContactDetails';
+import { CONTACT_DIALOG } from './constants';
 
 type RideDriverContactProps = Readonly<{
   /** Destino da carona, citado na mensagem que já vai escrita na conversa. */
@@ -31,16 +32,16 @@ export function RideDriverContact({ destination }: RideDriverContactProps) {
     const copied = await copyToClipboard(RIDE_DRIVER.email);
 
     if (!copied) {
-      notifyError(C.CONTACT_DIALOG.emailCopyFailed);
+      notifyError(CONTACT_DIALOG.emailCopyFailed);
       return;
     }
 
-    notifySuccess(C.CONTACT_DIALOG.emailCopied);
+    notifySuccess(CONTACT_DIALOG.emailCopied);
   }, [notifyError, notifySuccess]);
 
   const initials = useMemo(() => getInitials(RIDE_DRIVER.name), []);
   const phoneHref = useMemo(
-    () => whatsappConversationUrl(RIDE_DRIVER.phone, C.CONTACT_DIALOG.message(destination)),
+    () => whatsappConversationUrl(RIDE_DRIVER.phone, CONTACT_DIALOG.message(destination)),
     [destination],
   );
 
@@ -48,11 +49,11 @@ export function RideDriverContact({ destination }: RideDriverContactProps) {
 
   return (
     <>
-      <IconButton type="button" aria-label={C.RIDE_CARD_LABELS.contact} onClick={handleOpen}>
+      <IconButton type="button" aria-label={RIDE_CARD_LABELS.contact} onClick={handleOpen}>
         <ContactPageIcon />
       </IconButton>
 
-      <Dialog open={showingContact} onClose={handleClose} title={C.CONTACT_DIALOG.title}>
+      <Dialog open={showingContact} onClose={handleClose} title={CONTACT_DIALOG.title}>
         <Dialog.Body>
           <ContactDetails
             name={RIDE_DRIVER.name}

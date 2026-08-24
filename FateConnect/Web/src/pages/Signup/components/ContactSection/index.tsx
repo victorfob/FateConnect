@@ -3,9 +3,10 @@ import { useFormContext } from 'react-hook-form';
 import { useMaskedField } from '@app/hooks/useMaskedField';
 import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
-import * as S from '@app/pages/Signup/styles';
 import { maskPhone } from '@app/utils/masks/phoneMask';
 import { Input } from '@design-system';
+
+import * as S from './styles';
 
 /** Telefone e e-mail de contato. */
 export function ContactSection() {
@@ -16,7 +17,7 @@ export function ContactSection() {
   const phoneField = useMaskedField(register('phone'), maskPhone);
 
   return (
-    <S.FieldGrid>
+    <>
       <S.HalfWidthCell>
         <Input
           {...phoneField}
@@ -42,6 +43,6 @@ export function ContactSection() {
           error={errors.contactEmail?.message}
         />
       </S.HalfWidthCell>
-    </S.FieldGrid>
+    </>
   );
 }
