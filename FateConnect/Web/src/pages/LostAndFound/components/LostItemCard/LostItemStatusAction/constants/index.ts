@@ -6,7 +6,7 @@ const RESOLVE_LABEL: Readonly<Record<LostItemKindEnum, string>> = {
   [LostItemKindEnum.FOUND]: 'Marcar como devolvido',
 };
 
-const GENERIC_RESOLVE_LABEL = 'Concluir';
+const GENERIC_RESOLVE_LABEL = 'Resolver';
 
 export const REOPEN_LABEL = 'Reabrir';
 
@@ -17,7 +17,7 @@ export function lostItemResolveLabel(kind: string): string {
 }
 
 export const RESOLVE_DIALOG = {
-  title: 'Confirmar Conclusão',
-  messagePrefix: 'Tem certeza que deseja concluir o item ',
-  confirmLabel: 'Concluir',
+  title: 'Confirmar Resolução',
+  messagePrefix: 'Tem certeza que deseja resolver o item ',
+  confirmLabel: 'Resolver',
 };

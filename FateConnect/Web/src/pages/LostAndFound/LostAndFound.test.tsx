@@ -62,7 +62,7 @@ function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
 
 const NO_CONTENT = 204;
 
-const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Concluído', cancelled: 'Cancelado' };
+const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', cancelled: 'Cancelado' };
 
 const RESOLVE_LABEL = { lost: 'Marcar como encontrado', found: 'Marcar como devolvido' };
 
