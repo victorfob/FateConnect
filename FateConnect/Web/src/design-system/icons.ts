@@ -8,6 +8,7 @@
 export { default as AccessTimeIcon } from '@mui/icons-material/AccessTime';
 export { default as AddIcon } from '@mui/icons-material/Add';
 export { default as ArrowBackIcon } from '@mui/icons-material/ArrowBack';
+export { default as BackHandOutlinedIcon } from '@mui/icons-material/BackHandOutlined';
 export { default as CalendarTodayIcon } from '@mui/icons-material/CalendarToday';
 export { default as ChevronRightIcon } from '@mui/icons-material/ChevronRight';
 export { default as ContactPageIcon } from '@mui/icons-material/ContactPage';
@@ -24,6 +25,7 @@ export { default as LightModeIcon } from '@mui/icons-material/LightMode';
 export { default as LocalOfferIcon } from '@mui/icons-material/LocalOffer';
 export { default as LocationOnIcon } from '@mui/icons-material/LocationOn';
 export { default as MenuIcon } from '@mui/icons-material/Menu';
+export { default as NoBackpackOutlinedIcon } from '@mui/icons-material/NoBackpackOutlined';
 export { default as PhoneIcon } from '@mui/icons-material/Phone';
 export { default as ScheduleIcon } from '@mui/icons-material/Schedule';
 export { default as SaveIcon } from '@mui/icons-material/Save';

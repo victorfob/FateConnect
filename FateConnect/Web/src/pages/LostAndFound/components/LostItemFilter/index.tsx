@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, type ChangeEvent, type SubmitEvent } from 'react';
 
-import { LOST_ITEM_KIND_OPTIONS } from '@app/pages/LostAndFound/helpers/lostItemKind';
+import { isLostItemKind } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import { isLostItemStatus } from '@app/pages/LostAndFound/helpers/lostItemStatus';
 import {
   LostItemStatusEnum,
@@ -55,12 +55,10 @@ export function LostItemFilter({ onApply }: LostItemFilterProps) {
       event.preventDefault();
 
       const filters: LostItemFilterValues = {};
-      // A escolha carrega o valor canônico, então dispensa estreitar o texto do campo.
-      const selectedKind = LOST_ITEM_KIND_OPTIONS.find((option) => option.value === kind);
 
       if (itemName.trim()) filters.name = itemName.trim();
       if (occurredOn) filters.occurredOn = toApiDate(occurredOn);
-      if (selectedKind) filters.kind = selectedKind.value;
+      if (isLostItemKind(kind)) filters.kind = kind;
       if (owner === C.LostItemOwnerFilterEnum.MINE) filters.onlyMine = true;
       if (isLostItemStatus(status)) filters.status = status;
 

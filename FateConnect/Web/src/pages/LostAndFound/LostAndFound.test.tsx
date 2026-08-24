@@ -164,4 +164,14 @@ describe('LostAndFound', () => {
 
     vi.useRealTimers();
   });
+
+  it('should tell lost from found by the icon on the card', async () => {
+    listReturning([LOST_ITEM, { ...LOST_ITEM, id: 'outro', tipo: LostItemKindEnum.FOUND }]);
+
+    renderComponent();
+
+    await screen.findAllByText(LOST_ITEM.nome);
+    expect(screen.getByTestId('NoBackpackOutlinedIcon')).toBeInTheDocument();
+    expect(screen.getByTestId('BackHandOutlinedIcon')).toBeInTheDocument();
+  });
 });

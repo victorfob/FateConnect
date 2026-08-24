@@ -6,8 +6,9 @@ import {
 } from '@app/pages/LostAndFound/helpers/lostItemStatus';
 import type { LostItem } from '@app/services/lostAndFound/types';
 import { StatusTag, Typography } from '@design-system';
-import { CalendarTodayIcon, ImageIcon, LocalOfferIcon, LocationOnIcon } from '@design-system/icons';
+import { CalendarTodayIcon, ImageIcon, LocationOnIcon } from '@design-system/icons';
 
+import { LostItemKindIcon } from './LostItemKindIcon';
 import * as C from './constants';
 import * as S from './styles';
 
@@ -56,7 +57,7 @@ export function LostItemCard({ item }: LostItemCardProps) {
           </S.InfoItem>
 
           <S.InfoItem>
-            <LocalOfferIcon />
+            <LostItemKindIcon kind={item.tipo} />
             <Typography variant="caption" color="inherit">
               {item.tipo}
             </Typography>
