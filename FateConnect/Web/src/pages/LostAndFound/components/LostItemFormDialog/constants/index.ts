@@ -30,7 +30,7 @@ export const REGISTER_MODE: LostItemFormMode = {
   title: 'Cadastrar Item',
   submitLabel: 'Cadastrar Item',
   submitIcon: AddIcon,
-  succeeded: 'Item cadastrado com sucesso.',
+  succeeded: 'Item cadastrado.',
   failed: 'Erro ao cadastrar o item. Tente novamente.',
 };
 
@@ -38,7 +38,7 @@ export const EDIT_MODE: LostItemFormMode = {
   title: 'Editar Item',
   submitLabel: 'Salvar Alterações',
   submitIcon: SaveIcon,
-  succeeded: 'Item atualizado com sucesso.',
+  succeeded: 'Item atualizado.',
   failed: 'Erro ao atualizar o item. Tente novamente.',
 };
 
