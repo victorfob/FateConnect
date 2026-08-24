@@ -16,6 +16,7 @@ import {
   FILTER_PANEL_TITLE,
   FILTER_SUBMIT_LABEL,
 } from './components/LostItemFilter/constants';
+import { REGISTER_MODE } from './components/LostItemFormDialog/constants';
 import * as C from './constants';
 import { LostAndFound } from '.';
 
@@ -173,5 +174,54 @@ describe('LostAndFound', () => {
     await screen.findAllByText(LOST_ITEM.nome);
     expect(screen.getByTestId('NoBackpackOutlinedIcon')).toBeInTheDocument();
     expect(screen.getByTestId('BackHandOutlinedIcon')).toBeInTheDocument();
+  });
+
+  it('should open on the search tab, with the register dialog closed', () => {
+    listReturning([]);
+
+    renderComponent();
+
+    expect(screen.getByRole('tab', { name: C.SEARCH_TAB_LABEL })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.getByRole('tab', { name: C.REGISTER_TAB_LABEL })).toHaveAttribute(
+      'aria-selected',
+      'false',
+    );
+    expect(screen.queryByRole('heading', { name: REGISTER_MODE.title })).not.toBeInTheDocument();
+  });
+
+  it('should open the register dialog from the tab, without leaving the route', async () => {
+    listReturning([]);
+    const router = renderComponent();
+
+    await userEvent.click(screen.getByRole('tab', { name: C.REGISTER_TAB_LABEL }));
+
+    expect(await screen.findByRole('heading', { name: REGISTER_MODE.title })).toBeInTheDocument();
+    // O diálogo é modal e esconde a página atrás dele da árvore de
+    // acessibilidade: a aba só é alcançável com `hidden`. O destaque dela é
+    // visual enquanto o diálogo cobre a tela.
+    expect(screen.getByRole('tab', { name: C.REGISTER_TAB_LABEL, hidden: true })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(router.state.location.pathname).toBe(RoutePathEnum.LOST_AND_FOUND);
+  });
+
+  it('should hand the highlight back to the search tab when the dialog is dismissed', async () => {
+    listReturning([]);
+    renderComponent();
+
+    await userEvent.click(screen.getByRole('tab', { name: C.REGISTER_TAB_LABEL }));
+    await screen.findByRole('dialog');
+    await userEvent.keyboard('{Escape}');
+
+    await waitFor(() =>
+      expect(screen.getByRole('tab', { name: C.SEARCH_TAB_LABEL })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      ),
+    );
   });
 });
