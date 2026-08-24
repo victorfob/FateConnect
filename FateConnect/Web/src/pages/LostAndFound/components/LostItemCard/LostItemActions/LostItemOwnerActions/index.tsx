@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 
+import { LostItemConfirmAction } from '@app/pages/LostAndFound/components/LostItemCard/LostItemConfirmAction';
 import { LostItemStatusEnum, type LostItem } from '@app/services/lostAndFound/types';
 import { IconButton, Tooltip } from '@design-system';
 import { DeleteIcon, EditIcon } from '@design-system/icons';
 
-import { LostItemConfirmAction } from '../../LostItemConfirmAction';
 import * as C from '../constants';
 
 type LostItemOwnerActionsProps = Readonly<{
