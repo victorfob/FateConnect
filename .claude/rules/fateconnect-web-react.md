@@ -45,7 +45,9 @@ Componente = pasta com `index.tsx`, `styles.ts`, `types.ts` (quando houver tipo)
 
 ## Rotas
 
-Os caminhos são em **pt-BR** — `/inicio`, `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas/buscar`, `/caronas/ofertar`, com `/` → `/inicio` e curinga → `/inicio`. Trocar um segmento quebra link salvo; só com decisão de produto.
+Os caminhos são em **pt-BR** — `/inicio`, `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas`, com `/` → `/inicio` e curinga → `/inicio`. Trocar um segmento quebra link salvo; só com decisão de produto.
+
+Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/buscar` e `/caronas/ofertar` existiram e foram removidas — não recriar a rota ao mexer em `routeConfig`.
 
 ## Dados
 
