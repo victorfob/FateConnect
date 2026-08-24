@@ -5,8 +5,8 @@ import { styled } from '@src-ds/styled';
 import { spacing } from '@src-ds/theme/helpers/spacing';
 import {
   notificationSurface,
-  type NotificationVariant,
   onNotificationSurface,
+  type NotificationVariant,
 } from '@src-ds/theme/notificationSurface';
 import { mobileMedia, spacingScale, typographyTokens } from '@src-ds/tokens';
 

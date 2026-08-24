@@ -1,5 +1,11 @@
-import { mobileMedia, spacing, spacingScale, Stack, styled } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import {
+  mobileMedia,
+  spacing,
+  spacingScale,
+  Stack,
+  styled,
+  type PolymorphicProps,
+} from '@design-system';
 
 const { xs, md, xl } = spacingScale;
 

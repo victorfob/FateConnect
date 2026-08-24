@@ -1,7 +1,15 @@
 import type { FormHTMLAttributes } from 'react';
 
-import { Box, radius, radiusScale, shadowTokens, Stack, styled, tabletMedia } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import {
+  Box,
+  radius,
+  radiusScale,
+  shadowTokens,
+  Stack,
+  styled,
+  tabletMedia,
+  type PolymorphicProps,
+} from '@design-system';
 
 const CARD_WIDTH_PX = 360;
 const SUBMIT_HEIGHT_PX = 40;

@@ -1,8 +1,7 @@
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import { styled } from '@src-ds/styled';
-import type { PolymorphicProps } from '@src-ds/styled';
+import { styled, type PolymorphicProps } from '@src-ds/styled';
 import { spacing } from '@src-ds/theme/helpers/spacing';
 import { spacingScale } from '@src-ds/tokens';
 

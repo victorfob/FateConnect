@@ -4,8 +4,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
-import { RideTypeEnum } from '@app/services/rides/types';
-import type { Ride } from '@app/services/rides/types';
+import { RideTypeEnum, type Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';

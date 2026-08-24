@@ -1,5 +1,4 @@
-import { useCallback } from 'react';
-import type { MouseEvent } from 'react';
+import { useCallback, type MouseEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useNotification } from '@app/hooks/useNotification';

@@ -1,5 +1,13 @@
-import { Box, mobileMedia, radius, radiusScale, shadowTokens, Stack, styled } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import {
+  Box,
+  mobileMedia,
+  radius,
+  radiusScale,
+  shadowTokens,
+  Stack,
+  styled,
+  type PolymorphicProps,
+} from '@design-system';
 
 export const HowSection = styled(Stack)<PolymorphicProps>({
   flexDirection: 'column',

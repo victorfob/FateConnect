@@ -2,7 +2,7 @@ import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import { RideTypeEnum } from '@app/services/rides/types';
 
 import { RIDE_FORM_MESSAGES, RIDE_LIMITS } from '../constants';
-import { type RideFormInput, rideFormSchema } from '.';
+import { rideFormSchema, type RideFormInput } from '.';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DAYS_AHEAD = 30;

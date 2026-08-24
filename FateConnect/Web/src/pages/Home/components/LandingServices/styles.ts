@@ -7,8 +7,8 @@ import {
   shadowTokens,
   Stack,
   styled,
+  type PolymorphicProps,
 } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
 
 const CARD_MIN_WIDTH_PX = 500;
 const ICON_DISC_SIZE_PX = 70;

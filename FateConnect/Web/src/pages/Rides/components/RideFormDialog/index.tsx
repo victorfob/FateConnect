@@ -11,7 +11,7 @@ import { Dialog, Typography } from '@design-system';
 
 import { toFormValues, toRideInput } from './helpers/mapper';
 import { RideFormFields } from './RideFormFields';
-import { EMPTY_RIDE_FORM, type RideFormInput, rideFormSchema, type RideFormValues } from './schema';
+import { EMPTY_RIDE_FORM, rideFormSchema, type RideFormInput, type RideFormValues } from './schema';
 import * as C from './constants';
 import * as S from './styles';
 

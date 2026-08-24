@@ -1,5 +1,4 @@
-import { Box, desktopMedia, styled } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import { Box, desktopMedia, styled, type PolymorphicProps } from '@design-system';
 
 /** Metade da linha no desktop: 3 de 6 colunas. */
 export const HalfWidthCell = styled(Box)<PolymorphicProps>({

@@ -11,8 +11,8 @@ import {
   Stack,
   styled,
   Typography,
+  type PolymorphicProps,
 } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
 
 const { none, md, xl, xxl } = spacingScale;
 

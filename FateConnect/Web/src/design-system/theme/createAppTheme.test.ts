@@ -1,5 +1,10 @@
-import { colorTokens, mobileMedia, spacingScale, typographyTokens } from '../tokens';
-import type { TypographyToken } from '../tokens';
+import {
+  colorTokens,
+  mobileMedia,
+  spacingScale,
+  typographyTokens,
+  type TypographyToken,
+} from '../tokens';
 import { createAppTheme } from './createAppTheme';
 import { spacing } from './helpers/spacing';
 

@@ -1,4 +1,4 @@
-import { type ReactNode, useId } from 'react';
+import { useId, type ReactNode } from 'react';
 import MuiDialog from '@mui/material/Dialog';
 
 import { DialogBody } from './DialogBody';

@@ -1,5 +1,4 @@
-import { useCallback, useState } from 'react';
-import type { ChangeEvent, SubmitEvent } from 'react';
+import { useCallback, useState, type ChangeEvent, type SubmitEvent } from 'react';
 
 import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';

@@ -1,5 +1,4 @@
-import { Box, desktopMedia, styled } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import { Box, desktopMedia, styled, type PolymorphicProps } from '@design-system';
 
 /** Ocupa a linha inteira, em qualquer largura. */
 export const FullWidthCell = styled(Box)<PolymorphicProps>({

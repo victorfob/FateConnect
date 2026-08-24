@@ -1,5 +1,4 @@
-import { useCallback, useState } from 'react';
-import type { MouseEvent } from 'react';
+import { useCallback, useState, type MouseEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';

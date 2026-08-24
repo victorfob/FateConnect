@@ -1,5 +1,11 @@
-import { Box, iconSizeTokens, mobileMedia, Stack, styled } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import {
+  Box,
+  iconSizeTokens,
+  mobileMedia,
+  Stack,
+  styled,
+  type PolymorphicProps,
+} from '@design-system';
 
 const MAX_WIDTH_PX = 600;
 const TITLE_MAX_WIDTH_PX = 500;

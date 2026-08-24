@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import importX from 'eslint-plugin-import-x';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import perfectionist from 'eslint-plugin-perfectionist';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
@@ -23,6 +24,7 @@ export default tseslint.config(
       react: reactPlugin,
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
+      'import-x': importX,
       perfectionist,
     },
     settings: { react: { version: 'detect' } },
@@ -105,7 +107,11 @@ export default tseslint.config(
           ],
         },
       ],
-      'perfectionist/sort-named-imports': 'error',
+      // Um import por módulo: o tipo entra com o modificador inline no import de
+      // valor que já existe, em vez de abrir uma segunda declaração.
+      'import-x/no-duplicates': ['error', { 'prefer-inline': true }],
+      // Dentro das chaves, os valores primeiro e os tipos no fim.
+      'perfectionist/sort-named-imports': ['error', { groups: ['value-import', 'type-import'] }],
     },
   },
 
