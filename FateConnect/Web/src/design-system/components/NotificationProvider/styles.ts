@@ -1,14 +1,14 @@
 import Button from '@mui/material/Button';
 import type { Theme } from '@mui/material/styles';
 
-import { styled } from '../../styled';
-import { spacing } from '../../theme/helpers/spacing';
+import { styled } from '@src-ds/styled';
+import { spacing } from '@src-ds/theme/helpers/spacing';
 import {
   notificationSurface,
   onNotificationSurface,
   type NotificationVariant,
-} from '../../theme/notificationSurface';
-import { mobileMedia, spacingScale, typographyTokens } from '../../tokens';
+} from '@src-ds/theme/notificationSurface';
+import { mobileMedia, spacingScale, typographyTokens } from '@src-ds/tokens';
 
 const { xs, md } = spacingScale;
 

@@ -1,13 +1,12 @@
 import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-
-import { styled } from '../../styled';
-import { onChromeSurface } from '../../theme/chromeSurface';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import type { PolymorphicProps } from '../../styled';
-import { mobileMedia, shadowTokens, spacingScale } from '../../tokens';
-import { spacing } from '../../theme/helpers/spacing';
+import Toolbar from '@mui/material/Toolbar';
+
+import { styled, type PolymorphicProps } from '@src-ds/styled';
+import { onChromeSurface } from '@src-ds/theme/chromeSurface';
+import { spacing } from '@src-ds/theme/helpers/spacing';
+import { mobileMedia, shadowTokens, spacingScale } from '@src-ds/tokens';
 
 const { xs } = spacingScale;
 

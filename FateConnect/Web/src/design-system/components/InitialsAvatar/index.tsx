@@ -1,5 +1,5 @@
-import * as S from './styles';
 import type { InitialsAvatarSize } from './types';
+import * as S from './styles';
 
 export type InitialsAvatarProps = Readonly<{
   /** Iniciais já derivadas — o design system não conhece regra de nome. */

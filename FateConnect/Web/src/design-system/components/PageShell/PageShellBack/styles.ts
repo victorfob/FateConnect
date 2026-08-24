@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack';
-import { styled } from '@src-ds/styled';
-import type { PolymorphicProps } from '@src-ds/styled';
+
+import { styled, type PolymorphicProps } from '@src-ds/styled';
 import { radius } from '@src-ds/theme/helpers/radius';
 import { spacing } from '@src-ds/theme/helpers/spacing';
 import { radiusScale, shadowTokens, spacingScale } from '@src-ds/tokens';

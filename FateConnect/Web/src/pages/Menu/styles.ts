@@ -1,3 +1,5 @@
+import type { LinkProps } from 'react-router';
+
 import {
   iconSizeTokens,
   mobileMedia,
@@ -8,9 +10,8 @@ import {
   spacingScale,
   Stack,
   styled,
+  type PolymorphicProps,
 } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
-import type { LinkProps } from 'react-router';
 
 const { md, xl } = spacingScale;
 

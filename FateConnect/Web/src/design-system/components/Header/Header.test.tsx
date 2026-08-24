@@ -1,6 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
-
 import { render, screen, userEvent } from '@app/test/testing-library';
+
 import { Header } from '.';
 
 const MENU_LABEL = 'Abrir menu';

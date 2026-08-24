@@ -9,6 +9,7 @@ import { LostAndFound } from '@app/pages/LostAndFound';
 import { Menu } from '@app/pages/Menu';
 import { Rides } from '@app/pages/Rides';
 import { Signup } from '@app/pages/Signup';
+
 import { RoutePathEnum } from './paths';
 
 /**

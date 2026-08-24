@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { GenderValueEnum } from '../@types';
 import { SIGNUP_DEFAULT_VALUES, type SignupFormValues } from '../schema';
 import { toSignupRequest } from './mapper';

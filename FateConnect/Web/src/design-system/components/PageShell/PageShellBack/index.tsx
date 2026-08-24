@@ -1,5 +1,6 @@
-import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import Typography from '@mui/material/Typography';
+
 import type { PolymorphicProps } from '@src-ds/styled';
 
 import * as S from './styles';

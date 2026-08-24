@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { server } from '@app/mocks/server';

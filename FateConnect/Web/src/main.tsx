@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 
 import { AppProviders } from '@app/providers/AppProviders';
-import { reportUncaughtErrors } from '@app/utils/reportUncaughtErrors';
 import { routeConfig } from '@app/routes';
+import { reportUncaughtErrors } from '@app/utils/reportUncaughtErrors';
 
 reportUncaughtErrors();
 

@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest';
-
 import { render, screen } from '@app/test/testing-library';
-import { createAppTheme } from '../../theme';
-import { onStatusTagSurface, statusTagSurface } from '../../theme/statusTagSurface';
-import type { StatusTagTone } from '../../theme/statusTagSurface';
+import { createAppTheme } from '@src-ds/theme';
+import {
+  onStatusTagSurface,
+  statusTagSurface,
+  type StatusTagTone,
+} from '@src-ds/theme/statusTagSurface';
+
 import { StatusTag, type StatusTagProps } from '.';
 
 const LABEL = 'Aberto';

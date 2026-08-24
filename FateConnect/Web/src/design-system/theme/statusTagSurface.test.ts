@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { colorTokens, colorVariants, darkColorTokens } from '../tokens';
 import { createAppTheme } from './createAppTheme';
 import { onStatusTagSurface, statusTagSurface } from './statusTagSurface';

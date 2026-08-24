@@ -1,5 +1,5 @@
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import type { FocusEvent, ReactNode } from 'react';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 export type DateInputProps = Readonly<{
   label: ReactNode;

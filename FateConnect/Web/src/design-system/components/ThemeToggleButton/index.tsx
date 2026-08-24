@@ -1,7 +1,7 @@
 import IconButton from '@mui/material/IconButton';
 
-import { useThemeMode } from '../../ThemeProvider/context/ThemeModeContext';
-import { DarkModeIcon, LightModeIcon } from '../../icons';
+import { DarkModeIcon, LightModeIcon } from '@src-ds/icons';
+import { useThemeMode } from '@src-ds/ThemeProvider/context/ThemeModeContext';
 
 const LABEL_PARA_ESCURO = 'Ativar tema escuro';
 const LABEL_PARA_CLARO = 'Ativar tema claro';

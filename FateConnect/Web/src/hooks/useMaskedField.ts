@@ -1,5 +1,4 @@
-import { useCallback } from 'react';
-import type { ChangeEvent } from 'react';
+import { useCallback, type ChangeEvent } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
 import { caretAfterDigitCount, countDigits } from '@app/utils/masks/caret';

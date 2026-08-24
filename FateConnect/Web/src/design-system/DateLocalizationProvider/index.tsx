@@ -1,7 +1,7 @@
+import type { ReactNode } from 'react';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { ptBR } from 'date-fns/locale/pt-BR';
-import type { ReactNode } from 'react';
 
 /**
  * Locale dos componentes de data. Substitui o adapter de data escrito à mão no

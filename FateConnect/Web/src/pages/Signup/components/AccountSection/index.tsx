@@ -1,13 +1,14 @@
 import { useCallback, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
+import type { SignupFormValues } from '@app/pages/Signup/schema';
 import { IconButton, Input } from '@design-system';
 import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
-import * as C from '../../constants';
-import type { SignupFormValues } from '../../schema';
-import * as S from '../../styles';
 import { BirthDateField } from '../BirthDateField';
+import { GENDER_SELECT_OPTIONS, PASSWORD_TOGGLE_LABEL } from './constants';
+import * as S from './styles';
 
 /** Identificação e acesso: os seis primeiros campos do cadastro. */
 export function AccountSection() {
@@ -21,11 +22,11 @@ export function AccountSection() {
   const handleTogglePassword = useCallback(() => setPasswordHidden((hidden) => !hidden), []);
 
   return (
-    <S.FieldGrid>
+    <>
       <S.FullWidthCell>
         <Input
           {...register('fullName')}
-          label={C.FIELD_LABELS.fullName}
+          label={FIELD_LABELS.fullName}
           required
           fullWidth
           type="text"
@@ -37,7 +38,7 @@ export function AccountSection() {
       <S.ThirdWidthCell>
         <Input
           {...register('nickname')}
-          label={C.FIELD_LABELS.nickname}
+          label={FIELD_LABELS.nickname}
           fullWidth
           type="text"
           autoComplete="nickname"
@@ -47,12 +48,12 @@ export function AccountSection() {
       <S.ThirdWidthCell>
         <Input
           {...register('fatecEmail')}
-          label={C.FIELD_LABELS.fatecEmail}
+          label={FIELD_LABELS.fatecEmail}
           required
           fullWidth
           type="email"
           autoComplete="work email"
-          placeholder={C.FIELD_PLACEHOLDERS.fatecEmail}
+          placeholder={FIELD_PLACEHOLDERS.fatecEmail}
           error={errors.fatecEmail?.message}
         />
       </S.ThirdWidthCell>
@@ -68,8 +69,8 @@ export function AccountSection() {
           render={({ field }) => (
             <Input.Select
               {...field}
-              label={C.FIELD_LABELS.gender}
-              options={C.GENDER_SELECT_OPTIONS}
+              label={FIELD_LABELS.gender}
+              options={GENDER_SELECT_OPTIONS}
               autoComplete="sex"
               required
               error={errors.gender?.message}
@@ -81,7 +82,7 @@ export function AccountSection() {
       <S.ThirdWidthCell>
         <Input
           {...register('password')}
-          label={C.FIELD_LABELS.password}
+          label={FIELD_LABELS.password}
           required
           fullWidth
           type={passwordHidden ? 'password' : 'text'}
@@ -90,7 +91,7 @@ export function AccountSection() {
           endAdornment={
             <IconButton
               type="button"
-              aria-label={C.PASSWORD_TOGGLE_LABEL}
+              aria-label={PASSWORD_TOGGLE_LABEL}
               aria-pressed={!passwordHidden}
               onClick={handleTogglePassword}
             >
@@ -100,6 +101,6 @@ export function AccountSection() {
           }
         />
       </S.ThirdWidthCell>
-    </S.FieldGrid>
+    </>
   );
 }

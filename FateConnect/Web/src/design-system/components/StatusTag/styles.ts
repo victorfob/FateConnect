@@ -1,9 +1,12 @@
 import Box from '@mui/material/Box';
-import { styled } from '@src-ds/styled';
-import type { PolymorphicProps } from '@src-ds/styled';
+
+import { styled, type PolymorphicProps } from '@src-ds/styled';
 import { spacing } from '@src-ds/theme/helpers/spacing';
-import { onStatusTagSurface, statusTagSurface } from '@src-ds/theme/statusTagSurface';
-import type { StatusTagTone } from '@src-ds/theme/statusTagSurface';
+import {
+  onStatusTagSurface,
+  statusTagSurface,
+  type StatusTagTone,
+} from '@src-ds/theme/statusTagSurface';
 import { spacingScale } from '@src-ds/tokens';
 
 const { xxs, sm } = spacingScale;

@@ -1,5 +1,4 @@
-import { HEADER_HEIGHT_PX, Stack, styled } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import { HEADER_HEIGHT_PX, Stack, styled, type PolymorphicProps } from '@design-system';
 
 /**
  * Casca comum às duas rotas. O topo é fixo, então o conteúdo reserva a altura

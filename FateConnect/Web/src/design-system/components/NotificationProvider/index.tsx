@@ -1,7 +1,6 @@
+import { useCallback, type ReactNode } from 'react';
 import GlobalStyles from '@mui/material/GlobalStyles';
-import { SnackbarProvider, closeSnackbar } from 'notistack';
-import type { ReactNode } from 'react';
-import { useCallback } from 'react';
+import { closeSnackbar, SnackbarProvider } from 'notistack';
 
 import * as S from './styles';
 

@@ -1,5 +1,5 @@
-import MuiDialog from '@mui/material/Dialog';
 import { useId, type ReactNode } from 'react';
+import MuiDialog from '@mui/material/Dialog';
 
 import { DialogBody } from './DialogBody';
 import { DialogFooter } from './DialogFooter';

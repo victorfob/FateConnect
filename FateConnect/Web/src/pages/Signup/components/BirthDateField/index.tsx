@@ -1,21 +1,21 @@
-import { useCallback, useState } from 'react';
-import type { MouseEvent } from 'react';
+import { useCallback, useState, type MouseEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
-import { maskBirthDate } from '@app/utils/masks/birthDateMask';
-import { DateCalendar, IconButton, Input, Popover } from '@design-system';
-import { CalendarTodayIcon } from '@design-system/icons';
-
+import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
 import {
   EARLIEST_BIRTH_DATE,
   formatBirthDate,
   latestBirthDate,
   parseBirthDate,
-} from '../../helpers/birthDate';
-import * as C from '../../constants';
-import { useFilledLabel } from '../../hooks/useFilledLabel';
-import type { SignupFormValues } from '../../schema';
+} from '@app/pages/Signup/helpers/birthDate';
+import { useFilledLabel } from '@app/pages/Signup/hooks/useFilledLabel';
+import type { SignupFormValues } from '@app/pages/Signup/schema';
+import { maskBirthDate } from '@app/utils/masks/birthDateMask';
+import { DateCalendar, IconButton, Input, Popover } from '@design-system';
+import { CalendarTodayIcon } from '@design-system/icons';
+
+import { CALENDAR_TOGGLE_LABEL } from './constants';
 
 /** `dd/mm/aaaa` — o campo não aceita mais que isso. */
 const MASKED_DATE_LENGTH = 10;
@@ -63,22 +63,18 @@ export function BirthDateField() {
     <>
       <Input
         {...birthDateField}
-        label={C.FIELD_LABELS.birthDate}
+        label={FIELD_LABELS.birthDate}
         required
         fullWidth
         type="text"
         inputMode="numeric"
         autoComplete="bday"
-        placeholder={C.FIELD_PLACEHOLDERS.birthDate}
+        placeholder={FIELD_PLACEHOLDERS.birthDate}
         error={errors.birthDate?.message}
         shrinkLabel={isBirthDateFilled}
         maxLength={MASKED_DATE_LENGTH}
         endAdornment={
-          <IconButton
-            type="button"
-            aria-label={C.CALENDAR_TOGGLE_LABEL}
-            onClick={handleOpenCalendar}
-          >
+          <IconButton type="button" aria-label={CALENDAR_TOGGLE_LABEL} onClick={handleOpenCalendar}>
             <CalendarTodayIcon fontSize="small" />
           </IconButton>
         }

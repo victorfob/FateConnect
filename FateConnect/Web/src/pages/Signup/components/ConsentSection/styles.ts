@@ -1,6 +1,14 @@
-import { Box, desktopMedia, spacing, spacingScale, Stack, styled } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
 import type { ButtonHTMLAttributes } from 'react';
+
+import {
+  Box,
+  desktopMedia,
+  spacing,
+  spacingScale,
+  Stack,
+  styled,
+  type PolymorphicProps,
+} from '@design-system';
 
 const { md } = spacingScale;
 

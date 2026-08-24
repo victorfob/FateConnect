@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Link as RouterLink, Outlet } from 'react-router';
+import { Outlet, Link as RouterLink } from 'react-router';
 
 import * as C from '@app/constants/appContact';
 import { APP_LINKS } from '@app/constants/navigation';
@@ -13,8 +13,9 @@ import {
   NavigationDrawer,
   Typography,
 } from '@design-system';
-import { HeaderActions } from './components/HeaderActions';
+
 import * as S from '../shell.styles';
+import { HeaderActions } from './components/HeaderActions';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 

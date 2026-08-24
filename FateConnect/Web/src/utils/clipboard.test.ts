@@ -1,5 +1,3 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-
 import { copyToClipboard } from './clipboard';
 
 function stubClipboard(writeText: () => Promise<void>) {

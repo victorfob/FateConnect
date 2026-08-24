@@ -1,8 +1,8 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link as RouterLink, useLocation, useNavigate } from 'react-router';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
@@ -11,8 +11,8 @@ import type { ApiError } from '@app/services/httpClient';
 import { Button, IconButton, Input, Typography } from '@design-system';
 import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
-import * as C from './constants';
 import { loginSchema, type LoginFormValues } from './schema';
+import * as C from './constants';
 import * as S from './styles';
 
 const UNAUTHORIZED = 401;

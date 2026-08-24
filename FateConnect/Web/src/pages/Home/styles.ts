@@ -1,5 +1,4 @@
-import { Stack, styled, tabletMedia } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import { Stack, styled, tabletMedia, type PolymorphicProps } from '@design-system';
 
 export const HomeRoot = styled(Stack)<PolymorphicProps>({
   flexDirection: 'column',

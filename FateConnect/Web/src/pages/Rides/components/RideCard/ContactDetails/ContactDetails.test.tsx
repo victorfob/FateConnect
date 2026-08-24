@@ -1,4 +1,5 @@
 import { render, screen, userEvent } from '@app/test/testing-library';
+
 import { ContactDetails, type ContactDetailsProps } from '.';
 
 const DEFAULT_PROPS: ContactDetailsProps = {

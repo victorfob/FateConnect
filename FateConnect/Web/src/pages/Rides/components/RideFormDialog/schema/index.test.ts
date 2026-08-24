@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import { RideTypeEnum } from '@app/services/rides/types';
 

@@ -1,5 +1,4 @@
-import { Stack, styled } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import { Stack, styled, type PolymorphicProps } from '@design-system';
 
 /**
  * A tela de erro substitui a casca inteira — sem topo e sem rodapé para

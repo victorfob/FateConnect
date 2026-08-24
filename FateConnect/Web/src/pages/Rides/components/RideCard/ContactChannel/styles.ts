@@ -1,7 +1,14 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react';
 
-import { iconSizeTokens, spacing, spacingScale, Stack, styled, Typography } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import {
+  iconSizeTokens,
+  spacing,
+  spacingScale,
+  Stack,
+  styled,
+  Typography,
+  type PolymorphicProps,
+} from '@design-system';
 
 const { none, xs } = spacingScale;
 

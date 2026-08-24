@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
 
+import { RIDE_CARD_LABELS } from '@app/pages/Rides/constants';
 import type { Ride } from '@app/services/rides/types';
 import { Button, Dialog, IconButton } from '@design-system';
 import { DeleteIcon } from '@design-system/icons';
-import * as C from '@app/pages/Rides/constants';
 
+import { DELETE_DIALOG } from './constants';
 import * as S from './styles';
 
 type RideDeleteConfirmationProps = Readonly<{
@@ -28,25 +29,25 @@ export function RideDeleteConfirmation({ ride, onDelete }: RideDeleteConfirmatio
 
   return (
     <>
-      <IconButton type="button" aria-label={C.RIDE_CARD_LABELS.delete} onClick={handleAsk}>
+      <IconButton type="button" aria-label={RIDE_CARD_LABELS.delete} onClick={handleAsk}>
         <DeleteIcon />
       </IconButton>
 
-      <Dialog open={confirming} onClose={handleCancel} title={C.DELETE_DIALOG.title}>
+      <Dialog open={confirming} onClose={handleCancel} title={DELETE_DIALOG.title}>
         <Dialog.Body>
           <S.ConfirmationMessage variant="subtitle">
-            {C.DELETE_DIALOG.messagePrefix}
+            {DELETE_DIALOG.messagePrefix}
             <strong>{ride.destino}</strong>
-            {C.DELETE_DIALOG.messageSuffix}
+            {DELETE_DIALOG.messageSuffix}
           </S.ConfirmationMessage>
         </Dialog.Body>
 
         <Dialog.Footer>
           <Button type="button" variant="contained" color="primary" onClick={handleCancel}>
-            {C.DELETE_DIALOG.cancelLabel}
+            {DELETE_DIALOG.cancelLabel}
           </Button>
           <Button type="button" variant="contained" color="secondary" onClick={handleConfirm}>
-            {C.DELETE_DIALOG.confirmLabel}
+            {DELETE_DIALOG.confirmLabel}
           </Button>
         </Dialog.Footer>
       </Dialog>
