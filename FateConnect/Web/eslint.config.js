@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import perfectionist from 'eslint-plugin-perfectionist';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -22,6 +23,7 @@ export default tseslint.config(
       react: reactPlugin,
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
+      perfectionist,
     },
     settings: { react: { version: 'detect' } },
     rules: {
@@ -35,6 +37,37 @@ export default tseslint.config(
       '@typescript-eslint/no-deprecated': 'error',
       // Nenhum console solto no código: sobra de depuração vaza para produção.
       'no-console': 'error',
+      // A ordem dos imports é aplicada, não combinada — `yarn lint:fix` arruma.
+      // React no alto, o resto dos pacotes logo abaixo sem linha em branco,
+      // depois os aliases internos e por fim os relativos. `import type` fica
+      // no grupo do próprio módulo, ao lado do import de valor que o acompanha.
+      'perfectionist/sort-imports': [
+        'error',
+        {
+          newlinesBetween: 1,
+          internalPattern: ['^@app/', '^@design-system$', '^@design-system/', '^@src-ds/'],
+          customGroups: [
+            {
+              groupName: 'react',
+              anyOf: [
+                { elementNamePattern: '^react$' },
+                { elementNamePattern: '^react-dom(/.+)?$' },
+                { elementNamePattern: '^react-router(/.+)?$' },
+              ],
+            },
+          ],
+          groups: [
+            'react',
+            { newlinesBetween: 0 },
+            ['builtin', 'external'],
+            { newlinesBetween: 1 },
+            'internal',
+            { newlinesBetween: 1 },
+            ['parent', 'sibling', 'index'],
+          ],
+        },
+      ],
+      'perfectionist/sort-named-imports': 'error',
     },
   },
 
