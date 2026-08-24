@@ -5,10 +5,10 @@ import type { Ride } from '@app/services/rides/types';
 import { IconButton, StatusTag, Typography } from '@design-system';
 import { AccessTimeIcon, CalendarTodayIcon, EditIcon, GroupsIcon } from '@design-system/icons';
 
-import { rideTypeDisplayLabel, rideTypeTone } from '../../helpers/rideType';
+import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
 import { RideDeleteConfirmation } from './RideDeleteConfirmation';
 import { RideDriverContact } from './RideDriverContact';
-import * as C from '../../constants';
+import * as C from '@app/pages/Rides/constants';
 import * as S from './styles';
 
 const DATE_FORMAT = 'dd/MM/yyyy';

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { spacingScale } from '../../tokens';
+import { spacingScale } from '@src-ds/tokens';
 import { spacing } from './spacing';
 
 describe('spacing', () => {

@@ -4,9 +4,9 @@ import { useMaskedField } from '@app/hooks/useMaskedField';
 import { maskPhone } from '@app/utils/masks/phoneMask';
 import { Input } from '@design-system';
 
-import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '../../constants';
-import type { SignupFormValues } from '../../schema';
-import * as S from '../../styles';
+import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
+import type { SignupFormValues } from '@app/pages/Signup/schema';
+import * as S from '@app/pages/Signup/styles';
 
 /** Telefone e e-mail de contato. */
 export function ContactSection() {

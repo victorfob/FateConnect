@@ -4,9 +4,9 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { IconButton, Input } from '@design-system';
 import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
-import * as C from '../../constants';
-import type { SignupFormValues } from '../../schema';
-import * as S from '../../styles';
+import * as C from '@app/pages/Signup/constants';
+import type { SignupFormValues } from '@app/pages/Signup/schema';
+import * as S from '@app/pages/Signup/styles';
 import { BirthDateField } from '../BirthDateField';
 
 /** Identificação e acesso: os seis primeiros campos do cadastro. */

@@ -1,10 +1,10 @@
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 
-import { styled } from '../../styled';
-import { chromeSurface, onChromeSurface, chromeHover } from '../../theme/chromeSurface';
+import { styled } from '@src-ds/styled';
+import { chromeSurface, onChromeSurface, chromeHover } from '@src-ds/theme/chromeSurface';
 import Stack from '@mui/material/Stack';
-import type { PolymorphicProps } from '../../styled';
+import type { PolymorphicProps } from '@src-ds/styled';
 
 /** Largura do menu lateral no produto. */
 const DRAWER_WIDTH_PX = 300;

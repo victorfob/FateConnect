@@ -41,7 +41,7 @@ Fora da stack, por decisão: **sem SCSS**, **sem Tailwind**, **sem Nx**, **sem l
 
 Componente = pasta com `index.tsx`, `styles.ts`, `types.ts` (quando houver tipo) e `<Nome>.test.tsx`.
 
-`src/hooks/` guarda **só hooks** — arquivo ali dentro começa com `use` e obedece as regras de hooks. Função pura auxiliar vai para `src/utils/`, mesmo quando só um hook a consome. Feature em `src/pages/<feature>/`; reutilizável em `src/design-system/components/`. Import que sobe três níveis ou mais usa path alias (`@design-system`, `@app`), não `../../../`.
+`src/hooks/` guarda **só hooks** — arquivo ali dentro começa com `use` e obedece as regras de hooks. Função pura auxiliar vai para `src/utils/`, mesmo quando só um hook a consome. Feature em `src/pages/<feature>/`; reutilizável em `src/design-system/components/`. Import que sobe **dois níveis ou mais** usa path alias, nunca `../../`: `@app/*` na aplicação e `@src-ds/*` dentro do design system. Um nível (`../`) e o mesmo diretório (`./`) continuam relativos — são curtos e sobrevivem a mover a pasta. O ganho aparece em `styles.ts` de componente: `../../styled` não diz de onde vem, `@src-ds/styled` diz.
 
 ## Rotas
 

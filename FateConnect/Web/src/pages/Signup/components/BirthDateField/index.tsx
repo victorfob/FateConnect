@@ -12,10 +12,10 @@ import {
   formatBirthDate,
   latestBirthDate,
   parseBirthDate,
-} from '../../helpers/birthDate';
-import * as C from '../../constants';
-import { useFilledLabel } from '../../hooks/useFilledLabel';
-import type { SignupFormValues } from '../../schema';
+} from '@app/pages/Signup/helpers/birthDate';
+import * as C from '@app/pages/Signup/constants';
+import { useFilledLabel } from '@app/pages/Signup/hooks/useFilledLabel';
+import type { SignupFormValues } from '@app/pages/Signup/schema';
 
 /** `dd/mm/aaaa` — o campo não aceita mais que isso. */
 const MASKED_DATE_LENGTH = 10;

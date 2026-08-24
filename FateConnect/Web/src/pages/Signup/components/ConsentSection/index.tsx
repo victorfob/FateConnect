@@ -5,8 +5,8 @@ import { useFormContext } from 'react-hook-form';
 import { useNotification } from '@app/hooks/useNotification';
 import { Checkbox, FormControlLabel } from '@design-system';
 
-import * as C from '../../constants';
-import type { SignupFormValues } from '../../schema';
+import * as C from '@app/pages/Signup/constants';
+import type { SignupFormValues } from '@app/pages/Signup/schema';
 import * as S from './styles';
 
 /** Aceites. Os documentos legais ainda não existem — o clique avisa isso. */
