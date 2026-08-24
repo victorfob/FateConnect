@@ -13,7 +13,7 @@ export const FILTER_LABELS = {
   status: 'Situação',
 };
 
-export const FILTER_PLACEHOLDERS = { name: 'Digite o nome do item' };
+export const FILTER_PLACEHOLDERS = { name: 'Insira o nome do item' };
 
 /** `ALL` é sentinela do formulário: não vai para a requisição. */
 export enum LostItemKindFilterEnum {

@@ -17,7 +17,7 @@ export function lostItemResolveLabel(kind: string): string {
 }
 
 export const RESOLVE_DIALOG = {
-  title: 'Confirmar Resolução',
+  title: 'Confirmar resolução',
   messagePrefix: 'Tem certeza que deseja resolver o item ',
   confirmLabel: 'Resolver',
 };
