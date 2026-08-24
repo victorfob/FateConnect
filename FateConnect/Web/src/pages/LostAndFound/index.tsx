@@ -15,6 +15,7 @@ import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
 import { LostItemCard } from './components/LostItemCard';
 import { LostItemFilter } from './components/LostItemFilter';
 import { LostItemFormDialog } from './components/LostItemFormDialog';
+import { useLostItemTransitions } from './hooks/useLostItemTransitions';
 import * as C from './constants';
 import * as S from './styles';
 
@@ -26,6 +27,7 @@ export function LostAndFound() {
   const [filters, setFilters] = useState<LostItemFilterValues>(INITIAL_FILTERS);
   const [editingItem, setEditingItem] = useState<LostItem | undefined>(undefined);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const { resolveItem, cancelItem, reopenItem, isTransitioning } = useLostItemTransitions();
 
   const { data: items = [], isPending } = useQuery({
     queryKey: [C.LOST_ITEMS_QUERY_KEY, filters],
@@ -43,10 +45,16 @@ export function LostAndFound() {
     setIsFormOpen(true);
   }, []);
 
+  const handleEdit = useCallback((item: LostItem) => {
+    setEditingItem(item);
+    setIsFormOpen(true);
+  }, []);
+
   // O item fica até o diálogo fechar: zerar agora trocaria o título na frente de quem olha.
   const handleCloseForm = useCallback(() => setIsFormOpen(false), []);
 
   const isRegistering = isFormOpen && !editingItem;
+  const isLoading = isPending || isTransitioning;
 
   return (
     <PageShell
@@ -78,17 +86,27 @@ export function LostAndFound() {
       <LostItemFilter onApply={handleApplyFilters} />
 
       <S.LostItemList>
-        {isPending && (
+        {isLoading && (
           <S.LoadingContainer>
             <CircularProgress size={SPINNER_SIZE_PX} />
           </S.LoadingContainer>
         )}
 
-        {!isPending && items.length === 0 && (
+        {!isLoading && items.length === 0 && (
           <Typography variant="subtitle">{C.EMPTY_LIST_MESSAGE}</Typography>
         )}
 
-        {!isPending && items.map((item) => <LostItemCard key={item.id} item={item} />)}
+        {!isLoading &&
+          items.map((item) => (
+            <LostItemCard
+              key={item.id}
+              item={item}
+              onEdit={handleEdit}
+              onResolve={resolveItem}
+              onCancel={cancelItem}
+              onReopen={reopenItem}
+            />
+          ))}
       </S.LostItemList>
 
       <LostItemFormDialog open={isFormOpen} onClose={handleCloseForm} item={editingItem} />

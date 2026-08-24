@@ -10,4 +10,10 @@ export const EMPTY_LIST_MESSAGE = 'Nenhum item encontrado.';
 
 export const LOST_ITEM_LIST_MESSAGES = {
   loadFailed: 'Erro ao carregar os itens. Tente novamente.',
+  resolveSucceeded: 'Item concluído com sucesso.',
+  resolveFailed: 'Erro ao concluir o item. Tente novamente.',
+  cancelSucceeded: 'Item excluído com sucesso.',
+  cancelFailed: 'Erro ao excluir o item. Tente novamente.',
+  reopenSucceeded: 'Item reaberto com sucesso.',
+  reopenFailed: 'Erro ao reabrir o item. Tente novamente.',
 };

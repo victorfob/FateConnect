@@ -44,6 +44,8 @@ export async function updateLostItem(itemId: string, input: LostItemInput): Prom
   const { data } = await apiClient.put<LostItem>(`${LOST_AND_FOUND_PATH}/${itemId}`, input);
 
   return data;
+}
+
 /**
  * Concluir e reabrir mudam só a situação, então vão por um recurso próprio: um
  * `PUT` do item inteiro exigiria reenviar campos que a ação não toca.

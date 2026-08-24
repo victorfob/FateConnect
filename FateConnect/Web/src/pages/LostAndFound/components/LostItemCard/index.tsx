@@ -4,19 +4,26 @@ import {
   lostItemStatusLabel,
   lostItemStatusTone,
 } from '@app/pages/LostAndFound/helpers/lostItemStatus';
-import type { LostItem } from '@app/services/lostAndFound/types';
+import { LostItemStatusEnum, type LostItem } from '@app/services/lostAndFound/types';
 import { StatusTag, Typography } from '@design-system';
 import { CalendarTodayIcon, ImageIcon, LocationOnIcon } from '@design-system/icons';
 
+import { LostItemActions } from './LostItemActions';
 import { LostItemKindIcon } from './LostItemKindIcon';
 import * as C from './constants';
 import * as S from './styles';
 
 const DATE_FORMAT = 'dd/MM/yyyy';
 
-type LostItemCardProps = Readonly<{ item: LostItem }>;
+type LostItemCardProps = Readonly<{
+  item: LostItem;
+  onEdit?: (item: LostItem) => void;
+  onResolve: (item: LostItem) => void;
+  onCancel: (item: LostItem) => void;
+  onReopen: (item: LostItem) => void;
+}>;
 
-export function LostItemCard({ item }: LostItemCardProps) {
+export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: LostItemCardProps) {
   const statusTone = lostItemStatusTone(item.situacao);
   const statusLabel = lostItemStatusLabel(item.situacao);
 
@@ -36,9 +43,19 @@ export function LostItemCard({ item }: LostItemCardProps) {
         <S.HeaderRow>
           <Typography variant="subtitleBold">{item.nome}</Typography>
 
-          <S.WideOnlyTag>
-            <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
-          </S.WideOnlyTag>
+          <S.HeaderActions>
+            <S.WideOnlyTag>
+              <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
+            </S.WideOnlyTag>
+
+            <LostItemActions
+              item={item}
+              onEdit={onEdit}
+              onResolve={onResolve}
+              onCancel={onCancel}
+              onReopen={onReopen}
+            />
+          </S.HeaderActions>
         </S.HeaderRow>
 
         <S.InfoRow>
@@ -70,6 +87,14 @@ export function LostItemCard({ item }: LostItemCardProps) {
               {item.descricao}
             </Typography>
           </S.Description>
+        )}
+
+        {item.situacao === LostItemStatusEnum.CANCELLED && (
+          <S.CancellationNote>
+            <Typography variant="caption" color="inherit">
+              {C.cancellationNote(item.motivoCancelamento)}
+            </Typography>
+          </S.CancellationNote>
         )}
 
         <S.CompactOnlyTag>

@@ -4,6 +4,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import {
+  CancellationReasonEnum,
   LostItemKindEnum,
   LostItemStatusEnum,
   type LostItem,
@@ -11,6 +12,11 @@ import {
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { OWN_ITEM_LABEL } from './components/LostItemCard/constants';
+import {
+  DELETE_DIALOG,
+  LOST_ITEM_ACTION_LABELS,
+  RESOLVE_DIALOG,
+} from './components/LostItemCard/LostItemActions/constants';
 import {
   FILTER_LABELS,
   FILTER_PANEL_TITLE,
@@ -49,6 +55,73 @@ function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
       return HttpResponse.json(items);
     }),
   );
+}
+
+const NO_CONTENT = 204;
+
+const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Concluído', cancelled: 'Cancelado' };
+
+const RESOLVE_LABEL = { lost: 'Marcar como encontrado', found: 'Marcar como devolvido' };
+
+const CANCELLATION_NOTE = {
+  owner: 'Cancelado por quem cadastrou.',
+  inactivity: 'Cancelado por inatividade.',
+};
+
+const OWN_OPEN_ITEM: LostItem = { ...LOST_ITEM, meuItem: true };
+
+/**
+ * Mural que guarda o que as ações mudaram e respeita o filtro de situação, como
+ * a API faz: sem isso o item continuaria à vista depois de sair de Aberto.
+ */
+function boardTracking(initial: LostItem) {
+  let current: LostItem = initial;
+
+  server.use(
+    http.get(LOST_ITEMS_URL, ({ request }) => {
+      const wanted = new URL(request.url).searchParams.get('Situacao');
+      if (wanted && wanted !== current.situacao) return HttpResponse.json([]);
+
+      return HttpResponse.json([current]);
+    }),
+    http.patch<{ itemId: string }, { situacao: LostItemStatusEnum }>(
+      `${LOST_ITEMS_URL}/:itemId/situacao`,
+      async ({ request }) => {
+        const { situacao } = await request.json();
+        current = { ...current, situacao, motivoCancelamento: null };
+
+        return new HttpResponse(null, { status: NO_CONTENT });
+      },
+    ),
+    http.delete(`${LOST_ITEMS_URL}/:itemId`, () => {
+      current = {
+        ...current,
+        situacao: LostItemStatusEnum.CANCELLED,
+        motivoCancelamento: CancellationReasonEnum.OWNER,
+      };
+
+      return new HttpResponse(null, { status: NO_CONTENT });
+    }),
+  );
+}
+
+function card() {
+  return within(screen.getByRole('article'));
+}
+
+async function confirmAction(actionLabel: string, confirmLabel: string) {
+  await userEvent.click(screen.getByRole('button', { name: actionLabel }));
+  await userEvent.click(
+    within(await screen.findByRole('dialog')).getByRole('button', { name: confirmLabel }),
+  );
+}
+
+async function filterByStatus(optionLabel: string) {
+  await userEvent.click(screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.status) }));
+  await userEvent.click(
+    within(screen.getByRole('listbox')).getByRole('option', { name: optionLabel }),
+  );
+  await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 }
 
 function renderComponent() {
@@ -223,5 +296,165 @@ describe('LostAndFound', () => {
         'true',
       ),
     );
+  });
+
+  it('should walk the item from open to cancelled, back to open and then to concluded', async () => {
+    boardTracking(OWN_OPEN_ITEM);
+    renderComponent();
+    await screen.findByText(LOST_ITEM.nome);
+
+    await confirmAction(LOST_ITEM_ACTION_LABELS.delete, DELETE_DIALOG.confirmLabel);
+
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.cancelSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
+
+    await filterByStatus(STATUS_TAG_LABEL.cancelled);
+
+    expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
+    expect(card().getAllByText(STATUS_TAG_LABEL.cancelled)).not.toHaveLength(0);
+    expect(card().getByText(CANCELLATION_NOTE.owner)).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.reopen }));
+
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.reopenSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
+
+    await filterByStatus(STATUS_TAG_LABEL.open);
+    await screen.findByText(LOST_ITEM.nome);
+    await confirmAction(RESOLVE_LABEL.lost, RESOLVE_DIALOG.confirmLabel);
+
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.resolveSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
+
+    await filterByStatus(STATUS_TAG_LABEL.resolved);
+
+    expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
+    expect(card().getAllByText(STATUS_TAG_LABEL.resolved)).not.toHaveLength(0);
+  });
+
+  it('should keep the owner actions off the card of someone else', async () => {
+    listReturning([LOST_ITEM]);
+
+    renderComponent();
+
+    await screen.findByText(LOST_ITEM.nome);
+    expect(
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: RESOLVE_LABEL.lost })).not.toBeInTheDocument();
+  });
+
+  it('should leave a concluded item without any action of its own', async () => {
+    listReturning([{ ...OWN_OPEN_ITEM, situacao: LostItemStatusEnum.RESOLVED }]);
+
+    renderComponent();
+
+    await screen.findByText(LOST_ITEM.nome);
+    expect(
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: RESOLVE_LABEL.lost })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.reopen }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('should offer only the way back on a cancelled item', async () => {
+    listReturning([
+      {
+        ...OWN_OPEN_ITEM,
+        situacao: LostItemStatusEnum.CANCELLED,
+        motivoCancelamento: CancellationReasonEnum.INACTIVITY,
+      },
+    ]);
+
+    renderComponent();
+
+    await screen.findByText(LOST_ITEM.nome);
+    expect(
+      screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.reopen }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText(CANCELLATION_NOTE.inactivity)).toBeInTheDocument();
+  });
+
+  it('should name the ending after the kind of the item', async () => {
+    listReturning([OWN_OPEN_ITEM, { ...OWN_OPEN_ITEM, id: 'outro', tipo: LostItemKindEnum.FOUND }]);
+
+    renderComponent();
+
+    await screen.findAllByText(LOST_ITEM.nome);
+    expect(screen.getByRole('button', { name: RESOLVE_LABEL.lost })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: RESOLVE_LABEL.found })).toBeInTheDocument();
+  });
+
+  it('should keep the item as it is while the confirmation is not given', async () => {
+    boardTracking(OWN_OPEN_ITEM);
+    renderComponent();
+    await screen.findByText(LOST_ITEM.nome);
+
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
+    const dialog = within(await screen.findByRole('dialog'));
+    await userEvent.click(dialog.getByRole('button', { name: /Cancelar/ }));
+
+    // O diálogo sai por transição: some da árvore depois do clique, não nele.
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(card().getAllByText(STATUS_TAG_LABEL.open)).not.toHaveLength(0);
+  });
+
+  it('should reopen the item without asking anything first', async () => {
+    boardTracking({
+      ...OWN_OPEN_ITEM,
+      situacao: LostItemStatusEnum.CANCELLED,
+      motivoCancelamento: CancellationReasonEnum.OWNER,
+    });
+    renderComponent();
+    await filterByStatus(STATUS_TAG_LABEL.cancelled);
+    await screen.findByText(LOST_ITEM.nome);
+
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.reopen }));
+
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.reopenSucceeded)).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('should report a failure to conclude the item', async () => {
+    listReturning([OWN_OPEN_ITEM]);
+    server.use(
+      http.patch(
+        `${LOST_ITEMS_URL}/:itemId/situacao`,
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+    renderComponent();
+    await screen.findByText(LOST_ITEM.nome);
+
+    await confirmAction(RESOLVE_LABEL.lost, RESOLVE_DIALOG.confirmLabel);
+
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.resolveFailed)).toBeInTheDocument();
+  });
+
+  it('should report a failure to delete the item', async () => {
+    listReturning([OWN_OPEN_ITEM]);
+    server.use(
+      http.delete(`${LOST_ITEMS_URL}/:itemId`, () => new HttpResponse(null, { status: 500 })),
+    );
+    renderComponent();
+    await screen.findByText(LOST_ITEM.nome);
+
+    await confirmAction(LOST_ITEM_ACTION_LABELS.delete, DELETE_DIALOG.confirmLabel);
+
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.cancelFailed)).toBeInTheDocument();
   });
 });
