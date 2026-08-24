@@ -17,6 +17,7 @@ export { default as EditIcon } from '@mui/icons-material/Edit';
 export { default as EmailIcon } from '@mui/icons-material/Email';
 export { default as FilterAltIcon } from '@mui/icons-material/FilterAlt';
 export { default as GroupsIcon } from '@mui/icons-material/Groups';
+export { default as ImageIcon } from '@mui/icons-material/Image';
 export { default as InfoIcon } from '@mui/icons-material/Info';
 export { default as LightModeIcon } from '@mui/icons-material/LightMode';
 export { default as LocationOnIcon } from '@mui/icons-material/LocationOn';
