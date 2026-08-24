@@ -1,10 +1,11 @@
-import { RouterProvider, createMemoryRouter } from 'react-router';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
-import * as C from './constants';
+
 import { ErrorBoundary } from '.';
+import * as C from './constants';
 
 function ExplodingScreen(): never {
   throw new Error('falha proposital');

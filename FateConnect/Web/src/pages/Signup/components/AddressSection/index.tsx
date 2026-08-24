@@ -1,14 +1,13 @@
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
-import { maskZipCode } from '@app/utils/masks/zipCodeMask';
-import { CircularProgress, Input } from '@design-system';
-
 import * as C from '@app/pages/Signup/constants';
 import { useAddressAutofill } from '@app/pages/Signup/hooks/useAddressAutofill';
 import { useFilledLabel } from '@app/pages/Signup/hooks/useFilledLabel';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
 import * as S from '@app/pages/Signup/styles';
+import { maskZipCode } from '@app/utils/masks/zipCodeMask';
+import { CircularProgress, Input } from '@design-system';
 
 const SPINNER_SIZE_PX = 20;
 

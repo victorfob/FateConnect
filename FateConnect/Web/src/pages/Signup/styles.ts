@@ -1,3 +1,5 @@
+import type { FormHTMLAttributes } from 'react';
+
 import {
   Box,
   desktopMedia,
@@ -11,7 +13,6 @@ import {
   Typography,
 } from '@design-system';
 import type { PolymorphicProps } from '@design-system';
-import type { FormHTMLAttributes } from 'react';
 
 const { none, md, xl, xxl } = spacingScale;
 

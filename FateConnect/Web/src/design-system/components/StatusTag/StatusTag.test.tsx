@@ -4,6 +4,7 @@ import { render, screen } from '@app/test/testing-library';
 import { createAppTheme } from '@src-ds/theme';
 import { onStatusTagSurface, statusTagSurface } from '@src-ds/theme/statusTagSurface';
 import type { StatusTagTone } from '@src-ds/theme/statusTagSurface';
+
 import { StatusTag, type StatusTagProps } from '.';
 
 const LABEL = 'Aberto';

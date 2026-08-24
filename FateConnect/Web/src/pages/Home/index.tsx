@@ -1,4 +1,5 @@
 import { LandingSectionEnum } from '@app/routes/paths';
+
 import { LandingDescription } from './components/LandingDescription';
 import { LandingHowItWorks } from './components/LandingHowItWorks';
 import { LandingLoginCard } from './components/LandingLoginCard';

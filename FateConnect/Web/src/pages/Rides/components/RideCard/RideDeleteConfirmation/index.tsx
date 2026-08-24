@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
 
+import * as C from '@app/pages/Rides/constants';
 import type { Ride } from '@app/services/rides/types';
 import { Button, Dialog, IconButton } from '@design-system';
 import { DeleteIcon } from '@design-system/icons';
-import * as C from '@app/pages/Rides/constants';
 
 import * as S from './styles';
 

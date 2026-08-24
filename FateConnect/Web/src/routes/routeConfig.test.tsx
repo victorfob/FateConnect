@@ -1,14 +1,14 @@
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { RouterProvider, createMemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
-
-import { render, screen, within } from '@app/test/testing-library';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
+import { render, screen, within } from '@app/test/testing-library';
+
 import { RoutePathEnum } from './paths';
 import { routeConfig } from './routeConfig';
 

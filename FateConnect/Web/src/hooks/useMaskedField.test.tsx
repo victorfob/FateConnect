@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { render, screen, userEvent } from '@app/test/testing-library';
 import { maskBirthDate } from '@app/utils/masks/birthDateMask';
+
 import { useMaskedField } from './useMaskedField';
 
 const FIELD_LABEL = 'Data de nascimento';

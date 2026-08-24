@@ -1,6 +1,6 @@
+import type { ChangeEvent, FocusEvent, ReactNode, Ref } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import type { ChangeEvent, FocusEvent, ReactNode, Ref } from 'react';
 
 import type { SelectOption } from './types';
 

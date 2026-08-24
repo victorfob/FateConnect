@@ -1,14 +1,14 @@
-import { format, parseISO } from 'date-fns';
 import { useCallback } from 'react';
+import { format, parseISO } from 'date-fns';
 
+import * as C from '@app/pages/Rides/constants';
+import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
 import type { Ride } from '@app/services/rides/types';
 import { IconButton, StatusTag, Typography } from '@design-system';
 import { AccessTimeIcon, CalendarTodayIcon, EditIcon, GroupsIcon } from '@design-system/icons';
 
-import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
 import { RideDeleteConfirmation } from './RideDeleteConfirmation';
 import { RideDriverContact } from './RideDriverContact';
-import * as C from '@app/pages/Rides/constants';
 import * as S from './styles';
 
 const DATE_FORMAT = 'dd/MM/yyyy';

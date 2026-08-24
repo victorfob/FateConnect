@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
+
 import { login, logout } from './authService';
 import { tokenStorage } from './tokenStorage';
 

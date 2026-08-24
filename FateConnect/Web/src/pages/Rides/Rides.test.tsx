@@ -1,5 +1,5 @@
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { RouterProvider, createMemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
@@ -10,11 +10,11 @@ import { RideTypeEnum } from '@app/services/rides/types';
 import type { Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
+import { Rides } from '.';
 import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
-import { RIDE_DRIVER } from './helpers/rideDriver';
 import * as C from './constants';
-import { Rides } from '.';
+import { RIDE_DRIVER } from './helpers/rideDriver';
 
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
 

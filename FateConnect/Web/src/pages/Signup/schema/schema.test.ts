@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatBirthDate, latestBirthDate } from '../helpers/birthDate';
-import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from '.';
+import { SIGNUP_DEFAULT_VALUES, type SignupFormValues, signupSchema } from '.';
 import { GenderValueEnum } from '../@types';
+import { formatBirthDate, latestBirthDate } from '../helpers/birthDate';
 
 const ONE_DAY_MS = 86_400_000;
 

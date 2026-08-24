@@ -1,8 +1,9 @@
-import { RouterProvider, createMemoryRouter } from 'react-router';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, within } from '@app/test/testing-library';
+
 import { Home } from '.';
 import {
   DESCRIPTION_HIGHLIGHTS,

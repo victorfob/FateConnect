@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
 import type { ChangeEvent, SubmitEvent } from 'react';
 
+import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
 import { Button, Input, Typography } from '@design-system';
 import { FilterAltIcon, SearchIcon } from '@design-system/icons';
 
 import * as C from './constants';
-import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import * as S from './styles';
 
 type RideFilterProps = Readonly<{ onApply: (filters: RideFilterValues) => void }>;

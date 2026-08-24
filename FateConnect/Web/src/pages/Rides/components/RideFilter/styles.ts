@@ -1,3 +1,5 @@
+import type { FormHTMLAttributes } from 'react';
+
 import {
   Accordion,
   AccordionDetails,
@@ -12,7 +14,6 @@ import {
   styled,
 } from '@design-system';
 import type { PolymorphicProps } from '@design-system';
-import type { FormHTMLAttributes } from 'react';
 
 const { none, xxs, xs, md, lg, xl } = spacingScale;
 

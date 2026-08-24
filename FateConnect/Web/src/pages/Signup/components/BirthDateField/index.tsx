@@ -3,19 +3,18 @@ import type { MouseEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
-import { maskBirthDate } from '@app/utils/masks/birthDateMask';
-import { DateCalendar, IconButton, Input, Popover } from '@design-system';
-import { CalendarTodayIcon } from '@design-system/icons';
-
+import * as C from '@app/pages/Signup/constants';
 import {
   EARLIEST_BIRTH_DATE,
   formatBirthDate,
   latestBirthDate,
   parseBirthDate,
 } from '@app/pages/Signup/helpers/birthDate';
-import * as C from '@app/pages/Signup/constants';
 import { useFilledLabel } from '@app/pages/Signup/hooks/useFilledLabel';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
+import { maskBirthDate } from '@app/utils/masks/birthDateMask';
+import { DateCalendar, IconButton, Input, Popover } from '@design-system';
+import { CalendarTodayIcon } from '@design-system/icons';
 
 /** `dd/mm/aaaa` — o campo não aceita mais que isso. */
 const MASKED_DATE_LENGTH = 10;

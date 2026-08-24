@@ -2,6 +2,7 @@ import Avatar from '@mui/material/Avatar';
 
 import { styled } from '@src-ds/styled';
 import { spacingScale } from '@src-ds/tokens';
+
 import type { InitialsAvatarSize } from './types';
 
 /**

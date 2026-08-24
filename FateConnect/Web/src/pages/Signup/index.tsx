@@ -1,7 +1,7 @@
+import { Link as RouterLink, useNavigate } from 'react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Link as RouterLink, useNavigate } from 'react-router';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
@@ -15,7 +15,7 @@ import { ConsentSection } from './components/ConsentSection';
 import { ContactSection } from './components/ContactSection';
 import * as C from './constants';
 import { toSignupRequest } from './helpers/mapper';
-import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from './schema';
+import { SIGNUP_DEFAULT_VALUES, type SignupFormValues, signupSchema } from './schema';
 import * as S from './styles';
 
 const TITLE_ID = 'signup-title';

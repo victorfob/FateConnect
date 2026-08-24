@@ -1,8 +1,9 @@
-import { RouterProvider, createMemoryRouter } from 'react-router';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
+
 import { useLandingAnchor } from './useLandingAnchor';
 
 function SectionButton() {

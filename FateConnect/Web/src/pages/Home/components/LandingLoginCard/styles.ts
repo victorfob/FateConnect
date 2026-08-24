@@ -1,6 +1,6 @@
-import { Box, Stack, radius, radiusScale, shadowTokens, styled, tabletMedia } from '@design-system';
 import type { FormHTMLAttributes } from 'react';
 
+import { Box, radius, radiusScale, shadowTokens, Stack, styled, tabletMedia } from '@design-system';
 import type { PolymorphicProps } from '@design-system';
 
 const CARD_WIDTH_PX = 360;

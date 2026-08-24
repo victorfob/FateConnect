@@ -1,6 +1,7 @@
+import type { FormHTMLAttributes } from 'react';
+
 import { Button, radius, radiusScale, spacing, spacingScale, Stack, styled } from '@design-system';
 import type { PolymorphicProps } from '@design-system';
-import type { FormHTMLAttributes } from 'react';
 
 const { xs, lg } = spacingScale;
 

@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import { RideTypeEnum } from '@app/services/rides/types';
 
+import { type RideFormInput, rideFormSchema } from '.';
 import { RIDE_FORM_MESSAGES, RIDE_LIMITS } from '../constants';
-import { rideFormSchema, type RideFormInput } from '.';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DAYS_AHEAD = 30;

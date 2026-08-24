@@ -1,10 +1,11 @@
-import { RouterProvider, createMemoryRouter } from 'react-router';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
-import * as C from './constants';
+
 import { LostAndFound } from '.';
+import * as C from './constants';
 
 function renderComponent() {
   const router = createMemoryRouter(

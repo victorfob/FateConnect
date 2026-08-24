@@ -1,11 +1,12 @@
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { RouterProvider, createMemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
 import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+
 import { LandingLoginCard } from '.';
 import * as C from './constants';
 import { LOGIN_MESSAGES } from './schema';

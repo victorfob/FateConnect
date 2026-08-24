@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { useNotification } from '@app/hooks/useNotification';
+import * as C from '@app/pages/Rides/constants';
 import { isOwnRide, RIDE_DRIVER } from '@app/pages/Rides/helpers/rideDriver';
 import { copyToClipboard } from '@app/utils/clipboard';
 import { getInitials } from '@app/utils/initials';
 import { whatsappConversationUrl } from '@app/utils/whatsapp';
 import { Dialog, IconButton } from '@design-system';
 import { ContactPageIcon } from '@design-system/icons';
-import * as C from '@app/pages/Rides/constants';
 
 import { ContactDetails } from '../ContactDetails';
 

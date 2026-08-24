@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { render, screen, userEvent } from '@app/test/testing-library';
+
 import { Dialog, type DialogProps } from '.';
 
 const DEFAULT_PROPS: DialogProps = {

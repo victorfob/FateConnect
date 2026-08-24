@@ -1,6 +1,6 @@
+import { LandingSectionEnum } from '@app/routes/paths';
 import { Typography } from '@design-system';
 
-import { LandingSectionEnum } from '@app/routes/paths';
 import { HOW_IT_WORKS_STEPS, HOW_IT_WORKS_TITLE } from './constants';
 import * as S from './styles';
 

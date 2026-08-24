@@ -1,7 +1,8 @@
 import type { SignupRequest } from '@app/services/signup/types';
 import { onlyDigits } from '@app/utils/masks/caret';
-import { parseBirthDate, toApiBirthDate } from './birthDate';
+
 import type { SignupFormValues } from '../schema';
+import { parseBirthDate, toApiBirthDate } from './birthDate';
 
 /** Campo opcional: o backend prefere a ausência da chave a uma string vazia. */
 function optionalText(value: string): string | undefined {

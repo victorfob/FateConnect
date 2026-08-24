@@ -1,5 +1,5 @@
-import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import Typography from '@mui/material/Typography';
 
 import * as S from './styles';
 

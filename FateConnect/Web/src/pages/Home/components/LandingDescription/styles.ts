@@ -1,4 +1,4 @@
-import { Box, Stack, iconSizeTokens, mobileMedia, styled } from '@design-system';
+import { Box, iconSizeTokens, mobileMedia, Stack, styled } from '@design-system';
 import type { PolymorphicProps } from '@design-system';
 
 const MAX_WIDTH_PX = 600;
