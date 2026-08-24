@@ -3,7 +3,7 @@ import type { StatusTagTone } from '@design-system';
 
 const STATUS_LABEL: Readonly<Record<LostItemStatusEnum, string>> = {
   [LostItemStatusEnum.OPEN]: 'Aberto',
-  [LostItemStatusEnum.RESOLVED]: 'Concluído',
+  [LostItemStatusEnum.RESOLVED]: 'Resolvido',
   [LostItemStatusEnum.CANCELLED]: 'Cancelado',
 };
 

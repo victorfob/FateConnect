@@ -4,7 +4,7 @@ import { lostItemStatusLabel, lostItemStatusTone } from './lostItemStatus';
 
 describe('lostItemStatusLabel', () => {
   it('should accent the label the api sends without accent', () => {
-    expect(lostItemStatusLabel(LostItemStatusEnum.RESOLVED)).toBe('Concluído');
+    expect(lostItemStatusLabel(LostItemStatusEnum.RESOLVED)).toBe('Resolvido');
     expect(lostItemStatusLabel(LostItemStatusEnum.OPEN)).toBe('Aberto');
     expect(lostItemStatusLabel(LostItemStatusEnum.CANCELLED)).toBe('Cancelado');
   });

@@ -27,18 +27,18 @@ export const ACCEPTED_PHOTO_TYPES: ReadonlySet<string> = new Set([
 export const PHOTO_ACCEPT_ATTRIBUTE = [...ACCEPTED_PHOTO_TYPES].join(',');
 
 export const REGISTER_MODE: LostItemFormMode = {
-  title: 'Cadastrar Item',
-  submitLabel: 'Cadastrar Item',
+  title: 'Cadastrar item',
+  submitLabel: 'Cadastrar item',
   submitIcon: AddIcon,
-  succeeded: 'Item cadastrado com sucesso.',
+  succeeded: 'Item cadastrado.',
   failed: 'Erro ao cadastrar o item. Tente novamente.',
 };
 
 export const EDIT_MODE: LostItemFormMode = {
-  title: 'Editar Item',
-  submitLabel: 'Salvar Alterações',
+  title: 'Editar item',
+  submitLabel: 'Salvar alterações',
   submitIcon: SaveIcon,
-  succeeded: 'Item atualizado com sucesso.',
+  succeeded: 'Item atualizado.',
   failed: 'Erro ao atualizar o item. Tente novamente.',
 };
 
@@ -52,7 +52,7 @@ export const LOST_ITEM_FORM_LABELS = {
 };
 
 export const LOST_ITEM_FORM_PLACEHOLDERS = {
-  name: 'Digite o nome do item',
+  name: 'Insira o nome do item',
   place: 'Onde o item foi achado ou perdido',
   select: 'Selecione',
   description: 'Descreva o item com detalhes',
@@ -61,9 +61,9 @@ export const LOST_ITEM_FORM_PLACEHOLDERS = {
 export const DESCRIPTION_ROWS = 3;
 
 export const PHOTO_ACTIONS = {
-  pick: 'Escolher Foto',
-  replace: 'Trocar Foto',
-  remove: 'Remover Foto',
+  pick: 'Escolher foto',
+  replace: 'Trocar foto',
+  remove: 'Remover foto',
   previewAlt: 'Prévia da foto escolhida',
 };
 

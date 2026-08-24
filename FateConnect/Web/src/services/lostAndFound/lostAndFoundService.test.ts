@@ -2,7 +2,14 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 
-import { createLostItem, listLostItems, updateLostItem } from './lostAndFoundService';
+import {
+  cancelLostItem,
+  createLostItem,
+  listLostItems,
+  reopenLostItem,
+  resolveLostItem,
+  updateLostItem,
+} from './lostAndFoundService';
 import { LostItemKindEnum, LostItemStatusEnum, type LostItemInput } from './types';
 
 const LOST_ITEM_INPUT: LostItemInput = {
@@ -14,6 +21,26 @@ const LOST_ITEM_INPUT: LostItemInput = {
 };
 
 const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/achado';
+const ITEM_ID = 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14';
+
+const NO_CONTENT = 204;
+
+type StatusRequest = { itemId: string; situacao: string };
+
+/** Guarda o que chegou no recurso de situação, para o caso conferir depois. */
+function statusEndpointRecording(received: StatusRequest[]) {
+  server.use(
+    http.patch<{ itemId: string }, { situacao: string }>(
+      `${LOST_AND_FOUND_URL}/:itemId/situacao`,
+      async ({ request, params }) => {
+        const { situacao } = await request.json();
+        received.push({ itemId: params.itemId, situacao });
+
+        return new HttpResponse(null, { status: NO_CONTENT });
+      },
+    ),
+  );
+}
 
 describe('lostAndFoundService', () => {
   it('should translate the front filters into the api query parameters', async () => {
@@ -62,6 +89,39 @@ describe('lostAndFoundService', () => {
     const items = await listLostItems();
 
     expect(items).toHaveLength(1);
+  });
+
+  it('should conclude the item through the status resource', async () => {
+    const received: StatusRequest[] = [];
+    statusEndpointRecording(received);
+
+    await resolveLostItem(ITEM_ID);
+
+    expect(received).toEqual([{ itemId: ITEM_ID, situacao: LostItemStatusEnum.RESOLVED }]);
+  });
+
+  it('should reopen the item through the status resource', async () => {
+    const received: StatusRequest[] = [];
+    statusEndpointRecording(received);
+
+    await reopenLostItem(ITEM_ID);
+
+    expect(received).toEqual([{ itemId: ITEM_ID, situacao: LostItemStatusEnum.OPEN }]);
+  });
+
+  it('should cancel the item by deleting it, leaving the reason to the server', async () => {
+    const deleted: string[] = [];
+    server.use(
+      http.delete<{ itemId: string }>(`${LOST_AND_FOUND_URL}/:itemId`, ({ params }) => {
+        deleted.push(params.itemId);
+
+        return new HttpResponse(null, { status: NO_CONTENT });
+      }),
+    );
+
+    await cancelLostItem(ITEM_ID);
+
+    expect(deleted).toEqual([ITEM_ID]);
   });
 
   it('should fail when the response is not a list', async () => {

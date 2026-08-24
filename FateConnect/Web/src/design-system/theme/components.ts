@@ -5,7 +5,7 @@ import { chromeSurface, inputOutline } from './chromeSurface';
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
 
-const { xxs, md } = spacingScale;
+const { xxs, xs, md } = spacingScale;
 
 /** Altura da linha no painel do `select`, como no produto. */
 const SELECT_OPTION_MIN_HEIGHT_PX = 48;
@@ -55,6 +55,17 @@ export const components: Components<Theme> = {
         return { ...veil, '&:hover': { backgroundColor: theme.palette[ownerState.color].main } };
       },
     },
+    variants: [
+      {
+        props: { variant: 'soft' },
+        style: ({ theme }) => ({
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: radius(radiusScale.component),
+          color: theme.palette.text.primary,
+          padding: spacing(xs, md),
+        }),
+      },
+    ],
   },
   MuiCard: {
     styleOverrides: {

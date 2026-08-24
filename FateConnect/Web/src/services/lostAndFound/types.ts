@@ -4,10 +4,9 @@ export enum LostItemKindEnum {
   LOST = 'Perdido',
 }
 
-/** `Concluido` viaja sem acento, como o backend serializa. */
 export enum LostItemStatusEnum {
   OPEN = 'Aberto',
-  RESOLVED = 'Concluido',
+  RESOLVED = 'Resolvido',
   CANCELLED = 'Cancelado',
 }
 

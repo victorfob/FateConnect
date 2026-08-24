@@ -19,7 +19,10 @@ const PHOTO_SIZE_PX = 96;
 const OWN_ITEM_BORDER_PX = 4;
 
 /** A faixa na borda é o que diz, sem etiqueta, que o item é de quem olha. */
-export const CardRoot = styled(Stack)<PolymorphicProps & { own: boolean }>(({ theme, own }) => ({
+export const CardRoot = styled(Stack, {
+  // `own` é só para o estilo: sem isto o Stack a repassa e o React reclama do atributo.
+  shouldForwardProp: (prop) => prop !== 'own',
+})<PolymorphicProps & { own: boolean }>(({ theme, own }) => ({
   flexDirection: 'row',
   borderLeft: own ? `${OWN_ITEM_BORDER_PX}px solid ${theme.palette.secondary.main}` : 'none',
   alignItems: 'flex-start',
@@ -73,6 +76,13 @@ export const HeaderRow = styled(Stack)<PolymorphicProps>({
   marginBottom: spacing(sm),
 });
 
+export const HeaderActions = styled(Stack)<PolymorphicProps>({
+  flexDirection: 'row',
+  alignItems: 'center',
+  flexShrink: 0,
+  gap: spacing(sm),
+});
+
 export const InfoRow = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
@@ -94,6 +104,11 @@ export const InfoItem = styled(Stack)<PolymorphicProps>(({ theme }) => ({
 }));
 
 export const Description = styled(Box)<PolymorphicProps>(({ theme }) => ({
+  color: theme.palette.text.secondary,
+}));
+
+export const CancellationNote = styled(Box)<PolymorphicProps>(({ theme }) => ({
+  marginTop: spacing(xxs),
   color: theme.palette.text.secondary,
 }));
 

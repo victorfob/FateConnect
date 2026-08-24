@@ -22,6 +22,12 @@ declare module '@mui/material/styles' {
   }
 }
 
+declare module '@mui/material/Button' {
+  interface ButtonPropsVariantOverrides {
+    soft: true;
+  }
+}
+
 declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     subtitle: true;
