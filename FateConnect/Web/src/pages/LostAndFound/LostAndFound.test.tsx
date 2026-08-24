@@ -306,7 +306,7 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(LOST_ITEM.nome);
 
-    await confirmAction(LOST_ITEM_ACTION_LABELS.delete, DELETE_DIALOG.confirmLabel);
+    await confirmAction(LOST_ITEM_ACTION_LABELS.cancel, DELETE_DIALOG.confirmLabel);
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.cancelSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
@@ -345,7 +345,7 @@ describe('LostAndFound', () => {
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.cancel }),
     ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: RESOLVE_LABEL.lost })).not.toBeInTheDocument();
   });
@@ -360,7 +360,7 @@ describe('LostAndFound', () => {
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.cancel }),
     ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: RESOLVE_LABEL.lost })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: REOPEN_LABEL })).not.toBeInTheDocument();
@@ -383,7 +383,7 @@ describe('LostAndFound', () => {
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.cancel }),
     ).not.toBeInTheDocument();
     expect(screen.getByText(CANCELLATION_NOTE.inactivity)).toBeInTheDocument();
   });
@@ -403,7 +403,7 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(LOST_ITEM.nome);
 
-    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.cancel }));
     const dialog = within(await screen.findByRole('dialog'));
     await userEvent.click(dialog.getByRole('button', { name: /Cancelar/ }));
 
@@ -452,7 +452,7 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(LOST_ITEM.nome);
 
-    await confirmAction(LOST_ITEM_ACTION_LABELS.delete, DELETE_DIALOG.confirmLabel);
+    await confirmAction(LOST_ITEM_ACTION_LABELS.cancel, DELETE_DIALOG.confirmLabel);
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.cancelFailed)).toBeInTheDocument();
   });
