@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, type ChangeEvent } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
+import * as C from '@app/pages/LostAndFound/components/LostItemFormDialog/constants';
+import type {
+  LostItemFormInput,
+  LostItemFormValues,
+} from '@app/pages/LostAndFound/components/LostItemFormDialog/schema';
 import { Typography } from '@design-system';
 import { DeleteIcon, ImageIcon } from '@design-system/icons';
 
-import type { LostItemFormInput, LostItemFormValues } from '../../schema';
-import * as C from '../../constants';
 import * as S from './styles';
 
 export function LostItemPhotoField() {
