@@ -1,12 +1,11 @@
 import { apiClient } from '../httpClient';
-import type { LostItem, LostItemFilter } from './types';
+import type { LostItem, LostItemFilter, LostItemInput } from './types';
 
 const LOST_AND_FOUND_PATH = '/achado';
 
 const INVALID_LIST_PAYLOAD_MESSAGE =
   'A API de achados e perdidos respondeu algo que não é uma lista.';
 
-/** Tradução dos filtros do front para os nomes de parâmetro da API. */
 function toQueryParams(filters: LostItemFilter = {}): Record<string, string> {
   const params: Record<string, string> = {};
 
@@ -24,10 +23,20 @@ export async function listLostItems(filters?: LostItemFilter): Promise<LostItem[
     params: toQueryParams(filters),
   });
 
-  // O tipo do axios é promessa de contrato, não garantia: sem o endereço da API a
-  // requisição cai no próprio servidor de desenvolvimento, que responde o HTML da
-  // aplicação com status 200. Falhar aqui vira a notificação de erro da tela.
+  // Sem endereço de API a requisição cai no dev server, que responde HTML com 200.
   if (!Array.isArray(data)) throw new Error(INVALID_LIST_PAYLOAD_MESSAGE);
+
+  return data;
+}
+
+export async function createLostItem(input: LostItemInput): Promise<LostItem> {
+  const { data } = await apiClient.post<LostItem>(LOST_AND_FOUND_PATH, input);
+
+  return data;
+}
+
+export async function updateLostItem(itemId: string, input: LostItemInput): Promise<LostItem> {
+  const { data } = await apiClient.put<LostItem>(`${LOST_AND_FOUND_PATH}/${itemId}`, input);
 
   return data;
 }

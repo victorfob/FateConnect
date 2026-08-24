@@ -6,6 +6,7 @@ import { RoutePathEnum } from '@app/routes/paths';
 import { listLostItems } from '@app/services/lostAndFound/lostAndFoundService';
 import {
   LostItemStatusEnum,
+  type LostItem,
   type LostItemFilter as LostItemFilterValues,
 } from '@app/services/lostAndFound/types';
 import { CircularProgress, PageShell, Typography } from '@design-system';
@@ -13,16 +14,18 @@ import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
 
 import { LostItemCard } from './components/LostItemCard';
 import { LostItemFilter } from './components/LostItemFilter';
+import { LostItemFormDialog } from './components/LostItemFormDialog';
 import * as C from './constants';
 import * as S from './styles';
 
 const SPINNER_SIZE_PX = 60;
 
-/** O mural abre nos itens em aberto; as outras situações vêm pelo filtro. */
 const INITIAL_FILTERS: LostItemFilterValues = { status: LostItemStatusEnum.OPEN };
 
 export function LostAndFound() {
   const [filters, setFilters] = useState<LostItemFilterValues>(INITIAL_FILTERS);
+  const [editingItem, setEditingItem] = useState<LostItem | undefined>(undefined);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const { data: items = [], isPending } = useQuery({
     queryKey: [C.LOST_ITEMS_QUERY_KEY, filters],
@@ -34,6 +37,16 @@ export function LostAndFound() {
     (applied: LostItemFilterValues) => setFilters(applied),
     [],
   );
+
+  const handleRegister = useCallback(() => {
+    setEditingItem(undefined);
+    setIsFormOpen(true);
+  }, []);
+
+  // O item fica até o diálogo fechar: zerar agora trocaria o título na frente de quem olha.
+  const handleCloseForm = useCallback(() => setIsFormOpen(false), []);
+
+  const isRegistering = isFormOpen && !editingItem;
 
   return (
     <PageShell
@@ -51,12 +64,13 @@ export function LostAndFound() {
           <PageShell.Tab
             label={C.SEARCH_TAB_LABEL}
             icon={<SearchIcon fontSize="small" />}
-            selected
+            selected={!isRegistering}
           />
           <PageShell.Tab
             label={C.REGISTER_TAB_LABEL}
             icon={<AddIcon fontSize="small" />}
-            selected={false}
+            selected={isRegistering}
+            onClick={handleRegister}
           />
         </>
       }
@@ -76,6 +90,8 @@ export function LostAndFound() {
 
         {!isPending && items.map((item) => <LostItemCard key={item.id} item={item} />)}
       </S.LostItemList>
+
+      <LostItemFormDialog open={isFormOpen} onClose={handleCloseForm} item={editingItem} />
     </PageShell>
   );
 }

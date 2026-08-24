@@ -16,7 +16,6 @@ export enum CancellationReasonEnum {
   INACTIVITY = 'Inatividade',
 }
 
-/** Entidade como a API devolve (campos em pt-BR). O id é o `Guid` do backend. */
 export type LostItem = {
   id: string;
   nome: string;
@@ -31,7 +30,12 @@ export type LostItem = {
   dataCadastro: string;
 };
 
-/** Filtros do front, em inglês; o serviço traduz para os parâmetros da API. */
+/** A foto fica de fora: quem devolve a `fotoUrl` é o servidor. */
+export type LostItemInput = Pick<
+  LostItem,
+  'nome' | 'tipo' | 'local' | 'dataOcorrido' | 'descricao'
+>;
+
 export type LostItemFilter = {
   name?: string;
   occurredOn?: string;
