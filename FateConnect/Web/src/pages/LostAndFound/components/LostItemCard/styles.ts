@@ -12,10 +12,8 @@ import {
   type PolymorphicProps,
 } from '@design-system';
 
-const { xxs, sm, md } = spacingScale;
+const { xxs, sm, md, xxl } = spacingScale;
 
-/** Espaço entre as informações do item, em unidade de viewport como no produto. */
-const INFO_ROW_GAP = '5vw';
 const PHOTO_SIZE_PX = 96;
 
 export const CardRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
@@ -73,7 +71,7 @@ export const HeaderRow = styled(Stack)<PolymorphicProps>({
 
 export const InfoRow = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   flexDirection: 'row',
-  gap: INFO_ROW_GAP,
+  gap: spacing(xxl),
   marginBottom: spacing(sm),
   color: theme.palette.text.secondary,
 }));
