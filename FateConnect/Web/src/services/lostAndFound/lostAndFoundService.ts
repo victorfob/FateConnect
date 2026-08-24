@@ -1,5 +1,5 @@
 import { apiClient } from '../httpClient';
-import type { LostItem, LostItemFilter } from './types';
+import type { LostItem, LostItemFilter, LostItemInput } from './types';
 
 const LOST_AND_FOUND_PATH = '/achado';
 
@@ -28,6 +28,18 @@ export async function listLostItems(filters?: LostItemFilter): Promise<LostItem[
   // requisição cai no próprio servidor de desenvolvimento, que responde o HTML da
   // aplicação com status 200. Falhar aqui vira a notificação de erro da tela.
   if (!Array.isArray(data)) throw new Error(INVALID_LIST_PAYLOAD_MESSAGE);
+
+  return data;
+}
+
+export async function createLostItem(input: LostItemInput): Promise<LostItem> {
+  const { data } = await apiClient.post<LostItem>(LOST_AND_FOUND_PATH, input);
+
+  return data;
+}
+
+export async function updateLostItem(itemId: string, input: LostItemInput): Promise<LostItem> {
+  const { data } = await apiClient.put<LostItem>(`${LOST_AND_FOUND_PATH}/${itemId}`, input);
 
   return data;
 }

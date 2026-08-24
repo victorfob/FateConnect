@@ -2,8 +2,16 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 
-import { listLostItems } from './lostAndFoundService';
-import { LostItemKindEnum, LostItemStatusEnum } from './types';
+import { createLostItem, listLostItems, updateLostItem } from './lostAndFoundService';
+import { LostItemKindEnum, LostItemStatusEnum, type LostItemInput } from './types';
+
+const LOST_ITEM_INPUT: LostItemInput = {
+  nome: 'Garrafa térmica',
+  tipo: LostItemKindEnum.FOUND,
+  local: 'Biblioteca',
+  dataOcorrido: '2026-08-20',
+  descricao: 'Garrafa azul, com adesivos na tampa.',
+};
 
 const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/achado';
 
@@ -62,5 +70,36 @@ describe('lostAndFoundService', () => {
     );
 
     await expect(listLostItems()).rejects.toThrow(/não é uma lista/);
+  });
+
+  it('should post the item on creation and return what the api answered', async () => {
+    let body: LostItemInput | null = null;
+    server.use(
+      http.post(LOST_AND_FOUND_URL, async ({ request }) => {
+        body = (await request.json()) as LostItemInput;
+        return HttpResponse.json({ id: 'novo', ...LOST_ITEM_INPUT }, { status: 201 });
+      }),
+    );
+
+    const created = await createLostItem(LOST_ITEM_INPUT);
+
+    expect(body).toEqual(LOST_ITEM_INPUT);
+    expect(created.id).toBe('novo');
+  });
+
+  it('should put the item under its own id on update', async () => {
+    const itemId = 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14';
+    let requestUrl: string | null = null;
+    server.use(
+      http.put(`${LOST_AND_FOUND_URL}/:id`, ({ request }) => {
+        requestUrl = request.url;
+        return HttpResponse.json({ id: itemId, ...LOST_ITEM_INPUT });
+      }),
+    );
+
+    const updated = await updateLostItem(itemId, LOST_ITEM_INPUT);
+
+    expect(requestUrl).toBe(`${LOST_AND_FOUND_URL}/${itemId}`);
+    expect(updated.id).toBe(itemId);
   });
 });
