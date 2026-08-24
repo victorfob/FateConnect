@@ -23,6 +23,7 @@ export const PhotoField = styled(Stack)<PolymorphicProps>({
 export const PhotoRow = styled(Stack)<PolymorphicProps>({
   flexDirection: 'row',
   alignItems: 'center',
+  justifyContent: 'space-between',
   gap: spacing(sm),
 
   [compactMedia]: { flexDirection: 'column', alignItems: 'flex-start' },
@@ -36,9 +37,9 @@ export const PhotoPreview = styled('img')({
   borderRadius: radius(radiusScale.md),
 });
 
+/** Empilhadas, as duas ações saem com a mesma largura e não disputam a linha. */
 export const PhotoActions = styled(Stack)<PolymorphicProps>({
-  flexDirection: 'row',
-  flexWrap: 'wrap',
+  flexDirection: 'column',
   gap: spacing(xs),
 });
 
