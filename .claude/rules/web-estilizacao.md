@@ -91,6 +91,8 @@ export const Container = styled(Box)(({ theme }) => ({
 }));
 ```
 
+⛔ **`gap`, `padding` e `margin` são sempre `spacing()`.** Não existe px cru nessas três propriedades, nem herdado de código antigo: o painel de filtros carregava um `gap: '3px'` e o cartão de achados e perdidos um `gap: '5vw'`, os dois copiados de caronas na migração. Valor fora da escala vira o token mais próximo. Px literal continua valendo para o que **não é espaçamento** — largura de miniatura, altura de botão, raio.
+
 > ⚠️ **Espaçamento não passa por `theme.spacing()`.** O `theme.spacing` pertence ao MUI e é usado internamente pelos componentes dele; sobrescrevê-lo encolheu as gutters do `Toolbar` de 24px para 3px. Nossos tokens em px passam pelo helper `spacing()` do design system. As demais escalas do tema — `zIndex`, `transitions`, `breakpoints`, `shadows` — **são** consumidas pelo `theme`, porque essas o MUI não distorce.
 
 ### 4. CSS puro / classe solta

@@ -11,12 +11,14 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona as iniciais de quem está logado no topo da área logada (#91) [Frontend]
 - Adiciona o contato de quem ofertou a carona, com o e-mail copiável e a conversa no WhatsApp (#94) [Frontend]
 - Adiciona ofertar e editar carona, que antes só avisavam que a função viria em breve (#97) [Frontend]
+- Adiciona o mural de achados e perdidos, com filtros e a lista de itens, no lugar do aviso de área em breve (#131) [Frontend]
 
 ### Changed
 
 - Unifica os campos de todos os formulários num componente único do design system, com o visual preservado e medido (#96) [Frontend]
 - Passa a exigir e-mail do domínio institucional e endereço completo no cadastro, recusando no próprio formulário (#99) [Frontend]
 - Reúne caronas numa tela só: ofertar abre o formulário sobre a lista, em vez de levar a uma tela e a um endereço próprios (#128) [Frontend]
+- Avisa no painel de filtros de caronas que ele recolhe e quando há filtro valendo (#131) [Frontend]
 
 ### Fixed
 

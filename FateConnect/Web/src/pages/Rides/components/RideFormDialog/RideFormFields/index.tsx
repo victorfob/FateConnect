@@ -1,6 +1,6 @@
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { fromFormDate, toFormDate } from '@app/pages/Rides/helpers/apiDate';
+import { fromFormDate, toFormDate } from '@app/utils/apiDate';
 import { Input } from '@design-system';
 
 import type { RideFormInput, RideFormValues } from '../schema';
