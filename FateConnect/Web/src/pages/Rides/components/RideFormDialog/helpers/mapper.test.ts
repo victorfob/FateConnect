@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { type Ride, RideTypeEnum } from '@app/services/rides/types';
 
 import { EMPTY_RIDE_FORM, type RideFormValues } from '../schema';

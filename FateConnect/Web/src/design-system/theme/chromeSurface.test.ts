@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { colorTokens, darkColorTokens } from '../tokens';
 import { chromeDivider, chromeSurface, inputOutline, onChromeSurface } from './chromeSurface';
 import { createAppTheme } from './createAppTheme';

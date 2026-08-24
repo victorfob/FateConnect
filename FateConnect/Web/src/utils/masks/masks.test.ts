@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { maskBirthDate } from './birthDateMask';
 import { caretAfterDigitCount, countDigits, onlyDigits } from './caret';
 import { maskPhone } from './phoneMask';

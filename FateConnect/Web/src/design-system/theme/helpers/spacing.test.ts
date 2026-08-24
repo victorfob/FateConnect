@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { spacingScale } from '@src-ds/tokens';
 
 import { spacing } from './spacing';

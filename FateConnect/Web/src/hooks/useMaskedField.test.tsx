@@ -1,5 +1,4 @@
 import { useForm } from 'react-hook-form';
-import { describe, expect, it } from 'vitest';
 
 import { render, screen, userEvent } from '@app/test/testing-library';
 import { maskBirthDate } from '@app/utils/masks/birthDateMask';

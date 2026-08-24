@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { SIGNUP_DEFAULT_VALUES, type SignupFormValues, signupSchema } from '.';
 import { GenderValueEnum } from '../@types';
 import { formatBirthDate, latestBirthDate } from '../helpers/birthDate';

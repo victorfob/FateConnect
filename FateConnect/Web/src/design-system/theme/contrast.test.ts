@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { chromeSurface, onChromeSurface } from './chromeSurface';
 import { AA_NORMAL_TEXT, contrastRatio } from './contrast';
 import { createAppTheme } from './createAppTheme';

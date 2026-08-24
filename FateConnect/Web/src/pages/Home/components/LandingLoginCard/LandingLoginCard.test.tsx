@@ -1,6 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
 
 import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
 import { server } from '@app/mocks/server';

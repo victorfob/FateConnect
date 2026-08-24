@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { render, screen } from '@app/test/testing-library';
 import { createAppTheme } from '@src-ds/theme';
 import { onStatusTagSurface, statusTagSurface } from '@src-ds/theme/statusTagSurface';

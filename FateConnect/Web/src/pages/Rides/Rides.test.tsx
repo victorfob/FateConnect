@@ -1,7 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Mock } from 'vitest';
 
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';

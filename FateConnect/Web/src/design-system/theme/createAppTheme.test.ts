@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { colorTokens, mobileMedia, spacingScale, typographyTokens } from '../tokens';
 import type { TypographyToken } from '../tokens';
 import { createAppTheme } from './createAppTheme';

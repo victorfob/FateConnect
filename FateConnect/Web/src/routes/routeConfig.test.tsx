@@ -1,6 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { beforeEach, describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';

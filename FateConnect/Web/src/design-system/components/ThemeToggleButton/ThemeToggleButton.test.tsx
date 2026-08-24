@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { render, screen, userEvent } from '@app/test/testing-library';
 
 import { ThemeToggleButton } from '.';
