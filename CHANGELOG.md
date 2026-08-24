@@ -11,6 +11,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona as iniciais de quem está logado no topo da área logada (#91) [Frontend]
 - Adiciona o contato de quem ofertou a carona, com o e-mail copiável e a conversa no WhatsApp (#94) [Frontend]
 - Adiciona ofertar e editar carona, que antes só avisavam que a função viria em breve (#97) [Frontend]
+- Adiciona o mural de achados e perdidos, com filtros e a lista de itens, no lugar do aviso de área em breve (#131) [Frontend]
 
 ### Changed
 
