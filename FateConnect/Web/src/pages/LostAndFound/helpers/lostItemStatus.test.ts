@@ -16,8 +16,8 @@ describe('lostItemStatusLabel', () => {
 });
 
 describe('lostItemStatusTone', () => {
-  it('should keep the open item grey and colour only what ended', () => {
-    expect(lostItemStatusTone(LostItemStatusEnum.OPEN)).toBe('muted');
+  it('should give each situation its own colour', () => {
+    expect(lostItemStatusTone(LostItemStatusEnum.OPEN)).toBe('warning');
     expect(lostItemStatusTone(LostItemStatusEnum.RESOLVED)).toBe('success');
     expect(lostItemStatusTone(LostItemStatusEnum.CANCELLED)).toBe('danger');
   });

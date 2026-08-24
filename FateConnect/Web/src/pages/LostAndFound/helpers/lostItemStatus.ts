@@ -7,9 +7,9 @@ const STATUS_LABEL: Readonly<Record<LostItemStatusEnum, string>> = {
   [LostItemStatusEnum.CANCELLED]: 'Cancelado',
 };
 
-/** Aberto é o estado de repouso do mural: a cor fica para o que terminou. */
+/** A #29 previa cinza no aberto; virou amarelo quando a situação passou a ser a única etiqueta do cartão. */
 const STATUS_TONE: Readonly<Record<LostItemStatusEnum, StatusTagTone>> = {
-  [LostItemStatusEnum.OPEN]: 'muted',
+  [LostItemStatusEnum.OPEN]: 'warning',
   [LostItemStatusEnum.RESOLVED]: 'success',
   [LostItemStatusEnum.CANCELLED]: 'danger',
 };
