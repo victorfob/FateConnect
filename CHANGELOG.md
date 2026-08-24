@@ -18,6 +18,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Unifica os campos de todos os formulários num componente único do design system, com o visual preservado e medido (#96) [Frontend]
 - Passa a exigir e-mail do domínio institucional e endereço completo no cadastro, recusando no próprio formulário (#99) [Frontend]
 - Reúne caronas numa tela só: ofertar abre o formulário sobre a lista, em vez de levar a uma tela e a um endereço próprios (#128) [Frontend]
+- Avisa no painel de filtros de caronas que ele recolhe e quando há filtro valendo (#131) [Frontend]
 
 ### Fixed
 
