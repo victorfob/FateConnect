@@ -25,7 +25,7 @@ import {
   FILTER_PANEL_TITLE,
   FILTER_SUBMIT_LABEL,
 } from './components/LostItemFilter/constants';
-import { REGISTER_MODE } from './components/LostItemFormDialog/constants';
+import { EDIT_MODE, REGISTER_MODE } from './components/LostItemFormDialog/constants';
 import * as C from './constants';
 import { LostAndFound } from '.';
 
@@ -455,5 +455,17 @@ describe('LostAndFound', () => {
     await confirmAction(LOST_ITEM_ACTION_LABELS.delete, DELETE_DIALOG.confirmLabel);
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.cancelFailed)).toBeInTheDocument();
+  });
+
+  it('should open the dialog filled in when the item is edited from the card', async () => {
+    listReturning([OWN_OPEN_ITEM]);
+
+    renderComponent();
+    await screen.findByText(OWN_OPEN_ITEM.nome);
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }));
+
+    const dialog = within(await screen.findByRole('dialog'));
+    expect(dialog.getByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
+    expect(dialog.getByDisplayValue(OWN_OPEN_ITEM.nome)).toBeInTheDocument();
   });
 });
