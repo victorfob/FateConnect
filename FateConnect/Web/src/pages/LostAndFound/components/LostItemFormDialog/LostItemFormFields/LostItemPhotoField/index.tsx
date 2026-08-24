@@ -83,6 +83,22 @@ export function LostItemPhotoField() {
             </S.PhotoActionButton>
           )}
         </S.PhotoActions>
+
+        {errorMessage && (
+          <S.PhotoError>
+            <Typography variant="caption" color="inherit">
+              {errorMessage}
+            </Typography>
+          </S.PhotoError>
+        )}
+
+        {!errorMessage && (
+          <S.PhotoHint>
+            <Typography variant="caption" color="inherit">
+              {C.PHOTO_HINT}
+            </Typography>
+          </S.PhotoHint>
+        )}
       </S.PhotoRow>
 
       <S.HiddenFileInput
@@ -93,22 +109,6 @@ export function LostItemPhotoField() {
         disabled={disabled}
         onChange={handleFileChange}
       />
-
-      {errorMessage && (
-        <S.PhotoError>
-          <Typography variant="caption" color="inherit">
-            {errorMessage}
-          </Typography>
-        </S.PhotoError>
-      )}
-
-      {!errorMessage && (
-        <S.PhotoHint>
-          <Typography variant="caption" color="inherit">
-            {C.PHOTO_HINT}
-          </Typography>
-        </S.PhotoHint>
-      )}
     </S.PhotoField>
   );
 }

@@ -23,7 +23,6 @@ export const PhotoField = styled(Stack)<PolymorphicProps>({
 export const PhotoRow = styled(Stack)<PolymorphicProps>({
   flexDirection: 'row',
   alignItems: 'center',
-  justifyContent: 'space-between',
   gap: spacing(sm),
 
   [compactMedia]: { flexDirection: 'column', alignItems: 'flex-start' },
@@ -58,9 +57,11 @@ export const HiddenFileInput = styled('input')({
 });
 
 export const PhotoHint = styled(Box)<PolymorphicProps>(({ theme }) => ({
+  flex: 1,
   color: theme.palette.text.secondary,
 }));
 
 export const PhotoError = styled(Box)<PolymorphicProps>(({ theme }) => ({
+  flex: 1,
   color: theme.palette.error.main,
 }));
