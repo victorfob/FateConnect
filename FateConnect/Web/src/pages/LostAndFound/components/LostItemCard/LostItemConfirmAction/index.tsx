@@ -1,13 +1,15 @@
 import { useCallback, useState, type ReactNode } from 'react';
 
-import { Button, Dialog, IconButton } from '@design-system';
+import { Button, Dialog } from '@design-system';
 
-import { CONFIRMATION } from '../../constants';
+import { CONFIRMATION } from './constants';
+import { LostItemConfirmTrigger } from './LostItemConfirmTrigger';
 import * as S from './styles';
 
 type LostItemConfirmActionProps = Readonly<{
   label: string;
-  icon: ReactNode;
+  /** Sem ícone o gatilho é um botão com o rótulo à mostra. */
+  icon?: ReactNode;
   dialogTitle: string;
   messagePrefix: string;
   itemName: string;
@@ -35,9 +37,7 @@ export function LostItemConfirmAction({
 
   return (
     <>
-      <IconButton type="button" aria-label={label} onClick={handleAsk}>
-        {icon}
-      </IconButton>
+      <LostItemConfirmTrigger label={label} icon={icon} onClick={handleAsk} />
 
       <Dialog open={confirming} onClose={handleCancel} title={dialogTitle}>
         <Dialog.Body>

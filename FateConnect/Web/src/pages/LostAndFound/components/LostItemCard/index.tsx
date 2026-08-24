@@ -10,6 +10,7 @@ import { CalendarTodayIcon, ImageIcon, LocationOnIcon } from '@design-system/ico
 
 import { LostItemActions } from './LostItemActions';
 import { LostItemKindIcon } from './LostItemKindIcon';
+import { LostItemStatusAction } from './LostItemStatusAction';
 import * as C from './constants';
 import * as S from './styles';
 
@@ -48,13 +49,7 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
               <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
             </S.WideOnlyTag>
 
-            <LostItemActions
-              item={item}
-              onEdit={onEdit}
-              onResolve={onResolve}
-              onCancel={onCancel}
-              onReopen={onReopen}
-            />
+            <LostItemActions item={item} onEdit={onEdit} onCancel={onCancel} />
           </S.HeaderActions>
         </S.HeaderRow>
 
@@ -96,6 +91,8 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
             </Typography>
           </S.CancellationNote>
         )}
+
+        <LostItemStatusAction item={item} onResolve={onResolve} onReopen={onReopen} />
 
         <S.CompactOnlyTag>
           <StatusTag tone={statusTone}>{statusLabel}</StatusTag>

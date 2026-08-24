@@ -15,8 +15,11 @@ import { OWN_ITEM_LABEL } from './components/LostItemCard/constants';
 import {
   DELETE_DIALOG,
   LOST_ITEM_ACTION_LABELS,
-  RESOLVE_DIALOG,
 } from './components/LostItemCard/LostItemActions/constants';
+import {
+  REOPEN_LABEL,
+  RESOLVE_DIALOG,
+} from './components/LostItemCard/LostItemStatusAction/constants';
 import {
   FILTER_LABELS,
   FILTER_PANEL_TITLE,
@@ -314,7 +317,7 @@ describe('LostAndFound', () => {
     expect(card().getAllByText(STATUS_TAG_LABEL.cancelled)).not.toHaveLength(0);
     expect(card().getByText(CANCELLATION_NOTE.owner)).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.reopen }));
+    await userEvent.click(screen.getByRole('button', { name: REOPEN_LABEL }));
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.reopenSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
@@ -360,9 +363,7 @@ describe('LostAndFound', () => {
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
     ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: RESOLVE_LABEL.lost })).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.reopen }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: REOPEN_LABEL })).not.toBeInTheDocument();
   });
 
   it('should offer only the way back on a cancelled item', async () => {
@@ -377,9 +378,7 @@ describe('LostAndFound', () => {
     renderComponent();
 
     await screen.findByText(LOST_ITEM.nome);
-    expect(
-      screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.reopen }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: REOPEN_LABEL })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
     ).not.toBeInTheDocument();
@@ -423,7 +422,7 @@ describe('LostAndFound', () => {
     await filterByStatus(STATUS_TAG_LABEL.cancelled);
     await screen.findByText(LOST_ITEM.nome);
 
-    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.reopen }));
+    await userEvent.click(screen.getByRole('button', { name: REOPEN_LABEL }));
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.reopenSucceeded)).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
