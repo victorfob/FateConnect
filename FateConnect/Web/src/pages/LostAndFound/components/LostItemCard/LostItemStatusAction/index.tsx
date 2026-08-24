@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { LostItemStatusEnum, type LostItem } from '@app/services/lostAndFound/types';
 import { Button } from '@design-system';
+import { CheckCircleIcon, RestoreIcon } from '@design-system/icons';
 
 import { LostItemConfirmAction } from '../LostItemConfirmAction';
 import * as C from './constants';
@@ -22,7 +23,8 @@ export function LostItemStatusAction({ item, onResolve, onReopen }: LostItemStat
   if (item.situacao === LostItemStatusEnum.CANCELLED) {
     return (
       <S.ActionRow>
-        <Button type="button" variant="outlined" color="inherit" onClick={handleReopen}>
+        <Button type="button" variant="soft" onClick={handleReopen}>
+          <RestoreIcon fontSize="small" />
           {C.REOPEN_LABEL}
         </Button>
       </S.ActionRow>
@@ -35,6 +37,7 @@ export function LostItemStatusAction({ item, onResolve, onReopen }: LostItemStat
     <S.ActionRow>
       <LostItemConfirmAction
         label={C.lostItemResolveLabel(item.tipo)}
+        icon={<CheckCircleIcon fontSize="small" />}
         dialogTitle={C.RESOLVE_DIALOG.title}
         messagePrefix={C.RESOLVE_DIALOG.messagePrefix}
         itemName={item.nome}

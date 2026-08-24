@@ -22,6 +22,7 @@ paths:
 - Esses componentes são **prop-driven**: recebem conteúdo por propriedade ou slot e **não importam nada de `@app/*`**. O domínio (rotas, hooks, textos) é fornecido por quem os compõe.
 - Composição de domínio (um botão que conhece uma seção da landing, por exemplo) fica em `src/components/`, não no design system.
 - **A prop fala em termos visuais, não em termos do domínio.** A etiqueta de estado recebe `tone="success"`, não `tipo="filantropica"`: quem traduz o domínio para o tom é a tela. Foi o que permitiu o mesmo `StatusTag` servir caronas sem o design system saber o que é uma carona.
+- **Ação secundária usa `variant="soft"`**, a variante de contorno neutro declarada no tema. ⛔ Não componha uma aparência nova no ponto de uso — `variant="outlined" color="inherit"` apareceu em dois PRs no mesmo dia, escolhido duas vezes sem ninguém combinar. Falta variante para o que você precisa: **declare no tema**, como se faz com token.
 - **Subcomponente interno vai numa pasta dentro do pai**, com o seu `index` (`ConfirmDialog/DialogMessage/`). Se ele faz sentido para quem consome, expor por composição — `ConfirmDialog.Message` — em vez de repassar props do filho pelo pai.
 
 ## Diálogo: existe **um** esqueleto

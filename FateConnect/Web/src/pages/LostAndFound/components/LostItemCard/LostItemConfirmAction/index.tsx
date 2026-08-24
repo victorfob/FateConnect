@@ -8,8 +8,9 @@ import * as S from './styles';
 
 type LostItemConfirmActionProps = Readonly<{
   label: string;
-  /** Sem ícone o gatilho é um botão com o rótulo à mostra. */
-  icon?: ReactNode;
+  icon: ReactNode;
+  /** Sem rótulo à mostra: o nome do botão fica no tooltip. */
+  iconOnly?: boolean;
   dialogTitle: string;
   messagePrefix: string;
   itemName: string;
@@ -20,6 +21,7 @@ type LostItemConfirmActionProps = Readonly<{
 export function LostItemConfirmAction({
   label,
   icon,
+  iconOnly,
   dialogTitle,
   messagePrefix,
   itemName,
@@ -37,7 +39,7 @@ export function LostItemConfirmAction({
 
   return (
     <>
-      <LostItemConfirmTrigger label={label} icon={icon} onClick={handleAsk} />
+      <LostItemConfirmTrigger label={label} icon={icon} iconOnly={iconOnly} onClick={handleAsk} />
 
       <Dialog open={confirming} onClose={handleCancel} title={dialogTitle}>
         <Dialog.Body>
