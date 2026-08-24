@@ -10,7 +10,7 @@ import {
 } from '@app/services/lostAndFound/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
-import { OWN_ITEM_LABEL } from './components/LostItemCard/LostItemTags/constants';
+import { OWN_ITEM_LABEL } from './components/LostItemCard/constants';
 import {
   FILTER_LABELS,
   FILTER_PANEL_TITLE,

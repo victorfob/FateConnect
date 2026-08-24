@@ -21,6 +21,7 @@ export { default as GroupsIcon } from '@mui/icons-material/Groups';
 export { default as ImageIcon } from '@mui/icons-material/Image';
 export { default as InfoIcon } from '@mui/icons-material/Info';
 export { default as LightModeIcon } from '@mui/icons-material/LightMode';
+export { default as LocalOfferIcon } from '@mui/icons-material/LocalOffer';
 export { default as LocationOnIcon } from '@mui/icons-material/LocationOn';
 export { default as MenuIcon } from '@mui/icons-material/Menu';
 export { default as PhoneIcon } from '@mui/icons-material/Phone';

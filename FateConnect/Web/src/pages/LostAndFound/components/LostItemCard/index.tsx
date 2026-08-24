@@ -1,10 +1,13 @@
 import { format, parseISO } from 'date-fns';
 
+import {
+  lostItemStatusLabel,
+  lostItemStatusTone,
+} from '@app/pages/LostAndFound/helpers/lostItemStatus';
 import type { LostItem } from '@app/services/lostAndFound/types';
-import { Typography } from '@design-system';
-import { CalendarTodayIcon, ImageIcon, LocationOnIcon } from '@design-system/icons';
+import { StatusTag, Typography } from '@design-system';
+import { CalendarTodayIcon, ImageIcon, LocalOfferIcon, LocationOnIcon } from '@design-system/icons';
 
-import { LostItemTags } from './LostItemTags';
 import * as C from './constants';
 import * as S from './styles';
 
@@ -13,8 +16,13 @@ const DATE_FORMAT = 'dd/MM/yyyy';
 type LostItemCardProps = Readonly<{ item: LostItem }>;
 
 export function LostItemCard({ item }: LostItemCardProps) {
+  const statusTone = lostItemStatusTone(item.situacao);
+  const statusLabel = lostItemStatusLabel(item.situacao);
+
   return (
-    <S.CardRoot component="article">
+    <S.CardRoot component="article" own={item.meuItem}>
+      {item.meuItem && <S.ScreenReaderOnly>{C.OWN_ITEM_LABEL}</S.ScreenReaderOnly>}
+
       {item.fotoUrl ? (
         <S.Photo src={item.fotoUrl} alt={C.photoAlt(item.nome)} />
       ) : (
@@ -27,9 +35,9 @@ export function LostItemCard({ item }: LostItemCardProps) {
         <S.HeaderRow>
           <Typography variant="subtitleBold">{item.nome}</Typography>
 
-          <S.WideOnlyTags>
-            <LostItemTags item={item} />
-          </S.WideOnlyTags>
+          <S.WideOnlyTag>
+            <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
+          </S.WideOnlyTag>
         </S.HeaderRow>
 
         <S.InfoRow>
@@ -46,6 +54,13 @@ export function LostItemCard({ item }: LostItemCardProps) {
               {format(parseISO(item.dataOcorrido), DATE_FORMAT)}
             </Typography>
           </S.InfoItem>
+
+          <S.InfoItem>
+            <LocalOfferIcon />
+            <Typography variant="caption" color="inherit">
+              {item.tipo}
+            </Typography>
+          </S.InfoItem>
         </S.InfoRow>
 
         {item.descricao && (
@@ -56,9 +71,9 @@ export function LostItemCard({ item }: LostItemCardProps) {
           </S.Description>
         )}
 
-        <S.CompactOnlyTags>
-          <LostItemTags item={item} />
-        </S.CompactOnlyTags>
+        <S.CompactOnlyTag>
+          <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
+        </S.CompactOnlyTag>
       </S.CardBody>
     </S.CardRoot>
   );
