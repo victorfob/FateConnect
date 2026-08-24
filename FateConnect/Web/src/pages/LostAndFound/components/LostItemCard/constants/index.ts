@@ -7,7 +7,6 @@ export function photoAlt(itemName: string): string {
   return `Foto de ${itemName}`;
 }
 
-/** Quem cadastrou desistiu ou o mural expirou o item: são coisas diferentes. */
 const CANCELLATION_NOTE: Readonly<Record<CancellationReasonEnum, string>> = {
   [CancellationReasonEnum.OWNER]: 'Cancelado por quem cadastrou.',
   [CancellationReasonEnum.INACTIVITY]: 'Cancelado por inatividade.',

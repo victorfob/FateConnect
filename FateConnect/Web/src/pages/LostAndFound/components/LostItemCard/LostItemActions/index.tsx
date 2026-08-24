@@ -11,11 +11,7 @@ type LostItemActionsProps = Readonly<{
   onReopen: (item: LostItem) => void;
 }>;
 
-/**
- * A fileira de ações do cartão. Ela existe mesmo quando o item é de outra
- * pessoa, porque o contato de quem cadastrou aparece para todo mundo e entra
- * aqui ao lado das ações do dono.
- */
+/** Existe mesmo sem ações do dono: o contato entra aqui e é de todo mundo. */
 export function LostItemActions({
   item,
   onEdit,

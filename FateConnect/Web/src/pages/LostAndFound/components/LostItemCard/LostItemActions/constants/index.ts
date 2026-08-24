@@ -7,7 +7,6 @@ export const LOST_ITEM_ACTION_LABELS = {
   reopen: 'Reabrir',
 };
 
-/** O que encerra o item depende de quem o cadastrou ter ou não o objeto. */
 const RESOLVE_LABEL: Readonly<Record<LostItemKindEnum, string>> = {
   [LostItemKindEnum.LOST]: 'Marcar como encontrado',
   [LostItemKindEnum.FOUND]: 'Marcar como devolvido',

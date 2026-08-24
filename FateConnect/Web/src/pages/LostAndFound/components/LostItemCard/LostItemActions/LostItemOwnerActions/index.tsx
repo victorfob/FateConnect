@@ -15,7 +15,6 @@ type LostItemOwnerActionsProps = Readonly<{
   onReopen: (item: LostItem) => void;
 }>;
 
-/** O que quem cadastrou o item pode fazer com ele, conforme a situação. */
 export function LostItemOwnerActions({
   item,
   onEdit,
@@ -42,8 +41,7 @@ export function LostItemOwnerActions({
     );
   }
 
-  // Concluído é estado final e sai sem ação nenhuma, junto com qualquer
-  // situação que a API venha a inventar depois.
+  // Vale para concluído e para qualquer situação que a API venha a inventar.
   if (item.situacao !== LostItemStatusEnum.OPEN) return null;
 
   return (

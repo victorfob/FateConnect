@@ -15,7 +15,6 @@ type LostItemConfirmActionProps = Readonly<{
   onConfirm: VoidFunction;
 }>;
 
-/** Botão do cartão que só executa depois do sim, para o que não tem volta. */
 export function LostItemConfirmAction({
   label,
   icon,

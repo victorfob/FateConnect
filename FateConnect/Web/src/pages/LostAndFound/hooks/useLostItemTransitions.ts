@@ -18,10 +18,7 @@ type LostItemTransitions = {
   isTransitioning: boolean;
 };
 
-/**
- * As três mudanças de situação do item. Ficam fora da tela porque cada uma tem
- * mensagem própria de sucesso e de falha, e isso não cabe numa mutação só.
- */
+/** Uma mutação por transição: cada uma tem mensagem própria de erro. */
 export function useLostItemTransitions(): LostItemTransitions {
   const queryClient = useQueryClient();
   const { notifySuccess } = useNotification();

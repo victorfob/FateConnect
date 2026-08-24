@@ -73,7 +73,6 @@ export const HeaderRow = styled(Stack)<PolymorphicProps>({
   marginBottom: spacing(sm),
 });
 
-/** Etiqueta e ações caminham juntas na ponta direita do cabeçalho. */
 export const HeaderActions = styled(Stack)<PolymorphicProps>({
   flexDirection: 'row',
   alignItems: 'center',
@@ -105,7 +104,6 @@ export const Description = styled(Box)<PolymorphicProps>(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-/** Cancelado sem explicação vira suspeita de bug; o motivo fica no cartão. */
 export const CancellationNote = styled(Box)<PolymorphicProps>(({ theme }) => ({
   marginTop: spacing(xxs),
   color: theme.palette.text.secondary,
