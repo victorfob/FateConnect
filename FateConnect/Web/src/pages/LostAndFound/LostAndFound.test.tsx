@@ -8,7 +8,7 @@ import {
   LostItemStatusEnum,
   type LostItem,
 } from '@app/services/lostAndFound/types';
-import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
+import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { OWN_ITEM_LABEL } from './components/LostItemCard/LostItemTags/constants';
 import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from './components/LostItemFilter/constants';
@@ -127,5 +127,22 @@ describe('LostAndFound', () => {
 
     await screen.findByText(LOST_ITEM.nome);
     expect(screen.queryAllByText(OWN_ITEM_LABEL)).toHaveLength(0);
+  });
+
+  it('should not let the filter ask for a day that has not happened yet', async () => {
+    // Data fixa para o dia seguinte cair no mesmo mês, em qualquer dia do ano.
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date(2026, 7, 10));
+    listReturning([]);
+    renderComponent();
+    await screen.findByText(C.EMPTY_LIST_MESSAGE);
+
+    await userEvent.click(screen.getByRole('button', { name: /Escolha uma data/i }));
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '10' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '11' })).toBeDisabled();
+
+    vi.useRealTimers();
   });
 });

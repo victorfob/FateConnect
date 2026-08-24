@@ -11,6 +11,8 @@ export type DateInputProps = Readonly<{
   error?: string;
   required?: boolean;
   disabled?: boolean;
+  /** Limite superior do seletor; o dia do limite continua escolhível. */
+  maxDate?: Date;
 }>;
 
 /** O rótulo não nasce no alto: o seletor esconde as seções até o foco. */
@@ -23,6 +25,7 @@ export function DateInput({
   error,
   required,
   disabled,
+  maxDate,
 }: DateInputProps) {
   return (
     <DatePicker
@@ -31,6 +34,7 @@ export function DateInput({
       value={value}
       onChange={onChange}
       disabled={disabled}
+      maxDate={maxDate}
       slotProps={{
         textField: {
           required,

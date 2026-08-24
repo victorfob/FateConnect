@@ -1,4 +1,4 @@
-import { useCallback, useState, type ChangeEvent, type SubmitEvent } from 'react';
+import { useCallback, useMemo, useState, type ChangeEvent, type SubmitEvent } from 'react';
 
 import { LOST_ITEM_KIND_OPTIONS } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import { isLostItemStatus } from '@app/pages/LostAndFound/helpers/lostItemStatus';
@@ -22,6 +22,8 @@ export function LostItemFilter({ onApply }: LostItemFilterProps) {
   const [owner, setOwner] = useState<string>(C.LostItemOwnerFilterEnum.ALL);
   // O mural mostra o que está aberto até que se peça outra coisa.
   const [status, setStatus] = useState<string>(LostItemStatusEnum.OPEN);
+  // Item achado ou perdido só pode ter ocorrido até hoje.
+  const today = useMemo(() => new Date(), []);
 
   const handleNameChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => setItemName(event.target.value),
@@ -86,6 +88,7 @@ export function LostItemFilter({ onApply }: LostItemFilterProps) {
                 label={C.FILTER_LABELS.occurredOn}
                 value={occurredOn}
                 onChange={setOccurredOn}
+                maxDate={today}
               />
             </S.FieldCell>
 
