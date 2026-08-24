@@ -1,6 +1,6 @@
 import { createRef } from 'react';
 
-import { render, screen, userEvent } from '@app/test/testing-library';
+import { render, screen, userEvent, within } from '@app/test/testing-library';
 
 import { TIME_PICKER_LABEL } from './constants';
 import { Input, type InputProps } from '.';
@@ -125,5 +125,16 @@ describe('Input.Select', () => {
       'data-shrink',
       'true',
     );
+  });
+
+  it('should not offer a day after the max date', async () => {
+    const pickedDay = new Date(2026, 7, 10);
+    render(<Input.Date label="Data" value={pickedDay} maxDate={pickedDay} onChange={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: /Escolha uma data/i }));
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '10' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '11' })).toBeDisabled();
   });
 });

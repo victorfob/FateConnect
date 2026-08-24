@@ -9,7 +9,11 @@ import { render, screen, userEvent, waitFor, within } from '@app/test/testing-li
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
 import { CONTACT_DIALOG } from './components/RideCard/RideDriverContact/constants';
-import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from './components/RideFilter/constants';
+import {
+  FILTER_LABELS,
+  FILTER_PANEL_TITLE,
+  FILTER_SUBMIT_LABEL,
+} from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
 import { RIDE_DRIVER } from './helpers/rideDriver';
 import * as C from './constants';
@@ -189,6 +193,12 @@ describe('Rides', () => {
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
     await waitFor(() => expect(requestUrl?.searchParams.get('Destino')).toBe('Sorocaba'));
+    // O ponto do painel não tem papel de acessibilidade: chega-se a ele pelo título.
+    const activeDot = screen
+      .getByText(FILTER_PANEL_TITLE)
+      .closest('.MuiBadge-root')
+      ?.querySelector('.MuiBadge-badge');
+    expect(activeDot).not.toHaveClass('MuiBadge-invisible');
   });
 
   it('should ask for confirmation before deleting and keep the ride when it is refused', async () => {

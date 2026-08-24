@@ -16,6 +16,8 @@ export { Footer } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
 export { InitialsAvatar } from './components/InitialsAvatar';
 export { Dialog } from './components/Dialog';
+export { FilterPanel } from './components/FilterPanel';
+export type { FilterPanelProps } from './components/FilterPanel';
 export { Input } from './components/Input';
 export type { InputProps } from './components/Input';
 export type { SelectOption } from './components/Input/components/SelectInput/types';

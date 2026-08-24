@@ -1,5 +1,5 @@
-import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import { RideTypeEnum } from '@app/services/rides/types';
+import { toApiDate } from '@app/utils/apiDate';
 
 import { RIDE_FORM_MESSAGES, RIDE_LIMITS } from '../constants';
 import { rideFormSchema, type RideFormInput } from '.';

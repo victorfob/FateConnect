@@ -2,9 +2,9 @@ import { format } from 'date-fns';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
-import { toApiDate } from '@app/pages/Rides/helpers/apiDate';
 import { RideTypeEnum, type Ride, type RideInput } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
+import { toApiDate } from '@app/utils/apiDate';
 
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './constants';
 import { RideFormDialog, type RideFormDialogProps } from '.';
