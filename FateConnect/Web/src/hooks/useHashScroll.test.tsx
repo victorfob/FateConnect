@@ -1,8 +1,8 @@
-import { RouterProvider, createMemoryRouter } from 'react-router';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render } from '@app/test/testing-library';
+
 import { useHashScroll } from './useHashScroll';
 
 function ScreenWithHash() {

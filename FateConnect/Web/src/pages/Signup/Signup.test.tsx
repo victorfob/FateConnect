@@ -1,14 +1,17 @@
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { RouterProvider, createMemoryRouter } from 'react-router';
-import { describe, expect, it } from 'vitest';
 
+import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
-import { Signup } from '.';
-import * as C from './constants';
-import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
+
+import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
+import { CALENDAR_TOGGLE_LABEL } from './components/BirthDateField/constants';
+import { LEGAL_SOON_MESSAGES } from './components/ConsentSection/constants';
 import { SIGNUP_MESSAGES } from './schema';
+import * as C from './constants';
+import { Signup } from '.';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/usuario/cadastro';
 const ZIP_URL = 'https://viacep.com.br/ws/:zipCode/json/';
@@ -171,7 +174,7 @@ describe('Signup', () => {
   it('should toggle the password visibility and show the current state in the icon', async () => {
     renderSignup();
     const password = screen.getByLabelText(/^Senha/);
-    const toggle = screen.getByRole('button', { name: C.PASSWORD_TOGGLE_LABEL });
+    const toggle = screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL });
 
     expect(password).toHaveAttribute('type', 'password');
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
@@ -230,11 +233,11 @@ describe('Signup', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Termos de Uso' }));
 
-    expect(await screen.findByText(C.LEGAL_SOON_MESSAGES.terms)).toBeInTheDocument();
+    expect(await screen.findByText(LEGAL_SOON_MESSAGES.terms)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Política de Privacidade' }));
 
-    expect(await screen.findByText(C.LEGAL_SOON_MESSAGES.privacy)).toBeInTheDocument();
+    expect(await screen.findByText(LEGAL_SOON_MESSAGES.privacy)).toBeInTheDocument();
   });
 
   it('should not toggle the consent when the legal link is clicked', async () => {
@@ -356,7 +359,7 @@ describe('Signup', () => {
     const birthDate = screen.getByLabelText(/Data de nascimento/);
     await userEvent.type(birthDate, '22051999');
 
-    await userEvent.click(screen.getByRole('button', { name: C.CALENDAR_TOGGLE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: CALENDAR_TOGGLE_LABEL }));
     const calendar = await screen.findByRole('grid');
     await userEvent.click(within(calendar).getByRole('gridcell', { name: '10' }));
 

@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
 import { render, screen, userEvent, waitForElementToBeRemoved } from '@app/test/testing-library';
+
 import { useNotification } from './useNotification';
 
 const LONGER_MS = 8000;

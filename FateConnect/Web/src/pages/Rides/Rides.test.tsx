@@ -1,15 +1,14 @@
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { RouterProvider, createMemoryRouter } from 'react-router';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Mock } from 'vitest';
 
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
-import { RideTypeEnum } from '@app/services/rides/types';
-import type { Ride } from '@app/services/rides/types';
+import { RideTypeEnum, type Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
+import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
+import { CONTACT_DIALOG } from './components/RideCard/RideDriverContact/constants';
 import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
 import { RIDE_DRIVER } from './helpers/rideDriver';
@@ -200,10 +199,10 @@ describe('Rides', () => {
     await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
 
     const dialog = within(await screen.findByRole('dialog'));
-    expect(dialog.getByRole('heading', { name: C.DELETE_DIALOG.title })).toBeInTheDocument();
+    expect(dialog.getByRole('heading', { name: DELETE_DIALOG.title })).toBeInTheDocument();
     expect(dialog.getByText(RIDE.destino)).toBeInTheDocument();
 
-    await userEvent.click(dialog.getByRole('button', { name: C.DELETE_DIALOG.cancelLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.cancelLabel }));
 
     // O cartão só volta a ser alcançável quando o diálogo termina de fechar.
     expect(within(await screen.findByRole('article')).getByText(RIDE.destino)).toBeInTheDocument();
@@ -224,7 +223,7 @@ describe('Rides', () => {
 
     await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
     const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: C.DELETE_DIALOG.confirmLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.confirmLabel }));
 
     expect(await screen.findByText(C.RIDE_LIST_MESSAGES.deleteSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
@@ -238,7 +237,7 @@ describe('Rides', () => {
 
     await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
     const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: C.DELETE_DIALOG.confirmLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.confirmLabel }));
 
     expect(await screen.findByText(C.RIDE_LIST_MESSAGES.deleteFailed)).toBeInTheDocument();
   });
@@ -264,7 +263,7 @@ describe('Rides', () => {
     const dialog = within(await screen.findByRole('dialog'));
     await userEvent.click(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` }));
 
-    expect(await screen.findByText(C.CONTACT_DIALOG.emailCopied)).toBeInTheDocument();
+    expect(await screen.findByText(CONTACT_DIALOG.emailCopied)).toBeInTheDocument();
     expect(clipboardWrite).toHaveBeenCalledWith(RIDE_DRIVER.email);
   });
 
@@ -279,7 +278,7 @@ describe('Rides', () => {
     const dialog = within(await screen.findByRole('dialog'));
     await userEvent.click(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` }));
 
-    expect(await screen.findByText(C.CONTACT_DIALOG.emailCopyFailed)).toBeInTheDocument();
+    expect(await screen.findByText(CONTACT_DIALOG.emailCopyFailed)).toBeInTheDocument();
   });
 
   it('should open the conversation already mentioning the destination of the ride', async () => {

@@ -1,7 +1,7 @@
 import IconButton from '@mui/material/IconButton';
 
+import { TIME_PICKER_LABEL } from '@src-ds/components/Input/constants';
 import { ScheduleIcon } from '@src-ds/icons';
-import { TIME_PICKER_LABEL } from '../../constants';
 
 export type TimePickerButtonProps = Readonly<{ onOpen: VoidFunction }>;
 

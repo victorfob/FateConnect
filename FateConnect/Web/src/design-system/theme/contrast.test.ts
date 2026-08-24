@@ -1,10 +1,8 @@
-import { describe, expect, it } from 'vitest';
-
-import { AA_NORMAL_TEXT, contrastRatio } from './contrast';
 import { chromeSurface, onChromeSurface } from './chromeSurface';
+import { AA_NORMAL_TEXT, contrastRatio } from './contrast';
+import { createAppTheme } from './createAppTheme';
 import { notificationSurface, onNotificationSurface } from './notificationSurface';
 import { onStatusTagSurface, statusTagSurface } from './statusTagSurface';
-import { createAppTheme } from './createAppTheme';
 
 const lightTheme = createAppTheme('light');
 const darkTheme = createAppTheme('dark');

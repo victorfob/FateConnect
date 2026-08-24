@@ -3,8 +3,8 @@ import { createTheme, type Theme } from '@mui/material/styles';
 import { ptBR as pickersPtBR } from '@mui/x-date-pickers/locales';
 
 import { fontFamily, mobileMedia, typographyTokens } from '../tokens';
-import { darkPalette, lightPalette } from './palettes';
 import { components } from './components';
+import { darkPalette, lightPalette } from './palettes';
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {

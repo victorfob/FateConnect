@@ -1,7 +1,7 @@
+import { Link as RouterLink, useNavigate } from 'react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Link as RouterLink, useNavigate } from 'react-router';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
@@ -13,9 +13,9 @@ import { AccountSection } from './components/AccountSection';
 import { AddressSection } from './components/AddressSection';
 import { ConsentSection } from './components/ConsentSection';
 import { ContactSection } from './components/ContactSection';
-import * as C from './constants';
 import { toSignupRequest } from './helpers/mapper';
 import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from './schema';
+import * as C from './constants';
 import * as S from './styles';
 
 const TITLE_ID = 'signup-title';
@@ -63,15 +63,21 @@ export function Signup() {
 
         <FormProvider {...form}>
           <S.SignupForm component="form" onSubmit={handleSubmit} noValidate>
-            <AccountSection />
+            <S.FieldGrid>
+              <AccountSection />
+            </S.FieldGrid>
 
             <S.SectionDivider />
             <S.SectionTitle variant="subtitleBold">{C.ADDRESS_SECTION_TITLE}</S.SectionTitle>
-            <AddressSection />
+            <S.FieldGrid>
+              <AddressSection />
+            </S.FieldGrid>
 
             <S.SectionDivider />
             <S.SectionTitle variant="subtitleBold">{C.CONTACT_SECTION_TITLE}</S.SectionTitle>
-            <ContactSection />
+            <S.FieldGrid>
+              <ContactSection />
+            </S.FieldGrid>
 
             <S.SectionDivider />
             <ConsentSection />

@@ -1,6 +1,7 @@
 import Tooltip from '@mui/material/Tooltip';
 
 import { InfoIcon } from '@src-ds/icons';
+
 import * as S from './styles';
 
 export type InputHelpLabelProps = Readonly<{ children: string; helpText: string }>;

@@ -1,10 +1,10 @@
-import { styled } from '../../styled';
-import { chromeDivider, chromeSurface, onChromeSurface } from '../../theme/chromeSurface';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import type { PolymorphicProps } from '../../styled';
-import { mobileMedia, spacingScale } from '../../tokens';
-import { spacing } from '../../theme/helpers/spacing';
+
+import { styled, type PolymorphicProps } from '@src-ds/styled';
+import { chromeDivider, chromeSurface, onChromeSurface } from '@src-ds/theme/chromeSurface';
+import { spacing } from '@src-ds/theme/helpers/spacing';
+import { mobileMedia, spacingScale } from '@src-ds/tokens';
 
 const { md, xs } = spacingScale;
 

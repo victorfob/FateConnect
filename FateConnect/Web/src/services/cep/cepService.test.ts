@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
+
 import { isCepNotFound, lookupCep } from './cepService';
 
 const PRIMARY_URL = 'https://viacep.com.br/ws/18000000/json/';

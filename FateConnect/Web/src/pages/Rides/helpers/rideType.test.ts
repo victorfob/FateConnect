@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
 import { RideTypeEnum } from '@app/services/rides/types';
+
 import { parseRideType, rideTypeDisplayLabel, rideTypeTone } from './rideType';
 
 describe('parseRideType', () => {

@@ -1,6 +1,6 @@
 import TextField from '@mui/material/TextField';
 
-import { styled } from '../../styled';
+import { styled } from '@src-ds/styled';
 
 export const FieldRoot = styled(TextField)({
   // O raio do campo fica no tema, em `MuiOutlinedInput` — não aqui.

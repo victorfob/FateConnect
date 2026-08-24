@@ -1,6 +1,6 @@
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
 
 import { GlobalStyles } from '../GlobalStyles';
 import { createAppTheme, type ThemeMode } from '../theme';

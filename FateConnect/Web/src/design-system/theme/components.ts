@@ -1,4 +1,4 @@
-import type { CSSObject, Components, Theme } from '@mui/material/styles';
+import type { Components, CSSObject, Theme } from '@mui/material/styles';
 
 import { radiusScale, shadowTokens, spacingScale, typographyTokens } from '../tokens';
 import { chromeSurface, inputOutline } from './chromeSurface';

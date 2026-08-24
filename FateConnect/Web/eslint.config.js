@@ -1,5 +1,7 @@
 import js from '@eslint/js';
+import importX from 'eslint-plugin-import-x';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import perfectionist from 'eslint-plugin-perfectionist';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -22,6 +24,8 @@ export default tseslint.config(
       react: reactPlugin,
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
+      'import-x': importX,
+      perfectionist,
     },
     settings: { react: { version: 'detect' } },
     rules: {
@@ -35,6 +39,79 @@ export default tseslint.config(
       '@typescript-eslint/no-deprecated': 'error',
       // Nenhum console solto no código: sobra de depuração vaza para produção.
       'no-console': 'error',
+      // A ordem dos imports é aplicada, não combinada — `yarn lint:fix` arruma.
+      // React no alto, o resto dos pacotes logo abaixo sem linha em branco,
+      // depois os aliases internos e por fim os relativos. `import type` fica
+      // no grupo do próprio módulo, ao lado do import de valor que o acompanha.
+      'perfectionist/sort-imports': [
+        'error',
+        {
+          newlinesBetween: 1,
+          internalPattern: ['^@app/', '^@design-system$', '^@design-system/', '^@src-ds/'],
+          customGroups: [
+            {
+              groupName: 'react',
+              anyOf: [
+                { elementNamePattern: '^react$' },
+                { elementNamePattern: '^react-dom(/.+)?$' },
+                { elementNamePattern: '^react-router(/.+)?$' },
+              ],
+            },
+            // Namespace desce para o fim do seu bloco: primeiro o que a pasta
+            // exporta por nome, depois as constantes e por último o estilo.
+            {
+              groupName: 'parent-constants',
+              modifiers: ['wildcard'],
+              selector: 'parent',
+              elementNamePattern: 'constants$',
+            },
+            {
+              groupName: 'parent-styles',
+              modifiers: ['wildcard'],
+              selector: 'parent',
+              elementNamePattern: 'styles$',
+            },
+            {
+              groupName: 'sibling-constants',
+              modifiers: ['wildcard'],
+              selector: 'sibling',
+              elementNamePattern: 'constants$',
+            },
+            {
+              groupName: 'sibling-styles',
+              modifiers: ['wildcard'],
+              selector: 'sibling',
+              elementNamePattern: 'styles$',
+            },
+          ],
+          groups: [
+            'react',
+            { newlinesBetween: 0 },
+            ['builtin', 'external'],
+            { newlinesBetween: 1 },
+            'internal',
+            { newlinesBetween: 1 },
+            'parent',
+            { newlinesBetween: 0 },
+            'parent-constants',
+            { newlinesBetween: 0 },
+            'parent-styles',
+            { newlinesBetween: 0 },
+            'sibling',
+            { newlinesBetween: 0 },
+            'sibling-constants',
+            { newlinesBetween: 0 },
+            'sibling-styles',
+            { newlinesBetween: 0 },
+            'index',
+          ],
+        },
+      ],
+      // Um import por módulo: o tipo entra com o modificador inline no import de
+      // valor que já existe, em vez de abrir uma segunda declaração.
+      'import-x/no-duplicates': ['error', { 'prefer-inline': true }],
+      // Dentro das chaves, os valores primeiro e os tipos no fim.
+      'perfectionist/sort-named-imports': ['error', { groups: ['value-import', 'type-import'] }],
     },
   },
 

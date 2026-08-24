@@ -1,10 +1,9 @@
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
 
 import { server } from '@app/mocks/server';
+
 import { createRide, deleteRide, listRides, updateRide } from './ridesService';
-import { RideTypeEnum } from './types';
-import type { RideInput } from './types';
+import { RideTypeEnum, type RideInput } from './types';
 
 const RIDES_URL = 'https://rides.fateconnect.test/caronas';
 

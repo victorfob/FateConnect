@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Link as RouterLink, Outlet } from 'react-router';
+import { Outlet, Link as RouterLink } from 'react-router';
 
 import { DrawerSectionItem } from '@app/components/DrawerSectionItem';
 import { LandingNavButton } from '@app/components/LandingNavButton';
@@ -8,6 +8,7 @@ import { LANDING_LINKS } from '@app/constants/navigation';
 import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { Footer, Header, NavigationDrawer, ThemeToggleButton, Typography } from '@design-system';
+
 import * as S from '../shell.styles';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
