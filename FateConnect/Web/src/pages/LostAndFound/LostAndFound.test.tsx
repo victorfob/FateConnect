@@ -11,7 +11,11 @@ import {
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { OWN_ITEM_LABEL } from './components/LostItemCard/LostItemTags/constants';
-import { FILTER_LABELS, FILTER_SUBMIT_LABEL } from './components/LostItemFilter/constants';
+import {
+  FILTER_LABELS,
+  FILTER_PANEL_TITLE,
+  FILTER_SUBMIT_LABEL,
+} from './components/LostItemFilter/constants';
 import * as C from './constants';
 import { LostAndFound } from '.';
 
@@ -30,6 +34,11 @@ const LOST_ITEM: LostItem = {
   meuItem: false,
   dataCadastro: '2026-08-12T00:00:00',
 };
+
+/** O ponto do painel não tem papel de acessibilidade: chega-se a ele pelo título. */
+function activeFilterDot(title: string) {
+  return screen.getByText(title).closest('.MuiBadge-root')?.querySelector('.MuiBadge-badge');
+}
 
 function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
   server.use(
@@ -109,6 +118,16 @@ describe('LostAndFound', () => {
 
     await waitFor(() => expect(requestUrl!.searchParams.get('Nome')).toBe('Carteira'));
     expect(requestUrl!.searchParams.get('Situacao')).toBe(LostItemStatusEnum.OPEN);
+    expect(activeFilterDot(FILTER_PANEL_TITLE)).not.toHaveClass('MuiBadge-invisible');
+  });
+
+  it('should leave the filter unmarked while only the open items are asked for', async () => {
+    listReturning([]);
+
+    renderComponent();
+
+    await screen.findByText(C.EMPTY_LIST_MESSAGE);
+    expect(activeFilterDot(FILTER_PANEL_TITLE)).toHaveClass('MuiBadge-invisible');
   });
 
   it('should mark only the item that belongs to the user', async () => {

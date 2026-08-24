@@ -9,6 +9,7 @@ export { default as AccessTimeIcon } from '@mui/icons-material/AccessTime';
 export { default as AddIcon } from '@mui/icons-material/Add';
 export { default as ArrowBackIcon } from '@mui/icons-material/ArrowBack';
 export { default as CalendarTodayIcon } from '@mui/icons-material/CalendarToday';
+export { default as ChevronRightIcon } from '@mui/icons-material/ChevronRight';
 export { default as ContactPageIcon } from '@mui/icons-material/ContactPage';
 export { default as DarkModeIcon } from '@mui/icons-material/DarkMode';
 export { default as DeleteIcon } from '@mui/icons-material/Delete';

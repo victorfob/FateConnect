@@ -7,11 +7,19 @@ import {
   type LostItemFilter as LostItemFilterValues,
 } from '@app/services/lostAndFound/types';
 import { toApiDate } from '@app/utils/apiDate';
-import { Button, Input, Typography } from '@design-system';
-import { FilterAltIcon, SearchIcon } from '@design-system/icons';
+import { FilterPanel, Input } from '@design-system';
 
 import * as C from './constants';
-import * as S from './styles';
+
+/** Células por linha no desktop: cinco campos e o botão quebram em duas. */
+const FILTER_COLUMNS = 3;
+
+/** O mural já abre em Aberto, então isso sozinho não conta como filtro. */
+function isBeyondDefault({ status, ...rest }: LostItemFilterValues): boolean {
+  if (Object.keys(rest).length > 0) return true;
+
+  return status !== LostItemStatusEnum.OPEN;
+}
 
 type LostItemFilterProps = Readonly<{ onApply: (filters: LostItemFilterValues) => void }>;
 
@@ -20,8 +28,8 @@ export function LostItemFilter({ onApply }: LostItemFilterProps) {
   const [occurredOn, setOccurredOn] = useState<Date | null>(null);
   const [kind, setKind] = useState<string>(C.LostItemKindFilterEnum.ALL);
   const [owner, setOwner] = useState<string>(C.LostItemOwnerFilterEnum.ALL);
-  // O mural mostra o que está aberto até que se peça outra coisa.
   const [status, setStatus] = useState<string>(LostItemStatusEnum.OPEN);
+  const [isFiltered, setIsFiltered] = useState(false);
   // Item achado ou perdido só pode ter ocorrido até hoje.
   const today = useMemo(() => new Date(), []);
 
@@ -56,80 +64,65 @@ export function LostItemFilter({ onApply }: LostItemFilterProps) {
       if (owner === C.LostItemOwnerFilterEnum.MINE) filters.onlyMine = true;
       if (isLostItemStatus(status)) filters.status = status;
 
+      setIsFiltered(isBeyondDefault(filters));
       onApply(filters);
     },
     [itemName, occurredOn, kind, owner, status, onApply],
   );
 
   return (
-    <S.FilterPanel defaultExpanded disableGutters>
-      <S.FilterHeader>
-        <FilterAltIcon />
-        <Typography variant="subtitleBold" color="inherit">
-          {C.FILTER_PANEL_TITLE}
-        </Typography>
-      </S.FilterHeader>
+    <FilterPanel
+      title={C.FILTER_PANEL_TITLE}
+      submitLabel={C.FILTER_SUBMIT_LABEL}
+      columns={FILTER_COLUMNS}
+      active={isFiltered}
+      onSubmit={handleSubmit}
+    >
+      <FilterPanel.Field>
+        <Input
+          label={C.FILTER_LABELS.name}
+          fullWidth
+          placeholder={C.FILTER_PLACEHOLDERS.name}
+          value={itemName}
+          onChange={handleNameChange}
+        />
+      </FilterPanel.Field>
 
-      <S.FilterBody>
-        <S.FilterForm component="form" onSubmit={handleSubmit}>
-          <S.FieldsRow>
-            <S.FieldCell>
-              <Input
-                label={C.FILTER_LABELS.name}
-                fullWidth
-                placeholder={C.FILTER_PLACEHOLDERS.name}
-                value={itemName}
-                onChange={handleNameChange}
-              />
-            </S.FieldCell>
+      <FilterPanel.Field>
+        <Input.Date
+          label={C.FILTER_LABELS.occurredOn}
+          value={occurredOn}
+          onChange={setOccurredOn}
+          maxDate={today}
+        />
+      </FilterPanel.Field>
 
-            <S.FieldCell>
-              <Input.Date
-                label={C.FILTER_LABELS.occurredOn}
-                value={occurredOn}
-                onChange={setOccurredOn}
-                maxDate={today}
-              />
-            </S.FieldCell>
+      <FilterPanel.Field>
+        <Input.Select
+          label={C.FILTER_LABELS.kind}
+          options={C.LOST_ITEM_KIND_FILTER_OPTIONS}
+          value={kind}
+          onChange={handleKindChange}
+        />
+      </FilterPanel.Field>
 
-            <S.FieldCell>
-              <Input.Select
-                label={C.FILTER_LABELS.kind}
-                options={C.LOST_ITEM_KIND_FILTER_OPTIONS}
-                value={kind}
-                onChange={handleKindChange}
-              />
-            </S.FieldCell>
+      <FilterPanel.Field>
+        <Input.Select
+          label={C.FILTER_LABELS.owner}
+          options={C.LOST_ITEM_OWNER_FILTER_OPTIONS}
+          value={owner}
+          onChange={handleOwnerChange}
+        />
+      </FilterPanel.Field>
 
-            <S.FieldCell>
-              <Input.Select
-                label={C.FILTER_LABELS.owner}
-                options={C.LOST_ITEM_OWNER_FILTER_OPTIONS}
-                value={owner}
-                onChange={handleOwnerChange}
-              />
-            </S.FieldCell>
-
-            <S.FieldCell>
-              <Input.Select
-                label={C.FILTER_LABELS.status}
-                options={C.LOST_ITEM_STATUS_FILTER_OPTIONS}
-                value={status}
-                onChange={handleStatusChange}
-              />
-            </S.FieldCell>
-
-            <S.SubmitCell>
-              <Button type="submit" variant="contained" color="error" fullWidth>
-                <SearchIcon fontSize="small" />
-                <Typography variant="subtitleBold" color="inherit">
-                  {C.FILTER_SUBMIT_LABEL}
-                </Typography>
-              </Button>
-            </S.SubmitCell>
-          </S.FieldsRow>
-        </S.FilterForm>
-      </S.FilterBody>
-    </S.FilterPanel>
+      <FilterPanel.Field>
+        <Input.Select
+          label={C.FILTER_LABELS.status}
+          options={C.LOST_ITEM_STATUS_FILTER_OPTIONS}
+          value={status}
+          onChange={handleStatusChange}
+        />
+      </FilterPanel.Field>
+    </FilterPanel>
   );
 }
