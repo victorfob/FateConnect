@@ -41,6 +41,8 @@ Vale para pasta de componente e de tela. Pastas que **já são** dedicadas por n
 - **Props de componente sempre em `Readonly`**: `type RideCardProps = Readonly<{ ride: Ride; onEdit: (ride: Ride) => void }>`. Props não são para mutar.
 - **`enum` leva o sufixo `Enum`**: `RideTypeEnum`, `RoutePathEnum`, `GenderValueEnum`. O sufixo separa, na leitura, o que é enum do que é tipo ou componente.
 - **Constantes em namespace a partir de três**: com três ou mais nomes vindos de um módulo de constantes, importar `import * as C from './constants'` e usar `C.NOME`, mesmo padrão do `import * as S from './styles'`. Com um ou dois, import nomeado.
+- **`import * as S` com alias é sempre erro.** O estilo de um componente mora ao lado do `index` dele, então o import é `'./styles'` e nada mais. `import * as S from '@app/pages/Signup/styles'` em três seções do cadastro queria dizer que a grade do formulário estava na página e as células, que são de cada seção, junto: a página passou a envolver as seções em `FieldGrid` e cada seção ganhou o seu `styles.ts` com as células que usa.
+- **`import * as C` com alias só vale para constante compartilhada.** Constante geral da tela (`FIELD_LABELS`, usada por quatro seções) ou global (`appContact`) pode vir por alias. Constante consumida por **um** componente só vai para a pasta dele — `DELETE_DIALOG` saiu de `pages/Rides/constants` para `RideDeleteConfirmation/constants`. Antes de mover, conte os consumidores: `seatsLabel` parecia exclusivo do `RideCard` e o `RideFormDialog` também o usava.
 
 ## Erro de requisição: quem avisa é um só
 
