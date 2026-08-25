@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes } from 'react';
-import { desktopMedia, PolymorphicBox, spacing, spacingScale, Stack, styled } from '@design-system';
+import { desktopMedia, PolymorphicBox, spacingScale, Stack, styled } from '@design-system';
 
 const { md } = spacingScale;
 
@@ -16,11 +16,11 @@ const CONSENT_FONT_SIZE_MOBILE = '0.75rem';
 const CONSENT_ERROR_FONT_SIZE_MOBILE = '0.65rem';
 const CONSENT_ERROR_FONT_SIZE_DESKTOP = '0.75rem';
 
-export const ConsentGroup = styled(Stack)({
+export const ConsentGroup = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   fontSize: CONSENT_FONT_SIZE_MOBILE,
 
-  '& .MuiCheckbox-root': { padding: spacing(CHECKBOX_TOUCH_PADDING_MOBILE_PX) },
+  '& .MuiCheckbox-root': { padding: theme.space(CHECKBOX_TOUCH_PADDING_MOBILE_PX) },
   // O rótulo acompanha o corpo do bloco, como no produto, em vez de fixar a
   // tipografia do MUI — é o que faz o texto encolher junto no mobile.
   '& .MuiFormControlLabel-label': { fontSize: 'inherit', lineHeight: 'normal' },
@@ -28,9 +28,9 @@ export const ConsentGroup = styled(Stack)({
   [desktopMedia]: {
     fontSize: 'inherit',
 
-    '& .MuiCheckbox-root': { padding: spacing(CHECKBOX_TOUCH_PADDING_DESKTOP_PX) },
+    '& .MuiCheckbox-root': { padding: theme.space(CHECKBOX_TOUCH_PADDING_DESKTOP_PX) },
   },
-});
+}));
 
 /** Link no meio da frase do aceite: parece texto, age como botão. */
 export const InlineLink = styled(PolymorphicBox)<ButtonHTMLAttributes<HTMLButtonElement>>(
@@ -55,7 +55,7 @@ export const ConsentError = styled(PolymorphicBox)(({ theme }) => ({
   fontSize: CONSENT_ERROR_FONT_SIZE_MOBILE,
   lineHeight: 'normal',
   color: theme.palette.secondary.main,
-  paddingLeft: spacing(md),
+  paddingLeft: theme.space(md),
 
   [desktopMedia]: { fontSize: CONSENT_ERROR_FONT_SIZE_DESKTOP },
 }));

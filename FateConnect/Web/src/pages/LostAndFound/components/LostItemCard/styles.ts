@@ -5,10 +5,8 @@ import {
   iconSizeTokens,
   PolymorphicBox,
   PolymorphicStack,
-  radius,
   radiusScale,
   shadowTokens,
-  spacing,
   spacingScale,
   Stack,
   styled,
@@ -28,11 +26,11 @@ export const CardRoot = styled(PolymorphicStack, {
   flexDirection: 'row',
   borderLeft: own ? `${OWN_ITEM_BORDER_PX}px solid ${theme.palette.secondary.main}` : 'none',
   alignItems: 'flex-start',
-  gap: spacing(md),
+  gap: theme.space(md),
   width: '100%',
-  marginBottom: spacing(md),
-  padding: spacing(md),
-  borderRadius: radius(radiusScale.component),
+  marginBottom: theme.space(md),
+  padding: theme.space(md),
+  borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
   background: theme.palette.background.paper,
   color: theme.palette.text.primary,
@@ -42,13 +40,13 @@ export const CardRoot = styled(PolymorphicStack, {
 
 export const Photo = styled(PolymorphicBox)<
   Pick<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'>
->({
+>(({ theme }) => ({
   width: `${PHOTO_SIZE_PX}px`,
   height: `${PHOTO_SIZE_PX}px`,
   flexShrink: 0,
   objectFit: 'cover',
-  borderRadius: radius(radiusScale.md),
-});
+  borderRadius: theme.radius(radiusScale.md),
+}));
 
 /** Sem foto o espaço continua ocupado, para o cartão não mudar de altura. */
 export const PhotoPlaceholder = styled(Stack)(({ theme }) => ({
@@ -57,7 +55,7 @@ export const PhotoPlaceholder = styled(Stack)(({ theme }) => ({
   flexShrink: 0,
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: radius(radiusScale.md),
+  borderRadius: theme.radius(radiusScale.md),
   background: theme.palette.background.default,
 
   '& svg': {
@@ -72,34 +70,34 @@ export const CardBody = styled(Stack)({
   minWidth: 0,
 });
 
-export const HeaderRow = styled(Stack)({
+export const HeaderRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-  gap: spacing(sm),
-  marginBottom: spacing(sm),
-});
+  gap: theme.space(sm),
+  marginBottom: theme.space(sm),
+}));
 
-export const HeaderActions = styled(Stack)({
+export const HeaderActions = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   flexShrink: 0,
-  gap: spacing(sm),
-});
+  gap: theme.space(sm),
+}));
 
 export const InfoRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
-  columnGap: spacing(xxl),
-  rowGap: spacing(xxs),
-  marginBottom: spacing(sm),
+  columnGap: theme.space(xxl),
+  rowGap: theme.space(xxs),
+  marginBottom: theme.space(sm),
   color: theme.palette.text.secondary,
 }));
 
 export const InfoItem = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
-  gap: spacing(xxs),
+  gap: theme.space(xxs),
 
   '& svg': {
     color: theme.palette.secondary.main,
@@ -112,7 +110,7 @@ export const Description = styled(Box)(({ theme }) => ({
 }));
 
 export const CancellationNote = styled(Box)(({ theme }) => ({
-  marginTop: spacing(xxs),
+  marginTop: theme.space(xxs),
   color: theme.palette.text.secondary,
 }));
 
@@ -123,15 +121,15 @@ export const WideOnlyTag = styled(Box)({
   [compactMedia]: { display: 'none' },
 });
 
-export const CompactOnlyTag = styled(Box)({
+export const CompactOnlyTag = styled(Box)(({ theme }) => ({
   display: 'none',
 
   [compactMedia]: {
     display: 'flex',
     justifyContent: 'flex-end',
-    paddingTop: spacing(sm),
+    paddingTop: theme.space(sm),
   },
-});
+}));
 
 /** Fora da tela, mas dentro da árvore de acessibilidade. */
 export const ScreenReaderOnly = styled(PolymorphicBox)({

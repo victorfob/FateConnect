@@ -3,10 +3,8 @@ import {
   compactMedia,
   iconSizeTokens,
   PolymorphicStack,
-  radius,
   radiusScale,
   shadowTokens,
-  spacing,
   spacingScale,
   Stack,
   styled,
@@ -23,38 +21,38 @@ const ACTION_ICON_SCALE = 0.7;
 export const CardRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
   width: '100%',
-  marginBottom: spacing(md),
-  padding: spacing(md),
-  borderRadius: radius(radiusScale.component),
+  marginBottom: theme.space(md),
+  padding: theme.space(md),
+  borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
   background: theme.palette.background.paper,
   color: theme.palette.text.primary,
 }));
 
-export const HeaderRow = styled(Stack)({
+export const HeaderRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-  marginBottom: spacing(sm),
-});
+  marginBottom: theme.space(sm),
+}));
 
-export const HeaderActions = styled(Stack)({
+export const HeaderActions = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
-  gap: spacing(sm),
-});
+  gap: theme.space(sm),
+}));
 
 export const InfoRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   gap: INFO_ROW_GAP,
-  marginBottom: spacing(sm),
+  marginBottom: theme.space(sm),
   color: theme.palette.text.secondary,
 }));
 
 export const InfoItem = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
-  gap: spacing(xxs),
+  gap: theme.space(xxs),
 
   '& svg': {
     color: theme.palette.secondary.main,
@@ -64,7 +62,7 @@ export const InfoItem = styled(Stack)(({ theme }) => ({
 
 export const Description = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
-  marginBottom: spacing(sm),
+  marginBottom: theme.space(sm),
 }));
 
 export const ActionButtons = styled(Stack)(({ theme }) => ({
@@ -73,7 +71,7 @@ export const ActionButtons = styled(Stack)(({ theme }) => ({
   '& .MuiIconButton-root': {
     width: `${ACTION_BUTTON_SIZE_PX}px`,
     height: `${ACTION_BUTTON_SIZE_PX}px`,
-    padding: spacing(xxs),
+    padding: theme.space(xxs),
     color: theme.palette.text.primary,
   },
   '& .MuiIconButton-root svg': {
@@ -89,12 +87,12 @@ export const WideOnlyTag = styled(Box)({
   [compactMedia]: { display: 'none' },
 });
 
-export const CompactOnlyTag = styled(Box)({
+export const CompactOnlyTag = styled(Box)(({ theme }) => ({
   display: 'none',
 
   [compactMedia]: {
     display: 'flex',
     justifyContent: 'flex-end',
-    padding: spacing(sm, 0),
+    padding: theme.space(sm, 0),
   },
-});
+}));

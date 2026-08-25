@@ -4,7 +4,6 @@ import {
   mobileMedia,
   PolymorphicBox,
   PolymorphicStack,
-  radius,
   radiusScale,
   shadowTokens,
   Stack,
@@ -41,7 +40,7 @@ export const ServiceCardRoot = styled(PolymorphicStack)(({ theme }) => ({
   padding: '2rem',
   textAlign: 'center',
   backgroundColor: theme.palette.background.default,
-  borderRadius: radius(radiusScale.component),
+  borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
 
   [mobileMedia]: { minWidth: '100%' },

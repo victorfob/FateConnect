@@ -3,10 +3,8 @@ import {
   Box,
   desktopMedia,
   PolymorphicStack,
-  radius,
   radiusScale,
   shadowTokens,
-  spacing,
   spacingScale,
   Stack,
   styled,
@@ -27,28 +25,28 @@ const PAGE_BOTTOM_PADDING_PX = 40;
 /** Espaço entre a pergunta e o link de login, como no produto. */
 const LOGIN_ROW_GAP = '0.35rem';
 
-export const PageRoot = styled(Stack)({
+export const PageRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   flex: 1,
   justifyContent: 'center',
-  padding: spacing(xl, md, PAGE_BOTTOM_PADDING_PX),
+  padding: theme.space(xl, md, PAGE_BOTTOM_PADDING_PX),
   width: '100%',
   boxSizing: 'border-box',
-});
+}));
 
 export const SignupCard = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
-  gap: spacing(md),
+  gap: theme.space(md),
   width: '100%',
   maxWidth: CARD_MAX_WIDTH_MOBILE,
-  padding: spacing(xl),
+  padding: theme.space(xl),
   background: theme.palette.background.paper,
-  borderRadius: radius(radiusScale.component),
+  borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
   boxSizing: 'border-box',
 
   [desktopMedia]: {
-    padding: spacing(xl, xxl),
+    padding: theme.space(xl, xxl),
     maxWidth: CARD_MAX_WIDTH_DESKTOP,
   },
 }));
@@ -70,14 +68,14 @@ export const SectionDivider = styled(Box)(({ theme }) => ({
   width: '100%',
   height: HAIRLINE,
   backgroundColor: theme.palette.divider,
-  margin: spacing(xl, none, md),
+  margin: theme.space(xl, none, md),
 }));
 
 export const FieldGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: '1fr',
-  gap: spacing(md),
-  marginTop: spacing(md),
+  gap: theme.space(md),
+  marginTop: theme.space(md),
   // Impede que campos da mesma linha estiquem quando o vizinho exibe erro.
   alignItems: 'start',
 
@@ -88,19 +86,19 @@ export const FieldGrid = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const SubmitContainer = styled(Stack)({
-  marginTop: spacing(md),
+export const SubmitContainer = styled(Stack)(({ theme }) => ({
+  marginTop: theme.space(md),
   flexDirection: 'column',
-  gap: spacing(md),
+  gap: theme.space(md),
 
   '& .MuiButton-root': {
     width: '100%',
     maxWidth: `${SUBMIT_MAX_WIDTH_REM}rem`,
     alignSelf: 'center',
     height: `${SUBMIT_HEIGHT_PX}px`,
-    borderRadius: radius(radiusScale.component),
+    borderRadius: theme.radius(radiusScale.component),
   },
-});
+}));
 
 export const LoginRow = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',

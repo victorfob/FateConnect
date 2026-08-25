@@ -3,10 +3,8 @@ import {
   iconSizeTokens,
   mobileMedia,
   PolymorphicStack,
-  radius,
   radiusScale,
   shadowTokens,
-  spacing,
   spacingScale,
   Stack,
   styled,
@@ -24,37 +22,37 @@ const CARD_TRANSITION = 'transform 0.3s ease';
 
 type CardProps = Pick<LinkProps, 'to'>;
 
-export const MenuRoot = styled(Stack)({
+export const MenuRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   flex: 1,
   width: '100%',
   alignItems: 'center',
   justifyContent: 'center',
   textAlign: 'center',
-  gap: spacing(md),
+  gap: theme.space(md),
   padding: PAGE_PADDING,
-});
+}));
 
 /** O texto de apoio é mais apagado que o título. */
 export const MenuIntro = styled(Stack)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export const CardsContainer = styled(Stack)({
+export const CardsContainer = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
-  gap: spacing(xl),
+  gap: theme.space(xl),
 
   [mobileMedia]: { flexDirection: 'column' },
-});
+}));
 
 export const ServiceCard = styled(PolymorphicStack)<CardProps>(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
-  gap: spacing(md),
-  padding: spacing(xl),
+  gap: theme.space(md),
+  padding: theme.space(xl),
   minWidth: `${CARD_MIN_WIDTH_PX}px`,
   height: 'auto',
-  borderRadius: radius(radiusScale.lg),
+  borderRadius: theme.radius(radiusScale.lg),
   backgroundColor: theme.palette.background.paper,
   boxShadow: shadowTokens.component,
   color: theme.palette.text.primary,

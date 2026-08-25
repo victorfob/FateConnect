@@ -1,4 +1,4 @@
-import { spacing, spacingScale, Stack, styled } from '@design-system';
+import { spacingScale, Stack, styled } from '@design-system';
 
 const { xxs } = spacingScale;
 
@@ -13,7 +13,7 @@ export const ActionButtons = styled(Stack)(({ theme }) => ({
   '& .MuiIconButton-root': {
     width: `${ACTION_BUTTON_SIZE_PX}px`,
     height: `${ACTION_BUTTON_SIZE_PX}px`,
-    padding: spacing(xxs),
+    padding: theme.space(xxs),
     color: theme.palette.text.primary,
   },
   '& .MuiIconButton-root svg': {

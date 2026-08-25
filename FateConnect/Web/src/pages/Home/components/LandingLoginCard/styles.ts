@@ -2,7 +2,6 @@ import type { FormHTMLAttributes } from 'react';
 import {
   Box,
   PolymorphicStack,
-  radius,
   radiusScale,
   shadowTokens,
   styled,
@@ -18,7 +17,7 @@ export const CardRoot = styled(PolymorphicStack)(({ theme }) => ({
   padding: '1.75rem',
   width: `${CARD_WIDTH_PX}px`,
   background: theme.palette.background.paper,
-  borderRadius: radius(radiusScale.component),
+  borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
 
   [tabletMedia]: {
@@ -39,15 +38,15 @@ export const Form = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>
   '& svg': { color: theme.palette.text.secondary },
 }));
 
-export const SubmitRow = styled(Box)({
+export const SubmitRow = styled(Box)(({ theme }) => ({
   marginTop: '0.5rem',
 
   '& .MuiButton-root': {
     width: '100%',
     height: `${SUBMIT_HEIGHT_PX}px`,
-    borderRadius: radius(radiusScale.component),
+    borderRadius: theme.radius(radiusScale.component),
   },
-});
+}));
 
 export const SignupRow = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',

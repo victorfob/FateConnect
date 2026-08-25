@@ -1,6 +1,5 @@
 import { PolymorphicBox } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
-import { spacing } from '@ds-root/theme/helpers/spacing';
 import {
   onStatusTagSurface,
   statusTagSurface,
@@ -19,7 +18,7 @@ export const TagRoot = styled(PolymorphicBox, {
   // neutra evita que ela cresça quando o pai é um contêiner flex.
   display: 'inline',
   lineHeight: 1,
-  padding: spacing(xxs, sm),
+  padding: theme.space(xxs, sm),
   borderRadius: `${TAG_RADIUS_PX}px`,
   background: statusTagSurface(theme, tone),
   color: onStatusTagSurface(theme, tone),

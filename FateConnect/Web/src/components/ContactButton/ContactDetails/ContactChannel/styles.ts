@@ -1,12 +1,5 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react';
-import {
-  iconSizeTokens,
-  PolymorphicStack,
-  spacing,
-  spacingScale,
-  styled,
-  Typography,
-} from '@design-system';
+import { iconSizeTokens, PolymorphicStack, spacingScale, styled, Typography } from '@design-system';
 
 const { none, xs } = spacingScale;
 
@@ -21,13 +14,13 @@ type ChannelRowProps = Pick<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 't
 export const ChannelRow = styled(PolymorphicStack)<ChannelRowProps>(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
-  gap: spacing(xs),
+  gap: theme.space(xs),
   color: theme.palette.text.primary,
   textDecoration: 'none',
 
   // Como botão, o elemento vem com cromo de formulário: sem isto a linha ganha
   // borda, fundo e a fonte do sistema, e deixa de parecer com a linha do link.
-  padding: spacing(none),
+  padding: theme.space(none),
   border: 'none',
   background: 'none',
   font: 'inherit',

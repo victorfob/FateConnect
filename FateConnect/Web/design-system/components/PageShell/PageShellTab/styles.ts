@@ -2,8 +2,6 @@ import type { ButtonHTMLAttributes } from 'react';
 
 import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
-import { radius } from '@ds-root/theme/helpers/radius';
-import { spacing } from '@ds-root/theme/helpers/spacing';
 import { radiusScale, spacingScale } from '@ds-root/tokens';
 
 const { xxs, md } = spacingScale;
@@ -17,19 +15,19 @@ export const TabButton = styled(PolymorphicStack)<ButtonHTMLAttributes<HTMLButto
     alignItems: 'center',
     justifyContent: 'center',
     gap: TAB_GAP,
-    padding: spacing(md, xxs),
+    padding: theme.space(md, xxs),
     border: 0,
     background: 'transparent',
     color: theme.palette.text.primary,
     cursor: 'pointer',
 
     '&:first-of-type': {
-      borderTopLeftRadius: radius(radiusScale.component),
-      borderBottomLeftRadius: radius(radiusScale.component),
+      borderTopLeftRadius: theme.radius(radiusScale.component),
+      borderBottomLeftRadius: theme.radius(radiusScale.component),
     },
     '&:last-of-type': {
-      borderTopRightRadius: radius(radiusScale.component),
-      borderBottomRightRadius: radius(radiusScale.component),
+      borderTopRightRadius: theme.radius(radiusScale.component),
+      borderBottomRightRadius: theme.radius(radiusScale.component),
     },
 
     '&[aria-selected="true"]': {

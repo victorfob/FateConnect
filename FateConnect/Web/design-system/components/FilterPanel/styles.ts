@@ -8,8 +8,6 @@ import Stack from '@mui/material/Stack';
 
 import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
-import { radius } from '@ds-root/theme/helpers/radius';
-import { spacing } from '@ds-root/theme/helpers/spacing';
 import { desktopMedia, radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
 const { none, xxs, xs, md, lg, xl } = spacingScale;
@@ -22,8 +20,8 @@ const FULL_WIDTH_PERCENT = 100;
 const ACTIVE_DOT_OFFSET = 'translate(6px, -2px)';
 
 export const PanelRoot = styled(Accordion)(({ theme }) => ({
-  marginBottom: spacing(md),
-  borderRadius: radius(radiusScale.component),
+  marginBottom: theme.space(md),
+  borderRadius: theme.radius(radiusScale.component),
   background: theme.palette.background.paper,
   color: theme.palette.text.primary,
   border: 'none',
@@ -33,20 +31,20 @@ export const PanelRoot = styled(Accordion)(({ theme }) => ({
 
   // Único ponto do produto em que o campo usa o raio de componente: o resto
   // da aplicação mantém o raio padrão do Material.
-  '& .MuiOutlinedInput-root': { borderRadius: radius(radiusScale.component) },
+  '& .MuiOutlinedInput-root': { borderRadius: theme.radius(radiusScale.component) },
 }));
 
 export const PanelHeader = styled(AccordionSummary)(({ theme }) => ({
   color: theme.palette.text.primary,
   minHeight: `${HEADER_HEIGHT_PX}px`,
-  padding: spacing(none, lg),
+  padding: theme.space(none, lg),
 
   '&.Mui-expanded': { minHeight: `${HEADER_HEIGHT_PX}px` },
 
   '& .MuiAccordionSummary-content': {
     display: 'flex',
     alignItems: 'center',
-    gap: spacing(xxs),
+    gap: theme.space(xxs),
   },
   '& .MuiAccordionSummary-content svg': { color: theme.palette.text.primary },
 
@@ -63,9 +61,9 @@ export const ActiveFilterBadge = styled(Badge)({
   '& .MuiBadge-dot': { transform: ACTIVE_DOT_OFFSET },
 });
 
-export const PanelBody = styled(AccordionDetails)({
-  padding: spacing(none, lg, xl),
-});
+export const PanelBody = styled(AccordionDetails)(({ theme }) => ({
+  padding: theme.space(none, lg, xl),
+}));
 
 export const PanelForm = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>>({
   flexDirection: 'column',
@@ -74,12 +72,12 @@ export const PanelForm = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormEle
 /** Quem arranja a linha decide quantas células cabem nela. */
 export const FieldsRow = styled(Stack, {
   shouldForwardProp: (prop) => prop !== 'columns',
-})<{ columns: number }>(({ columns }) => ({
+})<{ columns: number }>(({ columns, theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'flex-start',
-  gap: spacing(md),
-  marginTop: spacing(md),
+  gap: theme.space(md),
+  marginTop: theme.space(md),
 
   [desktopMedia]: {
     '& > *': {
@@ -89,9 +87,9 @@ export const FieldsRow = styled(Stack, {
   },
 }));
 
-export const SubmitButton = styled(Button)({
+export const SubmitButton = styled(Button)(({ theme }) => ({
   height: `${SUBMIT_BUTTON_HEIGHT_PX}px`,
   letterSpacing: SUBMIT_BUTTON_LETTER_SPACING,
-  borderRadius: radius(radiusScale.component),
-  gap: spacing(xs),
-});
+  borderRadius: theme.radius(radiusScale.component),
+  gap: theme.space(xs),
+}));

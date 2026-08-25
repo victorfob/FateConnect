@@ -62,13 +62,13 @@ export const Tab = styled(PolymorphicBox)<Pick<NavLinkProps, 'to' | 'end'>>({ ..
 <Box sx={{ padding: '16px' }}>
 
 // ✅ Recomendado
-import { Box, spacing, spacingScale, styled } from '@design-system';
+import { Box, spacingScale, styled } from '@design-system';
 
 const { md } = spacingScale;
 
-export const StyledBox = styled(Box)({
-  padding: spacing(md),
-});
+export const StyledBox = styled(Box)(({ theme }) => ({
+  padding: theme.space(md),
+}));
 ```
 
 ### 2. Cor literal ou token de cor no componente
@@ -92,19 +92,25 @@ padding: '16px';
 zIndex: 1200;
 
 // ✅ Recomendado
-import { Box, spacing, spacingScale, styled, useTheme } from '@design-system';
+import { Box, spacingScale, styled } from '@design-system';
 
 const { md } = spacingScale;
 
 export const Container = styled(Box)(({ theme }) => ({
-  padding: spacing(md),
+  padding: theme.space(md),
   zIndex: theme.zIndex.drawer,
 }));
 ```
 
-⛔ **`gap`, `padding` e `margin` são sempre `spacing()`.** Não existe px cru nessas três propriedades, nem herdado de código antigo: o painel de filtros carregava um `gap: '3px'` e o cartão de achados e perdidos um `gap: '5vw'`, os dois copiados de caronas na migração. Valor fora da escala vira o token mais próximo. Px literal continua valendo para o que **não é espaçamento** — largura de miniatura, altura de botão, raio.
+⛔ **`gap`, `padding` e `margin` são sempre `theme.space()`.** Não existe px cru nessas três propriedades, nem herdado de código antigo: o painel de filtros carregava um `gap: '3px'` e o cartão de achados e perdidos um `gap: '5vw'`, os dois copiados de caronas na migração. Valor fora da escala vira o token mais próximo. Px literal continua valendo para o que **não é espaçamento** — largura de miniatura, altura de botão, raio.
 
-> ⚠️ **Espaçamento não passa por `theme.spacing()`.** O `theme.spacing` pertence ao MUI e é usado internamente pelos componentes dele; sobrescrevê-lo encolheu as gutters do `Toolbar` de 24px para 3px. Nossos tokens em px passam pelo helper `spacing()` do design system. As demais escalas do tema — `zIndex`, `transitions`, `breakpoints`, `shadows` — **são** consumidas pelo `theme`, porque essas o MUI não distorce.
+### Espaçamento e raio saem do tema, mas **não** de `theme.spacing`
+
+`theme.space(token)` e `theme.radius(token)` são chaves **nossas**, adicionadas ao tema por augmentation. O valor continua vindo de `spacingScale`/`radiusScale`, que se importa e desestrutura como sempre — muda só quem faz a conversão para `rem`.
+
+⛔ **`theme.spacing` é do MUI e não se toca.** Os componentes dele chamam `theme.spacing(1..3)` esperando o multiplicador de 8px; trocar a transformação encolheu as gutters do `Toolbar` de 24px para 3px. Por isso a nossa chave se chama `space`, e **o lint reprova `theme.spacing(`** — quem errar por três letras descobre na hora.
+
+Os helpers **não são exportados** pelo barrel: não há como importá-los na aplicação, e é de propósito. O acesso é sempre pelo tema, o que também elimina dois imports por `styles.ts`. As demais escalas — `zIndex`, `transitions`, `breakpoints`, `shadows` — já vinham do `theme`, porque essas o MUI não distorce.
 
 ### 4. CSS puro / classe solta
 

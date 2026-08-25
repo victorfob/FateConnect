@@ -4,7 +4,6 @@ import Toolbar from '@mui/material/Toolbar';
 import { PolymorphicBox, PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { onChromeSurface } from '@ds-root/theme/chromeSurface';
-import { spacing } from '@ds-root/theme/helpers/spacing';
 import { mobileMedia, shadowTokens, spacingScale } from '@ds-root/tokens';
 
 const { xs } = spacingScale;
@@ -52,7 +51,7 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'center',
-  gap: `${spacing(xs)} ${NAV_COLUMN_GAP}`,
+  gap: `${theme.space(xs)} ${NAV_COLUMN_GAP}`,
   // Empurra navegação e ações para a direita, mantendo só a marca à esquerda.
   // Sem isso, o `space-between` distribui os três blocos e centraliza a navegação.
   marginLeft: 'auto',
@@ -68,14 +67,14 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   [mobileMedia]: { display: 'none' },
 }));
 
-export const ActionsSlot = styled(PolymorphicStack)({
+export const ActionsSlot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   // Separa uma ação da outra. Com um filho só isso não aparecia, e duas
   // ações adjacentes ficavam encostadas.
-  gap: spacing(xs),
+  gap: theme.space(xs),
   marginLeft: NAV_COLUMN_GAP,
-});
+}));
 
 /**
  * Só existe abaixo do breakpoint mobile. O `display: flex` na consulta é o que

@@ -2,7 +2,6 @@ import Button from '@mui/material/Button';
 import type { Theme } from '@mui/material/styles';
 
 import { styled } from '@ds-root/styled';
-import { spacing } from '@ds-root/theme/helpers/spacing';
 import {
   notificationSurface,
   onNotificationSurface,
@@ -51,7 +50,7 @@ export function notificationStyles(theme: Theme) {
       fontSize: typographyTokens.subtitle.fontSize,
       fontWeight: typographyTokens.caption.fontWeight,
       lineHeight: 'normal',
-      padding: spacing(0, xs, 0, 0),
+      padding: theme.space(0, xs, 0, 0),
       flexWrap: 'nowrap',
       width: `${BOX_WIDTH_PX}px`,
 
@@ -63,7 +62,7 @@ export function notificationStyles(theme: Theme) {
     // direita — sem isso o "OK" cola no fim do texto e muda de lugar a cada
     // mensagem.
     '#notistack-snackbar': {
-      padding: spacing(MESSAGE_PADDING_Y_PX, xs, MESSAGE_PADDING_Y_PX, md),
+      padding: theme.space(MESSAGE_PADDING_Y_PX, xs, MESSAGE_PADDING_Y_PX, md),
       flexGrow: 1,
     },
     // A biblioteca envolve a ação num elemento com recuo próprio, que somava 8px
@@ -78,11 +77,11 @@ export function notificationStyles(theme: Theme) {
 }
 
 /** Ação de dispensar. Herda a cor do aviso, como o botão do produto. */
-export const DismissButton = styled(Button)({
+export const DismissButton = styled(Button)(({ theme }) => ({
   ...typographyTokens.button,
   lineHeight: 'normal',
   minWidth: `${DISMISS_MIN_WIDTH_PX}px`,
   height: `${DISMISS_HEIGHT_PX}px`,
-  padding: spacing(0, xs),
+  padding: theme.space(0, xs),
   color: 'inherit',
-});
+}));

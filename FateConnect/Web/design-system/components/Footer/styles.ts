@@ -4,7 +4,6 @@ import Stack from '@mui/material/Stack';
 import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { chromeDivider, chromeSurface, onChromeSurface } from '@ds-root/theme/chromeSurface';
-import { spacing } from '@ds-root/theme/helpers/spacing';
 import { mobileMedia, spacingScale } from '@ds-root/tokens';
 
 const { md, xs } = spacingScale;
@@ -20,7 +19,7 @@ export const FooterRoot = styled(PolymorphicStack)(({ theme }) => ({
   backgroundColor: chromeSurface(theme),
   color: onChromeSurface(theme),
   padding: '3vw 7vw',
-  gap: spacing(md),
+  gap: theme.space(md),
   width: '100%',
 
   [mobileMedia]: {
@@ -35,20 +34,20 @@ export const FooterRoot = styled(PolymorphicStack)(({ theme }) => ({
  * o alinhamento fica no contêiner e é herdado, no lugar do `:host-context` que
  * a tipografia usava para alcançar o pai.
  */
-export const ContactsContainer = styled(Stack)({
+export const ContactsContainer = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
-  gap: spacing(md),
+  gap: theme.space(md),
   width: '100%',
 
   [mobileMedia]: { alignItems: 'center', textAlign: 'center' },
-});
+}));
 
-export const ContactItem = styled(Stack)({
+export const ContactItem = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
-  gap: spacing(xs),
-});
+  gap: theme.space(xs),
+}));
 
 /** Vertical no desktop, horizontal no mobile. */
 export const FooterDivider = styled(Box)(({ theme }) => ({
@@ -59,12 +58,12 @@ export const FooterDivider = styled(Box)(({ theme }) => ({
   [mobileMedia]: { width: '100%', height: '1px' },
 }));
 
-export const CopyrightContainer = styled(Stack)({
+export const CopyrightContainer = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'flex-end',
-  gap: spacing(md),
+  gap: theme.space(md),
   width: '100%',
 
   [mobileMedia]: { alignItems: 'center', textAlign: 'center' },
-});
+}));

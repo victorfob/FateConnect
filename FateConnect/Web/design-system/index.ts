@@ -38,7 +38,6 @@ export { DateLocalizationProvider } from './DateLocalizationProvider';
 export { useThemeMode } from './ThemeProvider/context/ThemeModeContext';
 export { ThemeToggleButton } from './components/ThemeToggleButton';
 export { GlobalStyles } from './GlobalStyles';
-export { spacing, radius } from './theme';
 export {
   spacingScale,
   radiusScale,

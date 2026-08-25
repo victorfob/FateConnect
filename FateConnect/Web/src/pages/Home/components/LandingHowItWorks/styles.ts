@@ -2,7 +2,6 @@ import {
   Box,
   mobileMedia,
   PolymorphicStack,
-  radius,
   radiusScale,
   shadowTokens,
   Stack,
@@ -35,7 +34,7 @@ export const StepCard = styled(PolymorphicStack)(({ theme }) => ({
   alignItems: 'center',
   padding: '2rem 1.5rem 1.75rem',
   background: theme.palette.background.paper,
-  borderRadius: radius(radiusScale.component),
+  borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
   textAlign: 'center',
 }));

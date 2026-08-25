@@ -4,9 +4,29 @@ import { ptBR as pickersPtBR } from '@mui/x-date-pickers/locales';
 
 import { fontFamily, mobileMedia, typographyTokens } from '../tokens';
 import { components } from './components';
+import { radius } from './helpers/radius';
+import { spacing } from './helpers/spacing';
 import { darkPalette, lightPalette } from './palettes';
 
 declare module '@mui/material/styles' {
+  /**
+   * `space` e `radius` são chaves **nossas**, não API do MUI. Existem para o
+   * estilo ler o helper do tema em vez de importá-lo em cada `styles.ts`.
+   *
+   * ⛔ Não substituem o `spacing` do MUI, e é de propósito: os componentes dele
+   * chamam `theme.spacing(1..3)` esperando o multiplicador de 8px, e trocar a
+   * transformação encolheu as gutters do `Toolbar` de 24px para 3px.
+   */
+  interface Theme {
+    space: typeof spacing;
+    radius: typeof radius;
+  }
+
+  interface ThemeOptions {
+    space?: typeof spacing;
+    radius?: typeof radius;
+  }
+
   interface TypographyVariants {
     subtitle: React.CSSProperties;
     subtitleBold: React.CSSProperties;
@@ -44,6 +64,8 @@ export function createAppTheme(mode: ThemeMode = 'light'): Theme {
   return createTheme(
     {
       components,
+      space: spacing,
+      radius,
       palette: mode === 'dark' ? darkPalette : lightPalette,
       typography: {
         fontFamily,

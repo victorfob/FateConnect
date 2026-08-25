@@ -4,9 +4,7 @@ import {
   Button,
   compactMedia,
   PolymorphicBox,
-  radius,
   radiusScale,
-  spacing,
   spacingScale,
   Stack,
   styled,
@@ -18,21 +16,21 @@ const PREVIEW_SIZE_PX = 96;
 /** No estreito a miniatura encolhe para a foto e os botões caberem na mesma linha. */
 const COMPACT_PREVIEW_SIZE_PX = 72;
 
-export const PhotoField = styled(Stack)({
+export const PhotoField = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
-  gap: spacing(xxs),
-});
+  gap: theme.space(xxs),
+}));
 
-export const PhotoRow = styled(Stack)({
+export const PhotoRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   flexWrap: 'wrap',
-  gap: spacing(sm),
-});
+  gap: theme.space(sm),
+}));
 
 export const PhotoPreview = styled(PolymorphicBox)<
   Pick<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'>
->({
+>(({ theme }) => ({
   width: `${PREVIEW_SIZE_PX}px`,
   height: `${PREVIEW_SIZE_PX}px`,
 
@@ -42,18 +40,18 @@ export const PhotoPreview = styled(PolymorphicBox)<
   },
   flexShrink: 0,
   objectFit: 'cover',
-  borderRadius: radius(radiusScale.md),
-});
+  borderRadius: theme.radius(radiusScale.md),
+}));
 
-export const PhotoActions = styled(Stack)({
+export const PhotoActions = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
-  gap: spacing(xs),
-});
+  gap: theme.space(xs),
+}));
 
-export const PhotoActionButton = styled(Button)({
-  gap: spacing(xxs),
-  borderRadius: radius(radiusScale.component),
-});
+export const PhotoActionButton = styled(Button)(({ theme }) => ({
+  gap: theme.space(xxs),
+  borderRadius: theme.radius(radiusScale.component),
+}));
 
 /** Fora da vista, mas focável e rotulado: quem o aciona é o botão. */
 export const HiddenFileInput = styled(PolymorphicBox)<ComponentPropsWithRef<'input'>>({

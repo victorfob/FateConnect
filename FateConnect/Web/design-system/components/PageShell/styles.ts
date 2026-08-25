@@ -2,8 +2,6 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { styled } from '@ds-root/styled';
-import { radius } from '@ds-root/theme/helpers/radius';
-import { spacing } from '@ds-root/theme/helpers/spacing';
 import { radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
 const { md } = spacingScale;
@@ -11,13 +9,13 @@ const { md } = spacingScale;
 /** Recuo da página em unidades de viewport, como no produto. */
 const PAGE_PADDING = '3vw 7vw';
 
-export const PageRoot = styled(Stack)({
+export const PageRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   flex: 1,
   width: '100%',
-  gap: spacing(md),
+  gap: theme.space(md),
   padding: PAGE_PADDING,
-});
+}));
 
 export const PageHeaderRow = styled(Stack)({
   flexDirection: 'row',
@@ -32,8 +30,8 @@ export const PageTitleText = styled(Typography)(({ theme }) => ({
 export const TabBar = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   width: '100%',
-  borderRadius: radius(radiusScale.component),
-  marginTop: spacing(md),
+  borderRadius: theme.radius(radiusScale.component),
+  marginTop: theme.space(md),
   background: theme.palette.background.paper,
   boxShadow: shadowTokens.component,
 }));
