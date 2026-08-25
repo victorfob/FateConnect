@@ -14,6 +14,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona o mural de achados e perdidos, com filtros e a lista de itens, no lugar do aviso de área em breve (#131) [Frontend]
 - Adiciona o cadastro e a edição de item de achados e perdidos, em diálogo sobre a própria lista (#133) [Frontend]
 - Adiciona as ações de quem cadastrou o item de achados e perdidos — concluir, reabrir e excluir, com confirmação onde ela protege (#132) [Frontend]
+- Adiciona o contato de quem cadastrou o item de achados e perdidos, com e-mail copiável e conversa no WhatsApp (#134) [Frontend]
 
 ### Changed
 
