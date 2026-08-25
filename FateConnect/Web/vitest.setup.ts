@@ -1,6 +1,12 @@
 import '@testing-library/jest-dom/vitest';
+import failOnConsole from 'vitest-fail-on-console';
 
 import { server } from './src/mocks/server';
+
+// Aviso do React no console é defeito: prop vazando para o DOM, atualização
+// fora de `act`, chave repetida em lista. Sem isto o teste passa e o defeito
+// só aparece no navegador de quem estiver olhando.
+failOnConsole({ shouldFailOnWarn: true, shouldFailOnError: true });
 
 process.env.TZ = 'America/Sao_Paulo';
 

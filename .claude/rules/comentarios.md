@@ -17,4 +17,10 @@ Sai, sempre:
 - Parágrafo de contexto que pertence ao corpo do PR ou à issue — por que a API ainda não guarda o arquivo, o que a #106 vai implementar.
 - Comentário que repete a constante declarada logo acima.
 
+## Forma: JSDoc acima de declaração, `//` dentro de corpo
+
+O comentário que passou no teste acima ainda escolhe a forma errada. Acima de uma **declaração** — `const`, `function`, `type`, `enum`, componente `styled` — é `/** … */`, como `LOST_ITEM_OWNER`, `ErrorScreen` e `CardRoot` estão escritos. **Dentro** de um corpo — propriedade de objeto, ramo de `if`, passo de um teste — é `//`.
+
+⛔ Cobrado no PR #141: `// Instrumentado para a transação…` acima do `const router`, no `main.tsx`. *"Deveria ser jsDoc"*. O mesmo comentário, com o mesmo texto, estava certo — errada estava a forma.
+
 ⛔ **Cobrança repetida do Victor**, a última em 2026-08-24 com os três PRs de achados e perdidos abertos: *"já falei um milhão de vezes, só colocar comentários quando for estritamente essencial… se o código precisa ser explicado é pq ele está mal escrito"*. A varredura tirou **90 linhas líquidas de comentário de 25 arquivos** nos três PRs, e nenhum teste caiu — nenhuma delas estava segurando nada.
