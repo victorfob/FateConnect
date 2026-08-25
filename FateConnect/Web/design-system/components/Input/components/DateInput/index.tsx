@@ -1,6 +1,8 @@
 import type { FocusEvent, ReactNode } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
+import { DatePickerButton } from '@ds-root/components/Input/components/DatePickerButton';
+
 export type DateInputProps = Readonly<{
   label: ReactNode;
   value: Date | null;
@@ -35,6 +37,7 @@ export function DateInput({
       onChange={onChange}
       disabled={disabled}
       maxDate={maxDate}
+      slots={{ openPickerButton: DatePickerButton }}
       slotProps={{
         textField: {
           required,

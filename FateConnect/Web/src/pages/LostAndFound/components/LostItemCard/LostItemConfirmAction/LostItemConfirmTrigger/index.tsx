@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Button, IconButton, Tooltip } from '@design-system';
+import { Button, IconButton } from '@design-system';
 
 type LostItemConfirmTriggerProps = Readonly<{
   label: string;
@@ -24,10 +24,8 @@ export function LostItemConfirmTrigger({
   }
 
   return (
-    <Tooltip title={label}>
-      <IconButton type="button" aria-label={label} onClick={onClick}>
-        {icon}
-      </IconButton>
-    </Tooltip>
+    <IconButton type="button" label={label} onClick={onClick}>
+      {icon}
+    </IconButton>
   );
 }

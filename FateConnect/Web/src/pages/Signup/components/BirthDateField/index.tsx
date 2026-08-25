@@ -74,7 +74,7 @@ export function BirthDateField() {
         shrinkLabel={isBirthDateFilled}
         maxLength={MASKED_DATE_LENGTH}
         endAdornment={
-          <IconButton type="button" aria-label={CALENDAR_TOGGLE_LABEL} onClick={handleOpenCalendar}>
+          <IconButton type="button" label={CALENDAR_TOGGLE_LABEL} onClick={handleOpenCalendar}>
             <CalendarTodayIcon fontSize="small" />
           </IconButton>
         }

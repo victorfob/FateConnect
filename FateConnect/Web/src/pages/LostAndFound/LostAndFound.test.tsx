@@ -233,7 +233,7 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
-    await userEvent.click(screen.getByRole('button', { name: /Escolha uma data/i }));
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir calendário' }));
 
     const calendar = within(await screen.findByRole('grid'));
     expect(calendar.getByRole('gridcell', { name: '10' })).toBeEnabled();

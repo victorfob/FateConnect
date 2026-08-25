@@ -104,7 +104,7 @@ export function LandingLoginCard() {
           endAdornment={
             <IconButton
               type="button"
-              aria-label={C.PASSWORD_TOGGLE_LABEL}
+              label={C.PASSWORD_TOGGLE_LABEL}
               aria-pressed={!passwordHidden}
               onClick={handleTogglePassword}
             >

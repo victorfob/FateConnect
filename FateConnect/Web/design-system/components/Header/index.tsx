@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
-import IconButton from '@mui/material/IconButton';
+
+import { IconButton } from '@ds-root/components/IconButton';
 
 import * as S from './styles';
 
@@ -31,7 +32,7 @@ export function Header({ logo, navigation, actions, onMenuClick, menuButtonLabel
           {actions}
 
           <S.MenuButtonSlot component="span">
-            <IconButton color="inherit" aria-label={menuButtonLabel} onClick={onMenuClick}>
+            <IconButton color="inherit" label={menuButtonLabel} onClick={onMenuClick}>
               <MenuIcon />
             </IconButton>
           </S.MenuButtonSlot>

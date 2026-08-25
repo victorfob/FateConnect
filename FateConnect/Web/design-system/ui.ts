@@ -14,14 +14,12 @@ export { default as Checkbox } from '@mui/material/Checkbox';
 export { default as CircularProgress } from '@mui/material/CircularProgress';
 export { default as Drawer } from '@mui/material/Drawer';
 export { default as FormControlLabel } from '@mui/material/FormControlLabel';
-export { default as IconButton } from '@mui/material/IconButton';
 export { default as List } from '@mui/material/List';
 export { default as ListItemButton } from '@mui/material/ListItemButton';
 export { default as ListItemText } from '@mui/material/ListItemText';
 export { default as Popover } from '@mui/material/Popover';
 export { default as Stack } from '@mui/material/Stack';
 export { default as Toolbar } from '@mui/material/Toolbar';
-export { default as Tooltip } from '@mui/material/Tooltip';
 export { default as Typography } from '@mui/material/Typography';
 
 export type { BoxProps } from '@mui/material/Box';

@@ -40,7 +40,7 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
           <S.ActionButtons>
             <RideDriverContact destination={ride.destino} />
 
-            <IconButton type="button" aria-label={C.RIDE_CARD_LABELS.edit} onClick={handleEdit}>
+            <IconButton type="button" label={C.RIDE_CARD_LABELS.edit} onClick={handleEdit}>
               <EditIcon />
             </IconButton>
 
