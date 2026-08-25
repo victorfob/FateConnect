@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
+import { Button } from '@design-system';
 
 import type { LandingSectionEnum } from '@app/routes/paths';
-import { Button } from '@design-system';
 
 type LandingNavButtonProps = Readonly<{
   section: LandingSectionEnum;

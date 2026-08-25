@@ -16,7 +16,7 @@ A pergunta é uma só: **ele conhece o domínio?**
 
 | Conhece rota, texto de produto, tipo do domínio? | Onde |
 | --- | --- |
-| Não — é visual puro e reutilizável | `src/design-system/components/<Nome>/` |
+| Não — é visual puro e reutilizável | `design-system/components/<Nome>/` |
 | Sim — e serve mais de uma tela | `src/components/<Nome>/` |
 | Sim — e serve só uma tela | `src/pages/<Tela>/components/<Nome>/` |
 
@@ -41,7 +41,7 @@ MeuComponente/
 
 ## 3. Imports
 
-- UI vem **só** de `@design-system` (componentes, `styled`, `css`, tokens) e `@design-system/icons` (ícones). Fora de `src/design-system/`, importar `@mui/*` **reprova no lint**.
+- UI vem **só** de `@design-system` (componentes, `styled`, `css`, tokens) e `@design-system/icons` (ícones). Fora de `design-system/`, importar `@mui/*` **reprova no lint**.
 - Falta um componente no barrel? **Adicione ao barrel**, não importe por caminho interno.
 - Alias em vez de `../../../`: `@design-system`, `@app`.
 - Estilos como namespace (`import * as S from './styles'`). Constantes idem (`import * as C from './constants'`) **quando houver três ou mais**; abaixo disso, import nomeado.

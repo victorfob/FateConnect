@@ -8,7 +8,7 @@ paths:
 
 ## Princípio (prioridade)
 
-1. **Fonte de verdade:** o que **já está implementado** — os tokens e as variantes de tipografia do tema em `FateConnect/Web/src/design-system/`, e as telas existentes.
+1. **Fonte de verdade:** o que **já está implementado** — os tokens e as variantes de tipografia do tema em `FateConnect/Web/design-system/`, e as telas existentes.
 2. **Figma:** **protótipo** — fluxo, hierarquia visual, textos, disposição (desktop vs mobile) e marca. **Não** copiar `text-[Npx]` do export do MCP nem "igualar pixel a pixel" sem decisão explícita do time.
 3. **Componente novo:** reutilizar a **mesma escala** das telas já feitas. Se o protótipo divergir, as tabelas abaixo documentam o desvio para ninguém "corrigir" o código em direção ao Figma por engano.
 

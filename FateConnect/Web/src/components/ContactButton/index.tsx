@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
+import { Dialog, IconButton } from '@design-system';
+import { ContactPageIcon } from '@design-system/icons';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { copyToClipboard } from '@app/utils/clipboard';
 import { getInitials } from '@app/utils/initials';
 import { whatsappConversationUrl } from '@app/utils/whatsapp';
-import { Dialog, IconButton } from '@design-system';
-import { ContactPageIcon } from '@design-system/icons';
 
 import { ContactDetails } from './ContactDetails';
 import * as C from './constants';

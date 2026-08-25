@@ -1,3 +1,4 @@
+import { CircularProgress, Input } from '@design-system';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
@@ -6,7 +7,6 @@ import { useAddressAutofill } from '@app/pages/Signup/hooks/useAddressAutofill';
 import { useFilledLabel } from '@app/pages/Signup/hooks/useFilledLabel';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
 import { maskZipCode } from '@app/utils/masks/zipCodeMask';
-import { CircularProgress, Input } from '@design-system';
 
 import { STATE_SELECT_OPTIONS, ZIP_LOOKUP_LABEL } from './constants';
 import * as S from './styles';

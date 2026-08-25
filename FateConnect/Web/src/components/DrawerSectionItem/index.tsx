@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
+import { ListItemButton, ListItemText } from '@design-system';
 
 import type { LandingSectionEnum } from '@app/routes/paths';
-import { ListItemButton, ListItemText } from '@design-system';
 
 type DrawerSectionItemProps = Readonly<{
   section: LandingSectionEnum;

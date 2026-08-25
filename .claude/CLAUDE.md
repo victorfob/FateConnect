@@ -47,7 +47,7 @@ O `pre-push` roda só os testes **relacionados** aos arquivos enviados (via `Web
 ## Stack do front
 
 - Vite, React, MUI + Emotion, `@mui/x-date-pickers` + `date-fns`, notistack, React Router, react-hook-form + zod, TanStack Query, axios, Vitest + Testing Library.
-- Design system local em `Web/src/design-system/`, com **dois** barrels públicos: `@design-system` (componentes, estilo, tokens) e `@design-system/icons`. A aplicação usa também o alias `@app` para `Web/src`.
+- Design system local em `Web/design-system/` — **fora de `src`**, porque a aplicação o consome como biblioteca. Dois barrels públicos: `@design-system` (componentes, estilo, tokens) e `@design-system/icons`. A aplicação usa também o alias `@app` para `Web/src`.
 - Padrões em `.claude/rules/fateconnect-web-react.md` e nas regras `web-*`.
 
 ### Uma armadilha já mapeada

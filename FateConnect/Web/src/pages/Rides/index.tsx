@@ -1,13 +1,13 @@
 import { useCallback, useState } from 'react';
 import { NavLink } from 'react-router';
+import { CircularProgress, PageShell, Typography } from '@design-system';
+import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { RoutePathEnum } from '@app/routes/paths';
 import { deleteRide, listRides } from '@app/services/rides/ridesService';
 import type { Ride, RideFilter as RideFilterValues } from '@app/services/rides/types';
-import { CircularProgress, PageShell, Typography } from '@design-system';
-import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
 
 import { RideCard } from './components/RideCard';
 import { RideFilter } from './components/RideFilter';

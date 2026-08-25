@@ -1,5 +1,6 @@
-import { LostItemKindEnum } from '@app/services/lostAndFound/types';
 import { BackHandOutlinedIcon, LocalOfferIcon, NoBackpackOutlinedIcon } from '@design-system/icons';
+
+import { LostItemKindEnum } from '@app/services/lostAndFound/types';
 
 type LostItemKindIconProps = Readonly<{ kind: string }>;
 

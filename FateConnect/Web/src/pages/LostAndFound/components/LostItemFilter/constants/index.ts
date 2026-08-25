@@ -1,6 +1,7 @@
+import type { SelectOption } from '@design-system';
+
 import { LOST_ITEM_KIND_OPTIONS } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import { LOST_ITEM_STATUS_OPTIONS } from '@app/pages/LostAndFound/helpers/lostItemStatus';
-import type { SelectOption } from '@design-system';
 
 export const FILTER_PANEL_TITLE = 'Filtros';
 export const FILTER_SUBMIT_LABEL = 'Filtrar';
