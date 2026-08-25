@@ -6,7 +6,8 @@ import Badge from '@mui/material/Badge';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 
-import { styled, type PolymorphicProps } from '@ds-root/styled';
+import { PolymorphicStack } from '@ds-root/polymorphic';
+import { styled } from '@ds-root/styled';
 import { radius } from '@ds-root/theme/helpers/radius';
 import { spacing } from '@ds-root/theme/helpers/spacing';
 import { desktopMedia, radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
@@ -66,14 +67,14 @@ export const PanelBody = styled(AccordionDetails)({
   padding: spacing(none, lg, xl),
 });
 
-export const PanelForm = styled(Stack)<PolymorphicProps<FormHTMLAttributes<HTMLFormElement>>>({
+export const PanelForm = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>>({
   flexDirection: 'column',
 });
 
 /** Quem arranja a linha decide quantas células cabem nela. */
 export const FieldsRow = styled(Stack, {
   shouldForwardProp: (prop) => prop !== 'columns',
-})<PolymorphicProps & { columns: number }>(({ columns }) => ({
+})<{ columns: number }>(({ columns }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'flex-start',

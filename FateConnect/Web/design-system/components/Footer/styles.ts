@@ -1,7 +1,8 @@
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 
-import { styled, type PolymorphicProps } from '@ds-root/styled';
+import { PolymorphicStack } from '@ds-root/polymorphic';
+import { styled } from '@ds-root/styled';
 import { chromeDivider, chromeSurface, onChromeSurface } from '@ds-root/theme/chromeSurface';
 import { spacing } from '@ds-root/theme/helpers/spacing';
 import { mobileMedia, spacingScale } from '@ds-root/tokens';
@@ -13,7 +14,7 @@ const { md, xs } = spacingScale;
  * assinatura à direita, divisor vertical entre eles) e coluna centralizada
  * abaixo do breakpoint mobile. Paddings em `vw`, como no original.
  */
-export const FooterRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const FooterRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   backgroundColor: chromeSurface(theme),
@@ -34,7 +35,7 @@ export const FooterRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
  * o alinhamento fica no contêiner e é herdado, no lugar do `:host-context` que
  * a tipografia usava para alcançar o pai.
  */
-export const ContactsContainer = styled(Stack)<PolymorphicProps>({
+export const ContactsContainer = styled(Stack)({
   flexDirection: 'column',
   justifyContent: 'center',
   gap: spacing(md),
@@ -43,14 +44,14 @@ export const ContactsContainer = styled(Stack)<PolymorphicProps>({
   [mobileMedia]: { alignItems: 'center', textAlign: 'center' },
 });
 
-export const ContactItem = styled(Stack)<PolymorphicProps>({
+export const ContactItem = styled(Stack)({
   flexDirection: 'row',
   alignItems: 'center',
   gap: spacing(xs),
 });
 
 /** Vertical no desktop, horizontal no mobile. */
-export const FooterDivider = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const FooterDivider = styled(Box)(({ theme }) => ({
   width: '1px',
   height: 'auto',
   backgroundColor: chromeDivider(theme),
@@ -58,7 +59,7 @@ export const FooterDivider = styled(Box)<PolymorphicProps>(({ theme }) => ({
   [mobileMedia]: { width: '100%', height: '1px' },
 }));
 
-export const CopyrightContainer = styled(Stack)<PolymorphicProps>({
+export const CopyrightContainer = styled(Stack)({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'flex-end',

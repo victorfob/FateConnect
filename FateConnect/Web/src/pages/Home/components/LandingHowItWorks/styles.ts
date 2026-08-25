@@ -1,35 +1,35 @@
 import {
   Box,
   mobileMedia,
+  PolymorphicStack,
   radius,
   radiusScale,
   shadowTokens,
   Stack,
   styled,
-  type PolymorphicProps,
 } from '@design-system';
 
-export const HowSection = styled(Stack)<PolymorphicProps>({
+export const HowSection = styled(PolymorphicStack)({
   flexDirection: 'column',
   alignItems: 'center',
   padding: '3rem 7vw',
 });
 
-export const SectionTitle = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const SectionTitle = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   textAlign: 'center',
   marginBottom: '2rem',
   color: theme.palette.text.primary,
 }));
 
-export const StepsGrid = styled(Stack)<PolymorphicProps>({
+export const StepsGrid = styled(Stack)({
   flexDirection: 'row',
   gap: '2rem',
 
   [mobileMedia]: { flexDirection: 'column' },
 });
 
-export const StepCard = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const StepCard = styled(PolymorphicStack)(({ theme }) => ({
   position: 'relative',
   flexDirection: 'column',
   alignItems: 'center',
@@ -40,7 +40,7 @@ export const StepCard = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   textAlign: 'center',
 }));
 
-export const StepBadge = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const StepBadge = styled(PolymorphicStack)(({ theme }) => ({
   position: 'absolute',
   top: '-1.25rem',
   left: '50%',
@@ -60,16 +60,16 @@ export const StepBadge = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   [mobileMedia]: { left: '2rem' },
 }));
 
-export const StepBody = styled(Stack)<PolymorphicProps>({
+export const StepBody = styled(Stack)({
   flexDirection: 'column',
   gap: '0.75rem',
   marginTop: '0.5rem',
 });
 
-export const StepTitle = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const StepTitle = styled(Box)(({ theme }) => ({
   color: theme.palette.text.primary,
 }));
 
-export const StepDescription = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const StepDescription = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));

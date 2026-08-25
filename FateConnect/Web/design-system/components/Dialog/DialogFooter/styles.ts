@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack';
 
-import { styled, type PolymorphicProps } from '@ds-root/styled';
+import { styled } from '@ds-root/styled';
 import { radius } from '@ds-root/theme/helpers/radius';
 import { spacing } from '@ds-root/theme/helpers/spacing';
 import { mobileMedia, radiusScale, spacingScale } from '@ds-root/tokens';
@@ -12,7 +12,7 @@ const ACTION_MIN_WIDTH_MOBILE_PX = 100;
 const ACTION_LETTER_SPACING = '0.4px';
 
 /** As ações acompanham o título, que é centralizado em qualquer largura. */
-export const FooterRegion = styled(Stack)<PolymorphicProps>({
+export const FooterRegion = styled(Stack)({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',

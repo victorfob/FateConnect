@@ -2,6 +2,7 @@ import {
   Box,
   compactMedia,
   iconSizeTokens,
+  PolymorphicStack,
   radius,
   radiusScale,
   shadowTokens,
@@ -9,7 +10,6 @@ import {
   spacingScale,
   Stack,
   styled,
-  type PolymorphicProps,
 } from '@design-system';
 
 const { xxs, sm, md } = spacingScale;
@@ -20,7 +20,7 @@ const ACTION_BUTTON_SIZE_PX = 32;
 /** O glifo da biblioteca de origem ocupa 70% do botão. */
 const ACTION_ICON_SCALE = 0.7;
 
-export const CardRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const CardRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
   width: '100%',
   marginBottom: spacing(md),
@@ -31,27 +31,27 @@ export const CardRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   color: theme.palette.text.primary,
 }));
 
-export const HeaderRow = styled(Stack)<PolymorphicProps>({
+export const HeaderRow = styled(Stack)({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
   marginBottom: spacing(sm),
 });
 
-export const HeaderActions = styled(Stack)<PolymorphicProps>({
+export const HeaderActions = styled(Stack)({
   flexDirection: 'row',
   alignItems: 'center',
   gap: spacing(sm),
 });
 
-export const InfoRow = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const InfoRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   gap: INFO_ROW_GAP,
   marginBottom: spacing(sm),
   color: theme.palette.text.secondary,
 }));
 
-export const InfoItem = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const InfoItem = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: spacing(xxs),
@@ -62,12 +62,12 @@ export const InfoItem = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   },
 }));
 
-export const Description = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const Description = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
   marginBottom: spacing(sm),
 }));
 
-export const ActionButtons = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const ActionButtons = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
 
   '& .MuiIconButton-root': {
@@ -83,13 +83,13 @@ export const ActionButtons = styled(Stack)<PolymorphicProps>(({ theme }) => ({
 }));
 
 /** A etiqueta acompanha o cabeçalho no desktop e desce para o rodapé no estreito. */
-export const WideOnlyTag = styled(Box)<PolymorphicProps>({
+export const WideOnlyTag = styled(Box)({
   display: 'block',
 
   [compactMedia]: { display: 'none' },
 });
 
-export const CompactOnlyTag = styled(Box)<PolymorphicProps>({
+export const CompactOnlyTag = styled(Box)({
   display: 'none',
 
   [compactMedia]: {

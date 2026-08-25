@@ -2,7 +2,7 @@ import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import Stack from '@mui/material/Stack';
 
-import { styled, type PolymorphicProps } from '@ds-root/styled';
+import { styled } from '@ds-root/styled';
 import { chromeHover, chromeSurface, onChromeSurface } from '@ds-root/theme/chromeSurface';
 
 /** Largura do menu lateral no produto. */
@@ -26,7 +26,7 @@ export const DrawerRoot = styled(Drawer)(({ theme }) => ({
   },
 }));
 
-export const DrawerHeader = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const DrawerHeader = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'start',
   alignItems: 'center',

@@ -2,6 +2,7 @@ import type { FormHTMLAttributes } from 'react';
 import {
   Box,
   desktopMedia,
+  PolymorphicStack,
   radius,
   radiusScale,
   shadowTokens,
@@ -10,7 +11,6 @@ import {
   Stack,
   styled,
   Typography,
-  type PolymorphicProps,
 } from '@design-system';
 
 const { none, md, xl, xxl } = spacingScale;
@@ -27,7 +27,7 @@ const PAGE_BOTTOM_PADDING_PX = 40;
 /** Espaço entre a pergunta e o link de login, como no produto. */
 const LOGIN_ROW_GAP = '0.35rem';
 
-export const PageRoot = styled(Stack)<PolymorphicProps>({
+export const PageRoot = styled(Stack)({
   flexDirection: 'row',
   flex: 1,
   justifyContent: 'center',
@@ -36,7 +36,7 @@ export const PageRoot = styled(Stack)<PolymorphicProps>({
   boxSizing: 'border-box',
 });
 
-export const SignupCard = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const SignupCard = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
   gap: spacing(md),
   width: '100%',
@@ -62,18 +62,18 @@ export const SectionTitle = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.primary,
 }));
 
-export const SignupForm = styled(Stack)<PolymorphicProps & FormHTMLAttributes<HTMLFormElement>>({
+export const SignupForm = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>>({
   flexDirection: 'column',
 });
 
-export const SectionDivider = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const SectionDivider = styled(Box)(({ theme }) => ({
   width: '100%',
   height: HAIRLINE,
   backgroundColor: theme.palette.divider,
   margin: spacing(xl, none, md),
 }));
 
-export const FieldGrid = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const FieldGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: '1fr',
   gap: spacing(md),
@@ -88,7 +88,7 @@ export const FieldGrid = styled(Box)<PolymorphicProps>(({ theme }) => ({
   },
 }));
 
-export const SubmitContainer = styled(Stack)<PolymorphicProps>({
+export const SubmitContainer = styled(Stack)({
   marginTop: spacing(md),
   flexDirection: 'column',
   gap: spacing(md),
@@ -102,7 +102,7 @@ export const SubmitContainer = styled(Stack)<PolymorphicProps>({
   },
 });
 
-export const LoginRow = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const LoginRow = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   gap: LOGIN_ROW_GAP,

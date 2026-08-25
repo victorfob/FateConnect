@@ -8,7 +8,6 @@ import {
   spacingScale,
   Stack,
   styled,
-  type PolymorphicProps,
 } from '@design-system';
 
 const { xxs, xs, sm } = spacingScale;
@@ -17,12 +16,12 @@ const PREVIEW_SIZE_PX = 96;
 /** No estreito a miniatura encolhe para a foto e os botões caberem na mesma linha. */
 const COMPACT_PREVIEW_SIZE_PX = 72;
 
-export const PhotoField = styled(Stack)<PolymorphicProps>({
+export const PhotoField = styled(Stack)({
   flexDirection: 'column',
   gap: spacing(xxs),
 });
 
-export const PhotoRow = styled(Stack)<PolymorphicProps>({
+export const PhotoRow = styled(Stack)({
   flexDirection: 'row',
   alignItems: 'center',
   flexWrap: 'wrap',
@@ -42,7 +41,7 @@ export const PhotoPreview = styled('img')({
   borderRadius: radius(radiusScale.md),
 });
 
-export const PhotoActions = styled(Stack)<PolymorphicProps>({
+export const PhotoActions = styled(Stack)({
   flexDirection: 'column',
   gap: spacing(xs),
 });
@@ -63,14 +62,14 @@ export const HiddenFileInput = styled('input')({
 });
 
 /** No estreito a foto e os botões seguem lado a lado, e o texto desce inteiro. */
-export const PhotoHint = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const PhotoHint = styled(Box)(({ theme }) => ({
   flex: 1,
   color: theme.palette.text.secondary,
 
   [compactMedia]: { flexBasis: '100%' },
 }));
 
-export const PhotoError = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const PhotoError = styled(Box)(({ theme }) => ({
   flex: 1,
   color: theme.palette.error.main,
 

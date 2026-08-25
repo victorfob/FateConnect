@@ -8,7 +8,7 @@
  */
 export * from './ui';
 export { styled, css, keyframes, darken, lighten, alpha } from './styled';
-export type { PolymorphicProps } from './styled';
+export { PolymorphicBox, PolymorphicStack } from './polymorphic';
 
 export { Header } from './components/Header';
 export { HEADER_HEIGHT_PX } from './components/Header/styles';

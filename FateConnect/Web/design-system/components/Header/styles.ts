@@ -1,9 +1,8 @@
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 
-import { styled, type PolymorphicProps } from '@ds-root/styled';
+import { PolymorphicBox, PolymorphicStack } from '@ds-root/polymorphic';
+import { styled } from '@ds-root/styled';
 import { onChromeSurface } from '@ds-root/theme/chromeSurface';
 import { spacing } from '@ds-root/theme/helpers/spacing';
 import { mobileMedia, shadowTokens, spacingScale } from '@ds-root/tokens';
@@ -39,7 +38,7 @@ export const HeaderToolbar = styled(Toolbar)(({ theme }) => ({
 }));
 
 /** Marca: sem sublinhado e herdando a cor da barra, como no produto. */
-export const LogoSlot = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const LogoSlot = styled(PolymorphicBox)(({ theme }) => ({
   '& a': {
     textDecoration: 'none',
     color: onChromeSurface(theme),
@@ -49,7 +48,7 @@ export const LogoSlot = styled(Box)<PolymorphicProps>(({ theme }) => ({
   '& a:hover': { opacity: 0.8 },
 }));
 
-export const DesktopNav = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'center',
@@ -69,7 +68,7 @@ export const DesktopNav = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   [mobileMedia]: { display: 'none' },
 }));
 
-export const ActionsSlot = styled(Stack)<PolymorphicProps>({
+export const ActionsSlot = styled(PolymorphicStack)({
   flexDirection: 'row',
   alignItems: 'center',
   // Separa uma ação da outra. Com um filho só isso não aparecia, e duas
@@ -83,7 +82,7 @@ export const ActionsSlot = styled(Stack)<PolymorphicProps>({
  * volta a exibir o botão: sem ele o `display: none` da base vale em toda
  * largura e o ícone de menu nunca aparece.
  */
-export const MenuButtonSlot = styled(Stack)<PolymorphicProps>({
+export const MenuButtonSlot = styled(PolymorphicStack)({
   display: 'none',
 
   [mobileMedia]: {

@@ -1,15 +1,8 @@
-import {
-  mobileMedia,
-  spacing,
-  spacingScale,
-  Stack,
-  styled,
-  type PolymorphicProps,
-} from '@design-system';
+import { mobileMedia, spacing, spacingScale, Stack, styled } from '@design-system';
 
 const { xs, md, xl } = spacingScale;
 
-export const DetailsRow = styled(Stack)<PolymorphicProps>({
+export const DetailsRow = styled(Stack)({
   flexDirection: 'row',
   alignItems: 'center',
   gap: spacing(xl),
@@ -18,13 +11,13 @@ export const DetailsRow = styled(Stack)<PolymorphicProps>({
 });
 
 /** Quem é a pessoa: o círculo com as iniciais e o nome embaixo dele. */
-export const Identity = styled(Stack)<PolymorphicProps>({
+export const Identity = styled(Stack)({
   flexDirection: 'column',
   alignItems: 'center',
   gap: spacing(xs),
 });
 
-export const Channels = styled(Stack)<PolymorphicProps>({
+export const Channels = styled(Stack)({
   flexDirection: 'column',
   gap: spacing(xs),
 

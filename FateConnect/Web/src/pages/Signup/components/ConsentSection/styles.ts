@@ -1,13 +1,5 @@
 import type { ButtonHTMLAttributes } from 'react';
-import {
-  Box,
-  desktopMedia,
-  spacing,
-  spacingScale,
-  Stack,
-  styled,
-  type PolymorphicProps,
-} from '@design-system';
+import { desktopMedia, PolymorphicBox, spacing, spacingScale, Stack, styled } from '@design-system';
 
 const { md } = spacingScale;
 
@@ -24,7 +16,7 @@ const CONSENT_FONT_SIZE_MOBILE = '0.75rem';
 const CONSENT_ERROR_FONT_SIZE_MOBILE = '0.65rem';
 const CONSENT_ERROR_FONT_SIZE_DESKTOP = '0.75rem';
 
-export const ConsentGroup = styled(Stack)<PolymorphicProps>({
+export const ConsentGroup = styled(Stack)({
   flexDirection: 'column',
   fontSize: CONSENT_FONT_SIZE_MOBILE,
 
@@ -41,7 +33,7 @@ export const ConsentGroup = styled(Stack)<PolymorphicProps>({
 });
 
 /** Link no meio da frase do aceite: parece texto, age como botão. */
-export const InlineLink = styled(Box)<PolymorphicProps & ButtonHTMLAttributes<HTMLButtonElement>>(
+export const InlineLink = styled(PolymorphicBox)<ButtonHTMLAttributes<HTMLButtonElement>>(
   ({ theme }) => ({
     display: 'inline',
     border: 'none',
@@ -59,7 +51,7 @@ export const InlineLink = styled(Box)<PolymorphicProps & ButtonHTMLAttributes<HT
 );
 
 /** O produto pinta este aviso com o vermelho de destaque, não com o de erro. */
-export const ConsentError = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const ConsentError = styled(PolymorphicBox)(({ theme }) => ({
   fontSize: CONSENT_ERROR_FONT_SIZE_MOBILE,
   lineHeight: 'normal',
   color: theme.palette.secondary.main,

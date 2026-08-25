@@ -1,13 +1,13 @@
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import { styled, type PolymorphicProps } from '@ds-root/styled';
+import { styled } from '@ds-root/styled';
 import { spacing } from '@ds-root/theme/helpers/spacing';
 import { spacingScale } from '@ds-root/tokens';
 
 const { lg, xl } = spacingScale;
 
-export const DialogSurface = styled(Stack)<PolymorphicProps>({
+export const DialogSurface = styled(Stack)({
   flexDirection: 'column',
   gap: spacing(lg),
   padding: spacing(xl),

@@ -2,6 +2,7 @@ import type { LinkProps } from 'react-router';
 import {
   iconSizeTokens,
   mobileMedia,
+  PolymorphicStack,
   radius,
   radiusScale,
   shadowTokens,
@@ -9,7 +10,6 @@ import {
   spacingScale,
   Stack,
   styled,
-  type PolymorphicProps,
 } from '@design-system';
 
 const { md, xl } = spacingScale;
@@ -22,9 +22,9 @@ const ICON_DISC_SIZE_PX = 70;
 const CARD_HOVER_SCALE = 1.05;
 const CARD_TRANSITION = 'transform 0.3s ease';
 
-type CardProps = PolymorphicProps<Pick<LinkProps, 'to'>>;
+type CardProps = Pick<LinkProps, 'to'>;
 
-export const MenuRoot = styled(Stack)<PolymorphicProps>({
+export const MenuRoot = styled(Stack)({
   flexDirection: 'column',
   flex: 1,
   width: '100%',
@@ -36,18 +36,18 @@ export const MenuRoot = styled(Stack)<PolymorphicProps>({
 });
 
 /** O texto de apoio é mais apagado que o título. */
-export const MenuIntro = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const MenuIntro = styled(Stack)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export const CardsContainer = styled(Stack)<PolymorphicProps>({
+export const CardsContainer = styled(Stack)({
   flexDirection: 'row',
   gap: spacing(xl),
 
   [mobileMedia]: { flexDirection: 'column' },
 });
 
-export const ServiceCard = styled(Stack)<CardProps>(({ theme }) => ({
+export const ServiceCard = styled(PolymorphicStack)<CardProps>(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   gap: spacing(md),
@@ -65,7 +65,7 @@ export const ServiceCard = styled(Stack)<CardProps>(({ theme }) => ({
   '&:hover': { transform: `scale(${CARD_HOVER_SCALE})` },
 }));
 
-export const IconDisc = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const IconDisc = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',

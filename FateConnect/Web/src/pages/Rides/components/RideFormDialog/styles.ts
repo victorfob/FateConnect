@@ -1,13 +1,12 @@
 import type { FormHTMLAttributes } from 'react';
 import {
   Button,
+  PolymorphicStack,
   radius,
   radiusScale,
   spacing,
   spacingScale,
-  Stack,
   styled,
-  type PolymorphicProps,
 } from '@design-system';
 
 const { xs, lg } = spacingScale;
@@ -17,7 +16,7 @@ const { xs, lg } = spacingScale;
  * dos slots. Por isso ele repete o comportamento de filho flexível: é quem cede
  * altura para o miolo rolar quando a tela é baixa.
  */
-export const RideForm = styled(Stack)<PolymorphicProps<FormHTMLAttributes<HTMLFormElement>>>({
+export const RideForm = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>>({
   flexDirection: 'column',
   gap: spacing(lg),
   flexGrow: 1,

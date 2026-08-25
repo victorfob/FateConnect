@@ -34,12 +34,23 @@ Para o que não é flex, use `Box`.
 
 Quando o elemento tiver **semântica** (`footer`, `section`, `article`, `nav`, `ul`), manter a semântica pela prop `component` no ponto de uso — `<S.Container component="footer">` — em vez de voltar para a tag crua. Acessibilidade e paridade dependem disso.
 
+Para receber `component`, o alvo é `PolymorphicStack` ou `PolymorphicBox`, não `Stack`/`Box` crus:
+
+```ts
+import { PolymorphicStack, styled } from '@design-system';
+
+export const Container = styled(PolymorphicStack)({ flexDirection: 'row' });
+// <S.Container component="footer">
+```
+
+O `styled` do Emotion resolve as props do `Box` e do `Stack` pela última assinatura de chamada deles, onde `component` não aparece — e a prop some da tipagem. Os dois alvos pré-tipados declaram o que já é verdade. Alvo que **não** vai receber `component` continua sendo o cru: anotar tudo era o vício antigo, e 79 das 113 anotações nunca recebiam a prop.
+
+⛔ **Não estenda a lista de alvos pré-tipados para componente que não aceita `component`.** Foi medido: `AccordionDetails` é função simples, sem a prop, e o repo faz `styled(AccordionDetails)`. Prometê-la ali compila, mas em runtime o `component` chega ao DOM como atributo cru e a semântica se perde calada. Por isso a injeção **não** vive no `styled` — se vivesse, valeria para todo alvo.
+
 Se o alvo tem props próprias — um `NavLink` com `to`, um `button` com `type` —, declare-as no genérico em vez de forçar cast:
 
 ```ts
-type NavProps = PolymorphicProps<Pick<NavLinkProps, 'to' | 'end'>>;
-
-export const Tab = styled(Box)<NavProps>({ ... });
+export const Tab = styled(PolymorphicBox)<Pick<NavLinkProps, 'to' | 'end'>>({ ... });
 ```
 
 ## ❌ Evitar

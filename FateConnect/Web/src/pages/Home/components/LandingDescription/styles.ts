@@ -1,17 +1,17 @@
 import {
-  Box,
   iconSizeTokens,
   mobileMedia,
+  PolymorphicBox,
+  PolymorphicStack,
   Stack,
   styled,
-  type PolymorphicProps,
 } from '@design-system';
 
 const MAX_WIDTH_PX = 600;
 const TITLE_MAX_WIDTH_PX = 500;
 const HIGHLIGHT_MAX_WIDTH_PX = 120;
 
-export const DescriptionRoot = styled(Stack)<PolymorphicProps>({
+export const DescriptionRoot = styled(Stack)({
   flex: 1,
   flexDirection: 'column',
   alignItems: 'center',
@@ -19,7 +19,7 @@ export const DescriptionRoot = styled(Stack)<PolymorphicProps>({
   maxWidth: `${MAX_WIDTH_PX}px`,
 });
 
-export const TitleContainer = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const TitleContainer = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   maxWidth: `${TITLE_MAX_WIDTH_PX}px`,
   justifyContent: 'center',
@@ -27,12 +27,12 @@ export const TitleContainer = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   textAlign: 'center',
 }));
 
-export const Lead = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const Lead = styled(PolymorphicBox)(({ theme }) => ({
   color: theme.palette.text.secondary,
   textAlign: 'center',
 }));
 
-export const HighlightList = styled(Stack)<PolymorphicProps>({
+export const HighlightList = styled(PolymorphicStack)({
   listStyle: 'none',
   flexDirection: 'row',
   gap: '1rem',
@@ -40,7 +40,7 @@ export const HighlightList = styled(Stack)<PolymorphicProps>({
   [mobileMedia]: { display: 'none' },
 });
 
-export const HighlightItem = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const HighlightItem = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: '12px',
@@ -54,7 +54,7 @@ export const HighlightItem = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   },
 }));
 
-export const IconDisc = styled(Stack)<PolymorphicProps>({
+export const IconDisc = styled(PolymorphicStack)({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',

@@ -1,19 +1,18 @@
 import type { FormHTMLAttributes } from 'react';
 import {
   Box,
+  PolymorphicStack,
   radius,
   radiusScale,
   shadowTokens,
-  Stack,
   styled,
   tabletMedia,
-  type PolymorphicProps,
 } from '@design-system';
 
 const CARD_WIDTH_PX = 360;
 const SUBMIT_HEIGHT_PX = 40;
 
-export const CardRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const CardRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
   gap: '1.25rem',
   padding: '1.75rem',
@@ -28,21 +27,19 @@ export const CardRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   },
 }));
 
-export const CardTitle = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const CardTitle = styled(Box)(({ theme }) => ({
   color: theme.palette.text.primary,
   textAlign: 'center',
 }));
 
-export const Form = styled(Stack)<PolymorphicProps & FormHTMLAttributes<HTMLFormElement>>(
-  ({ theme }) => ({
-    flexDirection: 'column',
-    gap: '1rem',
+export const Form = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>>(({ theme }) => ({
+  flexDirection: 'column',
+  gap: '1rem',
 
-    '& svg': { color: theme.palette.text.secondary },
-  }),
-);
+  '& svg': { color: theme.palette.text.secondary },
+}));
 
-export const SubmitRow = styled(Box)<PolymorphicProps>({
+export const SubmitRow = styled(Box)({
   marginTop: '0.5rem',
 
   '& .MuiButton-root': {
@@ -52,7 +49,7 @@ export const SubmitRow = styled(Box)<PolymorphicProps>({
   },
 });
 
-export const SignupRow = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const SignupRow = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'baseline',
