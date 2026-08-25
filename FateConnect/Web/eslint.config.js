@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import { defineConfig } from 'eslint/config';
 import importX from 'eslint-plugin-import-x';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import perfectionist from 'eslint-plugin-perfectionist';
@@ -21,6 +22,22 @@ const styleConventions = [
       'Use o helper `spacing()` do design system. O `theme.spacing` é do MUI e sobrescrevê-lo encolhe os componentes dele (as gutters do Toolbar viraram 3px).',
   },
   {
+    // O `no-magic-numbers` ignora 0, 1 e -1, então era por ali que o `0` cru
+    // entrava em `theme.space(0, xs)` no lugar do token `none`.
+    selector:
+      "CallExpression[callee.object.name='theme'][callee.property.name=/^(space|radius)$/] > Literal",
+    message:
+      'Sem número cru em `theme.space()` e `theme.radius()`: use o token de `spacingScale`/`radiusScale` — inclusive `none` para zero.',
+  },
+  {
+    // `padding: 0` e `margin: 0` também são espaçamento: viram o token `none`.
+    // O `no-magic-numbers` ignora 0 de propósito, então quem barra aqui é este
+    // seletor. Valor em `vw`/`vh` e constante nomeada seguem passando.
+    selector: String.raw`Property[key.name=/^(gap|rowGap|columnGap|padding|padding[A-Z]\w*|margin|margin[A-Z]\w*)$/] > Literal[raw=/^-?[0-9]/]`,
+    message:
+      'Espaçamento nunca é número cru: use `theme.space()` com o token de `spacingScale` — `none` para zero.',
+  },
+  {
     selector: "CallExpression[callee.name='styled'] > Literal:first-child",
     message:
       'Sem tag HTML crua: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
@@ -34,12 +51,12 @@ const literalColors = [
     message: 'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
   },
   {
-    selector: 'Literal[value=/^rgba?\\(/]',
+    selector: String.raw`Literal[value=/^rgba?\(/]`,
     message: 'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
   },
 ];
 
-export default tseslint.config(
+export default defineConfig([
   { ignores: ['dist', 'coverage'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -290,4 +307,4 @@ export default tseslint.config(
   },
 
   prettierRecommended,
-);
+]);
