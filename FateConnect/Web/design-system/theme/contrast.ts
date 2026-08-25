@@ -34,14 +34,14 @@ function toLinearChannel(value: number): number {
 }
 
 function toNumbers(text: string): number[] {
-  return text.split(',').map((part) => Number(part));
+  return text.split(',').map(Number);
 }
 
 function fromHex(hex: string): Rgb {
   const channelAt = (position: number): number => {
     const start = position * HEX_CHANNEL_LENGTH;
 
-    return parseInt(hex.slice(start, start + HEX_CHANNEL_LENGTH), HEX_RADIX);
+    return Number.parseInt(hex.slice(start, start + HEX_CHANNEL_LENGTH), HEX_RADIX);
   };
 
   return {

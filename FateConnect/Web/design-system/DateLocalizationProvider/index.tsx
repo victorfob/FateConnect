@@ -8,7 +8,7 @@ import { ptBR } from 'date-fns/locale/pt-BR';
  * front anterior: o `date-fns` já traz o pt-BR. A tradução da interface do
  * calendário vem do tema, que já aplica o pacote pt-BR dos seletores.
  */
-export function DateLocalizationProvider({ children }: { children: ReactNode }) {
+export function DateLocalizationProvider({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
       {children}

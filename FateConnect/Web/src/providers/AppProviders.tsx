@@ -4,7 +4,7 @@ import { DateLocalizationProvider, NotificationProvider, ThemeProvider } from '@
 import { QueryProvider } from './QueryProvider';
 
 /** Composição única dos providers da aplicação, reusada também nos testes. */
-export function AppProviders({ children }: { children: ReactNode }) {
+export function AppProviders({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <ThemeProvider>
       <NotificationProvider>
