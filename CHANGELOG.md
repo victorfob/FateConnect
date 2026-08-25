@@ -34,6 +34,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige ofertar e editar carona, que falhavam quando a hora vinha sem os segundos (#99) [Backend]
 - Corrige a atualização de carona, que apagava a descrição quando o campo não era reenviado (#101) [Backend]
 - Corrige a página branca quando a aplicação quebra por inteiro: agora aparece a mesma tela de erro das rotas, com o caminho de volta ao início (#141) [Frontend]
+- Corrige o HTML das telas, que trazia atributos inválidos vindos de propriedades usadas só para estilo (#145) [Frontend]
 
 ## [0.2.0] - 2026-08-20
 

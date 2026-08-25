@@ -58,4 +58,10 @@ describe('FilterPanel', () => {
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
+
+  it('should keep the column count out of the markup', () => {
+    renderComponent();
+
+    expect(screen.getByText('campo').closest('[columns]')).toBeNull();
+  });
 });

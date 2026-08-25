@@ -71,7 +71,9 @@ export const PanelForm = styled(Stack)<PolymorphicProps<FormHTMLAttributes<HTMLF
 });
 
 /** Quem arranja a linha decide quantas células cabem nela. */
-export const FieldsRow = styled(Stack)<PolymorphicProps & { columns: number }>(({ columns }) => ({
+export const FieldsRow = styled(Stack, {
+  shouldForwardProp: (prop) => prop !== 'columns',
+})<PolymorphicProps & { columns: number }>(({ columns }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'flex-start',
