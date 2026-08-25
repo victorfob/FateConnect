@@ -43,6 +43,23 @@ Componente = pasta com `index.tsx`, `styles.ts`, `types.ts` (quando houver tipo)
 
 `src/hooks/` guarda **só hooks** — arquivo ali dentro começa com `use` e obedece as regras de hooks. Função pura auxiliar vai para `src/utils/`, mesmo quando só um hook a consome. Feature em `src/pages/<feature>/`; reutilizável em `design-system/components/`. Import que sobe **dois níveis ou mais** usa path alias, nunca `../../`: `@app/*` na aplicação e `@ds-root/*` dentro do design system. Um nível (`../`) e o mesmo diretório (`./`) continuam relativos — são curtos e sobrevivem a mover a pasta. O ganho aparece em `styles.ts` de componente: `../../styled` não diz de onde vem, `@ds-root/styled` diz.
 
+### Mover pasta: varrer os recortes de config
+
+⛔ **Toda config recortada em `src/**` deixa de alcançar a pasta que sai de `src` — e não acusa erro.** `tsc`, `eslint`, a suíte e o build continuam verdes; só as regras enfraquecem. Ao mover pasta, abrir estes quatro e conferir o glob:
+
+| Arquivo | O que se perde em silêncio |
+| --- | --- |
+| `eslint.config.js`, bloco de convenções | `no-magic-numbers`, proibição de `sx` inline e de `theme.spacing` |
+| `eslint.config.js`, bloco de cor literal | `styles.ts` e `GlobalStyles.tsx` voltam a aceitar hex e `rgba` crus |
+| `vite.config.ts`, `coverage.include` | os arquivos saem do denominador, e o limite de 90% passa a medir outra coisa |
+| `sonar-project.properties` | a pasta sai da análise, inclusive da regra de 0% de duplicação |
+
+Mais `scripts/test-changed.sh`, cujo `case` decide entre testes relacionados e suíte completa, e o script `format` do `package.json`.
+
+**Cada um se prova com número, porque "passou" não prova nada aqui:** `grep -c '^SF:' coverage/lcov.info` para a cobertura, `files indexed` no log do Sonar comparado com a run anterior, e rodar o hook de verdade no `/bin/bash` com um arquivo da pasta nova.
+
+Não estão em risco o gatilho do CI (`^FateConnect/Web/`) nem os `paths:` das rules (`FateConnect/Web/**`) — o que quebra é sempre o recorte escrito um nível mais fundo. Ancorado no PR #143, que tirou o design system de `src`.
+
 ## Rotas
 
 Os caminhos são em **pt-BR** — `/inicio`, `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas`, com `/` → `/inicio` e curinga → `/inicio`. Trocar um segmento quebra link salvo; só com decisão de produto.
