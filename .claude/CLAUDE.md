@@ -52,4 +52,4 @@ O `pre-push` roda só os testes **relacionados** aos arquivos enviados (via `Web
 
 ### Uma armadilha já mapeada
 
-O `spacing` default do MUI é **multiplicador de 8px**. Com escala de tokens em px, sem o override px→rem o layout fica 8x errado silenciosamente — é o que os helpers `spacing()` e `radius()` do design system resolvem, e por isso o `theme.spacing` do MUI não é sobrescrito.
+O `spacing` default do MUI é **multiplicador de 8px**. Com escala de tokens em px, `theme.spacing(16)` daria 128px — por isso o estilo usa `theme.space()` e `theme.radius()`, chaves nossas no tema, e o `theme.spacing` do MUI fica intacto para os componentes dele. Sobrescrevê-lo encolheu as gutters do `Toolbar` de 24px para 3px.

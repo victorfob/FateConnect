@@ -108,6 +108,8 @@ export const Container = styled(Box)(({ theme }) => ({
 
 `theme.space(token)` e `theme.radius(token)` são chaves **nossas**, adicionadas ao tema por augmentation. O valor continua vindo de `spacingScale`/`radiusScale`, que se importa e desestrutura como sempre — muda só quem faz a conversão para `rem`.
 
+A escala vai de `none` (0) a `giant` (112). Os dois últimos degraus — `huge` (80) e `giant` (112) — são de **página**: goteira e respiro de seção. Componente não chega neles.
+
 ⛔ **`theme.spacing` é do MUI e não se toca.** Os componentes dele chamam `theme.spacing(1..3)` esperando o multiplicador de 8px; trocar a transformação encolheu as gutters do `Toolbar` de 24px para 3px. Por isso a nossa chave se chama `space`, e **o lint reprova `theme.spacing(`** — quem errar por três letras descobre na hora.
 
 Os helpers **não são exportados** pelo barrel: não há como importá-los na aplicação, e é de propósito. O acesso é sempre pelo tema, o que também elimina dois imports por `styles.ts`. As demais escalas — `zIndex`, `transitions`, `shadows` — já vinham do `theme`, porque essas o MUI não distorce.
@@ -154,7 +156,24 @@ Número solto é **erro** (`@typescript-eslint/no-magic-numbers`): valor numéri
 
 `console` solto é **erro** (`no-console`) — em qualquer arquivo, inclusive teste. Depuração não vai para produção, e o rastro de erro é responsabilidade de quem trata o erro, não de um `console.error` esquecido no componente. `vi.spyOn(console, 'error')` continua valendo em teste: a regra reprova o acesso a `console.<método>`, não passar `console` como argumento.
 
-Estas quatro proibições são regra de ESLint (`no-restricted-imports`), não convenção:
+Estas proibições de **sintaxe** guardam as decisões de escala — todas com sonda que prova que pegam:
+
+| Proibido | Saída |
+| -------- | ----- |
+| número cru em `theme.space()`, `theme.radius()` e no helper livre | token de `spacingScale`/`radiusScale`, `none` para zero |
+| número cru em `gap`, `padding`, `margin` e variantes | idem — o `no-magic-numbers` ignora `0`, e era por ali que passava |
+| `theme.spacing(...)` | `theme.space()` |
+| chave de breakpoint que não seja `md` | `down('md')` e `up('md')`; só o tema fala `sm`, para desfazer o do MUI |
+| `@media` de largura escrito à mão | as duas consultas do tema |
+| `vw`/`vh` em medida (menos `100vh`) | token, com override em `down('md')` se mobile e desktop diferirem |
+| tag HTML crua em `styled(...)` | `styled(PolymorphicBox)` com a semântica em `component` |
+| `sx` inline | `styles.ts` com `styled(...)` |
+
+⚠️ **Literal se esconde em constante nomeada.** `const PAGE_PADDING = '3vw 7vw'` não aparece numa varredura de `propriedade: valor` — o literal está na declaração, longe do uso. Foi assim que quatro goteiras em `vw` sobreviveram a duas varreduras minhas. Quem garante agora é o lint, que casa o literal em qualquer posição sintática.
+
+⚠️ **`no-restricted-syntax` substitui a lista inteira, não soma.** Foi assim que essas proibições ficaram desligadas dentro dos `styles.ts` — justamente onde `styled(` se escreve. Os seletores vivem em constantes nomeadas no topo do config e cada bloco espalha as que valem ali.
+
+Estas proibições de **import** são regra de ESLint (`no-restricted-imports`), não convenção:
 
 | Import proibido | Onde | Saída |
 | --------------- | ---- | ----- |
@@ -162,4 +181,5 @@ Estas quatro proibições são regra de ESLint (`no-restricted-imports`), não c
 | `@design-system/*` (caminho interno) | em qualquer lugar | importar do barrel |
 | `@emotion/*` | fora do design system | `styled`, `css` e `keyframes` vêm do barrel |
 | `colorTokens`, `colorVariants`, `darkColorTokens` | fora de `theme/` | ler `theme.palette` |
+| `**/theme/helpers/*` | fora de `design-system/theme/` | `theme.space()` e `theme.radius()` |
 | `@testing-library/react` | fora dos testes e do test-utils | usar o `render` de `@app/test/testing-library` |
