@@ -25,7 +25,7 @@ Fora da stack, por decisão: **sem SCSS**, **sem Tailwind**, **sem Nx**, **sem l
 
 ## Design system local
 
-- Tudo em `src/design-system/`: `tokens/` (**não importa MUI**), `theme/`, `ThemeProvider/`, `GlobalStyles`, `components/`.
+- Tudo em `design-system/`, **irmão de `src`, não dentro dele**: `tokens/` (**não importa MUI**), `theme/`, `ThemeProvider/`, `GlobalStyles`, `components/`. Ele fica fora porque a aplicação o consome como biblioteca — é o mesmo motivo pelo qual o lint o ordena junto dos pacotes, e não junto dos aliases da aplicação.
 - A aplicação importa **somente dos barrels `@design-system` e `@design-system/icons`** — nunca caminho interno do design system. É o que mantém barato extrair para pacote depois.
 - ⛔ **Nunca sobrescrever o `spacing` do tema.** O MUI chama `theme.spacing(1..3)` dentro dos próprios componentes — gutters do `Toolbar`, padding de `Dialog` e de `Card`. Sobrescrever encolhe todos eles em silêncio: as gutters do `Toolbar` viraram **3px** onde deviam ser 24px. Os tokens em px passam pelo helper `spacing()` do design system; o tema mantém o spacing do MUI. Há teste travando as duas pontas.
 - **Tipografia:** variantes declaradas no tema + module augmentation do TypeScript. **Não** criar componente próprio de tipografia — usar o `Typography` do MUI com as variantes do projeto.
@@ -41,7 +41,7 @@ Fora da stack, por decisão: **sem SCSS**, **sem Tailwind**, **sem Nx**, **sem l
 
 Componente = pasta com `index.tsx`, `styles.ts`, `types.ts` (quando houver tipo) e `<Nome>.test.tsx`.
 
-`src/hooks/` guarda **só hooks** — arquivo ali dentro começa com `use` e obedece as regras de hooks. Função pura auxiliar vai para `src/utils/`, mesmo quando só um hook a consome. Feature em `src/pages/<feature>/`; reutilizável em `src/design-system/components/`. Import que sobe **dois níveis ou mais** usa path alias, nunca `../../`: `@app/*` na aplicação e `@src-ds/*` dentro do design system. Um nível (`../`) e o mesmo diretório (`./`) continuam relativos — são curtos e sobrevivem a mover a pasta. O ganho aparece em `styles.ts` de componente: `../../styled` não diz de onde vem, `@src-ds/styled` diz.
+`src/hooks/` guarda **só hooks** — arquivo ali dentro começa com `use` e obedece as regras de hooks. Função pura auxiliar vai para `src/utils/`, mesmo quando só um hook a consome. Feature em `src/pages/<feature>/`; reutilizável em `design-system/components/`. Import que sobe **dois níveis ou mais** usa path alias, nunca `../../`: `@app/*` na aplicação e `@ds-root/*` dentro do design system. Um nível (`../`) e o mesmo diretório (`./`) continuam relativos — são curtos e sobrevivem a mover a pasta. O ganho aparece em `styles.ts` de componente: `../../styled` não diz de onde vem, `@ds-root/styled` diz.
 
 ## Rotas
 
