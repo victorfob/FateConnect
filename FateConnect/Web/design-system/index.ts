@@ -17,6 +17,7 @@ export { NavigationDrawer } from './components/NavigationDrawer';
 export { InitialsAvatar } from './components/InitialsAvatar';
 export { Dialog } from './components/Dialog';
 export { FilterPanel } from './components/FilterPanel';
+export { HiddenField } from './components/HiddenField';
 export type { FilterPanelProps } from './components/FilterPanel';
 export { IconButton } from './components/IconButton';
 export type { IconButtonProps } from './components/IconButton';

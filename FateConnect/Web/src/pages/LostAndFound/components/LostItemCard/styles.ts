@@ -130,13 +130,3 @@ export const CompactOnlyTag = styled(Box)(({ theme }) => ({
     paddingTop: theme.space(sm),
   },
 }));
-
-/** Fora da tela, mas dentro da árvore de acessibilidade. */
-export const ScreenReaderOnly = styled(PolymorphicBox)({
-  position: 'absolute',
-  width: '1px',
-  height: '1px',
-  overflow: 'hidden',
-  clip: 'rect(0 0 0 0)',
-  whiteSpace: 'nowrap',
-});

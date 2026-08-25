@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, type ChangeEvent } from 'react';
-import { Typography } from '@design-system';
+import { HiddenField, Typography } from '@design-system';
 import { DeleteIcon, ImageIcon } from '@design-system/icons';
 import { useFormContext, useWatch } from 'react-hook-form';
 
@@ -106,7 +106,7 @@ export function LostItemPhotoField() {
         )}
       </S.PhotoRow>
 
-      <S.HiddenFileInput
+      <HiddenField
         component="input"
         ref={fileInputRef}
         type="file"

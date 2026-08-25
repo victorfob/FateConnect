@@ -1,4 +1,4 @@
-import { StatusTag, Typography } from '@design-system';
+import { HiddenField, StatusTag, Typography } from '@design-system';
 import { CalendarTodayIcon, ImageIcon, LocationOnIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
@@ -30,7 +30,7 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
 
   return (
     <S.CardRoot component="article" own={item.meuItem}>
-      {item.meuItem && <S.ScreenReaderOnly component="span">{C.OWN_ITEM_LABEL}</S.ScreenReaderOnly>}
+      {item.meuItem && <HiddenField component="span">{C.OWN_ITEM_LABEL}</HiddenField>}
 
       {item.fotoUrl ? (
         <S.Photo component="img" src={item.fotoUrl} alt={C.photoAlt(item.nome)} />

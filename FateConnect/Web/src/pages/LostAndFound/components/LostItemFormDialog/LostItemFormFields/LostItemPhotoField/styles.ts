@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, ImgHTMLAttributes } from 'react';
+import type { ImgHTMLAttributes } from 'react';
 import {
   Box,
   Button,
@@ -52,16 +52,6 @@ export const PhotoActionButton = styled(Button)(({ theme }) => ({
   gap: theme.space(xxs),
   borderRadius: theme.radius(radiusScale.component),
 }));
-
-/** Fora da vista, mas focável e rotulado: quem o aciona é o botão. */
-export const HiddenFileInput = styled(PolymorphicBox)<ComponentPropsWithRef<'input'>>({
-  position: 'absolute',
-  width: '1px',
-  height: '1px',
-  overflow: 'hidden',
-  clip: 'rect(0 0 0 0)',
-  whiteSpace: 'nowrap',
-});
 
 /** No estreito a foto e os botões seguem lado a lado, e o texto desce inteiro. */
 export const PhotoHint = styled(Box)(({ theme }) => ({
