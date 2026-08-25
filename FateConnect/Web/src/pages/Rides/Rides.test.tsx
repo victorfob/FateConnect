@@ -46,6 +46,11 @@ function listReturning(rides: Ride[], onRequest?: (url: URL) => void) {
   );
 }
 
+/** Editar e excluir só existem para quem ofertou; os casos deles partem daqui. */
+function loggedAsTheDriver() {
+  tokenStorage.save('token', RIDE_DRIVER.name);
+}
+
 function renderComponent() {
   const router = createMemoryRouter(
     [
@@ -201,6 +206,7 @@ describe('Rides', () => {
 
   it('should ask for confirmation before deleting and keep the ride when it is refused', async () => {
     listReturning([RIDE]);
+    loggedAsTheDriver();
     renderComponent();
     await screen.findByText(RIDE.destino);
 
@@ -217,6 +223,7 @@ describe('Rides', () => {
   });
 
   it('should delete the ride once the removal is confirmed', async () => {
+    loggedAsTheDriver();
     let deleted = false;
     server.use(
       http.get(RIDES_URL, () => HttpResponse.json(deleted ? [] : [RIDE])),
@@ -239,6 +246,7 @@ describe('Rides', () => {
 
   it('should report a failure to delete', async () => {
     listReturning([RIDE]);
+    loggedAsTheDriver();
     server.use(http.delete(`${RIDES_URL}/:rideId`, () => new HttpResponse(null, { status: 500 })));
     renderComponent();
     await screen.findByText(RIDE.destino);
@@ -329,6 +337,18 @@ describe('Rides', () => {
     expect(screen.queryByRole('button', { name: CONTACT_LABEL })).not.toBeInTheDocument();
   });
 
+  it('should keep the owner actions off a ride offered by someone else', async () => {
+    listReturning([RIDE]);
+    renderComponent();
+    await screen.findByText(RIDE.destino);
+
+    expect(screen.queryByRole('button', { name: C.RIDE_CARD_LABELS.edit })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: C.RIDE_CARD_LABELS.delete }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: CONTACT_LABEL })).toBeInTheDocument();
+  });
+
   it('should announce the ride of the logged user, which the border stripe only shows', async () => {
     tokenStorage.save('token', RIDE_DRIVER.name);
     listReturning([RIDE]);
@@ -348,6 +368,7 @@ describe('Rides', () => {
 
   it('should open the edit dialog filled with the ride, without lighting the offer tab', async () => {
     listReturning([RIDE]);
+    loggedAsTheDriver();
     renderComponent();
     await screen.findByText(RIDE.destino);
 
