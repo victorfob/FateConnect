@@ -15,6 +15,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona o cadastro e a edição de item de achados e perdidos, em diálogo sobre a própria lista (#133) [Frontend]
 - Adiciona as ações de quem cadastrou o item de achados e perdidos — concluir, reabrir e excluir, com confirmação onde ela protege (#132) [Frontend]
 - Adiciona o contato de quem cadastrou o item de achados e perdidos, com e-mail copiável e conversa no WhatsApp (#134) [Frontend]
+- Adiciona o monitoramento de erros e de navegação no Sentry, com gravação de sessão mascarada e sem enviar corpo de requisição nem dado de usuário (#141) [Frontend]
 
 ### Changed
 
@@ -32,6 +33,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige a recusa de carona marcada para as próximas horas, tratada como data passada (#99) [Backend]
 - Corrige ofertar e editar carona, que falhavam quando a hora vinha sem os segundos (#99) [Backend]
 - Corrige a atualização de carona, que apagava a descrição quando o campo não era reenviado (#101) [Backend]
+- Corrige a página branca quando a aplicação quebra por inteiro: agora aparece a mesma tela de erro das rotas, com o caminho de volta ao início (#141) [Frontend]
 
 ## [0.2.0] - 2026-08-20
 
