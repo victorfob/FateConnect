@@ -10,7 +10,6 @@ import { BirthDateField } from '../BirthDateField';
 import { GENDER_SELECT_OPTIONS, PASSWORD_TOGGLE_LABEL } from './constants';
 import * as S from './styles';
 
-/** Identificação e acesso: os seis primeiros campos do cadastro. */
 export function AccountSection() {
   const {
     control,

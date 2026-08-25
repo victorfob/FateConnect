@@ -12,9 +12,6 @@ import { Signup } from '@app/pages/Signup';
 
 import { RoutePathEnum } from './paths';
 
-/**
- * Duas cascas — visitante e interna —, com uma rota por tela.
- */
 export const routeConfig: RouteObject[] = [
   {
     element: <RootLayout />,

@@ -1,20 +1,24 @@
 import GlobalStylesBase from '@mui/material/GlobalStyles';
 
-import { fontFamily } from './tokens';
+import { fontFamily, spacingScale } from './tokens';
 
-/** Reset mínimo e base tipográfica do documento. */
+const { none, huge } = spacingScale;
+
 export function GlobalStyles() {
   return (
     <GlobalStylesBase
       styles={(theme) => ({
-        // Mesmo reset do produto: zera margem e recuo de todo elemento.
-        '*, *::before, *::after': { boxSizing: 'border-box', margin: 0, padding: 0 },
+        '*, *::before, *::after': {
+          boxSizing: 'border-box',
+          margin: theme.space(none),
+          padding: theme.space(none),
+        },
         html: { scrollBehavior: 'smooth' },
         // Compensa o topo fixo ao rolar até uma seção pelo fragmento da URL.
-        '[id]': { scrollMarginTop: '5rem' },
+        '[id]': { scrollMarginTop: theme.space(huge) },
         'html, body, #root': { height: '100%' },
         body: {
-          margin: 0,
+          margin: theme.space(none),
           // O CssBaseline do MUI aplica `antialiased`, que afina o texto. O produto
           // usa o padrão do navegador — sem isso, todo peso parece um grau menor.
           WebkitFontSmoothing: 'auto',

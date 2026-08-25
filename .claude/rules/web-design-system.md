@@ -19,6 +19,7 @@ paths:
 ## Componentes compartilhados vivem no design system
 
 - Cromo e UI reutilizável — cabeçalho, rodapé, menu lateral, diálogos — ficam em `design-system/components/`.
+- **Esconder visualmente sem tirar da acessibilidade é o `HiddenField`.** Serve ao texto que só o leitor de tela ouve e ao campo que só um botão aciona, pela prop `component`. ⛔ Não reescreva o bloco `position: absolute` + `clip` — ele existia duplicado em dois arquivos, byte a byte, até virar componente.
 - Esses componentes são **prop-driven**: recebem conteúdo por propriedade ou slot e **não importam nada de `@app/*`**. O domínio (rotas, hooks, textos) é fornecido por quem os compõe.
 - Composição de domínio (um botão que conhece uma seção da landing, por exemplo) fica em `src/components/`, não no design system.
 - **A prop fala em termos visuais, não em termos do domínio.** A etiqueta de estado recebe `tone="success"`, não `tipo="filantropica"`: quem traduz o domínio para o tom é a tela. Foi o que permitiu o mesmo `StatusTag` servir caronas sem o design system saber o que é uma carona.
@@ -38,7 +39,7 @@ paths:
 - **Nunca cor literal** (hex, rgb, rgba, hsl, nome de cor) em componente. Só token de `@design-system`.
 - **Nunca estilizar tipografia à mão** — sem `fontSize`, `fontWeight`, `lineHeight` ou `fontFamily` soltos. Use a variante de tipografia do tema.
 - **Nunca `palette.text.*` como cor de fundo**, nem `contrastText` como fundo — são cores de texto.
-- Espaçamento e raio sempre por token, via os helpers `spacing()` e `radius()` do design system — **não** via `theme.spacing()`, que pertence ao MUI e não deve ser sobrescrito. Sem px solto quando existe token equivalente.
+- Espaçamento e raio sempre por token, via `theme.space()` e `theme.radius()` — chaves **nossas** no tema. ⛔ **Não** via `theme.spacing()`, que é do MUI e não se sobrescreve. Os helpers livres não saem do barrel: a aplicação não consegue importá-los, e o lint barra quem tentar pelo caminho interno. Sem px solto quando existe token — e `0` é o token `none`.
 - Falta token para o que você precisa: **estenda os tokens**, alinhado ao que já existe, em vez de contornar com valor literal.
 
 ## Estilo

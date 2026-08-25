@@ -5,12 +5,10 @@ import { chromeSurface, inputOutline } from './chromeSurface';
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
 
-const { xxs, xs, md } = spacingScale;
+const { none, xxs, xs, md } = spacingScale;
 
-/** Altura da linha no painel do `select`, como no produto. */
 const SELECT_OPTION_MIN_HEIGHT_PX = 48;
 
-/** Overrides de componente do MUI alinhados ao visual já implementado no produto. */
 export const components: Components<Theme> = {
   MuiButton: {
     styleOverrides: {
@@ -86,7 +84,7 @@ export const components: Components<Theme> = {
         ...typographyTokens.formHelper,
         // O MUI afasta a mensagem em 3px e a alinha a 14px; o produto encosta
         // no campo e alinha a 16px. Os 3px somavam altura em cada campo com erro.
-        margin: spacing(0, md),
+        margin: spacing(none, md),
       },
     },
   },
@@ -96,7 +94,7 @@ export const components: Components<Theme> = {
   },
   MuiFormControlLabel: {
     styleOverrides: {
-      root: { marginLeft: 0, marginRight: 0 },
+      root: { marginLeft: spacing(none), marginRight: spacing(none) },
       label: { paddingLeft: spacing(xxs) },
     },
   },
@@ -112,7 +110,10 @@ export const components: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
-        padding: spacing(0, md),
+        padding: spacing(none, md),
+        // Aqui o `sm` é do MUI, não do produto: esta linha desfaz o
+        // `min-width:600px` que o próprio MuiMenuItem aplica.
+        // eslint-disable-next-line no-restricted-syntax
         [theme.breakpoints.up('sm')]: {
           minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
         },

@@ -42,7 +42,6 @@ export const colorTokens = {
   chromeDivider: 'rgba(255, 255, 255, 0.5)',
 };
 
-/** Sombra padrão de componente elevado. */
 export const shadowTokens = {
   component: '0 2px 5px rgba(0, 0, 0, 0.08)',
 };

@@ -27,7 +27,7 @@ Fora da stack, por decisão: **sem SCSS**, **sem Tailwind**, **sem Nx**, **sem l
 
 - Tudo em `design-system/`, **irmão de `src`, não dentro dele**: `tokens/` (**não importa MUI**), `theme/`, `ThemeProvider/`, `GlobalStyles`, `components/`. Ele fica fora porque a aplicação o consome como biblioteca — é o mesmo motivo pelo qual o lint o ordena junto dos pacotes, e não junto dos aliases da aplicação.
 - A aplicação importa **somente dos barrels `@design-system` e `@design-system/icons`** — nunca caminho interno do design system. É o que mantém barato extrair para pacote depois.
-- ⛔ **Nunca sobrescrever o `spacing` do tema.** O MUI chama `theme.spacing(1..3)` dentro dos próprios componentes — gutters do `Toolbar`, padding de `Dialog` e de `Card`. Sobrescrever encolhe todos eles em silêncio: as gutters do `Toolbar` viraram **3px** onde deviam ser 24px. Os tokens em px passam pelo helper `spacing()` do design system; o tema mantém o spacing do MUI. Há teste travando as duas pontas.
+- ⛔ **Nunca sobrescrever o `spacing` do tema.** O MUI chama `theme.spacing(1..3)` dentro dos próprios componentes — gutters do `Toolbar`, padding de `Dialog` e de `Card`. Sobrescrever encolhe todos eles em silêncio: as gutters do `Toolbar` viraram **3px** onde deviam ser 24px. Os tokens em px passam por `theme.space()` e `theme.radius()`, chaves nossas adicionadas ao tema por augmentation; o `theme.spacing` do MUI fica intacto. Há teste travando as duas pontas — ele afirma que `theme.spacing(1)` continua `8px`.
 - **Tipografia:** variantes declaradas no tema + module augmentation do TypeScript. **Não** criar componente próprio de tipografia — usar o `Typography` do MUI com as variantes do projeto.
 
 ## Estilo

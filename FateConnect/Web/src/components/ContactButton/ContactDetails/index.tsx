@@ -8,7 +8,6 @@ import * as S from './styles';
 const COPY_EMAIL_LABEL = 'Copiar';
 
 export type ContactDetailsProps = Readonly<{
-  /** Nome de quem será contatado. */
   name: string;
   initials: string;
   email: string;

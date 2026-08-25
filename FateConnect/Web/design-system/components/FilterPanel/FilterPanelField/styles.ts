@@ -1,8 +1,8 @@
 import Stack from '@mui/material/Stack';
 
-import { styled, type PolymorphicProps } from '@ds-root/styled';
+import { styled } from '@ds-root/styled';
 
-export const FieldCell = styled(Stack)<PolymorphicProps>({
+export const FieldCell = styled(Stack)({
   flexDirection: 'column',
   width: '100%',
 });

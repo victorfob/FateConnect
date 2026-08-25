@@ -1,7 +1,5 @@
-import type { ReactNode } from 'react';
+import type { ElementType, ReactNode } from 'react';
 import Typography from '@mui/material/Typography';
-
-import type { PolymorphicProps } from '@ds-root/styled';
 
 import * as S from './styles';
 
@@ -10,10 +8,14 @@ import * as S from './styles';
  * link do roteador em uso — `to` — ou uma âncora — `href` —, e o design system
  * continua sem depender de roteamento.
  */
-export type PageShellBackProps = Readonly<{ label: string; icon: ReactNode }> &
-  PolymorphicProps<{ to?: string; href?: string }>;
+export type PageShellBackProps = Readonly<{
+  label: string;
+  icon: ReactNode;
+  component?: ElementType;
+  to?: string;
+  href?: string;
+}>;
 
-/** Ação de voltar do cabeçalho. O cromo é daqui; o destino, de quem compõe. */
 export function PageShellBack({ label, icon, ...rest }: PageShellBackProps) {
   return (
     <S.BackAction {...rest}>

@@ -9,7 +9,6 @@ type DrawerSectionItemProps = Readonly<{
   onSelect: (section: LandingSectionEnum) => void;
 }>;
 
-/** Item do menu lateral que rola até uma seção da landing. */
 export function DrawerSectionItem({ section, label, onSelect }: DrawerSectionItemProps) {
   const handleClick = useCallback(() => onSelect(section), [onSelect, section]);
 

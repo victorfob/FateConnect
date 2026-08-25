@@ -5,7 +5,6 @@ import { ThemeToggleButton } from '.';
 const SWITCH_TO_DARK = 'Ativar tema escuro';
 const SWITCH_TO_LIGHT = 'Ativar tema claro';
 
-/** Lê a cor de fundo aplicada pelo tema ao corpo do documento. */
 function documentBackground() {
   return getComputedStyle(document.body).backgroundColor;
 }

@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { FATEC_EMAIL_MESSAGE, FATEC_EMAIL_PATTERN } from '@app/constants/fatecEmail';
 
-/** Mensagens iguais às do produto. */
 export const LOGIN_MESSAGES = {
   emailRequired: 'Informe o e-mail',
   passwordRequired: 'Informe a senha',

@@ -1,32 +1,28 @@
-import {
-  mobileMedia,
-  spacing,
-  spacingScale,
-  Stack,
-  styled,
-  type PolymorphicProps,
-} from '@design-system';
+import { spacingScale, Stack, styled } from '@design-system';
 
 const { xs, md, xl } = spacingScale;
 
-export const DetailsRow = styled(Stack)<PolymorphicProps>({
+export const DetailsRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
-  gap: spacing(xl),
+  gap: theme.space(xl),
 
-  [mobileMedia]: { flexDirection: 'column', alignItems: 'center', gap: spacing(md) },
-});
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: theme.space(md),
+  },
+}));
 
-/** Quem é a pessoa: o círculo com as iniciais e o nome embaixo dele. */
-export const Identity = styled(Stack)<PolymorphicProps>({
+export const Identity = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
-  gap: spacing(xs),
-});
+  gap: theme.space(xs),
+}));
 
-export const Channels = styled(Stack)<PolymorphicProps>({
+export const Channels = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
-  gap: spacing(xs),
+  gap: theme.space(xs),
 
-  [mobileMedia]: { alignItems: 'center' },
-});
+  [theme.breakpoints.down('md')]: { alignItems: 'center' },
+}));

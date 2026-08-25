@@ -8,7 +8,6 @@ const STATUS_LABEL: Readonly<Record<LostItemStatusEnum, string>> = {
   [LostItemStatusEnum.CANCELLED]: 'Cancelado',
 };
 
-/** A #29 previa cinza no aberto; virou amarelo quando a situação passou a ser a única etiqueta do cartão. */
 const STATUS_TONE: Readonly<Record<LostItemStatusEnum, StatusTagTone>> = {
   [LostItemStatusEnum.OPEN]: 'warning',
   [LostItemStatusEnum.RESOLVED]: 'success',

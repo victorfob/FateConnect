@@ -1,58 +1,62 @@
 import {
   Box,
   iconSizeTokens,
-  mobileMedia,
-  radius,
+  PolymorphicBox,
+  PolymorphicStack,
   radiusScale,
   shadowTokens,
+  spacingScale,
   Stack,
   styled,
-  type PolymorphicProps,
 } from '@design-system';
+
+const { md, lg, xl, xxl, xxxl, giant } = spacingScale;
 
 const CARD_MIN_WIDTH_PX = 500;
 const ICON_DISC_SIZE_PX = 70;
 
-export const ServicesSection = styled(Box)<PolymorphicProps>({
-  padding: '5vh 7vw 7vh',
-});
+export const ServicesSection = styled(PolymorphicBox)(({ theme }) => ({
+  padding: theme.space(xxl, giant, xxxl),
 
-export const SectionTitle = styled(Box)<PolymorphicProps>(({ theme }) => ({
+  [theme.breakpoints.down('md')]: { padding: theme.space(xxl, lg, xxxl) },
+}));
+
+export const SectionTitle = styled(Box)(({ theme }) => ({
   display: 'block',
   textAlign: 'center',
-  marginBottom: '2rem',
+  marginBottom: theme.space(xl),
   color: theme.palette.text.primary,
 }));
 
-export const CardsGrid = styled(Stack)<PolymorphicProps>({
+export const CardsGrid = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'center',
   flexWrap: 'wrap',
-  gap: '2rem',
-});
+  gap: theme.space(xl),
+}));
 
-export const ServiceCardRoot = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const ServiceCardRoot = styled(PolymorphicStack)(({ theme }) => ({
   flex: 0.5,
   flexDirection: 'column',
   minWidth: `${CARD_MIN_WIDTH_PX}px`,
   alignItems: 'center',
-  gap: '1rem',
-  padding: '2rem',
+  gap: theme.space(md),
+  padding: theme.space(xl),
   textAlign: 'center',
   backgroundColor: theme.palette.background.default,
-  borderRadius: radius(radiusScale.component),
+  borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
 
-  [mobileMedia]: { minWidth: '100%' },
+  [theme.breakpoints.down('md')]: { minWidth: '100%' },
 }));
 
-export const IconContainer = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const IconContainer = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
   width: `${ICON_DISC_SIZE_PX}px`,
   height: `${ICON_DISC_SIZE_PX}px`,
-  borderRadius: '50%',
+  borderRadius: theme.radius(radiusScale.circle),
   backgroundColor: theme.palette.secondary.main,
 
   '& svg': {
@@ -61,10 +65,10 @@ export const IconContainer = styled(Stack)<PolymorphicProps>(({ theme }) => ({
   },
 }));
 
-export const CardTitle = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const CardTitle = styled(Box)(({ theme }) => ({
   color: theme.palette.text.primary,
 }));
 
-export const CardBody = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const CardBody = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));

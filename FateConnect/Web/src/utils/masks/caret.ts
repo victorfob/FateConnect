@@ -1,9 +1,7 @@
-/** Dígitos do texto, sem separador nem espaço. */
 export function onlyDigits(text: string): string {
   return text.replaceAll(/\D/g, '');
 }
 
-/** Quantos dígitos existem no trecho. */
 export function countDigits(text: string): number {
   return onlyDigits(text).length;
 }

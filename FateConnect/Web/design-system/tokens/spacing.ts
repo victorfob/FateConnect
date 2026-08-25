@@ -1,4 +1,5 @@
-export type SpacingToken = 'none' | 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl';
+export type SpacingToken =
+  'none' | 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl' | 'huge' | 'giant';
 
 /**
  * Escala de espaçamento em **pixels**, derivada dos valores já praticados no produto.
@@ -14,4 +15,6 @@ export const spacingScale: Record<SpacingToken, number> = {
   xl: 32,
   xxl: 48,
   xxxl: 64,
+  huge: 80,
+  giant: 112,
 };

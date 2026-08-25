@@ -9,7 +9,6 @@ type ThemeModeContextValue = {
 
 export const ThemeModeContext = createContext<ThemeModeContextValue | null>(null);
 
-/** Modo de tema corrente e a ação de alternar. Só funciona sob o `ThemeProvider`. */
 export function useThemeMode(): ThemeModeContextValue {
   const contexto = useContext(ThemeModeContext);
   if (!contexto) throw new Error('useThemeMode precisa estar dentro do ThemeProvider');

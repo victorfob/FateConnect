@@ -10,13 +10,5 @@ export {
   iconSizeTokens,
 } from './palette';
 export { fontFamily, typographyTokens } from './typography';
-export {
-  COMPACT_MAX_WIDTH_PX,
-  compactMedia,
-  MOBILE_MAX_WIDTH_PX,
-  TABLET_MAX_WIDTH_PX,
-  mobileMedia,
-  tabletMedia,
-  desktopMedia,
-} from './breakpoints';
+export { DESKTOP_MIN_WIDTH_PX } from './breakpoints';
 export type { TypographyToken } from './typography';

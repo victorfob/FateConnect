@@ -1,10 +1,4 @@
-import {
-  colorTokens,
-  mobileMedia,
-  spacingScale,
-  typographyTokens,
-  type TypographyToken,
-} from '../tokens';
+import { colorTokens, spacingScale, typographyTokens, type TypographyToken } from '../tokens';
 import { createAppTheme } from './createAppTheme';
 import { spacing } from './helpers/spacing';
 
@@ -38,11 +32,12 @@ describe('createAppTheme', () => {
   // título ficava grande entre os dois pontos, e o teste antigo — que só
   // procurava o tamanho reduzido em algum lugar do objeto — não acusava.
   it('should shrink h1 at the product breakpoint keeping weight and line height', () => {
-    const { typography } = createAppTheme();
-    const h1 = typography.h1 as unknown as Record<string, TypographyToken>;
+    const theme = createAppTheme();
+    const h1 = theme.typography.h1 as unknown as Record<string, TypographyToken>;
 
-    expect(typography.h1.fontSize).toBe(typographyTokens.h1.fontSize);
-    expect(h1[mobileMedia]).toMatchObject(typographyTokens.h1Narrow);
+    expect(theme.typography.h1.fontSize).toBe(typographyTokens.h1.fontSize);
+    // A consulta escrita à mão no tema precisa ser a mesma que o MUI gera.
+    expect(h1[theme.breakpoints.down('md')]).toMatchObject(typographyTokens.h1Narrow);
   });
 
   it('should apply the product palette', () => {
