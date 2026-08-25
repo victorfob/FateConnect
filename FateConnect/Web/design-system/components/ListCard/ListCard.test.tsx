@@ -5,6 +5,8 @@ import { ListCard, type ListCardProps } from '.';
 const TITLE = 'Item de teste';
 const OWN_LABEL = 'Meu item';
 const MEDIA_TEXT = 'foto';
+const FIRST_INFO = 'Biblioteca';
+const SECOND_INFO = '11/08/2026';
 
 const DEFAULT_PROPS: ListCardProps = { children: TITLE };
 
@@ -33,6 +35,19 @@ describe('ListCard', () => {
     renderComponent({ ...DEFAULT_PROPS, ownLabel: OWN_LABEL });
 
     expect(screen.queryByText(OWN_LABEL)).not.toBeInTheDocument();
+  });
+
+  it('should separate the info items without anything the screen reader would read', () => {
+    renderComponent({
+      children: (
+        <ListCard.InfoRow>
+          <ListCard.InfoItem>{FIRST_INFO}</ListCard.InfoItem>
+          <ListCard.InfoItem>{SECOND_INFO}</ListCard.InfoItem>
+        </ListCard.InfoRow>
+      ),
+    });
+
+    expect(screen.getByRole('article')).toHaveTextContent(`${FIRST_INFO}${SECOND_INFO}`);
   });
 
   it('should keep the own flag out of the markup', () => {
