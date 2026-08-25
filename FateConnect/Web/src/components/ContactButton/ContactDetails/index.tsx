@@ -1,7 +1,7 @@
 import { InitialsAvatar, Typography } from '@design-system';
 import { EmailIcon, PhoneIcon } from '@design-system/icons';
 
-import { ContactChannel } from '../ContactChannel';
+import { ContactChannel } from './ContactChannel';
 import * as S from './styles';
 
 /** Prefixo do nome acessível do e-mail — o texto visível vem depois dele. */

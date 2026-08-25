@@ -1,6 +1,7 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
+import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
@@ -8,7 +9,6 @@ import { RideTypeEnum, type Ride } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
-import { CONTACT_DIALOG } from './components/RideCard/RideDriverContact/constants';
 import {
   FILTER_LABELS,
   FILTER_PANEL_TITLE,
@@ -257,7 +257,7 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(RIDE.destino);
 
-    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+    await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
 
     const dialog = within(await screen.findByRole('dialog'));
     expect(dialog.getByText(RIDE_DRIVER.name)).toBeInTheDocument();
@@ -269,7 +269,7 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(RIDE.destino);
 
-    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+    await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
     const dialog = within(await screen.findByRole('dialog'));
     await userEvent.click(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` }));
 
@@ -284,7 +284,7 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(RIDE.destino);
 
-    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+    await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
     const dialog = within(await screen.findByRole('dialog'));
     await userEvent.click(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` }));
 
@@ -296,7 +296,7 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(RIDE.destino);
 
-    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+    await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
 
     const dialog = within(await screen.findByRole('dialog'));
     const conversation = dialog.getByRole('link', { name: RIDE_DRIVER.phone });
@@ -312,7 +312,7 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(RIDE.destino);
 
-    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.contact }));
+    await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
     await screen.findByRole('dialog');
 
     // Por tecla, e não pelo botão: o caso é sobre o cartão voltar quando o
@@ -328,9 +328,7 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(RIDE.destino);
 
-    expect(
-      screen.queryByRole('button', { name: C.RIDE_CARD_LABELS.contact }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: CONTACT_LABEL })).not.toBeInTheDocument();
   });
 
   it('should open the edit dialog filled with the ride, without lighting the offer tab', async () => {

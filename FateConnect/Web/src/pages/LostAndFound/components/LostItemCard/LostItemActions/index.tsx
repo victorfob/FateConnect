@@ -1,5 +1,6 @@
 import type { LostItem } from '@app/services/lostAndFound/types';
 
+import { LostItemOwnerContact } from '../LostItemOwnerContact';
 import { LostItemOwnerActions } from './LostItemOwnerActions';
 import * as S from './styles';
 
@@ -13,6 +14,8 @@ type LostItemActionsProps = Readonly<{
 export function LostItemActions({ item, onEdit, onCancel }: LostItemActionsProps) {
   return (
     <S.ActionButtons>
+      <LostItemOwnerContact item={item} />
+
       <LostItemOwnerActions item={item} onEdit={onEdit} onCancel={onCancel} />
     </S.ActionButtons>
   );
