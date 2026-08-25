@@ -16,6 +16,14 @@ Sintoma de que a fatiação está errada: duas worktrees produzindo arquivos que
 
 Paralelizar é decisão do Victor, não minha. Ao ver duas issues independentes prontas para começar, dizer qual vai em qual worktree e **esperar a confirmação** — mesmo quando ele já usou a palavra "paralelo", porque foi justamente ela que se mostrou ambígua.
 
+### O "sim" à fatiação é o gatilho de execução
+
+⛔ **Aprovada a fatiação, a worktree e o agente saem no mesmo turno.** Não há segunda confirmação: o "sim" autorizou o trabalho, não só o desenho dele.
+
+Aconteceu na #137: propus "#137 e #140 em paralelo", o Victor respondeu *"Beleza, pode fazer"*, e eu comecei a #140 sozinho no checkout principal. A cobrança veio como *"pq não ta fazendo a 137 em paralelo?"*. Eu tinha lido o "sim" como aval do **desenho** e presumido que disparar agente precisava de um pedido à parte.
+
+O sinal de que estou prestes a repetir: começar a executar **uma** das issues logo depois de o Victor aprovar duas. Se a fatiação previa duas frentes e só uma está andando, falta disparar a outra — ou dizer explicitamente por que não vai.
+
 ## Issue-base pronta antes das dependentes
 
 Issue que declara "Depende de" só começa quando a base estiver **com o escopo inteiro, PR aberto e verde**. As irmãs saem então da branch da base, uma por worktree.
