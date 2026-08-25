@@ -38,7 +38,5 @@ ListCard.ActionButtons = S.ActionButtons;
 ListCard.InfoRow = S.InfoRow;
 ListCard.InfoItem = S.InfoItem;
 ListCard.Description = S.Description;
-ListCard.WideOnlyTag = S.WideOnlyTag;
-ListCard.CompactOnlyTag = S.CompactOnlyTag;
 
 export { ListCard };

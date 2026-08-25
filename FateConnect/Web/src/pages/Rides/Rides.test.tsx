@@ -141,9 +141,7 @@ describe('Rides', () => {
     expect(screen.getByText('22/05/2026')).toBeInTheDocument();
     expect(screen.getByText('07:30')).toBeInTheDocument();
     expect(screen.getByText(C.seatsLabel(RIDE.qtdVagas))).toBeInTheDocument();
-    // A etiqueta existe duas vezes: uma no cabeçalho e outra no rodapé do
-    // cartão, alternadas por media query — que o jsdom não avalia.
-    expect(screen.getAllByText('Solidária')).toHaveLength(2);
+    expect(screen.getAllByText('Solidária')).toHaveLength(1);
   });
 
   it('should tell the user when no ride matches', async () => {
@@ -329,6 +327,23 @@ describe('Rides', () => {
     await screen.findByText(RIDE.destino);
 
     expect(screen.queryByRole('button', { name: CONTACT_LABEL })).not.toBeInTheDocument();
+  });
+
+  it('should announce the ride of the logged user, which the border stripe only shows', async () => {
+    tokenStorage.save('token', RIDE_DRIVER.name);
+    listReturning([RIDE]);
+    renderComponent();
+    await screen.findByText(RIDE.destino);
+
+    expect(screen.getByText(C.OWN_RIDE_LABEL)).toBeInTheDocument();
+  });
+
+  it('should keep that announcement off a ride offered by someone else', async () => {
+    listReturning([RIDE]);
+    renderComponent();
+    await screen.findByText(RIDE.destino);
+
+    expect(screen.queryByText(C.OWN_RIDE_LABEL)).not.toBeInTheDocument();
   });
 
   it('should open the edit dialog filled with the ride, without lighting the offer tab', async () => {

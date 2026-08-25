@@ -33,18 +33,28 @@ export const CardRoot = styled(PolymorphicStack, {
   [theme.breakpoints.down('md')]: { flexDirection: 'column' },
 }));
 
-export const CardBody = styled(Stack)({
+export const CardBody = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   flexGrow: 1,
   minWidth: 0,
-});
+
+  // No estreito o cartão vira coluna, e aí o `flex-start` do topo encolheria o
+  // corpo até o conteúdo: o cabeçalho pararia antes da borda, em lugar
+  // diferente a cada cartão.
+  [theme.breakpoints.down('md')]: { width: '100%' },
+}));
 
 export const HeaderRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   gap: theme.space(sm),
   marginBottom: theme.space(sm),
+
+  // Sem os dois o título empurra a etiqueta e as ações para fora do cartão no
+  // estreito: o `minWidth` é o que deixa a caixa encolher, e a quebra é o que
+  // impede uma palavra sem espaço de correr por cima delas.
+  '& > :first-of-type': { minWidth: 0, overflowWrap: 'anywhere' },
 }));
 
 export const HeaderActions = styled(Stack)(({ theme }) => ({
@@ -109,21 +119,4 @@ export const InfoItem = styled(Stack)(({ theme }) => ({
 export const Description = styled(Box)(({ theme }) => ({
   marginBottom: theme.space(sm),
   color: theme.palette.text.secondary,
-}));
-
-/** A etiqueta acompanha o cabeçalho no desktop e desce para o rodapé no estreito. */
-export const WideOnlyTag = styled(Box)(({ theme }) => ({
-  display: 'block',
-
-  [theme.breakpoints.down('md')]: { display: 'none' },
-}));
-
-export const CompactOnlyTag = styled(Box)(({ theme }) => ({
-  display: 'none',
-
-  [theme.breakpoints.down('md')]: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    paddingTop: theme.space(sm),
-  },
 }));
