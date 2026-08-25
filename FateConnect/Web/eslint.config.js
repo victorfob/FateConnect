@@ -1,11 +1,11 @@
 import js from '@eslint/js';
-import { defineConfig } from 'eslint/config';
 import importX from 'eslint-plugin-import-x';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import perfectionist from 'eslint-plugin-perfectionist';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -89,12 +89,20 @@ export default defineConfig([
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{js,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2022,
       globals: { ...globals.browser, ...globals.node },
       // Informação de tipo: é o que permite ao lint enxergar `@deprecated`.
-      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+      //
+      // `allowDefaultProject` cobre este próprio arquivo: ele é `.js`, fica fora
+      // do `include` do tsconfig, e sem isto o serviço de projeto reprova com
+      // "was not found by the project service" — que foi como a deprecação do
+      // `tseslint.config()` passou despercebida pelo lint.
+      parserOptions: {
+        projectService: { allowDefaultProject: ['eslint.config.js'] },
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       react: reactPlugin,
@@ -225,7 +233,7 @@ export default defineConfig([
             },
             {
               group: ['@emotion/*'],
-              message: 'Use `styled`, `css` e `keyframes` do barrel `@design-system`.',
+              message: 'Use `styled`, `css` e keyframes do barrel `@design-system`.',
             },
           ],
           paths: [

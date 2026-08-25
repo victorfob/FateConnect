@@ -150,7 +150,7 @@ Para decidir em JS, `useMediaQuery(theme.breakpoints.up('md'))` — não meça `
 
 ## Aplicado pelo lint
 
-Uso de API marcada como `@deprecated` é **erro** (`@typescript-eslint/no-deprecated`, com informação de tipo via `projectService`). Ao ligar, ela já pegou o `.email()` do zod nos dois schemas — trocado por `.pipe(z.email(...))`, que preserva a ordem "obrigatório antes de inválido".
+Uso de API marcada como `@deprecated` é **erro** (`@typescript-eslint/no-deprecated`, com informação de tipo via `projectService`). O recorte cobre `**/*.{js,ts,tsx}`, o que inclui o **próprio `eslint.config.js`** — e ele precisa de `projectService: { allowDefaultProject: ['eslint.config.js'] }`, porque é `.js` e fica fora do `include` do `tsconfig`. Sem isso o parser reprova com *"was not found by the project service"*; sem o `.js` no recorte, uma API deprecada dentro do próprio config passa despercebida — foi o que aconteceu com o `tseslint.config()`. Ao ligar, ela já pegou o `.email()` do zod nos dois schemas — trocado por `.pipe(z.email(...))`, que preserva a ordem "obrigatório antes de inválido".
 
 Número solto é **erro** (`@typescript-eslint/no-magic-numbers`): valor numérico com significado vira constante nomeada. Ficam de fora `0`, `1` e `-1` — que aparecem em comprimento, índice e contador sem esconder intenção —, os testes, e valores dentro de objeto (é o que permite tabelas de token como `spacingScale`).
 
