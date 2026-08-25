@@ -5,7 +5,6 @@ export const APP_CONTACT = {
   address: 'Av. Eng. Carlos Reinaldo Mendes, 2015',
 };
 
-/** Título e assinatura do rodapé. */
 export const FOOTER_TITLE = 'Entre em contato';
 
 export const FOOTER_COPYRIGHT_LINES = [

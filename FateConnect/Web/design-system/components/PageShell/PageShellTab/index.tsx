@@ -11,7 +11,6 @@ export type PageShellTabProps = Readonly<{
   onClick?: VoidFunction;
 }>;
 
-/** Aba da barra do `PageShell` — destaca a atual e dispara a ação da outra. */
 export function PageShellTab({ label, icon, selected, onClick }: PageShellTabProps) {
   return (
     <S.TabButton

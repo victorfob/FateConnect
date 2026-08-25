@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, type ChangeEvent } from 'react';
-import { Typography } from '@design-system';
+import { HiddenField, Typography } from '@design-system';
 import { DeleteIcon, ImageIcon } from '@design-system/icons';
 import { useFormContext, useWatch } from 'react-hook-form';
 
@@ -62,7 +62,9 @@ export function LostItemPhotoField() {
       <Typography variant="caption">{C.LOST_ITEM_FORM_LABELS.photo}</Typography>
 
       <S.PhotoRow>
-        {previewUrl && <S.PhotoPreview src={previewUrl} alt={C.PHOTO_ACTIONS.previewAlt} />}
+        {previewUrl && (
+          <S.PhotoPreview component="img" src={previewUrl} alt={C.PHOTO_ACTIONS.previewAlt} />
+        )}
 
         <S.PhotoActions>
           <S.PhotoActionButton variant="outlined" onClick={handlePick} disabled={disabled}>
@@ -104,7 +106,8 @@ export function LostItemPhotoField() {
         )}
       </S.PhotoRow>
 
-      <S.HiddenFileInput
+      <HiddenField
+        component="input"
         ref={fileInputRef}
         type="file"
         accept={C.PHOTO_ACCEPT_ATTRIBUTE}

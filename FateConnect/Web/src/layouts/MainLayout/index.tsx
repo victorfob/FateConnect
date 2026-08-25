@@ -19,7 +19,6 @@ import { HeaderActions } from './components/HeaderActions';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
-/** Casca das rotas internas (`/menu`, `/caronas`, …). */
 export function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 

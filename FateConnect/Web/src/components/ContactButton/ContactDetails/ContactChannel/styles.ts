@@ -1,13 +1,5 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react';
-import {
-  iconSizeTokens,
-  spacing,
-  spacingScale,
-  Stack,
-  styled,
-  Typography,
-  type PolymorphicProps,
-} from '@design-system';
+import { iconSizeTokens, PolymorphicStack, spacingScale, styled, Typography } from '@design-system';
 
 const { none, xs } = spacingScale;
 
@@ -16,21 +8,19 @@ const { none, xs } = spacingScale;
  * dois — é o que permite `component="a"` com `href` e `component="button"` com
  * `type` e `onClick` sem cast no ponto de uso.
  */
-type ChannelRowProps = PolymorphicProps<
-  Pick<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'target' | 'rel'> &
-    Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick'>
->;
+type ChannelRowProps = Pick<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'target' | 'rel'> &
+  Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick'>;
 
-export const ChannelRow = styled(Stack)<ChannelRowProps>(({ theme }) => ({
+export const ChannelRow = styled(PolymorphicStack)<ChannelRowProps>(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
-  gap: spacing(xs),
+  gap: theme.space(xs),
   color: theme.palette.text.primary,
   textDecoration: 'none',
 
   // Como botão, o elemento vem com cromo de formulário: sem isto a linha ganha
   // borda, fundo e a fonte do sistema, e deixa de parecer com a linha do link.
-  padding: spacing(none),
+  padding: theme.space(none),
   border: 'none',
   background: 'none',
   font: 'inherit',

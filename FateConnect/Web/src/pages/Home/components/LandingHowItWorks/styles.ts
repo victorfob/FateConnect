@@ -1,75 +1,80 @@
 import {
   Box,
-  mobileMedia,
-  radius,
+  PolymorphicStack,
   radiusScale,
   shadowTokens,
+  spacingScale,
   Stack,
   styled,
-  type PolymorphicProps,
 } from '@design-system';
 
-export const HowSection = styled(Stack)<PolymorphicProps>({
+const { xs, sm, lg, xl, xxl, giant } = spacingScale;
+
+const BADGE_SIZE = '2.5rem';
+
+export const HowSection = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
-  padding: '3rem 7vw',
-});
+  padding: theme.space(xxl, giant),
 
-export const SectionTitle = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+  [theme.breakpoints.down('md')]: { padding: theme.space(xxl, lg) },
+}));
+
+export const SectionTitle = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   textAlign: 'center',
-  marginBottom: '2rem',
+  marginBottom: theme.space(xl),
   color: theme.palette.text.primary,
 }));
 
-export const StepsGrid = styled(Stack)<PolymorphicProps>({
+export const StepsGrid = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
-  gap: '2rem',
+  gap: theme.space(xl),
 
-  [mobileMedia]: { flexDirection: 'column' },
-});
+  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
+}));
 
-export const StepCard = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const StepCard = styled(PolymorphicStack)(({ theme }) => ({
   position: 'relative',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: '2rem 1.5rem 1.75rem',
+  padding: theme.space(xl, lg, lg),
   background: theme.palette.background.paper,
-  borderRadius: radius(radiusScale.component),
+  borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
   textAlign: 'center',
 }));
 
-export const StepBadge = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const StepBadge = styled(PolymorphicStack)(({ theme }) => ({
   position: 'absolute',
-  top: '-1.25rem',
+  // Metade da própria altura: é o que faz o círculo montar sobre a borda do
+  // cartão. Não é token de espaçamento — muda junto com `BADGE_SIZE`.
+  top: `calc(${BADGE_SIZE} / -2)`,
   left: '50%',
   transform: 'translateX(-50%)',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '2.5rem',
-  height: '2.5rem',
-  borderRadius: '50%',
+  width: BADGE_SIZE,
+  height: BADGE_SIZE,
+  borderRadius: theme.radius(radiusScale.circle),
   backgroundColor: theme.palette.secondary.main,
   color: theme.palette.common.white,
-  fontWeight: 700,
-  fontSize: '1.125rem',
-  lineHeight: 1,
+  ...theme.typography.subtitleBold,
 
-  [mobileMedia]: { left: '2rem' },
+  [theme.breakpoints.down('md')]: { left: theme.space(xl) },
 }));
 
-export const StepBody = styled(Stack)<PolymorphicProps>({
+export const StepBody = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
-  gap: '0.75rem',
-  marginTop: '0.5rem',
-});
+  gap: theme.space(sm),
+  marginTop: theme.space(xs),
+}));
 
-export const StepTitle = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const StepTitle = styled(Box)(({ theme }) => ({
   color: theme.palette.text.primary,
 }));
 
-export const StepDescription = styled(Box)<PolymorphicProps>(({ theme }) => ({
+export const StepDescription = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));

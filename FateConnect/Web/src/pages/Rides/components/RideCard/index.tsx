@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { IconButton, StatusTag, Typography } from '@design-system';
+import { IconButton, ListCard, StatusTag, Typography } from '@design-system';
 import { AccessTimeIcon, CalendarTodayIcon, EditIcon, GroupsIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
@@ -9,7 +9,6 @@ import type { Ride } from '@app/services/rides/types';
 
 import { RideDeleteConfirmation } from './RideDeleteConfirmation';
 import { RideDriverContact } from './RideDriverContact';
-import * as S from './styles';
 
 const DATE_FORMAT = 'dd/MM/yyyy';
 /** A API devolve `HH:mm:ss`; o cartão mostra só horas e minutos. */
@@ -28,16 +27,16 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
   const tone = rideTypeTone(ride.tipoCarona);
 
   return (
-    <S.CardRoot component="article">
-      <S.HeaderRow>
+    <ListCard>
+      <ListCard.Header>
         <Typography variant="subtitleBold">{ride.destino}</Typography>
 
-        <S.HeaderActions>
-          <S.WideOnlyTag>
+        <ListCard.Actions>
+          <ListCard.WideOnlyTag>
             <StatusTag tone={tone}>{typeLabel}</StatusTag>
-          </S.WideOnlyTag>
+          </ListCard.WideOnlyTag>
 
-          <S.ActionButtons>
+          <ListCard.ActionButtons>
             <RideDriverContact destination={ride.destino} />
 
             <IconButton type="button" label={C.RIDE_CARD_LABELS.edit} onClick={handleEdit}>
@@ -45,42 +44,42 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
             </IconButton>
 
             <RideDeleteConfirmation ride={ride} onDelete={onDelete} />
-          </S.ActionButtons>
-        </S.HeaderActions>
-      </S.HeaderRow>
+          </ListCard.ActionButtons>
+        </ListCard.Actions>
+      </ListCard.Header>
 
-      <S.InfoRow>
-        <S.InfoItem>
+      <ListCard.InfoRow>
+        <ListCard.InfoItem>
           <CalendarTodayIcon />
           <Typography variant="caption" color="inherit">
             {format(parseISO(ride.dataPartida), DATE_FORMAT)}
           </Typography>
-        </S.InfoItem>
+        </ListCard.InfoItem>
 
-        <S.InfoItem>
+        <ListCard.InfoItem>
           <AccessTimeIcon />
           <Typography variant="caption" color="inherit">
             {ride.horaPartida.slice(0, TIME_LENGTH)}
           </Typography>
-        </S.InfoItem>
+        </ListCard.InfoItem>
 
-        <S.InfoItem>
+        <ListCard.InfoItem>
           <GroupsIcon />
           <Typography variant="caption" color="inherit">
             {C.seatsLabel(ride.qtdVagas)}
           </Typography>
-        </S.InfoItem>
-      </S.InfoRow>
+        </ListCard.InfoItem>
+      </ListCard.InfoRow>
 
-      <S.Description>
+      <ListCard.Description>
         <Typography variant="subtitle" color="inherit">
           {ride.descricao}
         </Typography>
-      </S.Description>
+      </ListCard.Description>
 
-      <S.CompactOnlyTag>
+      <ListCard.CompactOnlyTag>
         <StatusTag tone={tone}>{typeLabel}</StatusTag>
-      </S.CompactOnlyTag>
-    </S.CardRoot>
+      </ListCard.CompactOnlyTag>
+    </ListCard>
   );
 }

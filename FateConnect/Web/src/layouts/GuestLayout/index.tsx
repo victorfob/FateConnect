@@ -13,7 +13,6 @@ import * as S from '../shell.styles';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
-/** Casca das rotas públicas (`/inicio`, `/cadastro`). */
 export function GuestLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const goToSection = useLandingAnchor();

@@ -45,7 +45,6 @@ export function Signup() {
     onError: (error: ApiError) => notifyError(errorMessageFor(error.status)),
   });
 
-  // O formulário inteiro fica desabilitado durante o envio e volta em caso de erro.
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: SIGNUP_DEFAULT_VALUES,
