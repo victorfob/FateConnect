@@ -24,6 +24,8 @@ export type { IconButtonProps } from './components/IconButton';
 export { Input } from './components/Input';
 export type { InputProps } from './components/Input';
 export type { SelectOption } from './components/Input/components/SelectInput/types';
+export { ListCard } from './components/ListCard';
+export type { ListCardProps } from './components/ListCard';
 export { NotificationProvider } from './components/NotificationProvider';
 export { PageMessage } from './components/PageMessage';
 export type { PageMessageProps } from './components/PageMessage';

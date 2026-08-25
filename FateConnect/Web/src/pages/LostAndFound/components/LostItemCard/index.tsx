@@ -1,5 +1,5 @@
-import { HiddenField, StatusTag, Typography } from '@design-system';
-import { CalendarTodayIcon, ImageIcon, LocationOnIcon } from '@design-system/icons';
+import { ListCard, StatusTag, Typography } from '@design-system';
+import { CalendarTodayIcon, LocationOnIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
 import {
@@ -10,6 +10,7 @@ import { LostItemStatusEnum, type LostItem } from '@app/services/lostAndFound/ty
 
 import { LostItemActions } from './LostItemActions';
 import { LostItemKindIcon } from './LostItemKindIcon';
+import { LostItemPhoto } from './LostItemPhoto';
 import { LostItemStatusAction } from './LostItemStatusAction';
 import * as C from './constants';
 import * as S from './styles';
@@ -29,75 +30,67 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
   const statusLabel = lostItemStatusLabel(item.situacao);
 
   return (
-    <S.CardRoot component="article" own={item.meuItem}>
-      {item.meuItem && <HiddenField component="span">{C.OWN_ITEM_LABEL}</HiddenField>}
+    <ListCard
+      own={item.meuItem}
+      ownLabel={C.OWN_ITEM_LABEL}
+      media={<LostItemPhoto url={item.fotoUrl} itemName={item.nome} />}
+    >
+      <ListCard.Header>
+        <Typography variant="subtitleBold">{item.nome}</Typography>
 
-      {item.fotoUrl ? (
-        <S.Photo component="img" src={item.fotoUrl} alt={C.photoAlt(item.nome)} />
-      ) : (
-        <S.PhotoPlaceholder aria-hidden>
-          <ImageIcon />
-        </S.PhotoPlaceholder>
+        <ListCard.Actions>
+          <ListCard.WideOnlyTag>
+            <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
+          </ListCard.WideOnlyTag>
+
+          <LostItemActions item={item} onEdit={onEdit} onCancel={onCancel} />
+        </ListCard.Actions>
+      </ListCard.Header>
+
+      <ListCard.InfoRow>
+        <ListCard.InfoItem>
+          <LocationOnIcon />
+          <Typography variant="caption" color="inherit">
+            {item.local}
+          </Typography>
+        </ListCard.InfoItem>
+
+        <ListCard.InfoItem>
+          <CalendarTodayIcon />
+          <Typography variant="caption" color="inherit">
+            {format(parseISO(item.dataOcorrido), DATE_FORMAT)}
+          </Typography>
+        </ListCard.InfoItem>
+
+        <ListCard.InfoItem>
+          <LostItemKindIcon kind={item.tipo} />
+          <Typography variant="caption" color="inherit">
+            {item.tipo}
+          </Typography>
+        </ListCard.InfoItem>
+      </ListCard.InfoRow>
+
+      {item.descricao && (
+        <ListCard.Description>
+          <Typography variant="subtitle" color="inherit">
+            {item.descricao}
+          </Typography>
+        </ListCard.Description>
       )}
 
-      <S.CardBody>
-        <S.HeaderRow>
-          <Typography variant="subtitleBold">{item.nome}</Typography>
+      {item.situacao === LostItemStatusEnum.CANCELLED && (
+        <S.CancellationNote>
+          <Typography variant="caption" color="inherit">
+            {C.cancellationNote(item.motivoCancelamento)}
+          </Typography>
+        </S.CancellationNote>
+      )}
 
-          <S.HeaderActions>
-            <S.WideOnlyTag>
-              <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
-            </S.WideOnlyTag>
+      <LostItemStatusAction item={item} onResolve={onResolve} onReopen={onReopen} />
 
-            <LostItemActions item={item} onEdit={onEdit} onCancel={onCancel} />
-          </S.HeaderActions>
-        </S.HeaderRow>
-
-        <S.InfoRow>
-          <S.InfoItem>
-            <LocationOnIcon />
-            <Typography variant="caption" color="inherit">
-              {item.local}
-            </Typography>
-          </S.InfoItem>
-
-          <S.InfoItem>
-            <CalendarTodayIcon />
-            <Typography variant="caption" color="inherit">
-              {format(parseISO(item.dataOcorrido), DATE_FORMAT)}
-            </Typography>
-          </S.InfoItem>
-
-          <S.InfoItem>
-            <LostItemKindIcon kind={item.tipo} />
-            <Typography variant="caption" color="inherit">
-              {item.tipo}
-            </Typography>
-          </S.InfoItem>
-        </S.InfoRow>
-
-        {item.descricao && (
-          <S.Description>
-            <Typography variant="subtitle" color="inherit">
-              {item.descricao}
-            </Typography>
-          </S.Description>
-        )}
-
-        {item.situacao === LostItemStatusEnum.CANCELLED && (
-          <S.CancellationNote>
-            <Typography variant="caption" color="inherit">
-              {C.cancellationNote(item.motivoCancelamento)}
-            </Typography>
-          </S.CancellationNote>
-        )}
-
-        <LostItemStatusAction item={item} onResolve={onResolve} onReopen={onReopen} />
-
-        <S.CompactOnlyTag>
-          <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
-        </S.CompactOnlyTag>
-      </S.CardBody>
-    </S.CardRoot>
+      <ListCard.CompactOnlyTag>
+        <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
+      </ListCard.CompactOnlyTag>
+    </ListCard>
   );
 }
