@@ -8,7 +8,13 @@
  * `Toolbar` e `Dialog` consultam breakpoints por dentro, e os dois citam `sm`.
  * Mexer no `sm` os encolheria em silêncio; no `md` não alcança nada deles.
  *
- * 769 e não 768 porque o `down` para meio centésimo antes: com 769, a largura
- * 768 continua sendo mobile, que é o limite que o produto pratica.
+ * **O valor é medido, não escolhido: quem manda é o cabeçalho.** Logo (128px),
+ * nav (506px) e botão de tema (40px) somam 674px de conteúdo, mais 224px de
+ * goteira. Abaixo disso a nav quebra em duas linhas e monta sobre o logo — em
+ * 800px a barra sai com 80px de altura no lugar de 36px, medido.
+ *
+ * ⛔ Ao mexer no conteúdo do cabeçalho, **remeça**: acrescentar um item de menu
+ * empurra este número para cima, e o sintoma aparece só entre este limite e o
+ * ponto onde a nav ainda cabia.
  */
-export const DESKTOP_MIN_WIDTH_PX = 769;
+export const DESKTOP_MIN_WIDTH_PX = 933;
