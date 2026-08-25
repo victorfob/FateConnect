@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { IconButton, Tooltip } from '@design-system';
+import { IconButton } from '@design-system';
 import { DeleteIcon, EditIcon } from '@design-system/icons';
 
 import { LostItemConfirmAction } from '@app/pages/LostAndFound/components/LostItemCard/LostItemConfirmAction';
@@ -24,11 +24,9 @@ export function LostItemOwnerActions({ item, onEdit, onCancel }: LostItemOwnerAc
 
   return (
     <>
-      <Tooltip title={C.LOST_ITEM_ACTION_LABELS.edit}>
-        <IconButton type="button" aria-label={C.LOST_ITEM_ACTION_LABELS.edit} onClick={handleEdit}>
-          <EditIcon />
-        </IconButton>
-      </Tooltip>
+      <IconButton type="button" label={C.LOST_ITEM_ACTION_LABELS.edit} onClick={handleEdit}>
+        <EditIcon />
+      </IconButton>
 
       <LostItemConfirmAction
         label={C.LOST_ITEM_ACTION_LABELS.delete}
