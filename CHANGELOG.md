@@ -24,6 +24,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a exigir e-mail do domínio institucional e endereço completo no cadastro, recusando no próprio formulário (#99) [Frontend]
 - Reúne caronas numa tela só: ofertar abre o formulário sobre a lista, em vez de levar a uma tela e a um endereço próprios (#128) [Frontend]
 - Avisa no painel de filtros de caronas que ele recolhe e quando há filtro valendo (#131) [Frontend]
+- Fixa os recuos e vãos das telas, que acompanhavam a largura da janela e cresciam sem limite em monitor grande, e antecipa a divisão entre apresentação e login na tela inicial (#148) [Frontend]
 
 ### Fixed
 
@@ -36,6 +37,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige a atualização de carona, que apagava a descrição quando o campo não era reenviado (#101) [Backend]
 - Corrige a página branca quando a aplicação quebra por inteiro: agora aparece a mesma tela de erro das rotas, com o caminho de volta ao início (#141) [Frontend]
 - Corrige o HTML das telas, que trazia atributos inválidos vindos de propriedades usadas só para estilo (#145) [Frontend]
+- Corrige a largura de 768px, em que o topo já estava no modo estreito enquanto o cadastro ainda usava a grade larga (#148) [Frontend]
 
 ## [0.2.0] - 2026-08-20
 
