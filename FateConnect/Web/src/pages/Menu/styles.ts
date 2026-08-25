@@ -1,5 +1,4 @@
 import type { LinkProps } from 'react-router';
-
 import {
   iconSizeTokens,
   mobileMedia,

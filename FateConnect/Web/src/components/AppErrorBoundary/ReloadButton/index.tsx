@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
+import { Button } from '@design-system';
 
 import { BACK_TO_START_LABEL } from '@app/components/CrashScreen/constants';
 import { RoutePathEnum } from '@app/routes/paths';
-import { Button } from '@design-system';
 
 /**
  * Navegação de página inteira, e não `Link`: este botão só aparece quando a

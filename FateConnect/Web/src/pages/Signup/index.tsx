@@ -1,4 +1,5 @@
 import { Link as RouterLink, useNavigate } from 'react-router';
+import { Button, Typography } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -7,7 +8,6 @@ import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import type { ApiError } from '@app/services/httpClient';
 import { signup } from '@app/services/signup/signupService';
-import { Button, Typography } from '@design-system';
 
 import { AccountSection } from './components/AccountSection';
 import { AddressSection } from './components/AddressSection';

@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
+import { IconButton, StatusTag, Typography } from '@design-system';
+import { AccessTimeIcon, CalendarTodayIcon, EditIcon, GroupsIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
 import * as C from '@app/pages/Rides/constants';
 import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
 import type { Ride } from '@app/services/rides/types';
-import { IconButton, StatusTag, Typography } from '@design-system';
-import { AccessTimeIcon, CalendarTodayIcon, EditIcon, GroupsIcon } from '@design-system/icons';
 
 import { RideDeleteConfirmation } from './RideDeleteConfirmation';
 import { RideDriverContact } from './RideDriverContact';

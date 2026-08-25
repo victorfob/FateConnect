@@ -1,5 +1,6 @@
-import { LostItemStatusEnum } from '@app/services/lostAndFound/types';
 import type { StatusTagTone } from '@design-system';
+
+import { LostItemStatusEnum } from '@app/services/lostAndFound/types';
 
 const STATUS_LABEL: Readonly<Record<LostItemStatusEnum, string>> = {
   [LostItemStatusEnum.OPEN]: 'Aberto',

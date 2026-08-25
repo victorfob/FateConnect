@@ -1,3 +1,5 @@
+import { StatusTag, Typography } from '@design-system';
+import { CalendarTodayIcon, ImageIcon, LocationOnIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
 import {
@@ -5,8 +7,6 @@ import {
   lostItemStatusTone,
 } from '@app/pages/LostAndFound/helpers/lostItemStatus';
 import { LostItemStatusEnum, type LostItem } from '@app/services/lostAndFound/types';
-import { StatusTag, Typography } from '@design-system';
-import { CalendarTodayIcon, ImageIcon, LocationOnIcon } from '@design-system/icons';
 
 import { LostItemActions } from './LostItemActions';
 import { LostItemKindIcon } from './LostItemKindIcon';

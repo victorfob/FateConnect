@@ -1,5 +1,4 @@
 import { Link as RouterLink } from 'react-router';
-
 import { Typography } from '@design-system';
 
 import * as C from './constants';

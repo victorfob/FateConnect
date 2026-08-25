@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { Dialog, Typography } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -7,7 +8,6 @@ import { useNotification } from '@app/hooks/useNotification';
 import { RIDES_QUERY_KEY } from '@app/pages/Rides/constants';
 import { createRide, updateRide } from '@app/services/rides/ridesService';
 import type { Ride, RideInput } from '@app/services/rides/types';
-import { Dialog, Typography } from '@design-system';
 
 import { toFormValues, toRideInput } from './helpers/mapper';
 import { RideFormFields } from './RideFormFields';

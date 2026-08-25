@@ -43,11 +43,16 @@ export default tseslint.config(
       // React no alto, o resto dos pacotes logo abaixo sem linha em branco,
       // depois os aliases internos e por fim os relativos. `import type` fica
       // no grupo do próprio módulo, ao lado do import de valor que o acompanha.
+      //
+      // `@design-system` fica fora do padrão interno de propósito: o design
+      // system mora fora de `src` e a aplicação o consome como biblioteca, então
+      // ele ordena junto dos pacotes. Devolvê-lo aqui o joga para o bloco dos
+      // aliases da aplicação.
       'perfectionist/sort-imports': [
         'error',
         {
           newlinesBetween: 1,
-          internalPattern: ['^@app/', '^@design-system$', '^@design-system/', '^@src-ds/'],
+          internalPattern: ['^@app/', '^@ds-root/'],
           customGroups: [
             {
               groupName: 'react',
@@ -126,7 +131,6 @@ export default tseslint.config(
   // A aplicação fala com a UI por uma porta só: o barrel do design system.
   {
     files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/design-system/**'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -168,7 +172,7 @@ export default tseslint.config(
 
   // Dentro do design system o MUI é a fronteira, e o tema pode ler os tokens.
   {
-    files: ['src/design-system/**/*.{ts,tsx}'],
+    files: ['design-system/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -186,15 +190,15 @@ export default tseslint.config(
 
   // O próprio test-utils e os testes de contexto precisam da biblioteca crua.
   {
-    files: ['src/test/**', 'src/**/*.test.{ts,tsx}'],
+    files: ['src/test/**', 'src/**/*.test.{ts,tsx}', 'design-system/**/*.test.{ts,tsx}'],
     rules: { 'no-restricted-imports': 'off' },
   },
 
   // Convenções de estilo aplicadas, não apenas documentadas.
   // Testes ficam de fora: eles precisam citar as APIs que o código de produção evita.
   {
-    files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/**/*.test.{ts,tsx}', 'src/test/**'],
+    files: ['src/**/*.{ts,tsx}', 'design-system/**/*.{ts,tsx}'],
+    ignores: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'design-system/**/*.test.{ts,tsx}'],
     rules: {
       'react-hooks/exhaustive-deps': 'error',
       // Número solto no meio do código não diz o que mede. Vira constante nomeada.
@@ -236,7 +240,13 @@ export default tseslint.config(
 
   // Cor literal só pode existir nos tokens.
   {
-    files: ['src/**/styles.ts', 'src/**/*.styles.ts', 'src/**/GlobalStyles.tsx'],
+    files: [
+      'src/**/styles.ts',
+      'src/**/*.styles.ts',
+      'design-system/**/styles.ts',
+      'design-system/**/*.styles.ts',
+      'design-system/**/GlobalStyles.tsx',
+    ],
     rules: {
       'no-restricted-syntax': [
         'error',
@@ -256,8 +266,8 @@ export default tseslint.config(
 
   // O design system não conhece a aplicação — é o que o mantém extraível.
   {
-    files: ['src/design-system/**/*.{ts,tsx}'],
-    ignores: ['src/design-system/**/*.test.{ts,tsx}'],
+    files: ['design-system/**/*.{ts,tsx}'],
+    ignores: ['design-system/**/*.test.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',

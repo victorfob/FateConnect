@@ -1,9 +1,9 @@
 import { useCallback, type MouseEvent } from 'react';
+import { Checkbox, FormControlLabel } from '@design-system';
 import { useFormContext } from 'react-hook-form';
 
 import { useNotification } from '@app/hooks/useNotification';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
-import { Checkbox, FormControlLabel } from '@design-system';
 
 import * as C from './constants';
 import * as S from './styles';

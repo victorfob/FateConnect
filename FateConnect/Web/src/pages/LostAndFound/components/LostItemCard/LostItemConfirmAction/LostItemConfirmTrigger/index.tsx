@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-
 import { Button, IconButton, Tooltip } from '@design-system';
 
 type LostItemConfirmTriggerProps = Readonly<{
