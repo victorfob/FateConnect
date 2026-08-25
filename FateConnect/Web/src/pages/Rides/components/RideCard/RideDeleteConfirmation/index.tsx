@@ -29,7 +29,7 @@ export function RideDeleteConfirmation({ ride, onDelete }: RideDeleteConfirmatio
 
   return (
     <>
-      <IconButton type="button" aria-label={RIDE_CARD_LABELS.delete} onClick={handleAsk}>
+      <IconButton type="button" label={RIDE_CARD_LABELS.delete} onClick={handleAsk}>
         <DeleteIcon />
       </IconButton>
 

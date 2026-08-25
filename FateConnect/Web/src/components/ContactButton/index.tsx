@@ -40,7 +40,7 @@ export function ContactButton({ contact, message }: ContactButtonProps) {
 
   return (
     <>
-      <IconButton type="button" aria-label={C.CONTACT_LABEL} onClick={handleOpen}>
+      <IconButton type="button" label={C.CONTACT_LABEL} onClick={handleOpen}>
         <ContactPageIcon />
       </IconButton>
 

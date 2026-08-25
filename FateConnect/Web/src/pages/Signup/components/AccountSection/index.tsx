@@ -91,7 +91,7 @@ export function AccountSection() {
           endAdornment={
             <IconButton
               type="button"
-              aria-label={PASSWORD_TOGGLE_LABEL}
+              label={PASSWORD_TOGGLE_LABEL}
               aria-pressed={!passwordHidden}
               onClick={handleTogglePassword}
             >

@@ -2,7 +2,7 @@ import { createRef } from 'react';
 
 import { act, render, screen, userEvent, within } from '@app/test/testing-library';
 
-import { TIME_PICKER_LABEL } from './constants';
+import { DATE_PICKER_LABEL, TIME_PICKER_LABEL } from './constants';
 import { Input, type InputProps } from '.';
 
 const DEFAULT_PROPS: InputProps = { label: 'Destino' };
@@ -131,7 +131,7 @@ describe('Input.Select', () => {
     const pickedDay = new Date(2026, 7, 10);
     render(<Input.Date label="Data" value={pickedDay} maxDate={pickedDay} onChange={vi.fn()} />);
 
-    await userEvent.click(screen.getByRole('button', { name: /Escolha uma data/i }));
+    await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
 
     const calendar = within(await screen.findByRole('grid'));
     expect(calendar.getByRole('gridcell', { name: '10' })).toBeEnabled();
