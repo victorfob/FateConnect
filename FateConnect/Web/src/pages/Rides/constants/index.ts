@@ -14,7 +14,7 @@ export const RIDE_LIST_MESSAGES = {
   deleteFailed: 'Erro ao excluir a carona. Tente novamente.',
 };
 
-export const RIDE_CARD_LABELS = { edit: 'Editar', delete: 'Excluir', contact: 'Contato' };
+export const RIDE_CARD_LABELS = { edit: 'Editar', delete: 'Excluir' };
 
 const SINGLE_SEAT = 1;
 

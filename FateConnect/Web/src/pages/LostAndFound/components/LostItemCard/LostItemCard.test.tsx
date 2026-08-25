@@ -1,3 +1,4 @@
+import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { LOST_ITEM_OWNER } from '@app/pages/LostAndFound/helpers/lostItemOwner';
 import {
   LostItemKindEnum,
@@ -6,7 +7,6 @@ import {
 } from '@app/services/lostAndFound/types';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
 
-import { CONTACT_DIALOG, CONTACT_LABEL } from './LostItemOwnerContact/constants';
 import { LostItemCard } from '.';
 
 const LOST_ITEM: LostItem = {
@@ -25,7 +25,6 @@ const LOST_ITEM: LostItem = {
 
 const COPY_EMAIL_LABEL = `Copiar ${LOST_ITEM_OWNER.email}`;
 
-/** As ações do dono são da tela; aqui só o contato importa. */
 const renderComponent = (item = LOST_ITEM) =>
   render(<LostItemCard item={item} onResolve={vi.fn()} onCancel={vi.fn()} onReopen={vi.fn()} />);
 
@@ -70,7 +69,6 @@ describe('LostItemCard', () => {
   });
 
   it('should keep the contact reachable after the item is resolved', async () => {
-    // Concluído tira as ações do dono; combinar a devolução continua valendo.
     renderComponent({ ...LOST_ITEM, situacao: LostItemStatusEnum.RESOLVED });
 
     const dialog = await openContact();
@@ -100,7 +98,6 @@ describe('LostItemCard', () => {
   });
 
   it('should report a refused copy instead of claiming success', async () => {
-    // O navegador nega a escrita fora de contexto seguro ou sem permissão.
     clipboardWrite.mockRejectedValueOnce(new Error('denied'));
     renderComponent();
     const dialog = await openContact();
