@@ -1,10 +1,24 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 
+import * as C from '@app/components/CrashScreen/constants';
+import { captureException, ErrorTypeEnum } from '@app/observability';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
 
-import * as C from './constants';
 import { ErrorBoundary } from '.';
+
+// Mocka o SDK, não o nosso barrel: assim o `buildRouteErrorReport` roda de
+// verdade e o teste prova a etiqueta que ele monta.
+vi.mock('@sentry/react', () => ({
+  captureException: vi.fn(),
+  ErrorBoundary: () => null,
+  wrapCreateBrowserRouter: (create: unknown) => create,
+  init: vi.fn(),
+  reactRouterBrowserTracingIntegration: vi.fn(),
+  replayIntegration: vi.fn(),
+}));
+
+const mockCaptureException = captureException as Mock;
 
 function ExplodingScreen(): never {
   throw new Error('falha proposital');
@@ -52,5 +66,16 @@ describe('ErrorBoundary', () => {
     await userEvent.click(screen.getByRole('link', { name: C.BACK_TO_START_LABEL }));
 
     expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
+  });
+
+  // Erro de renderização não chega ao `window.onerror`: sem este relato, a tela
+  // que quebrou é justamente a que ninguém fica sabendo.
+  it('should report the crash, tagged with the route that broke', () => {
+    renderComponent();
+
+    expect(mockCaptureException).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'falha proposital' }),
+      { tags: { errorType: ErrorTypeEnum.ROUTE_BOUNDARY, route: RoutePathEnum.MENU }, extra: {} },
+    );
   });
 });

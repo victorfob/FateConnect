@@ -1,6 +1,6 @@
 import { createRef } from 'react';
 
-import { render, screen, userEvent, within } from '@app/test/testing-library';
+import { act, render, screen, userEvent, within } from '@app/test/testing-library';
 
 import { TIME_PICKER_LABEL } from './constants';
 import { Input, type InputProps } from '.';
@@ -33,7 +33,7 @@ describe('Input', () => {
     const inputRef = createRef<HTMLInputElement>();
     renderComponent({ ...DEFAULT_PROPS, ref: inputRef });
 
-    inputRef.current?.focus();
+    act(() => inputRef.current?.focus());
 
     expect(inputRef.current?.tagName).toBe('INPUT');
     expect(inputRef.current).toHaveFocus();
