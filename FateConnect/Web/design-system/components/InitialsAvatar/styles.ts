@@ -17,7 +17,14 @@ const DIAMETER_PX: Record<InitialsAvatarSize, number> = {
   large: spacingScale.xxl,
 };
 
-export const InitialsCircle = styled(Avatar)<{ size: InitialsAvatarSize }>(({ theme, size }) => {
+/**
+ * `size` é só para o estilo. Hoje ele não aparece no DOM por acidente: o React
+ * descarta o atributo `size` quando o valor não é numérico, e a escala usa
+ * palavras. Trocar `small`/`large` por número faria o atributo voltar.
+ */
+export const InitialsCircle = styled(Avatar, {
+  shouldForwardProp: (prop) => prop !== 'size',
+})<{ size: InitialsAvatarSize }>(({ theme, size }) => {
   const bodyBySize = {
     small: theme.typography.captionBold,
     large: theme.typography.subtitleBold,
