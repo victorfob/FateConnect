@@ -8,7 +8,6 @@ import { spacingScale } from '@ds-root/tokens';
 
 const { none, sm, md, lg } = spacingScale;
 
-/** Largura do menu lateral no produto. */
 const DRAWER_WIDTH_PX = 300;
 
 /** Altura e recuo padrão de item de lista do Material, preservados. */

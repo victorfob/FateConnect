@@ -326,7 +326,6 @@ export default defineConfig([
     },
   },
 
-  // Cor literal só pode existir nos tokens.
   {
     files: [
       'src/**/styles.ts',

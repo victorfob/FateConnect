@@ -4,7 +4,6 @@ import { closeSnackbar, SnackbarProvider } from 'notistack';
 
 import * as S from './styles';
 
-/** Quantos avisos ficam empilhados ao mesmo tempo, como no produto. */
 const MAX_STACKED = 3;
 
 /**

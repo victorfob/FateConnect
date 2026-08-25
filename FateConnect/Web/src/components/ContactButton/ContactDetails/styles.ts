@@ -14,7 +14,6 @@ export const DetailsRow = styled(Stack)(({ theme }) => ({
   },
 }));
 
-/** Quem é a pessoa: o círculo com as iniciais e o nome embaixo dele. */
 export const Identity = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',

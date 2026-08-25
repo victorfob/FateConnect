@@ -9,7 +9,6 @@ type NavigationDrawerProps = Readonly<{
   children: ReactNode;
 }>;
 
-/** Menu lateral. Quem usa monta o cabeçalho e os itens. */
 export function NavigationDrawer({ open, onClose, header, children }: NavigationDrawerProps) {
   return (
     <S.DrawerRoot anchor="right" open={open} onClose={onClose}>

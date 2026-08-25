@@ -7,7 +7,6 @@ export type TypographyToken = {
 
 export const fontFamily = "'Inter', 'Helvetica Neue', sans-serif";
 
-/** Escala tipográfica do produto. */
 export const typographyTokens = {
   h1: { fontSize: '2rem', fontWeight: 700, lineHeight: 1.2 },
   h1Narrow: { fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2 },
@@ -24,6 +23,5 @@ export const typographyTokens = {
    * todos os botões da aplicação.
    */
   button: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.5, letterSpacing: 'normal' },
-  /** Mensagem sob o campo. Acompanha o corpo do campo, como no produto. */
   formHelper: { fontSize: '0.875rem', fontWeight: 400, lineHeight: 1.5 },
 } satisfies Record<string, TypographyToken>;

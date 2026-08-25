@@ -7,7 +7,6 @@ import type { RideFormInput, RideFormValues } from '../schema';
 import * as C from '../constants';
 import * as S from './styles';
 
-/** Os seis campos da carona: duas colunas, descrição ocupando a linha inteira. */
 export function RideFormFields() {
   const {
     control,

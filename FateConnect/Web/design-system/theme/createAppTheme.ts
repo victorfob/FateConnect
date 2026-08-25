@@ -71,7 +71,6 @@ const MOBILE_MEDIA = `@media (max-width:${DESKTOP_MIN_WIDTH_PX - BREAKPOINT_STEP
 
 export type ThemeMode = 'light' | 'dark';
 
-/** Modo claro é o padrão; o escuro segue o sistema de cor do Material Design. */
 export function createAppTheme(mode: ThemeMode = 'light'): Theme {
   return createTheme(
     {

@@ -5,10 +5,8 @@ import { spacingScale } from '@ds-root/tokens';
 
 const { md, xl } = spacingScale;
 
-/** Largura da coluna de texto, como no produto. */
 const CONTENT_MAX_WIDTH_REM = 28;
 
-/** Ocupa a área de conteúdo e centraliza — papel do `:host` da tela no produto. */
 export const PageMessageRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   flex: 1,

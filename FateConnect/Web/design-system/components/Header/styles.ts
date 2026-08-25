@@ -11,15 +11,11 @@ const { none, xs, lg, giant } = spacingScale;
 /** Altura do topo; a casca reserva esse espaço porque o header é fixo. */
 export const HEADER_HEIGHT_PX = 64;
 
-/** Tamanho e peso dos botões de navegação, iguais aos do produto. */
 const NAV_FONT_SIZE = '1rem';
 const NAV_FONT_WEIGHT = 500;
 const CTA_FONT_WEIGHT = 400;
 
-/** Largura do botão de menu no mobile, como no produto. */
 const MENU_BUTTON_WIDTH = '48px';
-
-/** Espaço horizontal entre os itens do topo — vale também entre a navegação e as ações. */
 
 export const HeaderBar = styled(AppBar)({
   boxShadow: shadowTokens.component,
@@ -37,7 +33,6 @@ export const HeaderToolbar = styled(Toolbar)(({ theme }) => ({
   [theme.breakpoints.down('md')]: { padding: theme.space(none, lg) },
 }));
 
-/** Marca: sem sublinhado e herdando a cor da barra, como no produto. */
 export const LogoSlot = styled(PolymorphicBox)(({ theme }) => ({
   '& a': {
     textDecoration: 'none',

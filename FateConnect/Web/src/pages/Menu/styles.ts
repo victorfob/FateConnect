@@ -11,7 +11,6 @@ import {
 
 const { md, lg, xl, xxl, giant } = spacingScale;
 
-/** Recuo da tela em unidade de viewport, como no produto. */
 const CARD_MIN_WIDTH_PX = 300;
 const ICON_DISC_SIZE_PX = 70;
 /** O cartão cresce um pouco sob o cursor — mesma proporção e curva do produto. */
@@ -33,7 +32,6 @@ export const MenuRoot = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.down('md')]: { padding: theme.space(lg) },
 }));
 
-/** O texto de apoio é mais apagado que o título. */
 export const MenuIntro = styled(Stack)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));

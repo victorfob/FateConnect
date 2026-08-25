@@ -5,7 +5,6 @@ import { useThemeMode } from '@ds-root/ThemeProvider/context/ThemeModeContext';
 const SWITCH_TO_DARK_LABEL = 'Ativar tema escuro';
 const SWITCH_TO_LIGHT_LABEL = 'Ativar tema claro';
 
-/** Alterna entre o tema claro e o escuro. */
 export function ThemeToggleButton() {
   const { mode, toggleMode } = useThemeMode();
   const isLightMode = mode === 'light';

@@ -7,10 +7,8 @@ import { spacing } from './helpers/spacing';
 
 const { none, xxs, xs, md } = spacingScale;
 
-/** Altura da linha no painel do `select`, como no produto. */
 const SELECT_OPTION_MIN_HEIGHT_PX = 48;
 
-/** Overrides de componente do MUI alinhados ao visual já implementado no produto. */
 export const components: Components<Theme> = {
   MuiButton: {
     styleOverrides: {

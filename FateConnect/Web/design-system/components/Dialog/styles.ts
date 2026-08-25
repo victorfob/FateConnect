@@ -16,7 +16,6 @@ export const DialogSurface = styled(Stack)(({ theme }) => ({
   overflow: 'hidden',
 }));
 
-/** Título centralizado em qualquer largura, ocupando a linha inteira. */
 export const DialogTitleText = styled(Typography)({
   textAlign: 'center',
 });

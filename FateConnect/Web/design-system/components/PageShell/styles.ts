@@ -6,7 +6,6 @@ import { radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
 const { md, lg, xxl, giant } = spacingScale;
 
-/** Recuo da página em unidades de viewport, como no produto. */
 export const PageRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   flex: 1,

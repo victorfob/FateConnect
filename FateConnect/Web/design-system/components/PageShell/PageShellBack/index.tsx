@@ -16,7 +16,6 @@ export type PageShellBackProps = Readonly<{
   href?: string;
 }>;
 
-/** Ação de voltar do cabeçalho. O cromo é daqui; o destino, de quem compõe. */
 export function PageShellBack({ label, icon, ...rest }: PageShellBackProps) {
   return (
     <S.BackAction {...rest}>

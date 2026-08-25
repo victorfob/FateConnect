@@ -76,7 +76,6 @@ export function notificationStyles(theme: Theme) {
   };
 }
 
-/** Ação de dispensar. Herda a cor do aviso, como o botão do produto. */
 export const DismissButton = styled(Button)(({ theme }) => ({
   ...typographyTokens.button,
   lineHeight: 'normal',

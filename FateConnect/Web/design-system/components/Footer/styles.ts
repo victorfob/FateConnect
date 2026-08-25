@@ -44,7 +44,6 @@ export const ContactItem = styled(Stack)(({ theme }) => ({
   gap: theme.space(xs),
 }));
 
-/** Vertical no desktop, horizontal no mobile. */
 export const FooterDivider = styled(Box)(({ theme }) => ({
   width: '1px',
   height: 'auto',

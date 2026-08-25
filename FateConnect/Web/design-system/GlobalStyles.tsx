@@ -4,12 +4,10 @@ import { fontFamily, spacingScale } from './tokens';
 
 const { none, huge } = spacingScale;
 
-/** Reset mínimo e base tipográfica do documento. */
 export function GlobalStyles() {
   return (
     <GlobalStylesBase
       styles={(theme) => ({
-        // Mesmo reset do produto: zera margem e recuo de todo elemento.
         '*, *::before, *::after': {
           boxSizing: 'border-box',
           margin: theme.space(none),
