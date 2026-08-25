@@ -8,6 +8,37 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+/** Convenções de estilo. Valem no código de produção e também nos `styles.ts`. */
+const styleConventions = [
+  {
+    selector: "JSXAttribute[name.name='sx']",
+    message:
+      'Sem `sx` inline. Declare o estilo em `styles.ts` com `styled(...)` e use `<S.Componente>`.',
+  },
+  {
+    selector: "CallExpression[callee.object.name='theme'][callee.property.name='spacing']",
+    message:
+      'Use o helper `spacing()` do design system. O `theme.spacing` é do MUI e sobrescrevê-lo encolhe os componentes dele (as gutters do Toolbar viraram 3px).',
+  },
+  {
+    selector: "CallExpression[callee.name='styled'] > Literal:first-child",
+    message:
+      'Sem tag HTML crua: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
+  },
+];
+
+/** Cor literal só pode existir nos tokens. */
+const literalColors = [
+  {
+    selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
+    message: 'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
+  },
+  {
+    selector: 'Literal[value=/^rgba?\\(/]',
+    message: 'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
+  },
+];
+
 export default tseslint.config(
   { ignores: ['dist', 'coverage'] },
   js.configs.recommended,
@@ -217,24 +248,7 @@ export default tseslint.config(
           detectObjects: false,
         },
       ],
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: "JSXAttribute[name.name='sx']",
-          message:
-            'Sem `sx` inline. Declare o estilo em `styles.ts` com `styled(...)` e use `<S.Componente>`.',
-        },
-        {
-          selector: "CallExpression[callee.object.name='theme'][callee.property.name='spacing']",
-          message:
-            'Use o helper `spacing()` do design system. O `theme.spacing` é do MUI e sobrescrevê-lo encolhe os componentes dele (as gutters do Toolbar viraram 3px).',
-        },
-        {
-          selector: "CallExpression[callee.name='styled'] > Literal:first-child",
-          message:
-            'Sem tag HTML crua: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
-        },
-      ],
+      'no-restricted-syntax': ['error', ...styleConventions],
     },
   },
 
@@ -248,19 +262,10 @@ export default tseslint.config(
       'design-system/**/GlobalStyles.tsx',
     ],
     rules: {
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
-          message:
-            'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
-        },
-        {
-          selector: 'Literal[value=/^rgba?\\(/]',
-          message:
-            'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
-        },
-      ],
+      // ⛔ Somar, não substituir. `no-restricted-syntax` sobrescreve a lista
+      // inteira, e sem os seletores de convenção aqui eles deixavam de valer
+      // justamente nos `styles.ts` — o único lugar onde `styled(` é escrito.
+      'no-restricted-syntax': ['error', ...styleConventions, ...literalColors],
     },
   },
 

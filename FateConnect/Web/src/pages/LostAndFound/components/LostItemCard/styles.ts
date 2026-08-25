@@ -1,7 +1,9 @@
+import type { ImgHTMLAttributes } from 'react';
 import {
   Box,
   compactMedia,
   iconSizeTokens,
+  PolymorphicBox,
   PolymorphicStack,
   radius,
   radiusScale,
@@ -38,7 +40,9 @@ export const CardRoot = styled(PolymorphicStack, {
   [compactMedia]: { flexDirection: 'column' },
 }));
 
-export const Photo = styled('img')({
+export const Photo = styled(PolymorphicBox)<
+  Pick<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'>
+>({
   width: `${PHOTO_SIZE_PX}px`,
   height: `${PHOTO_SIZE_PX}px`,
   flexShrink: 0,
@@ -130,7 +134,7 @@ export const CompactOnlyTag = styled(Box)({
 });
 
 /** Fora da tela, mas dentro da árvore de acessibilidade. */
-export const ScreenReaderOnly = styled('span')({
+export const ScreenReaderOnly = styled(PolymorphicBox)({
   position: 'absolute',
   width: '1px',
   height: '1px',

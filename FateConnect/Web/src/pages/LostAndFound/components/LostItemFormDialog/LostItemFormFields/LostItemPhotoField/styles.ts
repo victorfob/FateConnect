@@ -1,7 +1,9 @@
+import type { ComponentPropsWithRef, ImgHTMLAttributes } from 'react';
 import {
   Box,
   Button,
   compactMedia,
+  PolymorphicBox,
   radius,
   radiusScale,
   spacing,
@@ -28,7 +30,9 @@ export const PhotoRow = styled(Stack)({
   gap: spacing(sm),
 });
 
-export const PhotoPreview = styled('img')({
+export const PhotoPreview = styled(PolymorphicBox)<
+  Pick<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'>
+>({
   width: `${PREVIEW_SIZE_PX}px`,
   height: `${PREVIEW_SIZE_PX}px`,
 
@@ -52,7 +56,7 @@ export const PhotoActionButton = styled(Button)({
 });
 
 /** Fora da vista, mas focável e rotulado: quem o aciona é o botão. */
-export const HiddenFileInput = styled('input')({
+export const HiddenFileInput = styled(PolymorphicBox)<ComponentPropsWithRef<'input'>>({
   position: 'absolute',
   width: '1px',
   height: '1px',

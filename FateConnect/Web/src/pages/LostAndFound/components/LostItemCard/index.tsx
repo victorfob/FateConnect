@@ -30,10 +30,10 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
 
   return (
     <S.CardRoot component="article" own={item.meuItem}>
-      {item.meuItem && <S.ScreenReaderOnly>{C.OWN_ITEM_LABEL}</S.ScreenReaderOnly>}
+      {item.meuItem && <S.ScreenReaderOnly component="span">{C.OWN_ITEM_LABEL}</S.ScreenReaderOnly>}
 
       {item.fotoUrl ? (
-        <S.Photo src={item.fotoUrl} alt={C.photoAlt(item.nome)} />
+        <S.Photo component="img" src={item.fotoUrl} alt={C.photoAlt(item.nome)} />
       ) : (
         <S.PhotoPlaceholder aria-hidden>
           <ImageIcon />
