@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack';
 import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { chromeDivider, chromeSurface, onChromeSurface } from '@ds-root/theme/chromeSurface';
-import { mobileMedia, spacingScale } from '@ds-root/tokens';
+import { spacingScale } from '@ds-root/tokens';
 
 const { md, xs } = spacingScale;
 
@@ -22,7 +22,7 @@ export const FooterRoot = styled(PolymorphicStack)(({ theme }) => ({
   gap: theme.space(md),
   width: '100%',
 
-  [mobileMedia]: {
+  [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
     alignItems: 'center',
     padding: '7vw',
@@ -40,7 +40,7 @@ export const ContactsContainer = styled(Stack)(({ theme }) => ({
   gap: theme.space(md),
   width: '100%',
 
-  [mobileMedia]: { alignItems: 'center', textAlign: 'center' },
+  [theme.breakpoints.down('md')]: { alignItems: 'center', textAlign: 'center' },
 }));
 
 export const ContactItem = styled(Stack)(({ theme }) => ({
@@ -55,7 +55,7 @@ export const FooterDivider = styled(Box)(({ theme }) => ({
   height: 'auto',
   backgroundColor: chromeDivider(theme),
 
-  [mobileMedia]: { width: '100%', height: '1px' },
+  [theme.breakpoints.down('md')]: { width: '100%', height: '1px' },
 }));
 
 export const CopyrightContainer = styled(Stack)(({ theme }) => ({
@@ -65,5 +65,5 @@ export const CopyrightContainer = styled(Stack)(({ theme }) => ({
   gap: theme.space(md),
   width: '100%',
 
-  [mobileMedia]: { alignItems: 'center', textAlign: 'center' },
+  [theme.breakpoints.down('md')]: { alignItems: 'center', textAlign: 'center' },
 }));

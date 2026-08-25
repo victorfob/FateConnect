@@ -1,7 +1,6 @@
 import type { ImgHTMLAttributes } from 'react';
 import {
   Box,
-  compactMedia,
   iconSizeTokens,
   PolymorphicBox,
   PolymorphicStack,
@@ -35,7 +34,7 @@ export const CardRoot = styled(PolymorphicStack, {
   background: theme.palette.background.paper,
   color: theme.palette.text.primary,
 
-  [compactMedia]: { flexDirection: 'column' },
+  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
 }));
 
 export const Photo = styled(PolymorphicBox)<
@@ -115,16 +114,16 @@ export const CancellationNote = styled(Box)(({ theme }) => ({
 }));
 
 /** A etiqueta acompanha o cabeçalho no desktop e desce no estreito. */
-export const WideOnlyTag = styled(Box)({
+export const WideOnlyTag = styled(Box)(({ theme }) => ({
   display: 'block',
 
-  [compactMedia]: { display: 'none' },
-});
+  [theme.breakpoints.down('md')]: { display: 'none' },
+}));
 
 export const CompactOnlyTag = styled(Box)(({ theme }) => ({
   display: 'none',
 
-  [compactMedia]: {
+  [theme.breakpoints.down('md')]: {
     display: 'flex',
     justifyContent: 'flex-end',
     paddingTop: theme.space(sm),

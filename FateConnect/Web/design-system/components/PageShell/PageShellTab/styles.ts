@@ -6,15 +6,13 @@ import { radiusScale, spacingScale } from '@ds-root/tokens';
 
 const { xxs, md } = spacingScale;
 
-const TAB_GAP = '3px';
-
 export const TabButton = styled(PolymorphicStack)<ButtonHTMLAttributes<HTMLButtonElement>>(
   ({ theme }) => ({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: TAB_GAP,
+    gap: theme.space(xxs),
     padding: theme.space(md, xxs),
     border: 0,
     background: 'transparent',

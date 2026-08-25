@@ -1,12 +1,16 @@
 import {
   Box,
-  mobileMedia,
   PolymorphicStack,
   radiusScale,
   shadowTokens,
+  spacingScale,
   Stack,
   styled,
 } from '@design-system';
+
+const { xs, sm, lg, xl } = spacingScale;
+
+const BADGE_SIZE = '2.5rem';
 
 export const HowSection = styled(PolymorphicStack)({
   flexDirection: 'column',
@@ -17,22 +21,22 @@ export const HowSection = styled(PolymorphicStack)({
 export const SectionTitle = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   textAlign: 'center',
-  marginBottom: '2rem',
+  marginBottom: theme.space(xl),
   color: theme.palette.text.primary,
 }));
 
-export const StepsGrid = styled(Stack)({
+export const StepsGrid = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
-  gap: '2rem',
+  gap: theme.space(xl),
 
-  [mobileMedia]: { flexDirection: 'column' },
-});
+  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
+}));
 
 export const StepCard = styled(PolymorphicStack)(({ theme }) => ({
   position: 'relative',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: '2rem 1.5rem 1.75rem',
+  padding: theme.space(xl, lg, lg),
   background: theme.palette.background.paper,
   borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
@@ -41,14 +45,16 @@ export const StepCard = styled(PolymorphicStack)(({ theme }) => ({
 
 export const StepBadge = styled(PolymorphicStack)(({ theme }) => ({
   position: 'absolute',
-  top: '-1.25rem',
+  // Metade da própria altura: é o que faz o círculo montar sobre a borda do
+  // cartão. Não é token de espaçamento — muda junto com `BADGE_SIZE`.
+  top: `calc(${BADGE_SIZE} / -2)`,
   left: '50%',
   transform: 'translateX(-50%)',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '2.5rem',
-  height: '2.5rem',
+  width: BADGE_SIZE,
+  height: BADGE_SIZE,
   borderRadius: '50%',
   backgroundColor: theme.palette.secondary.main,
   color: theme.palette.common.white,
@@ -56,14 +62,14 @@ export const StepBadge = styled(PolymorphicStack)(({ theme }) => ({
   fontSize: '1.125rem',
   lineHeight: 1,
 
-  [mobileMedia]: { left: '2rem' },
+  [theme.breakpoints.down('md')]: { left: '2rem' },
 }));
 
-export const StepBody = styled(Stack)({
+export const StepBody = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
-  gap: '0.75rem',
-  marginTop: '0.5rem',
-});
+  gap: theme.space(sm),
+  marginTop: theme.space(xs),
+}));
 
 export const StepTitle = styled(Box)(({ theme }) => ({
   color: theme.palette.text.primary,

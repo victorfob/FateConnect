@@ -1,23 +1,14 @@
 /**
- * Larguras máximas dos breakpoints do produto. Não coincidem com os do MUI
- * (`md` = 900px), por isso são declaradas aqui e usadas direto nos estilos.
+ * O produto tem **duas** visões: mobile e desktop. O limite entra no tema como
+ * o `md` do MUI, então `theme.breakpoints.down('md')` é mobile e `up('md')` é
+ * desktop — e as duas nunca casam no mesmo pixel, porque o `down` do MUI para
+ * em `md - 0.05px`.
+ *
+ * ⛔ **Só o `md` é sobrescrito.** Entre os componentes do MUI que usamos, apenas
+ * `Toolbar` e `Dialog` consultam breakpoints por dentro, e os dois citam `sm`.
+ * Mexer no `sm` os encolheria em silêncio; no `md` não alcança nada deles.
+ *
+ * 769 e não 768 porque o `down` para meio centésimo antes: com 769, a largura
+ * 768 continua sendo mobile, que é o limite que o produto pratica.
  */
-export const COMPACT_MAX_WIDTH_PX = 600;
-export const MOBILE_MAX_WIDTH_PX = 768;
-export const TABLET_MAX_WIDTH_PX = 968;
-
-/** Consulta mais estreita, usada pelo cartão de carona ao empilhar a etiqueta. */
-export const compactMedia = `@media (max-width: ${COMPACT_MAX_WIDTH_PX}px)`;
-
-/** Media query de mobile (topo, rodapé, menu lateral, cartões). */
-export const mobileMedia = `@media (max-width: ${MOBILE_MAX_WIDTH_PX}px)`;
-
-/** Media query intermediária usada pela landing para empilhar apresentação e login. */
-export const tabletMedia = `@media (max-width: ${TABLET_MAX_WIDTH_PX}px)`;
-
-/**
- * Consulta de desktop do cadastro. É o **complemento** de `mobileMedia`, não o
- * seu espelho: a tela de cadastro declara `min-width: 768px`, então em exatos
- * 768px ela já usa a grade de seis colunas. Manter a assimetria é paridade.
- */
-export const desktopMedia = `@media (min-width: ${MOBILE_MAX_WIDTH_PX}px)`;
+export const DESKTOP_MIN_WIDTH_PX = 769;

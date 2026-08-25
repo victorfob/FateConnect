@@ -1,4 +1,4 @@
-import { Box, mobileMedia, spacingScale, styled } from '@design-system';
+import { Box, spacingScale, styled } from '@design-system';
 
 const { sm, md } = spacingScale;
 
@@ -10,7 +10,7 @@ export const FieldsGrid = styled(Box)(({ theme }) => ({
   // este respiro a primeira linha sairia cortada pela rolagem do diálogo.
   paddingTop: theme.space(sm),
 
-  [mobileMedia]: { gridTemplateColumns: '1fr' },
+  [theme.breakpoints.down('md')]: { gridTemplateColumns: '1fr' },
 }));
 
 /** Ocupa a linha inteira, em qualquer largura. */

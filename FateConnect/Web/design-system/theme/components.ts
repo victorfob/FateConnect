@@ -5,7 +5,7 @@ import { chromeSurface, inputOutline } from './chromeSurface';
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
 
-const { xxs, xs, md } = spacingScale;
+const { none, xxs, xs, md } = spacingScale;
 
 /** Altura da linha no painel do `select`, como no produto. */
 const SELECT_OPTION_MIN_HEIGHT_PX = 48;
@@ -96,7 +96,7 @@ export const components: Components<Theme> = {
   },
   MuiFormControlLabel: {
     styleOverrides: {
-      root: { marginLeft: 0, marginRight: 0 },
+      root: { marginLeft: spacing(none), marginRight: spacing(none) },
       label: { paddingLeft: spacing(xxs) },
     },
   },

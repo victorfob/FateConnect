@@ -7,9 +7,9 @@ import {
   onNotificationSurface,
   type NotificationVariant,
 } from '@ds-root/theme/notificationSurface';
-import { mobileMedia, spacingScale, typographyTokens } from '@ds-root/tokens';
+import { spacingScale, typographyTokens } from '@ds-root/tokens';
 
-const { xs, md } = spacingScale;
+const { none, xs, md } = spacingScale;
 
 const VARIANTS: NotificationVariant[] = ['success', 'error', 'warning'];
 
@@ -50,13 +50,13 @@ export function notificationStyles(theme: Theme) {
       fontSize: typographyTokens.subtitle.fontSize,
       fontWeight: typographyTokens.caption.fontWeight,
       lineHeight: 'normal',
-      padding: theme.space(0, xs, 0, 0),
+      padding: theme.space(none, xs, none, none),
       flexWrap: 'nowrap',
       width: `${BOX_WIDTH_PX}px`,
 
       // No estreito a caixa do produto não cabe: ali ela ocupa a largura do
       // contêiner, que o notistack estica na tela toda.
-      [mobileMedia]: { width: '100%' },
+      [theme.breakpoints.down('md')]: { width: '100%' },
     },
     // A mensagem fica com a sobra da caixa, o que empurra a ação para a borda
     // direita — sem isso o "OK" cola no fim do texto e muda de lugar a cada
@@ -69,8 +69,8 @@ export function notificationStyles(theme: Theme) {
     // à caixa. A classe dele é gerada, então o alvo é "o filho que não é a
     // mensagem" — o `id` da mensagem é o único seletor estável ali.
     '.notistack-MuiContent > :not(#notistack-snackbar)': {
-      padding: 0,
-      margin: 0,
+      padding: theme.space(none),
+      margin: theme.space(none),
     },
     ...Object.fromEntries(perVariant),
   };
@@ -82,6 +82,6 @@ export const DismissButton = styled(Button)(({ theme }) => ({
   lineHeight: 'normal',
   minWidth: `${DISMISS_MIN_WIDTH_PX}px`,
   height: `${DISMISS_HEIGHT_PX}px`,
-  padding: theme.space(0, xs),
+  padding: theme.space(none, xs),
   color: 'inherit',
 }));

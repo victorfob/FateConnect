@@ -39,13 +39,4 @@ export { DateLocalizationProvider } from './DateLocalizationProvider';
 export { useThemeMode } from './ThemeProvider/context/ThemeModeContext';
 export { ThemeToggleButton } from './components/ThemeToggleButton';
 export { GlobalStyles } from './GlobalStyles';
-export {
-  spacingScale,
-  radiusScale,
-  shadowTokens,
-  iconSizeTokens,
-  compactMedia,
-  mobileMedia,
-  tabletMedia,
-  desktopMedia,
-} from './tokens';
+export { spacingScale, radiusScale, shadowTokens, iconSizeTokens } from './tokens';

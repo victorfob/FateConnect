@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack';
 
 import { styled } from '@ds-root/styled';
-import { mobileMedia, radiusScale, spacingScale } from '@ds-root/tokens';
+import { radiusScale, spacingScale } from '@ds-root/tokens';
 
 const { xs } = spacingScale;
 
@@ -25,7 +25,7 @@ export const FooterRegion = styled(Stack)(({ theme }) => ({
     letterSpacing: ACTION_LETTER_SPACING,
   },
 
-  [mobileMedia]: {
+  [theme.breakpoints.down('md')]: {
     '& .MuiButton-root': { minWidth: `${ACTION_MIN_WIDTH_MOBILE_PX}px` },
   },
 }));

@@ -1,6 +1,5 @@
 import {
   Box,
-  compactMedia,
   iconSizeTokens,
   PolymorphicStack,
   radiusScale,
@@ -10,10 +9,8 @@ import {
   styled,
 } from '@design-system';
 
-const { xxs, sm, md } = spacingScale;
+const { none, xxs, sm, md, xl } = spacingScale;
 
-/** Espaço entre as informações da carona, em unidade de viewport como no produto. */
-const INFO_ROW_GAP = '5vw';
 const ACTION_BUTTON_SIZE_PX = 32;
 /** O glifo da biblioteca de origem ocupa 70% do botão. */
 const ACTION_ICON_SCALE = 0.7;
@@ -44,7 +41,7 @@ export const HeaderActions = styled(Stack)(({ theme }) => ({
 
 export const InfoRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
-  gap: INFO_ROW_GAP,
+  gap: theme.space(xl),
   marginBottom: theme.space(sm),
   color: theme.palette.text.secondary,
 }));
@@ -81,18 +78,18 @@ export const ActionButtons = styled(Stack)(({ theme }) => ({
 }));
 
 /** A etiqueta acompanha o cabeçalho no desktop e desce para o rodapé no estreito. */
-export const WideOnlyTag = styled(Box)({
+export const WideOnlyTag = styled(Box)(({ theme }) => ({
   display: 'block',
 
-  [compactMedia]: { display: 'none' },
-});
+  [theme.breakpoints.down('md')]: { display: 'none' },
+}));
 
 export const CompactOnlyTag = styled(Box)(({ theme }) => ({
   display: 'none',
 
-  [compactMedia]: {
+  [theme.breakpoints.down('md')]: {
     display: 'flex',
     justifyContent: 'flex-end',
-    padding: theme.space(sm, 0),
+    padding: theme.space(sm, none),
   },
 }));

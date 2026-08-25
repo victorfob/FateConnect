@@ -110,7 +110,20 @@ export const Container = styled(Box)(({ theme }) => ({
 
 ⛔ **`theme.spacing` é do MUI e não se toca.** Os componentes dele chamam `theme.spacing(1..3)` esperando o multiplicador de 8px; trocar a transformação encolheu as gutters do `Toolbar` de 24px para 3px. Por isso a nossa chave se chama `space`, e **o lint reprova `theme.spacing(`** — quem errar por três letras descobre na hora.
 
-Os helpers **não são exportados** pelo barrel: não há como importá-los na aplicação, e é de propósito. O acesso é sempre pelo tema, o que também elimina dois imports por `styles.ts`. As demais escalas — `zIndex`, `transitions`, `breakpoints`, `shadows` — já vinham do `theme`, porque essas o MUI não distorce.
+Os helpers **não são exportados** pelo barrel: não há como importá-los na aplicação, e é de propósito. O acesso é sempre pelo tema, o que também elimina dois imports por `styles.ts`. As demais escalas — `zIndex`, `transitions`, `shadows` — já vinham do `theme`, porque essas o MUI não distorce.
+
+### Duas visões, um limite
+
+O produto tem **mobile e desktop**, e nada entre os dois:
+
+```ts
+[theme.breakpoints.down('md')]: { flexDirection: 'column' }   // mobile
+[theme.breakpoints.up('md')]: { gridColumn: 'span 2' }        // desktop
+```
+
+O `md` está sobrescrito em **769px**, e é o único que mexemos: `Toolbar` e `Dialog` leem o `sm` por dentro, então esse fica nos valores do MUI. ⛔ Não declare consulta de media à mão nem crie um terceiro limite — havia quatro constantes para três valores, e a quarta sobrepunha as outras: em exatos 768px o cabeçalho ficava mobile enquanto a grade do cadastro ficava desktop. As consultas do MUI não se sobrepõem, porque o `down` para meio centésimo antes do `up`.
+
+Para decidir em JS, `useMediaQuery(theme.breakpoints.up('md'))` — não meça `window.innerWidth`.
 
 ### 4. CSS puro / classe solta
 

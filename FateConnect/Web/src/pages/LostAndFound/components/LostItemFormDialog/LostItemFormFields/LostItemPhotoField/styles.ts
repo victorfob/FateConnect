@@ -2,7 +2,6 @@ import type { ImgHTMLAttributes } from 'react';
 import {
   Box,
   Button,
-  compactMedia,
   PolymorphicBox,
   radiusScale,
   spacingScale,
@@ -34,7 +33,7 @@ export const PhotoPreview = styled(PolymorphicBox)<
   width: `${PREVIEW_SIZE_PX}px`,
   height: `${PREVIEW_SIZE_PX}px`,
 
-  [compactMedia]: {
+  [theme.breakpoints.down('md')]: {
     width: `${COMPACT_PREVIEW_SIZE_PX}px`,
     height: `${COMPACT_PREVIEW_SIZE_PX}px`,
   },
@@ -58,12 +57,12 @@ export const PhotoHint = styled(Box)(({ theme }) => ({
   flex: 1,
   color: theme.palette.text.secondary,
 
-  [compactMedia]: { flexBasis: '100%' },
+  [theme.breakpoints.down('md')]: { flexBasis: '100%' },
 }));
 
 export const PhotoError = styled(Box)(({ theme }) => ({
   flex: 1,
   color: theme.palette.error.main,
 
-  [compactMedia]: { flexBasis: '100%' },
+  [theme.breakpoints.down('md')]: { flexBasis: '100%' },
 }));

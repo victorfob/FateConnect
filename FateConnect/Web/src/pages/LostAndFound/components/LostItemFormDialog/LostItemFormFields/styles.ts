@@ -1,4 +1,4 @@
-import { Box, mobileMedia, spacingScale, styled } from '@design-system';
+import { Box, spacingScale, styled } from '@design-system';
 
 const { sm, md } = spacingScale;
 
@@ -9,7 +9,7 @@ export const FieldsGrid = styled(Box)(({ theme }) => ({
   // Respiro para o rótulo do campo preenchido não sair cortado na rolagem.
   paddingTop: theme.space(sm),
 
-  [mobileMedia]: { gridTemplateColumns: '1fr' },
+  [theme.breakpoints.down('md')]: { gridTemplateColumns: '1fr' },
 }));
 
 export const WideCell = styled(Box)({ gridColumn: '1 / -1' });

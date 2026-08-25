@@ -4,7 +4,7 @@ import Toolbar from '@mui/material/Toolbar';
 import { PolymorphicBox, PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { onChromeSurface } from '@ds-root/theme/chromeSurface';
-import { mobileMedia, shadowTokens, spacingScale } from '@ds-root/tokens';
+import { shadowTokens, spacingScale } from '@ds-root/tokens';
 
 const { xs } = spacingScale;
 
@@ -64,7 +64,7 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   // O destaque não recebe o peso reforçado, como no produto.
   '& .MuiButton-contained': { fontWeight: CTA_FONT_WEIGHT },
 
-  [mobileMedia]: { display: 'none' },
+  [theme.breakpoints.down('md')]: { display: 'none' },
 }));
 
 export const ActionsSlot = styled(PolymorphicStack)(({ theme }) => ({
@@ -81,14 +81,14 @@ export const ActionsSlot = styled(PolymorphicStack)(({ theme }) => ({
  * volta a exibir o botão: sem ele o `display: none` da base vale em toda
  * largura e o ícone de menu nunca aparece.
  */
-export const MenuButtonSlot = styled(PolymorphicStack)({
+export const MenuButtonSlot = styled(PolymorphicStack)(({ theme }) => ({
   display: 'none',
 
-  [mobileMedia]: {
+  [theme.breakpoints.down('md')]: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     width: MENU_BUTTON_WIDTH,
   },
-});
+}));

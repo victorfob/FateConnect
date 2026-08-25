@@ -1,14 +1,16 @@
 import {
   Box,
   iconSizeTokens,
-  mobileMedia,
   PolymorphicBox,
   PolymorphicStack,
   radiusScale,
   shadowTokens,
+  spacingScale,
   Stack,
   styled,
 } from '@design-system';
+
+const { md, xl } = spacingScale;
 
 const CARD_MIN_WIDTH_PX = 500;
 const ICON_DISC_SIZE_PX = 70;
@@ -20,30 +22,30 @@ export const ServicesSection = styled(PolymorphicBox)({
 export const SectionTitle = styled(Box)(({ theme }) => ({
   display: 'block',
   textAlign: 'center',
-  marginBottom: '2rem',
+  marginBottom: theme.space(xl),
   color: theme.palette.text.primary,
 }));
 
-export const CardsGrid = styled(Stack)({
+export const CardsGrid = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'center',
   flexWrap: 'wrap',
-  gap: '2rem',
-});
+  gap: theme.space(xl),
+}));
 
 export const ServiceCardRoot = styled(PolymorphicStack)(({ theme }) => ({
   flex: 0.5,
   flexDirection: 'column',
   minWidth: `${CARD_MIN_WIDTH_PX}px`,
   alignItems: 'center',
-  gap: '1rem',
-  padding: '2rem',
+  gap: theme.space(md),
+  padding: theme.space(xl),
   textAlign: 'center',
   backgroundColor: theme.palette.background.default,
   borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
 
-  [mobileMedia]: { minWidth: '100%' },
+  [theme.breakpoints.down('md')]: { minWidth: '100%' },
 }));
 
 export const IconContainer = styled(Stack)(({ theme }) => ({

@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react';
-import { desktopMedia, PolymorphicBox, spacingScale, Stack, styled } from '@design-system';
+import { PolymorphicBox, spacingScale, Stack, styled } from '@design-system';
 
-const { md } = spacingScale;
+const { none, md } = spacingScale;
 
 /**
  * Área de toque da caixa de seleção: 24px no mobile e 32px no desktop, como no
@@ -25,7 +25,7 @@ export const ConsentGroup = styled(Stack)(({ theme }) => ({
   // tipografia do MUI — é o que faz o texto encolher junto no mobile.
   '& .MuiFormControlLabel-label': { fontSize: 'inherit', lineHeight: 'normal' },
 
-  [desktopMedia]: {
+  [theme.breakpoints.up('md')]: {
     fontSize: 'inherit',
 
     '& .MuiCheckbox-root': { padding: theme.space(CHECKBOX_TOUCH_PADDING_DESKTOP_PX) },
@@ -39,7 +39,7 @@ export const InlineLink = styled(PolymorphicBox)<ButtonHTMLAttributes<HTMLButton
     border: 'none',
     background: 'none',
     font: 'inherit',
-    padding: 0,
+    padding: theme.space(none),
     color: theme.palette.secondary.main,
     cursor: 'pointer',
 
@@ -57,5 +57,5 @@ export const ConsentError = styled(PolymorphicBox)(({ theme }) => ({
   color: theme.palette.secondary.main,
   paddingLeft: theme.space(md),
 
-  [desktopMedia]: { fontSize: CONSENT_ERROR_FONT_SIZE_DESKTOP },
+  [theme.breakpoints.up('md')]: { fontSize: CONSENT_ERROR_FONT_SIZE_DESKTOP },
 }));

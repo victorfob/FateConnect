@@ -1,7 +1,6 @@
 import type { FormHTMLAttributes } from 'react';
 import {
   Box,
-  desktopMedia,
   PolymorphicStack,
   radiusScale,
   shadowTokens,
@@ -45,7 +44,7 @@ export const SignupCard = styled(PolymorphicStack)(({ theme }) => ({
   boxShadow: shadowTokens.component,
   boxSizing: 'border-box',
 
-  [desktopMedia]: {
+  [theme.breakpoints.up('md')]: {
     padding: theme.space(xl, xxl),
     maxWidth: CARD_MAX_WIDTH_DESKTOP,
   },
@@ -81,7 +80,7 @@ export const FieldGrid = styled(Box)(({ theme }) => ({
 
   '& .MuiInputAdornment-root svg': { color: theme.palette.text.secondary },
 
-  [desktopMedia]: {
+  [theme.breakpoints.up('md')]: {
     gridTemplateColumns: `repeat(${DESKTOP_COLUMNS}, minmax(0, 1fr))`,
   },
 }));

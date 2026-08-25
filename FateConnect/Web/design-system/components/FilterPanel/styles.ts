@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 
 import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
-import { desktopMedia, radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
+import { radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
 const { none, xxs, xs, md, lg, xl } = spacingScale;
 
@@ -79,7 +79,7 @@ export const FieldsRow = styled(Stack, {
   gap: theme.space(md),
   marginTop: theme.space(md),
 
-  [desktopMedia]: {
+  [theme.breakpoints.up('md')]: {
     '& > *': {
       flex: `1 1 calc(${FULL_WIDTH_PERCENT / columns}% - ${spacingScale.md}px)`,
       minWidth: `${FIELD_MIN_WIDTH_PX}px`,

@@ -1,7 +1,6 @@
 import type { LinkProps } from 'react-router';
 import {
   iconSizeTokens,
-  mobileMedia,
   PolymorphicStack,
   radiusScale,
   shadowTokens,
@@ -42,7 +41,7 @@ export const CardsContainer = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   gap: theme.space(xl),
 
-  [mobileMedia]: { flexDirection: 'column' },
+  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
 }));
 
 export const ServiceCard = styled(PolymorphicStack)<CardProps>(({ theme }) => ({
