@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
+import { Button, Dialog, IconButton } from '@design-system';
+import { DeleteIcon } from '@design-system/icons';
 
 import { RIDE_CARD_LABELS } from '@app/pages/Rides/constants';
 import type { Ride } from '@app/services/rides/types';
-import { Button, Dialog, IconButton } from '@design-system';
-import { DeleteIcon } from '@design-system/icons';
 
 import { DELETE_DIALOG } from './constants';
 import * as S from './styles';

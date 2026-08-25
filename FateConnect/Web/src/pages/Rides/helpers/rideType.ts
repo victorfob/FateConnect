@@ -1,5 +1,6 @@
-import { RideTypeEnum } from '@app/services/rides/types';
 import type { StatusTagTone } from '@design-system';
+
+import { RideTypeEnum } from '@app/services/rides/types';
 
 const LOWERCASE_TO_RIDE_TYPE: Readonly<Record<string, RideTypeEnum>> = {
   filantropica: RideTypeEnum.PHILANTHROPIC,

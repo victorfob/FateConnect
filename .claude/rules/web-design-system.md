@@ -10,15 +10,15 @@ paths:
 
 - **Dois barrels públicos:** `@design-system` para componentes, estilo e tokens; `@design-system/icons` só para ícones (`import { AddIcon } from '@design-system/icons'`). Qualquer outro caminho interno do design system é proibido — o lint reprova.
 - **No barrel só entra o que a aplicação pode usar direto.** Matéria-prima do tema — paleta de cores, tipografia, fábrica do tema, larguras cruas de breakpoint — fica interna: exportar o que ninguém pode consumir convida ao uso errado.
-- A aplicação importa UI **somente** de `@design-system`. **Nenhum arquivo fora de `src/design-system/` importa de `@mui/material` ou `@mui/icons-material`.** É o que permite envolver, restringir ou substituir um componente sem varrer o app.
+- A aplicação importa UI **somente** de `@design-system`. **Nenhum arquivo fora de `design-system/` importa de `@mui/material` ou `@mui/icons-material`.** É o que permite envolver, restringir ou substituir um componente sem varrer o app.
 - Componente de UI que a aplicação precisa e o barrel ainda não expõe: **adicionar ao barrel**, não importar direto.
 - `styled`, `css` e `keyframes` também vêm do barrel — e são os do **Emotion**, não os do MUI. O tipo `Theme` do Emotion está aumentado para o tema da aplicação, então `theme` no callback vem tipado.
-- Dentro de `src/design-system/` o import direto do MUI é o esperado: ali é a fronteira.
+- Dentro de `design-system/` o import direto do MUI é o esperado: ali é a fronteira.
 - **Tipo público do design system é união de literais, não `enum`.** `tone?: 'neutral' | 'success' | 'warning'` — o consumidor escreve `tone="success"` sem importar nada. A regra do sufixo `Enum` vale para os enums **da aplicação** (`RideTypeEnum`, `RoutePathEnum`); as duas convivem porque valem de lados opostos da fronteira.
 
 ## Componentes compartilhados vivem no design system
 
-- Cromo e UI reutilizável — cabeçalho, rodapé, menu lateral, diálogos — ficam em `src/design-system/components/`.
+- Cromo e UI reutilizável — cabeçalho, rodapé, menu lateral, diálogos — ficam em `design-system/components/`.
 - Esses componentes são **prop-driven**: recebem conteúdo por propriedade ou slot e **não importam nada de `@app/*`**. O domínio (rotas, hooks, textos) é fornecido por quem os compõe.
 - Composição de domínio (um botão que conhece uma seção da landing, por exemplo) fica em `src/components/`, não no design system.
 - **A prop fala em termos visuais, não em termos do domínio.** A etiqueta de estado recebe `tone="success"`, não `tipo="filantropica"`: quem traduz o domínio para o tom é a tela. Foi o que permitiu o mesmo `StatusTag` servir caronas sem o design system saber o que é uma carona.

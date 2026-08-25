@@ -1,9 +1,5 @@
 import { useCallback, useState } from 'react';
 import { Outlet, Link as RouterLink } from 'react-router';
-
-import * as C from '@app/constants/appContact';
-import { APP_LINKS } from '@app/constants/navigation';
-import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import {
   Button,
   Footer,
@@ -13,6 +9,10 @@ import {
   NavigationDrawer,
   Typography,
 } from '@design-system';
+
+import * as C from '@app/constants/appContact';
+import { APP_LINKS } from '@app/constants/navigation';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 import * as S from '../shell.styles';
 import { HeaderActions } from './components/HeaderActions';

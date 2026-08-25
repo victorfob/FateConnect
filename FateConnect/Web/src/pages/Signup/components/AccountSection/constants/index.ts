@@ -1,6 +1,7 @@
+import type { SelectOption } from '@design-system';
+
 import { GenderValueEnum } from '@app/pages/Signup/@types';
 import { SELECT_PLACEHOLDER } from '@app/pages/Signup/constants';
-import type { SelectOption } from '@design-system';
 
 export const PASSWORD_TOGGLE_LABEL = 'Mostrar ou ocultar senha';
 

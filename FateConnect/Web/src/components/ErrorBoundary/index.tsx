@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { Link as RouterLink, useLocation, useRouteError } from 'react-router';
+import { Button } from '@design-system';
 
 import { CrashScreen } from '@app/components/CrashScreen';
 import { BACK_TO_START_LABEL } from '@app/components/CrashScreen/constants';
 import { buildRouteErrorReport, captureException } from '@app/observability';
 import { RoutePathEnum } from '@app/routes/paths';
-import { Button } from '@design-system';
 
 /**
  * Última barreira das rotas: qualquer erro que escape de uma tela cai aqui, no

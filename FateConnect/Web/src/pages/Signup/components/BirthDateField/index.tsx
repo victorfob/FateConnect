@@ -1,4 +1,6 @@
 import { useCallback, useState, type MouseEvent } from 'react';
+import { DateCalendar, IconButton, Input, Popover } from '@design-system';
+import { CalendarTodayIcon } from '@design-system/icons';
 import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
@@ -12,8 +14,6 @@ import {
 import { useFilledLabel } from '@app/pages/Signup/hooks/useFilledLabel';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
 import { maskBirthDate } from '@app/utils/masks/birthDateMask';
-import { DateCalendar, IconButton, Input, Popover } from '@design-system';
-import { CalendarTodayIcon } from '@design-system/icons';
 
 import { CALENDAR_TOGGLE_LABEL } from './constants';
 

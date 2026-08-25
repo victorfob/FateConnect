@@ -1,5 +1,4 @@
 import { useCallback, useState, type ReactNode } from 'react';
-
 import { Button, Dialog } from '@design-system';
 
 import { CONFIRMATION } from './constants';

@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
+import { IconButton, Input } from '@design-system';
+import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
-import { IconButton, Input } from '@design-system';
-import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 
 import { BirthDateField } from '../BirthDateField';
 import { GENDER_SELECT_OPTIONS, PASSWORD_TOGGLE_LABEL } from './constants';

@@ -63,9 +63,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@design-system': fileURLToPath(new URL('./src/design-system', import.meta.url)),
+      '@design-system': fileURLToPath(new URL('./design-system', import.meta.url)),
       // Uso interno do design system, para os arquivos fundos não subirem por `../`.
-      '@src-ds': fileURLToPath(new URL('./src/design-system', import.meta.url)),
+      '@ds-root': fileURLToPath(new URL('./design-system', import.meta.url)),
       '@app': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
@@ -77,13 +77,14 @@ export default defineConfig({
     // rodaram — dado que o lcov não carrega, porque ele só fala de cobertura.
     reporters: ['default', ['vitest-sonar-reporter', { outputFile: 'coverage/sonar-report.xml' }]],
     coverage: {
-      include: ['src/**/*.{ts,tsx}'],
+      include: ['src/**/*.{ts,tsx}', 'design-system/**/*.{ts,tsx}'],
       exclude: [
         // Bootstrap: monta a árvore e não tem lógica própria a verificar.
         'src/main.tsx',
         // Infraestrutura de teste e declarações de tipo.
         'src/test/**',
         'src/**/*.test.{ts,tsx}',
+        'design-system/**/*.test.{ts,tsx}',
         'src/vite-env.d.ts',
       ],
       reporter: ['text', 'lcov'],

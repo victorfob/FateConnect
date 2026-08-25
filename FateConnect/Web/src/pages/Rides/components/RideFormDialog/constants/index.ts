@@ -1,7 +1,8 @@
-import { seatsLabel } from '@app/pages/Rides/constants';
-import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
 import type { SelectOption } from '@design-system';
 import { AddIcon, SaveIcon } from '@design-system/icons';
+
+import { seatsLabel } from '@app/pages/Rides/constants';
+import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
 
 import type { RideFormMode } from '../types';
 

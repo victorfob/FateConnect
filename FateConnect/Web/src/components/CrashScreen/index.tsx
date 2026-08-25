@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-
 import { PageMessage } from '@design-system';
 
 import * as C from './constants';

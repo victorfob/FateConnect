@@ -1,8 +1,8 @@
 import { useCallback, useState, type ChangeEvent, type SubmitEvent } from 'react';
+import { FilterPanel, Input } from '@design-system';
 
 import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
 import { toApiDate } from '@app/utils/apiDate';
-import { FilterPanel, Input } from '@design-system';
 
 import * as C from './constants';
 

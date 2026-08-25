@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
+import { InitialsAvatar, ThemeToggleButton } from '@design-system';
 
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { getInitials } from '@app/utils/initials';
-import { InitialsAvatar, ThemeToggleButton } from '@design-system';
 
 /**
  * Ações fixas do topo da área logada. O nome vem do login, guardado junto do

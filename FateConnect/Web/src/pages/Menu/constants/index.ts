@@ -1,5 +1,6 @@
-import { RoutePathEnum } from '@app/routes/paths';
 import { DirectionsCarIcon, SearchIcon } from '@design-system/icons';
+
+import { RoutePathEnum } from '@app/routes/paths';
 
 import type { MenuService } from '../@types';
 

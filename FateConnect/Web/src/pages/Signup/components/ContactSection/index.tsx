@@ -1,10 +1,10 @@
+import { Input } from '@design-system';
 import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
 import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
 import { maskPhone } from '@app/utils/masks/phoneMask';
-import { Input } from '@design-system';
 
 import * as S from './styles';
 
