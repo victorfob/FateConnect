@@ -5,6 +5,8 @@ import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { iconSizeTokens, radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
+import { ACTIONS_ATTRIBUTE } from './constants';
+
 const { xxs, sm, md } = spacingScale;
 
 const OWN_STRIPE_PX = 4;
@@ -13,11 +15,14 @@ const ACTION_BUTTON_SIZE_PX = 32;
 /** O glifo da biblioteca de origem ocupa 70% do botão. */
 const ACTION_ICON_SCALE = 0.7;
 
+const STYLE_ONLY_PROPS: ReadonlySet<string> = new Set(['own', 'hasMedia']);
+
 /** A faixa na borda é o que diz, sem etiqueta, que o registro é de quem olha. */
 export const CardRoot = styled(PolymorphicStack, {
-  // `own` é só para o estilo: sem isto o Stack a repassa e o React reclama do atributo.
-  shouldForwardProp: (prop) => prop !== 'own',
-})<{ own: boolean }>(({ theme, own }) => ({
+  // São só para o estilo: sem isto o Stack as repassa e o React reclama do atributo.
+  shouldForwardProp: (prop) => !STYLE_ONLY_PROPS.has(String(prop)),
+})<{ own: boolean; hasMedia: boolean }>(({ theme, own, hasMedia }) => ({
+  position: 'relative',
   flexDirection: 'row',
   alignItems: 'flex-start',
   gap: theme.space(md),
@@ -30,7 +35,20 @@ export const CardRoot = styled(PolymorphicStack, {
   background: theme.palette.background.paper,
   color: theme.palette.text.primary,
 
-  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+
+    // Com a mídia no topo, o cabeçalho desce com ela e a etiqueta sairia do
+    // canto. Tirá-la do fluxo é o que a mantém lá — e só há espaço para isso
+    // porque a mídia é uma miniatura, deixando a faixa à direita dela vazia.
+    ...(hasMedia && {
+      [`& [${ACTIONS_ATTRIBUTE}]`]: {
+        position: 'absolute',
+        top: theme.space(md),
+        right: theme.space(md),
+      },
+    }),
+  },
 }));
 
 export const CardBody = styled(Stack)(({ theme }) => ({
@@ -55,13 +73,6 @@ export const HeaderRow = styled(Stack)(({ theme }) => ({
   // estreito: o `minWidth` é o que deixa a caixa encolher, e a quebra é o que
   // impede uma palavra sem espaço de correr por cima delas.
   '& > :first-of-type': { minWidth: 0, overflowWrap: 'anywhere' },
-}));
-
-export const HeaderActions = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
-  alignItems: 'center',
-  flexShrink: 0,
-  gap: theme.space(sm),
 }));
 
 export const ActionButtons = styled(Stack)(({ theme }) => ({
