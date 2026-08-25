@@ -10,14 +10,16 @@ import {
   styled,
 } from '@design-system';
 
-const { md, xl } = spacingScale;
+const { md, lg, xl, xxl, xxxl, giant } = spacingScale;
 
 const CARD_MIN_WIDTH_PX = 500;
 const ICON_DISC_SIZE_PX = 70;
 
-export const ServicesSection = styled(PolymorphicBox)({
-  padding: '5vh 7vw 7vh',
-});
+export const ServicesSection = styled(PolymorphicBox)(({ theme }) => ({
+  padding: theme.space(xxl, giant, xxxl),
+
+  [theme.breakpoints.down('md')]: { padding: theme.space(xxl, lg, xxxl) },
+}));
 
 export const SectionTitle = styled(Box)(({ theme }) => ({
   display: 'block',
@@ -54,7 +56,7 @@ export const IconContainer = styled(Stack)(({ theme }) => ({
   alignItems: 'center',
   width: `${ICON_DISC_SIZE_PX}px`,
   height: `${ICON_DISC_SIZE_PX}px`,
-  borderRadius: '50%',
+  borderRadius: theme.radius(radiusScale.circle),
   backgroundColor: theme.palette.secondary.main,
 
   '& svg': {

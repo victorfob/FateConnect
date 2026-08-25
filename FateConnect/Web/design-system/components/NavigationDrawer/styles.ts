@@ -6,14 +6,10 @@ import { styled } from '@ds-root/styled';
 import { chromeHover, chromeSurface, onChromeSurface } from '@ds-root/theme/chromeSurface';
 import { spacingScale } from '@ds-root/tokens';
 
-const { none, md } = spacingScale;
+const { none, sm, md, lg } = spacingScale;
 
 /** Largura do menu lateral no produto. */
 const DRAWER_WIDTH_PX = 300;
-
-/** Recuos do conteúdo dentro do menu, em `vw`, como no original. */
-const DRAWER_VERTICAL_PADDING = '7vw';
-const LOGO_INSET = '3vw';
 
 /** Altura e recuo padrão de item de lista do Material, preservados. */
 const ITEM_MIN_HEIGHT_PX = 48;
@@ -23,7 +19,7 @@ export const DrawerRoot = styled(Drawer)(({ theme }) => ({
     width: `${DRAWER_WIDTH_PX}px`,
     backgroundColor: chromeSurface(theme),
     color: onChromeSurface(theme),
-    padding: `${DRAWER_VERTICAL_PADDING} 0`,
+    padding: theme.space(lg, none),
     overflowX: 'hidden',
   },
 }));
@@ -33,8 +29,8 @@ export const DrawerHeader = styled(Stack)(({ theme }) => ({
   justifyContent: 'start',
   alignItems: 'center',
   width: '100%',
-  paddingLeft: LOGO_INSET,
-  marginBottom: LOGO_INSET,
+  paddingLeft: theme.space(sm),
+  marginBottom: theme.space(sm),
 
   '& a': {
     textDecoration: 'none',
@@ -54,7 +50,6 @@ export const DrawerList = styled(List)(({ theme }) => ({
   '& .MuiListItemButton-root:hover': { backgroundColor: chromeHover(theme) },
   '& .MuiListItemText-primary': {
     color: onChromeSurface(theme),
-    fontSize: '1rem',
-    fontWeight: 400,
+    ...theme.typography.body,
   },
 }));

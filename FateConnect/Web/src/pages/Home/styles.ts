@@ -1,6 +1,6 @@
 import { PolymorphicStack, spacingScale, Stack, styled } from '@design-system';
 
-const { xl } = spacingScale;
+const { lg, xl, xxxl, giant } = spacingScale;
 
 export const HomeRoot = styled(Stack)({
   flexDirection: 'column',
@@ -11,10 +11,13 @@ export const DescriptionContainer = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-around',
-  padding: '7vh 7vw',
+  padding: theme.space(xxxl, giant),
   gap: theme.space(xl),
 
-  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+    padding: theme.space(xxxl, lg),
+  },
 }));
 
 export const LoginAnchor = styled(Stack)(({ theme }) => ({

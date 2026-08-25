@@ -6,5 +6,5 @@ import { Stack, styled } from '@design-system';
  */
 export const ErrorScreen = styled(Stack)({
   flexDirection: 'column',
-  minHeight: '100vh',
+  minHeight: '100%',
 });

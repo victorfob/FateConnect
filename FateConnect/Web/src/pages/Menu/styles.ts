@@ -9,10 +9,9 @@ import {
   styled,
 } from '@design-system';
 
-const { md, xl } = spacingScale;
+const { md, lg, xl, xxl, giant } = spacingScale;
 
 /** Recuo da tela em unidade de viewport, como no produto. */
-const PAGE_PADDING = '7vw';
 const CARD_MIN_WIDTH_PX = 300;
 const ICON_DISC_SIZE_PX = 70;
 /** O cartão cresce um pouco sob o cursor — mesma proporção e curva do produto. */
@@ -29,7 +28,9 @@ export const MenuRoot = styled(Stack)(({ theme }) => ({
   justifyContent: 'center',
   textAlign: 'center',
   gap: theme.space(md),
-  padding: PAGE_PADDING,
+  padding: theme.space(xxl, giant),
+
+  [theme.breakpoints.down('md')]: { padding: theme.space(lg) },
 }));
 
 /** O texto de apoio é mais apagado que o título. */
@@ -68,7 +69,7 @@ export const IconDisc = styled(PolymorphicStack)(({ theme }) => ({
   alignItems: 'center',
   width: `${ICON_DISC_SIZE_PX}px`,
   height: `${ICON_DISC_SIZE_PX}px`,
-  borderRadius: '50%',
+  borderRadius: theme.radius(radiusScale.circle),
   backgroundColor: theme.palette.secondary.main,
 
   '& svg': {

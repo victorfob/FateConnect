@@ -4,17 +4,17 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@ds-root/styled';
 import { radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
-const { md } = spacingScale;
+const { md, lg, xxl, giant } = spacingScale;
 
 /** Recuo da página em unidades de viewport, como no produto. */
-const PAGE_PADDING = '3vw 7vw';
-
 export const PageRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   flex: 1,
   width: '100%',
   gap: theme.space(md),
-  padding: PAGE_PADDING,
+  padding: theme.space(xxl, giant),
+
+  [theme.breakpoints.down('md')]: { padding: theme.space(lg) },
 }));
 
 export const PageHeaderRow = styled(Stack)({

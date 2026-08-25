@@ -2,7 +2,7 @@ import GlobalStylesBase from '@mui/material/GlobalStyles';
 
 import { fontFamily, spacingScale } from './tokens';
 
-const { none } = spacingScale;
+const { none, huge } = spacingScale;
 
 /** Reset mínimo e base tipográfica do documento. */
 export function GlobalStyles() {
@@ -17,7 +17,7 @@ export function GlobalStyles() {
         },
         html: { scrollBehavior: 'smooth' },
         // Compensa o topo fixo ao rolar até uma seção pelo fragmento da URL.
-        '[id]': { scrollMarginTop: '5rem' },
+        '[id]': { scrollMarginTop: theme.space(huge) },
         'html, body, #root': { height: '100%' },
         body: {
           margin: theme.space(none),

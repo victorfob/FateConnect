@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@design-system';
 
-const { none, md, xl, xxl } = spacingScale;
+const { none, xxs, md, xl, xxl } = spacingScale;
 
 /** Grade de seis colunas no desktop: combina metades, terços e a linha rua + número. */
 const DESKTOP_COLUMNS = 6;
@@ -22,7 +22,6 @@ const HAIRLINE = '1px';
 /** 2.5rem — sem token equivalente na escala, que salta de 32px para 48px. */
 const PAGE_BOTTOM_PADDING_PX = 40;
 /** Espaço entre a pergunta e o link de login, como no produto. */
-const LOGIN_ROW_GAP = '0.35rem';
 
 export const PageRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
@@ -102,7 +101,7 @@ export const SubmitContainer = styled(Stack)(({ theme }) => ({
 export const LoginRow = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
-  gap: LOGIN_ROW_GAP,
+  gap: theme.space(xxs),
   justifyContent: 'center',
   textAlign: 'center',
   color: theme.palette.text.secondary,

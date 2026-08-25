@@ -6,26 +6,21 @@ import { styled } from '@ds-root/styled';
 import { chromeDivider, chromeSurface, onChromeSurface } from '@ds-root/theme/chromeSurface';
 import { spacingScale } from '@ds-root/tokens';
 
-const { md, xs } = spacingScale;
+const { xs, md, lg, xxl, giant } = spacingScale;
 
-/**
- * Porte fiel do rodapé do produto: linha no desktop (contatos à esquerda,
- * assinatura à direita, divisor vertical entre eles) e coluna centralizada
- * abaixo do breakpoint mobile. Paddings em `vw`, como no original.
- */
 export const FooterRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   backgroundColor: chromeSurface(theme),
   color: onChromeSurface(theme),
-  padding: '3vw 7vw',
+  padding: theme.space(xxl, giant),
   gap: theme.space(md),
   width: '100%',
 
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '7vw',
+    padding: theme.space(lg),
   },
 }));
 

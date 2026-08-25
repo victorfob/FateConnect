@@ -8,15 +8,17 @@ import {
   styled,
 } from '@design-system';
 
-const { xs, sm, lg, xl } = spacingScale;
+const { xs, sm, lg, xl, xxl, giant } = spacingScale;
 
 const BADGE_SIZE = '2.5rem';
 
-export const HowSection = styled(PolymorphicStack)({
+export const HowSection = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
-  padding: '3rem 7vw',
-});
+  padding: theme.space(xxl, giant),
+
+  [theme.breakpoints.down('md')]: { padding: theme.space(xxl, lg) },
+}));
 
 export const SectionTitle = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
@@ -55,14 +57,12 @@ export const StepBadge = styled(PolymorphicStack)(({ theme }) => ({
   justifyContent: 'center',
   width: BADGE_SIZE,
   height: BADGE_SIZE,
-  borderRadius: '50%',
+  borderRadius: theme.radius(radiusScale.circle),
   backgroundColor: theme.palette.secondary.main,
   color: theme.palette.common.white,
-  fontWeight: 700,
-  fontSize: '1.125rem',
-  lineHeight: 1,
+  ...theme.typography.subtitleBold,
 
-  [theme.breakpoints.down('md')]: { left: '2rem' },
+  [theme.breakpoints.down('md')]: { left: theme.space(xl) },
 }));
 
 export const StepBody = styled(Stack)(({ theme }) => ({

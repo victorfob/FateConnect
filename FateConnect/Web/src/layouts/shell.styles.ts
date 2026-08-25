@@ -5,7 +5,7 @@ import { HEADER_HEIGHT_PX, PolymorphicStack, Stack, styled } from '@design-syste
  * dele — mesmo comportamento do produto.
  */
 export const ShellRoot = styled(Stack)({
-  minHeight: '100vh',
+  minHeight: '100%',
   paddingTop: `${HEADER_HEIGHT_PX}px`,
   flexDirection: 'column',
 });

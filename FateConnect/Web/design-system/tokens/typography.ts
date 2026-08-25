@@ -12,6 +12,7 @@ export const typographyTokens = {
   h1: { fontSize: '2rem', fontWeight: 700, lineHeight: 1.2 },
   h1Narrow: { fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2 },
   h2: { fontSize: '1.5rem', fontWeight: 600, lineHeight: 1.3 },
+  body: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.5 },
   subtitle: { fontSize: '1rem', fontWeight: 500, lineHeight: 1.5 },
   subtitleBold: { fontSize: '1rem', fontWeight: 700, lineHeight: 1.5 },
   caption: { fontSize: '0.875rem', fontWeight: 400, lineHeight: 1.4 },
@@ -24,5 +25,5 @@ export const typographyTokens = {
    */
   button: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.5, letterSpacing: 'normal' },
   /** Mensagem sob o campo. Acompanha o corpo do campo, como no produto. */
-  formHelper: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.25 },
+  formHelper: { fontSize: '0.875rem', fontWeight: 400, lineHeight: 1.5 },
 } satisfies Record<string, TypographyToken>;

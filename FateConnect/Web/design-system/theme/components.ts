@@ -86,7 +86,7 @@ export const components: Components<Theme> = {
         ...typographyTokens.formHelper,
         // O MUI afasta a mensagem em 3px e a alinha a 14px; o produto encosta
         // no campo e alinha a 16px. Os 3px somavam altura em cada campo com erro.
-        margin: spacing(0, md),
+        margin: spacing(none, md),
       },
     },
   },
@@ -112,7 +112,10 @@ export const components: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
-        padding: spacing(0, md),
+        padding: spacing(none, md),
+        // Aqui o `sm` é do MUI, não do produto: esta linha desfaz o
+        // `min-width:600px` que o próprio MuiMenuItem aplica.
+        // eslint-disable-next-line no-restricted-syntax
         [theme.breakpoints.up('sm')]: {
           minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
         },

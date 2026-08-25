@@ -23,19 +23,47 @@ const styleConventions = [
   },
   {
     // O `no-magic-numbers` ignora 0, 1 e -1, então era por ali que o `0` cru
-    // entrava em `theme.space(0, xs)` no lugar do token `none`.
+    // entrava no lugar do token `none`. Cobre as duas formas de chamada: a do
+    // tema e o helper livre do `theme/`, que foi por onde dois escaparam.
     selector:
-      "CallExpression[callee.object.name='theme'][callee.property.name=/^(space|radius)$/] > Literal",
+      "CallExpression[callee.object.name='theme'][callee.property.name=/^(space|radius)$/] > Literal, " +
+      'CallExpression[callee.name=/^(spacing|radius)$/] > Literal',
     message:
       'Sem número cru em `theme.space()` e `theme.radius()`: use o token de `spacingScale`/`radiusScale` — inclusive `none` para zero.',
   },
   {
     // `padding: 0` e `margin: 0` também são espaçamento: viram o token `none`.
     // O `no-magic-numbers` ignora 0 de propósito, então quem barra aqui é este
-    // seletor. Valor em `vw`/`vh` e constante nomeada seguem passando.
+    // seletor.
     selector: String.raw`Property[key.name=/^(gap|rowGap|columnGap|padding|padding[A-Z]\w*|margin|margin[A-Z]\w*)$/] > Literal[raw=/^-?[0-9]/]`,
     message:
       'Espaçamento nunca é número cru: use `theme.space()` com o token de `spacingScale` — `none` para zero.',
+  },
+  {
+    // Duas visões, um limite. `xs`, `sm`, `lg` e `xl` seguem nos valores do MUI
+    // e não são do produto. A regra vale em todo lugar: o único ponto que
+    // precisa falar `sm` é o override do `MuiMenuItem`, que desfaz um
+    // `min-width:600px` do próprio MUI, e ali há um disable com o motivo.
+    selector:
+      "CallExpression[callee.object.property.name='breakpoints'] > Literal[value=/^(xs|sm|lg|xl)$/]",
+    message:
+      "Só existem duas visões: use `md` — `theme.breakpoints.down('md')` para mobile e `up('md')` para desktop.",
+  },
+  {
+    // Unidade de viewport em medida é goteira fluida disfarçada: ela reaparecia
+    // escondida numa constante nomeada, longe da propriedade que a usava.
+    // Nem para altura de tela: `html, body, #root` já são 100%, então
+    // `minHeight: '100%'` preenche a janela sem unidade de viewport — e sem o
+    // problema do `100vh` com a barra do navegador no celular.
+    selector: String.raw`Literal[value=/[0-9](\.[0-9]+)?v[wh]\b/]`,
+    message:
+      "Sem unidade de viewport em medida: use o token de `spacingScale` por `theme.space()`, com override em `theme.breakpoints.down('md')` quando mobile e desktop diferirem.",
+  },
+  {
+    // Consulta de largura escrita à mão volta a criar limite paralelo, que foi
+    // o que produziu a contradição de 768px entre o cabeçalho e o cadastro.
+    selector: 'Literal[value=/@media[^)]*width/]',
+    message: "Sem media query à mão: use `theme.breakpoints.down('md')` ou `up('md')`.",
   },
   {
     selector: "CallExpression[callee.name='styled'] > Literal:first-child",
@@ -266,6 +294,27 @@ export default defineConfig([
         },
       ],
       'no-restricted-syntax': ['error', ...styleConventions],
+    },
+  },
+
+  // O helper livre de espaçamento existe só para o tema, que é construído antes
+  // de o tema existir. Todo o resto lê `theme.space()` e `theme.radius()`.
+  {
+    files: ['design-system/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
+    ignores: ['design-system/theme/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/theme/helpers/*'],
+              message:
+                'Espaçamento e raio saem do tema: `theme.space()` e `theme.radius()`. O helper livre é só do `theme/`, que roda antes de o tema existir.',
+            },
+          ],
+        },
+      ],
     },
   },
 
