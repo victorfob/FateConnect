@@ -19,9 +19,12 @@ function renderRoute(initialPath: string) {
 }
 
 describe('routeConfig', () => {
-  // A tela de caronas lista assim que monta.
+  // Caronas e achados e perdidos listam assim que montam.
   beforeEach(() => {
-    server.use(http.get('https://rides.fateconnect.test/caronas', () => HttpResponse.json([])));
+    server.use(
+      http.get('https://rides.fateconnect.test/caronas', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/achado', () => HttpResponse.json([])),
+    );
   });
 
   it.each([
