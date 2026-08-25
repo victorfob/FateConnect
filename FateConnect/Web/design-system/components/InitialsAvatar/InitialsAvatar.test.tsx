@@ -33,4 +33,10 @@ describe('InitialsAvatar', () => {
       backgroundColor: 'rgb(207, 46, 46)',
     });
   });
+
+  it('should keep the size out of the markup', () => {
+    renderComponent({ ...DEFAULT_PROPS, size: 'large' });
+
+    expect(screen.getByRole('img', { name: 'Maria Silva' })).not.toHaveAttribute('size');
+  });
 });

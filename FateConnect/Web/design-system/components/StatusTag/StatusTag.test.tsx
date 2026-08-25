@@ -55,4 +55,10 @@ describe('StatusTag', () => {
 
     expect(getComputedStyle(tagBox()).backgroundColor).toBe('rgba(0, 0, 0, 0)');
   });
+
+  it('should keep the tone out of the markup', () => {
+    renderComponent({ ...DEFAULT_PROPS, tone: 'muted' });
+
+    expect(tagBox()).not.toHaveAttribute('tone');
+  });
 });
