@@ -1,42 +1,32 @@
-# Um ambiente completo. Sobe duas vezes, com arquivos de configuração
+# As duas APIs de um ambiente. Sobe duas vezes, com arquivos de configuração
 # diferentes: ./deploy.sh hml e ./deploy.sh prod.
-# Nenhuma porta é publicada aqui — quem fala com a internet é a borda.
+#
+# Não há contêiner de banco nem de servidor web: a VPS já tem PostgreSQL e
+# nginx, e duplicá-los numa máquina de 1 GB gastaria memória que não existe. O
+# banco é alcançado pelo host; o front é servido pelo nginx do host.
 
 services:
-  db:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
-      interval: 5s
-      timeout: 5s
-      retries: 20
-    networks:
-      - internal
-
   conta-api:
     build:
       context: ../FateConnect/FateConnect.Api
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      DB_CONNECTION: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      CORS_ORIGINS: ${PUBLIC_URL}
+      DB_CONNECTION: Host=host.docker.internal;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      CORS_ORIGINS: ${PUBLIC_URL}${CORS_EXTRA_ORIGINS:+,${CORS_EXTRA_ORIGINS}}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRACAO_HORAS: ${JWT_EXPIRACAO_HORAS}
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - internal
+      # Numa máquina apertada o coletor padrão reserva muito mais heap do que
+      # esta API usa. O modo estação de trabalho a mantém dentro do limite.
+      DOTNET_gcServer: '0'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      # Só em 127.0.0.1: quem fala com a internet é o nginx do host.
+      - '127.0.0.1:${PORTA_CONTA}:8080'
+    mem_limit: 220m
 
   carona-api:
     build:
@@ -44,44 +34,15 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      CONECAO_POSTGRE_SQL: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      CORS_ORIGINS: ${PUBLIC_URL}
+      CONECAO_POSTGRE_SQL: Host=host.docker.internal;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      CORS_ORIGINS: ${PUBLIC_URL}${CORS_EXTRA_ORIGINS:+,${CORS_EXTRA_ORIGINS}}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRACAO_HORAS: ${JWT_EXPIRACAO_HORAS}
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - internal
-
-  web:
-    image: nginx:alpine
-    restart: unless-stopped
-    volumes:
-      # O front não é construído aqui: chega pronto de quem o compilou, para que
-      # os source maps enviados ao Sentry descrevam exatamente este bundle.
-      # Quem gera esta pasta é o workflow, ou o build-front.sh no caminho manual.
-      - ./dist/${ENVIRONMENT}:/usr/share/nginx/html:ro
-      - ./nginx/app.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - conta-api
-      - carona-api
-    networks:
-      internal:
-      edge:
-        # É por este nome que a borda encontra o ambiente, sem depender do nome
-        # que o compose dá ao contêiner.
-        aliases:
-          - web-${ENVIRONMENT}
-
-networks:
-  # Só os serviços deste ambiente se enxergam aqui. O banco não sai daqui.
-  internal:
-  edge:
-    external: true
-    name: fateconnect-edge
-
-volumes:
-  db-data:
+      DOTNET_gcServer: '0'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '127.0.0.1:${PORTA_CARONA}:8080'
+    mem_limit: 220m

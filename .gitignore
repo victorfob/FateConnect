@@ -11,5 +11,3 @@ FateConnect/FigmaBase/
 # Sobreposição local do compose: existe só na máquina de quem está testando.
 docker-compose.override.yml
 
-# Front construído para publicação: gerado pelo runner ou pelo build-front.sh.
-deploy/dist/

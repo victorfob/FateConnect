@@ -1,184 +1,155 @@
 # Publicar o FateConnect
 
-Guia do zero: de uma VPS recém-criada até a aplicação no ar, com homologação e
-produção separadas e HTTPS válido nas duas.
+Guia do zero: de uma VPS até a aplicação no ar, com homologação e produção
+separadas e HTTPS válido nas duas.
 
-## O que sobe
+## O que sobe, e o que já existe
 
-Três peças, todas em contêiner:
+O servidor já tem **PostgreSQL** e **nginx**. Numa máquina de 1 GB, subir
+cópias dos dois em contêiner gastaria memória que não sobra — então eles são
+reaproveitados:
 
-- **A borda** — um nginx que é o único a falar com a internet. Ele olha o
-  domínio de cada requisição e entrega ao ambiente certo. É também quem guarda
-  os certificados.
-- **Homologação** — front, as duas APIs e um Postgres só dela.
-- **Produção** — o mesmo conjunto, com banco próprio e segredos próprios.
+| Peça | Onde roda |
+| --- | --- |
+| Banco | PostgreSQL do host, com **um banco por ambiente** |
+| Front | arquivos estáticos servidos pelo nginx do host |
+| APIs | dois contêineres por ambiente, escutando só em `127.0.0.1` |
 
-Os dois ambientes não compartilham nada além da borda. Cada um tem seu banco,
-seu segredo de sessão e seu domínio; derrubar um não afeta o outro.
+O que separa os ambientes é banco, segredo, domínio e porta local. Derrubar um
+não afeta o outro.
 
 Homologação acompanha a branch `develop`; produção acompanha a `main`.
 
-## 1. Antes de começar
+## 1. Endereços
 
-### Os dois endereços
+Produção responde na raiz do domínio, homologação num subdomínio:
 
-Produção responde na raiz do domínio e homologação num subdomínio:
+| Ambiente | Endereço | Portas locais |
+| --- | --- | --- |
+| Produção | `fateconnect.com.br` | 8201 / 8202 |
+| Homologação | `hml.fateconnect.com.br` | 8101 / 8102 |
 
-| Ambiente | Endereço |
-| --- | --- |
-| Produção | `fateconnect.com.br` |
-| Homologação | `hml.fateconnect.com.br` |
-
-No painel de DNS do domínio, crie **dois registros do tipo A**, ambos apontando
-para o IP da VPS: um para `@` (a raiz) e outro para `hml`.
-
-Confira antes de seguir — o certificado só é emitido se os dois já resolverem:
+No painel de DNS, crie **dois registros A** apontando para o IP da VPS: um para
+a raiz (`@`) e outro para `hml`. Confira antes de seguir — o certificado só é
+emitido se os dois já resolverem:
 
 ```bash
 dig +short fateconnect.com.br
 dig +short hml.fateconnect.com.br
 ```
 
-Os dois precisam devolver o IP da VPS. A propagação costuma levar de minutos a
-algumas horas na primeira vez.
-
-Um domínio próprio foi preferido a um serviço de DNS dinâmico gratuito por dois
-motivos concretos: redes corporativas costumam bloquear a categoria inteira de
-DNS dinâmico, o que deixaria a aplicação inacessível de dentro delas; e domínios
+Um domínio próprio foi preferido a DNS dinâmico gratuito por dois motivos
+concretos: redes corporativas costumam bloquear a categoria inteira de DNS
+dinâmico, o que deixaria a aplicação inacessível de dentro delas; e domínios
 compartilhados por milhares de usuários dividem a cota semanal de emissão de
 certificado do Let's Encrypt, o que torna a renovação pouco confiável.
 
-### Acesso por chave SSH
+## 2. Acesso por chave SSH
 
-Na **sua máquina**, gere o par de chaves (uma vez só, se ainda não tiver):
-
-```bash
-ssh-keygen -t ed25519 -C "fateconnect-vps"
-```
-
-Envie a chave pública para a VPS — este comando pede a senha do servidor:
+Na **sua máquina**, envie sua chave pública para o servidor — este comando pede
+a senha da VPS:
 
 ```bash
-ssh-copy-id usuario@SEU_IP
+ssh-copy-id -i ~/.ssh/id_ed25519.pub usuario@SEU_IP
 ```
 
-Depois disso, crie um atalho em `~/.ssh/config` para não repetir o endereço:
+Se ainda não tiver uma chave, gere com `ssh-keygen -t ed25519`. **Nunca
+sobrescreva uma chave existente**: isso invalida todo acesso que dependa dela.
 
-```
-Host fateconnect-vps
-    HostName SEU_IP
-    User usuario
-```
+## 3. Preparar o servidor
 
-E teste: `ssh fateconnect-vps` deve entrar sem pedir senha.
-
-## 2. Preparar a VPS
-
-Conectado na VPS, instale Docker e git:
-
-```bash
-curl -fsSL https://get.docker.com | sudo sh
-sudo usermod -aG docker $USER
-sudo apt-get update && sudo apt-get install -y git
-```
-
-Saia e entre de novo (`exit`, depois `ssh fateconnect-vps`) para o grupo
-`docker` valer. Confirme:
-
-```bash
-docker run --rm hello-world
-```
-
-### Fechar o que não precisa estar aberto
-
-Deixe abertas só as portas de SSH e web:
-
-```bash
-sudo ufw allow OpenSSH
-sudo ufw allow 80
-sudo ufw allow 443
-sudo ufw enable
-```
-
-O Postgres **não** aparece nessa lista de propósito: ele só existe dentro da
-rede interna do Docker e não deve ser alcançável de fora.
-
-## 3. Clonar e configurar
+Clone o repositório e rode o preparador **uma vez**, com `sudo`:
 
 ```bash
 git clone https://github.com/victorfob/FateConnect.git
 cd FateConnect/deploy
+sudo ./vps-setup.sh
 ```
 
-Crie os três arquivos de configuração a partir dos modelos:
+Ele instala o Docker, fecha a porta do banco para a internet com firewall,
+permite que os contêineres alcancem o PostgreSQL do host, e cria um banco e um
+usuário por ambiente — gravando cada senha em `/root/senha-<banco>.txt`.
+
+O script **não desliga nada** por conta própria. Ao final ele sugere o que dá
+para liberar de memória, e a decisão é sua.
+
+Saia e entre de novo no SSH para o grupo `docker` valer.
+
+## 4. Configurar
 
 ```bash
 cp .env.example .env.hml
 cp .env.example .env.prod
-cp edge/.env.example edge/.env
 ```
 
-Gere os segredos — **um diferente para cada campo e para cada ambiente**:
+Preencha os dois. As senhas do banco estão em `/root/senha-fateconnect-hml.txt`
+e `/root/senha-fateconnect-prod.txt`; gere os segredos de sessão com
+`openssl rand -base64 32`, **diferentes** em cada ambiente. Deixe `PUBLIC_URL`
+com `http://` por enquanto.
 
-```bash
-openssl rand -base64 32
-```
-
-Preencha `.env.hml` e `.env.prod` (senha do banco, segredo de sessão e o
-`PUBLIC_URL` com `http://` por enquanto), e `edge/.env` com os dois domínios e
-seu e-mail.
-
-Nenhum desses arquivos é versionado — eles têm senha dentro e o repositório é
+Nenhum desses arquivos é versionado — eles têm senha dentro, e o repositório é
 público.
 
-## 4. Subir
+## 5. Publicar
 
-O front é construído fora do contêiner, e o `deploy.sh` espera encontrá-lo
-pronto. Publicando à mão, gere antes:
+Uma vez por ambiente, instale a configuração no nginx:
+
+```bash
+sudo ./install-site.sh hml
+sudo ./install-site.sh prod
+```
+
+Depois construa o front e suba as APIs:
 
 ```bash
 ./build-front.sh hml && ./deploy.sh hml
 ./build-front.sh prod && ./deploy.sh prod
 ```
 
-O `deploy.sh` puxa a branch do ambiente, constrói as APIs e sobe tudo. O banco
-nasce vazio e as tabelas são criadas pelas migrations na primeira subida, sem
-nenhum passo manual.
-
-Pela pipeline nada disso é digitado: o runner constrói o front, envia o
-resultado e chama o `deploy.sh`. Ver a seção **Publicar pela pipeline**.
-
-Confira nos dois endereços, ainda em `http://`.
-
-## 5. Ligar o HTTPS
-
-Com os dois já respondendo e os domínios apontando para a VPS:
+⚠️ **Num servidor de 1 GB o `build-front.sh` não conclui.** O Vite precisa de
+mais de 500 MB de heap e o Node aborta com `JavaScript heap out of memory`,
+sem gerar nada. Nesse caso construa o front em outra máquina e envie o
+resultado — que é exatamente o que a pipeline faz:
 
 ```bash
-./enable-https.sh
+# na sua máquina, dentro de FateConnect/Web
+VITE_API_URL=https://SEU_DOMINIO/api/conta \
+VITE_RIDE_API_URL=https://SEU_DOMINIO/api/carona \
+yarn build
+rsync -az --delete dist/ usuario@servidor:/var/www/fateconnect/<ambiente>/
 ```
 
-Ele confere que os domínios chegam na máquina, pede os certificados, troca a
-borda para HTTPS e reconstrói os dois fronts com o endereço novo — esse último
-passo é necessário porque o Vite grava o endereço da API dentro do bundle.
+O banco de cada ambiente nasce vazio e as tabelas são criadas pelas migrations
+na primeira subida, sem passo manual.
 
-Agende a renovação, já que o certificado vale 90 dias:
+Confira os dois endereços em `http://`.
+
+## 6. Ligar o HTTPS
+
+Com os domínios respondendo:
 
 ```bash
-crontab -e
+sudo apt-get install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d fateconnect.com.br
+sudo certbot --nginx -d hml.fateconnect.com.br
 ```
 
-E acrescente:
+O certbot edita a configuração do nginx sozinho e instala um agendamento de
+renovação. Confira com `systemctl list-timers | grep certbot`.
 
-```
-0 3 * * 1 cd ~/FateConnect/deploy && ./renew-https.sh >> /var/log/fateconnect-certbot.log 2>&1
+Depois troque `PUBLIC_URL` para `https://` nos dois `.env` e **reconstrua o
+front** — o endereço da API fica gravado dentro do bundle, então reiniciar não
+basta:
+
+```bash
+./build-front.sh hml && ./deploy.sh hml
+./build-front.sh prod && ./deploy.sh prod
 ```
 
 ## Publicar pela pipeline
 
-Com os segredos configurados, publicar deixa de ser um comando: mergear na
-`develop` publica homologação, e mergear na `main` publica produção junto com a
-tag da release.
+Com os segredos configurados, mergear na `develop` publica homologação e
+mergear na `main` publica produção junto da tag da release.
 
 O front é construído **no runner**, não na VPS. É isso que mantém os source
 maps enviados ao Sentry descrevendo o bundle que está no ar — construir de novo
@@ -188,18 +159,16 @@ acusar.
 ### O que configurar no GitHub
 
 Em **Settings → Environments**, crie `hml` e `prod`. Em produção, marque
-*Required reviewers* com você mesmo: assim o push na `main` fica parado até
-alguém aprovar, e homologação segue direto.
+*Required reviewers*: assim o push na `main` fica parado até alguém aprovar.
 
-Em cada ambiente, cadastre as **variables**:
+**Variables**, em cada ambiente:
 
-| Variable | Exemplo |
+| Variable | Conteúdo |
 | --- | --- |
 | `PUBLIC_URL` | o endereço daquele ambiente, com `https://` |
-| `VITE_SENTRY_DSN` | o DSN do Sentry, se usar |
-| `SENTRY_ORG`, `SENTRY_PROJECT` | idem |
+| `VITE_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT` | se usar Sentry |
 
-E os **secrets**:
+**Secrets**, em cada ambiente:
 
 | Secret | Conteúdo |
 | --- | --- |
@@ -214,10 +183,11 @@ um alimenta o bundle, o outro libera o CORS das APIs.
 
 ### A chave da pipeline
 
-Gere uma chave **separada** da sua, para poder revogá-la sem perder seu acesso:
+Gere **na VPS** uma chave separada da sua, para poder revogá-la sem perder seu
+acesso:
 
 ```bash
-ssh-keygen -t ed25519 -f ~/.ssh/github-actions -N "" -C "github-actions-fateconnect"
+ssh-keygen -t ed25519 -f ~/.ssh/github-actions -N "" -C "github-actions"
 cat ~/.ssh/github-actions.pub >> ~/.ssh/authorized_keys
 ```
 
@@ -228,46 +198,40 @@ O conteúdo de `~/.ssh/github-actions` (sem o `.pub`) vai no secret
 
 | O que você quer | Comando |
 | --- | --- |
-| Publicar o que entrou na `develop` | `./build-front.sh hml && ./deploy.sh hml` |
+| Publicar a `develop` | `./build-front.sh hml && ./deploy.sh hml` |
 | Publicar uma release | `./build-front.sh prod && ./deploy.sh prod` |
 | Ver o que está de pé | `docker compose -p fateconnect-prod ps` |
 | Ler os logs | `docker compose -p fateconnect-prod logs -f` |
-| Reiniciar um ambiente | `docker compose -p fateconnect-hml restart` |
+| Ver a memória | `free -h` |
 
 ### Backup do banco
 
 ```bash
-docker compose -p fateconnect-prod exec -T db \
-  pg_dump -U fateconnect fateconnect > backup-$(date +%F).sql
+sudo -u postgres pg_dump fateconnect_prod > backup-$(date +%F).sql
 ```
 
 Guarde o arquivo fora da VPS. Não há backup automático configurado.
 
 ## Quando algo dá errado
 
-**Um domínio responde 502.** Aquele ambiente está fora; o outro segue no ar.
-Veja o motivo com `docker compose -p fateconnect-hml logs`.
+**O site responde 502.** As APIs daquele ambiente estão fora. Veja com
+`docker compose -p fateconnect-hml logs`.
 
-**A borda não sobe depois de ligar o HTTPS.** Algum certificado não foi
-emitido. Volte `EDGE_CONF=http-only.conf` em `edge/.env`, suba a borda de novo e
-rode o `enable-https.sh` outra vez.
+**Um contêiner morre sozinho, sem erro claro.** Quase sempre é falta de
+memória: o kernel encerra o processo que mais consome. Confirme com
+`dmesg | grep -i "killed process"` e veja o que dá para liberar com `free -h`.
 
 **O front carrega mas nenhuma tela com dados funciona.** O endereço da API
-gravado no bundle está errado. Confira `PUBLIC_URL` no `.env` do ambiente e
-rode `./build-front.sh <ambiente>` de novo — reiniciar não basta, e o
-`deploy.sh` sozinho também não, porque o endereço entra na hora de construir.
-
-**O deploy para dizendo que falta o front.** Ninguém gerou o `dist` daquele
-ambiente ainda. Rode o `build-front.sh`, ou dispare a pipeline.
+gravado no bundle está errado. Confira `PUBLIC_URL` e rode o `build-front.sh`
+de novo — o `deploy.sh` sozinho não resolve, porque o endereço entra na hora de
+construir.
 
 **O deploy para dizendo que há alterações não commitadas.** Alguém editou algo
-direto na VPS. Veja com `git status` e descarte se não houver nada a salvar —
-o deploy troca de branch e não passa por cima disso.
+direto na VPS. Veja com `git status` e descarte se não houver nada a salvar.
 
 ## O que ainda não existe
 
-- **Achados e perdidos não funciona no ar.** O front chama `/achado`, e nenhuma
+- **Achados e perdidos não funciona no ar.** O front chama `/achado` e nenhuma
   das duas APIs implementa esse caminho ainda. As telas vão dar erro até a API
   existir.
-- **Nenhum backup automático** do banco.
-- **Backup do banco continua manual.**
+- **Backup do banco é manual.**

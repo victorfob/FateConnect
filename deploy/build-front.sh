@@ -28,21 +28,23 @@ if [ -z "${PUBLIC_URL:-}" ]; then
   exit 1
 fi
 
+DESTINO="/var/www/fateconnect/$AMBIENTE"
+if [ ! -d "$DESTINO" ]; then
+  echo "ERRO: $DESTINO não existe. Rode antes:  sudo ./install-site.sh $AMBIENTE" >&2
+  exit 1
+fi
+
 VERSAO_NODE=$(tr -d '[:space:]' < ../FateConnect/Web/.nvmrc)
-DESTINO="dist/$AMBIENTE"
 
 echo "==> Construindo o front de $AMBIENTE para $PUBLIC_URL (node $VERSAO_NODE)"
-rm -rf "$DESTINO"
-mkdir -p "$DESTINO"
-
 docker run --rm \
   -v "$(cd .. && pwd)/FateConnect/Web:/app" \
-  -v "$(pwd)/$DESTINO:/saida" \
+  -v "$DESTINO:/saida" \
   -w /app \
   -e "VITE_API_URL=$PUBLIC_URL/api/conta" \
   -e "VITE_RIDE_API_URL=$PUBLIC_URL/api/carona" \
   -e "VITE_SENTRY_DSN=${VITE_SENTRY_DSN:-}" \
   "node:$VERSAO_NODE-alpine" \
-  sh -c 'yarn install --frozen-lockfile && yarn build && cp -r dist/. /saida/'
+  sh -c 'yarn install --frozen-lockfile && yarn build && rm -rf /saida/* && cp -r dist/. /saida/'
 
 echo "==> Pronto: $DESTINO"
