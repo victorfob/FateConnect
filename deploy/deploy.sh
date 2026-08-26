@@ -15,6 +15,29 @@ case "$ENVIRONMENT" in
   *) echo "Uso: ./deploy.sh hml|prod" >&2; exit 1 ;;
 esac
 
+# A atualização vem antes de tudo que possa falhar. Depois da validação, um
+# defeito nas linhas de cima travaria a publicação para sempre: o script
+# quebrado nunca alcança o `git pull` que traria a própria correção, e só um
+# acesso manual à máquina destrava.
+if [ -z "${DEPLOY_SELF_UPDATED:-}" ]; then
+  echo "==> Atualizando o código a partir da branch $BRANCH"
+  # Avisar e seguir não adianta: o `git checkout` abaixo aborta sozinho e a
+  # mensagem dele não diz o que fazer. Melhor parar aqui, explicando.
+  if [ -n "$(git -C .. status --porcelain)" ]; then
+    echo "ERRO: há alterações não commitadas nesta cópia do repositório." >&2
+    echo "Veja o que é com:  git -C '$(cd .. && pwd)' status" >&2
+    exit 1
+  fi
+  git -C .. fetch --prune
+  git -C .. checkout "$BRANCH"
+  git -C .. pull --ff-only
+
+  # `exec`, e não seguir em frente: o bash lê o script incrementalmente, então
+  # continuar executando o arquivo que o `pull` acabou de reescrever é
+  # imprevisível. A guarda impede que a cópia nova atualize outra vez.
+  DEPLOY_SELF_UPDATED=1 exec "$0" "$@"
+fi
+
 ENV_FILE=".env.$ENVIRONMENT"
 PROJECT="fateconnect-$ENVIRONMENT"
 WEB_ROOT="/var/www/fateconnect/$ENVIRONMENT"
@@ -47,18 +70,6 @@ if [ ! -f "$WEB_ROOT/index.html" ]; then
   echo "  ./build-front.sh $ENVIRONMENT" >&2
   exit 1
 fi
-
-echo "==> Atualizando o código a partir da branch $BRANCH"
-# Avisar e seguir não adianta: o `git checkout` abaixo aborta sozinho e a
-# mensagem dele não diz o que fazer. Melhor parar aqui, explicando.
-if [ -n "$(git -C .. status --porcelain)" ]; then
-  echo "ERRO: há alterações não commitadas nesta cópia do repositório." >&2
-  echo "Veja o que é com:  git -C '$(cd .. && pwd)' status" >&2
-  exit 1
-fi
-git -C .. fetch --prune
-git -C .. checkout "$BRANCH"
-git -C .. pull --ff-only
 
 echo "==> Construindo as APIs de $ENVIRONMENT ($PUBLIC_URL)"
 docker compose -p "$PROJECT" --env-file "$ENV_FILE" build
