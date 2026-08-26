@@ -7,12 +7,11 @@ export type StatusTagTone = 'neutral' | 'muted' | 'success' | 'warning' | 'dange
 
 export type NotificationVariant = 'success' | 'error' | 'warning';
 
-/** Fundo e a cor do conteúdo sobre ele — o par que `contrast.test.ts` mede. */
 export type SurfacePair = { surface: string; content: string };
 
 /**
- * Cromo da aplicação — topo, rodapé, menu lateral e botão de voltar. O divisor
- * e o realce são próprios porque `palette.divider` e `palette.action.hover` são
- * de superfície neutra e desapareceriam sobre a cor de marca.
+ * Cromo da aplicação. O divisor e o realce são chaves próprias porque
+ * `palette.divider` e `palette.action.hover` são de superfície neutra e
+ * desapareceriam sobre a cor de marca.
  */
 export type ChromeColors = { main: string; contrastText: string; divider: string; hover: string };

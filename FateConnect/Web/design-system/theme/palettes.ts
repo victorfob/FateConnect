@@ -2,7 +2,6 @@ import type { PaletteOptions } from '@mui/material/styles';
 
 import { colorTokens, colorVariants, darkColorTokens } from '../tokens';
 
-/** O tom `neutral` da etiqueta não desenha caixa: fica texto corrido. */
 const NO_SURFACE = 'transparent';
 const INHERITED_CONTENT = 'inherit';
 
@@ -45,7 +44,6 @@ export const lightPalette: PaletteOptions = {
   },
   action: { hover: colorTokens.hover },
   divider: colorTokens.divider,
-  /** No claro o cromo é a cor de marca, como no produto. */
   chrome: {
     main: colorTokens.primary,
     contrastText: colorTokens.textOnAccent,
@@ -63,7 +61,6 @@ export const lightPalette: PaletteOptions = {
     success: { surface: colorTokens.successBackground, content: colorTokens.successText },
     warning: { surface: colorTokens.warningBackground, content: colorTokens.warningText },
     // O vermelho do produto não passa AA sobre o pastel; o mesmo escurecido passa.
-    // É a cor que o aviso de erro já usa, então os dois vermelhos combinam.
     danger: { surface: colorTokens.dangerBackground, content: colorVariants.secondaryDark },
   },
   /**
