@@ -28,6 +28,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Alinha o espaçamento dos cartões de carona e de achados e perdidos, que separavam as informações e a descrição com medidas diferentes (#148) [Frontend]
 - Aproxima as informações dos cartões de carona e de achados e perdidos, separadas agora por uma barra vertical em vez do vão que as fazia parecer colunas distintas (#149) [Frontend]
 - Passa a abrir a aplicação no tema escolhido na última visita, em vez de voltar ao claro a cada recarga (#149) [Frontend]
+- Junta a etiqueta e as ações no topo do cartão de carona e de achados e perdidos também no celular, onde a etiqueta descia sozinha para o rodapé (#150) [Frontend]
+- Passa a marcar a carona de quem a ofertou e a oferecer editar e excluir só nela; enquanto a API não disser de quem é cada carona, nenhuma é reconhecida como sua (#150) [Frontend]
 
 ### Fixed
 
@@ -41,6 +43,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige a página branca quando a aplicação quebra por inteiro: agora aparece a mesma tela de erro das rotas, com o caminho de volta ao início (#141) [Frontend]
 - Corrige o HTML das telas, que trazia atributos inválidos vindos de propriedades usadas só para estilo (#145) [Frontend]
 - Corrige a largura de 768px, em que o topo já estava no modo estreito enquanto o cadastro ainda usava a grade larga (#148) [Frontend]
+- Corrige o canto superior direito do cartão, que parava antes da borda em lugar diferente a cada cartão da lista, e o título comprido, que corria por cima da etiqueta e dos ícones (#150) [Frontend]
+- Corrige o diálogo de contato, que encostava o conteúdo à esquerda enquanto o título ficava centralizado (#150) [Frontend]
 
 ## [0.2.0] - 2026-08-20
 

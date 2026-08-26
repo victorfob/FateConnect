@@ -16,6 +16,9 @@ export const RIDE_LIST_MESSAGES = {
 
 export const RIDE_CARD_LABELS = { edit: 'Editar', delete: 'Excluir' };
 
+/** A faixa na borda não fala com leitor de tela; este texto é quem conta. */
+export const OWN_RIDE_LABEL = 'Minha carona';
+
 const SINGLE_SEAT = 1;
 
 export function seatsLabel(seats: number): string {

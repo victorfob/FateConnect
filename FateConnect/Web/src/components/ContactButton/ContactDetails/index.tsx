@@ -24,8 +24,8 @@ export type ContactDetailsProps = Readonly<{
 
 /**
  * Vias de contato de uma pessoa: identidade de um lado, canais clicáveis do
- * outro, empilhados e centralizados no estreito. Não sabe onde está sendo
- * mostrado — cabe dentro de um diálogo, de um cartão ou de um painel.
+ * outro, centralizados no espaço que receberem e empilhados no estreito. Não
+ * sabe onde está sendo mostrado — cabe num diálogo, num cartão ou num painel.
  */
 export function ContactDetails({
   name,

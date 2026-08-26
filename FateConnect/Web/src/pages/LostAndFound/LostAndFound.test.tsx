@@ -314,7 +314,7 @@ describe('LostAndFound', () => {
     await filterByStatus(STATUS_TAG_LABEL.cancelled);
 
     expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
-    expect(card().getAllByText(STATUS_TAG_LABEL.cancelled)).not.toHaveLength(0);
+    expect(card().getAllByText(STATUS_TAG_LABEL.cancelled)).toHaveLength(1);
     expect(card().getByText(CANCELLATION_NOTE.owner)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: REOPEN_LABEL }));
@@ -332,7 +332,7 @@ describe('LostAndFound', () => {
     await filterByStatus(STATUS_TAG_LABEL.resolved);
 
     expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
-    expect(card().getAllByText(STATUS_TAG_LABEL.resolved)).not.toHaveLength(0);
+    expect(card().getAllByText(STATUS_TAG_LABEL.resolved)).toHaveLength(1);
   });
 
   it('should keep the owner actions off the card of someone else', async () => {
@@ -409,7 +409,7 @@ describe('LostAndFound', () => {
 
     // O diálogo sai por transição: some da árvore depois do clique, não nele.
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(card().getAllByText(STATUS_TAG_LABEL.open)).not.toHaveLength(0);
+    expect(card().getAllByText(STATUS_TAG_LABEL.open)).toHaveLength(1);
   });
 
   it('should reopen the item without asking anything first', async () => {

@@ -39,9 +39,7 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
         <Typography variant="subtitleBold">{item.nome}</Typography>
 
         <ListCard.Actions>
-          <ListCard.WideOnlyTag>
-            <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
-          </ListCard.WideOnlyTag>
+          <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
 
           <LostItemActions item={item} onEdit={onEdit} onCancel={onCancel} />
         </ListCard.Actions>
@@ -87,10 +85,6 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
       )}
 
       <LostItemStatusAction item={item} onResolve={onResolve} onReopen={onReopen} />
-
-      <ListCard.CompactOnlyTag>
-        <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
-      </ListCard.CompactOnlyTag>
     </ListCard>
   );
 }

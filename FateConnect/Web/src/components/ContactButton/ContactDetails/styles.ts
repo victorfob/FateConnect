@@ -5,6 +5,7 @@ const { xs, md, xl } = spacingScale;
 export const DetailsRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
+  justifyContent: 'center',
   gap: theme.space(xl),
 
   [theme.breakpoints.down('md')]: {
