@@ -67,8 +67,8 @@ cp -a "$PG_HBA" "$PG_HBA.bak-$TIMESTAMP"
 # As faixas privadas cobrem as redes que o Docker cria. A internet não chega
 # aqui porque o firewall barra antes.
 for range in 172.16.0.0/12 192.168.0.0/16 10.0.0.0/8; do
-  if ! grep -q "$faixa" "$PG_HBA"; then
-    echo "host    all    all    $faixa    scram-sha-256" >> "$PG_HBA"
+  if ! grep -q "$range" "$PG_HBA"; then
+    echo "host    all    all    $range    scram-sha-256" >> "$PG_HBA"
   fi
 done
 systemctl reload postgresql

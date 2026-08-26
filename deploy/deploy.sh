@@ -31,7 +31,7 @@ set -a; . "./$ENV_FILE"; set +a
 missing=''
 for name in DOMAIN PUBLIC_URL ACCOUNT_API_PORT RIDE_API_PORT POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD JWT_SECRET; do
   eval "value=\${$name:-}"
-  if [ -z "$valor" ]; then
+  if [ -z "$value" ]; then
     missing="$missing $name"
   fi
 done

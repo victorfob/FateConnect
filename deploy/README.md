@@ -68,7 +68,7 @@ sudo ./vps-setup.sh
 
 Ele instala o Docker, fecha a porta do banco para a internet com firewall,
 permite que os contêineres alcancem o PostgreSQL do host, e cria um banco e um
-usuário por ambiente — gravando cada senha em `/root/senha-<banco>.txt`.
+usuário por ambiente — gravando cada senha em `/root/password-<banco>.txt`.
 
 O script **não desliga nada** por conta própria. Ao final ele sugere o que dá
 para liberar de memória, e a decisão é sua.
@@ -82,8 +82,8 @@ cp .env.example .env.hml
 cp .env.example .env.prod
 ```
 
-Preencha os dois. As senhas do banco estão em `/root/senha-fateconnect-hml.txt`
-e `/root/senha-fateconnect-prod.txt`; gere os segredos de sessão com
+Preencha os dois. As senhas do banco estão em `/root/password-fateconnect_hml.txt`
+e `/root/password-fateconnect_prod.txt`; gere os segredos de sessão com
 `openssl rand -base64 32`, **diferentes** em cada ambiente. Deixe `PUBLIC_URL`
 com `http://` por enquanto.
 

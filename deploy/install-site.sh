@@ -29,7 +29,7 @@ set -a; . "./$ENV_FILE"; set +a
 
 for name in DOMAIN ACCOUNT_API_PORT RIDE_API_PORT; do
   eval "value=\${$name:-}"
-  if [ -z "$valor" ]; then
+  if [ -z "$value" ]; then
     echo "ERRO: $name não está preenchido em deploy/$ENV_FILE." >&2
     exit 1
   fi
