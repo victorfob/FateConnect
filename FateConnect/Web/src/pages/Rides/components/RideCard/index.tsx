@@ -1,14 +1,14 @@
-import { useCallback } from 'react';
-import { IconButton, ListCard, StatusTag, Typography } from '@design-system';
-import { AccessTimeIcon, CalendarTodayIcon, EditIcon, GroupsIcon } from '@design-system/icons';
+import { ListCard, StatusTag, Typography } from '@design-system';
+import { AccessTimeIcon, CalendarTodayIcon, GroupsIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
 import * as C from '@app/pages/Rides/constants';
+import { isOwnRide, RIDE_DRIVER } from '@app/pages/Rides/helpers/rideDriver';
 import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
 import type { Ride } from '@app/services/rides/types';
 
-import { RideDeleteConfirmation } from './RideDeleteConfirmation';
 import { RideDriverContact } from './RideDriverContact';
+import { RideOwnerActions } from './RideOwnerActions';
 
 const DATE_FORMAT = 'dd/MM/yyyy';
 /** A API devolve `HH:mm:ss`; o cartão mostra só horas e minutos. */
@@ -21,29 +21,21 @@ type RideCardProps = Readonly<{
 }>;
 
 export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
-  const handleEdit = useCallback(() => onEdit(ride), [onEdit, ride]);
-
   const typeLabel = rideTypeDisplayLabel(ride.tipoCarona);
   const tone = rideTypeTone(ride.tipoCarona);
 
   return (
-    <ListCard>
+    <ListCard own={isOwnRide(RIDE_DRIVER)} ownLabel={C.OWN_RIDE_LABEL}>
       <ListCard.Header>
         <Typography variant="subtitleBold">{ride.destino}</Typography>
 
         <ListCard.Actions>
-          <ListCard.WideOnlyTag>
-            <StatusTag tone={tone}>{typeLabel}</StatusTag>
-          </ListCard.WideOnlyTag>
+          <StatusTag tone={tone}>{typeLabel}</StatusTag>
 
           <ListCard.ActionButtons>
             <RideDriverContact destination={ride.destino} />
 
-            <IconButton type="button" label={C.RIDE_CARD_LABELS.edit} onClick={handleEdit}>
-              <EditIcon />
-            </IconButton>
-
-            <RideDeleteConfirmation ride={ride} onDelete={onDelete} />
+            <RideOwnerActions ride={ride} onEdit={onEdit} onDelete={onDelete} />
           </ListCard.ActionButtons>
         </ListCard.Actions>
       </ListCard.Header>
@@ -76,10 +68,6 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
           {ride.descricao}
         </Typography>
       </ListCard.Description>
-
-      <ListCard.CompactOnlyTag>
-        <StatusTag tone={tone}>{typeLabel}</StatusTag>
-      </ListCard.CompactOnlyTag>
     </ListCard>
   );
 }

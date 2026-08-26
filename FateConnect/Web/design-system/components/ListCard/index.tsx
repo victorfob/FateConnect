@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { HiddenField } from '@ds-root/components/HiddenField';
 
+import { ListCardActions } from './ListCardActions';
 import * as S from './styles';
 
 export type ListCardProps = Readonly<{
@@ -22,7 +23,7 @@ export type ListCardProps = Readonly<{
  */
 function ListCard({ own = false, ownLabel, media, children }: ListCardProps) {
   return (
-    <S.CardRoot component="article" own={own}>
+    <S.CardRoot component="article" own={own} hasMedia={media !== undefined}>
       {own && ownLabel && <HiddenField component="span">{ownLabel}</HiddenField>}
 
       {media}
@@ -33,12 +34,10 @@ function ListCard({ own = false, ownLabel, media, children }: ListCardProps) {
 }
 
 ListCard.Header = S.HeaderRow;
-ListCard.Actions = S.HeaderActions;
+ListCard.Actions = ListCardActions;
 ListCard.ActionButtons = S.ActionButtons;
 ListCard.InfoRow = S.InfoRow;
 ListCard.InfoItem = S.InfoItem;
 ListCard.Description = S.Description;
-ListCard.WideOnlyTag = S.WideOnlyTag;
-ListCard.CompactOnlyTag = S.CompactOnlyTag;
 
 export { ListCard };
