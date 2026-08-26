@@ -14,7 +14,11 @@ using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Any;
 
-Env.Load("../.env");
+// Em contêiner as variáveis chegam pelo ambiente e não há arquivo para ler.
+if (File.Exists("../.env"))
+{
+    Env.Load("../.env");
+}
 
 var builder = WebApplication.CreateBuilder(args);
 

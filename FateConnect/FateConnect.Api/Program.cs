@@ -21,7 +21,11 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        Env.Load();
+        // Em contêiner as variáveis chegam pelo ambiente e não há arquivo para ler.
+        if (File.Exists(".env"))
+        {
+            Env.Load();
+        }
 
         // As datas do cadastro chegam sem fuso. Sem isto o Npgsql as recusa contra
         // uma coluna "timestamp with time zone", que é o mapeamento padrão dele.
