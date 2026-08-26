@@ -15,7 +15,7 @@ export const BackAction = styled(PolymorphicStack)(({ theme }) => ({
   borderRadius: theme.radius(radiusScale.component),
   overflow: 'hidden',
   textDecoration: 'none',
-  color: theme.palette.primary.contrastText,
-  background: theme.palette.primary.main,
+  color: theme.palette.chrome.contrastText,
+  background: theme.palette.chrome.main,
   boxShadow: shadowTokens.component,
 }));
