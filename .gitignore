@@ -2,3 +2,12 @@ FateConnect/FigmaBase/
 
 # Worktrees de agente, criadas sob demanda e nunca versionadas.
 .claude/worktrees/
+
+# Segredos do deploy: senha do banco e chave de sessão. O repositório é público.
+.env
+.env.*
+!.env.example
+
+# Sobreposição local do compose: existe só na máquina de quem está testando.
+docker-compose.override.yml
+

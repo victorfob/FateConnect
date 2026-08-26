@@ -51,66 +51,24 @@ jobs:
 
           echo "Tag v$version criada em $GITHUB_SHA."
 
-  # O build de produção mora aqui, e não num workflow próprio, porque o upload
-  # de source map tem que sair do MESMO build que vai ao ar: mapa gerado em
-  # outro build tem outro Debug ID, e o Sentry não simboliza nada com ele. Quem
-  # faz o upload é o plugin dentro do `yarn build` — não há passo separado.
+  # O build de produção e a publicação moram no mesmo lugar porque o upload de
+  # source map tem que sair do MESMO build que vai ao ar: mapa gerado em outro
+  # build tem outro Debug ID, e o Sentry não simboliza nada com ele. Quem faz o
+  # upload é o plugin dentro do `yarn build` — não há passo separado.
   #
-  # ⚠️ O DEPLOY ENTRA NESTE JOB, depois do build, e não em outro lugar. A
-  # hospedagem provável é a KingHost, e a conta ainda não existe; quando existir,
-  # o passo de publicação vai depois do `Build`, consumindo o `dist` que ele
-  # acabou de gerar. Publicar de outro job significaria baixar artefato de um
-  # build cujos mapas já foram enviados e apagados — é o cenário que esta
-  # estrutura existe para evitar.
-  #
-  # Enquanto não há deploy, o job serve para o upload dos mapas e para provar
-  # que o build de produção passa com a configuração do ambiente.
-  #
-  # ⚠️ FALTAM as variables `VITE_API_URL` e `VITE_RIDE_API_URL`, e ligar o
-  # deploy passa por criá-las. O GitHub recusa variable com valor vazio, e
-  # criá-las com valor de mentira seria pior: o Vite grava o valor no bundle
-  # em tempo de build. Sem elas o bundle sai com baseURL vazia, a requisição
-  # cai no próprio host e volta HTML com status 200 — a falha que a guarda
-  # `Array.isArray` do serviço de achados e perdidos existe para pegar.
+  # Os passos estão em `publish.yml`, compartilhados com homologação, para que
+  # os dois ambientes subam pelo mesmo caminho. As variáveis e os segredos vêm
+  # do ambiente `prod` do GitHub, que é também onde se exige aprovação antes de
+  # publicar.
   #
   # Independente do job da tag, como o back-merge: falha ao criar a tag não tem
   # por que impedir a publicação, e vice-versa.
-  build:
-    name: Build and upload source maps
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: FateConnect/Web/.nvmrc
-          cache: yarn
-          cache-dependency-path: FateConnect/Web/yarn.lock
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-        working-directory: FateConnect/Web
-
-      # A versão do projeto é a da raiz, a mesma que nomeia a tag — é ela que
-      # amarra o erro no Sentry à release que o produziu.
-      - name: Read version
-        id: version
-        run: echo "value=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
-
-      # O token é secret; o resto é variable. Sem o token o
-      # plugin se desliga e o build segue — é o que mantém o check de PR, que
-      # não recebe segredo nenhum, funcionando com a mesma configuração.
-      - name: Build
-        run: yarn build
-        working-directory: FateConnect/Web
-        env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-          VITE_RIDE_API_URL: ${{ vars.VITE_RIDE_API_URL }}
-          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
-          SENTRY_RELEASE: v${{ steps.version.outputs.value }}
+  publish:
+    name: Publish to production
+    uses: ./.github/workflows/publish.yml
+    with:
+      environment: prod
+    secrets: inherit
 
   # Independente do job da tag de propósito. A release entra pela main, mas o
   # trabalho continua na develop: sem trazer o merge de volta, a próxima release
