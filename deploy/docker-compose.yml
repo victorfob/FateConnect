@@ -1,0 +1,48 @@
+# As duas APIs de um ambiente. Sobe duas vezes, com arquivos de configuração
+# diferentes: ./deploy.sh hml e ./deploy.sh prod.
+#
+# Não há contêiner de banco nem de servidor web: a VPS já tem PostgreSQL e
+# nginx, e duplicá-los numa máquina de 1 GB gastaria memória que não existe. O
+# banco é alcançado pelo host; o front é servido pelo nginx do host.
+
+services:
+  account-api:
+    build:
+      context: ../FateConnect/FateConnect.Api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      DB_CONNECTION: Host=host.docker.internal;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      CORS_ORIGINS: ${PUBLIC_URL}${CORS_EXTRA_ORIGINS:+,${CORS_EXTRA_ORIGINS}}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRACAO_HORAS: ${JWT_EXPIRACAO_HORAS}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+      # Numa máquina apertada o coletor padrão reserva muito mais heap do que
+      # esta API usa. O modo estação de trabalho a mantém dentro do limite.
+      DOTNET_gcServer: '0'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      # Só em 127.0.0.1: quem fala com a internet é o nginx do host.
+      - '127.0.0.1:${ACCOUNT_API_PORT}:8080'
+    mem_limit: 220m
+
+  ride-api:
+    build:
+      context: ../FateConnect/Carona
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      CONECAO_POSTGRE_SQL: Host=host.docker.internal;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      CORS_ORIGINS: ${PUBLIC_URL}${CORS_EXTRA_ORIGINS:+,${CORS_EXTRA_ORIGINS}}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRACAO_HORAS: ${JWT_EXPIRACAO_HORAS}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+      DOTNET_gcServer: '0'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '127.0.0.1:${RIDE_API_PORT}:8080'
+    mem_limit: 220m

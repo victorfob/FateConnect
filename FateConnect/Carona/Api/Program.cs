@@ -14,7 +14,11 @@ using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Any;
 
-Env.Load("../.env");
+// Em contêiner as variáveis chegam pelo ambiente e não há arquivo para ler.
+if (File.Exists("../.env"))
+{
+    Env.Load("../.env");
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,14 +31,14 @@ builder.Services.AddDbContext<CaronaContext>(options =>
     options.UseNpgsql(connString);
 });
 
+var corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:5173")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", cors =>
     {
-        cors.WithOrigins(
-            "http://localhost:5173",
-            "http://191.252.210.114:8080"
-        )
+        cors.WithOrigins(corsOrigins)
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
@@ -119,6 +123,11 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<CaronaContext>().Database.Migrate();
+}
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
