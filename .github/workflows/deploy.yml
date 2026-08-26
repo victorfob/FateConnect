@@ -25,5 +25,5 @@ jobs:
     name: Staging
     uses: ./.github/workflows/publish.yml
     with:
-      ambiente: hml
+      environment: hml
     secrets: inherit

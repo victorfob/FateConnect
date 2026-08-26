@@ -18,10 +18,10 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-USUARIO_ALVO="${SUDO_USER:-$(logname 2>/dev/null || echo root)}"
+TARGET_USER="${SUDO_USER:-$(logname 2>/dev/null || echo root)}"
 PG_CONF=/etc/postgresql/17/main/postgresql.conf
 PG_HBA=/etc/postgresql/17/main/pg_hba.conf
-CARIMBO=$(date +%Y%m%d-%H%M%S)
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
 echo "==> 1/5 Ferramentas básicas"
 apt-get update -qq
@@ -38,8 +38,8 @@ if command -v docker >/dev/null 2>&1; then
 else
   curl -fsSL https://get.docker.com | sh
 fi
-usermod -aG docker "$USUARIO_ALVO"
-echo "    $USUARIO_ALVO adicionado ao grupo docker (vale no próximo login)"
+usermod -aG docker "$TARGET_USER"
+echo "    $TARGET_USER adicionado ao grupo docker (vale no próximo login)"
 
 echo "==> 3/5 Firewall"
 # O banco escuta em todas as interfaces para os contêineres o alcançarem. Quem
@@ -63,36 +63,36 @@ ufw --force enable >/dev/null
 echo "    liberadas 22, 80, 443 e 10000; a 5432 só para os contêineres"
 
 echo "==> 4/5 Acesso dos contêineres ao Postgres"
-cp -a "$PG_HBA" "$PG_HBA.bak-$CARIMBO"
+cp -a "$PG_HBA" "$PG_HBA.bak-$TIMESTAMP"
 # As faixas privadas cobrem as redes que o Docker cria. A internet não chega
 # aqui porque o firewall barra antes.
-for faixa in 172.16.0.0/12 192.168.0.0/16 10.0.0.0/8; do
+for range in 172.16.0.0/12 192.168.0.0/16 10.0.0.0/8; do
   if ! grep -q "$faixa" "$PG_HBA"; then
     echo "host    all    all    $faixa    scram-sha-256" >> "$PG_HBA"
   fi
 done
 systemctl reload postgresql
-echo "    pg_hba.conf ajustado (backup em $PG_HBA.bak-$CARIMBO)"
+echo "    pg_hba.conf ajustado (backup em $PG_HBA.bak-$TIMESTAMP)"
 
 echo "==> 5/5 Bancos dos dois ambientes"
-for ambiente in hml prod; do
-  banco="fateconnect_$ambiente"
-  usuario="fateconnect_$ambiente"
-  senha=$(openssl rand -base64 24 | tr -d '/+=')
+for environment in hml prod; do
+  database="fateconnect_$environment"
+  username="fateconnect_$environment"
+  password=$(openssl rand -base64 24 | tr -d '/+=')
 
   # `sudo -u` e não `su -`: o usuário postgres costuma ter /sbin/nologin como
   # shell, e aí o `su` falha sem conseguir sequer abrir a sessão.
-  existe=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$banco'")
-  if [ "$existe" = "1" ]; then
-    echo "    $banco já existe; senha não alterada"
+  exists=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$database'")
+  if [ "$exists" = "1" ]; then
+    echo "    $database já existe; senha não alterada"
     continue
   fi
 
-  sudo -u postgres psql -q -c "CREATE USER $usuario WITH PASSWORD '$senha';"
-  sudo -u postgres psql -q -c "CREATE DATABASE $banco OWNER $usuario;"
-  echo "$senha" > "/root/senha-$banco.txt"
-  chmod 600 "/root/senha-$banco.txt"
-  echo "    $banco criado; senha em /root/senha-$banco.txt"
+  sudo -u postgres psql -q -c "CREATE USER $username WITH PASSWORD '$password';"
+  sudo -u postgres psql -q -c "CREATE DATABASE $database OWNER $username;"
+  echo "$password" > "/root/password-$database.txt"
+  chmod 600 "/root/password-$database.txt"
+  echo "    $database criado; senha em /root/password-$database.txt"
 done
 
 echo

@@ -12,7 +12,7 @@ name: Publish
 on:
   workflow_call:
     inputs:
-      ambiente:
+      environment:
         description: hml ou prod
         required: true
         type: string
@@ -28,7 +28,7 @@ jobs:
     # É o ambiente do GitHub que separa as variáveis e os segredos dos dois
     # destinos, e é onde se exige aprovação antes de produção.
     environment:
-      name: ${{ inputs.ambiente }}
+      name: ${{ inputs.environment }}
       url: ${{ vars.PUBLIC_URL }}
 
     steps:
@@ -77,25 +77,25 @@ jobs:
         run: |
           # Quem serve estes arquivos é o nginx do host; a pasta é criada pelo
           # install-site.sh, com dono no usuário do deploy.
-          destino="/var/www/fateconnect/${{ inputs.ambiente }}"
+          target="/var/www/fateconnect/${{ inputs.environment }}"
           # --delete remove o que saiu do build: sem isso um arquivo apagado no
           # código continuaria servido no ar indefinidamente.
           rsync -az --delete \
             -e "ssh -i ~/.ssh/deploy_key -o BatchMode=yes" \
             FateConnect/Web/dist/ \
-            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:$destino/"
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:$target/"
 
       - name: Publish
         run: |
           ssh -i ~/.ssh/deploy_key -o BatchMode=yes \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
-            "cd '${{ secrets.DEPLOY_PATH }}/deploy' && ./deploy.sh '${{ inputs.ambiente }}'"
+            "cd '${{ secrets.DEPLOY_PATH }}/deploy' && ./deploy.sh '${{ inputs.environment }}'"
 
       - name: Check that the containers stayed up
         run: |
           ssh -i ~/.ssh/deploy_key -o BatchMode=yes \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
-            "docker ps --filter 'name=fateconnect-${{ inputs.ambiente }}' --filter 'status=running' --format '{{.Names}}'" \
+            "docker ps --filter 'name=fateconnect-${{ inputs.environment }}' --filter 'status=running' --format '{{.Names}}'" \
             > containers.txt
           echo 'No ar:'; cat containers.txt
           # Um ambiente são dois contêineres, as duas APIs. O banco e o servidor

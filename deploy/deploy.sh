@@ -8,43 +8,43 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-AMBIENTE="${1:-}"
-case "$AMBIENTE" in
+ENVIRONMENT="${1:-}"
+case "$ENVIRONMENT" in
   hml)  BRANCH=develop ;;
   prod) BRANCH=main ;;
   *) echo "Uso: ./deploy.sh hml|prod" >&2; exit 1 ;;
 esac
 
-ARQUIVO_ENV=".env.$AMBIENTE"
-PROJETO="fateconnect-$AMBIENTE"
-RAIZ_WEB="/var/www/fateconnect/$AMBIENTE"
+ENV_FILE=".env.$ENVIRONMENT"
+PROJECT="fateconnect-$ENVIRONMENT"
+WEB_ROOT="/var/www/fateconnect/$ENVIRONMENT"
 
-if [ ! -f "$ARQUIVO_ENV" ]; then
-  echo "ERRO: falta o arquivo deploy/$ARQUIVO_ENV." >&2
-  echo "  cp .env.example $ARQUIVO_ENV && nano $ARQUIVO_ENV" >&2
+if [ ! -f "$ENV_FILE" ]; then
+  echo "ERRO: falta o arquivo deploy/$ENV_FILE." >&2
+  echo "  cp .env.example $ENV_FILE && nano $ENV_FILE" >&2
   exit 1
 fi
 
 # shellcheck disable=SC1090
-set -a; . "./$ARQUIVO_ENV"; set +a
+set -a; . "./$ENV_FILE"; set +a
 
-faltando=''
-for nome in DOMINIO PUBLIC_URL PORTA_CONTA PORTA_CARONA POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD JWT_SECRET; do
-  eval "valor=\${$nome:-}"
+missing=''
+for name in DOMAIN PUBLIC_URL ACCOUNT_API_PORT RIDE_API_PORT POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD JWT_SECRET; do
+  eval "value=\${$name:-}"
   if [ -z "$valor" ]; then
-    faltando="$faltando $nome"
+    missing="$missing $name"
   fi
 done
 
-if [ -n "$faltando" ]; then
-  echo "ERRO: variáveis sem valor em deploy/$ARQUIVO_ENV:$faltando" >&2
+if [ -n "$missing" ]; then
+  echo "ERRO: variáveis sem valor em deploy/$ENV_FILE:$missing" >&2
   exit 1
 fi
 
-if [ ! -f "$RAIZ_WEB/index.html" ]; then
-  echo "ERRO: falta o front em $RAIZ_WEB." >&2
+if [ ! -f "$WEB_ROOT/index.html" ]; then
+  echo "ERRO: falta o front em $WEB_ROOT." >&2
   echo "Pela pipeline ele é enviado pelo runner. Publicando à mão, gere antes:" >&2
-  echo "  ./build-front.sh $AMBIENTE" >&2
+  echo "  ./build-front.sh $ENVIRONMENT" >&2
   exit 1
 fi
 
@@ -60,17 +60,17 @@ git -C .. fetch --prune
 git -C .. checkout "$BRANCH"
 git -C .. pull --ff-only
 
-echo "==> Construindo as APIs de $AMBIENTE ($PUBLIC_URL)"
-docker compose -p "$PROJETO" --env-file "$ARQUIVO_ENV" build
+echo "==> Construindo as APIs de $ENVIRONMENT ($PUBLIC_URL)"
+docker compose -p "$PROJECT" --env-file "$ENV_FILE" build
 
-echo "==> Subindo as APIs de $AMBIENTE"
-docker compose -p "$PROJETO" --env-file "$ARQUIVO_ENV" up -d --remove-orphans
+echo "==> Subindo as APIs de $ENVIRONMENT"
+docker compose -p "$PROJECT" --env-file "$ENV_FILE" up -d --remove-orphans
 
 echo
-docker compose -p "$PROJETO" --env-file "$ARQUIVO_ENV" ps
+docker compose -p "$PROJECT" --env-file "$ENV_FILE" ps
 echo
 echo "Memória da máquina depois da subida:"
 free -h | sed 's/^/  /'
 echo
-echo "Pronto. $AMBIENTE responde em $PUBLIC_URL"
-echo "Se algo não subiu:  docker compose -p $PROJETO logs -f"
+echo "Pronto. $ENVIRONMENT responde em $PUBLIC_URL"
+echo "Se algo não subiu:  docker compose -p $PROJECT logs -f"

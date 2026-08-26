@@ -113,8 +113,8 @@ resultado — que é exatamente o que a pipeline faz:
 
 ```bash
 # na sua máquina, dentro de FateConnect/Web
-VITE_API_URL=https://SEU_DOMINIO/api/conta \
-VITE_RIDE_API_URL=https://SEU_DOMINIO/api/carona \
+VITE_API_URL=https://hml.fateconnect.com.br/api/conta \
+VITE_RIDE_API_URL=https://hml.fateconnect.com.br/api/carona \
 yarn build
 rsync -az --delete dist/ usuario@servidor:/var/www/fateconnect/<ambiente>/
 ```

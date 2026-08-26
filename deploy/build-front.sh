@@ -8,43 +8,43 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-AMBIENTE="${1:-}"
-case "$AMBIENTE" in
+ENVIRONMENT="${1:-}"
+case "$ENVIRONMENT" in
   hml|prod) ;;
   *) echo "Uso: ./build-front.sh hml|prod" >&2; exit 1 ;;
 esac
 
-ARQUIVO_ENV=".env.$AMBIENTE"
-if [ ! -f "$ARQUIVO_ENV" ]; then
-  echo "ERRO: falta deploy/$ARQUIVO_ENV." >&2
+ENV_FILE=".env.$ENVIRONMENT"
+if [ ! -f "$ENV_FILE" ]; then
+  echo "ERRO: falta deploy/$ENV_FILE." >&2
   exit 1
 fi
 
 # shellcheck disable=SC1090
-set -a; . "./$ARQUIVO_ENV"; set +a
+set -a; . "./$ENV_FILE"; set +a
 
 if [ -z "${PUBLIC_URL:-}" ]; then
-  echo "ERRO: PUBLIC_URL não está preenchido em deploy/$ARQUIVO_ENV." >&2
+  echo "ERRO: PUBLIC_URL não está preenchido em deploy/$ENV_FILE." >&2
   exit 1
 fi
 
-DESTINO="/var/www/fateconnect/$AMBIENTE"
-if [ ! -d "$DESTINO" ]; then
-  echo "ERRO: $DESTINO não existe. Rode antes:  sudo ./install-site.sh $AMBIENTE" >&2
+TARGET="/var/www/fateconnect/$ENVIRONMENT"
+if [ ! -d "$TARGET" ]; then
+  echo "ERRO: $TARGET não existe. Rode antes:  sudo ./install-site.sh $ENVIRONMENT" >&2
   exit 1
 fi
 
-VERSAO_NODE=$(tr -d '[:space:]' < ../FateConnect/Web/.nvmrc)
+NODE_VERSION=$(tr -d '[:space:]' < ../FateConnect/Web/.nvmrc)
 
-echo "==> Construindo o front de $AMBIENTE para $PUBLIC_URL (node $VERSAO_NODE)"
+echo "==> Construindo o front de $ENVIRONMENT para $PUBLIC_URL (node $NODE_VERSION)"
 docker run --rm \
   -v "$(cd .. && pwd)/FateConnect/Web:/app" \
-  -v "$DESTINO:/saida" \
+  -v "$TARGET:/saida" \
   -w /app \
   -e "VITE_API_URL=$PUBLIC_URL/api/conta" \
   -e "VITE_RIDE_API_URL=$PUBLIC_URL/api/carona" \
   -e "VITE_SENTRY_DSN=${VITE_SENTRY_DSN:-}" \
-  "node:$VERSAO_NODE-alpine" \
+  "node:$NODE_VERSION-alpine" \
   sh -c 'yarn install --frozen-lockfile && yarn build && rm -rf /saida/* && cp -r dist/. /saida/'
 
-echo "==> Pronto: $DESTINO"
+echo "==> Pronto: $TARGET"

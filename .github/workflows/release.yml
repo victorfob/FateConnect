@@ -67,7 +67,7 @@ jobs:
     name: Publish to production
     uses: ./.github/workflows/publish.yml
     with:
-      ambiente: prod
+      environment: prod
     secrets: inherit
 
   # Independente do job da tag de propósito. A release entra pela main, mas o

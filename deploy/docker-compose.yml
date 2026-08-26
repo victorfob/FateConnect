@@ -6,7 +6,7 @@
 # banco é alcançado pelo host; o front é servido pelo nginx do host.
 
 services:
-  conta-api:
+  account-api:
     build:
       context: ../FateConnect/FateConnect.Api
     restart: unless-stopped
@@ -25,10 +25,10 @@ services:
       - 'host.docker.internal:host-gateway'
     ports:
       # Só em 127.0.0.1: quem fala com a internet é o nginx do host.
-      - '127.0.0.1:${PORTA_CONTA}:8080'
+      - '127.0.0.1:${ACCOUNT_API_PORT}:8080'
     mem_limit: 220m
 
-  carona-api:
+  ride-api:
     build:
       context: ../FateConnect/Carona
     restart: unless-stopped
@@ -44,5 +44,5 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     ports:
-      - '127.0.0.1:${PORTA_CARONA}:8080'
+      - '127.0.0.1:${RIDE_API_PORT}:8080'
     mem_limit: 220m
