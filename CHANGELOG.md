@@ -26,6 +26,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Avisa no painel de filtros de caronas que ele recolhe e quando há filtro valendo (#131) [Frontend]
 - Fixa os recuos e vãos das telas, que acompanhavam a largura da janela e cresciam sem limite em monitor grande, e antecipa a divisão entre apresentação e login na tela inicial (#148) [Frontend]
 - Alinha o espaçamento dos cartões de carona e de achados e perdidos, que separavam as informações e a descrição com medidas diferentes (#148) [Frontend]
+- Aproxima as informações dos cartões de carona e de achados e perdidos, separadas agora por uma barra vertical em vez do vão que as fazia parecer colunas distintas (#149) [Frontend]
+- Passa a abrir a aplicação no tema escolhido na última visita, em vez de voltar ao claro a cada recarga (#149) [Frontend]
 
 ### Fixed
 

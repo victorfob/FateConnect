@@ -5,9 +5,10 @@ import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { iconSizeTokens, radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
-const { xxs, sm, md, xl } = spacingScale;
+const { xxs, sm, md } = spacingScale;
 
 const OWN_STRIPE_PX = 4;
+const HAIRLINE = '1px';
 const ACTION_BUTTON_SIZE_PX = 32;
 /** O glifo da biblioteca de origem ocupa 70% do botão. */
 const ACTION_ICON_SCALE = 0.7;
@@ -72,16 +73,32 @@ export const ActionButtons = styled(Stack)(({ theme }) => ({
 export const InfoRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
-  columnGap: theme.space(xl),
+  columnGap: theme.space(md),
   rowGap: theme.space(xxs),
   marginBottom: theme.space(sm),
+  // Cada item desenha a barra à sua esquerda, dentro do vão. É este recorte que
+  // apaga a do primeiro item de cada linha — inclusive a da linha que quebrou.
+  overflow: 'hidden',
   color: theme.palette.text.secondary,
 }));
 
 export const InfoItem = styled(Stack)(({ theme }) => ({
+  position: 'relative',
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.space(xxs),
+
+  // Desenhada como fundo, e não como caractere, para o leitor de tela ler a
+  // informação e não a separação.
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: `calc(${theme.space(md)} / -2)`,
+    width: HAIRLINE,
+    backgroundColor: theme.palette.divider,
+  },
 
   '& svg': {
     color: theme.palette.secondary.main,
