@@ -5,24 +5,35 @@ import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { GlobalStyles } from '../GlobalStyles';
 import { createAppTheme, type ThemeMode } from '../theme';
 import { ThemeModeContext } from './context/ThemeModeContext';
+import { themeModeStorage } from './storage/themeModeStorage';
 
 type ThemeProviderProps = Readonly<{
   children: ReactNode;
   defaultMode?: ThemeMode;
 }>;
 
+function oppositeMode(mode: ThemeMode): ThemeMode {
+  if (mode === 'light') return 'dark';
+  return 'light';
+}
+
 export function ThemeProvider({ children, defaultMode = 'light' }: ThemeProviderProps) {
-  const [mode, setMode] = useState<ThemeMode>(defaultMode);
+  const [mode, setMode] = useState<ThemeMode>(() => themeModeStorage.read() ?? defaultMode);
 
   const toggleMode = useCallback(() => {
-    setMode((atual) => (atual === 'light' ? 'dark' : 'light'));
+    setMode((current) => {
+      const chosen = oppositeMode(current);
+      themeModeStorage.save(chosen);
+
+      return chosen;
+    });
   }, []);
 
   const theme = useMemo(() => createAppTheme(mode), [mode]);
-  const contexto = useMemo(() => ({ mode, toggleMode }), [mode, toggleMode]);
+  const themeMode = useMemo(() => ({ mode, toggleMode }), [mode, toggleMode]);
 
   return (
-    <ThemeModeContext.Provider value={contexto}>
+    <ThemeModeContext.Provider value={themeMode}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         <GlobalStyles />
