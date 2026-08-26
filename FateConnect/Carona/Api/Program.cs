@@ -27,14 +27,14 @@ builder.Services.AddDbContext<CaronaContext>(options =>
     options.UseNpgsql(connString);
 });
 
+var corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:5173")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", cors =>
     {
-        cors.WithOrigins(
-            "http://localhost:5173",
-            "http://191.252.210.114:8080"
-        )
+        cors.WithOrigins(corsOrigins)
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();

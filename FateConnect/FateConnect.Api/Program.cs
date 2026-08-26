@@ -24,15 +24,15 @@ public class Program
         Env.Load();
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        string localUrl = "http://localhost:5173";
-        string serverUrl = "http://191.252.210.114:8080";
+        string[] corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:5173")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         string corsPolicy = "AllowFrontend";
 
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(corsPolicy, policy =>
             {
-                policy.WithOrigins(localUrl, serverUrl)
+                policy.WithOrigins(corsOrigins)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -123,7 +123,7 @@ public class Program
 
         WebApplication app = builder.Build();
 
-        app.Logger.LogInformation("CORS liberado para: {Local} e {Server}", localUrl, serverUrl);
+        app.Logger.LogInformation("CORS liberado para: {Origins}", string.Join(", ", corsOrigins));
         app.Logger.LogInformation("Variaveis carregadas para Issuer: {Issuer}", jwtOptions.Issuer);
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
