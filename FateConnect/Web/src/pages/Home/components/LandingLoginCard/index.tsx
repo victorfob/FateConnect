@@ -115,7 +115,7 @@ export function LandingLoginCard() {
         />
 
         <S.SubmitRow>
-          <Button type="submit" variant="contained" color="error" loading={isPending}>
+          <Button type="submit" variant="contained" color="secondary" loading={isPending}>
             {C.SUBMIT_LABEL}
           </Button>
         </S.SubmitRow>

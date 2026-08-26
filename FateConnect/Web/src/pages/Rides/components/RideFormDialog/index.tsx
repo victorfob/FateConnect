@@ -78,7 +78,7 @@ export function RideFormDialog({ open, onClose, ride }: RideFormDialogProps) {
             <S.SubmitButton
               type="submit"
               variant="contained"
-              color="error"
+              color="secondary"
               fullWidth
               loading={isPending}
             >

@@ -79,7 +79,7 @@ export function LostItemFormDialog({ open, onClose, item }: LostItemFormDialogPr
             <S.SubmitButton
               type="submit"
               variant="contained"
-              color="error"
+              color="secondary"
               fullWidth
               loading={isPending}
             >

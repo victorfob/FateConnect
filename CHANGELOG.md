@@ -31,6 +31,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a abrir a aplicação no tema escolhido na última visita, em vez de voltar ao claro a cada recarga (#149) [Frontend]
 - Junta a etiqueta e as ações no topo do cartão de carona e de achados e perdidos também no celular, onde a etiqueta descia sozinha para o rodapé (#150) [Frontend]
 - Passa a marcar a carona de quem a ofertou e a oferecer editar e excluir só nela; enquanto a API não disser de quem é cada carona, nenhuma é reconhecida como sua (#150) [Frontend]
+- Padroniza o vermelho das ações, que alternava entre dois tons e destoava dentro da mesma tela, principalmente no tema escuro (#158) [Frontend]
 
 ### Fixed
 

@@ -77,7 +77,7 @@ export function LostItemPhotoField() {
           {photo && (
             <S.PhotoActionButton
               variant="outlined"
-              color="error"
+              color="secondary"
               onClick={handleRemove}
               disabled={disabled}
             >
