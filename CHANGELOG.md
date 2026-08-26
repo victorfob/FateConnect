@@ -17,6 +17,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona o contato de quem cadastrou o item de achados e perdidos, com e-mail copiável e conversa no WhatsApp (#134) [Frontend]
 - Adiciona o monitoramento de erros e de navegação no Sentry, com gravação de sessão mascarada e sem enviar corpo de requisição nem dado de usuário (#141) [Frontend]
 - Adiciona o rótulo dos botões de ícone, que passam a dizer o que fazem ao ponteiro e ao leitor de tela (#146) [Frontend]
+- Adiciona a publicação da aplicação em homologação e produção, cada uma com endereço, banco e segredos próprios, servidas por HTTPS (#152) [Frontend] [Backend]
 
 ### Changed
 
@@ -45,6 +46,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige a largura de 768px, em que o topo já estava no modo estreito enquanto o cadastro ainda usava a grade larga (#148) [Frontend]
 - Corrige o canto superior direito do cartão, que parava antes da borda em lugar diferente a cada cartão da lista, e o título comprido, que corria por cima da etiqueta e dos ícones (#150) [Frontend]
 - Corrige o diálogo de contato, que encostava o conteúdo à esquerda enquanto o título ficava centralizado (#150) [Frontend]
+- Corrige as APIs, que subiam sem criar as tabelas do banco e só falhavam no primeiro acesso (#152) [Backend]
+- Corrige o cadastro de usuário, que devolvia erro interno ao gravar a data de nascimento (#152) [Backend]
 
 ## [0.2.0] - 2026-08-20
 
