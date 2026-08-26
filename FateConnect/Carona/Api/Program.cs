@@ -120,6 +120,11 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<CaronaContext>().Database.Migrate();
+}
+
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseCors("AllowFrontend");

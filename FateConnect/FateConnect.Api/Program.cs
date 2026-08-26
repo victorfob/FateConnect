@@ -22,6 +22,11 @@ public class Program
     public static void Main(string[] args)
     {
         Env.Load();
+
+        // As datas do cadastro chegam sem fuso. Sem isto o Npgsql as recusa contra
+        // uma coluna "timestamp with time zone", que é o mapeamento padrão dele.
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
         string[] corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:5173")
@@ -122,6 +127,11 @@ public class Program
         options.UseNpgsql(connectionString));
 
         WebApplication app = builder.Build();
+
+        using (IServiceScope scope = app.Services.CreateScope())
+        {
+            scope.ServiceProvider.GetRequiredService<FateConnectDbContext>().Database.Migrate();
+        }
 
         app.Logger.LogInformation("CORS liberado para: {Origins}", string.Join(", ", corsOrigins));
         app.Logger.LogInformation("Variaveis carregadas para Issuer: {Issuer}", jwtOptions.Issuer);
