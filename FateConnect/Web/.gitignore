@@ -14,3 +14,8 @@ npm-debug.log
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Despejo de memória: o build do Vite estoura o heap do Node em máquina
+# pequena e deixa um core de mais de 1 GB, que suja a árvore e faz o
+# deploy abortar.
+core.*
