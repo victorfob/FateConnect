@@ -7,6 +7,7 @@ import { components } from './components';
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
 import { darkPalette, lightPalette } from './palettes';
+import type { ChromeColors, NotificationVariant, StatusTagTone, SurfacePair } from './types';
 
 declare module '@mui/material/styles' {
   /**
@@ -25,6 +26,25 @@ declare module '@mui/material/styles' {
   interface ThemeOptions {
     space?: typeof spacing;
     radius?: typeof radius;
+  }
+
+  /**
+   * Cores que variam entre os temas e não têm slot no MUI. Cada paleta as
+   * declara uma vez e o consumidor **lê** — cor nova que muda com o tema entra
+   * aqui, nunca como função que ramifica no modo.
+   */
+  interface Palette {
+    chrome: ChromeColors;
+    inputOutline: string;
+    statusTag: Record<StatusTagTone, SurfacePair>;
+    notification: Record<NotificationVariant, SurfacePair>;
+  }
+
+  interface PaletteOptions {
+    chrome: ChromeColors;
+    inputOutline: string;
+    statusTag: Record<StatusTagTone, SurfacePair>;
+    notification: Record<NotificationVariant, SurfacePair>;
   }
 
   interface TypographyVariants {

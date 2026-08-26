@@ -51,6 +51,8 @@ paths:
 
 - `tokens/` guarda os valores brutos e **alimenta a paleta** em `theme/palettes.ts`. Componente lê `theme.palette.*` — nunca o token direto. O lint reprova.
 - Dois temas: claro (paridade com o produto) e escuro (sistema de cor do Material Design — superfície `#121212`, marca dessaturada, "on colors" por ênfase).
-- Cromo da aplicação (topo, rodapé, menu lateral) usa `chromeSurface(theme)` e `onChromeSurface(theme)`: cor de marca no claro, superfície elevada no escuro.
+- ⛔ **Cor que varia entre os temas é chave da paleta, nunca função que ramifica no modo.** Falta slot no MUI para o que você precisa: declare o tipo em `theme/types.ts`, aumente `Palette` e `PaletteOptions` no `declare module` de `createAppTheme.ts`, e dê o valor nas duas paletas. As nove ramificações `if (palette.mode === 'dark')` que existiam nasceram assim — o caso seguinte copiou o anterior.
+- **Cor parametrizada por tom ou variante vira grupo indexado**, não valor solto: `theme.palette.statusTag[tone].surface`, `theme.palette.notification[variant].content`.
+- Cromo da aplicação (topo, rodapé, menu lateral) lê `theme.palette.chrome`: cor de marca no claro, superfície elevada no escuro. O divisor e o realce são chaves próprias do cromo — `palette.divider` e `palette.action.hover` são de superfície neutra e somem sobre a cor de marca.
 - **Par de cor tem o mesmo contrato nos dois temas.** Na etiqueta de estado, `light` é sempre o fundo e `main` sempre o texto; no tema escuro o par inverte de claridade, não de papel. Declarar só `main` deixa o MUI derivar o outro — foi assim que as etiquetas saíram verde-claro sobre verde-claro no escuro.
 - **Contraste é verificado por teste** (`contrast.test.ts`), com mínimo AA (4.5:1) em todo par de conteúdo e fundo, nos dois temas. Cor nova entra com o par correspondente no teste.

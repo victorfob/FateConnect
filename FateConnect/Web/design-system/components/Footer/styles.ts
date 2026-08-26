@@ -3,7 +3,6 @@ import Stack from '@mui/material/Stack';
 
 import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
-import { chromeDivider, chromeSurface, onChromeSurface } from '@ds-root/theme/chromeSurface';
 import { spacingScale } from '@ds-root/tokens';
 
 const { xs, md, lg, xxl, giant } = spacingScale;
@@ -11,8 +10,8 @@ const { xs, md, lg, xxl, giant } = spacingScale;
 export const FooterRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
-  backgroundColor: chromeSurface(theme),
-  color: onChromeSurface(theme),
+  backgroundColor: theme.palette.chrome.main,
+  color: theme.palette.chrome.contrastText,
   padding: theme.space(xxl, giant),
   gap: theme.space(md),
   width: '100%',
@@ -47,7 +46,7 @@ export const ContactItem = styled(Stack)(({ theme }) => ({
 export const FooterDivider = styled(Box)(({ theme }) => ({
   width: '1px',
   height: 'auto',
-  backgroundColor: chromeDivider(theme),
+  backgroundColor: theme.palette.chrome.divider,
 
   [theme.breakpoints.down('md')]: { width: '100%', height: '1px' },
 }));

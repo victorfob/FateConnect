@@ -3,7 +3,6 @@ import List from '@mui/material/List';
 import Stack from '@mui/material/Stack';
 
 import { styled } from '@ds-root/styled';
-import { chromeHover, chromeSurface, onChromeSurface } from '@ds-root/theme/chromeSurface';
 import { spacingScale } from '@ds-root/tokens';
 
 const { none, sm, md, lg } = spacingScale;
@@ -16,8 +15,8 @@ const ITEM_MIN_HEIGHT_PX = 48;
 export const DrawerRoot = styled(Drawer)(({ theme }) => ({
   '& .MuiDrawer-paper': {
     width: `${DRAWER_WIDTH_PX}px`,
-    backgroundColor: chromeSurface(theme),
-    color: onChromeSurface(theme),
+    backgroundColor: theme.palette.chrome.main,
+    color: theme.palette.chrome.contrastText,
     padding: theme.space(lg, none),
     overflowX: 'hidden',
   },
@@ -33,7 +32,7 @@ export const DrawerHeader = styled(Stack)(({ theme }) => ({
 
   '& a': {
     textDecoration: 'none',
-    color: onChromeSurface(theme),
+    color: theme.palette.chrome.contrastText,
     cursor: 'pointer',
   },
 }));
@@ -46,9 +45,9 @@ export const DrawerList = styled(List)(({ theme }) => ({
     paddingLeft: theme.space(md),
     paddingRight: theme.space(md),
   },
-  '& .MuiListItemButton-root:hover': { backgroundColor: chromeHover(theme) },
+  '& .MuiListItemButton-root:hover': { backgroundColor: theme.palette.chrome.hover },
   '& .MuiListItemText-primary': {
-    color: onChromeSurface(theme),
+    color: theme.palette.chrome.contrastText,
     ...theme.typography.body,
   },
 }));

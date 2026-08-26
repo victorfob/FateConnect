@@ -2,6 +2,10 @@ import type { PaletteOptions } from '@mui/material/styles';
 
 import { colorTokens, colorVariants, darkColorTokens } from '../tokens';
 
+/** O tom `neutral` da etiqueta não desenha caixa: fica texto corrido. */
+const NO_SURFACE = 'transparent';
+const INHERITED_CONTENT = 'inherit';
+
 /**
  * Paletas construídas segundo o sistema de cor do Material Design: cada cor de
  * marca tem `light`, `main` e `dark`, e cada superfície declara a cor do
@@ -41,6 +45,38 @@ export const lightPalette: PaletteOptions = {
   },
   action: { hover: colorTokens.hover },
   divider: colorTokens.divider,
+  /** No claro o cromo é a cor de marca, como no produto. */
+  chrome: {
+    main: colorTokens.primary,
+    contrastText: colorTokens.textOnAccent,
+    divider: colorTokens.chromeDivider,
+    hover: colorTokens.chromeHover,
+  },
+  /**
+   * Borda do campo de formulário. O padrão do MUI é mais claro que o do produto
+   * (23% contra 38%), o que deixaria todo formulário mais lavado que hoje.
+   */
+  inputOutline: colorTokens.inputOutline,
+  statusTag: {
+    neutral: { surface: NO_SURFACE, content: INHERITED_CONTENT },
+    muted: { surface: colorTokens.mutedBackground, content: colorTokens.mutedText },
+    success: { surface: colorTokens.successBackground, content: colorTokens.successText },
+    warning: { surface: colorTokens.warningBackground, content: colorTokens.warningText },
+    // O vermelho do produto não passa AA sobre o pastel; o mesmo escurecido passa.
+    // É a cor que o aviso de erro já usa, então os dois vermelhos combinam.
+    danger: { surface: colorTokens.dangerBackground, content: colorVariants.secondaryDark },
+  },
+  /**
+   * No produto o fundo do aviso é pastel por estado e o texto é sempre o cinza
+   * apagado — nada de fundo saturado com texto branco, que é o padrão da
+   * biblioteca. O cinza apagado, porém, não alcança AA sobre esses pastéis, então
+   * cada variante usa a própria cor de estado, como a etiqueta já faz.
+   */
+  notification: {
+    success: { surface: colorTokens.successBackground, content: colorTokens.successText },
+    error: { surface: colorTokens.dangerBackground, content: colorVariants.secondaryDark },
+    warning: { surface: colorTokens.warningBackground, content: colorTokens.warningText },
+  },
 };
 
 export const darkPalette: PaletteOptions = {
@@ -72,4 +108,45 @@ export const darkPalette: PaletteOptions = {
   },
   action: { hover: darkColorTokens.hover },
   divider: darkColorTokens.divider,
+  /**
+   * No escuro o cromo é a superfície elevada, não a cor de marca: o sistema de
+   * cor do Material Design pede superfície neutra em área grande, onde marca
+   * saturada cansa a vista e reduz a hierarquia.
+   */
+  chrome: {
+    main: darkColorTokens.surfaceElevated,
+    contrastText: darkColorTokens.onSurfaceHigh,
+    divider: darkColorTokens.divider,
+    hover: darkColorTokens.hover,
+  },
+  /** 38% de branco é a ênfase desabilitada do sistema de cor do Material Design. */
+  inputOutline: darkColorTokens.onSurfaceDisabled,
+  // No escuro o par da etiqueta e o do aviso invertem de claridade, não de papel.
+  statusTag: {
+    neutral: { surface: NO_SURFACE, content: INHERITED_CONTENT },
+    muted: { surface: darkColorTokens.mutedTagBackground, content: darkColorTokens.mutedTagText },
+    success: {
+      surface: darkColorTokens.successTagBackground,
+      content: darkColorTokens.successTagText,
+    },
+    warning: {
+      surface: darkColorTokens.warningTagBackground,
+      content: darkColorTokens.warningTagText,
+    },
+    danger: {
+      surface: darkColorTokens.dangerTagBackground,
+      content: darkColorTokens.dangerTagText,
+    },
+  },
+  notification: {
+    success: {
+      surface: darkColorTokens.successTagBackground,
+      content: darkColorTokens.successTagText,
+    },
+    error: { surface: darkColorTokens.dangerTagBackground, content: darkColorTokens.dangerTagText },
+    warning: {
+      surface: darkColorTokens.warningTagBackground,
+      content: darkColorTokens.warningTagText,
+    },
+  },
 };
