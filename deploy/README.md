@@ -204,6 +204,9 @@ O conteúdo de `~/.ssh/github-actions` (sem o `.pub`) vai no secret
 | Ler os logs | `docker compose -p fateconnect-prod logs -f` |
 | Ver a memória | `free -h` |
 
+Para olhar os dados de homologação pelo DBeaver — túnel SSH e campos de
+conexão —, veja [DATABASE.md](DATABASE.md).
+
 ### Backup do banco
 
 ```bash
