@@ -20,22 +20,33 @@ Homologação acompanha a branch `develop`; produção acompanha a `main`.
 
 ## 1. Antes de começar
 
-### Os dois endereços, no DuckDNS
+### Os dois endereços
 
-1. Entre em <https://www.duckdns.org> e faça login com sua conta do GitHub.
-2. Crie **dois** subdomínios, por exemplo `fateconnect` e `fateconnect-hml`.
-3. Em cada um, preencha o campo de IP com o endereço da sua VPS e salve.
-4. Confira que os dois resolvem para o IP certo:
+Produção responde na raiz do domínio e homologação num subdomínio:
 
-   ```bash
-   nslookup fateconnect.duckdns.org
-   nslookup fateconnect-hml.duckdns.org
-   ```
+| Ambiente | Endereço |
+| --- | --- |
+| Produção | `fateconnect.com.br` |
+| Homologação | `hml.fateconnect.com.br` |
 
-O DuckDNS foi escolhido por um motivo técnico, não por acaso: ele está na
-Public Suffix List, então cada subdomínio tem cota própria de emissão de
-certificado. Serviços de DNS grátis que não estão nessa lista dividem a cota
-entre todos os usuários e a renovação passa a falhar.
+No painel de DNS do domínio, crie **dois registros do tipo A**, ambos apontando
+para o IP da VPS: um para `@` (a raiz) e outro para `hml`.
+
+Confira antes de seguir — o certificado só é emitido se os dois já resolverem:
+
+```bash
+dig +short fateconnect.com.br
+dig +short hml.fateconnect.com.br
+```
+
+Os dois precisam devolver o IP da VPS. A propagação costuma levar de minutos a
+algumas horas na primeira vez.
+
+Um domínio próprio foi preferido a um serviço de DNS dinâmico gratuito por dois
+motivos concretos: redes corporativas costumam bloquear a categoria inteira de
+DNS dinâmico, o que deixaria a aplicação inacessível de dentro delas; e domínios
+compartilhados por milhares de usuários dividem a cota semanal de emissão de
+certificado do Let's Encrypt, o que torna a renovação pouco confiável.
 
 ### Acesso por chave SSH
 

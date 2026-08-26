@@ -28,7 +28,7 @@ for dominio in "$DOMAIN_PROD" "$DOMAIN_HML"; do
   codigo=$(curl -sS -m 20 -o /dev/null -w '%{http_code}' "http://$dominio/" || echo 000)
   if [ "$codigo" = "000" ]; then
     echo "ERRO: $dominio não respondeu por HTTP." >&2
-    echo "Confirme no DuckDNS que ele aponta para o IP desta VPS e que o deploy.sh já rodou." >&2
+    echo "Confirme que o registro A dele aponta para o IP desta VPS e que o deploy.sh já rodou." >&2
     exit 1
   fi
   echo "    $dominio -> HTTP $codigo"
