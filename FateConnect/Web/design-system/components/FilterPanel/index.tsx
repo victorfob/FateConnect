@@ -34,7 +34,7 @@ function FilterPanel({
     <S.PanelRoot defaultExpanded disableGutters>
       <S.PanelHeader expandIcon={<ChevronRightIcon />}>
         <FilterAltIcon />
-        <S.ActiveFilterBadge variant="dot" color="error" invisible={!active}>
+        <S.ActiveFilterBadge variant="dot" color="secondary" invisible={!active}>
           <Typography variant="subtitleBold" color="inherit">
             {title}
           </Typography>
@@ -47,7 +47,7 @@ function FilterPanel({
             {children}
 
             <FilterPanelField>
-              <S.SubmitButton type="submit" variant="contained" color="error" fullWidth>
+              <S.SubmitButton type="submit" variant="contained" color="secondary" fullWidth>
                 <SearchIcon fontSize="small" />
                 <Typography variant="subtitleBold" color="inherit">
                   {submitLabel}
