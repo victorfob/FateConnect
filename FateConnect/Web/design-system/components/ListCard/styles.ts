@@ -122,7 +122,7 @@ export const InfoItem = styled(Stack)(({ theme }) => ({
   },
 
   '& svg': {
-    color: theme.palette.secondary.main,
+    color: theme.palette.brandText,
     fontSize: `${iconSizeTokens.sm}px`,
   },
 }));

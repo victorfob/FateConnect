@@ -81,7 +81,15 @@ export const colorVariants = {
  */
 export const darkColorTokens = {
   primary: '#68828E',
-  secondary: '#D84E4E',
+  /** Fundo de botão: escuro o bastante para o texto branco, que aqui é regra. */
+  secondary: '#CF2E2E',
+  /**
+   * A mesma marca **como texto**, e por isso mais clara que o fundo de botão
+   * acima. São dois tons porque os dois papéis se excluem: para o branco passar
+   * AA em cima, a cor precisa de luminância ≤ 0.183; para ela mesma ser texto
+   * legível sobre `#121212`, ≥ 0.202. Nenhuma cor cabe nas duas.
+   */
+  brandText: '#D84E4E',
   error: '#F44336',
 
   surface: '#121212',

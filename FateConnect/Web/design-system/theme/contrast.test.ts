@@ -1,4 +1,4 @@
-import { AA_NORMAL_TEXT, contrastRatio } from './contrast';
+import { AA_NON_TEXT, AA_NORMAL_TEXT, contrastRatio } from './contrast';
 import { createAppTheme } from './createAppTheme';
 
 const lightTheme = createAppTheme('light');
@@ -36,6 +36,7 @@ describe('light theme contrast', () => {
     ['secondary text on a surface', palette.text.secondary, palette.background.paper],
     ['content on the primary colour', palette.primary.contrastText, palette.primary.main],
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
+    ['brand text on the page background', palette.brandText, palette.background.default],
     ['content on the error colour', palette.error.contrastText, palette.error.main],
     ['content on the app chrome', palette.chrome.contrastText, palette.chrome.main],
     ['a muted tag', palette.statusTag.muted.content, palette.statusTag.muted.surface],
@@ -70,7 +71,7 @@ describe('dark theme contrast', () => {
     ['body text on an elevated surface', palette.text.primary, palette.background.paper],
     ['secondary text on the page background', palette.text.secondary, palette.background.default],
     ['the primary colour on the background', palette.primary.main, palette.background.default],
-    ['the secondary colour on the background', palette.secondary.main, palette.background.default],
+    ['brand text on the page background', palette.brandText, palette.background.default],
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
     ['the error colour on the background', palette.error.main, palette.background.default],
     ['content on the app chrome', palette.chrome.contrastText, palette.chrome.main],
@@ -95,5 +96,14 @@ describe('dark theme contrast', () => {
     ],
   ])('should meet AA for %s', (_, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
+  });
+
+  // O fundo do botão não é texto: o que precisa de 4.5:1 é o branco em cima
+  // dele, medido acima. Aqui vale o limite de controle — e é essa distinção que
+  // permite o botão ser escuro o bastante para o branco funcionar.
+  it.each([
+    ['the button fill on the page background', palette.secondary.main, palette.background.default],
+  ])('should meet the non-text threshold for %s', (_, foreground, background) => {
+    expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NON_TEXT);
   });
 });

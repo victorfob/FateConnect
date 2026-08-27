@@ -111,3 +111,9 @@ export function contrastRatio(foreground: string, background: string): number {
 /** Mínimos da WCAG nível AA. */
 export const AA_NORMAL_TEXT = 4.5;
 export const AA_LARGE_TEXT = 3;
+/**
+ * Limite da WCAG 1.4.11, para o que **não é texto**: o fundo de um controle
+ * contra a página. Vale 3 como o texto grande, mas por outra razão — reunir os
+ * dois num nome só faria o próximo caso escolher pelo número, não pelo papel.
+ */
+export const AA_NON_TEXT = 3;
