@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance } from 'axios';
 
+import { notifySessionExpired } from './auth/sessionExpiry';
 import { tokenStorage } from './auth/tokenStorage';
 
 /** Erro já normalizado para a camada de UI. */
@@ -10,6 +11,9 @@ export type ApiError = {
 
 export const NETWORK_ERROR_MESSAGE = 'Não foi possível conectar ao servidor. Tente novamente.';
 export const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
+export const SESSION_EXPIRED_MESSAGE = 'Sua sessão expirou. Entre novamente para continuar.';
+
+const UNAUTHORIZED = 401;
 
 function withInterceptors(client: AxiosInstance): AxiosInstance {
   client.interceptors.request.use((config) => {
@@ -28,6 +32,21 @@ function withInterceptors(client: AxiosInstance): AxiosInstance {
 
       if (!error.response) {
         return Promise.reject<ApiError>({ message: NETWORK_ERROR_MESSAGE });
+      }
+
+      // Só é expiração quando havia sessão: o interceptor acima só manda
+      // `Authorization` se houver token, então `401` sem token é credencial
+      // recusada — o que o login devolve a quem erra a senha.
+      if (error.response.status === UNAUTHORIZED && tokenStorage.getToken()) {
+        // Limpar antes de avisar encerra o laço: as requisições que falharem em
+        // seguida já não levam token, então não voltam por este caminho.
+        tokenStorage.clear();
+        notifySessionExpired();
+
+        return Promise.reject<ApiError>({
+          status: error.response.status,
+          message: SESSION_EXPIRED_MESSAGE,
+        });
       }
 
       return Promise.reject<ApiError>({
