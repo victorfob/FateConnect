@@ -31,6 +31,8 @@ export { PageMessage } from './components/PageMessage';
 export type { PageMessageProps } from './components/PageMessage';
 export { PageShell } from './components/PageShell';
 export type { PageShellProps } from './components/PageShell';
+export { Pagination } from './components/Pagination';
+export type { PaginationProps } from './components/Pagination';
 export { StatusTag } from './components/StatusTag';
 export type { StatusTagProps } from './components/StatusTag';
 export type { StatusTagTone } from './theme/types';
