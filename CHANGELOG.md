@@ -50,6 +50,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige as APIs, que subiam sem criar as tabelas do banco e só falhavam no primeiro acesso (#152) [Backend]
 - Corrige o cadastro de usuário, que devolvia erro interno ao gravar a data de nascimento (#152) [Backend]
 - Corrige o botão de voltar das telas de caronas e de achados e perdidos, que mantinha a cor do tema claro no tema escuro em vez de acompanhar o topo e o menu (#159) [Frontend]
+- Corrige o texto dos botões vermelhos e das iniciais do avatar no tema escuro, que saía escuro em vez de branco (#161) [Frontend]
+- Corrige o contraste de textos, bordas e do botão de escolher foto que não alcançavam o mínimo de legibilidade — no diálogo do tema escuro e nos textos de apoio do tema claro (#161) [Frontend]
 
 ## [0.2.0] - 2026-08-20
 

@@ -61,7 +61,7 @@ export const IconContainer = styled(Stack)(({ theme }) => ({
 
   '& svg': {
     fontSize: `${iconSizeTokens.lg}px`,
-    color: theme.palette.common.white,
+    color: theme.palette.secondary.contrastText,
   },
 }));
 

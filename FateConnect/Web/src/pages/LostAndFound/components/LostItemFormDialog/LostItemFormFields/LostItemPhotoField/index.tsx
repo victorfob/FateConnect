@@ -75,17 +75,12 @@ export function LostItemPhotoField() {
           </S.PhotoActionButton>
 
           {photo && (
-            <S.PhotoActionButton
-              variant="outlined"
-              color="secondary"
-              onClick={handleRemove}
-              disabled={disabled}
-            >
+            <S.PhotoRemoveButton variant="outlined" onClick={handleRemove} disabled={disabled}>
               <DeleteIcon fontSize="small" />
               <Typography variant="caption" color="inherit">
                 {C.PHOTO_ACTIONS.remove}
               </Typography>
-            </S.PhotoActionButton>
+            </S.PhotoRemoveButton>
           )}
         </S.PhotoActions>
 

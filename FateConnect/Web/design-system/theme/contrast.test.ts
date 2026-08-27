@@ -1,5 +1,8 @@
-import { AA_NORMAL_TEXT, contrastRatio } from './contrast';
+import type { Theme } from '@mui/material/styles';
+
+import { AA_NON_TEXT, AA_NORMAL_TEXT, contrastRatio } from './contrast';
 import { createAppTheme } from './createAppTheme';
+import type { NotificationVariant, StatusTagTone } from './types';
 
 const lightTheme = createAppTheme('light');
 const darkTheme = createAppTheme('dark');
@@ -8,6 +11,10 @@ describe('contrastRatio', () => {
   it('should return the known ratios for the reference pairs', () => {
     expect(contrastRatio('#FFFFFF', '#000000')).toBeCloseTo(21, 1);
     expect(contrastRatio('#FFFFFF', '#FFFFFF')).toBeCloseTo(1, 1);
+  });
+
+  it('should read the three-digit hex the library writes', () => {
+    expect(contrastRatio('#fff', '#000000')).toBeCloseTo(21, 1);
   });
 
   it('should flatten a translucent colour over its background before measuring', () => {
@@ -27,73 +34,79 @@ describe('contrastRatio', () => {
   });
 });
 
-describe('light theme contrast', () => {
-  const { palette } = lightTheme;
+type Par = [string, string, string];
 
-  it.each([
-    ['body text on the page background', palette.text.primary, palette.background.default],
-    ['body text on a surface', palette.text.primary, palette.background.paper],
-    ['secondary text on a surface', palette.text.secondary, palette.background.paper],
-    ['content on the primary colour', palette.primary.contrastText, palette.primary.main],
-    ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
-    ['content on the error colour', palette.error.contrastText, palette.error.main],
+/** Toda cor de conteúdo é medida contra **todas** as superfícies daqui. */
+function surfaces(theme: Theme): [string, string][] {
+  return [
+    ['the page background', theme.palette.background.default],
+    ['a surface', theme.palette.background.paper],
+  ];
+}
+
+/** Cor que o usuário lê. Acrescentar aqui já a mede contra todas as superfícies. */
+function contentColours(theme: Theme): [string, string][] {
+  return [
+    ['body text', theme.palette.text.primary],
+    ['secondary text', theme.palette.text.secondary],
+    ['brand text', theme.palette.brandText],
+    ['error text', theme.palette.error.main],
+  ];
+}
+
+function nonTextColours(theme: Theme): [string, string][] {
+  return [
+    ['the field outline', theme.palette.inputOutline],
+    ['the button fill', theme.palette.secondary.main],
+  ];
+}
+
+function against(theme: Theme, colours: (theme: Theme) => [string, string][]): Par[] {
+  return colours(theme).flatMap(([content, foreground]) =>
+    surfaces(theme).map(([surface, background]): Par => [
+      `${content} on ${surface}`,
+      foreground,
+      background,
+    ]),
+  );
+}
+
+function boundPairs(theme: Theme): Par[] {
+  const { palette } = theme;
+  const tones: StatusTagTone[] = ['muted', 'success', 'warning', 'danger'];
+  const variants: NotificationVariant[] = ['success', 'error', 'warning'];
+
+  return [
     ['content on the app chrome', palette.chrome.contrastText, palette.chrome.main],
-    ['a muted tag', palette.statusTag.muted.content, palette.statusTag.muted.surface],
-    ['a success tag', palette.statusTag.success.content, palette.statusTag.success.surface],
-    ['a warning tag', palette.statusTag.warning.content, palette.statusTag.warning.surface],
-    ['a danger tag', palette.statusTag.danger.content, palette.statusTag.danger.surface],
-    [
-      'a success notification',
-      palette.notification.success.content,
-      palette.notification.success.surface,
-    ],
-    [
-      'an error notification',
-      palette.notification.error.content,
-      palette.notification.error.surface,
-    ],
-    [
-      'a warning notification',
-      palette.notification.warning.content,
-      palette.notification.warning.surface,
-    ],
-  ])('should meet AA for %s', (_, foreground, background) => {
-    expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
-  });
-});
-
-describe('dark theme contrast', () => {
-  const { palette } = darkTheme;
-
-  it.each([
-    ['body text on the page background', palette.text.primary, palette.background.default],
-    ['body text on an elevated surface', palette.text.primary, palette.background.paper],
-    ['secondary text on the page background', palette.text.secondary, palette.background.default],
-    ['the primary colour on the background', palette.primary.main, palette.background.default],
-    ['the secondary colour on the background', palette.secondary.main, palette.background.default],
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
-    ['the error colour on the background', palette.error.main, palette.background.default],
-    ['content on the app chrome', palette.chrome.contrastText, palette.chrome.main],
-    ['a muted tag', palette.statusTag.muted.content, palette.statusTag.muted.surface],
-    ['a success tag', palette.statusTag.success.content, palette.statusTag.success.surface],
-    ['a warning tag', palette.statusTag.warning.content, palette.statusTag.warning.surface],
-    ['a danger tag', palette.statusTag.danger.content, palette.statusTag.danger.surface],
-    [
-      'a success notification',
-      palette.notification.success.content,
-      palette.notification.success.surface,
-    ],
-    [
-      'an error notification',
-      palette.notification.error.content,
-      palette.notification.error.surface,
-    ],
-    [
-      'a warning notification',
-      palette.notification.warning.content,
-      palette.notification.warning.surface,
-    ],
-  ])('should meet AA for %s', (_, foreground, background) => {
-    expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
-  });
+    ...tones.map((tone): Par => [
+      `a ${tone} tag`,
+      palette.statusTag[tone].content,
+      palette.statusTag[tone].surface,
+    ]),
+    ...variants.map((variant): Par => [
+      `a ${variant} notification`,
+      palette.notification[variant].content,
+      palette.notification[variant].surface,
+    ]),
+  ];
+}
+
+describe.each([
+  ['light', lightTheme],
+  ['dark', darkTheme],
+])('%s theme contrast', (_, theme) => {
+  it.each([...against(theme, contentColours), ...boundPairs(theme)])(
+    'should meet AA for %s',
+    (_name, foreground, background) => {
+      expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
+    },
+  );
+
+  it.each(against(theme, nonTextColours))(
+    'should meet the non-text threshold for %s',
+    (_name, foreground, background) => {
+      expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+    },
+  );
 });
