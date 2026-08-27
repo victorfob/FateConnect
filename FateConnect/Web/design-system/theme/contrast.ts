@@ -52,6 +52,11 @@ function fromHex(hex: string): Rgb {
 }
 
 function toRgb(color: string): Rgb {
+  const short = /^#([0-9a-f]{3})$/i.exec(color.trim())?.[1];
+  // `#fff` é como o MUI escreve `common.white`. Sem expandir, a medição estoura
+  // em vez de medir — e um teste que estoura não avisa o que estava errado.
+  if (short) return fromHex([...short].map((channel) => channel + channel).join(''));
+
   const hex = /^#([0-9a-f]{6})$/i.exec(color.trim())?.[1];
   if (hex) return fromHex(hex);
 
