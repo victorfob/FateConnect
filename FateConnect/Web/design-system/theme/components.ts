@@ -1,7 +1,6 @@
 import type { Components, CSSObject, Theme } from '@mui/material/styles';
 
 import { radiusScale, shadowTokens, spacingScale, typographyTokens } from '../tokens';
-import { chromeSurface, inputOutline } from './chromeSurface';
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
 
@@ -75,7 +74,7 @@ export const components: Components<Theme> = {
       // O raio de 10px vale para cartão, diálogo e botão — não para o campo, que
       // no produto usa o raio padrão do Material. Medido em `/cadastro` e no login.
       root: { borderRadius: radius(radiusScale.sm) },
-      notchedOutline: ({ theme }) => ({ borderColor: inputOutline(theme) }),
+      notchedOutline: ({ theme }) => ({ borderColor: theme.palette.inputOutline }),
     },
   },
   MuiFormHelperText: {
@@ -124,7 +123,7 @@ export const components: Components<Theme> = {
   MuiAppBar: {
     defaultProps: { elevation: 0 },
     styleOverrides: {
-      root: ({ theme }) => ({ backgroundColor: chromeSurface(theme) }),
+      root: ({ theme }) => ({ backgroundColor: theme.palette.chrome.main }),
     },
   },
 };

@@ -37,3 +37,17 @@ Issue que declara "Depende de" só começa quando a base estiver **com o escopo 
 - **`.claude/worktrees/` fica fora do versionamento** — a pasta é ignorada, porque worktree de agente dentro de pasta versionada aparece como arquivo não rastreado na raiz.
 - **Agente cai.** Nesta rodada um morreu em erro 403 de autenticação e outro travou depois de commitar. Quando cair: verificar o que já foi commitado na branch da worktree e assumir a fatia — relançar às cegas refaz trabalho que já existe.
 - **A integração é minha.** Cherry-pick da branch da worktree para a branch da tarefa, e os gates valem no **estado integrado** — o verde que cada worktree reporta é sobre uma árvore que ninguém vai mergear.
+
+## Conferir a entrega do agente: comentário primeiro
+
+⛔ **Antes de aceitar o que um agente entregou, meça a densidade de comentário.** As rules do repo carregam para dentro da worktree, mas o agente as pondera menos que o resto do prompt — e comentário é o item que ele mais acrescenta por conta própria.
+
+```bash
+git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+[^+]"                 # linhas adicionadas
+git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+\s*(/\*\*|\*|//)" # dessas, comentário
+```
+
+Na #156 deram **37 de 157 linhas — 24%**. Sete reprovaram no teste da `comentarios.md` e saíram: um JSDoc que repetia o que o `types.ts` já dizia e ainda pousava sobre a constante errada, um que só reafirmava a linha logo abaixo, e uma enumeração de consumidores que **envelheceu no próprio PR** que a escreveu.
+
+⚠️ **A densidade é o gatilho de ir olhar, não o veredito.** Compare com o mesmo arquivo na branch base antes de cortar: `palettes.ts` já era 15% e `tokens/palette.ts` é 40% — arquivo que guarda decisão de cor é denso por convenção da casa, e cortar até uma meta inventada apaga justamente o *porquê*. Quem decide continua sendo o teste de cada comentário: **ele impede alguém de fazer uma mudança errada?**
+
