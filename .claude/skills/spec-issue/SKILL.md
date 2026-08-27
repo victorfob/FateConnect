@@ -81,6 +81,31 @@ Os `id` saem de `gh api graphql -f query='{repository(owner:"...",name:"..."){is
 
 Antes de dizer que acabou, cruzar **cada** coisa conversada contra o que entrou. Cada item termina em um de três estados ditos em voz alta: **coberto** (por qual sub-issue), **fora de escopo por decisão** (com o motivo), ou **aberto** (com quem destrava). Item conversado que evapora é o defeito clássico desta skill.
 
+## 7. Fechar o pai é manual, e ninguém avisa
+
+⛔ **Nada fecha sozinho aqui.** Duas mecânicas somadas deixam a árvore aberta com tudo entregue:
+
+- `Closes #N` só dispara quando o PR merge na **branch padrão**, e os nossos miram a `develop` — a skill `pr-creator` já registra isso para a issue do PR;
+- o relacionamento de **sub-issue** do GitHub **não propaga** o fechamento: fechar a última filha não toca no pai.
+
+Então, ao fechar a última sub-issue, faça as duas coisas no pai:
+
+```bash
+gh issue close <pai> --comment "As sub-issues foram entregues: #a, #b, #c."
+gh project item-edit --project-id <projeto> --id <card> --field-id <status> --single-select-option-id <Done>
+```
+
+⚠️ **O card do pai é o que mais escapa**, porque ele nunca se moveu: o trabalho acontece nas filhas, então o guarda-chuva fica em `Todo` do nascimento ao fim. A #136 ficou dias fechada de fato e aberta no GitHub, com o card ainda em `Todo`, e só apareceu porque o Victor perguntou.
+
+**A varredura que acha os esquecidos**, quando a suspeita surgir:
+
+```bash
+gh api graphql -f query='{repository(owner:"<dono>",name:"<repo>"){issues(first:100,states:OPEN){nodes{number title subIssues(first:30){nodes{state}}}}}}' \
+  --jq '.data.repository.issues.nodes[] | select((.subIssues.nodes|length)>0 and ([.subIssues.nodes[]|select(.state=="OPEN")]|length)==0) | "#\(.number) \(.title)"'
+```
+
+⚠️ Issue aberta com PR mergeado **não** é sinal de esquecimento: no nosso caso as três que apareceram eram de backend, citadas por PRs de front que só dependiam delas. Confirme o que a issue pede antes de fechar.
+
 ## Armadilhas já pagas
 
 | Sintoma | Causa |
