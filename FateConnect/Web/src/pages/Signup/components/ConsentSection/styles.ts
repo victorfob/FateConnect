@@ -1,7 +1,7 @@
-import type { ButtonHTMLAttributes } from 'react';
+import type { AnchorHTMLAttributes, LabelHTMLAttributes } from 'react';
 import { PolymorphicBox, spacingScale, Stack, styled } from '@design-system';
 
-const { none, md } = spacingScale;
+const { none, xxs, md } = spacingScale;
 
 /**
  * Área de toque da caixa de seleção: 24px no mobile e 32px no desktop, como no
@@ -32,13 +32,27 @@ export const ConsentGroup = styled(Stack)(({ theme }) => ({
   },
 }));
 
-/** Link no meio da frase do aceite: parece texto, age como botão. */
-export const InlineLink = styled(PolymorphicBox)<ButtonHTMLAttributes<HTMLButtonElement>>(
+export const TermsRow = styled(Stack)({
+  flexDirection: 'row',
+  alignItems: 'center',
+});
+
+export const TermsText = styled(PolymorphicBox)(({ theme }) => ({
+  fontSize: 'inherit',
+  lineHeight: 'normal',
+  // O mesmo recuo que o MUI dá ao rótulo do `FormControlLabel` da linha de baixo.
+  paddingLeft: theme.space(xxs),
+}));
+
+export const TermsLabel = styled(PolymorphicBox)<LabelHTMLAttributes<HTMLLabelElement>>({
+  cursor: 'pointer',
+});
+
+export const InlineLink = styled(PolymorphicBox)<AnchorHTMLAttributes<HTMLAnchorElement>>(
   ({ theme }) => ({
     display: 'inline',
-    border: 'none',
-    background: 'none',
     font: 'inherit',
+    textDecoration: 'none',
     padding: theme.space(none),
     color: theme.palette.brandText,
     cursor: 'pointer',

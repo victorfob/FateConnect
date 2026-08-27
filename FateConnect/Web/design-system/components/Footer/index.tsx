@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -11,9 +12,11 @@ type FooterProps = Readonly<{
   title: string;
   contact: { email: string; phone: string; address: string };
   copyrightLines: string[];
+  /** Links institucionais, montados pela aplicação — o design system não conhece rotas. */
+  links?: ReactNode;
 }>;
 
-export function Footer({ anchorId, title, contact, copyrightLines }: FooterProps) {
+export function Footer({ anchorId, title, contact, copyrightLines, links }: FooterProps) {
   return (
     <S.FooterRoot component="footer">
       <S.ContactsContainer id={anchorId}>
@@ -41,6 +44,8 @@ export function Footer({ anchorId, title, contact, copyrightLines }: FooterProps
             {line}
           </Typography>
         ))}
+
+        {links}
       </S.CopyrightContainer>
     </S.FooterRoot>
   );
