@@ -11,7 +11,7 @@ export type ApiError = {
 
 export const NETWORK_ERROR_MESSAGE = 'Não foi possível conectar ao servidor. Tente novamente.';
 export const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
-export const SESSION_EXPIRED_MESSAGE = 'Sua sessão expirou. Entre novamente para continuar.';
+export const SESSION_EXPIRED_MESSAGE = 'Sessão expirada. Entre novamente para continuar.';
 
 const UNAUTHORIZED = 401;
 
