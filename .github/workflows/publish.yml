@@ -1,0 +1,111 @@
+name: Publish
+
+# Publicação de um ambiente, chamada por quem tem o gatilho: o `release.yml`
+# para produção e o `deploy.yml` para homologação. Fica num arquivo só para que
+# os dois ambientes subam exatamente pelos mesmos passos — deploy que difere
+# entre ambientes deixa de valer como ensaio.
+#
+# O front é construído AQUI, e é este `dist` que vai para a VPS. É o que mantém
+# os source maps enviados ao Sentry descrevendo o bundle que está no ar;
+# reconstruir no servidor produziria outro bundle, e o erro apontaria a linha
+# errada sem nada acusar.
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: hml ou prod
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Build and publish
+    runs-on: ubuntu-latest
+
+    # É o ambiente do GitHub que separa as variáveis e os segredos dos dois
+    # destinos, e é onde se exige aprovação antes de produção.
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ vars.PUBLIC_URL }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: FateConnect/Web/.nvmrc
+          cache: yarn
+          cache-dependency-path: FateConnect/Web/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        working-directory: FateConnect/Web
+
+      # A versão da raiz é a que nomeia a tag, e é ela que amarra o erro no
+      # Sentry à release que o produziu.
+      - name: Read version
+        id: version
+        run: echo "value=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
+
+      # Sem o token o plugin do Sentry se desliga e o build segue.
+      - name: Build the front
+        run: yarn build
+        working-directory: FateConnect/Web
+        env:
+          VITE_API_URL: ${{ vars.PUBLIC_URL }}/api/conta
+          VITE_RIDE_API_URL: ${{ vars.PUBLIC_URL }}/api/carona
+          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+          SENTRY_RELEASE: v${{ steps.version.outputs.value }}
+
+      - name: Load the deploy key
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Aceita a identidade do servidor na primeira conexão. Para fixá-la,
+          # guarde a saída de `ssh-keyscan` num secret e escreva-a aqui.
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Send the front to the VPS
+        run: |
+          # Quem serve estes arquivos é o nginx do host; a pasta é criada pelo
+          # install-site.sh, com dono no usuário do deploy.
+          target="/var/www/fateconnect/${{ inputs.environment }}"
+          # --delete remove o que saiu do build: sem isso um arquivo apagado no
+          # código continuaria servido no ar indefinidamente.
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o BatchMode=yes" \
+            FateConnect/Web/dist/ \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:$target/"
+
+      - name: Publish
+        run: |
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "cd '${{ secrets.DEPLOY_PATH }}/deploy' && ./deploy.sh '${{ inputs.environment }}'"
+
+      - name: Check that the containers stayed up
+        run: |
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "docker ps --filter 'name=fateconnect-${{ inputs.environment }}' --filter 'status=running' --format '{{.Names}}'" \
+            > containers.txt
+          echo 'No ar:'; cat containers.txt
+          # Um ambiente são dois contêineres, as duas APIs. O banco e o servidor
+          # web são os do próprio host, e não aparecem aqui.
+          total=$(grep -c . containers.txt || true)
+          if [ "$total" -lt 2 ]; then
+            echo "ERRO: só $total contêiner(es) de pé; esperado 2." >&2
+            exit 1
+          fi
+
+      - name: Remove the deploy key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
 import { render, screen, userEvent, waitForElementToBeRemoved } from '@app/test/testing-library';
+
 import { useNotification } from './useNotification';
 
 const LONGER_MS = 8000;
@@ -39,7 +38,6 @@ describe('useNotification', () => {
     expect(await screen.findByText(message)).toBeInTheDocument();
   });
 
-  // A duração padrão serve a quase tudo; quem precisa de outra passa o número.
   it('should keep a notification for as long as the caller asked', async () => {
     render(<Screen />);
 

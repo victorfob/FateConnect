@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { GenderValueEnum } from '../@types';
 import { SIGNUP_DEFAULT_VALUES, type SignupFormValues } from '../schema';
 import { toSignupRequest } from './mapper';
@@ -31,7 +29,7 @@ describe('toSignupRequest', () => {
     expect(request.apelido).toBe('Mari');
     expect(request.emailFatec).toBe('maria.silva@aluno.cps.sp.gov.br');
     expect(request.dataNascimento).toContain('1999-05-22');
-    expect(request.genero).toBe(Number(GenderValueEnum.FEMALE));
+    expect(request.genero).toBe(GenderValueEnum.FEMALE);
   });
 
   // O backend prefere a ausência da chave a uma string vazia.
@@ -41,11 +39,20 @@ describe('toSignupRequest', () => {
     expect(request.apelido).toBeUndefined();
   });
 
-  it('should strip the mask from the zip code and the phone', () => {
+  // A API documenta o CEP com o hífen e o telefone só com dígitos.
+  it('should keep the zip code masked and send the phone as digits', () => {
     const request = toSignupRequest(FILLED);
 
-    expect(request.enderecos[0]?.cep).toBe('18000000');
+    expect(request.enderecos[0]?.cep).toBe('18000-000');
     expect(request.contatos[0]?.telefone).toBe('15999999999');
+  });
+
+  // `toISOString()` sobre a data local move o instante e, a leste de
+  // Greenwich, o dia inteiro.
+  it('should send the birth date as midnight in utc', () => {
+    const request = toSignupRequest(FILLED);
+
+    expect(request.dataNascimento).toBe('1999-05-22T00:00:00Z');
   });
 
   it('should send an empty birth date when the typed one is not a date', () => {

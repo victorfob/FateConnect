@@ -1,14 +1,17 @@
 import { z } from 'zod';
 
-/** Mensagens iguais às do produto. */
+import { FATEC_EMAIL_MESSAGE, FATEC_EMAIL_PATTERN } from '@app/constants/fatecEmail';
+
 export const LOGIN_MESSAGES = {
   emailRequired: 'Informe o e-mail',
-  emailInvalid: 'E-mail inválido',
   passwordRequired: 'Informe a senha',
 };
 
 export const loginSchema = z.object({
-  email: z.string().min(1, LOGIN_MESSAGES.emailRequired).pipe(z.email(LOGIN_MESSAGES.emailInvalid)),
+  email: z
+    .string()
+    .min(1, LOGIN_MESSAGES.emailRequired)
+    .regex(FATEC_EMAIL_PATTERN, FATEC_EMAIL_MESSAGE),
   password: z.string().min(1, LOGIN_MESSAGES.passwordRequired),
 });
 

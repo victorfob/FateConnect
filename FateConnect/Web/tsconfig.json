@@ -21,10 +21,11 @@
     "noUncheckedIndexedAccess": true,
 
     "paths": {
-      "@design-system": ["./src/design-system/index.ts"],
-      "@design-system/*": ["./src/design-system/*"],
+      "@design-system": ["./design-system/index.ts"],
+      "@design-system/*": ["./design-system/*"],
+      "@ds-root/*": ["./design-system/*"],
       "@app/*": ["./src/*"]
     }
   },
-  "include": ["src", "vitest.setup.ts", "vite.config.ts"]
+  "include": ["src", "design-system", "vitest.setup.ts", "vite.config.ts"]
 }

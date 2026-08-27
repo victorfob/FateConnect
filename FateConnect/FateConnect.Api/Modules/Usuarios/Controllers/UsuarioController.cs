@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FateConnect.Api.Modules.Usuarios.Controllers;
 
 [ApiController]
-[Route("api/usuario")]
+[Route("[controller]")]
 [Produces("application/json")]
 public class UsuarioController : ControllerBase
 {

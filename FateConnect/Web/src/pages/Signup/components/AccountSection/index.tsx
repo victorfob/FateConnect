@@ -1,18 +1,18 @@
 import { useCallback, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
-
-import { IconButton, InputAdornment, TextField } from '@design-system';
+import { IconButton, Input } from '@design-system';
 import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
+import { Controller, useFormContext } from 'react-hook-form';
 
-import * as C from '../../constants';
-import type { SignupFormValues } from '../../schema';
-import * as S from '../../styles';
+import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
+import type { SignupFormValues } from '@app/pages/Signup/schema';
+
 import { BirthDateField } from '../BirthDateField';
-import { SelectField } from '../SelectField';
+import { GENDER_SELECT_OPTIONS, PASSWORD_TOGGLE_LABEL } from './constants';
+import * as S from './styles';
 
-/** Identificação e acesso: os seis primeiros campos do cadastro. */
 export function AccountSection() {
   const {
+    control,
     register,
     formState: { errors },
   } = useFormContext<SignupFormValues>();
@@ -21,24 +21,23 @@ export function AccountSection() {
   const handleTogglePassword = useCallback(() => setPasswordHidden((hidden) => !hidden), []);
 
   return (
-    <S.FieldGrid>
+    <>
       <S.FullWidthCell>
-        <TextField
+        <Input
           {...register('fullName')}
-          label={C.FIELD_LABELS.fullName}
+          label={FIELD_LABELS.fullName}
           required
           fullWidth
           type="text"
           autoComplete="name"
-          error={Boolean(errors.fullName)}
-          helperText={errors.fullName?.message}
+          error={errors.fullName?.message}
         />
       </S.FullWidthCell>
 
       <S.ThirdWidthCell>
-        <TextField
+        <Input
           {...register('nickname')}
-          label={C.FIELD_LABELS.nickname}
+          label={FIELD_LABELS.nickname}
           fullWidth
           type="text"
           autoComplete="nickname"
@@ -46,16 +45,15 @@ export function AccountSection() {
       </S.ThirdWidthCell>
 
       <S.ThirdWidthCell>
-        <TextField
+        <Input
           {...register('fatecEmail')}
-          label={C.FIELD_LABELS.fatecEmail}
+          label={FIELD_LABELS.fatecEmail}
           required
           fullWidth
           type="email"
           autoComplete="work email"
-          placeholder={C.FIELD_PLACEHOLDERS.fatecEmail}
-          error={Boolean(errors.fatecEmail)}
-          helperText={errors.fatecEmail?.message}
+          placeholder={FIELD_PLACEHOLDERS.fatecEmail}
+          error={errors.fatecEmail?.message}
         />
       </S.ThirdWidthCell>
 
@@ -64,44 +62,44 @@ export function AccountSection() {
       </S.ThirdWidthCell>
 
       <S.ThirdWidthCell>
-        <SelectField
+        <Controller
           name="gender"
-          label={C.FIELD_LABELS.gender}
-          options={C.GENDER_OPTIONS}
-          autoComplete="sex"
-          required
+          control={control}
+          render={({ field }) => (
+            <Input.Select
+              {...field}
+              label={FIELD_LABELS.gender}
+              options={GENDER_SELECT_OPTIONS}
+              autoComplete="sex"
+              required
+              error={errors.gender?.message}
+            />
+          )}
         />
       </S.ThirdWidthCell>
 
       <S.ThirdWidthCell>
-        <TextField
+        <Input
           {...register('password')}
-          label={C.FIELD_LABELS.password}
+          label={FIELD_LABELS.password}
           required
           fullWidth
           type={passwordHidden ? 'password' : 'text'}
           autoComplete={passwordHidden ? 'new-password' : 'off'}
-          error={Boolean(errors.password)}
-          helperText={errors.password?.message}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    type="button"
-                    aria-label={C.PASSWORD_TOGGLE_LABEL}
-                    aria-pressed={!passwordHidden}
-                    onClick={handleTogglePassword}
-                  >
-                    {/* O ícone mostra o estado atual: olho aberto = senha visível. */}
-                    {passwordHidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
+          error={errors.password?.message}
+          endAdornment={
+            <IconButton
+              type="button"
+              label={PASSWORD_TOGGLE_LABEL}
+              aria-pressed={!passwordHidden}
+              onClick={handleTogglePassword}
+            >
+              {/* O ícone mostra o estado atual: olho aberto = senha visível. */}
+              {passwordHidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </IconButton>
+          }
         />
       </S.ThirdWidthCell>
-    </S.FieldGrid>
+    </>
   );
 }

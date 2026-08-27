@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
 import { RideTypeEnum } from '@app/services/rides/types';
+
 import { parseRideType, rideTypeDisplayLabel, rideTypeTone } from './rideType';
 
 describe('parseRideType', () => {
@@ -20,7 +19,7 @@ describe('parseRideType', () => {
 
 describe('rideTypeDisplayLabel', () => {
   it('should label the known types in pt-BR', () => {
-    expect(rideTypeDisplayLabel('Filantropica')).toBe('Filantrópica');
+    expect(rideTypeDisplayLabel('Filantropica')).toBe('Solidária');
     expect(rideTypeDisplayLabel('igualitaria')).toBe('Igualitária');
   });
 

@@ -51,6 +51,25 @@ jobs:
 
           echo "Tag v$version criada em $GITHUB_SHA."
 
+  # O build de produção e a publicação moram no mesmo lugar porque o upload de
+  # source map tem que sair do MESMO build que vai ao ar: mapa gerado em outro
+  # build tem outro Debug ID, e o Sentry não simboliza nada com ele. Quem faz o
+  # upload é o plugin dentro do `yarn build` — não há passo separado.
+  #
+  # Os passos estão em `publish.yml`, compartilhados com homologação, para que
+  # os dois ambientes subam pelo mesmo caminho. As variáveis e os segredos vêm
+  # do ambiente `prod` do GitHub, que é também onde se exige aprovação antes de
+  # publicar.
+  #
+  # Independente do job da tag, como o back-merge: falha ao criar a tag não tem
+  # por que impedir a publicação, e vice-versa.
+  publish:
+    name: Publish to production
+    uses: ./.github/workflows/publish.yml
+    with:
+      environment: prod
+    secrets: inherit
+
   # Independente do job da tag de propósito. A release entra pela main, mas o
   # trabalho continua na develop: sem trazer o merge de volta, a próxima release
   # nasce de uma base que não conhece a anterior, e o primeiro PR depois dela já

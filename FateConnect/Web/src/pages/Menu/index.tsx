@@ -1,11 +1,9 @@
 import { Link as RouterLink } from 'react-router';
-
 import { Typography } from '@design-system';
 
 import * as C from './constants';
 import * as S from './styles';
 
-/** Tela inicial da área logada: saudação e os serviços disponíveis. */
 export function Menu() {
   return (
     <S.MenuRoot>

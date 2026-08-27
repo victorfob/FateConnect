@@ -3,7 +3,6 @@ import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 export type LandingLink = { section: LandingSectionEnum; label: string; highlighted: boolean };
 export type AppLink = { path: RoutePathEnum; label: string };
 
-/** Navegação da landing: rola até a seção correspondente. */
 export const LANDING_LINKS: LandingLink[] = [
   { section: LandingSectionEnum.SERVICES, label: 'Serviços', highlighted: false },
   { section: LandingSectionEnum.HOW_IT_WORKS, label: 'Como Funciona', highlighted: false },

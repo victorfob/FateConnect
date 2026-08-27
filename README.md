@@ -13,6 +13,7 @@ FateConnect/
 .claude/              contexto que um agente de código carrega ao trabalhar aqui
 .github/workflows/    validação de PR e criação da tag de release
 .githooks/            hooks locais de lint e teste
+deploy/               publicação em homologação e produção → deploy/README.md
 ESII/  ESIII/  LBD/   documentos das disciplinas, versionados por entrega
 CHANGELOG.md          histórico de mudanças no formato Keep a Changelog
 package.json          a versão do projeto, e nada mais

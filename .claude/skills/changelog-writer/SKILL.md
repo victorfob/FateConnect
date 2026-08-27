@@ -22,11 +22,15 @@ O diff e os commits dizem **o que** foi tocado. A entrada precisa dizer **o efei
 
 ## 2. Decidir se a mudança entra
 
-Entra quando alguém que usa a aplicação percebe: tela nova, comportamento diferente, correção visível, remoção de funcionalidade.
+Entra toda alteração de comportamento do produto: tela nova, comportamento diferente, defeito corrigido, remoção de funcionalidade.
 
-**Não entra:** refactor sem efeito externo, remoção de código morto, ajuste de teste, mudança de configuração de lint ou de CI. Isso vive no histórico de commit.
+**Correção entra mesmo que nenhum usuário chegue nela hoje.** O changelog é registro do que foi alterado. Defeito de API que só outro cliente alcançaria continua sendo correção feita — e o marcador de lado é o que avisa qual serviço precisa subir.
 
-Na dúvida, a pergunta é: *alguém que não leu o PR se importaria?*
+**Não entra** o que não muda comportamento: refactor sem efeito externo, remoção de código morto, ajuste de teste, mudança de configuração de lint ou de CI. Isso vive no histórico de commit.
+
+Na dúvida, a pergunta é: *o comportamento mudou?* — não *o usuário perceberia?*
+
+⛔ Aconteceu na #100: o `PUT` de carona apagava a descrição quando o corpo não trazia o campo, e eu recomendei deixar de fora porque a tela sempre envia o campo, então ninguém via o defeito. Correção do Victor: *"ele é um registro de alterações feitas, mesmo que não afete usuários hoje é uma correção que foi feita então vale entrar"*. Daquela análise sobrevive só o cuidado com a **frase**: descreva o defeito como ele era, sem inventar uma vítima que não existiu.
 
 ## 3. Escolher a seção
 
@@ -43,13 +47,19 @@ Reescrever algo por dentro sem mudar o que o usuário vê é `Changed`, não `Ad
 
 ## 4. Escrever
 
-Uma entrada principal, imperativo, linha curta, terminando no número do PR:
+Uma entrada principal, imperativo, linha curta, terminando no número do PR e no lado que mudou — `[Frontend]` ou `[Backend]`:
 
 ```bash
 gh pr view --json number --jq .number
 ```
 
 Se o PR ainda não foi aberto, escreva `(#?)` e **avise na resposta** que precisa ser trocado antes do merge.
+
+### O commit do changelog é o último da branch
+
+⛔ **Sempre deixe o changelog no último commit**, depois de todos os outros. É o que permite trocar o `(#?)` pelo número real com `git commit --amend` assim que o PR abrir.
+
+Changelog no meio da branch obriga a um **commit novo** só para corrigir o número — e um commit chamado "aponta o changelog para o PR" é ruído no histórico, além de deixar de ser o último quando algo mais entra depois. Aconteceu no PR #94: a entrada saiu dentro do commit da funcionalidade e o número virou um quinto commit.
 
 ## 5. Reler antes de entregar
 
@@ -58,6 +68,7 @@ Confira linha por linha — é o que a review pega:
 - [ ] começa com verbo no imperativo (`Adiciona`, `Corrige`, `Remove`, `Reescreve`)
 - [ ] descreve o **efeito**, não a implementação: sem nome de arquivo, de componente ou de camada
 - [ ] termina com `(#<número do PR>)` — o PR, nunca a issue
+- [ ] fecha com `[Frontend]` ou `[Backend]`, **depois** do número do PR; os dois quando a mudança exige os dois lados
 - [ ] a seção existe e tem mudança de verdade; seção vazia não fica no arquivo
 - [ ] é **uma** entrada para a tarefa, não uma por commit
 

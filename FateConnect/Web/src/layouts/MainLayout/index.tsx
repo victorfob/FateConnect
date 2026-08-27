@@ -1,9 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Link as RouterLink, Outlet } from 'react-router';
-
-import * as C from '@app/constants/appContact';
-import { APP_LINKS } from '@app/constants/navigation';
-import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
+import { Outlet, Link as RouterLink } from 'react-router';
 import {
   Button,
   Footer,
@@ -11,14 +7,18 @@ import {
   ListItemButton,
   ListItemText,
   NavigationDrawer,
-  ThemeToggleButton,
   Typography,
 } from '@design-system';
+
+import * as C from '@app/constants/appContact';
+import { APP_LINKS } from '@app/constants/navigation';
+import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
+
 import * as S from '../shell.styles';
+import { HeaderActions } from './components/HeaderActions';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
-/** Casca das rotas internas (`/menu`, `/caronas`, …). */
 export function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -37,7 +37,7 @@ export function MainLayout() {
     <S.ShellRoot>
       <Header
         logo={logo}
-        actions={<ThemeToggleButton />}
+        actions={<HeaderActions />}
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
         navigation={APP_LINKS.map(({ path, label }) => (

@@ -1,13 +1,17 @@
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
-import { RouterProvider, createMemoryRouter } from 'react-router';
-import { describe, expect, it } from 'vitest';
 
+import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
-import { Signup } from '.';
-import * as C from './constants';
+
+import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
+import { CALENDAR_TOGGLE_LABEL } from './components/BirthDateField/constants';
+import { LEGAL_SOON_MESSAGES } from './components/ConsentSection/constants';
 import { SIGNUP_MESSAGES } from './schema';
+import * as C from './constants';
+import { Signup } from '.';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/usuario/cadastro';
 const ZIP_URL = 'https://viacep.com.br/ws/:zipCode/json/';
@@ -35,6 +39,18 @@ function renderSignup() {
 }
 
 async function fillRequiredFields() {
+  // O endereço é obrigatório, e quem o preenche é a busca por CEP.
+  server.use(
+    http.get(ZIP_URL, () =>
+      HttpResponse.json({
+        cep: '18000-000',
+        logradouro: 'Rua das Flores',
+        localidade: 'Sorocaba',
+        uf: 'SP',
+      }),
+    ),
+  );
+
   await userEvent.type(screen.getByLabelText(/Nome completo/), VALID_SIGNUP.fullName);
   await userEvent.type(screen.getByLabelText(/E-mail Fatec/), VALID_SIGNUP.fatecEmail);
   await userEvent.type(screen.getByLabelText(/Data de nascimento/), VALID_SIGNUP.birthDate);
@@ -42,6 +58,11 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText(/Telefone/), VALID_SIGNUP.phone);
   await userEvent.type(screen.getByLabelText(/E-mail para contato/), VALID_SIGNUP.contactEmail);
   await selectOption(C.FIELD_LABELS.gender, 'Feminino');
+
+  await userEvent.type(screen.getByLabelText(/CEP/), '18000000');
+  await screen.findByDisplayValue('Rua das Flores');
+  await userEvent.type(screen.getByLabelText(/Número/), '100');
+
   await userEvent.click(screen.getByRole('checkbox', { name: /Termos de Uso/ }));
 }
 
@@ -84,8 +105,19 @@ describe('Signup', () => {
 
     await submit();
 
-    expect(await screen.findByText(SIGNUP_MESSAGES.emailInvalid)).toBeInTheDocument();
+    expect(await screen.findByText(FATEC_EMAIL_MESSAGE)).toBeInTheDocument();
     expect(screen.getByText(SIGNUP_MESSAGES.passwordTooShort)).toBeInTheDocument();
+  });
+
+  // A API só aceita o domínio institucional; recusar aqui poupa uma requisição
+  // que voltaria 400 sem dizer qual campo reprovou.
+  it('should reject an email outside the institutional domain', async () => {
+    renderSignup();
+    await userEvent.type(screen.getByLabelText(/E-mail Fatec/), 'maria.silva@gmail.com');
+
+    await submit();
+
+    expect(await screen.findByText(FATEC_EMAIL_MESSAGE)).toBeInTheDocument();
   });
 
   it('should reject a phone number outside ten or eleven digits', async () => {
@@ -142,7 +174,7 @@ describe('Signup', () => {
   it('should toggle the password visibility and show the current state in the icon', async () => {
     renderSignup();
     const password = screen.getByLabelText(/^Senha/);
-    const toggle = screen.getByRole('button', { name: C.PASSWORD_TOGGLE_LABEL });
+    const toggle = screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL });
 
     expect(password).toHaveAttribute('type', 'password');
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
@@ -201,11 +233,11 @@ describe('Signup', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Termos de Uso' }));
 
-    expect(await screen.findByText(C.LEGAL_SOON_MESSAGES.terms)).toBeInTheDocument();
+    expect(await screen.findByText(LEGAL_SOON_MESSAGES.terms)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Política de Privacidade' }));
 
-    expect(await screen.findByText(C.LEGAL_SOON_MESSAGES.privacy)).toBeInTheDocument();
+    expect(await screen.findByText(LEGAL_SOON_MESSAGES.privacy)).toBeInTheDocument();
   });
 
   it('should not toggle the consent when the legal link is clicked', async () => {
@@ -265,7 +297,17 @@ describe('Signup', () => {
       nomeCompleto: VALID_SIGNUP.fullName,
       emailFatec: VALID_SIGNUP.fatecEmail,
       senha: VALID_SIGNUP.password,
-      genero: 1,
+      genero: 'Feminino',
+      dataNascimento: '1999-05-22T00:00:00Z',
+      enderecos: [
+        {
+          cep: '18000-000',
+          logradouro: 'Rua das Flores',
+          numero: '100',
+          cidade: 'Sorocaba',
+          estado: 'SP',
+        },
+      ],
       contatos: [{ telefone: '11912345678', emailContato: VALID_SIGNUP.contactEmail }],
     });
   });
@@ -317,7 +359,7 @@ describe('Signup', () => {
     const birthDate = screen.getByLabelText(/Data de nascimento/);
     await userEvent.type(birthDate, '22051999');
 
-    await userEvent.click(screen.getByRole('button', { name: C.CALENDAR_TOGGLE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: CALENDAR_TOGGLE_LABEL }));
     const calendar = await screen.findByRole('grid');
     await userEvent.click(within(calendar).getByRole('gridcell', { name: '10' }));
 

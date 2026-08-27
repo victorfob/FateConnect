@@ -25,9 +25,9 @@ Fora da stack, por decisão: **sem SCSS**, **sem Tailwind**, **sem Nx**, **sem l
 
 ## Design system local
 
-- Tudo em `src/design-system/`: `tokens/` (**não importa MUI**), `theme/`, `ThemeProvider/`, `GlobalStyles`, `components/`.
+- Tudo em `design-system/`, **irmão de `src`, não dentro dele**: `tokens/` (**não importa MUI**), `theme/`, `ThemeProvider/`, `GlobalStyles`, `components/`. Ele fica fora porque a aplicação o consome como biblioteca — é o mesmo motivo pelo qual o lint o ordena junto dos pacotes, e não junto dos aliases da aplicação.
 - A aplicação importa **somente dos barrels `@design-system` e `@design-system/icons`** — nunca caminho interno do design system. É o que mantém barato extrair para pacote depois.
-- ⛔ **Nunca sobrescrever o `spacing` do tema.** O MUI chama `theme.spacing(1..3)` dentro dos próprios componentes — gutters do `Toolbar`, padding de `Dialog` e de `Card`. Sobrescrever encolhe todos eles em silêncio: as gutters do `Toolbar` viraram **3px** onde deviam ser 24px. Os tokens em px passam pelo helper `spacing()` do design system; o tema mantém o spacing do MUI. Há teste travando as duas pontas.
+- ⛔ **Nunca sobrescrever o `spacing` do tema.** O MUI chama `theme.spacing(1..3)` dentro dos próprios componentes — gutters do `Toolbar`, padding de `Dialog` e de `Card`. Sobrescrever encolhe todos eles em silêncio: as gutters do `Toolbar` viraram **3px** onde deviam ser 24px. Os tokens em px passam por `theme.space()` e `theme.radius()`, chaves nossas adicionadas ao tema por augmentation; o `theme.spacing` do MUI fica intacto. Há teste travando as duas pontas — ele afirma que `theme.spacing(1)` continua `8px`.
 - **Tipografia:** variantes declaradas no tema + module augmentation do TypeScript. **Não** criar componente próprio de tipografia — usar o `Typography` do MUI com as variantes do projeto.
 
 ## Estilo
@@ -41,11 +41,30 @@ Fora da stack, por decisão: **sem SCSS**, **sem Tailwind**, **sem Nx**, **sem l
 
 Componente = pasta com `index.tsx`, `styles.ts`, `types.ts` (quando houver tipo) e `<Nome>.test.tsx`.
 
-`src/hooks/` guarda **só hooks** — arquivo ali dentro começa com `use` e obedece as regras de hooks. Função pura auxiliar vai para `src/utils/`, mesmo quando só um hook a consome. Feature em `src/pages/<feature>/`; reutilizável em `src/design-system/components/`. Import que sobe três níveis ou mais usa path alias (`@design-system`, `@app`), não `../../../`.
+`src/hooks/` guarda **só hooks** — arquivo ali dentro começa com `use` e obedece as regras de hooks. Função pura auxiliar vai para `src/utils/`, mesmo quando só um hook a consome. Feature em `src/pages/<feature>/`; reutilizável em `design-system/components/`. Import que sobe **dois níveis ou mais** usa path alias, nunca `../../`: `@app/*` na aplicação e `@ds-root/*` dentro do design system. Um nível (`../`) e o mesmo diretório (`./`) continuam relativos — são curtos e sobrevivem a mover a pasta. O ganho aparece em `styles.ts` de componente: `../../styled` não diz de onde vem, `@ds-root/styled` diz.
+
+### Mover pasta: varrer os recortes de config
+
+⛔ **Toda config recortada em `src/**` deixa de alcançar a pasta que sai de `src` — e não acusa erro.** `tsc`, `eslint`, a suíte e o build continuam verdes; só as regras enfraquecem. Ao mover pasta, abrir estes quatro e conferir o glob:
+
+| Arquivo | O que se perde em silêncio |
+| --- | --- |
+| `eslint.config.js`, bloco de convenções | `no-magic-numbers`, proibição de `sx` inline e de `theme.spacing` |
+| `eslint.config.js`, bloco de cor literal | `styles.ts` e `GlobalStyles.tsx` voltam a aceitar hex e `rgba` crus |
+| `vite.config.ts`, `coverage.include` | os arquivos saem do denominador, e o limite de 90% passa a medir outra coisa |
+| `sonar-project.properties` | a pasta sai da análise, inclusive da regra de 0% de duplicação |
+
+Mais `scripts/test-changed.sh`, cujo `case` decide entre testes relacionados e suíte completa, e o script `format` do `package.json`.
+
+**Cada um se prova com número, porque "passou" não prova nada aqui:** `grep -c '^SF:' coverage/lcov.info` para a cobertura, `files indexed` no log do Sonar comparado com a run anterior, e rodar o hook de verdade no `/bin/bash` com um arquivo da pasta nova.
+
+Não estão em risco o gatilho do CI (`^FateConnect/Web/`) nem os `paths:` das rules (`FateConnect/Web/**`) — o que quebra é sempre o recorte escrito um nível mais fundo. Ancorado no PR #143, que tirou o design system de `src`.
 
 ## Rotas
 
-Os caminhos são em **pt-BR** — `/inicio`, `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas/buscar`, `/caronas/ofertar`, com `/` → `/inicio` e curinga → `/inicio`. Trocar um segmento quebra link salvo; só com decisão de produto.
+Os caminhos são em **pt-BR** — `/inicio`, `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas`, com `/` → `/inicio` e curinga → `/inicio`. Trocar um segmento quebra link salvo; só com decisão de produto.
+
+Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/buscar` e `/caronas/ofertar` existiram e foram removidas — não recriar a rota ao mexer em `routeConfig`.
 
 ## Dados
 

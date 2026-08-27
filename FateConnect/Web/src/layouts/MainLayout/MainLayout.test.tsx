@@ -1,8 +1,9 @@
-import { RouterProvider, createMemoryRouter } from 'react-router';
-import { describe, expect, it } from 'vitest';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 
 import { RoutePathEnum } from '@app/routes/paths';
+import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
+
 import { MainLayout } from '.';
 
 function renderLayout() {
@@ -42,6 +43,19 @@ describe('MainLayout', () => {
     await userEvent.click(within(drawer).getByRole('link', { name: 'Caronas' }));
 
     expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES);
+  });
+
+  it('should show the initials of the logged user', () => {
+    tokenStorage.save('token-de-teste', 'Maria da Silva');
+    renderLayout();
+
+    expect(screen.getByRole('img', { name: 'Maria da Silva' })).toHaveTextContent('MS');
+  });
+
+  it('should not show the avatar when no name is stored', () => {
+    renderLayout();
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('should point the logo to the menu', () => {

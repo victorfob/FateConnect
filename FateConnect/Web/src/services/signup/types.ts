@@ -19,7 +19,7 @@ export type SignupRequest = {
   nomeCompleto: string;
   apelido?: string;
   dataNascimento: string;
-  genero: number;
+  genero: string;
   enderecos: SignupAddress[];
   contatos: SignupContact[];
 };

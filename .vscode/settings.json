@@ -1,0 +1,7 @@
+{
+  "dotnet.defaultSolution": "FateConnect/FateConnect.Api/FateConnect.Api.sln",
+  "sonarlint.connectedMode.project": {
+    "connectionId": "fateconnect",
+    "projectKey": "fateconnect_FateConnect"
+  }
+}

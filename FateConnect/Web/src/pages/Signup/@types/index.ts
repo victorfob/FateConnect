@@ -1,11 +1,6 @@
-/** Gênero como o formulário o carrega: o `select` trabalha com texto. */
+/** Gênero com o nome que o enum do back usa — é esse texto que vai no payload. */
 export enum GenderValueEnum {
-  MALE = '0',
-  FEMALE = '1',
-  UNDISCLOSED = '2',
+  MALE = 'Masculino',
+  FEMALE = 'Feminino',
+  OTHER = 'Outro',
 }
-
-export type SelectOption = {
-  readonly value: string;
-  readonly label: string;
-};

@@ -16,7 +16,7 @@ A pergunta é uma só: **ele conhece o domínio?**
 
 | Conhece rota, texto de produto, tipo do domínio? | Onde |
 | --- | --- |
-| Não — é visual puro e reutilizável | `src/design-system/components/<Nome>/` |
+| Não — é visual puro e reutilizável | `design-system/components/<Nome>/` |
 | Sim — e serve mais de uma tela | `src/components/<Nome>/` |
 | Sim — e serve só uma tela | `src/pages/<Tela>/components/<Nome>/` |
 
@@ -41,7 +41,7 @@ MeuComponente/
 
 ## 3. Imports
 
-- UI vem **só** de `@design-system` (componentes, `styled`, `css`, tokens) e `@design-system/icons` (ícones). Fora de `src/design-system/`, importar `@mui/*` **reprova no lint**.
+- UI vem **só** de `@design-system` (componentes, `styled`, `css`, tokens) e `@design-system/icons` (ícones). Fora de `design-system/`, importar `@mui/*` **reprova no lint**.
 - Falta um componente no barrel? **Adicione ao barrel**, não importe por caminho interno.
 - Alias em vez de `../../../`: `@design-system`, `@app`.
 - Estilos como namespace (`import * as S from './styles'`). Constantes idem (`import * as C from './constants'`) **quando houver três ou mais**; abaixo disso, import nomeado.
@@ -51,7 +51,7 @@ MeuComponente/
 - Um `styles.ts` por componente. **Nunca** `sx` inline; **nunca** definir `styled` no arquivo que o usa.
 - `styled(Stack)` quando for flex, `styled(Box)` no resto — nunca tag HTML crua. A semântica vem da prop `component`: `<S.CardRoot component="article">`.
 - O nome do styled descreve **o que ele renderiza** (`FooterDivider`, `TilesRow`), nunca genérico (`Wrapper2`, `Hero`).
-- Espaçamento e raio pelos helpers `spacing()` e `radius()`; cor por `theme.palette.*`. **Nunca** hex, `rgb()` ou px solto quando existe token. Falta token? Estenda os tokens.
+- Espaçamento e raio por `theme.space()` e `theme.radius()`, com o token vindo de `spacingScale`/`radiusScale`; cor por `theme.palette.*`. Os helpers não são exportados pelo barrel — o acesso é sempre pelo tema. **Nunca** hex, `rgb()` ou px solto quando existe token. Falta token? Estenda os tokens.
 - Número com significado vira constante nomeada — `@typescript-eslint/no-magic-numbers` é **erro**.
 - `Stack` é flex em **coluna** por padrão, diferente de `display: flex` cru. Declare `flexDirection`.
 

@@ -1,0 +1,29 @@
+name: Deploy to staging
+
+# Homologação acompanha a develop: tudo que mergeia aparece lá antes de virar
+# release. Produção não sai daqui — ela é publicada pelo `release.yml`, junto da
+# tag, para que subir versão continue sendo um ato só.
+on:
+  push:
+    branches:
+      - develop
+  # Permite republicar sem precisar de um commit novo, útil quando a VPS estava
+  # fora do ar durante o push.
+  workflow_dispatch:
+
+# Duas publicações no mesmo ambiente não podem correr juntas: a segunda
+# reconstruiria os contêineres enquanto a primeira ainda sobe.
+concurrency:
+  group: deploy-hml
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  staging:
+    name: Staging
+    uses: ./.github/workflows/publish.yml
+    with:
+      environment: hml
+    secrets: inherit

@@ -6,8 +6,9 @@
 #
 #   related  — `vitest related` segue o grafo de imports e roda só os testes que
 #              alcançam os arquivos citados. É o caminho normal.
-#   completa — quando a mudança sai de `src/` (config, dependências, setup de
-#              teste) ou quando houve remoção de arquivo. Nesses casos o grafo
+#   completa — quando a mudança sai do código do front (config, dependências,
+#              setup de teste) ou quando houve remoção de arquivo. O código do
+#              front é `src/` e `design-system/`. Nesses casos o grafo
 #              não alcança o efeito: `vitest related vite.config.ts` não encontra
 #              teste nenhum e sai com código 0, o que passaria batido.
 #
@@ -38,7 +39,7 @@ for path in "$@"; do
   relative="${path#$WEB_PREFIX}"
 
   case "$relative" in
-    src/*) ;;
+    src/*|design-system/*) ;;
     *) run_everything=1; continue ;;
   esac
 
@@ -51,7 +52,7 @@ for path in "$@"; do
 done
 
 if [ "$run_everything" -eq 1 ]; then
-  echo "test-changed: mudança fora de src/ ou remoção de arquivo — suíte completa."
+  echo "test-changed: mudança fora de src/ e design-system/ ou remoção de arquivo — suíte completa."
   exec npx --no-install vitest run
 fi
 
@@ -60,6 +61,6 @@ if [ ! -s "$list" ]; then
   exit 0
 fi
 
-echo "test-changed: $(wc -l < "$list" | tr -d ' ') arquivo(s) de src/ — testes relacionados:"
+echo "test-changed: $(wc -l < "$list" | tr -d ' ') arquivo(s) do front — testes relacionados:"
 sed 's/^/  /' "$list"
 tr '\n' '\0' < "$list" | xargs -0 npx --no-install vitest related --run

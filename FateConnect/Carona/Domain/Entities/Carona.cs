@@ -5,6 +5,14 @@ namespace Domain.Entities
 {
     public class Carona
     {
+        /// <summary>
+        /// A data e a hora chegam como a pessoa as escolheu, no fuso do produto.
+        /// Compará-las direto com <see cref="DateTime.UtcNow"/> recusava carona
+        /// marcada para as próximas horas, dizendo que a data era passada.
+        /// </summary>
+        private static readonly TimeZoneInfo FusoDoProduto =
+            TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
+
         public Guid Id { get; private set; }
         public int QtdVagas { get; private set; }
         public string Destino { get; private set; } = default!;
@@ -48,7 +56,9 @@ namespace Domain.Entities
             if (tipoCarona.HasValue)
                 TipoCarona = tipoCarona.Value;
 
-            Descricao = descricao;
+            // Ausente mantém o texto atual; string vazia é como a edição o apaga.
+            if (descricao is not null)
+                Descricao = descricao;
         }
 
         public void AlterarDataPartida(DateOnly? dataPartida, TimeOnly? horaPartida)
@@ -72,9 +82,9 @@ namespace Domain.Entities
 
         private void ValidarDataPartida(DateOnly data, TimeOnly hora)
         {
-            DateTime dataHoraPartida = data.ToDateTime(hora);
+            DateTime partidaUtc = TimeZoneInfo.ConvertTimeToUtc(data.ToDateTime(hora), FusoDoProduto);
 
-            if (dataHoraPartida < DateTime.UtcNow)
+            if (partidaUtc < DateTime.UtcNow)
                 throw new DomainException("A data da carona tem que ser uma data futura");
         }
 
