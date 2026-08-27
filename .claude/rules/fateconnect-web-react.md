@@ -86,7 +86,3 @@ Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/b
 - Helper de render com providers em `src/test/testing-library.tsx`.
 - **Cobertura mínima de 90%** em statements, branches, functions e lines. O limite está em `vite.config.ts` e é aplicado pelo `yarn test:ci`, que a pipeline executa — código novo sem teste reprova a PR. Exclusões conscientes: `main.tsx` (bootstrap), infraestrutura de teste e declarações de tipo. Ampliar a lista de exclusão exige justificativa; o caminho normal é escrever o teste.
 - `renderHook` vem de `@testing-library/react` — **não** do pacote `@testing-library/react-hooks`, que é do React 17 e está morto.
-
-## Figma
-
-Mesma prioridade da regra `.claude/rules/figma-code-typography-divergence.md`: **implementação é fonte de verdade**, Figma é protótipo. A escala tipográfica e os tokens vêm do `@design-system` e das telas já feitas, não dos px do export.
