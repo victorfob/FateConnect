@@ -4,11 +4,13 @@ export const colorTokens = {
   accent: '#CF2E2E',
 
   /**
-   * Segundo vermelho do produto, usado no botão de acesso — papel de **erro**.
-   * Escurecido em relação ao herdado (`#F44336`) para alcançar 4.5:1 com texto
-   * branco; o tom original fica como `error.light`.
+   * Vermelho de **erro**, hoje só como texto: a validação de campo e a mensagem
+   * do campo de foto. Escurecido em relação ao herdado (`#F44336`) para alcançar
+   * 4.5:1 sobre os dois fundos claros — o `#E81C0D` anterior passava sobre o
+   * branco do diálogo e reprovava sobre o cinza da página, com 4.07:1. O tom
+   * original fica como `error.light`.
    */
-  error: '#E81C0D',
+  error: '#D4190C',
   errorInherited: '#F44336',
 
   surfaceGray: '#F0F2F4',
@@ -22,9 +24,17 @@ export const colorTokens = {
   hover: 'rgba(0, 0, 0, 0.035)',
 
   textOnGray: '#747D84',
-  /** Borda do campo de formulário — o mesmo 38% que o produto desenha hoje. */
-  inputOutline: 'rgba(0, 0, 0, 0.38)',
-  textMuted: '#6C757D',
+  /**
+   * Borda do campo de formulário. O produto desenha 38%, que dá 2.64:1 sobre o
+   * fundo da página — abaixo dos 3:1 que a WCAG 1.4.11 pede para o limite de um
+   * controle. 44% é o menor valor que passa nos dois fundos claros.
+   */
+  inputOutline: 'rgba(0, 0, 0, 0.44)',
+  /**
+   * Texto de apoio. O `#6C757D` do produto dá 4.18:1 sobre o fundo da página e
+   * reprova AA; este passa nos dois fundos claros (4.69:1 e 5.27:1).
+   */
+  textMuted: '#646D75',
   textOnAccent: 'rgba(255, 255, 255, 0.9)',
 
   successText: '#155724',
@@ -70,8 +80,8 @@ export const colorVariants = {
   secondaryLight: '#DC6161',
   secondaryDark: '#A62525',
   errorLight: '#F77268',
-  /** Escurecido até alcançar 4.5:1 com texto branco — ver `contrast.test.ts`. */
-  errorDark: '#E81C0D',
+  /** Acompanha `error`, que é medido em `contrast.test.ts`. */
+  errorDark: '#D4190C',
 };
 
 /**
