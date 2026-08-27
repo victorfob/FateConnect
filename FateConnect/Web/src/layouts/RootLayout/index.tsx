@@ -1,5 +1,6 @@
 import { Outlet, ScrollRestoration } from 'react-router';
 
+import { SessionExpiryGate } from '@app/components/SessionExpiryGate';
 import { useHashScroll } from '@app/hooks/useHashScroll';
 
 /**
@@ -12,7 +13,9 @@ export function RootLayout() {
   return (
     <>
       <ScrollRestoration />
-      <Outlet />
+      <SessionExpiryGate>
+        <Outlet />
+      </SessionExpiryGate>
     </>
   );
 }
