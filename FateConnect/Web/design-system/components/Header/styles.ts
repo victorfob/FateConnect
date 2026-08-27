@@ -3,7 +3,6 @@ import Toolbar from '@mui/material/Toolbar';
 
 import { PolymorphicBox, PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
-import { onChromeSurface } from '@ds-root/theme/chromeSurface';
 import { shadowTokens, spacingScale } from '@ds-root/tokens';
 
 const { none, xs, lg, giant } = spacingScale;
@@ -28,7 +27,7 @@ export const HeaderToolbar = styled(Toolbar)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: theme.space(none, giant),
-  color: onChromeSurface(theme),
+  color: theme.palette.chrome.contrastText,
 
   [theme.breakpoints.down('md')]: { padding: theme.space(none, lg) },
 }));
@@ -36,7 +35,7 @@ export const HeaderToolbar = styled(Toolbar)(({ theme }) => ({
 export const LogoSlot = styled(PolymorphicBox)(({ theme }) => ({
   '& a': {
     textDecoration: 'none',
-    color: onChromeSurface(theme),
+    color: theme.palette.chrome.contrastText,
     cursor: 'pointer',
     transition: theme.transitions.create('opacity'),
   },
@@ -55,7 +54,7 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   '& .MuiButton-root': {
     fontSize: NAV_FONT_SIZE,
     fontWeight: NAV_FONT_WEIGHT,
-    color: onChromeSurface(theme),
+    color: theme.palette.chrome.contrastText,
   },
   // O destaque não recebe o peso reforçado, como no produto.
   '& .MuiButton-contained': { fontWeight: CTA_FONT_WEIGHT },

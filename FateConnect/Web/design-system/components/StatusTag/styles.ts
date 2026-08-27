@@ -1,10 +1,6 @@
 import { PolymorphicBox } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
-import {
-  onStatusTagSurface,
-  statusTagSurface,
-  type StatusTagTone,
-} from '@ds-root/theme/statusTagSurface';
+import type { StatusTagTone } from '@ds-root/theme/types';
 import { spacingScale } from '@ds-root/tokens';
 
 const { xxs, sm } = spacingScale;
@@ -20,6 +16,6 @@ export const TagRoot = styled(PolymorphicBox, {
   lineHeight: 1,
   padding: theme.space(xxs, sm),
   borderRadius: `${TAG_RADIUS_PX}px`,
-  background: statusTagSurface(theme, tone),
-  color: onStatusTagSurface(theme, tone),
+  background: theme.palette.statusTag[tone].surface,
+  color: theme.palette.statusTag[tone].content,
 }));

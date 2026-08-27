@@ -2,11 +2,7 @@ import Button from '@mui/material/Button';
 import type { Theme } from '@mui/material/styles';
 
 import { styled } from '@ds-root/styled';
-import {
-  notificationSurface,
-  onNotificationSurface,
-  type NotificationVariant,
-} from '@ds-root/theme/notificationSurface';
+import type { NotificationVariant } from '@ds-root/theme/types';
 import { spacingScale, typographyTokens } from '@ds-root/tokens';
 
 const { none, xs, md } = spacingScale;
@@ -40,8 +36,8 @@ export function notificationStyles(theme: Theme) {
   const perVariant = VARIANTS.map((variant) => [
     `.notistack-MuiContent-${variant}`,
     {
-      backgroundColor: notificationSurface(theme, variant),
-      color: onNotificationSurface(theme, variant),
+      backgroundColor: theme.palette.notification[variant].surface,
+      color: theme.palette.notification[variant].content,
     },
   ]);
 

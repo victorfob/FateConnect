@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import Typography from '@mui/material/Typography';
 
-import type { StatusTagTone } from '@ds-root/theme/statusTagSurface';
+import type { StatusTagTone } from '@ds-root/theme/types';
 
 import * as S from './styles';
 

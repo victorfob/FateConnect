@@ -49,6 +49,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o diálogo de contato, que encostava o conteúdo à esquerda enquanto o título ficava centralizado (#150) [Frontend]
 - Corrige as APIs, que subiam sem criar as tabelas do banco e só falhavam no primeiro acesso (#152) [Backend]
 - Corrige o cadastro de usuário, que devolvia erro interno ao gravar a data de nascimento (#152) [Backend]
+- Corrige o botão de voltar das telas de caronas e de achados e perdidos, que mantinha a cor do tema claro no tema escuro em vez de acompanhar o topo e o menu (#159) [Frontend]
 
 ## [0.2.0] - 2026-08-20
 

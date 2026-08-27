@@ -1,10 +1,6 @@
 import { render, screen } from '@app/test/testing-library';
 import { createAppTheme } from '@ds-root/theme';
-import {
-  onStatusTagSurface,
-  statusTagSurface,
-  type StatusTagTone,
-} from '@ds-root/theme/statusTagSurface';
+import type { StatusTagTone } from '@ds-root/theme/types';
 
 import { StatusTag, type StatusTagProps } from '.';
 
@@ -45,8 +41,8 @@ describe('StatusTag', () => {
 
     const style = getComputedStyle(tagBox());
 
-    expect(style.backgroundColor).toBe(toRgb(statusTagSurface(lightTheme, tone)));
-    expect(style.color).toBe(toRgb(onStatusTagSurface(lightTheme, tone)));
+    expect(style.backgroundColor).toBe(toRgb(lightTheme.palette.statusTag[tone].surface));
+    expect(style.color).toBe(toRgb(lightTheme.palette.statusTag[tone].content));
   });
 
   // O jsdom resolve `transparent` para o rgba equivalente.

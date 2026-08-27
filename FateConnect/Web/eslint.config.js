@@ -70,6 +70,16 @@ const styleConventions = [
     message:
       'Sem tag HTML crua: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
   },
+  {
+    // Os quatro nomes barrados são a diferença entre a união de cor do MUI e o
+    // que o produto usa: sobram `inherit`, `primary` e `secondary`. Sete botões
+    // pediam `error` só por ser vermelho, e o resultado eram dois vermelhos
+    // convivendo na mesma tela. Estado colorido não passa por esta prop — ele
+    // vem de `palette.statusTag` e `palette.notification`.
+    selector: "JSXAttribute[name.name='color'] > Literal[value=/^(error|success|info|warning)$/]",
+    message:
+      'A cor de ação é `secondary`. `error` fica reservado ao erro de verdade — validação de campo e mensagem —, e estado colorido vem de `palette.statusTag` ou `palette.notification`, não desta prop.',
+  },
 ];
 
 /** Cor literal só pode existir nos tokens. */

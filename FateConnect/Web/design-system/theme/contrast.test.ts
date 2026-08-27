@@ -1,8 +1,5 @@
-import { chromeSurface, onChromeSurface } from './chromeSurface';
 import { AA_NORMAL_TEXT, contrastRatio } from './contrast';
 import { createAppTheme } from './createAppTheme';
-import { notificationSurface, onNotificationSurface } from './notificationSurface';
-import { onStatusTagSurface, statusTagSurface } from './statusTagSurface';
 
 const lightTheme = createAppTheme('light');
 const darkTheme = createAppTheme('dark');
@@ -40,37 +37,25 @@ describe('light theme contrast', () => {
     ['content on the primary colour', palette.primary.contrastText, palette.primary.main],
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
     ['content on the error colour', palette.error.contrastText, palette.error.main],
-    ['content on the app chrome', onChromeSurface(lightTheme), chromeSurface(lightTheme)],
-    ['a muted tag', onStatusTagSurface(lightTheme, 'muted'), statusTagSurface(lightTheme, 'muted')],
-    [
-      'a success tag',
-      onStatusTagSurface(lightTheme, 'success'),
-      statusTagSurface(lightTheme, 'success'),
-    ],
-    [
-      'a warning tag',
-      onStatusTagSurface(lightTheme, 'warning'),
-      statusTagSurface(lightTheme, 'warning'),
-    ],
-    [
-      'a danger tag',
-      onStatusTagSurface(lightTheme, 'danger'),
-      statusTagSurface(lightTheme, 'danger'),
-    ],
+    ['content on the app chrome', palette.chrome.contrastText, palette.chrome.main],
+    ['a muted tag', palette.statusTag.muted.content, palette.statusTag.muted.surface],
+    ['a success tag', palette.statusTag.success.content, palette.statusTag.success.surface],
+    ['a warning tag', palette.statusTag.warning.content, palette.statusTag.warning.surface],
+    ['a danger tag', palette.statusTag.danger.content, palette.statusTag.danger.surface],
     [
       'a success notification',
-      onNotificationSurface(lightTheme, 'success'),
-      notificationSurface(lightTheme, 'success'),
+      palette.notification.success.content,
+      palette.notification.success.surface,
     ],
     [
       'an error notification',
-      onNotificationSurface(lightTheme, 'error'),
-      notificationSurface(lightTheme, 'error'),
+      palette.notification.error.content,
+      palette.notification.error.surface,
     ],
     [
       'a warning notification',
-      onNotificationSurface(lightTheme, 'warning'),
-      notificationSurface(lightTheme, 'warning'),
+      palette.notification.warning.content,
+      palette.notification.warning.surface,
     ],
   ])('should meet AA for %s', (_, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
@@ -88,37 +73,25 @@ describe('dark theme contrast', () => {
     ['the secondary colour on the background', palette.secondary.main, palette.background.default],
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
     ['the error colour on the background', palette.error.main, palette.background.default],
-    ['content on the app chrome', onChromeSurface(darkTheme), chromeSurface(darkTheme)],
-    ['a muted tag', onStatusTagSurface(darkTheme, 'muted'), statusTagSurface(darkTheme, 'muted')],
-    [
-      'a success tag',
-      onStatusTagSurface(darkTheme, 'success'),
-      statusTagSurface(darkTheme, 'success'),
-    ],
-    [
-      'a warning tag',
-      onStatusTagSurface(darkTheme, 'warning'),
-      statusTagSurface(darkTheme, 'warning'),
-    ],
-    [
-      'a danger tag',
-      onStatusTagSurface(darkTheme, 'danger'),
-      statusTagSurface(darkTheme, 'danger'),
-    ],
+    ['content on the app chrome', palette.chrome.contrastText, palette.chrome.main],
+    ['a muted tag', palette.statusTag.muted.content, palette.statusTag.muted.surface],
+    ['a success tag', palette.statusTag.success.content, palette.statusTag.success.surface],
+    ['a warning tag', palette.statusTag.warning.content, palette.statusTag.warning.surface],
+    ['a danger tag', palette.statusTag.danger.content, palette.statusTag.danger.surface],
     [
       'a success notification',
-      onNotificationSurface(darkTheme, 'success'),
-      notificationSurface(darkTheme, 'success'),
+      palette.notification.success.content,
+      palette.notification.success.surface,
     ],
     [
       'an error notification',
-      onNotificationSurface(darkTheme, 'error'),
-      notificationSurface(darkTheme, 'error'),
+      palette.notification.error.content,
+      palette.notification.error.surface,
     ],
     [
       'a warning notification',
-      onNotificationSurface(darkTheme, 'warning'),
-      notificationSurface(darkTheme, 'warning'),
+      palette.notification.warning.content,
+      palette.notification.warning.surface,
     ],
   ])('should meet AA for %s', (_, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
