@@ -40,12 +40,12 @@ export const InlineLink = styled(PolymorphicBox)<ButtonHTMLAttributes<HTMLButton
     background: 'none',
     font: 'inherit',
     padding: theme.space(none),
-    color: theme.palette.secondary.main,
+    color: theme.palette.brandText,
     cursor: 'pointer',
 
     '&:hover': {
       textDecoration: 'underline',
-      textDecorationColor: theme.palette.secondary.main,
+      textDecorationColor: theme.palette.brandText,
     },
   }),
 );
@@ -54,7 +54,7 @@ export const InlineLink = styled(PolymorphicBox)<ButtonHTMLAttributes<HTMLButton
 export const ConsentError = styled(PolymorphicBox)(({ theme }) => ({
   fontSize: CONSENT_ERROR_FONT_SIZE_MOBILE,
   lineHeight: 'normal',
-  color: theme.palette.secondary.main,
+  color: theme.palette.brandText,
   paddingLeft: theme.space(md),
 
   [theme.breakpoints.up('md')]: { fontSize: CONSENT_ERROR_FONT_SIZE_DESKTOP },

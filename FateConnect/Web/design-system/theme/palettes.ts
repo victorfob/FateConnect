@@ -27,6 +27,7 @@ export const lightPalette: PaletteOptions = {
     // Branco puro: o branco a 90% do produto ficava em 4.42:1, abaixo de AA.
     contrastText: colorTokens.surfaceWhite,
   },
+  brandText: colorTokens.accent,
   error: {
     light: colorTokens.errorInherited,
     main: colorTokens.error,
@@ -84,8 +85,9 @@ export const darkPalette: PaletteOptions = {
   },
   secondary: {
     main: darkColorTokens.secondary,
-    contrastText: darkColorTokens.surface,
+    contrastText: colorTokens.surfaceWhite,
   },
+  brandText: darkColorTokens.brandText,
   error: {
     main: darkColorTokens.error,
     contrastText: darkColorTokens.surface,

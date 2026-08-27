@@ -59,7 +59,7 @@ export const StepBadge = styled(PolymorphicStack)(({ theme }) => ({
   height: BADGE_SIZE,
   borderRadius: theme.radius(radiusScale.circle),
   backgroundColor: theme.palette.secondary.main,
-  color: theme.palette.common.white,
+  color: theme.palette.secondary.contrastText,
   ...theme.typography.subtitleBold,
 
   [theme.breakpoints.down('md')]: { left: theme.space(xl) },

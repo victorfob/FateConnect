@@ -47,9 +47,26 @@ export const PhotoActions = styled(Stack)(({ theme }) => ({
   gap: theme.space(xs),
 }));
 
+/**
+ * Escolher a foto é um controle do formulário: rótulo no texto de conteúdo e
+ * borda igual à dos campos ao lado. A derivação do MUI — cor da paleta no
+ * rótulo e ela a 50% na borda — dava 2.44:1 e 2.00:1 sobre a superfície.
+ */
 export const PhotoActionButton = styled(Button)(({ theme }) => ({
   gap: theme.space(xxs),
   borderRadius: theme.radius(radiusScale.component),
+  color: theme.palette.text.primary,
+  borderColor: theme.palette.inputOutline,
+}));
+
+/**
+ * Remover é destrutivo e por isso continua vermelho. O tom é o da marca **como
+ * texto**, que é o papel aqui — `secondary.main` é fundo de botão e sobre a
+ * superfície dá 3.24:1. A borda vai sem alpha: os 50% do MUI davam 1.65:1.
+ */
+export const PhotoRemoveButton = styled(PhotoActionButton)(({ theme }) => ({
+  color: theme.palette.brandText,
+  borderColor: theme.palette.brandText,
 }));
 
 /** No estreito a foto e os botões seguem lado a lado, e o texto desce inteiro. */

@@ -110,11 +110,11 @@ export const LoginRow = styled(PolymorphicStack)(({ theme }) => ({
     // Sem `inline-flex` a âncora impõe a entrelinha do corpo (24px) e a linha
     // fica mais alta que a do produto, que segue a altura do próprio texto.
     display: 'inline-flex',
-    color: theme.palette.secondary.main,
+    color: theme.palette.brandText,
     textDecoration: 'none',
   },
   '& a:hover': {
     textDecoration: 'underline',
-    textDecorationColor: theme.palette.secondary.main,
+    textDecorationColor: theme.palette.brandText,
   },
 }));

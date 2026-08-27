@@ -28,7 +28,7 @@ export const ChannelRow = styled(PolymorphicStack)<ChannelRowProps>(({ theme }) 
   cursor: 'pointer',
 
   '& svg': {
-    color: theme.palette.secondary.main,
+    color: theme.palette.brandText,
     fontSize: `${iconSizeTokens.sm}px`,
     // O ícone é a bandeira do canal, não parte do texto: sem isso ele encolhe
     // junto com a quebra de um e-mail longo.

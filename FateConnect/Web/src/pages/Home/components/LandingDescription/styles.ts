@@ -57,7 +57,7 @@ export const HighlightItem = styled(PolymorphicStack)(({ theme }) => ({
 
   '& svg': {
     fontSize: `${iconSizeTokens.sm}px`,
-    color: theme.palette.secondary.main,
+    color: theme.palette.brandText,
   },
 }));
 

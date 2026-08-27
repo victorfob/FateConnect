@@ -34,6 +34,7 @@ declare module '@mui/material/styles' {
    * aqui, nunca como função que ramifica no modo.
    */
   interface Palette {
+    brandText: string;
     chrome: ChromeColors;
     inputOutline: string;
     statusTag: Record<StatusTagTone, SurfacePair>;
@@ -41,6 +42,7 @@ declare module '@mui/material/styles' {
   }
 
   interface PaletteOptions {
+    brandText: string;
     chrome: ChromeColors;
     inputOutline: string;
     statusTag: Record<StatusTagTone, SurfacePair>;

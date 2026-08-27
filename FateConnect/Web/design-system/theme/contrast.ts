@@ -24,7 +24,6 @@ const OPAQUE = 1;
 
 type Rgb = { red: number; green: number; blue: number };
 
-/** Canal linearizado, conforme a definição de luminância relativa da WCAG. */
 function toLinearChannel(value: number): number {
   const normalized = value / CHANNEL_MAX;
 
@@ -52,6 +51,11 @@ function fromHex(hex: string): Rgb {
 }
 
 function toRgb(color: string): Rgb {
+  const short = /^#([0-9a-f]{3})$/i.exec(color.trim())?.[1];
+  // `#fff` é como o MUI escreve `common.white`. Sem expandir, a medição estoura
+  // em vez de medir — e um teste que estoura não avisa o que estava errado.
+  if (short) return fromHex([...short].map((channel) => channel + channel).join(''));
+
   const hex = /^#([0-9a-f]{6})$/i.exec(color.trim())?.[1];
   if (hex) return fromHex(hex);
 
@@ -98,7 +102,6 @@ export function relativeLuminance(color: string, background = '#FFFFFF'): number
   );
 }
 
-/** Razão de contraste da WCAG entre duas cores, de 1:1 a 21:1. */
 export function contrastRatio(foreground: string, background: string): number {
   const foregroundLuminance = relativeLuminance(foreground, background);
   const backgroundLuminance = relativeLuminance(background, background);
@@ -111,3 +114,8 @@ export function contrastRatio(foreground: string, background: string): number {
 /** Mínimos da WCAG nível AA. */
 export const AA_NORMAL_TEXT = 4.5;
 export const AA_LARGE_TEXT = 3;
+/**
+ * Limite da WCAG 1.4.11, para o que **não é texto**. Vale 3 como o texto grande,
+ * mas por outra razão: um nome só faria escolher pelo número, não pelo papel.
+ */
+export const AA_NON_TEXT = 3;

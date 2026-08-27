@@ -72,7 +72,7 @@ export const components: Components<Theme> = {
   MuiOutlinedInput: {
     styleOverrides: {
       // O raio de 10px vale para cartão, diálogo e botão — não para o campo, que
-      // no produto usa o raio padrão do Material. Medido em `/cadastro` e no login.
+      // no produto usa o raio padrão do Material.
       root: { borderRadius: radius(radiusScale.sm) },
       notchedOutline: ({ theme }) => ({ borderColor: theme.palette.inputOutline }),
     },
@@ -119,6 +119,10 @@ export const components: Components<Theme> = {
       }),
     },
   },
+  // O `Paper` do MUI clareia a superfície por elevação no tema escuro: no
+  // diálogo isso levava `#1E1E1E` a `#434343`, e o contraste medido no token
+  // deixava de valer para o que a tela desenhava.
+  MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
   MuiDialog: { styleOverrides: { paper: { borderRadius: radius(radiusScale.lg) } } },
   MuiAppBar: {
     defaultProps: { elevation: 0 },
