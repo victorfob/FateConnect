@@ -87,9 +87,13 @@ export const darkColorTokens = {
    * A mesma marca **como texto**, e por isso mais clara que o fundo de botão
    * acima. São dois tons porque os dois papéis se excluem: para o branco passar
    * AA em cima, a cor precisa de luminância ≤ 0.183; para ela mesma ser texto
-   * legível sobre `#121212`, ≥ 0.202. Nenhuma cor cabe nas duas.
+   * legível, ≥ 0.233. Nenhuma cor cabe nas duas.
+   *
+   * O piso vale sobre a **superfície elevada**, não sobre a página: o link de
+   * cadastro vive dentro de um cartão, que é o fundo mais claro dos dois e
+   * portanto o exigente.
    */
-  brandText: '#D84E4E',
+  brandText: '#E06055',
   error: '#F44336',
 
   surface: '#121212',

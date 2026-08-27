@@ -119,6 +119,12 @@ export const components: Components<Theme> = {
       }),
     },
   },
+  // No tema escuro o `Paper` do MUI pinta um véu branco por cima, proporcional à
+  // elevação, e no diálogo (elevação 24) ele clareia `#1E1E1E` até `#434343`.
+  // Isso desfaz a superfície que a paleta declara e derruba o contraste medido:
+  // o texto secundário caía de 6.77:1 para 4.02:1 sem nada acusar, porque o
+  // teste mede o token e a tela desenha outra cor.
+  MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
   MuiDialog: { styleOverrides: { paper: { borderRadius: radius(radiusScale.lg) } } },
   MuiAppBar: {
     defaultProps: { elevation: 0 },
