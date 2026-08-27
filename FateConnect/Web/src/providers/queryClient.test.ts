@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 
-import { ApiError } from '@app/services/httpClient';
+import { ApiError, SessionExpiredError } from '@app/services/httpClient';
 
 import { createQueryClient, type RequestErrorMeta } from './queryClient';
 
@@ -38,6 +38,16 @@ describe('createQueryClient', () => {
     await failQuery(client, new ApiError('da api'));
 
     expect(notifyError).toHaveBeenCalledWith('da api');
+  });
+
+  // A tela de sessão expirada substitui o conteúdo: um aviso por cima dela
+  // seria o mesmo recado duas vezes, e ainda falando de carregar dados.
+  it('should stay quiet when the session expired', async () => {
+    const { client, notifyError } = clientWithNotifier();
+
+    await failQuery(client, new SessionExpiredError(401), { errorMessage: 'da tela' });
+
+    expect(notifyError).not.toHaveBeenCalled();
   });
 
   it('should fall back to a generic message when the error carries none', async () => {

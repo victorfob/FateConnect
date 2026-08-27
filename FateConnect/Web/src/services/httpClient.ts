@@ -17,6 +17,18 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Sessão vencida tem tipo próprio porque quem trata precisa **calar**, não
+ * avisar: a tela de sessão expirada já está no ar, e uma notificação em cima
+ * dela seria o mesmo recado duas vezes.
+ */
+export class SessionExpiredError extends ApiError {
+  constructor(status?: number) {
+    super(SESSION_EXPIRED_MESSAGE, status);
+    this.name = 'SessionExpiredError';
+  }
+}
+
 export const NETWORK_ERROR_MESSAGE = 'Não foi possível conectar ao servidor. Tente novamente.';
 export const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
 export const SESSION_EXPIRED_MESSAGE = 'Sessão expirada. Entre novamente para continuar.';
@@ -51,7 +63,7 @@ function withInterceptors(client: AxiosInstance): AxiosInstance {
         tokenStorage.clear();
         notifySessionExpired();
 
-        return Promise.reject(new ApiError(SESSION_EXPIRED_MESSAGE, error.response.status));
+        return Promise.reject(new SessionExpiredError(error.response.status));
       }
 
       return Promise.reject(new ApiError(GENERIC_ERROR_MESSAGE, error.response.status));
