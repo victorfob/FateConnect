@@ -3,11 +3,19 @@ import axios, { type AxiosInstance } from 'axios';
 import { notifySessionExpired } from './auth/sessionExpiry';
 import { tokenStorage } from './auth/tokenStorage';
 
-/** Erro já normalizado para a camada de UI. */
-export type ApiError = {
-  status?: number;
-  message: string;
-};
+/**
+ * Erro já normalizado para a camada de UI. É classe, e não objeto solto, porque
+ * rejeitar promessa com literal descarta a pilha e faz `instanceof` mentir.
+ */
+export class ApiError extends Error {
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
 
 export const NETWORK_ERROR_MESSAGE = 'Não foi possível conectar ao servidor. Tente novamente.';
 export const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
@@ -27,11 +35,11 @@ function withInterceptors(client: AxiosInstance): AxiosInstance {
     (response) => response,
     (error: unknown) => {
       if (!axios.isAxiosError(error)) {
-        return Promise.reject<ApiError>({ message: GENERIC_ERROR_MESSAGE });
+        return Promise.reject(new ApiError(GENERIC_ERROR_MESSAGE));
       }
 
       if (!error.response) {
-        return Promise.reject<ApiError>({ message: NETWORK_ERROR_MESSAGE });
+        return Promise.reject(new ApiError(NETWORK_ERROR_MESSAGE));
       }
 
       // Só é expiração quando havia sessão: o interceptor acima só manda
@@ -43,16 +51,10 @@ function withInterceptors(client: AxiosInstance): AxiosInstance {
         tokenStorage.clear();
         notifySessionExpired();
 
-        return Promise.reject<ApiError>({
-          status: error.response.status,
-          message: SESSION_EXPIRED_MESSAGE,
-        });
+        return Promise.reject(new ApiError(SESSION_EXPIRED_MESSAGE, error.response.status));
       }
 
-      return Promise.reject<ApiError>({
-        status: error.response.status,
-        message: GENERIC_ERROR_MESSAGE,
-      });
+      return Promise.reject(new ApiError(GENERIC_ERROR_MESSAGE, error.response.status));
     },
   );
 

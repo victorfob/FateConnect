@@ -1,5 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query';
 
+import { ApiError } from '@app/services/httpClient';
+
 import { createQueryClient, type RequestErrorMeta } from './queryClient';
 
 function clientWithNotifier() {
@@ -25,7 +27,7 @@ describe('createQueryClient', () => {
   it('should notify the message the screen declared in the request meta', async () => {
     const { client, notifyError } = clientWithNotifier();
 
-    await failQuery(client, { message: 'da api' }, { errorMessage: 'da tela' });
+    await failQuery(client, new ApiError('da api'), { errorMessage: 'da tela' });
 
     expect(notifyError).toHaveBeenCalledWith('da tela');
   });
@@ -33,7 +35,7 @@ describe('createQueryClient', () => {
   it('should notify the api message when the screen declared none', async () => {
     const { client, notifyError } = clientWithNotifier();
 
-    await failQuery(client, { message: 'da api' });
+    await failQuery(client, new ApiError('da api'));
 
     expect(notifyError).toHaveBeenCalledWith('da api');
   });
@@ -49,7 +51,7 @@ describe('createQueryClient', () => {
   it('should stay quiet when the screen notifies the error itself', async () => {
     const { client, notifyError } = clientWithNotifier();
 
-    await failQuery(client, { message: 'da api' }, { notifiesErrorItself: true });
+    await failQuery(client, new ApiError('da api'), { notifiesErrorItself: true });
 
     expect(notifyError).not.toHaveBeenCalled();
   });
