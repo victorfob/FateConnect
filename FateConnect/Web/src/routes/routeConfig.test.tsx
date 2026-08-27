@@ -49,20 +49,14 @@ describe('routeConfig', () => {
     expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
   });
 
-  it('should send the dropped rides sub-routes to the landing page', () => {
-    const router = renderRoute('/caronas/ofertar');
-
-    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
-  });
-
-  it('should send the dropped contact route to the landing page', () => {
-    const router = renderRoute('/contato');
-
-    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
-  });
-
-  it('should send an unknown route to the landing page', () => {
-    const router = renderRoute('/rota-que-nao-existe');
+  // A raiz fica fora deste grupo de propósito: ela é redirecionamento explícito
+  // de índice, e continuaria passando com o curinga quebrado.
+  it.each([
+    ['a dropped rides sub-route', '/caronas/ofertar'],
+    ['a dropped route', '/contato'],
+    ['an unknown route', '/rota-que-nao-existe'],
+  ])('should send %s to the landing page', (_name, path) => {
+    const router = renderRoute(path);
 
     expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
   });
