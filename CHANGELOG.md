@@ -6,6 +6,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Adiciona a tela de sessão expirada: token recusado leva ao aviso e ao caminho de volta ao login, em vez da mensagem genérica de erro com a sessão vencida ainda guardada (#167) [Frontend]
+
 ## [0.3.0] - 2026-08-27
 
 ### Added
