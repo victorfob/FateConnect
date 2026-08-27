@@ -24,7 +24,6 @@ const OPAQUE = 1;
 
 type Rgb = { red: number; green: number; blue: number };
 
-/** Canal linearizado, conforme a definição de luminância relativa da WCAG. */
 function toLinearChannel(value: number): number {
   const normalized = value / CHANNEL_MAX;
 
@@ -103,7 +102,6 @@ export function relativeLuminance(color: string, background = '#FFFFFF'): number
   );
 }
 
-/** Razão de contraste da WCAG entre duas cores, de 1:1 a 21:1. */
 export function contrastRatio(foreground: string, background: string): number {
   const foregroundLuminance = relativeLuminance(foreground, background);
   const backgroundLuminance = relativeLuminance(background, background);
@@ -117,8 +115,7 @@ export function contrastRatio(foreground: string, background: string): number {
 export const AA_NORMAL_TEXT = 4.5;
 export const AA_LARGE_TEXT = 3;
 /**
- * Limite da WCAG 1.4.11, para o que **não é texto**: o fundo de um controle
- * contra a página. Vale 3 como o texto grande, mas por outra razão — reunir os
- * dois num nome só faria o próximo caso escolher pelo número, não pelo papel.
+ * Limite da WCAG 1.4.11, para o que **não é texto**. Vale 3 como o texto grande,
+ * mas por outra razão: um nome só faria escolher pelo número, não pelo papel.
  */
 export const AA_NON_TEXT = 3;

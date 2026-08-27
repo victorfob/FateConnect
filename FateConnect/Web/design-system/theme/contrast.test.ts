@@ -36,12 +36,7 @@ describe('contrastRatio', () => {
 
 type Par = [string, string, string];
 
-/**
- * As superfícies em que qualquer conteúdo pode cair. Toda cor de conteúdo é
- * medida contra **todas** elas: o defeito que originou este formato era uma cor
- * antiga aterrissando numa superfície que ninguém tinha medido, e um tema
- * cobrindo o par que faltava no outro.
- */
+/** Toda cor de conteúdo é medida contra **todas** as superfícies daqui. */
 function surfaces(theme: Theme): [string, string][] {
   return [
     ['the page background', theme.palette.background.default],
@@ -59,7 +54,6 @@ function contentColours(theme: Theme): [string, string][] {
   ];
 }
 
-/** Cor que só delimita um controle: vale o limite de não-texto, não o de texto. */
 function nonTextColours(theme: Theme): [string, string][] {
   return [
     ['the field outline', theme.palette.inputOutline],
@@ -77,7 +71,6 @@ function against(theme: Theme, colours: (theme: Theme) => [string, string][]): P
   );
 }
 
-/** Pares em que o fundo é fixo pelo próprio componente, sem produto cartesiano. */
 function boundPairs(theme: Theme): Par[] {
   const { palette } = theme;
   const tones: StatusTagTone[] = ['muted', 'success', 'warning', 'danger'];
