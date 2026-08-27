@@ -1,28 +1,32 @@
-import { Stack, styled, tabletMedia } from '@design-system';
-import type { PolymorphicProps } from '@design-system';
+import { PolymorphicStack, spacingScale, Stack, styled } from '@design-system';
 
-export const HomeRoot = styled(Stack)<PolymorphicProps>({
+const { lg, xl, xxxl, giant } = spacingScale;
+
+export const HomeRoot = styled(Stack)({
   flexDirection: 'column',
   width: '100%',
 });
 
-export const DescriptionContainer = styled(Stack)<PolymorphicProps>({
+export const DescriptionContainer = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-around',
-  padding: '7vh 7vw',
-  gap: '32px',
+  padding: theme.space(xxxl, giant),
+  gap: theme.space(xl),
 
-  [tabletMedia]: { flexDirection: 'column' },
-});
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+    padding: theme.space(xxxl, lg),
+  },
+}));
 
-export const LoginAnchor = styled(Stack)<PolymorphicProps>({
+export const LoginAnchor = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
 
-  [tabletMedia]: { justifyContent: 'center' },
-});
+  [theme.breakpoints.down('md')]: { justifyContent: 'center' },
+}));
 
-export const ServicesContainer = styled(Stack)<PolymorphicProps>(({ theme }) => ({
+export const ServicesContainer = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   background: theme.palette.background.paper,

@@ -1,5 +1,7 @@
+# Variáveis de ambiente — só o exemplo é versionado
 .env
 .env.*
+!.env.example
+
 [Bb]in/
 [Oo]bj/
-[Mm]igrations/

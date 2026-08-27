@@ -5,14 +5,13 @@ name: Check Pull Request
 # destino no PR, porque PR empilhado (base em outra feature branch) também
 # precisa ser validado.
 #
-# O `package.json` da raiz entra no filtro por causa do passo de versão: é lá
-# que a versão do projeto mora, e mudança de versão não pode escapar da
-# validação.
+# O recorte é feito DENTRO do job, não em `paths` no gatilho, porque este check
+# é obrigatório para mergear. Workflow que não dispara não deixa o check
+# ausente: deixa ele `Pending` para sempre, e o PR fica impossível de mergear.
+# Rodando sempre, o contexto sempre reporta — e o PR que não toca o front paga
+# só a partida do runner, não a suíte.
 on:
-  pull_request:
-    paths:
-      - 'FateConnect/Web/**'
-      - 'package.json'
+  pull_request
 
 # Execução nova na mesma ref cancela a anterior.
 concurrency:
@@ -21,6 +20,8 @@ concurrency:
 
 permissions:
   contents: read
+  # Para ler a lista de arquivos do PR e decidir o que rodar.
+  pull-requests: read
 
 jobs:
   web:
@@ -31,6 +32,40 @@ jobs:
         working-directory: FateConnect/Web
     steps:
       - uses: actions/checkout@v5
+        with:
+          # Clone completo por causa do Sonar: sem histórico ele não sabe quem
+          # mudou o quê e perde a noção de código novo, que é o que o quality
+          # gate mede.
+          fetch-depth: 0
+
+      # A lista vem da API do PR, não de `git diff`: o checkout traz um commit
+      # só, e comparar com a base exigiria clone completo por um dado que o
+      # GitHub já tem pronto.
+      #
+      # É a API de arquivos, paginada, e não `gh pr diff`: aquele recusa PR com
+      # mais de 300 arquivos (HTTP 406), e a release que trocou o front inteiro
+      # tinha 330. Um check obrigatório reprovaria exatamente no PR de release.
+      #
+      # A versão do projeto mora no `package.json` da raiz, então ela entra no
+      # recorte junto do front: mudança de versão não pode escapar da validação.
+      - name: Changed paths
+        id: changes
+        run: |
+          set -euo pipefail
+
+          changed=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')
+
+          if printf '%s\n' "$changed" | grep -qE '^(FateConnect/Web/|package\.json$)'; then
+            echo 'web=true' >> "$GITHUB_OUTPUT"
+            echo 'A mudança alcança o front ou a versão do projeto — validando.'
+            exit 0
+          fi
+
+          echo 'web=false' >> "$GITHUB_OUTPUT"
+          echo 'Nada em FateConnect/Web nem na versão do projeto — nada a validar aqui.'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
 
       # A tag da release nasce da versão do `package.json` da raiz, então PR para
       # a main é a última chance de pegar versão repetida: ou o bump foi
@@ -45,7 +80,7 @@ jobs:
       # nenhuma tag, então a busca local não acharia nada nunca e o passo
       # aprovaria tudo em silêncio.
       - name: Version
-        if: github.base_ref == 'main'
+        if: steps.changes.outputs.web == 'true' && github.base_ref == 'main'
         run: |
           set -euo pipefail
 
@@ -59,18 +94,22 @@ jobs:
           echo "Versão $version disponível para publicação."
 
       - uses: actions/setup-node@v5
+        if: steps.changes.outputs.web == 'true'
         with:
           node-version-file: FateConnect/Web/.nvmrc
           cache: yarn
           cache-dependency-path: FateConnect/Web/yarn.lock
 
       - name: Install dependencies
+        if: steps.changes.outputs.web == 'true'
         run: yarn install --frozen-lockfile
 
       - name: Types
+        if: steps.changes.outputs.web == 'true'
         run: yarn typecheck
 
       - name: Lint
+        if: steps.changes.outputs.web == 'true'
         run: yarn lint
 
       # Suíte inteira: os limites de cobertura são globais, então medi-los sobre
@@ -82,7 +121,30 @@ jobs:
       # — a API responde 404. Quem reprova por cobertura é o limite do Vitest,
       # aplicado dentro do `test:ci`.
       - name: Tests and coverage
+        if: steps.changes.outputs.web == 'true'
         run: yarn test:ci
 
       - name: Build
+        if: steps.changes.outputs.web == 'true'
         run: yarn build
+
+      # Passo deste job, e não um job à parte, porque é este o check exigido
+      # pelo ruleset da develop: Sonar reprovado tem que impedir o merge, e um
+      # job separado só bloquearia se alguém o marcasse como obrigatório na
+      # configuração do repositório. Aqui a garantia é do próprio repositório.
+      #
+      # Vem depois dos testes porque consome o lcov que eles produzem, e por
+      # último porque é o passo mais lento — o `sonar.qualitygate.wait` do
+      # sonar-project.properties espera o veredito do gate e é ele que faz este
+      # passo reprovar. Sem ele o scan publica o resultado e sai verde.
+      #
+      # Só o front é analisado: o scanner genérico não analisa C#, que exigiria
+      # o SonarScanner for .NET em volta do `dotnet build` e, por não poder
+      # dividir o mesmo projectKey, um projeto próprio no Sonar.
+      - name: Sonar
+        if: steps.changes.outputs.web == 'true'
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
+        with:
+          projectBaseDir: FateConnect/Web
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

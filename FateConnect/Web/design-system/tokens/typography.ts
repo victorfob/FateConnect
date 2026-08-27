@@ -1,0 +1,27 @@
+export type TypographyToken = {
+  fontSize: string;
+  fontWeight: number;
+  lineHeight: number;
+  letterSpacing?: string;
+};
+
+export const fontFamily = "'Inter', 'Helvetica Neue', sans-serif";
+
+export const typographyTokens = {
+  h1: { fontSize: '2rem', fontWeight: 700, lineHeight: 1.2 },
+  h1Narrow: { fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2 },
+  h2: { fontSize: '1.5rem', fontWeight: 600, lineHeight: 1.3 },
+  body: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.5 },
+  subtitle: { fontSize: '1rem', fontWeight: 500, lineHeight: 1.5 },
+  subtitleBold: { fontSize: '1rem', fontWeight: 700, lineHeight: 1.5 },
+  caption: { fontSize: '0.875rem', fontWeight: 400, lineHeight: 1.4 },
+  captionBold: { fontSize: '0.875rem', fontWeight: 700, lineHeight: 1.4 },
+  logo: { fontSize: '1.3rem', fontWeight: 600, lineHeight: 1.2 },
+  /**
+   * Rótulo de botão. O padrão do MUI é menor e mais pesado que o do produto
+   * (0.875rem/500, com espaçamento entre letras), o que mudaria o texto de
+   * todos os botões da aplicação.
+   */
+  button: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.5, letterSpacing: 'normal' },
+  formHelper: { fontSize: '0.875rem', fontWeight: 400, lineHeight: 1.5 },
+} satisfies Record<string, TypographyToken>;

@@ -1,87 +1,103 @@
-import { useFormContext } from 'react-hook-form';
+import { CircularProgress, Input } from '@design-system';
+import { Controller, useFormContext } from 'react-hook-form';
 
-import { CircularProgress, InputAdornment, TextField } from '@design-system';
-
-import * as C from '../../constants';
-import { useAddressAutofill } from '../../hooks/useAddressAutofill';
-import { useFilledLabel } from '../../hooks/useFilledLabel';
-import { SelectField } from '../SelectField';
-import type { SignupFormValues } from '../../schema';
-import * as S from '../../styles';
 import { useMaskedField } from '@app/hooks/useMaskedField';
+import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
+import { useAddressAutofill } from '@app/pages/Signup/hooks/useAddressAutofill';
+import { useFilledLabel } from '@app/pages/Signup/hooks/useFilledLabel';
+import type { SignupFormValues } from '@app/pages/Signup/schema';
 import { maskZipCode } from '@app/utils/masks/zipCodeMask';
+
+import { STATE_SELECT_OPTIONS, ZIP_LOOKUP_LABEL } from './constants';
+import * as S from './styles';
 
 const SPINNER_SIZE_PX = 20;
 
 /** Endereço, preenchido pelo CEP quando ele está completo. */
 export function AddressSection() {
-  const { register } = useFormContext<SignupFormValues>();
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<SignupFormValues>();
   const { isLookingUpZipCode } = useAddressAutofill();
   const zipCodeField = useMaskedField(register('zipCode'), maskZipCode);
-  const zipCodeLabel = useFilledLabel('zipCode');
-  const streetLabel = useFilledLabel('street');
-  const cityLabel = useFilledLabel('city');
+  const isZipCodeFilled = useFilledLabel('zipCode');
+  const isStreetFilled = useFilledLabel('street');
+  const isCityFilled = useFilledLabel('city');
 
   return (
-    <S.FieldGrid>
+    <>
       <S.ThirdWidthCell>
-        <TextField
+        <Input
           {...zipCodeField}
-          label={C.FIELD_LABELS.zipCode}
+          label={FIELD_LABELS.zipCode}
+          required
+          error={errors.zipCode?.message}
           fullWidth
           type="text"
           inputMode="numeric"
           autoComplete="postal-code"
-          placeholder={C.FIELD_PLACEHOLDERS.zipCode}
+          placeholder={FIELD_PLACEHOLDERS.zipCode}
           aria-busy={isLookingUpZipCode}
-          slotProps={{
-            inputLabel: zipCodeLabel,
-            input: {
-              endAdornment: isLookingUpZipCode ? (
-                <InputAdornment position="end">
-                  <CircularProgress size={SPINNER_SIZE_PX} aria-label={C.ZIP_LOOKUP_LABEL} />
-                </InputAdornment>
-              ) : null,
-            },
-          }}
+          shrinkLabel={isZipCodeFilled}
+          endAdornment={
+            isLookingUpZipCode ? (
+              <CircularProgress size={SPINNER_SIZE_PX} aria-label={ZIP_LOOKUP_LABEL} />
+            ) : null
+          }
         />
       </S.ThirdWidthCell>
 
       <S.ThirdWidthCell>
-        <SelectField
+        <Controller
           name="state"
-          label={C.FIELD_LABELS.state}
-          options={C.BRAZILIAN_STATES}
-          autoComplete="address-level1"
+          control={control}
+          render={({ field }) => (
+            <Input.Select
+              {...field}
+              label={FIELD_LABELS.state}
+              options={STATE_SELECT_OPTIONS}
+              autoComplete="address-level1"
+              required
+              error={errors.state?.message}
+            />
+          )}
         />
       </S.ThirdWidthCell>
 
       <S.ThirdWidthCell>
-        <TextField
+        <Input
           {...register('city')}
-          label={C.FIELD_LABELS.city}
+          label={FIELD_LABELS.city}
+          required
+          error={errors.city?.message}
           fullWidth
           type="text"
           autoComplete="address-level2"
-          slotProps={{ inputLabel: cityLabel }}
+          shrinkLabel={isCityFilled}
         />
       </S.ThirdWidthCell>
 
       <S.StreetCell>
-        <TextField
+        <Input
           {...register('street')}
-          label={C.FIELD_LABELS.street}
+          label={FIELD_LABELS.street}
+          required
+          error={errors.street?.message}
           fullWidth
           type="text"
           autoComplete="address-line1"
-          slotProps={{ inputLabel: streetLabel }}
+          shrinkLabel={isStreetFilled}
         />
       </S.StreetCell>
 
       <S.StreetNumberCell>
-        <TextField
+        <Input
           {...register('streetNumber')}
-          label={C.FIELD_LABELS.streetNumber}
+          label={FIELD_LABELS.streetNumber}
+          required
+          error={errors.streetNumber?.message}
           fullWidth
           type="text"
           autoComplete="off"
@@ -89,14 +105,14 @@ export function AddressSection() {
       </S.StreetNumberCell>
 
       <S.FullWidthCell>
-        <TextField
+        <Input
           {...register('complement')}
-          label={C.FIELD_LABELS.complement}
+          label={FIELD_LABELS.complement}
           fullWidth
           type="text"
           autoComplete="address-line2"
         />
       </S.FullWidthCell>
-    </S.FieldGrid>
+    </>
   );
 }

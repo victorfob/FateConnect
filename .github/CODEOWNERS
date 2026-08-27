@@ -2,6 +2,10 @@
 
 .claude/ @victorfob
 
+# Configuração de deploy
+
+deploy @victorfob
+
 # Frontend
 
 FateConnect/Web/ @victorfob
@@ -9,7 +13,10 @@ FateConnect/Web/ @victorfob
 # Backend
 
 FateConnect/Carona/ @Lautones
+FateConnect/FateConnect.Api/ @Lautones
 
 # Database
 
 LBD/ @pdorth
+ESII/ @pdorth
+ESIII/ @pdorth

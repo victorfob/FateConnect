@@ -34,11 +34,17 @@ Vale para pasta de componente e de tela. Pastas que **já são** dedicadas por n
 - **Interno** (não faz sentido fora do pai): pasta dentro do pai — `ConfirmDialog/DialogMessage/index.tsx`. Quando forem vários, agrupar em `components/`.
 - **Reutilizável a partir do design system**: expor por composição — `ConfirmDialog` e `ConfirmDialog.Message` — em vez de um segundo export solto do mesmo arquivo.
 
+⛔ **Constante com JSX no corpo do pai é corpo do pai.** A regra não é sobre a palavra `function` — é sobre onde o JSX mora. As ações do topo montadas como `const actions = (<>…</>)` dentro do `MainLayout` são um componente escondido numa variável, refeita a cada render: virou `HeaderActions`, com pasta e `index`. Se o trecho tem condição, estado ou hook, é componente com pasta — não variável no meio do pai.
+
 ## Tipagem e imports
 
 - **Props de componente sempre em `Readonly`**: `type RideCardProps = Readonly<{ ride: Ride; onEdit: (ride: Ride) => void }>`. Props não são para mutar.
 - **`enum` leva o sufixo `Enum`**: `RideTypeEnum`, `RoutePathEnum`, `GenderValueEnum`. O sufixo separa, na leitura, o que é enum do que é tipo ou componente.
+- **O tipo entra no import que já existe.** Se o módulo já é importado por valor, o tipo vai junto com o modificador inline, no fim das chaves — `import { createMemoryRouter, RouterProvider, type LinkProps } from 'react-router'`. Segunda declaração `import type` só quando o módulo entra **apenas** por tipo, como o `ReactNode` num arquivo que não usa nada de valor do React. O lint funde e ordena sozinho.
+- **A ordem dos imports é do lint, não da mão.** Pacotes (react na frente, e `@design-system` entre eles) → alias da aplicação → relativos → `.`. O design system conta como **pacote**, não como alias interno: ele mora fora de `src` e é consumido como biblioteca, então fica no bloco do react, sem linha em branco separando. Dentro do bloco relativo: `../` antes de `./`, e o namespace desce para o fim do seu bloco — primeiro o que vem por nome, depois `* as C` e por último `* as S`. `yarn lint:fix` arruma; não vale reordenar à mão contra a regra.
 - **Constantes em namespace a partir de três**: com três ou mais nomes vindos de um módulo de constantes, importar `import * as C from './constants'` e usar `C.NOME`, mesmo padrão do `import * as S from './styles'`. Com um ou dois, import nomeado.
+- **`import * as S` com alias é sempre erro.** O estilo de um componente mora ao lado do `index` dele, então o import é `'./styles'` e nada mais. `import * as S from '@app/pages/Signup/styles'` em três seções do cadastro queria dizer que a grade do formulário estava na página e as células, que são de cada seção, junto: a página passou a envolver as seções em `FieldGrid` e cada seção ganhou o seu `styles.ts` com as células que usa. Vale também para o `styles.ts` do **pai**: `import * as S from '../styles'` põe o estilo de um componente na pasta de outro. O `FilterPanel` do design system nasceu assim, com a célula do campo desenhada no estilo do painel — a célula é do campo, e foi para a pasta dele.
+- **`import * as C` com alias só vale para constante compartilhada.** Constante geral da tela (`FIELD_LABELS`, usada por quatro seções) ou global (`appContact`) pode vir por alias. Constante consumida por **um** componente só vai para a pasta dele — `DELETE_DIALOG` saiu de `pages/Rides/constants` para `RideDeleteConfirmation/constants`. Antes de mover, conte os consumidores: `seatsLabel` parecia exclusivo do `RideCard` e o `RideFormDialog` também o usava.
 
 ## Erro de requisição: quem avisa é um só
 

@@ -10,6 +10,10 @@ export const tokenStorage = {
     return window.localStorage.getItem(TOKEN_KEY);
   },
 
+  getUserName(): string | null {
+    return window.localStorage.getItem(USER_NAME_KEY);
+  },
+
   save(token: string, userName: string): void {
     window.localStorage.setItem(TOKEN_KEY, token);
     window.localStorage.setItem(USER_NAME_KEY, userName);

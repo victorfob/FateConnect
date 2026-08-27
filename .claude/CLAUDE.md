@@ -17,12 +17,12 @@ Planejamento e rastreio ficam no **GitHub** (issues + Project board do repositó
 ## Organização desta configuração
 
 - `.claude/rules/` — regras do projeto. Sem `paths:` carregam sempre; com `paths:` carregam quando um arquivo que casa é lido.
-- `.claude/skills/` — fluxos sob demanda: `pr-creator` (abrir/atualizar PR), `write-commit` (mensagem de commit e agrupamento em commits), `changelog-writer` (entrada do CHANGELOG) e `fateconnect-create-component` (criar componente no front).
+- `.claude/skills/` — fluxos sob demanda: `spec-issue` (especificar uma issue e dividir em sub-issues), `pr-creator` (abrir/atualizar PR), `resolve-pr-comments` (triar e responder review), `write-commit` (mensagem de commit e agrupamento em commits), `changelog-writer` (entrada do CHANGELOG), `create-release` (cortar uma versão e publicar), `ux-writing` (texto de interface) e `fateconnect-create-component` (criar componente no front).
 - `.claude/` é **versionada**: rule e skill passam por review no PR como qualquer código, e valem igual para quem clonar o repo. Por isso a restrição do repositório acima se aplica a elas também.
 
 ## Fluxo de trabalho
 
-- Branch base: **`develop`**. Nomear branch como `<tipo>/<número-da-issue>` (ex.: `chore/48`).
+- Branch base: **`develop`**. ⛔ **Nunca commitar direto nela** — toda mudança sai numa branch a partir da `develop` e volta por PR, **inclusive mudança em `.claude/`**. Nomear branch como `<tipo>/<número-da-issue>` (ex.: `chore/48`); quando não houver issue, um slug descritivo (`docs/spec-issue-skill`).
 - Toda correção ou alteração começa por uma **issue no GitHub** — o número dela alimenta a branch, o título do PR e o corpo do PR.
 - Abrir PR: usar a skill `pr-creator`. Commitar: usar a skill `write-commit` — e **pedir confirmação antes de qualquer comando git**.
 - ⛔ **Nunca escrever changelog à mão** — usar a skill `changelog-writer`. À mão sai um bullet por commit, que é o oposto do formato: uma entrada principal descrevendo o efeito para quem usa. O formato está em `.claude/rules/changelog-format.md`.
@@ -47,9 +47,9 @@ O `pre-push` roda só os testes **relacionados** aos arquivos enviados (via `Web
 ## Stack do front
 
 - Vite, React, MUI + Emotion, `@mui/x-date-pickers` + `date-fns`, notistack, React Router, react-hook-form + zod, TanStack Query, axios, Vitest + Testing Library.
-- Design system local em `Web/src/design-system/`, com **dois** barrels públicos: `@design-system` (componentes, estilo, tokens) e `@design-system/icons`. A aplicação usa também o alias `@app` para `Web/src`.
+- Design system local em `Web/design-system/` — **fora de `src`**, porque a aplicação o consome como biblioteca. Dois barrels públicos: `@design-system` (componentes, estilo, tokens) e `@design-system/icons`. A aplicação usa também o alias `@app` para `Web/src`.
 - Padrões em `.claude/rules/fateconnect-web-react.md` e nas regras `web-*`.
 
 ### Uma armadilha já mapeada
 
-O `spacing` default do MUI é **multiplicador de 8px**. Com escala de tokens em px, sem o override px→rem o layout fica 8x errado silenciosamente — é o que os helpers `spacing()` e `radius()` do design system resolvem, e por isso o `theme.spacing` do MUI não é sobrescrito.
+O `spacing` default do MUI é **multiplicador de 8px**. Com escala de tokens em px, `theme.spacing(16)` daria 128px — por isso o estilo usa `theme.space()` e `theme.radius()`, chaves nossas no tema, e o `theme.spacing` do MUI fica intacto para os componentes dele. Sobrescrevê-lo encolheu as gutters do `Toolbar` de 24px para 3px.

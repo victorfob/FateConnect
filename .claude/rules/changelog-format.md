@@ -1,5 +1,5 @@
 ---
-description: Formato das entradas do CHANGELOG — Keep a Changelog, cabeçalho em inglês, conteúdo em pt-BR no imperativo, uma entrada principal por tarefa, terminando no número do PR
+description: Formato das entradas do CHANGELOG — Keep a Changelog, cabeçalho em inglês, conteúdo em pt-BR no imperativo, uma entrada principal por tarefa, terminando no número do PR e no lado que mudou
 paths:
   - "CHANGELOG.md"
 ---
@@ -24,14 +24,17 @@ Só as seções com mudança de verdade aparecem. Seção vazia não fica no arq
 - **Uma entrada principal por tarefa.** A entrada descreve o **efeito para quem consome**, não a implementação. Agrupe as mudanças relacionadas numa linha concisa.
 - **Uma linha curta por mudança.** Sem lista de arquivo, camada ou nome interno.
 - **Termina no número do PR**, entre parênteses: `(#84)`. **Sempre o PR, nunca a issue** — o link precisa cair no diff e no review, não no planejamento. Se o PR ainda não existe, use `(#?)` e troque antes do merge.
-- **Item puramente interno não entra.** Remoção de helper morto, refactor sem efeito externo, ajuste de teste: isso vive no histórico de commit, não no changelog.
+- **Fecha com o lado que mudou:** `[Frontend]` ou `[Backend]`, **depois** do número do PR. O repositório guarda o front e dois serviços .NET, e quem lê a release precisa saber o que precisa subir. Mudança que só funciona com os dois lados leva os dois marcadores, nessa ordem — e se cada lado produzir um efeito diferente, são duas entradas, não uma com dois marcadores.
+- **Correção entra mesmo sem efeito visível hoje.** O changelog é registro de alteração, não nota de divulgação: defeito corrigido em serviço publicado entra ainda que nenhum cliente atual chegue nele — e o marcador de lado é o que avisa quem precisa subir. Descreva o defeito **como ele era**, sem sugerir que alguém o sofreu quando ninguém sofreu.
+- **Item que não muda comportamento não entra.** Remoção de helper morto, refactor sem efeito externo, ajuste de teste, configuração de lint ou de CI: isso vive no histórico de commit, não no changelog.
 
 ### Faça
 
 ```markdown
-- Adiciona a tela de menu da área logada (#81)
-- Corrige o aviso que não aparecia sobre superfície clara (#84)
-- Remove a tela de contato; o contato passa a ser seção da landing (#79)
+- Adiciona a tela de menu da área logada (#81) [Frontend]
+- Corrige o aviso que não aparecia sobre superfície clara (#84) [Frontend]
+- Corrige a recusa de carona marcada para as próximas horas (#99) [Backend]
+- Remove o prefixo das rotas, que o front nunca enviou (#99) [Frontend] [Backend]
 ```
 
 ### Não faça
@@ -43,6 +46,9 @@ Só as seções com mudança de verdade aparecem. Seção vazia não fica no arq
 - Foi adicionada a tela de menu                                   <- não é imperativo
 - Adiciona a tela de menu                                         <- falta o PR
 - Adiciona a tela de menu (#78)                                   <- é a issue, não o PR
+- Adiciona a tela de menu (#81)                                   <- falta o lado que mudou
+- Adiciona a tela de menu [Frontend] (#81)                        <- o marcador vem depois do PR
+- Corrige a perda de descrição sofrida por quem editava carona    <- defeito que ninguém alcançou; não invente a vítima
 ```
 
 ## Um bullet por commit é o sintoma

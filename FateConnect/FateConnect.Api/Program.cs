@@ -21,18 +21,27 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        Env.Load();
+        // Em contêiner as variáveis chegam pelo ambiente e não há arquivo para ler.
+        if (File.Exists(".env"))
+        {
+            Env.Load();
+        }
+
+        // As datas do cadastro chegam sem fuso. Sem isto o Npgsql as recusa contra
+        // uma coluna "timestamp with time zone", que é o mapeamento padrão dele.
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        string localUrl = "http://localhost:4200";
-        string serverUrl = "http://191.252.210.114:8080";
+        string[] corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:5173")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         string corsPolicy = "AllowFrontend";
 
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(corsPolicy, policy =>
             {
-                policy.WithOrigins(localUrl, serverUrl)
+                policy.WithOrigins(corsOrigins)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -123,7 +132,12 @@ public class Program
 
         WebApplication app = builder.Build();
 
-        app.Logger.LogInformation("CORS liberado para: {Local} e {Server}", localUrl, serverUrl);
+        using (IServiceScope scope = app.Services.CreateScope())
+        {
+            scope.ServiceProvider.GetRequiredService<FateConnectDbContext>().Database.Migrate();
+        }
+
+        app.Logger.LogInformation("CORS liberado para: {Origins}", string.Join(", ", corsOrigins));
         app.Logger.LogInformation("Variaveis carregadas para Issuer: {Issuer}", jwtOptions.Issuer);
 
         app.UseMiddleware<GlobalExceptionMiddleware>();

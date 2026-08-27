@@ -8,8 +8,6 @@ type ExternallyFilledField = Extract<
   'birthDate' | 'zipCode' | 'street' | 'city'
 >;
 
-type FloatingLabelProps = Readonly<{ shrink?: true }>;
-
 /**
  * Mantém o rótulo no alto quando o valor chega de fora — preenchimento por CEP
  * ou escolha no calendário.
@@ -19,11 +17,9 @@ type FloatingLabelProps = Readonly<{ shrink?: true }>;
  * desenharia o rótulo por cima do texto. Com o campo vazio nada é forçado, para
  * o rótulo continuar subindo ao receber o foco.
  */
-export function useFilledLabel(name: ExternallyFilledField): FloatingLabelProps {
+export function useFilledLabel(name: ExternallyFilledField): boolean {
   const { control } = useFormContext<SignupFormValues>();
   const value = useWatch({ control, name });
 
-  if (value) return { shrink: true };
-
-  return {};
+  return Boolean(value);
 }
