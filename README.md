@@ -9,7 +9,6 @@ FateConnect/
   Web/                front-end em React + Vite       → FateConnect/Web/README.md
   FateConnect.Api/    API .NET em módulos (Auth, Caronas, Achados, Denuncias, Usuarios)
   Carona/             microsserviço de caronas em .NET 8 com DDD → FateConnect/Carona/README.md
-  FigmaBase/          CSS exportado do protótipo, guardado como referência
 .claude/              contexto que um agente de código carrega ao trabalhar aqui
 .github/workflows/    validação de PR e criação da tag de release
 .githooks/            hooks locais de lint e teste

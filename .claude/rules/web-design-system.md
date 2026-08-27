@@ -38,6 +38,7 @@ paths:
 
 - **Nunca cor literal** (hex, rgb, rgba, hsl, nome de cor) em componente. Só token de `@design-system`.
 - **Nunca estilizar tipografia à mão** — sem `fontSize`, `fontWeight`, `lineHeight` ou `fontFamily` soltos. Use a variante de tipografia do tema.
+- **A escala tipográfica é única.** Tela nova reutiliza a variante que a tela parecida já usa; a escala só muda por decisão explícita, nunca para acertar um valor visto fora do código.
 - **Nunca `palette.text.*` como cor de fundo**, nem `contrastText` como fundo — são cores de texto.
 - Espaçamento e raio sempre por token, via `theme.space()` e `theme.radius()` — chaves **nossas** no tema. ⛔ **Não** via `theme.spacing()`, que é do MUI e não se sobrescreve. Os helpers livres não saem do barrel: a aplicação não consegue importá-los, e o lint barra quem tentar pelo caminho interno. Sem px solto quando existe token — e `0` é o token `none`.
 - Falta token para o que você precisa: **estenda os tokens**, alinhado ao que já existe, em vez de contornar com valor literal.
