@@ -6,6 +6,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-08-27
+
+### Fixed
+
+- Corrige a análise de qualidade da branch principal, que reprovava sem ter código novo para avaliar (#182) [Frontend]
+
 ## [0.4.0] - 2026-08-27
 
 ### Added
