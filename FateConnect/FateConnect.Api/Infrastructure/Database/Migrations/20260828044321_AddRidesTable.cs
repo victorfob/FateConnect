@@ -11,6 +11,10 @@ public partial class AddRidesTable : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.DropTable(
+            name: "caronas"
+        );
+
         migrationBuilder.CreateTable(
             name: "rides",
             columns: table => new
@@ -28,7 +32,8 @@ public partial class AddRidesTable : Migration
             constraints: table =>
             {
                 table.PrimaryKey("PK_rides", x => x.Id);
-            });
+            }
+        );
     }
 
     /// <inheritdoc />
