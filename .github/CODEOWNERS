@@ -12,8 +12,8 @@ FateConnect/Web/ @victorfob
 
 # Backend
 
-FateConnect/Carona/ @Lautones
 FateConnect/FateConnect.Api/ @Lautones
+FateConnect/FateConnect.Api.Tests/ @Lautones
 
 # Database
 
