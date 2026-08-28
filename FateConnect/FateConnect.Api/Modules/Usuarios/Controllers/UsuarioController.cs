@@ -1,4 +1,4 @@
-using FateConnect.Api.Modules.Shared.DTOs;
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Usuarios.DTOs;
 using FateConnect.Api.Modules.Usuarios.Services;
 using Microsoft.AspNetCore.Authorization;

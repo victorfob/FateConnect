@@ -1,6 +1,5 @@
-using FateConnect.Api.Modules.Auth.Interfaces;
-using FateConnect.Api.Modules.Shared.DTOs;
-using FateConnect.Api.Modules.Shared.Entities;
+using FateConnect.Api.Modules.Common.Entities;
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Usuarios.DTOs;
 using FateConnect.Api.Modules.Usuarios.Enums;
 using FateConnect.Api.Modules.Usuarios.Exceptions;
@@ -44,7 +43,7 @@ public class UsuarioService : IUsuarioService
             throw new EmailJaCadastradoException(email);
     }
 
-    private Usuario MontarEntidadeUsuario(CreateUsuarioDto dto)
+    private static Usuario MontarEntidadeUsuario(CreateUsuarioDto dto)
     {
         string senhaComHash = GerarHashDaSenha(dto.Senha);
 
@@ -59,7 +58,7 @@ public class UsuarioService : IUsuarioService
             DataNascimento = dto.DataNascimento,
             Genero = dto.Genero,
             Senha = senhaComHash,
-            Perfil = TipoPerfilEnum.Operador,
+            Perfil = EnumProfileType.Operator,
             DataCadastro = DateTime.UtcNow,
             DataAtualizacao = DateTime.UtcNow,
             Enderecos = enderecosMapeados,
@@ -69,9 +68,9 @@ public class UsuarioService : IUsuarioService
         return usuario;
     }
 
-    private List<Endereco> MontarListaDeEnderecos(List<CreateEnderecoDto>? dtos)
+    private static List<Endereco> MontarListaDeEnderecos(List<CreateEnderecoDto>? dtos)
     {
-        if (dtos == null || !dtos.Any())
+        if (dtos is null or { Count: 0 })
             return new List<Endereco>();
 
         List<Endereco> enderecos = dtos.Select(dto => new Endereco
@@ -87,9 +86,9 @@ public class UsuarioService : IUsuarioService
         return enderecos;
     }
 
-    private List<Contato> MontarListaDeContatos(List<CreateContatoDto>? dtos)
+    private static List<Contato> MontarListaDeContatos(List<CreateContatoDto>? dtos)
     {
-        if (dtos == null || !dtos.Any())
+        if (dtos is null or { Count: 0 })
             return new List<Contato>();
 
         List<Contato> contatos = dtos.Select(dto => new Contato
@@ -101,7 +100,7 @@ public class UsuarioService : IUsuarioService
         return contatos;
     }
 
-    private string GerarHashDaSenha(string senhaPadrao)
+    private static string GerarHashDaSenha(string senhaPadrao)
     {
         return HashPassword(senhaPadrao);
     }

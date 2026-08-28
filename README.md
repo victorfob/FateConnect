@@ -8,7 +8,6 @@ Plataforma de caronas. Este repositório reúne o produto — front-end e APIs �
 FateConnect/
   Web/                front-end em React + Vite       → FateConnect/Web/README.md
   FateConnect.Api/    API .NET em módulos (Auth, Caronas, Achados, Denuncias, Usuarios)
-  Carona/             microsserviço de caronas em .NET 8 com DDD → FateConnect/Carona/README.md
 .claude/              contexto que um agente de código carrega ao trabalhar aqui
 .github/workflows/    validação de PR e criação da tag de release
 .githooks/            hooks locais de lint e teste

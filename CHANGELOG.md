@@ -6,6 +6,15 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Passa a atender as caronas pela mesma API do cadastro, em `/Rides`, com o contrato em inglês: mudam os nomes dos filtros e os valores de tipo de carona e de gênero (#186) [Backend]
+
+### Fixed
+
+- Corrige a busca de carona por destino, que respondia erro em vez de listar o resultado (#186) [Backend]
+- Corrige a ordem da listagem de caronas, que ignorava a hora da partida e podia variar entre duas consultas iguais (#186) [Backend]
+
 ## [0.4.1] - 2026-08-27
 
 ### Fixed

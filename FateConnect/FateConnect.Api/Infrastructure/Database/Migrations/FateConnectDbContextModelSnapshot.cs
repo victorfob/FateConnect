@@ -22,7 +22,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Shared.Entities.Contato", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Contato", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -50,7 +50,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("Contatos");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Shared.Entities.Endereco", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Endereco", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -96,6 +96,44 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("Enderecos");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.Ride", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AvailableSeats")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateOnly>("DepartureDate")
+                        .HasColumnType("date");
+
+                    b.Property<TimeOnly>("DepartureTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Destination")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("RideType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("rides", (string)null);
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Usuarios.Usuario", b =>
@@ -149,7 +187,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("Usuarios");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Shared.Entities.Contato", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Contato", b =>
                 {
                     b.HasOne("FateConnect.Api.Modules.Usuarios.Usuario", "Usuario")
                         .WithMany("Contatos")
@@ -160,7 +198,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Shared.Entities.Endereco", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Endereco", b =>
                 {
                     b.HasOne("FateConnect.Api.Modules.Usuarios.Usuario", "Usuario")
                         .WithMany("Enderecos")

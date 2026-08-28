@@ -1,10 +1,9 @@
-namespace FateConnect.Api.Modules.Usuarios.Exceptions
+namespace FateConnect.Api.Modules.Usuarios.Exceptions;
+
+public class CredenciaisInvalidasException : UnauthorizedAccessException
 {
-    public class CredenciaisInvalidasException : UnauthorizedAccessException
+    public CredenciaisInvalidasException()
+        : base("E-mail ou senha inválido.")
     {
-        public CredenciaisInvalidasException()
-            : base("E-mail ou senha inválido.")
-        {
-        }
     }
 }

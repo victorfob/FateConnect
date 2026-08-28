@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Shared.Entities;
+namespace FateConnect.Api.Modules.Common.Entities;
 
 using FateConnect.Api.Modules.Usuarios;
 

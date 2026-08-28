@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-namespace FateConnect.Api.Modules.Shared.DTOs;
+namespace FateConnect.Api.Modules.Common.DTOs;
 
 public class CreateContatoDto
 {
