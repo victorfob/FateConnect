@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 [SwaggerTag("Ride Management")]
 public class RidesController(IRideService rideService) : ControllerBase
 {
