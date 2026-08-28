@@ -16,6 +16,7 @@ using FateConnect.Api.Modules.Usuarios.Interfaces;
 using FateConnect.Api.Modules.Usuarios.Repositories;
 using FateConnect.Api.Modules.Usuarios.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
@@ -147,6 +148,11 @@ public class Program
                     ClockSkew = TimeSpan.Zero
                 };
             });
+
+        builder.Services.AddAuthorizationBuilder()
+            .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build());
 
         string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? string.Empty;
 
