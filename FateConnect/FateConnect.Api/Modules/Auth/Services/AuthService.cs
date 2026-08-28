@@ -5,43 +5,42 @@ using FateConnect.Api.Modules.Usuarios.Exceptions;
 using FateConnect.Api.Modules.Usuarios.Interfaces;
 using static BCrypt.Net.BCrypt;
 
-namespace FateConnect.Api.Modules.Auth.Services
+namespace FateConnect.Api.Modules.Auth.Services;
+
+public class AuthService : IAuthService
 {
-    public class AuthService : IAuthService
+    private readonly IUsuarioRepository _usuarioRepository;
+    private readonly ITokenService _tokenService;
+
+    public AuthService(IUsuarioRepository usuarioRepository, ITokenService tokenService)
     {
-        private readonly IUsuarioRepository _usuarioRepository;
-        private readonly ITokenService _tokenService;
+        _usuarioRepository = usuarioRepository;
+        _tokenService = tokenService;
+    }
 
-        public AuthService(IUsuarioRepository usuarioRepository, ITokenService tokenService)
+    public async Task<TokenResponseDto> LoginAsync(LoginDto dto)
+    {
+        Usuario? usuario = await _usuarioRepository.ObterUsuarioPorEmailAsync(dto.EmailFatec);
+
+        bool saoCredenciaisInvalidas = CredenciaisInvalidas(usuario, dto.Senha);
+
+        if (saoCredenciaisInvalidas)
+            throw new CredenciaisInvalidasException();
+
+        string tokenGerado = _tokenService.GerarJwtToken(usuario!);
+
+        return new TokenResponseDto
         {
-            _usuarioRepository = usuarioRepository;
-            _tokenService = tokenService;
-        }
+            NomeCompleto = usuario!.NomeCompleto,
+            Token = tokenGerado
+        };
+    }
 
-        public async Task<TokenResponseDto> LoginAsync(LoginDto dto)
-        {
-            Usuario? usuario = await _usuarioRepository.ObterUsuarioPorEmailAsync(dto.EmailFatec);
+    private bool CredenciaisInvalidas(Usuario? usuario, string senhaInserida)
+    {
+        if (usuario == null)
+            return true;
 
-            bool saoCredenciaisInvalidas = CredenciaisInvalidas(usuario, dto.Senha);
-
-            if (saoCredenciaisInvalidas)
-                throw new CredenciaisInvalidasException();
-
-            string tokenGerado = _tokenService.GerarJwtToken(usuario!);
-
-            return new TokenResponseDto
-            {
-                NomeCompleto = usuario!.NomeCompleto,
-                Token = tokenGerado
-            };
-        }
-
-        private bool CredenciaisInvalidas(Usuario? usuario, string senhaInserida)
-        {
-            if (usuario == null)
-                return true;
-
-            return !Verify(senhaInserida, usuario.Senha);
-        }
+        return !Verify(senhaInserida, usuario.Senha);
     }
 }

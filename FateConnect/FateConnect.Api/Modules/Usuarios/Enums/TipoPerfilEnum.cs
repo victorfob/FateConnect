@@ -1,8 +1,7 @@
-namespace FateConnect.Api.Modules.Usuarios.Enums
+namespace FateConnect.Api.Modules.Usuarios.Enums;
+
+public enum TipoPerfilEnum
 {
-    public enum TipoPerfilEnum
-    {
-        Operador = 1,
-        Administrador = 2,
-    }
+    Operador = 1,
+    Administrador = 2,
 }
