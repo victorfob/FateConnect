@@ -38,6 +38,13 @@ cd FateConnect/Web && yarn test:ci      # suíte inteira com cobertura
 cd FateConnect/Web && yarn lint && yarn typecheck
 ```
 
+APIs (.NET 8):
+
+```bash
+dotnet test FateConnect/FateConnect.Api.Tests/FateConnect.Api.Tests.csproj
+dotnet test FateConnect/Carona/Api.Tests/Api.Tests.csproj
+```
+
 ```bash
 git config core.hooksPath .githooks     # habilita os hooks deste clone
 ```
