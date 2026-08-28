@@ -35,7 +35,7 @@ public class CreateUsuarioDto
 
     [Required]
     [DefaultValue(0)]
-    public Genero Genero { get; set; }
+    public EnumGender Genero { get; set; }
 
     [Required]
     required public List<CreateEnderecoDto> Enderecos { get; set; } =

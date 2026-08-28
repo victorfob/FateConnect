@@ -14,7 +14,7 @@ public class Ride
     public DateOnly DepartureDate { get; private set; }
     public TimeOnly DepartureTime { get; private set; }
     public DateTime CreatedAt { get; private set; }
-    public RideType RideType { get; private set; }
+    public EnumRideType RideType { get; private set; }
     public string? Description { get; private set; }
     public bool IsActive { get; private set; }
 
@@ -25,7 +25,7 @@ public class Ride
         string destination,
         DateOnly departureDate,
         TimeOnly departureTime,
-        RideType rideType,
+        EnumRideType rideType,
         string? description = null)
     {
         ValidateAvailableSeats(availableSeats);
@@ -46,7 +46,7 @@ public class Ride
     public void UpdateBasicAttributes(
         int? availableSeats,
         string? destination,
-        RideType? rideType,
+        EnumRideType? rideType,
         string? description)
     {
         if (availableSeats.HasValue)

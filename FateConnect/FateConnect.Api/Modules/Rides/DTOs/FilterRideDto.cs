@@ -12,14 +12,14 @@ public record FilterRideDto
     [StringLength(100, ErrorMessage = "Destination filter cannot exceed 100 characters.")]
     public string? Destination { get; init; }
 
-    [EnumDataType(typeof(RideType), ErrorMessage = "Invalid ride type.")]
-    public RideType? RideType { get; init; }
+    [EnumDataType(typeof(EnumRideType), ErrorMessage = "Invalid ride type.")]
+    public EnumRideType? RideType { get; init; }
 
     public void Deconstruct(
         out DateOnly? departureDate,
         out TimeOnly? departureTime,
         out string? destination,
-        out RideType? rideType)
+        out EnumRideType? rideType)
     {
         departureDate = DepartureDate;
         departureTime = DepartureTime;

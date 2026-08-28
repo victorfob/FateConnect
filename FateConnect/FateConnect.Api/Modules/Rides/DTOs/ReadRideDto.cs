@@ -9,7 +9,7 @@ public record ReadRideDto(
     DateOnly DepartureDate,
     TimeOnly DepartureTime,
     DateTime CreatedAt,
-    RideType RideType,
+    EnumRideType RideType,
     string? Description,
     bool IsActive
 );

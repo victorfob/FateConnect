@@ -14,7 +14,7 @@ public record CreateRideDto
 
     public TimeOnly DepartureTime { get; init; }
 
-    public RideType RideType { get; init; }
+    public EnumRideType RideType { get; init; }
 
     [StringLength(300)]
     public string? Description { get; init; }

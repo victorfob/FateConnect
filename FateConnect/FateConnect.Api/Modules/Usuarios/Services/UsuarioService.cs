@@ -58,7 +58,7 @@ public class UsuarioService : IUsuarioService
             DataNascimento = dto.DataNascimento,
             Genero = dto.Genero,
             Senha = senhaComHash,
-            Perfil = TipoPerfil.Operador,
+            Perfil = EnumProfileType.Operator,
             DataCadastro = DateTime.UtcNow,
             DataAtualizacao = DateTime.UtcNow,
             Enderecos = enderecosMapeados,

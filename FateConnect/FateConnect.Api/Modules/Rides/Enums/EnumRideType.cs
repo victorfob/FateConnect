@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Rides.Enums;
 
-public enum RideType
+public enum EnumRideType
 {
-    Philanthropic = 1,
+    Solidarity = 1,
     Egalitarian = 2
 }

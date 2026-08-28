@@ -15,8 +15,8 @@ public record UpdateRideDto
 
     public TimeOnly? DepartureTime { get; init; }
 
-    [EnumDataType(typeof(RideType), ErrorMessage = "Invalid ride type.")]
-    public RideType? RideType { get; init; }
+    [EnumDataType(typeof(EnumRideType), ErrorMessage = "Invalid ride type.")]
+    public EnumRideType? RideType { get; init; }
 
     [StringLength(300, ErrorMessage = "The description cannot exceed 300 characters.")]
     public string? Description { get; init; }
