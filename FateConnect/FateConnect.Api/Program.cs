@@ -3,6 +3,7 @@ namespace FateConnect.Api;
 using System.Text;
 using System.Text.Json.Serialization;
 using DotNetEnv;
+using FateConnect.Api.Infrastructure.Converters;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Infrastructure.Middlewares;
 using FateConnect.Api.Modules.Auth.Entities;
@@ -75,6 +76,7 @@ public class Program
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
