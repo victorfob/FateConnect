@@ -8,21 +8,20 @@ using Microsoft.EntityFrameworkCore;
 
 public class RideRepository(FateConnectDbContext context) : IRideRepository
 {
-    public async Task<IEnumerable<Ride>> GetAllAsync(FilterRideDto filter)
+    public async Task<IReadOnlyList<Ride>> GetAllAsync(FilterRideDto filter)
     {
-        var (departureDate, departureTime, destination, rideType) = filter;
 
         IQueryable<Ride> query = context.Rides.AsNoTracking().Where(r => r.IsActive);
 
-        if (departureDate.HasValue)
-            query = query.Where(r => r.DepartureDate == departureDate.Value);
+        if (filter.DepartureDate.HasValue)
+            query = query.Where(r => r.DepartureDate == filter.DepartureDate.Value);
 
-        if (departureTime.HasValue)
-            query = query.Where(r => r.DepartureTime == departureTime.Value);
+        if (filter.DepartureTime.HasValue)
+            query = query.Where(r => r.DepartureTime == filter.DepartureTime.Value);
 
-        if (!string.IsNullOrWhiteSpace(destination))
+        if (!string.IsNullOrWhiteSpace(filter.Destination))
         {
-            string escapedDestination = destination
+            string escapedDestination = filter.Destination
                 .Replace(@"\", @"\\")
                 .Replace("%", @"\%")
                 .Replace("_", @"\_");
@@ -35,8 +34,8 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
                 ));
         }
 
-        if (rideType.HasValue)
-            query = query.Where(r => r.RideType == rideType.Value);
+        if (filter.RideType.HasValue)
+            query = query.Where(r => r.RideType == filter.RideType.Value);
 
         var orderedRidesQuery = query
             .OrderBy(r => r.DepartureDate)

@@ -1,6 +1,6 @@
-using FateConnect.Api.Modules.Rides.Enums;
-
 namespace FateConnect.Api.Modules.Rides.DTOs;
+
+using FateConnect.Api.Modules.Rides.Enums;
 
 public record ReadRideDto(
     Guid Id,
@@ -10,6 +10,5 @@ public record ReadRideDto(
     TimeOnly DepartureTime,
     DateTime CreatedAt,
     EnumRideType RideType,
-    string? Description,
-    bool IsActive
+    string? Description
 );

@@ -30,14 +30,11 @@ public partial class RideService(
 
     public async Task<IEnumerable<ReadRideDto>> GetAllAsync(FilterRideDto filter)
     {
-        var rides = await repository.GetAllAsync(
-            filter
-        );
+        var rides = await repository.GetAllAsync(filter);
 
-        var rideList = rides as IReadOnlyCollection<Ride> ?? rides.ToList();
-        LogRidesRetrieved(logger, rideList.Count);
+        LogRidesRetrieved(logger, rides.Count);
 
-        return rideList.Select(MapToReadDto);
+        return rides.Select(MapToReadDto);
     }
 
     public async Task<ReadRideDto?> GetByIdAsync(Guid id)
@@ -111,8 +108,7 @@ public partial class RideService(
             ride.DepartureTime,
             ride.CreatedAt,
             ride.RideType,
-            ride.Description,
-            ride.IsActive
+            ride.Description
         );
 
 }
