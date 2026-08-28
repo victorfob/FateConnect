@@ -9,7 +9,7 @@ public class InvalidAvailableSeatsException(int seats)
     : RideDomainException($"The number of seats must be between 1 and 7. Received: {seats}.");
 
 public class InvalidDestinationException()
-    : RideDomainException("The destination cannot be null, empty, or whitespace.");
+    : RideDomainException("The destination must contain between 3 and 100 characters.");
 
 public class InvalidRideTypeException()
     : RideDomainException("Invalid ride type.");

@@ -113,7 +113,9 @@ public class Ride
 
     private static void ValidateDestination(string? destination)
     {
-        if (string.IsNullOrWhiteSpace(destination))
+        bool isInvalidDestination = string.IsNullOrWhiteSpace(destination) || destination.Trim().Length < 3;
+
+        if (isInvalidDestination)
             throw new InvalidDestinationException();
     }
 }
