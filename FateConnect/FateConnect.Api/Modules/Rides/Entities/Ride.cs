@@ -81,9 +81,6 @@ public class Ride
 
     public void Deactivate()
     {
-        if (!IsActive)
-            throw new RideAlreadyDeactivatedException();
-
         IsActive = false;
     }
 
