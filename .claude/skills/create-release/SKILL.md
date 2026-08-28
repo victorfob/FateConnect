@@ -60,23 +60,24 @@ A da raiz sobe **sempre**. As outras sobem **só se aquele lado mudou** — vers
 ```bash
 git fetch origin
 git diff --name-only origin/main..origin/develop -- FateConnect/Web | head -1
-git diff --name-only origin/main..origin/develop -- FateConnect/FateConnect.Api FateConnect/Carona | head -1
+git diff --name-only origin/main..origin/develop -- FateConnect/FateConnect.Api | head -1
 ```
 
 | Onde | Sobe quando |
 | --- | --- |
 | `package.json` da raiz | **sempre** — é a versão da release e vira a tag |
 | `FateConnect/Web/package.json` | houve mudança em `FateConnect/Web/` |
-| `FateConnect/FateConnect.Api/FateConnect.Api.csproj` | houve mudança em `FateConnect/FateConnect.Api/` |
-| `FateConnect/Carona/Directory.Build.props` | houve mudança em `FateConnect/Carona/` — cobre os projetos da pasta |
+| `FateConnect/FateConnect.Api/FateConnect.Api.csproj` | houve mudança em `FateConnect/FateConnect.Api/` ou em `FateConnect/FateConnect.Api.Tests/` |
 
-⚠️ **As duas APIs versionam separado**, porque sobem como contêineres separados. Mudança só em caronas não move a versão da API de contas.
+⚠️ **O front e a API versionam separado**, porque sobem como artefatos separados — estáticos servidos pelo nginx e um contêiner. Mudança só no front não move a versão da API.
+
+⚠️ **O projeto de teste conta como mudança na API.** Ele mora em `FateConnect.Api.Tests`, pasta irmã e não filha, então um filtro por `FateConnect/FateConnect.Api/` com barra no final não o alcança.
 
 Uma pista rápida do que cada lado recebeu: as entradas do `Unreleased` terminam em `[Frontend]` ou `[Backend]`. É indício, não prova — refactor e correção de infraestrutura não aparecem no changelog e mesmo assim mudam o código.
 
-⚠️ **Só a da raiz é lida por alguma coisa.** As outras três não alimentam build, tag nem Sentry — existem para o artefato não mentir sobre si. Saber disso evita duas coisas: tratar um bump esquecido como incidente, e supor que mexer nelas afeta a publicação.
+⚠️ **Só a da raiz é lida por alguma coisa.** As outras duas não alimentam build, tag nem Sentry — existem para o artefato não mentir sobre si. Saber disso evita duas coisas: tratar um bump esquecido como incidente, e supor que mexer nelas afeta a publicação.
 
-Depois de tocar `.csproj` ou `Directory.Build.props`, **confirme que o número chegou** e que o build passa:
+Depois de tocar o `.csproj`, **confirme que o número chegou** e que o build passa:
 
 ```bash
 dotnet msbuild <projeto>.csproj -getProperty:Version
