@@ -22,12 +22,26 @@ public class TimeOnlyJsonConverter : JsonConverter<TimeOnly>
 
     public override TimeOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        bool isInvalidTokenType = reader.TokenType != JsonTokenType.String;
+
+        if (isInvalidTokenType)
+        {
+            throw new JsonException("Invalid time format: Expected a string in HH:mm or HH:mm:ss format.");
+        }
+
         string? stringValue = reader.GetString();
 
-        if (TimeOnly.TryParseExact(stringValue, AcceptedFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out TimeOnly time))
-        {
+        bool isValidTimeFormat = TimeOnly.TryParseExact(
+            stringValue,
+            AcceptedFormats,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out TimeOnly time
+        );
+
+        if (isValidTimeFormat)
             return time;
-        }
+
 
         throw new JsonException($"Invalid time format: '{stringValue}'. Expected HH:mm or HH:mm:ss.");
     }
