@@ -33,7 +33,7 @@ gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
 ```
 
 - ⛔ **A linha precisa estar dentro de uma seção do diff**, senão a API responde 422. Confira antes mapeando as seções — o `Program.cs` tinha um vão de duas linhas exatamente onde eu queria comentar.
-- **Problema num arquivo apagado: `side: LEFT`, no arquivo antigo.** É a melhor âncora para comportamento removido — o comentário sobre o `TimeOnlyJsonConverter` ficou em cima do XML doc que explicava por que ele existia, então o motivo e o apontamento chegam juntos.
+- **Problema num arquivo apagado: `side: LEFT`, no arquivo antigo.** É a melhor âncora para comportamento removido: o thread nasce em cima do código que some, e não numa linha vizinha parecida. Ancore na **declaração** — a classe, o método —, nunca na chave de fechamento.
 - Editar: `PATCH .../pulls/comments/<id>`. Apagar: `DELETE` no mesmo caminho.
 
 ⛔ **Quando o problema é ausência, não há âncora.** Arquivo que o PR *não* tocou não está no diff. Aí o apontamento não é comentário: vira issue, ou não é levantado. **Decida com o usuário** — foi assim que o contrato do front virou uma issue em vez de um thread.
