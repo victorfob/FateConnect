@@ -29,7 +29,7 @@ public class TokenService : ITokenService
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = claimsDoUsuario,
-            Expires = DateTime.UtcNow.AddHours(_jwtOptions.ExpiracaoHoras),
+            Expires = DateTime.UtcNow.AddHours(_jwtOptions.ExpirationHours),
             Issuer = _jwtOptions.Issuer,
             Audience = _jwtOptions.Audience,
             SigningCredentials = new SigningCredentials(

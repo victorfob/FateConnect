@@ -45,7 +45,7 @@ public class Program
         {
             options.AddPolicy(corsPolicy, policy =>
             {
-                policy.WithOrigins(corsPolicy)
+                policy.WithOrigins(allowedOrigins)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -57,7 +57,7 @@ public class Program
             Secret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? string.Empty,
             Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? string.Empty,
             Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? string.Empty,
-            ExpiracaoHoras = double.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRATION_HOURS"), out double hours) ? hours : 8
+            ExpirationHours = double.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRATION_HOURS"), out double hours) ? hours : 8
         };
 
         builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(jwtOptions));
@@ -127,7 +127,7 @@ public class Program
             });
         });
 
-        byte[] key = Encoding.ASCII.GetBytes(jwtOptions.Secret);
+        byte[] key = Encoding.UTF8.GetBytes(jwtOptions.Secret);
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
