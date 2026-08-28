@@ -1,15 +1,39 @@
 import axios, { type AxiosInstance } from 'axios';
 
+import { notifySessionExpired } from './auth/sessionExpiry';
 import { tokenStorage } from './auth/tokenStorage';
 
-/** Erro já normalizado para a camada de UI. */
-export type ApiError = {
-  status?: number;
-  message: string;
-};
+/**
+ * Erro já normalizado para a camada de UI. É classe, e não objeto solto, porque
+ * rejeitar promessa com literal descarta a pilha e faz `instanceof` mentir.
+ */
+export class ApiError extends Error {
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
+/**
+ * Sessão vencida tem tipo próprio porque quem trata precisa **calar**, não
+ * avisar: a tela de sessão expirada já está no ar, e uma notificação em cima
+ * dela seria o mesmo recado duas vezes.
+ */
+export class SessionExpiredError extends ApiError {
+  constructor(status?: number) {
+    super(SESSION_EXPIRED_MESSAGE, status);
+    this.name = 'SessionExpiredError';
+  }
+}
 
 export const NETWORK_ERROR_MESSAGE = 'Não foi possível conectar ao servidor. Tente novamente.';
 export const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
+export const SESSION_EXPIRED_MESSAGE = 'Sessão expirada. Entre novamente para continuar.';
+
+const UNAUTHORIZED = 401;
 
 function withInterceptors(client: AxiosInstance): AxiosInstance {
   client.interceptors.request.use((config) => {
@@ -23,17 +47,26 @@ function withInterceptors(client: AxiosInstance): AxiosInstance {
     (response) => response,
     (error: unknown) => {
       if (!axios.isAxiosError(error)) {
-        return Promise.reject<ApiError>({ message: GENERIC_ERROR_MESSAGE });
+        return Promise.reject(new ApiError(GENERIC_ERROR_MESSAGE));
       }
 
       if (!error.response) {
-        return Promise.reject<ApiError>({ message: NETWORK_ERROR_MESSAGE });
+        return Promise.reject(new ApiError(NETWORK_ERROR_MESSAGE));
       }
 
-      return Promise.reject<ApiError>({
-        status: error.response.status,
-        message: GENERIC_ERROR_MESSAGE,
-      });
+      // Só é expiração quando havia sessão: o interceptor acima só manda
+      // `Authorization` se houver token, então `401` sem token é credencial
+      // recusada — o que o login devolve a quem erra a senha.
+      if (error.response.status === UNAUTHORIZED && tokenStorage.getToken()) {
+        // Limpar antes de avisar encerra o laço: as requisições que falharem em
+        // seguida já não levam token, então não voltam por este caminho.
+        tokenStorage.clear();
+        notifySessionExpired();
+
+        return Promise.reject(new SessionExpiredError(error.response.status));
+      }
+
+      return Promise.reject(new ApiError(GENERIC_ERROR_MESSAGE, error.response.status));
     },
   );
 

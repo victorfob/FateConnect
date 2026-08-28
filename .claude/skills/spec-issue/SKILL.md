@@ -38,6 +38,14 @@ Priorize o que trava decisão adiante: contrato e modelo de dados primeiro, depo
 
 ⛔ **Não pergunte o que o código responde.** "Qual o limite do campo?" é leitura, não sabatina. Pergunte o que só o usuário sabe: produto, prioridade, e o que o protótipo não mostra.
 
+### A primeira pergunta é o artefato, não onde ele mora
+
+⛔ **Antes de perguntar sobre implementação, pergunte o que a pessoa recebe.** O formato da entrega — página, arquivo, PDF, e-mail —, se é definitivo ou provisório, e o que ele precisa conter: isso é produto, e só o usuário decide. Onde a rota mora, como o link abre e qual componente monta a tela vem depois, e boa parte disso o código já responde sozinho.
+
+**O sinal de que a ordem inverteu:** a spec já descreve arquivo, rota e componente, e ninguém disse ainda em que forma a coisa chega a quem usa.
+
+⛔ Aconteceu na #163. A sabatina perguntou onde a rota morava, como os links abriam e se o rodapé linkava — implementação, toda ela — e **fechou calada as duas decisões que eram de produto**: que o texto seria renderizado como página React, e que entraria como rascunho. As duas foram para o corpo da issue escritas como decisão, sem nunca terem sido oferecidas como opção. As duas foram derrubadas durante a implementação, uma em cada mensagem — *"não ter texto na página, a ideia é que os links abram o PDF numa nova guia"* —, e o que já estava construído foi jogado fora. A cobrança foi exatamente esta: *"vc tomou uma decisão de renderizar o texto na página sem nem abordar outras opções e nem me perguntar"*.
+
 ### A resposta em texto livre é a que muda o desenho
 
 A opção que o usuário digita vale mais que as que você ofereceu — e costuma contradizer algo já decidido. **Antes do bloco seguinte, reconcilie.**
@@ -51,6 +59,12 @@ Mesma regra quando a resposta cresce o escopo para fora da issue: **diga em qual
 No **corpo da issue**, que passa a ser o guarda-chuva. Nada de documento à parte: o que não está na issue não é lido por quem implementa.
 
 O corpo carrega, nessa ordem: as decisões em tabela, o modelo de dados ou contrato em bloco de código, as suposições com esse nome, e a referência ao protótipo.
+
+⛔ **Escolha que ninguém te deu vai para "suposições", nunca para "decisões".** A tabela de decisões registra o que o usuário decidiu; tudo que você fechou para conseguir seguir escrevendo é suposição, por mais óbvia que pareça.
+
+**O tell é a voz.** Se você escreve uma escolha sua com a mesma frase com que escreve um achado do código — *"duas rotas novas, cada uma renderizando o texto versionado"* —, ela vira decisão aos olhos de quem lê, e ninguém volta a discuti-la. Na #163 duas escolhas de produto entraram assim e as duas foram derrubadas depois, com o trabalho já feito.
+
+Na dúvida entre as duas seções, é suposição: a decisão errada custa uma pergunta, a suposição errada custa a implementação.
 
 ## 4. Dividir em sub-issues
 

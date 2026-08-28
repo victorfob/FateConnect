@@ -1,6 +1,6 @@
 import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
 
-import type { ApiError } from '@app/services/httpClient';
+import { ApiError, SessionExpiredError } from '@app/services/httpClient';
 
 const RETRY_ATTEMPTS = 1;
 
@@ -16,13 +16,18 @@ const FALLBACK_MESSAGE = 'Algo deu errado. Tente novamente.';
 export type RequestErrorMeta = { errorMessage?: string; notifiesErrorItself?: boolean };
 
 function messageOf(error: unknown): string {
-  const apiError = error as ApiError;
+  if (error instanceof ApiError) return error.message;
 
-  return apiError?.message ?? FALLBACK_MESSAGE;
+  return FALLBACK_MESSAGE;
 }
 
 function notifierFor(notifyError: (message: string) => void) {
   return (error: unknown, meta: RequestErrorMeta | undefined): void => {
+    // A tela de sessão expirada substitui o conteúdo inteiro; notificar por
+    // cima dela é o mesmo recado duas vezes, e a mensagem da query ainda fala
+    // de carregar dados, que deixou de ser o assunto.
+    if (error instanceof SessionExpiredError) return;
+
     if (meta?.notifiesErrorItself) return;
 
     notifyError(meta?.errorMessage ?? messageOf(error));

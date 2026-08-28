@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@design-system';
 
+import { LegalFooterLinks } from '@app/components/LegalFooterLinks';
 import * as C from '@app/constants/appContact';
 import { APP_LINKS } from '@app/constants/navigation';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
@@ -64,6 +65,7 @@ export function MainLayout() {
         title={C.FOOTER_TITLE}
         contact={C.APP_CONTACT}
         copyrightLines={C.FOOTER_COPYRIGHT_LINES}
+        links={<LegalFooterLinks />}
       />
     </S.ShellRoot>
   );

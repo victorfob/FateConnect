@@ -124,6 +124,17 @@ export const components: Components<Theme> = {
   // deixava de valer para o que a tela desenhava.
   MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
   MuiDialog: { styleOverrides: { paper: { borderRadius: radius(radiusScale.lg) } } },
+  // O esqueleto pisca por gradiente, não pela opacidade do `pulse` padrão: a 40%
+  // de opacidade a cor pintada deixa de ser a que `contrast.test.ts` mede.
+  MuiSkeleton: {
+    defaultProps: { variant: 'rectangular', animation: 'wave' },
+    styleOverrides: {
+      root: ({ theme }) => ({
+        backgroundColor: theme.palette.skeleton,
+        borderRadius: radius(radiusScale.sm),
+      }),
+    },
+  },
   MuiAppBar: {
     defaultProps: { elevation: 0 },
     styleOverrides: {
