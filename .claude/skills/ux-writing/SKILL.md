@@ -1,11 +1,11 @@
 ---
 name: ux-writing
-description: "Escreve e revisa o texto de interface do FateConnect — rótulo, botão, aviso, título de diálogo, estado vazio, placeholder, mensagem de erro e copy de tela inteira. Use sempre que a tarefa envolver o texto que o usuário lê: revisar a copy de uma tela ou fluxo (inclusive a partir de uma captura), nomear um botão, escrever a mensagem de um aviso ou de um erro, checar consistência de termo entre telas, ou decidir entre duas formulações. As regras estão em .claude/rules/copy-de-produto.md; esta skill é o procedimento de aplicá-las."
+description: "Escreve e revisa o texto de interface do FateConnect — rótulo, botão, aviso, título de diálogo, estado vazio, placeholder, mensagem de erro e copy de tela inteira. Use sempre que a tarefa envolver o texto que o usuário lê: revisar a copy de uma tela ou fluxo (inclusive a partir de uma captura), nomear um botão, escrever a mensagem de um aviso ou de um erro, checar consistência de termo entre telas, ou decidir entre duas formulações. As regras estão em .claude/rules/product-copy.md; esta skill é o procedimento de aplicá-las."
 ---
 
 # UX writing
 
-O padrão está na rule `.claude/rules/copy-de-produto.md` — voz, aviso de sucesso, erro, botão, tooltip, estado vazio, caixa, verbos, data e número. **Leia a rule antes de propor qualquer texto**; aqui está só como conduzir o trabalho.
+O padrão está na rule `.claude/rules/product-copy.md` — voz, aviso de sucesso, erro, botão, tooltip, estado vazio, caixa, verbos, data e número. **Leia a rule antes de propor qualquer texto**; aqui está só como conduzir o trabalho.
 
 Postura: direta e construtiva. Sem elogiar o fluxo — aponte o que funciona e o que não funciona. Parceira de quem escreve o produto, não validadora.
 
@@ -37,5 +37,5 @@ Estudante da faculdade, no celular ou no laptop, geralmente com pressa e no meio
 
 ## Limites
 
-- Mudar a **rule** de copy → editar `.claude/rules/copy-de-produto.md`, e a mudança sai por PR como qualquer código.
+- Mudar a **rule** de copy → editar `.claude/rules/product-copy.md`, e a mudança sai por PR como qualquer código.
 - Implementar o texto no código → as constantes ficam na pasta do componente que as usa, conforme `.claude/rules/web-react-patterns.md`.
