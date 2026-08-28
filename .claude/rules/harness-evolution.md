@@ -96,3 +96,9 @@ Gatilho que dispara no meio de uma tarefa: **termine a tarefa primeiro**, depois
 ## Fechamento de rodada
 
 Ao fim de uma rodada com correções do usuário, antes de partir para a próxima tarefa: cruzar **cada** correção contra o harness e terminar em um de dois estados explícitos — **coberta** (dizer por qual rule/skill/memória) ou **descartada por decisão consciente** (dizer o motivo). Auditar também a memória contra as rules: memória órfã é regra que só dispara se eu lembrar de procurá-la.
+
+⛔ **A varredura roda ANTES de abrir o PR de harness, não depois.** É o único momento em que o item que ela encontra entra de graça: com o PR aberto, ele custa outro PR; com o PR mergeado, ele fica esperando o próximo — e "o próximo" é onde item conversado evapora.
+
+Aconteceu em 2026-08-28. Saíram **dois** PRs de harness no mesmo dia e um item conhecido não entrou em nenhum: o Victor tinha corrigido, horas antes do primeiro, que suposição com ele presente deveria virar pergunta. Eu só cruzei as correções contra o harness depois do segundo PR mergear, e a cobrança foi direta — *"acabamos de fazer um PR de harness, pq vc não sugeriu colocar nele isso?"*.
+
+**O gatilho é escrever `gh pr create` num PR que toca `.claude/`.** Antes de rodar: releia a conversa inteira procurando correção do usuário, não só a que motivou este PR.

@@ -69,6 +69,16 @@ O corpo carrega, nessa ordem: as decisões em tabela, o modelo de dados ou contr
 
 Na dúvida entre as duas seções, é suposição: a decisão errada custa uma pergunta, a suposição errada custa a implementação.
 
+### Antes de registrar a suposição, ofereça a decisão
+
+⛔ **Suposição é para o que não dá para perguntar agora** — usuário ausente, resposta que depende de terceiro, detalhe que só a implementação revela. Com ele presente, parquear uma escolha na tabela de suposições é adiar trabalho que sairia por uma pergunta.
+
+O custo real de uma suposição não é ela estar errada: é **alguém ter que voltar nela**. Cada linha da tabela é uma conversa marcada para depois, e "depois" costuma ser no meio da implementação, com código já escrito em cima.
+
+⛔ Aconteceu na #184. Escrevi três suposições — projeto único no Sonar, análise dentro do job existente, chave do projeto sem nome — e o Victor respondeu *"não quero que fique suposições, vamos transformar elas em decisões"*. As três viraram um bloco de `AskUserQuestion` e foram decididas em uma rodada, com o motivo de cada uma registrado na tabela de decisões. A tabela de suposições sumiu do corpo.
+
+**A regra prática:** montou a lista de suposições, releia procurando as que **cabem numa pergunta com duas opções concretas**. Essas não são suposições — são perguntas que você não fez.
+
 ## 4. Dividir em sub-issues
 
 **Uma sub-issue é um PR.** O teste: dá para revisar e reverter sozinha?
