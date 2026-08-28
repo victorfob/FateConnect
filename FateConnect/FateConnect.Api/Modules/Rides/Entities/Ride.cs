@@ -90,12 +90,11 @@ public class Ride
 
     private static void ValidateRideType(EnumRideType rideType)
     {
-        bool isInvalidRideType = !Enum.IsDefined(typeof(EnumRideType), rideType);
+        bool isInvalidRideType = !Enum.IsDefined(rideType);
 
         if (isInvalidRideType)
-        {
             throw new InvalidRideTypeException();
-        }
+
     }
 
     private static void ValidateDepartureDateTime(DateOnly date, TimeOnly time)
