@@ -33,9 +33,12 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
         if (rideType.HasValue)
             query = query.Where(r => r.RideType == rideType.Value);
 
-        return await query
+        var orderedRidesQuery = query
             .OrderBy(r => r.DepartureDate)
-            .ToListAsync();
+            .ThenBy(r => r.DepartureTime)
+            .ThenBy(r => r.Id);
+
+        return await orderedRidesQuery.ToListAsync();
     }
 
     public async Task<Ride?> GetByIdAsync(Guid id)

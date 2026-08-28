@@ -62,13 +62,12 @@ public class Program
 
         builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(jwtOptions));
 
-        // Users & Auth Modules
         builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
 
-        // Rides Module
         builder.Services.AddScoped<IRideRepository, RideRepository>();
         builder.Services.AddScoped<IRideService, RideService>();
 
