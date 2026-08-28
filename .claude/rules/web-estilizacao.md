@@ -137,6 +137,14 @@ Para decidir em JS, `useMediaQuery(theme.breakpoints.up('md'))` — não meça `
 <S.Container>
 ```
 
+## Sobrescrever estado do MUI: repita a classe do componente
+
+⛔ **`& .Mui-selected` empata com o seletor da biblioteca e perde no desempate por ordem de fonte.** Use `& .MuiPaginationItem-root.Mui-selected` — a classe do componente mais a do estado —, que sobe a especificidade acima da do MUI. Vale para `.Mui-selected`, `.Mui-disabled`, `.Mui-focused`, `.Mui-checked` e companhia.
+
+**O sintoma é traiçoeiro porque é parcial:** só as propriedades que o MUI também declara voltam ao valor dele. Na #171 o `color` aplicava e o `backgroundColor` não, e o número da página selecionada saía **branco sobre o cinza da biblioteca** — quase ilegível. Um seletor que "quase funciona" é mais difícil de ver do que um que não funciona.
+
+⚠️ **Nenhum gate pega isso.** ESLint, `tsc`, a suíte e o teste de contraste passam: nenhum deles renderiza o componente com o CSS do MUI competindo. A conferência é rodar na aplicação — ver `.claude/rules/paralelismo-e-worktrees.md`.
+
 ## 📚 Referências
 
 - [Palette](https://mui.com/material-ui/customization/palette/)
