@@ -23,7 +23,7 @@ public class TokenService : ITokenService
     {
         JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
-        byte[] chaveSeguranca = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
+        byte[] chaveSeguranca = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
         ClaimsIdentity claimsDoUsuario = CriarClaimsDoUsuario(usuario);
 
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
