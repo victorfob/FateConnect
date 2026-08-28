@@ -2,13 +2,13 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
 import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
+import { PRIVACY_URL, TERMS_URL } from '@app/constants/legalDocuments';
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
 import { CALENDAR_TOGGLE_LABEL } from './components/BirthDateField/constants';
-import { LEGAL_SOON_MESSAGES } from './components/ConsentSection/constants';
 import { SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
@@ -228,23 +228,32 @@ describe('Signup', () => {
     expect(await screen.findByText(C.ZIP_LOOKUP_MESSAGES.failed)).toBeInTheDocument();
   });
 
-  it('should announce that the legal documents are not available yet', async () => {
+  it('should open each legal document in a new tab, so the form survives', () => {
     renderSignup();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Termos de Uso' }));
+    const terms = screen.getByRole('link', { name: 'Termos de Uso' });
+    expect(terms).toHaveAttribute('href', TERMS_URL);
+    expect(terms).toHaveAttribute('target', '_blank');
 
-    expect(await screen.findByText(LEGAL_SOON_MESSAGES.terms)).toBeInTheDocument();
+    const privacy = screen.getByRole('link', { name: 'Política de Privacidade' });
+    expect(privacy).toHaveAttribute('href', PRIVACY_URL);
+    expect(privacy).toHaveAttribute('target', '_blank');
+  });
 
-    await userEvent.click(screen.getByRole('button', { name: 'Política de Privacidade' }));
+  it('should toggle the consent when the sentence around the links is clicked', async () => {
+    renderSignup();
+    const consent = screen.getByRole('checkbox', { name: /Termos de Uso/ });
 
-    expect(await screen.findByText(LEGAL_SOON_MESSAGES.privacy)).toBeInTheDocument();
+    await userEvent.click(screen.getByText(/Eu concordo com os/));
+
+    expect(consent).toBeChecked();
   });
 
   it('should not toggle the consent when the legal link is clicked', async () => {
     renderSignup();
     const consent = screen.getByRole('checkbox', { name: /Termos de Uso/ });
 
-    await userEvent.click(screen.getByRole('button', { name: 'Termos de Uso' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Termos de Uso' }));
 
     expect(consent).not.toBeChecked();
   });

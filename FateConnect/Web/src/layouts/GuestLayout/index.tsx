@@ -4,6 +4,7 @@ import { Footer, Header, NavigationDrawer, ThemeToggleButton, Typography } from 
 
 import { DrawerSectionItem } from '@app/components/DrawerSectionItem';
 import { LandingNavButton } from '@app/components/LandingNavButton';
+import { LegalFooterLinks } from '@app/components/LegalFooterLinks';
 import * as C from '@app/constants/appContact';
 import { LANDING_LINKS } from '@app/constants/navigation';
 import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
@@ -73,6 +74,7 @@ export function GuestLayout() {
         title={C.FOOTER_TITLE}
         contact={C.APP_CONTACT}
         copyrightLines={C.FOOTER_COPYRIGHT_LINES}
+        links={<LegalFooterLinks />}
       />
     </S.ShellRoot>
   );

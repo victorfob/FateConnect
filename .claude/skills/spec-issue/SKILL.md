@@ -38,6 +38,14 @@ Priorize o que trava decisão adiante: contrato e modelo de dados primeiro, depo
 
 ⛔ **Não pergunte o que o código responde.** "Qual o limite do campo?" é leitura, não sabatina. Pergunte o que só o usuário sabe: produto, prioridade, e o que o protótipo não mostra.
 
+### A primeira pergunta é o artefato, não onde ele mora
+
+⛔ **Antes de perguntar sobre implementação, pergunte o que a pessoa recebe.** O formato da entrega — página, arquivo, PDF, e-mail —, se é definitivo ou provisório, e o que ele precisa conter: isso é produto, e só o usuário decide. Onde a rota mora, como o link abre e qual componente monta a tela vem depois, e boa parte disso o código já responde sozinho.
+
+**O sinal de que a ordem inverteu:** a spec já descreve arquivo, rota e componente, e ninguém disse ainda em que forma a coisa chega a quem usa.
+
+⛔ Aconteceu na #163. A sabatina perguntou onde a rota morava, como os links abriam e se o rodapé linkava — implementação, toda ela — e **fechou calada as duas decisões que eram de produto**: que o texto seria renderizado como página React, e que entraria como rascunho. As duas foram para o corpo da issue escritas como decisão, sem nunca terem sido oferecidas como opção. As duas foram derrubadas durante a implementação, uma em cada mensagem — *"não ter texto na página, a ideia é que os links abram o PDF numa nova guia"* —, e o que já estava construído foi jogado fora. A cobrança foi exatamente esta: *"vc tomou uma decisão de renderizar o texto na página sem nem abordar outras opções e nem me perguntar"*.
+
 ### A resposta em texto livre é a que muda o desenho
 
 A opção que o usuário digita vale mais que as que você ofereceu — e costuma contradizer algo já decidido. **Antes do bloco seguinte, reconcilie.**
