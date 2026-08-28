@@ -6,7 +6,7 @@ import { useNotification } from '@app/hooks/useNotification';
 import { createQueryClient } from './queryClient';
 
 /** Precisa ficar dentro do provider de notificação: consome o notificador. */
-export function QueryProvider({ children }: { children: ReactNode }) {
+export function QueryProvider({ children }: Readonly<{ children: ReactNode }>) {
   const { notifyError } = useNotification();
   const [queryClient] = useState(() => createQueryClient(notifyError));
 

@@ -34,6 +34,14 @@ O mesmo objeto ou estado se chama igual em **toda** a tela — etiqueta, botão,
 
 ⛔ Aconteceu em achados e perdidos: etiqueta "Concluído", diálogo "Confirmar Conclusão", botão "Concluir" e aviso "Item resolvido" — dois nomes para um estado. Ficou **Resolvido** em todos, inclusive no valor que o contrato serializa.
 
+### O valor que o contrato serializa não é o rótulo
+
+⛔ **Antes de escrever um valor de enum em texto que alguém lê — copy, URL, corpo de issue —, confira o mapa de rótulo.** Os dois nem sempre coincidem: `Filantropica` aparece na tela como **Solidária**, e `Igualitaria` como **Igualitária**, com acento. O mapa mora ao lado da tela, em `src/pages/Rides/helpers/rideType.ts`.
+
+Aconteceu ao especificar a paginação: escrevi `?tipo=filantropica` chamando aquilo de "o termo em pt-BR do produto". Não era — era a serialização do backend, e a palavra que a interface usa é outra. Eu tinha lido o `types.ts`; o valor estava certo e o **papel** dele, errado.
+
+Coincidir é o caso feliz, não a regra: em achados e perdidos `lostItemKind.ts` diz que "o valor canônico já é o rótulo", e é por isso que lá não há armadilha.
+
 ## Erro: o problema e a saída
 
 Diz o que aconteceu e o que fazer: `Erro ao carregar os itens. Tente novamente.`
