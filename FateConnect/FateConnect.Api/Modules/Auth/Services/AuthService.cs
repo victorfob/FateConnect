@@ -36,7 +36,7 @@ public class AuthService : IAuthService
         };
     }
 
-    private bool CredenciaisInvalidas(Usuario? usuario, string senhaInserida)
+    private static bool CredenciaisInvalidas(Usuario? usuario, string senhaInserida)
     {
         if (usuario == null)
             return true;

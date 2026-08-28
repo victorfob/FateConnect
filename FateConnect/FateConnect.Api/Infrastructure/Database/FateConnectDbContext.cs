@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Infrastructure.Database;
 
 using FateConnect.Api.Modules.Rides.Entities;
-using FateConnect.Api.Modules.Shared.Entities;
+using FateConnect.Api.Modules.Common.Entities;
 using FateConnect.Api.Modules.Usuarios;
 using Microsoft.EntityFrameworkCore;
 

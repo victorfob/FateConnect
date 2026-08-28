@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Shared.Constants;
+namespace FateConnect.Api.Modules.Common.Constants;
 
 public class RegexConstants
 {

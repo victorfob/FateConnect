@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using FateConnect.Api.Modules.Shared.Constants;
+using FateConnect.Api.Modules.Common.Constants;
 
 namespace FateConnect.Api.Modules.Usuarios.DTOs;
 

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -41,11 +42,11 @@ public class TokenService : ITokenService
         return tokenHandler.WriteToken(token);
     }
 
-    private ClaimsIdentity CriarClaimsDoUsuario(Usuario usuario)
+    private static ClaimsIdentity CriarClaimsDoUsuario(Usuario usuario)
     {
         Claim[] claims =
         [
-            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString(CultureInfo.InvariantCulture)),
             new Claim(ClaimTypes.Email, usuario.EmailFatec),
             new Claim(ClaimTypes.Role, usuario.Perfil.ToString())
         ];

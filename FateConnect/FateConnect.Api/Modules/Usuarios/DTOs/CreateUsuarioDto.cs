@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using FateConnect.Api.Modules.Shared.Constants;
-using FateConnect.Api.Modules.Shared.DTOs;
+using FateConnect.Api.Modules.Common.Constants;
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Usuarios.Enums;
 
 namespace FateConnect.Api.Modules.Usuarios.DTOs;
@@ -35,7 +35,7 @@ public class CreateUsuarioDto
 
     [Required]
     [DefaultValue(0)]
-    public GeneroEnum Genero { get; set; }
+    public Genero Genero { get; set; }
 
     [Required]
     required public List<CreateEnderecoDto> Enderecos { get; set; } =

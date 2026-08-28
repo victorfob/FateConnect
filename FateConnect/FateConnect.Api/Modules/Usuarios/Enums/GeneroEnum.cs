@@ -1,6 +1,6 @@
 namespace FateConnect.Api.Modules.Usuarios.Enums;
 
-public enum GeneroEnum
+public enum Genero
 {
     Masculino,
     Feminino,

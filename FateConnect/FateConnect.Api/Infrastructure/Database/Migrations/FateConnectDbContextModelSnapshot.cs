@@ -22,7 +22,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Shared.Entities.Contato", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Contato", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -50,7 +50,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("Contatos");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Shared.Entities.Endereco", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Endereco", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -149,7 +149,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("Usuarios");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Shared.Entities.Contato", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Contato", b =>
                 {
                     b.HasOne("FateConnect.Api.Modules.Usuarios.Usuario", "Usuario")
                         .WithMany("Contatos")
@@ -160,7 +160,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Shared.Entities.Endereco", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Endereco", b =>
                 {
                     b.HasOne("FateConnect.Api.Modules.Usuarios.Usuario", "Usuario")
                         .WithMany("Enderecos")
