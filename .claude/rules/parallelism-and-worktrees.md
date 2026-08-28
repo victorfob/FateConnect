@@ -47,7 +47,26 @@ git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+[^+]"                 # l
 git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+\s*(/\*\*|\*|//)" # dessas, comentário
 ```
 
-Na #156 deram **37 de 157 linhas — 24%**. Sete reprovaram no teste da `comentarios.md` e saíram: um JSDoc que repetia o que o `types.ts` já dizia e ainda pousava sobre a constante errada, um que só reafirmava a linha logo abaixo, e uma enumeração de consumidores que **envelheceu no próprio PR** que a escreveu.
+Na #156 deram **37 de 157 linhas — 24%**. Sete reprovaram no teste da `comments.md` e saíram: um JSDoc que repetia o que o `types.ts` já dizia e ainda pousava sobre a constante errada, um que só reafirmava a linha logo abaixo, e uma enumeração de consumidores que **envelheceu no próprio PR** que a escreveu.
 
 ⚠️ **A densidade é o gatilho de ir olhar, não o veredito.** Compare com o mesmo arquivo na branch base antes de cortar: `palettes.ts` já era 15% e `tokens/palette.ts` é 40% — arquivo que guarda decisão de cor é denso por convenção da casa, e cortar até uma meta inventada apaga justamente o *porquê*. Quem decide continua sendo o teste de cada comentário: **ele impede alguém de fazer uma mudança errada?**
 
+## Gate verde não prova componente
+
+⛔ **Rode a entrega do agente dentro da aplicação antes de aceitá-la.** ESLint, `tsc`, a suíte inteira e o teste de contraste podem passar sobre um componente que se desenha errado, porque **nenhum deles o renderiza dentro do app** — sem o CSS da biblioteca competindo, sem o tema real, sem os vizinhos.
+
+⛔ **E desconfie de medição feita em sonda isolada.** É o jeito natural de um agente provar estilo, e é justamente onde o defeito se esconde: a sonda mede um mundo em que a disputa não existe. Medição fora do contexto real não é medição fraca: é medição de outra coisa.
+
+Aconteceu na #171. O agente relatou, de boa-fé, ter medido a página selecionada em `#CF2E2E` com texto branco. No app o fundo era o **cinza do MUI**: o seletor `& .Mui-selected` tem a mesma especificidade do seletor da biblioteca e perdia no desempate por ordem de fonte. A cor do texto aplicava — o MUI não disputa essa propriedade —, então o número saía **branco sobre cinza claro**, quase ilegível. Atravessou ESLint, `tsc`, 436 testes e o teste de contraste. Quem pegou foi o Victor, mandando testar antes de abrir o PR.
+
+**O que rodar:** suba a aplicação, ligue o componente numa tela de verdade — fiação temporária, fora de commit — e meça com `getComputedStyle` **ali**. Depois desfaça a fiação e confira que ela não entrou em commit nenhum.
+
+## Fatiação do agente: cada commit precisa compilar sozinho
+
+⛔ **Confira o corte, não só o conteúdo.** O agente agrupa por assunto e esquece a ordem de dependência, e nenhum gate pega: eles rodam sempre na ponta da branch, nunca em cada commit.
+
+Na mesma #171, o commit da paginação já trazia o barrel **inteiro**, exportando um componente cuja pasta só chegava no commit seguinte — `tsc` reprovaria naquele ponto do histórico. Cada commit passou a levar apenas a sua própria linha no barrel.
+
+```bash
+git ls-tree -r --name-only <commit> -- <caminho que o barrel exporta>   # vazio = o commit aponta para o vazio
+```

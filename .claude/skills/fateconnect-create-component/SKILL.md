@@ -92,6 +92,16 @@ cd FateConnect/Web && yarn typecheck && npx eslint <arquivos> && yarn test:ci
 
 Cor nova entra com o par correspondente no `contrast.test.ts` (mínimo AA, 4,5:1, nos dois temas) ou a suíte reprova.
 
+## 9. Olhar, não só medir
+
+⛔ **Antes de dizer que está pronto, renderize a tela e compare o elemento novo com o vizinho.** O gate prova que o código é válido; ele não prova que a coisa ficou certa ao lado do que já existia.
+
+**A comparação é o passo que enxerga** — sozinho, o elemento novo quase sempre parece bem. Foi lado a lado que apareceram, no mesmo dia: um vão de **4px contra 8px** entre a caixa de seleção e o texto, porque o rótulo do `FormControlLabel` tem `padding-left` próprio e o meu não tinha; e um link de rodapé sem nada que o distinguisse do texto ao lado, porque herdava a mesma cor e não tinha sublinhado.
+
+Os dois estavam a **uma captura de tela** de distância, os dois passaram por ESLint, `tsc` e a suíte inteira, e quem viu foi o Victor.
+
+⚠️ **Medir só depois de olhar.** `getComputedStyle` responde a pergunta que você faz; se você não desconfia de nada, não faz pergunta nenhuma. A ordem certa é olhar, estranhar, e então medir para saber o número.
+
 ## Confirmar API antes de implementar
 
 Dúvida em MUI, Emotion, react-hook-form, zod, TanStack Query, React Router ou `@mui/x-date-pickers`: consultar o **MCP do Context7** (`resolve-library-id` + `query-docs`). Não inventar API nem assumir versão — as instaladas estão em `FateConnect/Web/package.json`.

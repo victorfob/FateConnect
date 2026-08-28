@@ -60,6 +60,12 @@ No **corpo da issue**, que passa a ser o guarda-chuva. Nada de documento à part
 
 O corpo carrega, nessa ordem: as decisões em tabela, o modelo de dados ou contrato em bloco de código, as suposições com esse nome, e a referência ao protótipo.
 
+⛔ **Escolha que ninguém te deu vai para "suposições", nunca para "decisões".** A tabela de decisões registra o que o usuário decidiu; tudo que você fechou para conseguir seguir escrevendo é suposição, por mais óbvia que pareça.
+
+**O tell é a voz.** Se você escreve uma escolha sua com a mesma frase com que escreve um achado do código — *"duas rotas novas, cada uma renderizando o texto versionado"* —, ela vira decisão aos olhos de quem lê, e ninguém volta a discuti-la. Na #163 duas escolhas de produto entraram assim e as duas foram derrubadas depois, com o trabalho já feito.
+
+Na dúvida entre as duas seções, é suposição: a decisão errada custa uma pergunta, a suposição errada custa a implementação.
+
 ## 4. Dividir em sub-issues
 
 **Uma sub-issue é um PR.** O teste: dá para revisar e reverter sozinha?
