@@ -21,7 +21,7 @@ Saber isto muda o que você precisa fazer à mão. O `release.yml` dispara em to
 | `publish` | constrói e publica em produção, pelo mesmo `publish.yml` da homologação |
 | `back-merge` | traz a `main` de volta para a `develop` |
 
-⚠️ O `publish` para em **espera de aprovação**: o ambiente `prod` tem *Required reviewers*. A tag e o back-merge não esperam por ele — são jobs independentes de propósito.
+⚠️ **Mergear é publicar** — o `publish` sobe para produção sozinho, sem portão de aprovação. O que for conferir, confira antes do merge.
 
 ## 1. Ver se há o que publicar, e o quê
 
@@ -107,5 +107,4 @@ E confira que a `develop` recebeu o back-merge: `git rev-list --count origin/dev
 | Sintoma | Causa |
 | --- | --- |
 | O PR para a `main` é reprovado no passo `Version` | a versão da raiz já tem tag — faltou o bump |
-| A tag saiu, mas nada foi publicado | normal enquanto ninguém aprova o ambiente `prod` |
 | Um bump ficou para trás e ninguém notou | só a versão da raiz é lida; as outras não quebram nada ao divergir |
