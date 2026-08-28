@@ -47,7 +47,7 @@ git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+[^+]"                 # l
 git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+\s*(/\*\*|\*|//)" # dessas, comentário
 ```
 
-Na #156 deram **37 de 157 linhas — 24%**. Sete reprovaram no teste da `comentarios.md` e saíram: um JSDoc que repetia o que o `types.ts` já dizia e ainda pousava sobre a constante errada, um que só reafirmava a linha logo abaixo, e uma enumeração de consumidores que **envelheceu no próprio PR** que a escreveu.
+Na #156 deram **37 de 157 linhas — 24%**. Sete reprovaram no teste da `comments.md` e saíram: um JSDoc que repetia o que o `types.ts` já dizia e ainda pousava sobre a constante errada, um que só reafirmava a linha logo abaixo, e uma enumeração de consumidores que **envelheceu no próprio PR** que a escreveu.
 
 ⚠️ **A densidade é o gatilho de ir olhar, não o veredito.** Compare com o mesmo arquivo na branch base antes de cortar: `palettes.ts` já era 15% e `tokens/palette.ts` é 40% — arquivo que guarda decisão de cor é denso por convenção da casa, e cortar até uma meta inventada apaga justamente o *porquê*. Quem decide continua sendo o teste de cada comentário: **ele impede alguém de fazer uma mudança errada?**
 

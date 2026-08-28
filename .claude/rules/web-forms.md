@@ -41,4 +41,4 @@ O ícone mostra a situação atual, não o destino do clique: olho aberto quando
 
 Cobrir, no mínimo: mensagens de campo obrigatório, formato inválido, alternância de visibilidade (inclusive o ícone), sucesso, cada ramo de erro por status, e o estado de carregamento.
 
-O caso de carregamento **segura a resposta numa promessa que o próprio teste resolve** — nunca `setTimeout`. Espera por tempo passa localmente e falha sob cobertura, quando a requisição termina antes da verificação. Com o botão em `loading`, o nome acessível continua o mesmo: asserir `toBeDisabled()` e o `progressbar` dentro dele. Schema tem teste próprio — ver `.claude/rules/web-testes-zod.md`.
+O caso de carregamento **segura a resposta numa promessa que o próprio teste resolve** — nunca `setTimeout`. Espera por tempo passa localmente e falha sob cobertura, quando a requisição termina antes da verificação. Com o botão em `loading`, o nome acessível continua o mesmo: asserir `toBeDisabled()` e o `progressbar` dentro dele. Schema tem teste próprio — ver `.claude/rules/web-testing-zod.md`.
