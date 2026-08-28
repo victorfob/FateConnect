@@ -47,6 +47,20 @@ Antes de escrever, escolha o lugar — os quatro não são intercambiáveis:
 - `description` em rule é documentação para humanos — mantenha precisa, mas não espere que condicione nada. **Só skill dispara por `description`.**
 - Esta rule é uma das exceções sem `paths`: os gatilhos disparam em qualquer arquivo.
 
+## Caminho citado no harness tem check
+
+Rule e skill citam código por caminho, e nada as avisa quando o código sai — o texto continua sintaticamente perfeito descrevendo algo que não existe.
+
+```bash
+./scripts/check-harness-paths.sh
+```
+
+Ele lista todo caminho ancorado numa entrada real da raiz do repositório que não corresponde a arquivo nem diretório rastreado. Rodando contra o harness de antes da limpeza do #186, encontrou os quatro que uma leitura à mão tinha encontrado — inclusive um dentro de bloco de código e um sem extensão, que uma varredura por crase perde.
+
+⚠️ **Ele cobre caminho, não nome de símbolo.** O XML doc do `TimeOnlyJsonConverter` foi citado por nome numa skill e sobreviveu à remoção sem o check acusar. Para símbolo, o `grep -rn "<Nome>" .claude/` da `comments.md` continua sendo o que existe.
+
+⚠️ **A resposta é relativa à branch.** Caminho que nasce noutro PR aparece como órfão até aquele PR mergear — é correto, não defeito.
+
 ## Rule também tem fim de vida
 
 Quando a pasta que uma rule descreve deixa de existir, a rule é **deletada, não reescrita** para o que ficou no lugar. Ela descrevia corretamente algo que não existe mais; reaproveitar o arquivo mistura dois contextos e produz orientação híbrida que não vale para nenhum dos dois. O mesmo vale para skill: procedimento sem alvo sai do repo, não vira procedimento genérico.

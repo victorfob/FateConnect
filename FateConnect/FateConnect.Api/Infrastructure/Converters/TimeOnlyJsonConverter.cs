@@ -4,11 +4,6 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-/// <summary>
-/// The default <see cref="TimeOnly"/> converter requires seconds, whereas browser
-/// time inputs send <c>HH:mm</c>. Accepting both formats keeps formatting tolerance
-/// inside the API without forcing every client to append seconds before sending.
-/// </summary>
 public class TimeOnlyJsonConverter : JsonConverter<TimeOnly>
 {
     private const string WriteFormat = "HH:mm:ss";

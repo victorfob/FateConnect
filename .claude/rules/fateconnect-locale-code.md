@@ -35,6 +35,7 @@ O idioma é o mesmo dos dois lados; o **rigor** não.
 - **Arquivo, classe, método ou variável novo nasce em inglês**, mesmo cercado de português. `AuthorizationTests` ao lado de `GerarJwtToken` é o estado esperado durante a migração, não inconsistência a corrigir.
 - **O que já existe fica.** Renomear símbolo público arrasta interface, chamadas e às vezes migration — PR de funcionalidade não é lugar para isso.
 - **Traduza o símbolo que o próprio PR já estiver reescrevendo** por outro motivo. É o único rename que sai de graça.
+- **Enum leva o prefixo `Enum`** — `EnumRideType`, `EnumGender`, `EnumProfileType` —, enquanto no front a regra é o sufixo (`RideTypeEnum`, `RoutePathEnum`). A divergência não é descuido e **não se corrige**: a análise da Microsoft reprova o sufixo pela **CA1711**, e com o `TreatWarningsAsErrors` do `.csproj` isso é erro de compilação, não preferência. Medido em 2026-08-28: um `public enum SondaEnum` derruba o build com `error CA1711: Rename type name SondaEnum so that it does not end in 'Enum'`.
 
 ⛔ **Comentário continua em pt-BR dos dois lados**, `///` de C# incluído. O idioma do código e o idioma da explicação são decisões separadas.
 

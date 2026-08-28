@@ -1,8 +1,26 @@
 ---
-description: Quando comentar — só o estritamente essencial, e o teste é se o comentário impede uma mudança errada
+description: Quando comentar — zero no back-end .NET, e no front só o estritamente essencial, cujo teste é impedir uma mudança errada
 ---
 
 # Comentário
+
+## No back-end .NET, zero
+
+⛔ **Nenhum comentário em C#** — nem `//`, nem `///`, nem XML doc, em código de produção ou de teste. Não há exceção a pesar caso a caso: a regra é a ausência.
+
+Decidido pelo Victor em 2026-08-28, durante a reescrita da `fix/176`: *"vamos ajustar a regra de comentários, zero comentários no backend"*. Saíram **25 linhas de 5 arquivos** — a política de fallback, a guarda de migration, os XML docs da fábrica de teste, a explicação do segredo acentuado e o XML doc do `TimeOnlyJsonConverter` —, e nenhum teste caiu.
+
+⛔ **Ao apagar um comentário ou uma declaração, procure o nome dela em `.claude/`.** Rule e skill citam código por nome, e nada as avisa quando o código sai — o texto continua sintaticamente perfeito descrevendo algo que não existe.
+
+```bash
+grep -rn "<NomeDoSímbolo>" .claude/
+```
+
+Aconteceu nesta mesma rodada: apagado o XML doc do `TimeOnlyJsonConverter`, a `write-review-comment` continuou ensinando a ancorar o comentário de review "em cima do XML doc que explicava por que ele existia" — técnica que esta regra tinha acabado de proibir. Quem viu foi o Victor.
+
+**Onde a explicação passa a morar:** no nome do símbolo, no corpo do PR, ou na issue. Se um trecho de C# só se entende com texto ao lado, é o trecho que precisa mudar.
+
+⚠️ **A regra é do código, não do repositório.** YAML de workflow, script de shell, Markdown e o front seguem pela seção abaixo — lá o comentário existe, só é raro.
 
 ⛔ **Comentário só quando for estritamente essencial:** trecho não óbvio, que não se explica sozinho. **Se o código precisa ser explicado, o problema é o código** — renomeie, extraia, simplifique, e o comentário deixa de ser necessário.
 
