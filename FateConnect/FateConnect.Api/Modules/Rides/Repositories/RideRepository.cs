@@ -22,12 +22,17 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
 
         if (!string.IsNullOrWhiteSpace(destination))
         {
+            string escapedDestination = destination
+                .Replace(@"\", @"\\")
+                .Replace("%", @"\%")
+                .Replace("_", @"\_");
+
             query = query.Where(r =>
                 EF.Functions.ILike(
                     EF.Functions.Unaccent(r.Destination),
-                    "%" + EF.Functions.Unaccent(destination) + "%"
-                )
-            );
+                    $"%{EF.Functions.Unaccent(escapedDestination)}%",
+                    @"\"
+                ));
         }
 
         if (rideType.HasValue)
