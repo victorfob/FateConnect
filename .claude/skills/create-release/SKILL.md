@@ -87,6 +87,12 @@ dotnet build -v q --nologo
 
 `## [Unreleased]` vira `## [X.Y.Z] - AAAA-MM-DD`, e um `## [Unreleased]` **vazio** nasce por cima. Não há links de comparação no rodapé deste arquivo — não invente.
 
+### Um commit só
+
+⛔ **O bump e o corte do CHANGELOG saem no mesmo commit.** Os dois passos acima são um assunto — *cortar a versão X.Y.Z* — e a release é onde o histórico tem que ser mínimo: quem revisa quer ver o número mudando, não a sequência que o produziu.
+
+Quando a branch de release levar correção junto — esteira, configuração —, ela é **um** commit e o corte é o outro. Dois é o teto.
+
 ## 5. Abrir o PR
 
 Branch `release/X.Y.Z` a partir da `develop`, PR **para a `main`** pela skill `pr-creator`.
