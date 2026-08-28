@@ -31,6 +31,7 @@ public class Ride
         ValidateAvailableSeats(availableSeats);
         ValidateDestination(destination);
         ValidateDepartureDateTime(departureDate, departureTime);
+        ValidateRideType(rideType);
 
         Id = Guid.NewGuid();
         AvailableSeats = availableSeats;
@@ -62,7 +63,10 @@ public class Ride
         }
 
         if (rideType.HasValue)
+        {
+            ValidateRideType(rideType.Value);
             RideType = rideType.Value;
+        }
 
         if (description is not null)
             Description = description.Trim();
@@ -82,6 +86,16 @@ public class Ride
     public void Deactivate()
     {
         IsActive = false;
+    }
+
+    private static void ValidateRideType(EnumRideType rideType)
+    {
+        bool isInvalidRideType = !Enum.IsDefined(typeof(EnumRideType), rideType);
+
+        if (isInvalidRideType)
+        {
+            throw new InvalidRideTypeException();
+        }
     }
 
     private static void ValidateDepartureDateTime(DateOnly date, TimeOnly time)
