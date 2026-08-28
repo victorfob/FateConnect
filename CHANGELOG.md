@@ -6,6 +6,13 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-27
+
+### Added
+
+- Adiciona a tela de sessão expirada: token recusado leva ao aviso e ao caminho de volta ao login, em vez da mensagem genérica de erro com a sessão vencida ainda guardada (#167) [Frontend]
+- Adiciona os termos de uso e a política de privacidade, que os links do cadastro só prometiam para breve: agora abrem em nova guia, sem perder o formulário preenchido, e o rodapé também leva a eles (#177) [Frontend]
+
 ## [0.3.0] - 2026-08-27
 
 ### Added

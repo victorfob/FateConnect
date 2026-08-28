@@ -40,15 +40,16 @@ describe('httpClient', () => {
   it('should normalize an http failure into an api error carrying the status', async () => {
     server.use(http.get(PING_URL, () => new HttpResponse(null, { status: 500 })));
 
-    await expect(apiClient.get('/ping')).rejects.toEqual({
-      status: 500,
-      message: GENERIC_ERROR_MESSAGE,
-    });
+    await expect(apiClient.get('/ping')).rejects.toThrow(
+      expect.objectContaining({ status: 500, message: GENERIC_ERROR_MESSAGE }),
+    );
   });
 
   it('should normalize a network failure into an api error without status', async () => {
     server.use(http.get(PING_URL, () => HttpResponse.error()));
 
-    await expect(apiClient.get('/ping')).rejects.toEqual({ message: NETWORK_ERROR_MESSAGE });
+    await expect(apiClient.get('/ping')).rejects.toThrow(
+      expect.objectContaining({ status: undefined, message: NETWORK_ERROR_MESSAGE }),
+    );
   });
 });

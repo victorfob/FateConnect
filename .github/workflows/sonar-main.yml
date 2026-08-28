@@ -1,0 +1,65 @@
+name: Sonar main
+
+# A `main` precisa ser analisada para o Sonar ter linha de base: é contra ela
+# que ele calcula o "código novo" de cada PR. O `check.yml` só dispara em
+# `pull_request`, então até aqui nenhuma análise da branch principal existia — e
+# o painel do projeto avisava isso.
+on:
+  push:
+    branches:
+      - main
+  # Disparo manual porque o push na `main` só acontece em release: sem ele, uma
+  # análise fora de ciclo — depois de mexer na configuração do Sonar, por
+  # exemplo — esperaria semanas pela próxima versão.
+  workflow_dispatch:
+
+# Duas análises da mesma branch em sequência não podem correr juntas: a segunda
+# publicaria um resultado calculado sobre um estado que já mudou.
+concurrency:
+  group: sonar-main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # Workflow próprio, e não um job no `release.yml`: lá os jobs são sobre
+  # publicar, e análise falha por motivos diferentes de tag e deploy.
+  sonar:
+    name: Analyze the main branch
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FateConnect/Web
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Mesmo motivo do `check.yml`: sem histórico completo o Sonar não sabe
+          # quem mudou o quê e perde a noção de código novo.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: FateConnect/Web/.nvmrc
+          cache: yarn
+          cache-dependency-path: FateConnect/Web/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # O scan consome o lcov e o `sonar-report.xml` que esta suíte produz —
+      # sem rodá-la, `sonar.testExecutionReportPaths` aponta para um arquivo que
+      # não existe e o scan falha.
+      - name: Tests and coverage
+        run: yarn test:ci
+
+      # Mesma configuração do PR, pelo `sonar-project.properties`. O
+      # `sonar.qualitygate.wait` de lá vale aqui também: na `main` ele não
+      # bloqueia nada, mas deixa o run vermelho quando algo escapou do gate do
+      # PR — que é o único jeito de descobrir que escapou.
+      - name: Sonar
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
+        with:
+          projectBaseDir: FateConnect/Web
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
