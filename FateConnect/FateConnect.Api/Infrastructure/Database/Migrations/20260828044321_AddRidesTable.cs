@@ -11,9 +11,7 @@ public partial class AddRidesTable : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "caronas"
-        );
+        migrationBuilder.Sql("DROP TABLE IF EXISTS caronas;");
 
         migrationBuilder.CreateTable(
             name: "rides",
