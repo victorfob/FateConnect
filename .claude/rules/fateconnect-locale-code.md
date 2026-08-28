@@ -1,12 +1,12 @@
 ---
-description: Front — pt-BR para UI e URLs; inglês para código TypeScript e estrutura; domínio Ride e contrato da API Caronas
+description: pt-BR para UI e URLs; inglês para código e estrutura — absoluto no front, boy-scout no back-end .NET; domínio Ride e contrato da API Caronas
 paths:
-  - "FateConnect/Web/**"
+  - "FateConnect/**"
 ---
 
 # FateConnect — idioma da interface vs idioma do código
 
-Separar o que é **experiência do usuário (pt-BR)** do que é **base de código (inglês)**.
+Separar o que é **experiência do usuário (pt-BR)** do que é **base de código (inglês)**. O que vem a seguir descreve o front; o back-end .NET tem seção própria no fim, com rigor diferente.
 
 ## O que fica em **pt-BR**
 
@@ -23,6 +23,20 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 - **`id` e seletor** usados só pelo código (não copy): inglês.
 - **Tokens** do design system: inglês (`primary`, `surfaceWhite`, `textMuted`).
 - **Teste:** `describe` e `it` em inglês, no padrão `should <fazer algo>`. O código dentro do teste também é inglês. Copy de produto em asserção continua em pt-BR, porque é o texto real da tela.
+
+## Back-end .NET: inglês no que nasce, boy-scout no que existe
+
+O idioma é o mesmo dos dois lados; o **rigor** não.
+
+**No front é absoluto** — nenhum identificador em português, e `Ride` no lugar de `Carona`.
+
+**No back-end é boy-scout**, porque o C# nasceu misto: verbo em inglês e domínio em português no mesmo símbolo (`GerarJwtToken`, `CriarClaimsDoUsuario`, `chaveSeguranca`, `CaronasController`).
+
+- **Arquivo, classe, método ou variável novo nasce em inglês**, mesmo cercado de português. `AuthorizationTests` ao lado de `GerarJwtToken` é o estado esperado durante a migração, não inconsistência a corrigir.
+- **O que já existe fica.** Renomear símbolo público arrasta interface, chamadas e às vezes migration — PR de funcionalidade não é lugar para isso.
+- **Traduza o símbolo que o próprio PR já estiver reescrevendo** por outro motivo. É o único rename que sai de graça.
+
+⛔ **Comentário continua em pt-BR dos dois lados**, `///` de C# incluído. O idioma do código e o idioma da explicação são decisões separadas.
 
 ## Contrato com a **API Caronas**
 
