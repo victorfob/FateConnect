@@ -56,6 +56,7 @@ export const lightPalette: PaletteOptions = {
    * (23% contra 38%), o que deixaria todo formulário mais lavado que hoje.
    */
   inputOutline: colorTokens.inputOutline,
+  skeleton: colorTokens.skeleton,
   statusTag: {
     neutral: { surface: NO_SURFACE, content: INHERITED_CONTENT },
     muted: { surface: colorTokens.mutedBackground, content: colorTokens.mutedText },
@@ -120,6 +121,7 @@ export const darkPalette: PaletteOptions = {
   },
   /** 38% de branco é a ênfase desabilitada do sistema de cor do Material Design. */
   inputOutline: darkColorTokens.onSurfaceDisabled,
+  skeleton: darkColorTokens.skeleton,
   // No escuro o par da etiqueta e o do aviso invertem de claridade, não de papel.
   statusTag: {
     neutral: { surface: NO_SURFACE, content: INHERITED_CONTENT },

@@ -43,6 +43,14 @@ export const colorTokens = {
   mutedText: '#383D41',
   mutedBackground: '#E2E3E5',
 
+  /**
+   * Bloco-fantasma do esqueleto de carregamento. O cinza de esqueleto usual
+   * fica perto de 1.2:1 e some para quem enxerga pouco; este é o tom mais claro
+   * da família neutra que ainda alcança os 3:1 da WCAG 1.4.11 sobre os dois
+   * fundos claros.
+   */
+  skeleton: '#848C92',
+
   /** Divisor sobre superfície neutra. */
   divider: '#D9D9D9',
   /** Divisor sobre o cromo colorido, onde a linha precisa ser clara. */
@@ -117,6 +125,9 @@ export const darkColorTokens = {
   dangerTagText: '#EF9A9A',
   mutedTagBackground: '#37393B',
   mutedTagText: '#CFD8DC',
+
+  /** Bloco-fantasma: 33% de branco já achatado sobre a superfície elevada. */
+  skeleton: '#696969',
 
   onSurfaceHigh: 'rgba(255, 255, 255, 0.87)',
   onSurfaceMedium: 'rgba(255, 255, 255, 0.60)',

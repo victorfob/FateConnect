@@ -58,6 +58,7 @@ function nonTextColours(theme: Theme): [string, string][] {
   return [
     ['the field outline', theme.palette.inputOutline],
     ['the button fill', theme.palette.secondary.main],
+    ['the loading skeleton', theme.palette.skeleton],
   ];
 }
 
