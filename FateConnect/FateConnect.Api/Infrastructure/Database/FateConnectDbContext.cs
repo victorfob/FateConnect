@@ -1,23 +1,24 @@
-using FateConnect.Api.Modules.Shared.Entities;
+namespace FateConnect.Api.Infrastructure.Database;
+
+using FateConnect.Api.Modules.Rides.Entities;
+using FateConnect.Api.Modules.Common.Entities;
 using FateConnect.Api.Modules.Usuarios;
 using Microsoft.EntityFrameworkCore;
 
-namespace FateConnect.Api.Infrastructure.Database;
-
-public class FateConnectDbContext : DbContext
+public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options) : DbContext(options)
 {
-    public FateConnectDbContext(DbContextOptions<FateConnectDbContext> options)
-    : base(options)
-    {
-    }
-
-    public DbSet<Usuario> Usuarios { get; set; }
-    public DbSet<Endereco> Enderecos { get; set; }
-    public DbSet<Contato> Contatos { get; set; }
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
+    public DbSet<Endereco> Enderecos => Set<Endereco>();
+    public DbSet<Contato> Contatos => Set<Contato>();
+    public DbSet<Ride> Rides => Set<Ride>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.HasPostgresExtension("unaccent");
+
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FateConnectDbContext).Assembly);
 
         modelBuilder.Entity<Usuario>(entity =>
         {

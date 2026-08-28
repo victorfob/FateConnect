@@ -1,9 +1,8 @@
 using FateConnect.Api.Modules.Usuarios;
 
-namespace FateConnect.Api.Modules.Auth.Interfaces
+namespace FateConnect.Api.Modules.Auth.Interfaces;
+
+public interface ITokenService
 {
-    public interface ITokenService
-    {
-        string GerarJwtToken(Usuario usuario);
-    }
+    string GerarJwtToken(Usuario usuario);
 }

@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using FateConnect.Api.Modules.Shared.Constants;
-using FateConnect.Api.Modules.Shared.DTOs;
+using FateConnect.Api.Modules.Common.Constants;
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Usuarios.Enums;
 
 namespace FateConnect.Api.Modules.Usuarios.DTOs;
@@ -34,8 +34,9 @@ public class CreateUsuarioDto
     public DateTime DataNascimento { get; set; }
 
     [Required]
-    [DefaultValue(0)]
-    public GeneroEnum Genero { get; set; }
+    [DefaultValue(1)]
+    [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
+    public EnumGender Genero { get; set; }
 
     [Required]
     required public List<CreateEnderecoDto> Enderecos { get; set; } =
