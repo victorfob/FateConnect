@@ -70,7 +70,7 @@ public class UsuarioService : IUsuarioService
 
     private static List<Endereco> MontarListaDeEnderecos(List<CreateEnderecoDto>? dtos)
     {
-        if (dtos == null || dtos.Count > 0)
+        if (dtos is null or { Count: 0 })
             return new List<Endereco>();
 
         List<Endereco> enderecos = dtos.Select(dto => new Endereco
@@ -88,7 +88,7 @@ public class UsuarioService : IUsuarioService
 
     private static List<Contato> MontarListaDeContatos(List<CreateContatoDto>? dtos)
     {
-        if (dtos == null || dtos.Count > 0)
+        if (dtos is null or { Count: 0 })
             return new List<Contato>();
 
         List<Contato> contatos = dtos.Select(dto => new Contato
