@@ -53,13 +53,30 @@ jobs:
       - name: Tests and coverage
         run: yarn test:ci
 
+      # A definição de código novo do projeto é `previous_version`, então sem
+      # versão declarada não há fronteira: as sete condições do gate são todas
+      # sobre código novo, nenhuma métrica `new_*` é calculada, e o veredito sai
+      # `NONE` — que o `sonar.qualitygate.wait` reprova como se fosse falha.
+      #
+      # Vem daqui e não do `sonar-project.properties` porque o número mora no
+      # `package.json` da raiz, fora do `projectBaseDir`.
+      - name: Project version
+        id: version
+        run: echo "value=$(jq -r .version "$GITHUB_WORKSPACE/package.json")" >> "$GITHUB_OUTPUT"
+
       # Mesma configuração do PR, pelo `sonar-project.properties`. O
       # `sonar.qualitygate.wait` de lá vale aqui também: na `main` ele não
-      # bloqueia nada, mas deixa o run vermelho quando algo escapou do gate do
-      # PR — que é o único jeito de descobrir que escapou.
+      # bloqueia merge nenhum, mas deixa o run vermelho quando o gate não sai
+      # `OK` — seja porque algo escapou do gate do PR, seja porque não houve
+      # código novo para avaliar.
+      #
+      # A versão só é declarada aqui: é a história de versões da `main` que
+      # forma a linha de base. Análise de PR usa o próprio diff como código
+      # novo e nunca consulta a versão.
       - name: Sonar
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
         with:
           projectBaseDir: FateConnect/Web
+          args: -Dsonar.projectVersion=${{ steps.version.outputs.value }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

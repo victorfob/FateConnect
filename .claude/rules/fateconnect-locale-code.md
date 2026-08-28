@@ -12,6 +12,7 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 
 - **Copy de produto:** texto de tela, notificação, diálogo, placeholder, `aria-label` quando é mensagem ao usuário, e o erro de bootstrap em `main.tsx`.
 - **URLs visíveis:** segmentos de rota e fragmentos de âncora (`inicio`, `cadastro`, `menu`, `achados-perdidos`, `caronas`, `buscar`, `ofertar`, `servicos`, `contato`, `login`). Trocar um segmento quebra link salvo — só com decisão de produto.
+- **Query string — o nome e o valor.** ⛔ **A regra não para no caminho:** `?meus=true` é errado pela mesma razão que uma rota `/lost-and-found` seria. Booleano é `sim` e `nao`; conjunto fechado usa o **rótulo** da interface, em minúscula e sem acento (`?tipo=solidaria`), nunca o valor que o backend serializa — ver `.claude/rules/product-copy.md`. Leitura tolerante a maiúscula, e valor irreconhecível cai no padrão em vez de quebrar a tela.
 - **`index.html`:** `lang="pt-BR"`, alinhado à interface.
 - **Comentário e JSDoc:** português, citando nome de API em inglês quando necessário.
 

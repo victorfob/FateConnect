@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # É o ambiente do GitHub que separa as variáveis e os segredos dos dois
-    # destinos, e é onde se exige aprovação antes de produção.
+    # destinos.
     environment:
       name: ${{ inputs.environment }}
       url: ${{ vars.PUBLIC_URL }}

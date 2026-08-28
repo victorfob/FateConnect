@@ -27,7 +27,9 @@ O comentário que passou no teste acima ainda escolhe a forma errada. Acima de u
 
 O comentário que passou nos dois testes acima ainda mente com o tempo: ele foi escrito quando a regra nasceu, e a **regra ao lado mudou depois**. Ninguém releu.
 
-⛔ **Ao adicionar regra, seletor ou ramo perto de um comentário existente, releia o comentário vizinho.** É barato e é o único momento em que a divergência é visível.
+⛔ **Ao adicionar regra, seletor, ramo — ou outro comentário — perto de um comentário existente, releia o comentário vizinho.** É barato e é o único momento em que a divergência é visível.
+
+**Comentário ao lado de comentário é o caso mais fácil de pular**, porque o gesto não parece uma mudança de código: você está justamente escrevendo a explicação, então parece que a explicação já está sendo cuidada. Aconteceu em 2026-08-27 no `sonar-main.yml`: escrevi um bloco novo explicando por que a análise precisa declarar a versão, encostado num bloco que dizia que o run só fica vermelho *"quando algo escapou do gate do PR"* — a frase que acabara de se mostrar falsa, e a razão de eu ter procurado um culpado inexistente. Passei por cima dela para escrever ao lado. Quem apontou foi o Victor.
 
 Aconteceu três vezes no mesmo arquivo, em 2026-08-25, no `eslint.config.js` — e quem achou a primeira foi o Victor:
 

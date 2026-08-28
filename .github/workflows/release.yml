@@ -58,8 +58,7 @@ jobs:
   #
   # Os passos estão em `publish.yml`, compartilhados com homologação, para que
   # os dois ambientes subam pelo mesmo caminho. As variáveis e os segredos vêm
-  # do ambiente `prod` do GitHub, que é também onde se exige aprovação antes de
-  # publicar.
+  # do ambiente `prod` do GitHub.
   #
   # Independente do job da tag, como o back-merge: falha ao criar a tag não tem
   # por que impedir a publicação, e vice-versa.
