@@ -6,3 +6,8 @@
 *.xlsx filter=lfs diff=lfs merge=lfs -text
 *.ppt filter=lfs diff=lfs merge=lfs -text
 *.pptx filter=lfs diff=lfs merge=lfs -text
+
+# Os PDFs que a aplicação serve ficam FORA do LFS: são pequenos, mudam pouco e
+# precisam existir em qualquer clone e em qualquer build. O checkout do CI não
+# baixa objeto de LFS, e o que iria para o ar seria o ponteiro de 130 bytes.
+FateConnect/Web/public/*.pdf !filter !diff !merge -text
