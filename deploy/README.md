@@ -158,8 +158,9 @@ acusar.
 
 ### O que configurar no GitHub
 
-Em **Settings → Environments**, crie `hml` e `prod`. Em produção, marque
-*Required reviewers*: assim o push na `main` fica parado até alguém aprovar.
+Em **Settings → Environments**, crie `hml` e `prod`. É o ambiente que separa as
+variáveis e os segredos de cada destino; o push na `main` publica em produção
+direto.
 
 **Variables**, em cada ambiente:
 
