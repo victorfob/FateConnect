@@ -11,6 +11,9 @@ public partial class AddRidesTable : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.AlterDatabase()
+            .Annotation("Npgsql:PostgresExtension:unaccent", ",,");
+
         migrationBuilder.Sql("DROP TABLE IF EXISTS caronas;");
 
         migrationBuilder.CreateTable(

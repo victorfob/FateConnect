@@ -16,6 +16,8 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.HasPostgresExtension("unaccent");
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(FateConnectDbContext).Assembly);
 
         modelBuilder.Entity<Usuario>(entity =>
