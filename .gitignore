@@ -9,3 +9,7 @@
 # Sobreposição local do compose: existe só na máquina de quem está testando.
 docker-compose.override.yml
 
+# Saída de build dos projetos .NET. Fica aqui, e não em mais um `.gitignore` por
+# projeto, porque a regra é a mesma para todos e projeto novo já nasce coberto.
+[Bb]in/
+[Oo]bj/

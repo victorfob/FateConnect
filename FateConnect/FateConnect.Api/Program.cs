@@ -18,6 +18,7 @@ using FateConnect.Api.Modules.Usuarios.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -163,7 +164,9 @@ public class Program
 
         using (IServiceScope scope = app.Services.CreateScope())
         {
-            scope.ServiceProvider.GetRequiredService<FateConnectDbContext>().Database.Migrate();
+            DatabaseFacade database = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>().Database;
+
+            if (database.IsRelational()) database.Migrate();
         }
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
