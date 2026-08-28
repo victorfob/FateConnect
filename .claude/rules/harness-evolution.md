@@ -17,10 +17,11 @@ Tudo vive no próprio repositório e é editável direto — não há package ne
 | Skills | `.claude/skills/<nome>/SKILL.md` | sob demanda, por `description` ou `/<nome>` |
 | Memória do projeto | `~/.claude/projects/-Users-victorbrayner-Development-Projects-FateConnect/memory/` | por recall, indexada em `MEMORY.md` |
 
-`.claude/` é **versionada**: mudar uma rule é mudar o repositório, entra no mesmo PR da mudança que a motivou e passa por review como qualquer código. Duas consequências práticas:
+`.claude/` é **versionada**: mudar uma rule é mudar o repositório e passa por review como qualquer código. Duas consequências práticas:
 
 - **A restrição do repositório vale aqui.** Rule e skill são conteúdo público: nada de nome de empregador, repositório interno, pacote privado ou ferramenta corporativa. Quando a orientação vier de fonte interna, registrar só a **decisão e a justificativa autônoma**.
-- **A correção anda junto com o código.** Rule que descreve um padrão deve chegar no mesmo PR em que o padrão aparece — separar as duas coisas é como elas divergem.
+- **Onde a mudança de harness entra é decisão de quem revisa — pergunte.** O instinto é mandar rule e código juntos, para não divergirem; mas abrir um PR inteiro por uma frase de rule é cerimônia que não paga, e levar uma rule sem relação nenhuma dentro de um PR de funcionalidade polui o review dele. Com a mudança na mão, ofereça as duas saídas: aproveitar um PR já aberto, ou abrir um só de harness.
+- ⛔ **Indo para PR próprio, vai `.claude/` inteiro — não metade.** Em 2026-08-28 escolhi sozinho levar a rule dentro do PR de autenticação; mandado separar, separei só o que não tinha relação com aquele PR e deixei para trás o que ele mesmo havia causado. A correção foi *"falei tudo relacionado a harness num PR proprio"*. **Documentação do repositório não é harness:** `README.md` e `CONTRIBUTING.md` continuam com o código que os motivou.
 
 ## Gatilhos — quando escrever em vez de só corrigir
 
