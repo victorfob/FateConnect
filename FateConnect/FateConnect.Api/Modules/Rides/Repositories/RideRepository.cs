@@ -29,7 +29,7 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
             query = query.Where(r =>
                 EF.Functions.ILike(
                     EF.Functions.Unaccent(r.Destination),
-                    $"%{EF.Functions.Unaccent(escapedDestination)}%",
+                    "%" + EF.Functions.Unaccent(escapedDestination) + "%",
                     @"\"
                 ));
         }
