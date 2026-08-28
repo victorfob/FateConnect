@@ -34,7 +34,8 @@ public class CreateUsuarioDto
     public DateTime DataNascimento { get; set; }
 
     [Required]
-    [DefaultValue(0)]
+    [DefaultValue(1)]
+    [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
     public EnumGender Genero { get; set; }
 
     [Required]
