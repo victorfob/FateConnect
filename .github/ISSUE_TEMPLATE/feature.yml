@@ -1,0 +1,35 @@
+name: Funcionalidade
+description: Algo que o projeto ainda não faz.
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: O problema
+      description: O que a pessoa não consegue fazer hoje. Descreva a necessidade, não a solução — a solução vem depois, na especificação.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Proposta
+      description: Como você imagina resolver. Tudo bem não ter resposta fechada.
+
+  - type: dropdown
+    id: onde
+    attributes:
+      label: Onde
+      options:
+        - Front-end (Web)
+        - API de contas (FateConnect.Api)
+        - API de caronas (Carona)
+        - Ainda não está claro
+    validations:
+      required: true
+
+  - type: textarea
+    id: referencia
+    attributes:
+      label: Referência
+      description: Protótipo, captura de outra aplicação, ou o texto que descreve como deve ficar.
