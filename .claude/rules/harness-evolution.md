@@ -50,6 +50,28 @@ Antes de escrever, escolha o lugar — os quatro não são intercambiáveis:
 
 Quando a pasta que uma rule descreve deixa de existir, a rule é **deletada, não reescrita** para o que ficou no lugar. Ela descrevia corretamente algo que não existe mais; reaproveitar o arquivo mistura dois contextos e produz orientação híbrida que não vale para nenhum dos dois. O mesmo vale para skill: procedimento sem alvo sai do repo, não vira procedimento genérico.
 
+## Criou skill, rule ou workflow? A lista que o enumera muda no mesmo PR
+
+⛔ **Dois inventários deste repo são mantidos à mão, e um deles mora em dois lugares.** Criar o item sem atualizar a lista não quebra nada e não deixa rastro: meses depois ninguém sabe qual PR a deixou para trás.
+
+| Inventário | Onde é enumerado |
+| --- | --- |
+| Skills | `.claude/CLAUDE.md` **e** `README.md` — duas cópias, que divergem |
+| Workflows | tabela de integração contínua do `README.md` |
+
+**As rules não entram na tabela porque ninguém as enumera** — os dois documentos descrevem o mecanismo (`paths:`, quando carrega) e apontam para um arquivo específico quando precisam. É por isso que elas nunca drifaram. Ao documentar algo novo, prefira descrever o mecanismo a listar os itens: **lista não escrita é lista que não mente.**
+
+**A conferência é contagem, não leitura** — foi lendo e achando certo que ela drifou:
+
+```bash
+ls -d .claude/skills/*/ | wc -l      # contra os nomes citados no CLAUDE.md E no README
+ls .github/workflows/*.yml | wc -l   # contra as linhas da tabela de CI
+```
+
+Em 2026-08-28 o README dizia **4 skills** quando eram 8 e **2 workflows** quando eram 5; o `CLAUDE.md`, que lista as mesmas skills, estava certo — a divergência entre as duas cópias é o sintoma. Junto vieram duas frases envelhecidas do mesmo jeito: *"os dois passos da release"*, que virou três jobs, e *"quem reprova por cobertura é o limite do Vitest"*, depois que o Sonar passou a reprovar também.
+
+⚠️ **O pior caso não é o número errado, é a ausência.** O Sonar não aparecia em lugar nenhum do README, sendo o check obrigatório da `develop` — e ausência não deixa frase errada apontando para ela. Só a comparação com o inventário real a encontra.
+
 ## O que NÃO fazer
 
 - **Não duplique silenciosamente.** Antes de criar rule nova, verifique se uma existente deveria ser estendida. Rules sobrepostas diluem o contexto e divergem com o tempo.

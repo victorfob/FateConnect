@@ -1,23 +1,26 @@
 ---
 name: spec-issue
 description: >-
-  Especifica uma issue do GitHub por sabatina — perguntas em blocos até fechar as ambiguidades entre
-  o que a issue diz e o que o código mostra, decisões registradas no corpo da issue e divisão em
-  sub-issues de um PR cada. Use quando o usuário pedir para especificar, detalhar, refinar, planejar
-  ou quebrar uma issue.
+  Escreve ou especifica uma issue do GitHub por sabatina — perguntas em blocos até fechar as
+  ambiguidades entre o que se quer e o que o código mostra, decisões registradas no corpo da issue e
+  divisão em sub-issues de um PR cada. Use quando o usuário pedir para **criar** ou **abrir** uma
+  issue, e também para especificar, detalhar, refinar, planejar ou quebrar uma que já existe.
 ---
 
 # Especificar uma issue
 
 A issue diz o que se quer; o código diz o que existe. A especificação fecha a distância entre os dois — e quem fecha é o usuário, respondendo perguntas, não eu escolhendo em silêncio.
 
-⛔ **Não crie issue, branch ou label sem o usuário pedir.** Esta skill só cria sub-issues depois de listar todas e receber o sim.
+⛔ **Não crie issue, branch ou label sem o usuário pedir.** Pedida a issue, ela nasce ao fim da sabatina — nunca antes, porque é a sabatina que decide o que vai no corpo. Sub-issue só depois de listar todas e receber o sim.
 
 ## 1. Ler antes de perguntar
 
 Pergunta feita sem ler é pergunta que o repositório já respondia. Antes do primeiro bloco:
 
 - A issue e as que ela cita — `gh issue view <n> --json title,body,comments,milestone,assignees`
+- **Quando a issue ainda não existe**, não há o que abrir: leia no lugar as issues que ela vai
+  encostar — a que ela destrava, a que vai desfazer parte do que ela monta — e confira com
+  `gh issue list --state all --search` se alguém já abriu a mesma coisa
 - O **protótipo anexado**, quando houver: o corpo traz um `<img src="https://github.com/user-attachments/...">` e `curl -sL` baixa. Export de tela inteira vem alto demais para uma leitura só — fatiar com `sips` e ler banda a banda
 - A tela ou o módulo mais parecido que já existe — é dele que saem as opções fundamentadas
 - Os arquivos que a mudança vai tocar, com `Grep` e `Read`

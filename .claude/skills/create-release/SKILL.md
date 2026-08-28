@@ -68,7 +68,7 @@ git diff --name-only origin/main..origin/develop -- FateConnect/FateConnect.Api 
 | `package.json` da raiz | **sempre** — é a versão da release e vira a tag |
 | `FateConnect/Web/package.json` | houve mudança em `FateConnect/Web/` |
 | `FateConnect/FateConnect.Api/FateConnect.Api.csproj` | houve mudança em `FateConnect/FateConnect.Api/` |
-| `FateConnect/Carona/Directory.Build.props` | houve mudança em `FateConnect/Carona/` — cobre os quatro projetos |
+| `FateConnect/Carona/Directory.Build.props` | houve mudança em `FateConnect/Carona/` — cobre os projetos da pasta |
 
 ⚠️ **As duas APIs versionam separado**, porque sobem como contêineres separados. Mudança só em caronas não move a versão da API de contas.
 
