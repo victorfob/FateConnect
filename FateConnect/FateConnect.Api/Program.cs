@@ -33,7 +33,7 @@ public class Program
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        var originsEnv = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
+        var originsEnv = Environment.GetEnvironmentVariable("CORS_ORIGINS");
 
         var allowedOrigins = string.IsNullOrWhiteSpace(originsEnv)
             ? ["http://localhost:5173"]
