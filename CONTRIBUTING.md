@@ -50,6 +50,12 @@ Antes de pedir review, rode os mesmos portões que o CI roda:
 cd FateConnect/Web && yarn lint && yarn typecheck && yarn test:ci
 ```
 
+Mexeu na API, rode também a suíte dela:
+
+```bash
+dotnet test FateConnect/FateConnect.Api.Tests/FateConnect.Api.Tests.csproj
+```
+
 Erro reprova. Warning não.
 
 ## Mudança que o usuário percebe entra no CHANGELOG
