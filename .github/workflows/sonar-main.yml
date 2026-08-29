@@ -1,9 +1,13 @@
 name: Sonar main
 
 # A `main` precisa ser analisada para o Sonar ter linha de base: é contra ela
-# que ele calcula o "código novo" de cada PR. O `check.yml` só dispara em
-# `pull_request`, então até aqui nenhuma análise da branch principal existia — e
-# o painel do projeto avisava isso.
+# que ele calcula o "código novo" de cada PR. Os checks de PR só disparam em
+# `pull_request`, então sem este workflow nenhuma análise da branch principal
+# existiria — e o painel avisa isso.
+#
+# São dois projetos no Sonar, um por lado, porque um `projectKey` não se divide
+# entre dois scanners: o front usa a action genérica, e C# exige o scanner de
+# .NET em volta do build. Daí também os dois gates, que diferem só na cobertura.
 on:
   push:
     branches:
@@ -25,8 +29,8 @@ permissions:
 jobs:
   # Workflow próprio, e não um job no `release.yml`: lá os jobs são sobre
   # publicar, e análise falha por motivos diferentes de tag e deploy.
-  sonar:
-    name: Analyze the main branch
+  web:
+    name: Analyze the front
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -78,5 +82,56 @@ jobs:
         with:
           projectBaseDir: FateConnect/Web
           args: -Dsonar.projectVersion=${{ steps.version.outputs.value }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  api:
+    name: Analyze the API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Mesmo motivo do job acima: sem histórico completo o Sonar perde a
+          # noção de quem mudou o quê.
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # O scanner roda na JVM, mesmo analisando C#.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install the Sonar scanner
+        run: dotnet tool install --global dotnet-sonarscanner --version 11.2.1
+
+      - name: Project version
+        id: version
+        run: echo "value=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
+
+      # A suíte não roda aqui: o gate `Backend` não tem condição de cobertura,
+      # então nada do que ela produz é consumido. Teste quebrado é reprovado no
+      # check do PR, antes de chegar na main.
+      - name: Sonar begin
+        run: >
+          dotnet sonarscanner begin
+          /k:fateconnect_FateConnect-api
+          /o:fateconnect
+          /v:${{ steps.version.outputs.value }}
+          /d:sonar.host.url=https://sonarcloud.io
+          /d:sonar.token=$SONAR_TOKEN
+          /d:sonar.qualitygate.wait=true
+          /d:sonar.exclusions=FateConnect/Web/**
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Build
+        run: dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
+
+      - name: Sonar end
+        run: dotnet sonarscanner end /d:sonar.token=$SONAR_TOKEN
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
