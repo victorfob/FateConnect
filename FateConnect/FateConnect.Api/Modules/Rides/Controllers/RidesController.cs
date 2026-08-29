@@ -1,8 +1,6 @@
 namespace FateConnect.Api.Modules.Rides.Controllers;
 
-using System.Globalization;
-using System.Security.Claims;
-using FateConnect.Api.Modules.Auth.Exceptions;
+using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -15,21 +13,11 @@ using Swashbuckle.AspNetCore.Annotations;
 [SwaggerTag("Ride Management")]
 public class RidesController(IRideService rideService) : ControllerBase
 {
-    private int GetCurrentUserId()
-    {
-        string? identifier = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId))
-            throw new UnidentifiedUserException();
-
-        return userId;
-    }
-
     [HttpGet]
     [SwaggerOperation(Summary = "Get active rides", Description = "Returns a list of all rides that are currently active based on optional filters.")]
     public async Task<ActionResult<IEnumerable<ReadRideDto>>> GetAllAsync([FromQuery] FilterRideDto filters)
     {
-        var rides = await rideService.GetAllAsync(filters, GetCurrentUserId());
+        var rides = await rideService.GetAllAsync(filters, User.GetUserId());
         return Ok(rides);
     }
 
@@ -37,7 +25,7 @@ public class RidesController(IRideService rideService) : ControllerBase
     [SwaggerOperation(Summary = "Get ride by ID", Description = "Returns a specific ride by its ID, provided it is active.")]
     public async Task<ActionResult<ReadRideDto>> GetByIdAsync(Guid id)
     {
-        var ride = await rideService.GetByIdAsync(id, GetCurrentUserId());
+        var ride = await rideService.GetByIdAsync(id, User.GetUserId());
 
         if (ride is null)
             return NotFound();
@@ -49,7 +37,7 @@ public class RidesController(IRideService rideService) : ControllerBase
     [SwaggerOperation(Summary = "Create a new ride", Description = "Registers a new ride in the system, offered by the authenticated user.")]
     public async Task<ActionResult<ReadRideDto>> CreateAsync(CreateRideDto dto)
     {
-        var newRide = await rideService.CreateAsync(dto, GetCurrentUserId());
+        var newRide = await rideService.CreateAsync(dto, User.GetUserId());
 
         return CreatedAtRoute(
             routeName: "GetRideById",
@@ -62,7 +50,7 @@ public class RidesController(IRideService rideService) : ControllerBase
     [SwaggerOperation(Summary = "Update an existing ride", Description = "Updates ride details such as available seats, destination, or departure time. Only the user who offered the ride can change it.")]
     public async Task<ActionResult<ReadRideDto>> UpdateAsync(Guid id, UpdateRideDto dto)
     {
-        var updatedRide = await rideService.UpdateAsync(id, dto, GetCurrentUserId());
+        var updatedRide = await rideService.UpdateAsync(id, dto, User.GetUserId());
 
         if (updatedRide is null)
             return NotFound();
@@ -74,7 +62,7 @@ public class RidesController(IRideService rideService) : ControllerBase
     [SwaggerOperation(Summary = "Deactivate a ride", Description = "Sets the ride active status to false. Only the user who offered the ride can do it.")]
     public async Task<IActionResult> DeleteAsync(Guid id)
     {
-        var isDeactivated = await rideService.DeleteAsync(id, GetCurrentUserId());
+        var isDeactivated = await rideService.DeleteAsync(id, User.GetUserId());
 
         if (!isDeactivated)
             return NotFound();
