@@ -1,6 +1,6 @@
 # FateConnect
 
-Plataforma de caronas. Este repositório reúne o produto — front-end e APIs — e os documentos das disciplinas mantidos junto dele.
+Plataforma de caronas. Este repositório reúne o produto — front-end e API — e os documentos das disciplinas mantidos junto dele.
 
 ## Estrutura
 
@@ -66,7 +66,7 @@ A validação consulta as tags no **remoto**. Consultar localmente aprovaria qua
 
 O `check.yml` dispara em todo PR, e cada job decide se tem o que fazer olhando os arquivos alterados: PR que só mexe no back-end não paga a suíte de front, nem o contrário. O `package.json` da raiz entra no filtro do front por causa da validação de versão — mudança de versão não pode escapar dela. Só o job do front é exigido para mergear.
 
-Os três jobs da release moram no mesmo workflow porque acontecem no mesmo evento: o push que a `main` recebe quando a release entra. Eles não dependem uns dos outros — falha ao marcar a tag não impede a publicação nem a sincronização, e vice-versa.
+Os três jobs da release moram no mesmo workflow porque acontecem no mesmo evento: o push que a `main` recebe quando a release entra. A tag não depende de ninguém — falha ao marcá-la não impede a publicação nem a sincronização, e vice-versa. O back-merge, esse, espera a publicação terminar: o push que ele faz na `develop` é o que dispara a publicação de homologação, e as duas usam o mesmo checkout na VPS. Publicação reprovada não perde o back-merge, porque a correção entra na `main` e esse push refaz o workflow inteiro.
 
 O job de back-merge do `release.yml` empurra **direto na `develop`**, sem PR: a ruleset da `develop` concede bypass a uma **deploy key** de escrita, que o workflow usa no checkout, e a da `main` não concede a ninguém — a release continua exigindo PR e review. Bypass para o app GitHub Actions resolveria sem chave nenhuma, mas ele exige repositório de organização: em conta pessoal a API recusa o ator. O caminho comum é fast-forward, porque a `develop` normalmente não andou desde o corte da release. Quando andou, o job faz o merge de verdade; se conflitar, ele para e reporta, porque escolher qual lado vale é decisão humana.
 
