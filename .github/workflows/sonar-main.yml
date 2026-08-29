@@ -48,8 +48,11 @@ jobs:
           cache: yarn
           cache-dependency-path: FateConnect/Web/yarn.lock
 
+      # `--ignore-scripts` porque instalar dependência não deve executar código:
+      # sem ele o `postinstall` de qualquer pacote da árvore roda no runner, com
+      # os segredos do job ao alcance.
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --ignore-scripts
 
       # O scan consome o lcov e o `sonar-report.xml` que esta suíte produz —
       # sem rodá-la, `sonar.testExecutionReportPaths` aponta para um arquivo que

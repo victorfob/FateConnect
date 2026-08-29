@@ -40,8 +40,11 @@ jobs:
           cache: yarn
           cache-dependency-path: FateConnect/Web/yarn.lock
 
+      # `--ignore-scripts` porque instalar dependência não deve executar código:
+      # sem ele o `postinstall` de qualquer pacote da árvore roda no runner, com
+      # os segredos do job ao alcance.
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --ignore-scripts
         working-directory: FateConnect/Web
 
       # A versão da raiz é a que nomeia a tag, e é ela que amarra o erro no
