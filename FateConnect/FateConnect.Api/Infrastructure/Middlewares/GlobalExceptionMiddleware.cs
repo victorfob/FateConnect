@@ -57,7 +57,7 @@ public partial class GlobalExceptionMiddleware(
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        await context.Response.WriteAsJsonAsync(new { error = errorMessage });
+        await context.Response.WriteAsJsonAsync(new { error = errorMessage }, context.RequestAborted);
     }
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Unhandled internal server error occurred.")]

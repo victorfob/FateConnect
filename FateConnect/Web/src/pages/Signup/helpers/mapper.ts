@@ -6,7 +6,7 @@ import { parseBirthDate, toApiBirthDate } from './birthDate';
 
 /** Campo opcional: o backend prefere a ausência da chave a uma string vazia. */
 function optionalText(value: string): string | undefined {
-  if (value.length === 0) return undefined;
+  if (value === '') return undefined;
 
   return value;
 }

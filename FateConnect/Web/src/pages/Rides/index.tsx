@@ -16,8 +16,8 @@ import * as C from './constants';
 import * as S from './styles';
 
 const SPINNER_SIZE_PX = 60;
+const NO_ITEMS = 0;
 
-/** Uma tela só: a lista com os filtros, e a aba de ofertar abrindo o diálogo. */
 export function Rides() {
   const queryClient = useQueryClient();
   const { notifySuccess } = useNotification();
@@ -97,7 +97,7 @@ export function Rides() {
           </S.LoadingContainer>
         )}
 
-        {!isLoading && rides.length === 0 && (
+        {!isLoading && rides.length === NO_ITEMS && (
           <Typography variant="subtitle">{C.EMPTY_LIST_MESSAGE}</Typography>
         )}
 

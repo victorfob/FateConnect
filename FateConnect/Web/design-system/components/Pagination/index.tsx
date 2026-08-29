@@ -2,6 +2,8 @@ import { useCallback, type ChangeEvent } from 'react';
 
 import * as S from './styles';
 
+const SINGLE_PAGE = 1;
+
 export type PaginationProps = Readonly<{
   /** Total de páginas. Com uma só o controle não se desenha. */
   count: number;
@@ -16,7 +18,7 @@ export function Pagination({ count, page, onChange }: PaginationProps) {
     [onChange],
   );
 
-  if (count <= 1) return null;
+  if (count <= SINGLE_PAGE) return null;
 
   return <S.PaginationNav count={count} page={page} onChange={handleChange} />;
 }

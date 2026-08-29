@@ -59,6 +59,21 @@ Aconteceu três vezes no mesmo arquivo, em 2026-08-25, no `eslint.config.js` —
 
 ⛔ **Cobrança repetida do Victor**, a última em 2026-08-24 com os três PRs de achados e perdidos abertos: *"já falei um milhão de vezes, só colocar comentários quando for estritamente essencial… se o código precisa ser explicado é pq ele está mal escrito"*. A varredura tirou **90 linhas líquidas de comentário de 25 arquivos** nos três PRs, e nenhum teste caiu — nenhuma delas estava segurando nada.
 
+## Enxugar não muda o próximo arquivo que escrevo
+
+⛔ **Passar uma varredura de comentário não desliga o hábito.** O commit de limpeza mede o que já existe; o arquivo seguinte nasce do mesmo impulso de antes, e nasce denso.
+
+Aconteceu duas vezes no mesmo dia: enxuguei os sete workflows de 33% para 22% de comentário e, **dois commits depois**, escrevi um workflow novo com 33%. Quem viu foi o Victor: *"vc encheu o check-version de comentário de novo"*.
+
+**O gatilho é escrever arquivo novo logo após uma limpeza** — é ali que a régua ainda não pegou. Antes de commitar o arquivo novo, medir:
+
+```bash
+grep -c '^\s*#' <arquivo>   # comentários
+wc -l < <arquivo>            # linhas
+```
+
+Densidade acima da dos vizinhos é ordem de reler cada comentário pelo teste desta rule, não de aceitar porque "acabei de aprender a regra".
+
 ## Comentário órfão: a declaração some e ele fica
 
 Caso irmão do anterior e mais difícil de ver: o comentário não passou a descrever o vizinho errado por desatenção — **a declaração que ele documentava foi deletada**. O JSDoc sobrevive, pula a linha em branco e se cola ao próximo símbolo, que ele nunca descreveu.

@@ -56,13 +56,18 @@ export const RIDE_TYPE_SELECT_OPTIONS: readonly SelectOption[] = [
   ...RIDE_TYPE_OPTIONS,
 ];
 
+const INCLUSIVE_END = 1;
+
 export const SEAT_OPTIONS: readonly SelectOption[] = [
   EMPTY_CHOICE,
-  ...Array.from({ length: RIDE_LIMITS.maxSeats - RIDE_LIMITS.minSeats + 1 }, (_value, index) => {
-    const seats = RIDE_LIMITS.minSeats + index;
+  ...Array.from(
+    { length: RIDE_LIMITS.maxSeats - RIDE_LIMITS.minSeats + INCLUSIVE_END },
+    (_value, index) => {
+      const seats = RIDE_LIMITS.minSeats + index;
 
-    return { value: String(seats), label: seatsLabel(seats) };
-  }),
+      return { value: String(seats), label: seatsLabel(seats) };
+    },
+  ),
 ];
 
 export const RIDE_FORM_MESSAGES = {

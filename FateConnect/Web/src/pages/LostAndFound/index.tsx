@@ -20,6 +20,7 @@ import * as C from './constants';
 import * as S from './styles';
 
 const SPINNER_SIZE_PX = 60;
+const NO_ITEMS = 0;
 
 const INITIAL_FILTERS: LostItemFilterValues = { status: LostItemStatusEnum.OPEN };
 
@@ -92,7 +93,7 @@ export function LostAndFound() {
           </S.LoadingContainer>
         )}
 
-        {!isLoading && items.length === 0 && (
+        {!isLoading && items.length === NO_ITEMS && (
           <Typography variant="subtitle">{C.EMPTY_LIST_MESSAGE}</Typography>
         )}
 

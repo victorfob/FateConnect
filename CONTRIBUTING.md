@@ -57,7 +57,7 @@ dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
 dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build
 ```
 
-Erro reprova. Warning não.
+Aviso reprova nos dois lados: o lint do front roda com `--max-warnings=0`, e o `.csproj` da API liga `TreatWarningsAsErrors`.
 
 ## Mudança que o usuário percebe entra no CHANGELOG
 

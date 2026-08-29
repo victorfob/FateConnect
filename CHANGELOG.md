@@ -6,6 +6,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Corrige o cadastro, que aceitava requisição sem data de nascimento e gravava `01/01/0001` no lugar de recusar (#205) [Backend]
+
 ## [0.5.0] - 2026-08-28
 
 ### Changed
