@@ -106,7 +106,7 @@ Se o `psql` pedir senha, o túnel está funcionando e o resto é credencial.
 
 ## O que você vai encontrar
 
-O banco é compartilhado pelas duas APIs, então as tabelas das contas e as das
-caronas convivem no mesmo lugar, junto da tabela de controle das migrations.
+As tabelas de contas e as de caronas convivem no mesmo banco, junto da tabela
+de controle das migrations.
 O schema é criado pelas migrations na subida da aplicação — não altere tabela
 pelo DBeaver, ou o próximo deploy vai divergir do que o código espera.

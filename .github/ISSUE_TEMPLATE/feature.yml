@@ -22,8 +22,7 @@ body:
       label: Onde
       options:
         - Front-end (Web)
-        - API de contas (FateConnect.Api)
-        - API de caronas (Carona)
+        - API (FateConnect.Api)
         - Ainda não está claro
     validations:
       required: true

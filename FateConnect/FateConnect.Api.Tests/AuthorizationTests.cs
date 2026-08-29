@@ -4,11 +4,11 @@ using System.Net.Http.Json;
 
 namespace FateConnect.Api.Tests;
 
-public class AuthorizationTests : IClassFixture<AccountApiFactory>
+public class AuthorizationTests : IClassFixture<ApiFactory>
 {
-    private readonly AccountApiFactory _factory;
+    private readonly ApiFactory _factory;
 
-    public AuthorizationTests(AccountApiFactory factory)
+    public AuthorizationTests(ApiFactory factory)
     {
         _factory = factory;
     }
@@ -38,7 +38,7 @@ public class AuthorizationTests : IClassFixture<AccountApiFactory>
     {
         HttpClient client = _factory.CreateClient();
         client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", AccountApiFactory.IssueToken());
+            new AuthenticationHeaderValue("Bearer", ApiFactory.IssueToken());
 
         HttpResponseMessage response = await client.GetAsync("/Rides");
 
