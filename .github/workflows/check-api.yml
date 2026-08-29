@@ -51,15 +51,19 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      # Aponta para a solução, e não para cada projeto de teste, porque assim o
-      # projeto novo entra na esteira ao ser adicionado à solução — o mesmo gesto
-      # que o faz aparecer na IDE.
+      # Aponta para a solução, e não para cada projeto, porque assim o projeto
+      # novo entra na esteira ao ser adicionado à solução — o mesmo gesto que o
+      # faz aparecer na IDE.
+      - name: Build
+        if: steps.changes.outputs.api == 'true'
+        run: dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
+
+      # `--no-build` aproveita a compilação do passo acima. Sem ele o MSBuild
+      # roda de novo e um erro de compilação chegaria disfarçado de falha de
+      # teste, no passo errado.
       #
       # A suíte sobe a própria aplicação com banco em memória, então não há
       # Postgres a provisionar aqui.
       - name: Tests
         if: steps.changes.outputs.api == 'true'
-        run: |
-          set -euo pipefail
-
-          dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln
+        run: dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build
