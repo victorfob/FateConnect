@@ -13,3 +13,9 @@ public class InvalidDestinationException()
 
 public class InvalidRideTypeException()
     : RideDomainException("Invalid ride type.");
+
+public class InvalidRideDriverException()
+    : RideDomainException("The ride must belong to an identified user.");
+
+public class RideNotDrivenByUserException(Guid rideId)
+    : Exception($"The ride {rideId} was offered by another user.");
