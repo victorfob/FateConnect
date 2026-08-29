@@ -47,7 +47,7 @@ public async Task RideEndpoints_WithAValidToken_ReachTheController()
 {
     HttpClient client = _factory.CreateClient();
     client.DefaultRequestHeaders.Authorization =
-        new AuthenticationHeaderValue("Bearer", AccountApiFactory.IssueToken());
+        new AuthenticationHeaderValue("Bearer", ApiFactory.IssueToken());
 
     HttpResponseMessage response = await client.GetAsync("/Rides");
 
@@ -71,7 +71,7 @@ Valor fixo que não se explica sozinho vira constante nomeada, não literal solt
 
 ## Estado compartilhado: helper, não Setup
 
-`SetUp`/`TearDown` não existem no xUnit 2.x. Estado comum vai em método auxiliar ou no construtor da classe de teste; fixture cara vai em `IClassFixture<T>`, como o `AccountApiFactory`.
+`SetUp`/`TearDown` não existem no xUnit 2.x. Estado comum vai em método auxiliar ou no construtor da classe de teste; fixture cara vai em `IClassFixture<T>`, como o `ApiFactory`.
 
 ## Método privado se testa pelo público
 
@@ -85,6 +85,6 @@ Aqui isso já espera por alguém: `Ride.ValidateDepartureDateTime` compara a par
 
 ## Subir a aplicação sem banco
 
-O `AccountApiFactory` troca o provedor por `UseInMemoryDatabase`, e o `Program` só chama `Migrate()` quando `database.IsRelational()` — sem essa guarda a aplicação não sobe no teste, porque provedor em memória não tem migration.
+O `ApiFactory` troca o provedor por `UseInMemoryDatabase`, e o `Program` só chama `Migrate()` quando `database.IsRelational()` — sem essa guarda a aplicação não sobe no teste, porque provedor em memória não tem migration.
 
 ⚠️ **O provedor em memória não é o Postgres.** Ele não avalia `unaccent` nem `ILike`, então filtro por destino não se prova ali: ou o teste evita esse caminho, ou a prova é gerar o SQL e lê-lo.

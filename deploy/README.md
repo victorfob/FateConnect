@@ -13,7 +13,7 @@ reaproveitados:
 | --- | --- |
 | Banco | PostgreSQL do host, com **um banco por ambiente** |
 | Front | arquivos estáticos servidos pelo nginx do host |
-| APIs | dois contêineres por ambiente, escutando só em `127.0.0.1` |
+| API | um contêiner por ambiente, escutando só em `127.0.0.1` |
 
 O que separa os ambientes é banco, segredo, domínio e porta local. Derrubar um
 não afeta o outro.
@@ -24,10 +24,10 @@ Homologação acompanha a branch `develop`; produção acompanha a `main`.
 
 Produção responde na raiz do domínio, homologação num subdomínio:
 
-| Ambiente | Endereço | Portas locais |
+| Ambiente | Endereço | Porta local |
 | --- | --- | --- |
-| Produção | `fateconnect.com.br` | 8201 / 8202 |
-| Homologação | `hml.fateconnect.com.br` | 8101 / 8102 |
+| Produção | `fateconnect.com.br` | 8201 |
+| Homologação | `hml.fateconnect.com.br` | 8101 |
 
 No painel de DNS, crie **dois registros A** apontando para o IP da VPS: um para
 a raiz (`@`) e outro para `hml`. Confira antes de seguir — o certificado só é
@@ -99,7 +99,7 @@ sudo ./install-site.sh hml
 sudo ./install-site.sh prod
 ```
 
-Depois construa o front e suba as APIs:
+Depois construa o front e suba a API:
 
 ```bash
 ./build-front.sh hml && ./deploy.sh hml
@@ -113,8 +113,7 @@ resultado — que é exatamente o que a pipeline faz:
 
 ```bash
 # na sua máquina, dentro de FateConnect/Web
-VITE_API_URL=https://hml.fateconnect.com.br/api/conta \
-VITE_RIDE_API_URL=https://hml.fateconnect.com.br/api/carona \
+VITE_API_URL=https://hml.fateconnect.com.br/api \
 yarn build
 rsync -az --delete dist/ usuario@servidor:/var/www/fateconnect/<ambiente>/
 ```
@@ -158,18 +157,23 @@ acusar.
 
 ### O que configurar no GitHub
 
-Em **Settings → Environments**, crie `hml` e `prod`. É o ambiente que separa as
-variáveis e os segredos de cada destino; o push na `main` publica em produção
-direto.
+Em **Settings → Environments**, crie `hml` e `prod`. É o ambiente que separa o
+endereço de cada destino; o push na `main` publica em produção direto.
 
-**Variables**, em cada ambiente:
+**Variable de cada ambiente** — é a única coisa que muda entre `hml` e `prod`:
 
 | Variable | Conteúdo |
 | --- | --- |
 | `PUBLIC_URL` | o endereço daquele ambiente, com `https://` |
+
+**Variables do repositório**, valendo para os dois ambientes:
+
+| Variable | Conteúdo |
+| --- | --- |
 | `VITE_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT` | se usar Sentry |
 
-**Secrets**, em cada ambiente:
+**Secrets do repositório** — a VPS é a mesma nos dois ambientes, então não há
+motivo para duplicá-los por ambiente:
 
 | Secret | Conteúdo |
 | --- | --- |
@@ -180,7 +184,7 @@ direto.
 | `SENTRY_AUTH_TOKEN` | se usar Sentry |
 
 O `PUBLIC_URL` da variable e o do `.env` na VPS precisam ser o mesmo endereço:
-um alimenta o bundle, o outro libera o CORS das APIs.
+um alimenta o bundle, o outro libera o CORS da API.
 
 ### A chave da pipeline
 
@@ -195,10 +199,30 @@ cat ~/.ssh/github-actions.pub >> ~/.ssh/authorized_keys
 O conteúdo de `~/.ssh/github-actions` (sem o `.pub`) vai no secret
 `DEPLOY_SSH_KEY`. Ele nunca deve ser colado em conversa, chamado ou commit.
 
+## Atualizar o código da VPS
+
+⛔ **A pipeline não faz isso.** Ela envia o `dist/` do front por `rsync` e roda o
+`deploy.sh` que **já está na VPS** — nunca um `git pull`. Tudo o que vem do
+repositório continua no commit do último `pull` manual: o `docker-compose.yml`,
+os scripts daqui, o template do nginx e o **código da API**, que o compose
+constrói de `../FateConnect/FateConnect.Api`.
+
+```bash
+cd ~/FateConnect && git pull
+```
+
+Sem isso, uma mudança em `deploy/` ou na API entra no repositório e não chega ao
+ar — e a publicação seguinte roda a versão antiga sem acusar nada.
+
+⚠️ **Mudou o template do nginx?** O `deploy.sh` não toca no nginx. Depois do
+`pull`, rode `sudo ./install-site.sh <ambiente>` para regenerar a configuração,
+uma vez por ambiente.
+
 ## Dia a dia
 
 | O que você quer | Comando |
 | --- | --- |
+| Atualizar o código da VPS | `cd ~/FateConnect && git pull` |
 | Publicar a `develop` | `./build-front.sh hml && ./deploy.sh hml` |
 | Publicar uma release | `./build-front.sh prod && ./deploy.sh prod` |
 | Ver o que está de pé | `docker compose -p fateconnect-prod ps` |
@@ -218,7 +242,7 @@ Guarde o arquivo fora da VPS. Não há backup automático configurado.
 
 ## Quando algo dá errado
 
-**O site responde 502.** As APIs daquele ambiente estão fora. Veja com
+**O site responde 502.** A API daquele ambiente está fora. Veja com
 `docker compose -p fateconnect-hml logs`.
 
 **Um contêiner morre sozinho, sem erro claro.** Quase sempre é falta de
@@ -235,7 +259,6 @@ direto na VPS. Veja com `git status` e descarte se não houver nada a salvar.
 
 ## O que ainda não existe
 
-- **Achados e perdidos não funciona no ar.** O front chama `/achado` e nenhuma
-  das duas APIs implementa esse caminho ainda. As telas vão dar erro até a API
-  existir.
+- **Achados e perdidos não funciona no ar.** O front chama `/achado` e a API
+  não implementa esse caminho ainda. As telas vão dar erro até ele existir.
 - **Backup do banco é manual.**

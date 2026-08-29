@@ -10,11 +10,11 @@ using Microsoft.Extensions.Options;
 
 namespace FateConnect.Api.Tests;
 
-public class AccountApiFactory : WebApplicationFactory<Program>
+public class ApiFactory : WebApplicationFactory<Program>
 {
     public const string FakeSecret = "fake-test-secret-with-no-value-outside-this-suite";
 
-    public AccountApiFactory()
+    public ApiFactory()
     {
         Environment.SetEnvironmentVariable("JWT_SECRET", FakeSecret);
         Environment.SetEnvironmentVariable("JWT_ISSUER", "FateConnectTest");
@@ -29,7 +29,7 @@ public class AccountApiFactory : WebApplicationFactory<Program>
                 service => service.ServiceType == typeof(DbContextOptions<FateConnectDbContext>));
 
             services.Remove(registration);
-            services.AddDbContext<FateConnectDbContext>(options => options.UseInMemoryDatabase("accounts"));
+            services.AddDbContext<FateConnectDbContext>(options => options.UseInMemoryDatabase("fateconnect-tests"));
         });
     }
 

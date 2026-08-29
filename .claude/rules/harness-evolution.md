@@ -65,6 +65,16 @@ Ele lista todo caminho ancorado numa entrada real da raiz do repositório que n�
 
 Quando a pasta que uma rule descreve deixa de existir, a rule é **deletada, não reescrita** para o que ficou no lugar. Ela descrevia corretamente algo que não existe mais; reaproveitar o arquivo mistura dois contextos e produz orientação híbrida que não vale para nenhum dos dois. O mesmo vale para skill: procedimento sem alvo sai do repo, não vira procedimento genérico.
 
+## Rule descreve o estado atual, não o caminho até ele
+
+⛔ **Não registre em rule o que foi removido, renomeado ou dissolvido.** A rule é lida por quem vai escrever código agora, e ela responde *o que existe*. O histórico já está no GitHub — commit, PR e issue —, e é lá que se pergunta por que algo deixou de existir.
+
+Cobrado em 2026-08-29, na `fateconnect-overview.md`: eu tinha escrito *"O microsserviço de caronas foi dissolvido aqui pela #44"* e ainda **defendi** a frase, como proteção contra alguém "restaurar" o que saiu. A correção foi direta: *"ela deve dizer o estado atual da aplicação, se alguém quiser ver histórico é só ver o github"*.
+
+**O teste:** a frase descreve algo que **existe**? Fica. Descreve algo que **existia**? Sai. E o que sobra costuma dizer a mesma coisa sem envelhecer — *"uma só, em módulos por domínio"* já entrega tudo o que *"o microsserviço foi dissolvido"* entregava.
+
+⚠️ **Não confunda com a proibição ancorada no presente.** *"Não existe tela de contato… não 'restaurar' o item de menu"* é estado atual mais consequência, e impede uma mudança errada hoje. O que sai é a **narrativa do passado**, não a instrução.
+
 ## Criou skill, rule ou workflow? A lista que o enumera muda no mesmo PR
 
 ⛔ **Dois inventários deste repo são mantidos à mão, e um deles mora em dois lugares.** Criar o item sem atualizar a lista não quebra nada e não deixa rastro: meses depois ninguém sabe qual PR a deixou para trás.

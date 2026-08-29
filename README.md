@@ -6,19 +6,21 @@ Plataforma de caronas. Este repositório reúne o produto — front-end e APIs �
 
 ```
 FateConnect/
-  Web/                front-end em React + Vite       → FateConnect/Web/README.md
-  FateConnect.Api/    API .NET em módulos (Auth, Caronas, Achados, Denuncias, Usuarios)
-.claude/              contexto que um agente de código carrega ao trabalhar aqui
-.github/workflows/    validação de PR e criação da tag de release
-.githooks/            hooks locais de lint e teste
-deploy/               publicação em homologação e produção → deploy/README.md
-ESII/  ESIII/  LBD/   documentos das disciplinas, versionados por entrega
-CHANGELOG.md          histórico de mudanças no formato Keep a Changelog
-CONTRIBUTING.md       como propor uma mudança
-CODE_OF_CONDUCT.md    o que se espera de quem participa
-SECURITY.md           como relatar vulnerabilidade
-LICENSE               MIT
-package.json          a versão do projeto, e nada mais
+  Web/                    front-end em React + Vite       → FateConnect/Web/README.md
+  FateConnect.Api/        API .NET em módulos (Achados, Auth, Common, Denuncias, Rides, Usuarios)
+  FateConnect.Api.Tests/  suíte xUnit da API, pasta irmã e não filha
+.claude/                  contexto que um agente de código carrega ao trabalhar aqui
+.github/workflows/        validação de PR e criação da tag de release
+.githooks/                hooks locais de lint e teste
+deploy/                   publicação em homologação e produção → deploy/README.md
+scripts/                  scripts de manutenção do repositório
+ESII/  ESIII/  LBD/       documentos das disciplinas, versionados por entrega
+CHANGELOG.md              histórico de mudanças no formato Keep a Changelog
+CONTRIBUTING.md           como propor uma mudança
+CODE_OF_CONDUCT.md        o que se espera de quem participa
+SECURITY.md               como relatar vulnerabilidade
+LICENSE                   MIT
+package.json              a versão do projeto, e nada mais
 ```
 
 ## Idioma

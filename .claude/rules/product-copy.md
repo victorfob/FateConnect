@@ -36,7 +36,7 @@ O mesmo objeto ou estado se chama igual em **toda** a tela — etiqueta, botão,
 
 ### O valor que o contrato serializa não é o rótulo
 
-⛔ **Antes de escrever um valor de enum em texto que alguém lê — copy, URL, corpo de issue —, confira o mapa de rótulo.** Os dois nem sempre coincidem: `Filantropica` aparece na tela como **Solidária**, e `Igualitaria` como **Igualitária**, com acento. O mapa mora ao lado da tela, em `src/pages/Rides/helpers/rideType.ts`.
+⛔ **Antes de escrever um valor de enum em texto que alguém lê — copy, URL, corpo de issue —, confira o mapa de rótulo.** Os dois nem sempre coincidem: `Solidarity` aparece na tela como **Solidária**, e `Egalitarian` como **Igualitária** — o valor é inglês, o rótulo é português com acento. O mapa mora ao lado da tela, em `src/pages/Rides/helpers/rideType.ts`.
 
 Aconteceu ao especificar a paginação: escrevi `?tipo=filantropica` chamando aquilo de "o termo em pt-BR do produto". Não era — era a serialização do backend, e a palavra que a interface usa é outra. Eu tinha lido o `types.ts`; o valor estava certo e o **papel** dele, errado.
 
