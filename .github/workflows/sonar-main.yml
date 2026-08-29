@@ -95,8 +95,6 @@ jobs:
         id: version
         run: echo "value=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
 
-      # A suíte não roda aqui: o gate `Backend` não tem condição de cobertura, e
-      # teste quebrado já foi reprovado no check do PR.
       - name: Sonar begin
         run: >
           dotnet sonarscanner begin
@@ -106,12 +104,23 @@ jobs:
           /d:sonar.host.url=https://sonarcloud.io
           /d:sonar.token=$SONAR_TOKEN
           /d:sonar.qualitygate.wait=true
-          /d:sonar.exclusions=FateConnect/Web/**
+          /d:sonar.exclusions=FateConnect/Web/**,LBD/**,ESII/**,ESIII/**
+          /d:sonar.cs.opencover.reportsPaths=coverage/**/coverage.opencover.xml
+          /d:sonar.coverage.exclusions=**/Migrations/**,**/obj/**
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build
         run: dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
+
+      # A suíte roda para produzir cobertura: sem ela a `main` reportaria 0% e o
+      # painel mentiria sobre o projeto. O formato é OpenCover porque o Sonar não
+      # lê Cobertura para C#.
+      - name: Tests
+        run: |
+          dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build \
+            --collect:"XPlat Code Coverage;Format=opencover" \
+            --results-directory coverage
 
       - name: Sonar end
         run: dotnet sonarscanner end /d:sonar.token=$SONAR_TOKEN

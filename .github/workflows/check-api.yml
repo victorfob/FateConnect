@@ -78,8 +78,12 @@ jobs:
       # análise de branch e mediria o repositório inteiro.
       #
       # `qualitygate.wait` é o que faz o passo reprovar; sem ele o scan publica e
-      # sai verde. A exclusão mantém o front fora: ele tem projeto e gate
-      # próprios, e seria medido duas vezes, a segunda com o gate errado.
+      # sai verde.
+      #
+      # O scanner varre a pasta base inteira, não só o C#. A exclusão tira o
+      # front, que tem projeto e gate próprios e seria medido duas vezes com o
+      # gate errado, e as pastas das disciplinas, que não são código de produto —
+      # os `.sql` de LBD acionavam o analisador de PL/SQL.
       - name: Sonar begin
         if: steps.changes.outputs.api == 'true'
         run: >
@@ -89,7 +93,9 @@ jobs:
           /d:sonar.host.url=https://sonarcloud.io
           /d:sonar.token=$SONAR_TOKEN
           /d:sonar.qualitygate.wait=true
-          /d:sonar.exclusions=FateConnect/Web/**
+          /d:sonar.exclusions=FateConnect/Web/**,LBD/**,ESII/**,ESIII/**
+          /d:sonar.cs.opencover.reportsPaths=coverage/**/coverage.opencover.xml
+          /d:sonar.coverage.exclusions=**/Migrations/**,**/obj/**
           /d:sonar.pullrequest.key=$PR_NUMBER
           /d:sonar.pullrequest.branch=$HEAD_REF
           /d:sonar.pullrequest.base=$BASE_REF
@@ -107,9 +113,15 @@ jobs:
 
       # A suíte sobe a própria aplicação com banco em memória, então não há
       # Postgres a provisionar aqui.
+      #
+      # O formato é OpenCover porque o Sonar não lê Cobertura para C#, que é o
+      # que o `dotnet test` produz por padrão.
       - name: Tests
         if: steps.changes.outputs.api == 'true'
-        run: dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build
+        run: |
+          dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build \
+            --collect:"XPlat Code Coverage;Format=opencover" \
+            --results-directory coverage
 
       - name: Sonar end
         if: steps.changes.outputs.api == 'true'
