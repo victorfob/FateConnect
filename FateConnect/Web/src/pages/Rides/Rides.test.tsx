@@ -19,21 +19,20 @@ import { RIDE_DRIVER } from './helpers/rideDriver';
 import * as C from './constants';
 import { Rides } from '.';
 
-const RIDES_URL = 'https://rides.fateconnect.test/caronas';
+const RIDES_URL = 'https://api.fateconnect.test/Rides';
 
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
 const RETRY_WINDOW_MS = 5000;
 
 const RIDE: Ride = {
   id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
-  qtdVagas: 3,
-  destino: 'Fatec Sorocaba',
-  dataPartida: '2026-05-22T00:00:00',
-  horaPartida: '07:30:00',
-  dataCadastro: '2026-05-01T00:00:00',
-  tipoCarona: RideTypeEnum.PHILANTHROPIC,
-  descricao: 'Saída do centro, com parada no terminal.',
-  ativo: true,
+  availableSeats: 3,
+  destination: 'Fatec Sorocaba',
+  departureDate: '2026-05-22T00:00:00',
+  departureTime: '07:30:00',
+  createdAt: '2026-05-01T00:00:00',
+  rideType: RideTypeEnum.SOLIDARITY,
+  description: 'Saída do centro, com parada no terminal.',
 };
 
 function listReturning(rides: Ride[], onRequest?: (url: URL) => void) {
@@ -142,10 +141,10 @@ describe('Rides', () => {
     listReturning([RIDE]);
     renderComponent();
 
-    expect(await screen.findByText(RIDE.destino)).toBeInTheDocument();
+    expect(await screen.findByText(RIDE.destination)).toBeInTheDocument();
     expect(screen.getByText('22/05/2026')).toBeInTheDocument();
     expect(screen.getByText('07:30')).toBeInTheDocument();
-    expect(screen.getByText(C.seatsLabel(RIDE.qtdVagas))).toBeInTheDocument();
+    expect(screen.getByText(C.seatsLabel(RIDE.availableSeats))).toBeInTheDocument();
     expect(screen.getAllByText('Solidária')).toHaveLength(1);
   });
 
@@ -195,7 +194,7 @@ describe('Rides', () => {
     await userEvent.type(screen.getByLabelText(FILTER_LABELS.destination), 'Sorocaba');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
-    await waitFor(() => expect(requestUrl?.searchParams.get('Destino')).toBe('Sorocaba'));
+    await waitFor(() => expect(requestUrl?.searchParams.get('destination')).toBe('Sorocaba'));
     // O ponto do painel não tem papel de acessibilidade: chega-se a ele pelo título.
     const activeDot = screen
       .getByText(FILTER_PANEL_TITLE)
@@ -208,18 +207,20 @@ describe('Rides', () => {
     listReturning([RIDE]);
     loggedAsTheDriver();
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
 
     const dialog = within(await screen.findByRole('dialog'));
     expect(dialog.getByRole('heading', { name: DELETE_DIALOG.title })).toBeInTheDocument();
-    expect(dialog.getByText(RIDE.destino)).toBeInTheDocument();
+    expect(dialog.getByText(RIDE.destination)).toBeInTheDocument();
 
     await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.cancelLabel }));
 
     // O cartão só volta a ser alcançável quando o diálogo termina de fechar.
-    expect(within(await screen.findByRole('article')).getByText(RIDE.destino)).toBeInTheDocument();
+    expect(
+      within(await screen.findByRole('article')).getByText(RIDE.destination),
+    ).toBeInTheDocument();
   });
 
   it('should delete the ride once the removal is confirmed', async () => {
@@ -234,7 +235,7 @@ describe('Rides', () => {
       }),
     );
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
     const dialog = within(await screen.findByRole('dialog'));
@@ -249,7 +250,7 @@ describe('Rides', () => {
     loggedAsTheDriver();
     server.use(http.delete(`${RIDES_URL}/:rideId`, () => new HttpResponse(null, { status: 500 })));
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
     const dialog = within(await screen.findByRole('dialog'));
@@ -261,7 +262,7 @@ describe('Rides', () => {
   it('should show the contact of whoever offered the ride', async () => {
     listReturning([RIDE]);
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
 
@@ -273,7 +274,7 @@ describe('Rides', () => {
   it('should copy the email and say so', async () => {
     listReturning([RIDE]);
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
     const dialog = within(await screen.findByRole('dialog'));
@@ -288,7 +289,7 @@ describe('Rides', () => {
     clipboardWrite.mockRejectedValueOnce(new Error('denied'));
     listReturning([RIDE]);
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
     const dialog = within(await screen.findByRole('dialog'));
@@ -300,7 +301,7 @@ describe('Rides', () => {
   it('should open the conversation already mentioning the destination of the ride', async () => {
     listReturning([RIDE]);
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
 
@@ -309,14 +310,14 @@ describe('Rides', () => {
 
     expect(conversation).toHaveAttribute(
       'href',
-      expect.stringContaining(encodeURIComponent(RIDE.destino)),
+      expect.stringContaining(encodeURIComponent(RIDE.destination)),
     );
   });
 
   it('should give the card back when the contact is dismissed', async () => {
     listReturning([RIDE]);
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
     await screen.findByRole('dialog');
@@ -325,14 +326,16 @@ describe('Rides', () => {
     // diálogo fecha, seja qual for o gesto que o fechou.
     await userEvent.keyboard('{Escape}');
 
-    expect(within(await screen.findByRole('article')).getByText(RIDE.destino)).toBeInTheDocument();
+    expect(
+      within(await screen.findByRole('article')).getByText(RIDE.destination),
+    ).toBeInTheDocument();
   });
 
   it('should not offer contact on a ride offered by the logged user', async () => {
     tokenStorage.save('token', RIDE_DRIVER.name);
     listReturning([RIDE]);
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     expect(screen.queryByRole('button', { name: CONTACT_LABEL })).not.toBeInTheDocument();
   });
@@ -340,7 +343,7 @@ describe('Rides', () => {
   it('should keep the owner actions off a ride offered by someone else', async () => {
     listReturning([RIDE]);
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     expect(screen.queryByRole('button', { name: C.RIDE_CARD_LABELS.edit })).not.toBeInTheDocument();
     expect(
@@ -353,7 +356,7 @@ describe('Rides', () => {
     tokenStorage.save('token', RIDE_DRIVER.name);
     listReturning([RIDE]);
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     expect(screen.getByText(C.OWN_RIDE_LABEL)).toBeInTheDocument();
   });
@@ -361,7 +364,7 @@ describe('Rides', () => {
   it('should keep that announcement off a ride offered by someone else', async () => {
     listReturning([RIDE]);
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     expect(screen.queryByText(C.OWN_RIDE_LABEL)).not.toBeInTheDocument();
   });
@@ -370,14 +373,14 @@ describe('Rides', () => {
     listReturning([RIDE]);
     loggedAsTheDriver();
     renderComponent();
-    await screen.findByText(RIDE.destino);
+    await screen.findByText(RIDE.destination);
 
     await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.edit }));
 
     expect(await screen.findByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
     expect(
       screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.destination) }),
-    ).toHaveValue(RIDE.destino);
+    ).toHaveValue(RIDE.destination);
     expect(screen.getByRole('tab', { name: C.OFFER_TAB_LABEL, hidden: true })).toHaveAttribute(
       'aria-selected',
       'false',

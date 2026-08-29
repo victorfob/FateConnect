@@ -10,10 +10,9 @@ failOnConsole({ shouldFailOnWarn: true, shouldFailOnError: true });
 
 process.env.TZ = 'America/Sao_Paulo';
 
-// Endereços fictícios: os clientes HTTP são criados na carga do módulo, então o
+// Endereço fictício: o cliente HTTP é criado na carga do módulo, então o
 // stub precisa acontecer antes de qualquer import de teste.
 vi.stubEnv('VITE_API_URL', 'https://api.fateconnect.test');
-vi.stubEnv('VITE_RIDE_API_URL', 'https://rides.fateconnect.test');
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => {

@@ -5,14 +5,13 @@ import { toFormValues, toRideInput } from './mapper';
 
 const RIDE: Ride = {
   id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
-  qtdVagas: 4,
-  destino: 'Fatec Sorocaba',
-  dataPartida: '2026-05-22T00:00:00',
-  horaPartida: '07:30:00',
-  dataCadastro: '2026-05-01T00:00:00',
-  tipoCarona: RideTypeEnum.EGALITARIAN,
-  descricao: 'Saída do centro.',
-  ativo: true,
+  availableSeats: 4,
+  destination: 'Fatec Sorocaba',
+  departureDate: '2026-05-22T00:00:00',
+  departureTime: '07:30:00',
+  createdAt: '2026-05-01T00:00:00',
+  rideType: RideTypeEnum.EGALITARIAN,
+  description: 'Saída do centro.',
 };
 
 describe('toFormValues', () => {
@@ -30,7 +29,7 @@ describe('toFormValues', () => {
   });
 
   it('should turn a missing description into an empty field', () => {
-    expect(toFormValues({ ...RIDE, descricao: null }).description).toBe('');
+    expect(toFormValues({ ...RIDE, description: null }).description).toBe('');
   });
 });
 
@@ -46,12 +45,12 @@ describe('toRideInput', () => {
     };
 
     expect(toRideInput(values)).toEqual({
-      qtdVagas: 4,
-      destino: 'Fatec Sorocaba',
-      dataPartida: '2026-05-22',
-      horaPartida: '07:30',
-      tipoCarona: RideTypeEnum.EGALITARIAN,
-      descricao: 'Saída do centro.',
+      availableSeats: 4,
+      destination: 'Fatec Sorocaba',
+      departureDate: '2026-05-22',
+      departureTime: '07:30',
+      rideType: RideTypeEnum.EGALITARIAN,
+      description: 'Saída do centro.',
     });
   });
 });

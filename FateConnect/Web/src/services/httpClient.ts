@@ -73,10 +73,5 @@ function withInterceptors(client: AxiosInstance): AxiosInstance {
   return client;
 }
 
-/** API principal — autenticação e cadastro. */
+/** Cliente único da API. */
 export const apiClient = withInterceptors(axios.create({ baseURL: import.meta.env.VITE_API_URL }));
-
-/** API de caronas, que tem endereço próprio. */
-export const rideApiClient = withInterceptors(
-  axios.create({ baseURL: import.meta.env.VITE_RIDE_API_URL }),
-);

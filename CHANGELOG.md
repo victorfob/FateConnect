@@ -9,6 +9,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - Passa a atender as caronas pela mesma API do cadastro, em `/Rides`, com o contrato em inglês: mudam os nomes dos filtros e os valores de tipo de carona e de gênero (#186) [Backend]
+- Passa a consumir as caronas pela mesma API do cadastro e a enviar os valores novos de tipo de carona e de gênero; os rótulos na tela não mudam (#194) [Frontend]
 
 ### Fixed
 
