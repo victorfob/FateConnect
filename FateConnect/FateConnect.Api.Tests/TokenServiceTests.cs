@@ -27,7 +27,12 @@ public class TokenServiceTests
         };
 
         string token = new TokenService(Options.Create(options))
-            .GerarJwtToken(new Usuario { Id = 7, EmailFatec = "pessoa@fatec.sp.gov.br" });
+            .GerarJwtToken(new Usuario
+            {
+                Id = 7,
+                NomeCompleto = "Pessoa de Teste",
+                EmailFatec = "pessoa@fatec.sp.gov.br",
+            });
 
         ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(
             token,
@@ -45,5 +50,6 @@ public class TokenServiceTests
             out SecurityToken _);
 
         Assert.Equal("7", principal.FindFirstValue(ClaimTypes.NameIdentifier));
+        Assert.Equal("Pessoa de Teste", principal.FindFirstValue(ClaimTypes.Name));
     }
 }

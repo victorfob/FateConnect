@@ -47,6 +47,7 @@ public class TokenService : ITokenService
         Claim[] claims =
         [
             new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString(CultureInfo.InvariantCulture)),
+            new Claim(ClaimTypes.Name, usuario.NomeCompleto),
             new Claim(ClaimTypes.Email, usuario.EmailFatec),
             new Claim(ClaimTypes.Role, usuario.Perfil.ToString())
         ];

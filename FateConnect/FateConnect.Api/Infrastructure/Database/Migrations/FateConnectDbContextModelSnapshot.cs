@@ -20,6 +20,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Contato", b =>
@@ -125,6 +126,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int>("DriverId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -132,6 +136,8 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DriverId");
 
                     b.ToTable("rides", (string)null);
                 });
@@ -207,6 +213,17 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.Ride", b =>
+                {
+                    b.HasOne("FateConnect.Api.Modules.Usuarios.Usuario", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Driver");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Usuarios.Usuario", b =>

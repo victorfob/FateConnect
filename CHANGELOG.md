@@ -6,9 +6,17 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Passa a devolver quem ofertou a carona, com nome e contato, e a indicar se ela é de quem consultou (#201) [Backend]
+
 ### Fixed
 
 - Corrige o cadastro, que aceitava requisição sem data de nascimento e gravava `01/01/0001` no lugar de recusar (#205) [Backend]
+
+### Security
+
+- Restringe editar e excluir carona a quem a ofertou; antes qualquer pessoa autenticada alterava a carona de outra (#201) [Backend]
 
 ## [0.5.0] - 2026-08-28
 

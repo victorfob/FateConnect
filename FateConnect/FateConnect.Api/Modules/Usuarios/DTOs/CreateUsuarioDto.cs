@@ -43,6 +43,7 @@ public class CreateUsuarioDto
     [];
 
     [Required]
+    [MinLength(1, ErrorMessage = "É obrigatório informar ao menos um contato")]
     required public List<CreateContatoDto> Contatos { get; set; } =
     [];
 }

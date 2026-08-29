@@ -36,5 +36,13 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
 
         builder.Property(r => r.IsActive)
               .IsRequired();
+
+        builder.Property(r => r.DriverId)
+              .IsRequired();
+
+        builder.HasOne(r => r.Driver)
+              .WithMany()
+              .HasForeignKey(r => r.DriverId)
+              .OnDelete(DeleteBehavior.Restrict);
     }
 }

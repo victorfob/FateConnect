@@ -24,4 +24,7 @@ public partial class RideService
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Ride {RideId} was already deactivated or not found.")]
     private static partial void LogRideDeactivationFailed(ILogger logger, Guid rideId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "User {UserId} tried to change ride {RideId}, offered by another user.")]
+    private static partial void LogRideChangeRefused(ILogger logger, int userId, Guid rideId);
 }
