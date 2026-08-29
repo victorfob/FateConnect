@@ -9,6 +9,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - Passa a devolver quem ofertou a carona, com nome e contato, e a indicar se ela é de quem consultou (#201) [Backend]
+- Passa a mostrar quem ofertou cada carona, com nome e contato reais, e a reconhecer as suas — com marcação própria e os botões de editar e excluir (#203) [Frontend]
 
 ### Fixed
 
