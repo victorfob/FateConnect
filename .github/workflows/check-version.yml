@@ -1,0 +1,48 @@
+name: Check version
+
+# A tag da release nasce da versão do `package.json` da raiz, então PR para a
+# `main` é a última chance de pegar versão repetida: ou o bump foi esquecido, ou
+# a versão já foi publicada. Nos dois casos a release entraria sem tag nova.
+#
+# Workflow próprio, e não um passo do check do front, porque a versão é do
+# repositório e não de um lado dele. Como passo de lá, a validação dependia do
+# recorte daquele job: PR para a `main` que não tocasse o front nem o
+# `package.json` a pulava em silêncio — e "não tocou o `package.json`" é
+# precisamente o bump esquecido que ela existe para pegar.
+on:
+  pull_request
+
+concurrency:
+  group: check-version-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    name: Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Só o PR para a `main` é validado — a versão que vale é a que está sendo
+      # publicada. Em PR de feature a versão é a da última release, e a tag dela
+      # existe: validar ali reprovaria toda feature.
+      #
+      # A busca é no remoto, não em `git tag -l`: o checkout traz um commit e
+      # nenhuma tag, então a busca local não acharia nada nunca e o passo
+      # aprovaria tudo em silêncio.
+      - name: Version
+        if: github.base_ref == 'main'
+        run: |
+          set -euo pipefail
+
+          version=$(jq -r .version package.json)
+
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
+            echo "::error::A versão $version já foi publicada (tag v$version). Atualize a versão no package.json da raiz e abra a seção correspondente no CHANGELOG.md."
+            exit 1
+          fi
+
+          echo "Versão $version disponível para publicação."

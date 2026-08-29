@@ -47,9 +47,6 @@ jobs:
       # É a API de arquivos, paginada, e não `gh pr diff`: aquele recusa PR com
       # mais de 300 arquivos (HTTP 406), e a release que trocou o front inteiro
       # tinha 330. Um check obrigatório reprovaria exatamente no PR de release.
-      #
-      # A versão do projeto mora no `package.json` da raiz, então ela entra no
-      # recorte junto do front: mudança de versão não pode escapar da validação.
       - name: Changed paths
         id: changes
         run: |
@@ -64,43 +61,17 @@ jobs:
           # minutos.
           relevant=$(printf '%s\n' "$changed" | grep -vE '\.md$' || true)
 
-          if printf '%s\n' "$relevant" | grep -qE '^(FateConnect/Web/|package\.json$)'; then
+          if printf '%s\n' "$relevant" | grep -qE '^FateConnect/Web/'; then
             echo 'web=true' >> "$GITHUB_OUTPUT"
-            echo 'A mudança alcança o front ou a versão do projeto — validando.'
+            echo 'A mudança alcança o front — validando.'
             exit 0
           fi
 
           echo 'web=false' >> "$GITHUB_OUTPUT"
-          echo 'Nada em FateConnect/Web nem na versão do projeto — nada a validar aqui.'
+          echo 'Nada em FateConnect/Web — nada a validar aqui.'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-
-      # A tag da release nasce da versão do `package.json` da raiz, então PR para
-      # a main é a última chance de pegar versão repetida: ou o bump foi
-      # esquecido, ou a versão já foi publicada. Nos dois casos a release
-      # entraria sem tag nova.
-      #
-      # Só o PR para a main é validado — a versão que vale é a que está sendo
-      # publicada. Em PR de feature a versão é a da última release, e a tag dela
-      # existe: validar ali reprovaria toda feature.
-      #
-      # A busca é no remoto, não em `git tag -l`: o checkout traz um commit e
-      # nenhuma tag, então a busca local não acharia nada nunca e o passo
-      # aprovaria tudo em silêncio.
-      - name: Version
-        if: steps.changes.outputs.web == 'true' && github.base_ref == 'main'
-        run: |
-          set -euo pipefail
-
-          version=$(jq -r .version "$GITHUB_WORKSPACE/package.json")
-
-          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
-            echo "::error::A versão $version já foi publicada (tag v$version). Atualize a versão no package.json da raiz e abra a seção correspondente no CHANGELOG.md."
-            exit 1
-          fi
-
-          echo "Versão $version disponível para publicação."
 
       - uses: actions/setup-node@v5
         if: steps.changes.outputs.web == 'true'
