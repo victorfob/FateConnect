@@ -13,7 +13,7 @@ const REPLAY_ON_ERROR_SAMPLE_RATE = 1;
 
 /** Só nas nossas APIs o cabeçalho de rastro é propagado. */
 function tracePropagationTargets(): string[] {
-  const apis = [import.meta.env.VITE_API_URL, import.meta.env.VITE_RIDE_API_URL];
+  const apis = [import.meta.env.VITE_API_URL];
 
   return ['localhost', ...apis.filter(Boolean)];
 }

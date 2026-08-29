@@ -1,24 +1,12 @@
-import { rideApiClient } from '../httpClient';
+import { apiClient } from '../httpClient';
 import type { Ride, RideFilter, RideInput } from './types';
 
-const RIDES_PATH = '/caronas';
+const RIDES_PATH = '/Rides';
 
 const INVALID_LIST_PAYLOAD_MESSAGE = 'A API de caronas respondeu algo que não é uma lista.';
 
-/** Tradução dos filtros do front para os nomes de parâmetro da API. */
-function toQueryParams(filters: RideFilter = {}): Record<string, string> {
-  const params: Record<string, string> = {};
-
-  if (filters.destination) params.Destino = filters.destination;
-  if (filters.departureDate) params.DataPartida = filters.departureDate;
-  if (filters.departureTime) params.HoraPartida = filters.departureTime;
-  if (filters.rideType) params.TipoCarona = filters.rideType;
-
-  return params;
-}
-
 export async function listRides(filters?: RideFilter): Promise<Ride[]> {
-  const { data } = await rideApiClient.get<Ride[]>(RIDES_PATH, { params: toQueryParams(filters) });
+  const { data } = await apiClient.get<Ride[]>(RIDES_PATH, { params: filters });
 
   // O tipo do axios é uma promessa de contrato, não uma garantia: sem o endereço
   // da API a requisição cai no próprio servidor de desenvolvimento, que responde
@@ -30,17 +18,17 @@ export async function listRides(filters?: RideFilter): Promise<Ride[]> {
 }
 
 export async function createRide(input: RideInput): Promise<Ride> {
-  const { data } = await rideApiClient.post<Ride>(RIDES_PATH, input);
+  const { data } = await apiClient.post<Ride>(RIDES_PATH, input);
 
   return data;
 }
 
 export async function updateRide(rideId: string, input: RideInput): Promise<Ride> {
-  const { data } = await rideApiClient.put<Ride>(`${RIDES_PATH}/${rideId}`, input);
+  const { data } = await apiClient.put<Ride>(`${RIDES_PATH}/${rideId}`, input);
 
   return data;
 }
 
 export async function deleteRide(rideId: string): Promise<void> {
-  await rideApiClient.delete(`${RIDES_PATH}/${rideId}`);
+  await apiClient.delete(`${RIDES_PATH}/${rideId}`);
 }

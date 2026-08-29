@@ -306,7 +306,7 @@ describe('Signup', () => {
       nomeCompleto: VALID_SIGNUP.fullName,
       emailFatec: VALID_SIGNUP.fatecEmail,
       senha: VALID_SIGNUP.password,
-      genero: 'Feminino',
+      genero: 'Female',
       dataNascimento: '1999-05-22T00:00:00Z',
       enderecos: [
         {

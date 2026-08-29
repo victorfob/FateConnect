@@ -46,11 +46,7 @@ describe('initSentry', () => {
 
     expect(mockInit).toHaveBeenCalledWith(
       expect.objectContaining({
-        tracePropagationTargets: [
-          'localhost',
-          'https://api.fateconnect.test',
-          'https://rides.fateconnect.test',
-        ],
+        tracePropagationTargets: ['localhost', 'https://api.fateconnect.test'],
       }),
     );
   });

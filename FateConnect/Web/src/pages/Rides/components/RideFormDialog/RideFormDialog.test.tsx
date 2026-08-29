@@ -9,7 +9,7 @@ import { toApiDate } from '@app/utils/apiDate';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './constants';
 import { RideFormDialog, type RideFormDialogProps } from '.';
 
-const RIDES_URL = 'https://rides.fateconnect.test/caronas';
+const RIDES_URL = 'https://api.fateconnect.test/Rides';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DAYS_AHEAD = 30;
@@ -20,14 +20,13 @@ const TYPED_DATE = format(OFFERED_AT, 'ddMMyyyy');
 
 const RIDE: Ride = {
   id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
-  qtdVagas: 4,
-  destino: 'Fatec Sorocaba',
-  dataPartida: toApiDate(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
-  horaPartida: '07:30:00',
-  dataCadastro: '2026-05-01T00:00:00',
-  tipoCarona: RideTypeEnum.EGALITARIAN,
-  descricao: 'Saída do centro, com parada no terminal.',
-  ativo: true,
+  availableSeats: 4,
+  destination: 'Fatec Sorocaba',
+  departureDate: toApiDate(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
+  departureTime: '07:30:00',
+  createdAt: '2026-05-01T00:00:00',
+  rideType: RideTypeEnum.EGALITARIAN,
+  description: 'Saída do centro, com parada no terminal.',
 };
 
 const onClose = vi.fn();
@@ -57,10 +56,10 @@ describe('RideFormDialog', () => {
 
     expect(await screen.findByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: EDIT_MODE.submitLabel })).toBeInTheDocument();
-    expect(destinationField()).toHaveValue(RIDE.destino);
+    expect(destinationField()).toHaveValue(RIDE.destination);
     expect(
       screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.description) }),
-    ).toHaveValue(RIDE.descricao);
+    ).toHaveValue(RIDE.description);
   });
 
   it('should refuse to submit an empty form and say what is missing', async () => {
@@ -95,12 +94,12 @@ describe('RideFormDialog', () => {
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
-      qtdVagas: RIDE.qtdVagas,
-      destino: RIDE.destino,
-      dataPartida: RIDE.dataPartida,
-      horaPartida: '07:30',
-      tipoCarona: RIDE.tipoCarona,
-      descricao: RIDE.descricao,
+      availableSeats: RIDE.availableSeats,
+      destination: RIDE.destination,
+      departureDate: RIDE.departureDate,
+      departureTime: '07:30',
+      rideType: RIDE.rideType,
+      description: RIDE.description,
     });
   });
 
@@ -113,7 +112,7 @@ describe('RideFormDialog', () => {
 
     expect(await screen.findByText(EDIT_MODE.failed)).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
-    expect(destinationField()).toHaveValue(RIDE.destino);
+    expect(destinationField()).toHaveValue(RIDE.destination);
   });
 
   it('should offer the ride the form describes', async () => {
@@ -149,12 +148,12 @@ describe('RideFormDialog', () => {
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
-      qtdVagas: 3,
-      destino: 'Terminal Santo Antônio',
-      dataPartida: toApiDate(OFFERED_AT),
-      horaPartida: '18:30',
-      tipoCarona: RideTypeEnum.PHILANTHROPIC,
-      descricao: '',
+      availableSeats: 3,
+      destination: 'Terminal Santo Antônio',
+      departureDate: toApiDate(OFFERED_AT),
+      departureTime: '18:30',
+      rideType: RideTypeEnum.SOLIDARITY,
+      description: '',
     });
   });
 });

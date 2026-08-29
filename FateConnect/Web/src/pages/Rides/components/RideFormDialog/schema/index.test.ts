@@ -12,7 +12,7 @@ const VALID: RideFormInput = {
   destination: 'Fatec Sorocaba',
   departureDate: toApiDate(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
   departureTime: '07:30',
-  rideType: RideTypeEnum.PHILANTHROPIC,
+  rideType: RideTypeEnum.SOLIDARITY,
   seats: '3',
   description: 'Saída do centro.',
 };
@@ -29,7 +29,7 @@ describe('rideFormSchema', () => {
     const result = rideFormSchema.safeParse(VALID);
 
     expect(result.success).toBe(true);
-    expect(result.data?.rideType).toBe(RideTypeEnum.PHILANTHROPIC);
+    expect(result.data?.rideType).toBe(RideTypeEnum.SOLIDARITY);
   });
 
   it('should trim the destination and the description', () => {
