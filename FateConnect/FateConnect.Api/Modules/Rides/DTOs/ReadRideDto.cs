@@ -10,5 +10,7 @@ public record ReadRideDto(
     TimeOnly DepartureTime,
     DateTime CreatedAt,
     EnumRideType RideType,
-    string? Description
+    string? Description,
+    RideDriverDto Driver,
+    bool IsOwner
 );

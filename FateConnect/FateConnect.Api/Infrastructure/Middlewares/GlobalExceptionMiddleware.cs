@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Infrastructure.Middlewares;
 
 using System.Net;
+using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Usuarios.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -33,14 +34,19 @@ public partial class GlobalExceptionMiddleware(
                 errorMessage = ex.Message;
                 break;
 
+            case RideNotDrivenByUserException ex:
+                statusCode = HttpStatusCode.Forbidden;
+                errorMessage = ex.Message;
+                break;
+
             case EmailJaCadastradoException ex:
                 statusCode = HttpStatusCode.Conflict;
                 errorMessage = ex.Message;
                 break;
 
-            case CredenciaisInvalidasException ex:
+            case UnidentifiedUserException or CredenciaisInvalidasException:
                 statusCode = HttpStatusCode.Unauthorized;
-                errorMessage = ex.Message;
+                errorMessage = exception.Message;
                 break;
 
             case JwtNaoConfiguradoException ex:
