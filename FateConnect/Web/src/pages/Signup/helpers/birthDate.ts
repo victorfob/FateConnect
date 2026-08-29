@@ -4,9 +4,11 @@ const BIRTH_DATE_FORMAT = 'dd/MM/yyyy';
 const API_DATE_FORMAT = 'yyyy-MM-dd';
 const MINIMUM_AGE_YEARS = 18;
 const EARLIEST_BIRTH_YEAR = 1900;
+const JANUARY = 0;
+const FIRST_DAY_OF_MONTH = 1;
 
 /** Piso do seletor, igual ao do formulário anterior. */
-export const EARLIEST_BIRTH_DATE = new Date(EARLIEST_BIRTH_YEAR, 0, 1);
+export const EARLIEST_BIRTH_DATE = new Date(EARLIEST_BIRTH_YEAR, JANUARY, FIRST_DAY_OF_MONTH);
 
 /**
  * Última data de nascimento aceita — quem completa 18 anos hoje ainda pode se

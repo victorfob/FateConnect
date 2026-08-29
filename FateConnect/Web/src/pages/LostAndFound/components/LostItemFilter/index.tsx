@@ -13,10 +13,11 @@ import * as C from './constants';
 
 /** Células por linha no desktop: cinco campos e o botão quebram em duas. */
 const FILTER_COLUMNS = 3;
+const NO_FILTERS = 0;
 
 /** O mural já abre em Aberto, então isso sozinho não conta como filtro. */
 function isBeyondDefault({ status, ...rest }: LostItemFilterValues): boolean {
-  if (Object.keys(rest).length > 0) return true;
+  if (Object.keys(rest).length > NO_FILTERS) return true;
 
   return status !== LostItemStatusEnum.OPEN;
 }

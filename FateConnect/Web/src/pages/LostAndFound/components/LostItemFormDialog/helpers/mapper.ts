@@ -1,4 +1,5 @@
 import type { LostItem, LostItemInput } from '@app/services/lostAndFound/types';
+import { firstCharacters } from '@app/utils/sequence';
 
 import { EMPTY_LOST_ITEM_FORM, type LostItemFormInput, type LostItemFormValues } from '../schema';
 
@@ -11,7 +12,7 @@ export function toFormValues(item: LostItem | undefined): LostItemFormInput {
     name: item.nome,
     kind: item.tipo,
     place: item.local,
-    occurredOn: item.dataOcorrido.slice(0, DATE_LENGTH),
+    occurredOn: firstCharacters(item.dataOcorrido, DATE_LENGTH),
     description: item.descricao ?? '',
     // O campo só lida com arquivo escolhido agora, não com a URL guardada.
     photo: null,

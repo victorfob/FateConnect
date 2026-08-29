@@ -6,6 +6,7 @@ import * as C from '@app/pages/Rides/constants';
 import { isOwnRide, RIDE_DRIVER } from '@app/pages/Rides/helpers/rideDriver';
 import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
 import type { Ride } from '@app/services/rides/types';
+import { firstCharacters } from '@app/utils/sequence';
 
 import { RideDriverContact } from './RideDriverContact';
 import { RideOwnerActions } from './RideOwnerActions';
@@ -51,7 +52,7 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
         <ListCard.InfoItem>
           <AccessTimeIcon />
           <Typography variant="caption" color="inherit">
-            {ride.departureTime.slice(0, TIME_LENGTH)}
+            {firstCharacters(ride.departureTime, TIME_LENGTH)}
           </Typography>
         </ListCard.InfoItem>
 
