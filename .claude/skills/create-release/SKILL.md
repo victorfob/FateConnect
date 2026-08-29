@@ -41,13 +41,13 @@ Leia a seção `## [Unreleased]` inteira. Ela é a release: se estiver vazia, n�
 
 Em `0.x`, funcionalidade nova é **minor** — `0.2.0 → 0.3.0`. Só correção é **patch**.
 
-⛔ **A versão do projeto é a do `package.json` da raiz, e só ela.** É o que o `check.yml`, o `release.yml` e o `publish.yml` leem:
+⛔ **A versão do projeto é a do `package.json` da raiz, e só ela.** É o que o `check-version.yml`, o `release.yml`, o `publish.yml` e o `sonar-main.yml` leem:
 
 ```bash
 grep -rn 'jq -r .version' .github/workflows/
 ```
 
-O `check.yml` **reprova o PR para a `main`** se a tag `vX.Y.Z` já existir. Confira antes de abrir:
+O `check-version.yml` **reprova o PR para a `main`** se a tag `vX.Y.Z` já existir. Confira antes de abrir:
 
 ```bash
 git ls-remote --tags origin "refs/tags/v<versão>"     # tem que voltar vazio

@@ -2,6 +2,10 @@
 
 .claude/ @victorfob
 
+# Integração contínua e configuração do repositório
+
+.github/ @victorfob
+
 # Configuração de deploy
 
 deploy @victorfob

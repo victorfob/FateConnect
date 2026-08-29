@@ -50,10 +50,11 @@ Antes de pedir review, rode os mesmos portões que o CI roda:
 cd FateConnect/Web && yarn lint && yarn typecheck && yarn test:ci
 ```
 
-Mexeu na API, rode também a suíte dela:
+Mexeu na API, compile e rode a suíte dela — a compilação é portão à parte, e reprova por aviso:
 
 ```bash
-dotnet test FateConnect/FateConnect.Api.Tests/FateConnect.Api.Tests.csproj
+dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
+dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build
 ```
 
 Erro reprova. Warning não.
