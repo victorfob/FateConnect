@@ -1,23 +1,26 @@
 ---
 name: spec-issue
 description: >-
-  Especifica uma issue do GitHub por sabatina — perguntas em blocos até fechar as ambiguidades entre
-  o que a issue diz e o que o código mostra, decisões registradas no corpo da issue e divisão em
-  sub-issues de um PR cada. Use quando o usuário pedir para especificar, detalhar, refinar, planejar
-  ou quebrar uma issue.
+  Escreve ou especifica uma issue do GitHub por sabatina — perguntas em blocos até fechar as
+  ambiguidades entre o que se quer e o que o código mostra, decisões registradas no corpo da issue e
+  divisão em sub-issues de um PR cada. Use quando o usuário pedir para **criar** ou **abrir** uma
+  issue, e também para especificar, detalhar, refinar, planejar ou quebrar uma que já existe.
 ---
 
 # Especificar uma issue
 
 A issue diz o que se quer; o código diz o que existe. A especificação fecha a distância entre os dois — e quem fecha é o usuário, respondendo perguntas, não eu escolhendo em silêncio.
 
-⛔ **Não crie issue, branch ou label sem o usuário pedir.** Esta skill só cria sub-issues depois de listar todas e receber o sim.
+⛔ **Não crie issue, branch ou label sem o usuário pedir.** Pedida a issue, ela nasce ao fim da sabatina — nunca antes, porque é a sabatina que decide o que vai no corpo. Sub-issue só depois de listar todas e receber o sim.
 
 ## 1. Ler antes de perguntar
 
 Pergunta feita sem ler é pergunta que o repositório já respondia. Antes do primeiro bloco:
 
 - A issue e as que ela cita — `gh issue view <n> --json title,body,comments,milestone,assignees`
+- **Quando a issue ainda não existe**, não há o que abrir: leia no lugar as issues que ela vai
+  encostar — a que ela destrava, a que vai desfazer parte do que ela monta — e confira com
+  `gh issue list --state all --search` se alguém já abriu a mesma coisa
 - O **protótipo anexado**, quando houver: o corpo traz um `<img src="https://github.com/user-attachments/...">` e `curl -sL` baixa. Export de tela inteira vem alto demais para uma leitura só — fatiar com `sips` e ler banda a banda
 - A tela ou o módulo mais parecido que já existe — é dele que saem as opções fundamentadas
 - Os arquivos que a mudança vai tocar, com `Grep` e `Read`
@@ -65,6 +68,16 @@ O corpo carrega, nessa ordem: as decisões em tabela, o modelo de dados ou contr
 **O tell é a voz.** Se você escreve uma escolha sua com a mesma frase com que escreve um achado do código — *"duas rotas novas, cada uma renderizando o texto versionado"* —, ela vira decisão aos olhos de quem lê, e ninguém volta a discuti-la. Na #163 duas escolhas de produto entraram assim e as duas foram derrubadas depois, com o trabalho já feito.
 
 Na dúvida entre as duas seções, é suposição: a decisão errada custa uma pergunta, a suposição errada custa a implementação.
+
+### Antes de registrar a suposição, ofereça a decisão
+
+⛔ **Suposição é para o que não dá para perguntar agora** — usuário ausente, resposta que depende de terceiro, detalhe que só a implementação revela. Com ele presente, parquear uma escolha na tabela de suposições é adiar trabalho que sairia por uma pergunta.
+
+O custo real de uma suposição não é ela estar errada: é **alguém ter que voltar nela**. Cada linha da tabela é uma conversa marcada para depois, e "depois" costuma ser no meio da implementação, com código já escrito em cima.
+
+⛔ Aconteceu na #184. Escrevi três suposições — projeto único no Sonar, análise dentro do job existente, chave do projeto sem nome — e o Victor respondeu *"não quero que fique suposições, vamos transformar elas em decisões"*. As três viraram um bloco de `AskUserQuestion` e foram decididas em uma rodada, com o motivo de cada uma registrado na tabela de decisões. A tabela de suposições sumiu do corpo.
+
+**A regra prática:** montou a lista de suposições, releia procurando as que **cabem numa pergunta com duas opções concretas**. Essas não são suposições — são perguntas que você não fez.
 
 ## 4. Dividir em sub-issues
 

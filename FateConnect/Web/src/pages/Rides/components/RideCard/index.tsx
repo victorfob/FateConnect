@@ -21,19 +21,19 @@ type RideCardProps = Readonly<{
 }>;
 
 export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
-  const typeLabel = rideTypeDisplayLabel(ride.tipoCarona);
-  const tone = rideTypeTone(ride.tipoCarona);
+  const typeLabel = rideTypeDisplayLabel(ride.rideType);
+  const tone = rideTypeTone(ride.rideType);
 
   return (
     <ListCard own={isOwnRide(RIDE_DRIVER)} ownLabel={C.OWN_RIDE_LABEL}>
       <ListCard.Header>
-        <Typography variant="subtitleBold">{ride.destino}</Typography>
+        <Typography variant="subtitleBold">{ride.destination}</Typography>
 
         <ListCard.Actions>
           <StatusTag tone={tone}>{typeLabel}</StatusTag>
 
           <ListCard.ActionButtons>
-            <RideDriverContact destination={ride.destino} />
+            <RideDriverContact destination={ride.destination} />
 
             <RideOwnerActions ride={ride} onEdit={onEdit} onDelete={onDelete} />
           </ListCard.ActionButtons>
@@ -44,28 +44,28 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
         <ListCard.InfoItem>
           <CalendarTodayIcon />
           <Typography variant="caption" color="inherit">
-            {format(parseISO(ride.dataPartida), DATE_FORMAT)}
+            {format(parseISO(ride.departureDate), DATE_FORMAT)}
           </Typography>
         </ListCard.InfoItem>
 
         <ListCard.InfoItem>
           <AccessTimeIcon />
           <Typography variant="caption" color="inherit">
-            {ride.horaPartida.slice(0, TIME_LENGTH)}
+            {ride.departureTime.slice(0, TIME_LENGTH)}
           </Typography>
         </ListCard.InfoItem>
 
         <ListCard.InfoItem>
           <GroupsIcon />
           <Typography variant="caption" color="inherit">
-            {C.seatsLabel(ride.qtdVagas)}
+            {C.seatsLabel(ride.availableSeats)}
           </Typography>
         </ListCard.InfoItem>
       </ListCard.InfoRow>
 
       <ListCard.Description>
         <Typography variant="subtitle" color="inherit">
-          {ride.descricao}
+          {ride.description}
         </Typography>
       </ListCard.Description>
     </ListCard>

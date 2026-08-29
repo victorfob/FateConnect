@@ -5,15 +5,15 @@ import { server } from '@app/mocks/server';
 import { createRide, deleteRide, listRides, updateRide } from './ridesService';
 import { RideTypeEnum, type RideInput } from './types';
 
-const RIDES_URL = 'https://rides.fateconnect.test/caronas';
+const RIDES_URL = 'https://api.fateconnect.test/Rides';
 
 const RIDE_INPUT: RideInput = {
-  qtdVagas: 3,
-  destino: 'Fatec Sorocaba',
-  dataPartida: '2026-05-22',
-  horaPartida: '07:30',
-  tipoCarona: RideTypeEnum.PHILANTHROPIC,
-  descricao: 'Saída do centro.',
+  availableSeats: 3,
+  destination: 'Fatec Sorocaba',
+  departureDate: '2026-05-22',
+  departureTime: '07:30',
+  rideType: RideTypeEnum.SOLIDARITY,
+  description: 'Saída do centro.',
 };
 
 describe('ridesService', () => {
@@ -33,10 +33,10 @@ describe('ridesService', () => {
       rideType: RideTypeEnum.EGALITARIAN,
     });
 
-    expect(received!.get('Destino')).toBe('Sorocaba');
-    expect(received!.get('DataPartida')).toBe('2026-08-20');
-    expect(received!.get('HoraPartida')).toBe('07:30');
-    expect(received!.get('TipoCarona')).toBe(RideTypeEnum.EGALITARIAN);
+    expect(received!.get('destination')).toBe('Sorocaba');
+    expect(received!.get('departureDate')).toBe('2026-08-20');
+    expect(received!.get('departureTime')).toBe('07:30');
+    expect(received!.get('rideType')).toBe(RideTypeEnum.EGALITARIAN);
   });
 
   it('should omit parameters that were not filled in', async () => {
@@ -50,11 +50,11 @@ describe('ridesService', () => {
 
     await listRides({ destination: 'Sorocaba' });
 
-    expect([...received!.keys()]).toEqual(['Destino']);
+    expect([...received!.keys()]).toEqual(['destination']);
   });
 
   it('should list rides without filters', async () => {
-    server.use(http.get(RIDES_URL, () => HttpResponse.json([{ id: 1, destino: 'Sorocaba' }])));
+    server.use(http.get(RIDES_URL, () => HttpResponse.json([{ id: 1, destination: 'Sorocaba' }])));
 
     const rides = await listRides();
 

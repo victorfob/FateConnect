@@ -17,10 +17,11 @@ Tudo vive no próprio repositório e é editável direto — não há package ne
 | Skills | `.claude/skills/<nome>/SKILL.md` | sob demanda, por `description` ou `/<nome>` |
 | Memória do projeto | `~/.claude/projects/-Users-victorbrayner-Development-Projects-FateConnect/memory/` | por recall, indexada em `MEMORY.md` |
 
-`.claude/` é **versionada**: mudar uma rule é mudar o repositório, entra no mesmo PR da mudança que a motivou e passa por review como qualquer código. Duas consequências práticas:
+`.claude/` é **versionada**: mudar uma rule é mudar o repositório e passa por review como qualquer código. Duas consequências práticas:
 
 - **A restrição do repositório vale aqui.** Rule e skill são conteúdo público: nada de nome de empregador, repositório interno, pacote privado ou ferramenta corporativa. Quando a orientação vier de fonte interna, registrar só a **decisão e a justificativa autônoma**.
-- **A correção anda junto com o código.** Rule que descreve um padrão deve chegar no mesmo PR em que o padrão aparece — separar as duas coisas é como elas divergem.
+- **Onde a mudança de harness entra é decisão de quem revisa — pergunte.** O instinto é mandar rule e código juntos, para não divergirem; mas abrir um PR inteiro por uma frase de rule é cerimônia que não paga, e levar uma rule sem relação nenhuma dentro de um PR de funcionalidade polui o review dele. Com a mudança na mão, ofereça as duas saídas: aproveitar um PR já aberto, ou abrir um só de harness.
+- ⛔ **Indo para PR próprio, vai `.claude/` inteiro — não metade.** Em 2026-08-28 escolhi sozinho levar a rule dentro do PR de autenticação; mandado separar, separei só o que não tinha relação com aquele PR e deixei para trás o que ele mesmo havia causado. A correção foi *"falei tudo relacionado a harness num PR proprio"*. **Documentação do repositório não é harness:** `README.md` e `CONTRIBUTING.md` continuam com o código que os motivou.
 
 ## Gatilhos — quando escrever em vez de só corrigir
 
@@ -46,9 +47,55 @@ Antes de escrever, escolha o lugar — os quatro não são intercambiáveis:
 - `description` em rule é documentação para humanos — mantenha precisa, mas não espere que condicione nada. **Só skill dispara por `description`.**
 - Esta rule é uma das exceções sem `paths`: os gatilhos disparam em qualquer arquivo.
 
+## Caminho citado no harness tem check
+
+Rule e skill citam código por caminho, e nada as avisa quando o código sai — o texto continua sintaticamente perfeito descrevendo algo que não existe.
+
+```bash
+./scripts/check-harness-paths.sh
+```
+
+Ele lista todo caminho ancorado numa entrada real da raiz do repositório que não corresponde a arquivo nem diretório rastreado. Rodando contra o harness de antes da limpeza do #186, encontrou os quatro que uma leitura à mão tinha encontrado — inclusive um dentro de bloco de código e um sem extensão, que uma varredura por crase perde.
+
+⚠️ **Ele cobre caminho, não nome de símbolo.** O XML doc do `TimeOnlyJsonConverter` foi citado por nome numa skill e sobreviveu à remoção sem o check acusar. Para símbolo, o `grep -rn "<Nome>" .claude/` da `comments.md` continua sendo o que existe.
+
+⚠️ **A resposta é relativa à branch.** Caminho que nasce noutro PR aparece como órfão até aquele PR mergear — é correto, não defeito.
+
 ## Rule também tem fim de vida
 
 Quando a pasta que uma rule descreve deixa de existir, a rule é **deletada, não reescrita** para o que ficou no lugar. Ela descrevia corretamente algo que não existe mais; reaproveitar o arquivo mistura dois contextos e produz orientação híbrida que não vale para nenhum dos dois. O mesmo vale para skill: procedimento sem alvo sai do repo, não vira procedimento genérico.
+
+## Rule descreve o estado atual, não o caminho até ele
+
+⛔ **Não registre em rule o que foi removido, renomeado ou dissolvido.** A rule é lida por quem vai escrever código agora, e ela responde *o que existe*. O histórico já está no GitHub — commit, PR e issue —, e é lá que se pergunta por que algo deixou de existir.
+
+Cobrado em 2026-08-29, na `fateconnect-overview.md`: eu tinha escrito *"O microsserviço de caronas foi dissolvido aqui pela #44"* e ainda **defendi** a frase, como proteção contra alguém "restaurar" o que saiu. A correção foi direta: *"ela deve dizer o estado atual da aplicação, se alguém quiser ver histórico é só ver o github"*.
+
+**O teste:** a frase descreve algo que **existe**? Fica. Descreve algo que **existia**? Sai. E o que sobra costuma dizer a mesma coisa sem envelhecer — *"uma só, em módulos por domínio"* já entrega tudo o que *"o microsserviço foi dissolvido"* entregava.
+
+⚠️ **Não confunda com a proibição ancorada no presente.** *"Não existe tela de contato… não 'restaurar' o item de menu"* é estado atual mais consequência, e impede uma mudança errada hoje. O que sai é a **narrativa do passado**, não a instrução.
+
+## Criou skill, rule ou workflow? A lista que o enumera muda no mesmo PR
+
+⛔ **Dois inventários deste repo são mantidos à mão, e um deles mora em dois lugares.** Criar o item sem atualizar a lista não quebra nada e não deixa rastro: meses depois ninguém sabe qual PR a deixou para trás.
+
+| Inventário | Onde é enumerado |
+| --- | --- |
+| Skills | `.claude/CLAUDE.md` **e** `README.md` — duas cópias, que divergem |
+| Workflows | tabela de integração contínua do `README.md` |
+
+**As rules não entram na tabela porque ninguém as enumera** — os dois documentos descrevem o mecanismo (`paths:`, quando carrega) e apontam para um arquivo específico quando precisam. É por isso que elas nunca drifaram. Ao documentar algo novo, prefira descrever o mecanismo a listar os itens: **lista não escrita é lista que não mente.**
+
+**A conferência é contagem, não leitura** — foi lendo e achando certo que ela drifou:
+
+```bash
+ls -d .claude/skills/*/ | wc -l      # contra os nomes citados no CLAUDE.md E no README
+ls .github/workflows/*.yml | wc -l   # contra as linhas da tabela de CI
+```
+
+Em 2026-08-28 o README dizia **4 skills** quando eram 8 e **2 workflows** quando eram 5; o `CLAUDE.md`, que lista as mesmas skills, estava certo — a divergência entre as duas cópias é o sintoma. Junto vieram duas frases envelhecidas do mesmo jeito: *"os dois passos da release"*, que virou três jobs, e *"quem reprova por cobertura é o limite do Vitest"*, depois que o Sonar passou a reprovar também.
+
+⚠️ **O pior caso não é o número errado, é a ausência.** O Sonar não aparecia em lugar nenhum do README, sendo o check obrigatório da `develop` — e ausência não deixa frase errada apontando para ela. Só a comparação com o inventário real a encontra.
 
 ## O que NÃO fazer
 
@@ -73,3 +120,9 @@ Gatilho que dispara no meio de uma tarefa: **termine a tarefa primeiro**, depois
 ## Fechamento de rodada
 
 Ao fim de uma rodada com correções do usuário, antes de partir para a próxima tarefa: cruzar **cada** correção contra o harness e terminar em um de dois estados explícitos — **coberta** (dizer por qual rule/skill/memória) ou **descartada por decisão consciente** (dizer o motivo). Auditar também a memória contra as rules: memória órfã é regra que só dispara se eu lembrar de procurá-la.
+
+⛔ **A varredura roda ANTES de abrir o PR de harness, não depois.** É o único momento em que o item que ela encontra entra de graça: com o PR aberto, ele custa outro PR; com o PR mergeado, ele fica esperando o próximo — e "o próximo" é onde item conversado evapora.
+
+Aconteceu em 2026-08-28. Saíram **dois** PRs de harness no mesmo dia e um item conhecido não entrou em nenhum: o Victor tinha corrigido, horas antes do primeiro, que suposição com ele presente deveria virar pergunta. Eu só cruzei as correções contra o harness depois do segundo PR mergear, e a cobrança foi direta — *"acabamos de fazer um PR de harness, pq vc não sugeriu colocar nele isso?"*.
+
+**O gatilho é escrever `gh pr create` num PR que toca `.claude/`.** Antes de rodar: releia a conversa inteira procurando correção do usuário, não só a que motivou este PR.

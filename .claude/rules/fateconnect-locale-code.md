@@ -1,12 +1,12 @@
 ---
-description: Front — pt-BR para UI e URLs; inglês para código TypeScript e estrutura; domínio Ride e contrato da API Caronas
+description: pt-BR para UI e URLs; inglês para código e estrutura — absoluto no front, boy-scout no back-end .NET; domínio Ride e o contrato misto da API
 paths:
-  - "FateConnect/Web/**"
+  - "FateConnect/**"
 ---
 
 # FateConnect — idioma da interface vs idioma do código
 
-Separar o que é **experiência do usuário (pt-BR)** do que é **base de código (inglês)**.
+Separar o que é **experiência do usuário (pt-BR)** do que é **base de código (inglês)**. O que vem a seguir descreve o front; o back-end .NET tem seção própria no fim, com rigor diferente.
 
 ## O que fica em **pt-BR**
 
@@ -24,16 +24,32 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 - **Tokens** do design system: inglês (`primary`, `surfaceWhite`, `textMuted`).
 - **Teste:** `describe` e `it` em inglês, no padrão `should <fazer algo>`. O código dentro do teste também é inglês. Copy de produto em asserção continua em pt-BR, porque é o texto real da tela.
 
-## Contrato com a **API Caronas**
+## Back-end .NET: inglês no que nasce, boy-scout no que existe
 
-O idioma do contrato vem do backend, não da nossa convenção:
+O idioma é o mesmo dos dois lados; o **rigor** não.
 
-- Caminho HTTP **`/caronas`**, query params (`Destino`, `DataPartida`, `HoraPartida`, `TipoCarona`) e propriedades do JSON (`destino`, `dataPartida`, `tipoCarona`, …) ficam como o backend expõe.
-- O que é **só nosso** usa inglês: `RideFilter` tem `destination`, `departureDate`, `departureTime`, `rideType`, e o serviço traduz na borda.
-- Valores do enum na serialização: `Filantropica` | `Igualitaria`.
+**No front é absoluto** — nenhum identificador em português, e `Ride` no lugar de `Carona`.
+
+**No back-end é boy-scout**, porque o C# nasceu misto: verbo em inglês e domínio em português no mesmo símbolo (`GerarJwtToken`, `CriarClaimsDoUsuario`, `chaveSeguranca`, `CaronasController`).
+
+- **Arquivo, classe, método ou variável novo nasce em inglês**, mesmo cercado de português. `AuthorizationTests` ao lado de `GerarJwtToken` é o estado esperado durante a migração, não inconsistência a corrigir.
+- **O que já existe fica.** Renomear símbolo público arrasta interface, chamadas e às vezes migration — PR de funcionalidade não é lugar para isso.
+- **Traduza o símbolo que o próprio PR já estiver reescrevendo** por outro motivo. É o único rename que sai de graça.
+- **Enum leva o prefixo `Enum`** — `EnumRideType`, `EnumGender`, `EnumProfileType` —, enquanto no front a regra é o sufixo (`RideTypeEnum`, `RoutePathEnum`). A divergência não é descuido e **não se corrige**: a análise da Microsoft reprova o sufixo pela **CA1711**, e com o `TreatWarningsAsErrors` do `.csproj` isso é erro de compilação, não preferência. Medido em 2026-08-28: um `public enum SondaEnum` derruba o build com `error CA1711: Rename type name SondaEnum so that it does not end in 'Enum'`.
+
+⛔ **Comentário continua em pt-BR dos dois lados**, `///` de C# incluído. O idioma do código e o idioma da explicação são decisões separadas.
+
+## Contrato com a API
+
+O idioma do contrato vem do backend, não da nossa convenção — e hoje ele é **misto**, um módulo em cada idioma:
+
+- **Caronas, em inglês.** Caminho `/Rides`, query params (`destination`, `departureDate`, `departureTime`, `rideType`) e propriedades do JSON com os mesmos nomes. Valores do enum: `Solidarity` | `Egalitarian`. **Não há tradução na borda** — o `RideFilter` vai direto na query, porque os dois lados falam o mesmo idioma.
+- **Cadastro, em pt-BR.** `emailFatec`, `senha`, `nomeCompleto`, `apelido`, `dataNascimento`, `genero`, `enderecos` (`cep`, `logradouro`, `numero`, `complemento`, `cidade`, `estado`) e `contatos` (`telefone`, `emailContato`) — é o que o `CreateUsuarioDto` expõe. ⛔ Não "corrija" para inglês: o mapper do cadastro traduz do formulário para essas chaves de propósito. Só o **valor** de gênero é inglês: `Male` | `Female` | `Other`.
+
+⚠️ **A mistura é do backend, não descuido nosso.** Quem migrar o cadastro para inglês muda 14 chaves em três níveis — é tarefa própria, não boy-scout.
 
 ## Referência no repositório
 
 - Feature de exemplo: [`FateConnect/Web/src/pages/Rides/`](FateConnect/Web/src/pages/Rides/)
 - Rotas: [`FateConnect/Web/src/routes/paths.ts`](FateConnect/Web/src/routes/paths.ts)
-- Tradução na borda: [`FateConnect/Web/src/services/rides/ridesService.ts`](FateConnect/Web/src/services/rides/ridesService.ts)
+- Serviço de caronas: [`FateConnect/Web/src/services/rides/ridesService.ts`](FateConnect/Web/src/services/rides/ridesService.ts)
