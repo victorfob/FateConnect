@@ -1,21 +1,23 @@
-name: Check Pull Request
+name: Check front
 
-# Um job por lado do repositório, e cada um roda só quando a mudança toca o seu:
-# PR de backend não paga a suíte de front, nem o contrário. Sem filtro de branch
-# de destino no PR, porque PR empilhado (base em outra feature branch) também
-# precisa ser validado.
+# Um workflow por lado do repositório: PR de backend não paga a suíte de front,
+# nem o contrário.
 #
-# O recorte é feito DENTRO de cada job, não em `paths` no gatilho, porque o job
-# do front é o check obrigatório para mergear. Workflow que não dispara não deixa
-# o check ausente: deixa ele `Pending` para sempre, e o PR fica impossível de
-# mergear. Rodando sempre, o contexto sempre reporta — e o PR que não toca aquele
-# lado paga só a partida do runner, não a suíte.
+# O recorte é feito DENTRO do job, e não em `paths` no gatilho, porque este é o
+# check obrigatório para mergear. Workflow que não dispara não deixa o check
+# ausente: deixa ele `Pending` para sempre, e o PR fica impossível de mergear.
+# Rodando sempre, o contexto sempre reporta — e o PR que não toca o front paga
+# só a partida do runner, não a suíte.
+#
+# Sem filtro de branch de destino, porque PR empilhado (base em outra feature
+# branch) também precisa ser validado.
 on:
   pull_request
 
-# Execução nova na mesma ref cancela a anterior.
+# Execução nova na mesma ref cancela a anterior. O grupo leva o nome do
+# workflow: compartilhá-lo com o check da API faria um cancelar o outro.
 concurrency:
-  group: check-${{ github.head_ref }}
+  group: check-front-${{ github.head_ref }}
   cancel-in-progress: true
 
 permissions:
@@ -148,50 +150,3 @@ jobs:
           projectBaseDir: FateConnect/Web
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-  api:
-    name: .NET API
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      # Mesmo recorte do job acima, e pelo mesmo motivo: o checkout traz um
-      # commit só, então `git diff` contra a base não tem com o que comparar. O
-      # padrão não leva barra ao final para alcançar também o projeto de teste,
-      # que mora em `FateConnect.Api.Tests`, ao lado e não dentro.
-      - name: Changed paths
-        id: changes
-        run: |
-          set -euo pipefail
-
-          changed=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')
-
-          if printf '%s\n' "$changed" | grep -qE '^(FateConnect/FateConnect\.Api|global\.json)'; then
-            echo 'api=true' >> "$GITHUB_OUTPUT"
-            echo 'A mudança alcança a API — validando.'
-            exit 0
-          fi
-
-          echo 'api=false' >> "$GITHUB_OUTPUT"
-          echo 'Nada na API — nada a validar aqui.'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-
-      - uses: actions/setup-dotnet@v4
-        if: steps.changes.outputs.api == 'true'
-        with:
-          dotnet-version: 8.0.x
-
-      # Aponta para a solução, e não para cada projeto de teste, porque assim o
-      # projeto novo entra na esteira ao ser adicionado à solução — o mesmo gesto
-      # que o faz aparecer na IDE.
-      #
-      # A suíte sobe a própria aplicação com banco em memória, então não há
-      # Postgres a provisionar aqui.
-      - name: Tests
-        if: steps.changes.outputs.api == 'true'
-        run: |
-          set -euo pipefail
-
-          dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln

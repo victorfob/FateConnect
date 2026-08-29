@@ -1,0 +1,65 @@
+name: Check API
+
+# Irmão do `check-front.yml`, com a mesma estrutura e pelos mesmos motivos: o
+# recorte fica dentro do job para que o check sempre reporte, e o gatilho não
+# filtra branch de destino.
+on:
+  pull_request
+
+# Grupo próprio: dividir com o check do front faria um cancelar o outro.
+concurrency:
+  group: check-api-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # Para ler a lista de arquivos do PR e decidir o que rodar.
+  pull-requests: read
+
+jobs:
+  api:
+    name: .NET API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Mesmo recorte do job acima, e pelo mesmo motivo: o checkout traz um
+      # commit só, então `git diff` contra a base não tem com o que comparar. O
+      # padrão não leva barra ao final para alcançar também o projeto de teste,
+      # que mora em `FateConnect.Api.Tests`, ao lado e não dentro.
+      - name: Changed paths
+        id: changes
+        run: |
+          set -euo pipefail
+
+          changed=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')
+
+          if printf '%s\n' "$changed" | grep -qE '^(FateConnect/FateConnect\.Api|global\.json)'; then
+            echo 'api=true' >> "$GITHUB_OUTPUT"
+            echo 'A mudança alcança a API — validando.'
+            exit 0
+          fi
+
+          echo 'api=false' >> "$GITHUB_OUTPUT"
+          echo 'Nada na API — nada a validar aqui.'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.changes.outputs.api == 'true'
+        with:
+          dotnet-version: 8.0.x
+
+      # Aponta para a solução, e não para cada projeto de teste, porque assim o
+      # projeto novo entra na esteira ao ser adicionado à solução — o mesmo gesto
+      # que o faz aparecer na IDE.
+      #
+      # A suíte sobe a própria aplicação com banco em memória, então não há
+      # Postgres a provisionar aqui.
+      - name: Tests
+        if: steps.changes.outputs.api == 'true'
+        run: |
+          set -euo pipefail
+
+          dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln
