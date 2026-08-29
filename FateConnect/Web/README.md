@@ -108,6 +108,8 @@ Use o `render` de `@app/test/testing-library`, que já monta tema, rotas e cache
 | `pre-push`   | só os testes **relacionados** aos arquivos enviados | —         |
 | CI (no PR)   | tipos, lint, **suíte inteira**, build e Sonar        | mede      |
 
+⚠️ O hook roda com o Node do seu shell, não com o do `.nvmrc`. Num Node anterior ao 22 ele falha com `mapTypes.union is not a function`, que é uma regra de lint usando `Set.prototype.union` — a saída é `nvm use` antes de commitar.
+
 O `pre-push` usa `scripts/test-changed.sh`, que segue o grafo de imports com `vitest related`: mudar uma tela roda os testes que a alcançam, não a suíte inteira. Ele cai na suíte inteira quando a mudança sai de `src/` ou remove arquivo — nesses casos o grafo não alcança o efeito, e `vitest related vite.config.ts` sairia com sucesso sem rodar teste nenhum.
 
 Nenhum dos hooks mede cobertura: o limite é global e medi-lo sobre um recorte reprova código saudável. Quem mede é o CI, sobre a suíte inteira, contra o limite de **90%** que o Vitest aplica dentro do `test:ci` — o mesmo limite vale ao rodar o comando na máquina.
