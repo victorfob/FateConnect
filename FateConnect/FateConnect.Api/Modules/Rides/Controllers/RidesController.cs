@@ -2,11 +2,13 @@ namespace FateConnect.Api.Modules.Rides.Controllers;
 
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 [SwaggerTag("Ride Management")]
 public class RidesController(IRideService rideService) : ControllerBase
 {
