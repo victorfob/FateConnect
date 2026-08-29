@@ -21,7 +21,7 @@ public class TimeOnlyJsonConverter : JsonConverter<TimeOnly>
 
         if (isInvalidTokenType)
         {
-            throw new JsonException("Invalid time format: Expected a string in HH:mm or HH:mm:ss format.");
+            throw new JsonException("Formato de hora inválido. Informe a hora como texto, no formato HH:mm ou HH:mm:ss.");
         }
 
         string? stringValue = reader.GetString();
@@ -38,7 +38,7 @@ public class TimeOnlyJsonConverter : JsonConverter<TimeOnly>
             return time;
 
 
-        throw new JsonException($"Invalid time format: '{stringValue}'. Expected HH:mm or HH:mm:ss.");
+        throw new JsonException($"Formato de hora inválido: '{stringValue}'. Informe a hora no formato HH:mm ou HH:mm:ss.");
     }
 
     public override void Write(Utf8JsonWriter writer, TimeOnly value, JsonSerializerOptions options)

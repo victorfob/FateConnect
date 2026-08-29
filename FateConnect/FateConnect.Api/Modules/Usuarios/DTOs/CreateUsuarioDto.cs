@@ -35,7 +35,7 @@ public class CreateUsuarioDto
 
     [Required]
     [DefaultValue(1)]
-    [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
+    [EnumDataType(typeof(EnumGender), ErrorMessage = "Gênero inválido")]
     required public EnumGender Genero { get; set; }
 
     [Required]
