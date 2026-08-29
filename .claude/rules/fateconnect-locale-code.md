@@ -1,5 +1,5 @@
 ---
-description: pt-BR para UI e URLs; inglês para código e estrutura — absoluto no front, boy-scout no back-end .NET; domínio Ride e contrato da API Caronas
+description: pt-BR para UI e URLs; inglês para código e estrutura — absoluto no front, boy-scout no back-end .NET; domínio Ride e o contrato misto da API
 paths:
   - "FateConnect/**"
 ---
@@ -39,16 +39,17 @@ O idioma é o mesmo dos dois lados; o **rigor** não.
 
 ⛔ **Comentário continua em pt-BR dos dois lados**, `///` de C# incluído. O idioma do código e o idioma da explicação são decisões separadas.
 
-## Contrato com a **API Caronas**
+## Contrato com a API
 
-O idioma do contrato vem do backend, não da nossa convenção:
+O idioma do contrato vem do backend, não da nossa convenção — e hoje ele é **misto**, um módulo em cada idioma:
 
-- Caminho HTTP **`/caronas`**, query params (`Destino`, `DataPartida`, `HoraPartida`, `TipoCarona`) e propriedades do JSON (`destino`, `dataPartida`, `tipoCarona`, …) ficam como o backend expõe.
-- O que é **só nosso** usa inglês: `RideFilter` tem `destination`, `departureDate`, `departureTime`, `rideType`, e o serviço traduz na borda.
-- Valores do enum na serialização: `Filantropica` | `Igualitaria`.
+- **Caronas, em inglês.** Caminho `/Rides`, query params (`destination`, `departureDate`, `departureTime`, `rideType`) e propriedades do JSON com os mesmos nomes. Valores do enum: `Solidarity` | `Egalitarian`. **Não há tradução na borda** — o `RideFilter` vai direto na query, porque os dois lados falam o mesmo idioma.
+- **Cadastro, em pt-BR.** `emailFatec`, `senha`, `nomeCompleto`, `apelido`, `dataNascimento`, `genero`, `enderecos` (`cep`, `logradouro`, `numero`, `complemento`, `cidade`, `estado`) e `contatos` (`telefone`, `emailContato`) — é o que o `CreateUsuarioDto` expõe. ⛔ Não "corrija" para inglês: o mapper do cadastro traduz do formulário para essas chaves de propósito. Só o **valor** de gênero é inglês: `Male` | `Female` | `Other`.
+
+⚠️ **A mistura é do backend, não descuido nosso.** Quem migrar o cadastro para inglês muda 14 chaves em três níveis — é tarefa própria, não boy-scout.
 
 ## Referência no repositório
 
 - Feature de exemplo: [`FateConnect/Web/src/pages/Rides/`](FateConnect/Web/src/pages/Rides/)
 - Rotas: [`FateConnect/Web/src/routes/paths.ts`](FateConnect/Web/src/routes/paths.ts)
-- Tradução na borda: [`FateConnect/Web/src/services/rides/ridesService.ts`](FateConnect/Web/src/services/rides/ridesService.ts)
+- Serviço de caronas: [`FateConnect/Web/src/services/rides/ridesService.ts`](FateConnect/Web/src/services/rides/ridesService.ts)
