@@ -12,7 +12,7 @@ const PAYLOAD: SignupRequest = {
   senha: 'segredo123',
   nomeCompleto: 'Fulano de Tal',
   dataNascimento: '2000-01-01T00:00:00Z',
-  genero: 'Feminino',
+  genero: 'Female',
   enderecos: [],
   contatos: [],
 };
