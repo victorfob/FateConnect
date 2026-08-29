@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Usuarios.Exceptions;
+namespace FateConnect.Api.Modules.Users.Exceptions;
 
 public class EmailJaCadastradoException : InvalidOperationException
 {

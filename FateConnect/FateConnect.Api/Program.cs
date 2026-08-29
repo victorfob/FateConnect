@@ -13,9 +13,9 @@ using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Rides.Interfaces;
 using FateConnect.Api.Modules.Rides.Repositories;
 using FateConnect.Api.Modules.Rides.Services;
-using FateConnect.Api.Modules.Usuarios.Interfaces;
-using FateConnect.Api.Modules.Usuarios.Repositories;
-using FateConnect.Api.Modules.Usuarios.Services;
+using FateConnect.Api.Modules.Users.Interfaces;
+using FateConnect.Api.Modules.Users.Repositories;
+using FateConnect.Api.Modules.Users.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -69,8 +69,8 @@ public class Program
 
         builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(jwtOptions));
 
-        builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-        builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IUserService, UserService>();
 
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();

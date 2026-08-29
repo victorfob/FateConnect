@@ -2,7 +2,7 @@ namespace FateConnect.Api.Modules.Rides.Entities;
 
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Rides.Exceptions;
-using FateConnect.Api.Modules.Usuarios;
+using FateConnect.Api.Modules.Users.Entities;
 
 public class Ride
 {
@@ -19,7 +19,7 @@ public class Ride
     public string? Description { get; private set; }
     public bool IsActive { get; private set; }
     public int DriverId { get; private set; }
-    public Usuario Driver { get; private set; } = null!;
+    public User Driver { get; private set; } = null!;
 
     private Ride() { }
 
