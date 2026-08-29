@@ -56,13 +56,13 @@ A validação consulta as tags no **remoto**. Consultar localmente aprovaria qua
 
 | Workflow          | Quando                                        | O que faz                                                                   |
 | ----------------- | --------------------------------------------- | --------------------------------------------------------------------------- |
-| `check.yml`       | PR que toca `FateConnect/Web/**` ou a versão  | valida a versão, tipos, lint, testes, build e a análise do Sonar            |
+| `check.yml`       | todo PR                                       | um job por lado: front (versão, tipos, lint, testes, build e Sonar) e API (testes)      |
 | `deploy.yml`      | push na `develop`                             | publica em homologação                                                      |
 | `release.yml`     | push na `main`                                | cria a tag, publica em produção e devolve a `main` para a `develop`         |
 | `sonar-main.yml`  | push na `main`                                | analisa a `main`, que é a linha de base do código novo de cada PR           |
 | `publish.yml`     | chamado pelos dois de publicação              | constrói o front e sobe um ambiente — os passos que homologação e produção compartilham |
 
-O `check.yml` não roda em PR que não mexe no front: mudança de back-end não tem por que pagar a suíte de front. O `package.json` da raiz entra no filtro por causa da validação de versão — mudança de versão não pode escapar dela.
+O `check.yml` dispara em todo PR, e cada job decide se tem o que fazer olhando os arquivos alterados: PR que só mexe no back-end não paga a suíte de front, nem o contrário. O `package.json` da raiz entra no filtro do front por causa da validação de versão — mudança de versão não pode escapar dela. Só o job do front é exigido para mergear.
 
 Os três jobs da release moram no mesmo workflow porque acontecem no mesmo evento: o push que a `main` recebe quando a release entra. Eles não dependem uns dos outros — falha ao marcar a tag não impede a publicação nem a sincronização, e vice-versa.
 
