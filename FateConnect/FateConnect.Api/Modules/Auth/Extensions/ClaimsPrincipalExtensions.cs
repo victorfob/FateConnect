@@ -10,7 +10,9 @@ public static class ClaimsPrincipalExtensions
     {
         string? identifier = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId))
+        bool isValidUserId = int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId);
+
+        if (!isValidUserId)
             throw new UnidentifiedUserException();
 
         return userId;
