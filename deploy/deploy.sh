@@ -84,10 +84,10 @@ if [ ! -f "$WEB_ROOT/index.html" ]; then
   exit 1
 fi
 
-echo "==> Construindo as APIs de $ENVIRONMENT ($PUBLIC_URL)"
+echo "==> Construindo a API de $ENVIRONMENT ($PUBLIC_URL)"
 docker compose -p "$PROJECT" --env-file "$ENV_FILE" build
 
-echo "==> Subindo as APIs de $ENVIRONMENT"
+echo "==> Subindo a API de $ENVIRONMENT"
 docker compose -p "$PROJECT" --env-file "$ENV_FILE" up -d --remove-orphans
 
 echo

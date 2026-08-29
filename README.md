@@ -1,6 +1,6 @@
 # FateConnect
 
-Plataforma de caronas. Este repositório reúne o produto — front-end e APIs — e os documentos das disciplinas mantidos junto dele.
+Plataforma de caronas. Este repositório reúne o produto — front-end e API — e os documentos das disciplinas mantidos junto dele.
 
 ## Estrutura
 
