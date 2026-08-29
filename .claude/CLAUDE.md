@@ -48,7 +48,7 @@ dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln
 git config core.hooksPath .githooks     # habilita os hooks deste clone
 ```
 
-O `pre-push` roda só os testes **relacionados** aos arquivos enviados (via `Web/scripts/test-changed.sh`); a suíte inteira com cobertura fica no CI.
+O `pre-push` roda só os testes **relacionados** aos arquivos enviados (via `FateConnect/Web/scripts/test-changed.sh`); a suíte inteira com cobertura fica no CI.
 
 ## Stack do front
 
