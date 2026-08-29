@@ -60,15 +60,15 @@ A validação consulta as tags no **remoto**. Consultar localmente aprovaria qua
 | ----------------- | --------------------------------------------- | --------------------------------------------------------------------------- |
 | `check-front.yml` | todo PR                                       | valida o front: versão, tipos, lint, testes, build e Sonar                   |
 | `check-api.yml`   | todo PR                                       | valida a API: compilação, testes e Sonar                                    |
-| `check-version.yml` | todo PR, age nos que miram a `main`         | reprova quando a versão da raiz já tem tag                                  |
+| `check-version.yml` | PR para a `main`                            | reprova quando a versão da raiz já tem tag                                  |
 | `deploy.yml`      | push na `develop`                             | publica em homologação                                                      |
 | `release.yml`     | push na `main`                                | cria a tag, publica em produção e devolve a `main` para a `develop`         |
 | `sonar-main.yml`  | push na `main`                                | analisa a `main` dos dois projetos, linha de base do código novo de cada PR |
 | `publish.yml`     | chamado pelos dois de publicação              | constrói o front e sobe um ambiente — os passos que homologação e produção compartilham |
 
-Os checks disparam em todo PR, e cada um decide se tem o que fazer olhando os arquivos alterados: PR que só mexe no back-end não paga a suíte de front, nem o contrário. Mudança só de documentação não roda suíte nenhuma: nenhum `.md` é importado pelo código, então não há o que validar. `React front (Web)` e `.NET API` são exigidos para mergear, e um check que não teve o que fazer reporta verde do mesmo jeito.
+Os checks de front e de API disparam em todo PR, e cada um decide se tem o que fazer olhando os arquivos alterados: PR que só mexe no back-end não paga a suíte de front, nem o contrário. Mudança só de documentação não roda suíte nenhuma: nenhum `.md` é importado pelo código, então não há o que validar. `React front (Web)` e `.NET API` são exigidos para mergear, e um check que não teve o que fazer reporta verde do mesmo jeito.
 
-A validação de versão tem workflow próprio porque a versão é do repositório, não de um lado dele. Como passo do check do front ela dependia do recorte daquele job, e PR para a `main` que não tocasse o front nem o `package.json` a pulava em silêncio — que é exatamente o bump esquecido que ela existe para pegar.
+A validação de versão tem workflow próprio porque a versão é do repositório, não de um lado dele. Como passo do check do front ela dependia do recorte daquele job, e PR para a `main` que não tocasse o front nem o `package.json` a pulava em silêncio — que é exatamente o bump esquecido que ela existe para pegar. Ela é a única que filtra pela branch de destino no próprio gatilho, porque é a única cuja condição é a branch: só aparece em PR para a `main`.
 
 Cada check é um workflow, e não um job dentro de um arquivo só, para que cada assunto tenha o seu. Cada um leva grupo de concorrência próprio: compartilhá-lo faria um cancelar o outro, já que execução nova na mesma branch cancela a anterior.
 
