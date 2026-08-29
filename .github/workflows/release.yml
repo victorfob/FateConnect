@@ -1,7 +1,7 @@
 name: Release
 
-# Todo push na main é uma release. A versão do projeto é a do `package.json` da
-# raiz — o front tem versão própria, que não diz nada sobre a release.
+# Todo push na main é uma release. A versão é a do `package.json` da raiz — o
+# front tem versão própria, que não diz nada sobre a release.
 on:
   push:
     branches:
@@ -13,13 +13,12 @@ concurrency:
   group: release
   cancel-in-progress: false
 
-# Cada job pede o que precisa; nada é concedido por padrão.
 permissions:
   contents: read
 
 jobs:
-  # O passo de versão do check já barrou versão repetida no PR, então aqui não
-  # sobra decisão: só marcar o commit que foi publicado.
+  # O `check-version.yml` já barrou versão repetida no PR, então aqui não sobra
+  # decisão: só marcar o commit publicado.
   tag:
     name: Create version tag
     runs-on: ubuntu-latest
@@ -34,15 +33,14 @@ jobs:
 
           version=$(jq -r .version package.json)
 
-          # Push na main sem bump — correção de documentação, ajuste que não
-          # muda o produto — não é erro: a tag já está lá e o job encerra verde.
-          # É também o que segura o caso da tag criada à mão.
+          # Push na main sem bump não é erro — correção de documentação, tag
+          # criada à mão: a tag já está lá e o job encerra verde.
           if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
             echo "A versão $version já está publicada na tag v$version — nada a fazer."
             exit 0
           fi
 
-          # Tag anotada, não leve: guarda data e autoria, então o histórico
+          # Anotada, não leve: guarda data e autoria, então o histórico
           # registra quando a versão saiu, não só onde ela caiu.
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -51,17 +49,9 @@ jobs:
 
           echo "Tag v$version criada em $GITHUB_SHA."
 
-  # O build de produção e a publicação moram no mesmo lugar porque o upload de
-  # source map tem que sair do MESMO build que vai ao ar: mapa gerado em outro
-  # build tem outro Debug ID, e o Sentry não simboliza nada com ele. Quem faz o
-  # upload é o plugin dentro do `yarn build` — não há passo separado.
-  #
   # Os passos estão em `publish.yml`, compartilhados com homologação, para que
-  # os dois ambientes subam pelo mesmo caminho. As variáveis e os segredos vêm
-  # do ambiente `prod` do GitHub.
-  #
-  # Independente do job da tag: falha ao criar a tag não tem por que impedir a
-  # publicação, e vice-versa.
+  # os dois ambientes subam pelo mesmo caminho. Independente do job da tag:
+  # falha ao marcar não tem por que impedir a publicação, e vice-versa.
   publish:
     name: Publish to production
     uses: ./.github/workflows/publish.yml
@@ -69,19 +59,14 @@ jobs:
       environment: prod
     secrets: inherit
 
-  # A release entra pela main, mas o trabalho continua na develop: sem trazer o
-  # merge de volta, a próxima release nasce de uma base que não conhece a
-  # anterior, e o primeiro PR depois dela já vem com conflito de changelog e
-  # versão.
+  # Sem trazer o merge de volta, a próxima release nasce de uma base que não
+  # conhece a anterior, e o primeiro PR depois dela já vem com conflito de
+  # changelog e versão.
   #
   # Espera a publicação porque o push que ele faz na develop dispara a de
-  # homologação, e as duas usam o mesmo checkout na VPS. Quem impede o atropelo é
-  # a trava do `deploy.sh`; esperar aqui evita que a de homologação comece só
-  # para ficar parada nela. Publicação que falha não perde o back-merge: a
-  # correção entra na main, e esse push refaz este workflow inteiro.
-  #
-  # A tag continua independente — falha ao criar tag é corrigível à mão e não
-  # tem por que segurar a develop.
+  # homologação, e as duas usam o mesmo checkout na VPS. Publicação que falha
+  # não perde o back-merge: a correção entra na main, e esse push refaz este
+  # workflow inteiro. A tag segue independente.
   back-merge:
     name: Sync develop with main
     needs: publish
@@ -93,9 +78,8 @@ jobs:
           # raso não tem os commits para contar.
           fetch-depth: 0
           # A deploy key é o que faz o push na develop passar — é a ela que a
-          # ruleset da develop concede bypass. Bypass para o app GitHub Actions
-          # não serve aqui: ele exige repositório de organização, e a API recusa
-          # em conta pessoal.
+          # ruleset concede bypass. Bypass para o app GitHub Actions exigiria
+          # repositório de organização, e a API recusa em conta pessoal.
           ssh-key: ${{ secrets.BACK_MERGE_SSH_KEY }}
 
       - name: Sync develop
@@ -116,8 +100,8 @@ jobs:
 
           git checkout -B develop origin/develop
 
-          # Caso comum: a develop não andou desde o corte da release, então a
-          # sincronização é fast-forward e não inventa commit nenhum.
+          # Caso comum: a develop não andou, então é fast-forward e não
+          # inventa commit nenhum.
           if [ "$ahead" -eq 0 ]; then
             git merge --ff-only origin/main
             git push origin develop
@@ -125,8 +109,8 @@ jobs:
             exit 0
           fi
 
-          # A develop andou por conta própria — feature mergeada enquanto a
-          # release estava aberta. Aí o merge é de verdade.
+          # A develop andou — feature mergeada enquanto a release estava
+          # aberta. Aí o merge é de verdade.
           if git merge --no-edit origin/main; then
             git push origin develop
             echo "main mergeada na develop em $(git rev-parse --short HEAD) ($ahead commit(s) próprios preservados)."

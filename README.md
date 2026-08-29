@@ -58,21 +58,29 @@ A validação consulta as tags no **remoto**. Consultar localmente aprovaria qua
 
 | Workflow          | Quando                                        | O que faz                                                                   |
 | ----------------- | --------------------------------------------- | --------------------------------------------------------------------------- |
-| `check.yml`       | todo PR                                       | um job por lado: front (versão, tipos, lint, testes, build e Sonar) e API (testes)      |
+| `check-front.yml` | todo PR                                       | valida o front: versão, tipos, lint, testes, build e Sonar                   |
+| `check-api.yml`   | todo PR                                       | valida a API: compilação, testes e Sonar                                    |
+| `check-version.yml` | PR para a `main`                            | reprova quando a versão da raiz já tem tag                                  |
 | `deploy.yml`      | push na `develop`                             | publica em homologação                                                      |
 | `release.yml`     | push na `main`                                | cria a tag, publica em produção e devolve a `main` para a `develop`         |
-| `sonar-main.yml`  | push na `main`                                | analisa a `main`, que é a linha de base do código novo de cada PR           |
+| `sonar-main.yml`  | push na `main`                                | analisa a `main` dos dois projetos, linha de base do código novo de cada PR |
 | `publish.yml`     | chamado pelos dois de publicação              | constrói o front e sobe um ambiente — os passos que homologação e produção compartilham |
 
-O `check.yml` dispara em todo PR, e cada job decide se tem o que fazer olhando os arquivos alterados: PR que só mexe no back-end não paga a suíte de front, nem o contrário. O `package.json` da raiz entra no filtro do front por causa da validação de versão — mudança de versão não pode escapar dela. Só o job do front é exigido para mergear.
+Os checks de front e de API disparam em todo PR, e cada um decide se tem o que fazer olhando os arquivos alterados: PR que só mexe no back-end não paga a suíte de front, nem o contrário. Mudança só de documentação não roda suíte nenhuma: nenhum `.md` é importado pelo código, então não há o que validar. `React front (Web)` e `.NET API` são exigidos para mergear, e um check que não teve o que fazer reporta verde do mesmo jeito.
+
+A validação de versão tem workflow próprio porque a versão é do repositório, não de um lado dele. Como passo do check do front ela dependia do recorte daquele job, e PR para a `main` que não tocasse o front nem o `package.json` a pulava em silêncio — que é exatamente o bump esquecido que ela existe para pegar. Ela é a única que filtra pela branch de destino no próprio gatilho, porque é a única cuja condição é a branch: só aparece em PR para a `main`.
+
+Cada check é um workflow, e não um job dentro de um arquivo só, para que cada assunto tenha o seu. Cada um leva grupo de concorrência próprio: compartilhá-lo faria um cancelar o outro, já que execução nova na mesma branch cancela a anterior.
 
 Os três jobs da release moram no mesmo workflow porque acontecem no mesmo evento: o push que a `main` recebe quando a release entra. A tag não depende de ninguém — falha ao marcá-la não impede a publicação nem a sincronização, e vice-versa. O back-merge, esse, espera a publicação terminar: o push que ele faz na `develop` é o que dispara a publicação de homologação, e as duas usam o mesmo checkout na VPS. Publicação reprovada não perde o back-merge, porque a correção entra na `main` e esse push refaz o workflow inteiro.
 
 O job de back-merge do `release.yml` empurra **direto na `develop`**, sem PR: a ruleset da `develop` concede bypass a uma **deploy key** de escrita, que o workflow usa no checkout, e a da `main` não concede a ninguém — a release continua exigindo PR e review. Bypass para o app GitHub Actions resolveria sem chave nenhuma, mas ele exige repositório de organização: em conta pessoal a API recusa o ator. O caminho comum é fast-forward, porque a `develop` normalmente não andou desde o corte da release. Quando andou, o job faz o merge de verdade; se conflitar, ele para e reporta, porque escolher qual lado vale é decisão humana.
 
+São **dois projetos no Sonar**, um por lado: um `projectKey` não se divide entre dois scanners, porque o front usa a action genérica e C# exige o SonarScanner for .NET em volta do `dotnet build`. Os gates diferem numa linha — o do front cobra cobertura de código novo, o da API ainda não.
+
 Quem reprova por cobertura é o **quality gate do Sonar**, que mede o código novo do PR, somado ao limite do Vitest dentro do `test:ci`. Não há envio para o Code Quality do GitHub: ele exige repositório de organização em plano Team ou Enterprise Cloud, e este é de conta pessoal.
 
-A análise da `main` existe para dar ao Sonar a **linha de base** — é contra ela que o código novo de cada PR é calculado. Ela declara a versão do `package.json` da raiz porque a definição de código novo do projeto é *previous_version*: sem versão declarada não há fronteira, nenhuma métrica de código novo é calculada, e o gate reprova por não ter o que avaliar.
+A análise da `main` existe para dar ao Sonar a **linha de base** da branch principal, sobre a qual o código novo da própria `main` é medido. Análise de PR não depende dela: o código novo de um PR é o diff dele contra a base, que o Sonar tira do git. Ela declara a versão do `package.json` da raiz porque a definição de código novo do projeto é *previous_version*: sem versão declarada não há fronteira, nenhuma métrica de código novo é calculada, e o gate reprova por não ter o que avaliar.
 
 ## Configuração do agente de código
 

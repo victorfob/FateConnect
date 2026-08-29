@@ -104,7 +104,7 @@ Use o `render` de `@app/test/testing-library`, que já monta tema, rotas e cache
 | ------------ | --------------------------------------------------- | --------- |
 | `pre-commit` | `lint-staged` sobre os arquivos preparados          | —         |
 | `pre-push`   | só os testes **relacionados** aos arquivos enviados | —         |
-| CI (no PR)   | tipos, lint, **suíte inteira**, build               | mede      |
+| CI (no PR)   | tipos, lint, **suíte inteira**, build e Sonar        | mede      |
 
 O `pre-push` usa `scripts/test-changed.sh`, que segue o grafo de imports com `vitest related`: mudar uma tela roda os testes que a alcançam, não a suíte inteira. Ele cai na suíte inteira quando a mudança sai de `src/` ou remove arquivo — nesses casos o grafo não alcança o efeito, e `vitest related vite.config.ts` sairia com sucesso sem rodar teste nenhum.
 
