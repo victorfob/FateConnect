@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -22,13 +23,13 @@ public class TokenService : ITokenService
     {
         JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
-        byte[] chaveSeguranca = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
+        byte[] chaveSeguranca = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
         ClaimsIdentity claimsDoUsuario = CriarClaimsDoUsuario(usuario);
 
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = claimsDoUsuario,
-            Expires = DateTime.UtcNow.AddHours(_jwtOptions.ExpiracaoHoras),
+            Expires = DateTime.UtcNow.AddHours(_jwtOptions.ExpirationHours),
             Issuer = _jwtOptions.Issuer,
             Audience = _jwtOptions.Audience,
             SigningCredentials = new SigningCredentials(
@@ -41,11 +42,11 @@ public class TokenService : ITokenService
         return tokenHandler.WriteToken(token);
     }
 
-    private ClaimsIdentity CriarClaimsDoUsuario(Usuario usuario)
+    private static ClaimsIdentity CriarClaimsDoUsuario(Usuario usuario)
     {
         Claim[] claims =
         [
-            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString(CultureInfo.InvariantCulture)),
             new Claim(ClaimTypes.Email, usuario.EmailFatec),
             new Claim(ClaimTypes.Role, usuario.Perfil.ToString())
         ];

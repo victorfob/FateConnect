@@ -27,7 +27,7 @@ fi
 # shellcheck disable=SC1090
 set -a; . "./$ENV_FILE"; set +a
 
-for name in DOMAIN ACCOUNT_API_PORT RIDE_API_PORT; do
+for name in DOMAIN API_PORT; do
   eval "value=\${$name:-}"
   if [ -z "$value" ]; then
     echo "ERRO: $name não está preenchido em deploy/$ENV_FILE." >&2
@@ -46,8 +46,7 @@ chown -R "${SUDO_USER:-root}":"${SUDO_USER:-root}" /var/www/fateconnect
 echo "==> Configuração do nginx: $CONF"
 sed -e "s|__DOMAIN__|$DOMAIN|g" \
     -e "s|__ENVIRONMENT__|$ENVIRONMENT|g" \
-    -e "s|__ACCOUNT_API_PORT__|$ACCOUNT_API_PORT|g" \
-    -e "s|__RIDE_API_PORT__|$RIDE_API_PORT|g" \
+    -e "s|__API_PORT__|$API_PORT|g" \
     nginx/site.conf.template > "$CONF"
 ln -sf "$CONF" "/etc/nginx/sites-enabled/fateconnect-$ENVIRONMENT"
 
@@ -55,7 +54,19 @@ echo "==> Conferindo a configuração antes de recarregar"
 nginx -t
 systemctl reload nginx
 
+# O passo acima sobrescreve o arquivo inteiro, e o template só descreve a porta
+# 80 — então o bloco 443 que o certbot escreveu some a cada execução. Reaplicar
+# não reemite certificado: só devolve o TLS ao arquivo recém-gerado.
+if [ -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+  echo "==> Devolvendo o HTTPS à configuração recém-gerada"
+  certbot install --nginx --cert-name "$DOMAIN"
+  nginx -t
+  systemctl reload nginx
+fi
+
 echo
 echo "Pronto: $DOMAIN servido a partir de $TARGET"
-echo "Para ligar o HTTPS depois que o domínio estiver respondendo:"
-echo "  sudo certbot --nginx -d $DOMAIN"
+if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+  echo "Para ligar o HTTPS depois que o domínio estiver respondendo:"
+  echo "  sudo certbot --nginx -d $DOMAIN"
+fi

@@ -54,7 +54,7 @@ Componente = pasta com `index.tsx`, `styles.ts`, `types.ts` (quando houver tipo)
 | `vite.config.ts`, `coverage.include` | os arquivos saem do denominador, e o limite de 90% passa a medir outra coisa |
 | `sonar-project.properties` | a pasta sai da análise, inclusive da regra de 0% de duplicação |
 
-Mais `scripts/test-changed.sh`, cujo `case` decide entre testes relacionados e suíte completa, e o script `format` do `package.json`.
+Mais `FateConnect/Web/scripts/test-changed.sh`, cujo `case` decide entre testes relacionados e suíte completa, e o script `format` do `package.json`.
 
 **Cada um se prova com número, porque "passou" não prova nada aqui:** `grep -c '^SF:' coverage/lcov.info` para a cobertura, `files indexed` no log do Sonar comparado com a run anterior, e rodar o hook de verdade no `/bin/bash` com um arquivo da pasta nova.
 

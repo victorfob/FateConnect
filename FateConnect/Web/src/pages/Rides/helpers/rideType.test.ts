@@ -4,10 +4,10 @@ import { parseRideType, rideTypeDisplayLabel, rideTypeTone } from './rideType';
 
 describe('parseRideType', () => {
   it.each([
-    ['Filantropica', RideTypeEnum.PHILANTHROPIC],
-    ['filantropica', RideTypeEnum.PHILANTHROPIC],
-    ['Igualitaria', RideTypeEnum.EGALITARIAN],
-    ['igualitaria', RideTypeEnum.EGALITARIAN],
+    ['Solidarity', RideTypeEnum.SOLIDARITY],
+    ['solidarity', RideTypeEnum.SOLIDARITY],
+    ['Egalitarian', RideTypeEnum.EGALITARIAN],
+    ['egalitarian', RideTypeEnum.EGALITARIAN],
   ])('should read %s as a canonical value', (raw, expected) => {
     expect(parseRideType(raw)).toBe(expected);
   });
@@ -19,8 +19,8 @@ describe('parseRideType', () => {
 
 describe('rideTypeDisplayLabel', () => {
   it('should label the known types in pt-BR', () => {
-    expect(rideTypeDisplayLabel('Filantropica')).toBe('Solidária');
-    expect(rideTypeDisplayLabel('igualitaria')).toBe('Igualitária');
+    expect(rideTypeDisplayLabel('Solidarity')).toBe('Solidária');
+    expect(rideTypeDisplayLabel('egalitarian')).toBe('Igualitária');
   });
 
   it('should keep an unknown value, falling back to a dash when it is blank', () => {
@@ -31,8 +31,8 @@ describe('rideTypeDisplayLabel', () => {
 
 describe('rideTypeTone', () => {
   it.each([
-    ['Filantropica', 'success'],
-    ['Igualitaria', 'warning'],
+    ['Solidarity', 'success'],
+    ['Egalitarian', 'warning'],
     ['desconhecido', 'neutral'],
   ])('should give %s the expected tone', (value, expected) => {
     expect(rideTypeTone(value)).toBe(expected);

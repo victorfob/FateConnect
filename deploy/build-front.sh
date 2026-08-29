@@ -41,8 +41,7 @@ docker run --rm \
   -v "$(cd .. && pwd)/FateConnect/Web:/app" \
   -v "$TARGET:/saida" \
   -w /app \
-  -e "VITE_API_URL=$PUBLIC_URL/api/conta" \
-  -e "VITE_RIDE_API_URL=$PUBLIC_URL/api/carona" \
+  -e "VITE_API_URL=$PUBLIC_URL/api" \
   -e "VITE_SENTRY_DSN=${VITE_SENTRY_DSN:-}" \
   "node:$NODE_VERSION-alpine" \
   sh -c 'yarn install --frozen-lockfile && yarn build && rm -rf /saida/* && cp -r dist/. /saida/'

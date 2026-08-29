@@ -17,7 +17,7 @@ Planejamento e rastreio ficam no **GitHub** (issues + Project board do repositó
 ## Organização desta configuração
 
 - `.claude/rules/` — regras do projeto. Sem `paths:` carregam sempre; com `paths:` carregam quando um arquivo que casa é lido.
-- `.claude/skills/` — fluxos sob demanda: `spec-issue` (especificar uma issue e dividir em sub-issues), `pr-creator` (abrir/atualizar PR), `resolve-pr-comments` (triar e responder review), `write-commit` (mensagem de commit e agrupamento em commits), `changelog-writer` (entrada do CHANGELOG), `create-release` (cortar uma versão e publicar), `ux-writing` (texto de interface) e `fateconnect-create-component` (criar componente no front).
+- `.claude/skills/` — fluxos sob demanda: `spec-issue` (especificar uma issue e dividir em sub-issues), `pr-creator` (abrir/atualizar PR), `resolve-pr-comments` (triar e responder review), `write-review-comment` (comentar o PR de outra pessoa), `write-commit` (mensagem de commit e agrupamento em commits), `changelog-writer` (entrada do CHANGELOG), `create-release` (cortar uma versão e publicar), `ux-writing` (texto de interface) e `fateconnect-create-component` (criar componente no front).
 - `.claude/` é **versionada**: rule e skill passam por review no PR como qualquer código, e valem igual para quem clonar o repo. Por isso a restrição do repositório acima se aplica a elas também.
 
 ## Fluxo de trabalho
@@ -38,11 +38,17 @@ cd FateConnect/Web && yarn test:ci      # suíte inteira com cobertura
 cd FateConnect/Web && yarn lint && yarn typecheck
 ```
 
+API (.NET 8):
+
+```bash
+dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln
+```
+
 ```bash
 git config core.hooksPath .githooks     # habilita os hooks deste clone
 ```
 
-O `pre-push` roda só os testes **relacionados** aos arquivos enviados (via `Web/scripts/test-changed.sh`); a suíte inteira com cobertura fica no CI.
+O `pre-push` roda só os testes **relacionados** aos arquivos enviados (via `FateConnect/Web/scripts/test-changed.sh`); a suíte inteira com cobertura fica no CI.
 
 ## Stack do front
 

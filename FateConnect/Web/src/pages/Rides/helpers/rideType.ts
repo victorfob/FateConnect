@@ -3,17 +3,17 @@ import type { StatusTagTone } from '@design-system';
 import { RideTypeEnum } from '@app/services/rides/types';
 
 const LOWERCASE_TO_RIDE_TYPE: Readonly<Record<string, RideTypeEnum>> = {
-  filantropica: RideTypeEnum.PHILANTHROPIC,
-  igualitaria: RideTypeEnum.EGALITARIAN,
+  solidarity: RideTypeEnum.SOLIDARITY,
+  egalitarian: RideTypeEnum.EGALITARIAN,
 };
 
 const RIDE_TYPE_LABEL: Readonly<Record<RideTypeEnum, string>> = {
-  [RideTypeEnum.PHILANTHROPIC]: 'Solidária',
+  [RideTypeEnum.SOLIDARITY]: 'Solidária',
   [RideTypeEnum.EGALITARIAN]: 'Igualitária',
 };
 
 const RIDE_TYPE_TONE: Readonly<Record<RideTypeEnum, StatusTagTone>> = {
-  [RideTypeEnum.PHILANTHROPIC]: 'success',
+  [RideTypeEnum.SOLIDARITY]: 'success',
   [RideTypeEnum.EGALITARIAN]: 'warning',
 };
 
@@ -23,7 +23,7 @@ const UNKNOWN_LABEL = '—';
 
 /** Escolhas de tipo — uma fonte só, servindo o filtro e o formulário de carona. */
 export const RIDE_TYPE_OPTIONS: readonly { value: RideTypeEnum; label: string }[] = [
-  { value: RideTypeEnum.PHILANTHROPIC, label: RIDE_TYPE_LABEL[RideTypeEnum.PHILANTHROPIC] },
+  { value: RideTypeEnum.SOLIDARITY, label: RIDE_TYPE_LABEL[RideTypeEnum.SOLIDARITY] },
   { value: RideTypeEnum.EGALITARIAN, label: RIDE_TYPE_LABEL[RideTypeEnum.EGALITARIAN] },
 ];
 

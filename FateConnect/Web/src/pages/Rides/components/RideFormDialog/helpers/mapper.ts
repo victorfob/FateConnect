@@ -12,23 +12,23 @@ export function toFormValues(ride: Ride | undefined): RideFormInput {
   if (!ride) return EMPTY_RIDE_FORM;
 
   return {
-    destination: ride.destino,
-    departureDate: ride.dataPartida.slice(0, DATE_LENGTH),
-    departureTime: ride.horaPartida.slice(0, TIME_LENGTH),
-    rideType: ride.tipoCarona,
-    seats: String(ride.qtdVagas),
-    description: ride.descricao ?? '',
+    destination: ride.destination,
+    departureDate: ride.departureDate.slice(0, DATE_LENGTH),
+    departureTime: ride.departureTime.slice(0, TIME_LENGTH),
+    rideType: ride.rideType,
+    seats: String(ride.availableSeats),
+    description: ride.description ?? '',
   };
 }
 
 /** O schema já entregou os campos aparados e o tipo estreitado. */
 export function toRideInput(values: RideFormValues): RideInput {
   return {
-    qtdVagas: Number(values.seats),
-    destino: values.destination,
-    dataPartida: values.departureDate,
-    horaPartida: values.departureTime,
-    tipoCarona: values.rideType,
-    descricao: values.description,
+    availableSeats: Number(values.seats),
+    destination: values.destination,
+    departureDate: values.departureDate,
+    departureTime: values.departureTime,
+    rideType: values.rideType,
+    description: values.description,
   };
 }
