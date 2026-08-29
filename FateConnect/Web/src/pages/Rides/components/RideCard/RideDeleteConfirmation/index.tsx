@@ -37,7 +37,7 @@ export function RideDeleteConfirmation({ ride, onDelete }: RideDeleteConfirmatio
         <Dialog.Body>
           <S.ConfirmationMessage variant="subtitle">
             {DELETE_DIALOG.messagePrefix}
-            <strong>{ride.destino}</strong>
+            <strong>{ride.destination}</strong>
             {DELETE_DIALOG.messageSuffix}
           </S.ConfirmationMessage>
         </Dialog.Body>
