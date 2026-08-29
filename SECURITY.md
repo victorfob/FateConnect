@@ -19,7 +19,7 @@ Ajuda muito incluir:
 
 - o que a falha permite fazer, em uma frase;
 - o passo a passo para reproduzir;
-- a parte afetada — front, API de contas, API de caronas — se souber;
+- a parte afetada — front ou API — se souber;
 - a versão ou o commit onde encontrou.
 
 ## O que esperar
