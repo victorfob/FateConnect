@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 namespace FateConnect.Api;
 
 using System.Text;
@@ -25,6 +26,9 @@ using Microsoft.OpenApi.Models;
 
 public class Program
 {
+    [ExcludeFromCodeCoverage]
+    private Program() { }
+
     public static void Main(string[] args)
     {
         if (File.Exists(".env"))

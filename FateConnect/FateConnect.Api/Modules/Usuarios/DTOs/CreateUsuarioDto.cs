@@ -31,12 +31,12 @@ public class CreateUsuarioDto
 
     [Required]
     [DefaultValue("2000-01-01T00:00:00Z")]
-    public DateTime DataNascimento { get; set; }
+    required public DateTime DataNascimento { get; set; }
 
     [Required]
     [DefaultValue(1)]
     [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
-    public EnumGender Genero { get; set; }
+    required public EnumGender Genero { get; set; }
 
     [Required]
     required public List<CreateEnderecoDto> Enderecos { get; set; } =
