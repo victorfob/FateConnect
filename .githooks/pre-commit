@@ -1,21 +1,62 @@
 #!/usr/bin/env bash
-# Roda lint-staged no front React (FateConnect/Web) sobre os arquivos staged.
+# Roda os gates locais sobre o que está preparado: lint-staged no front React e a
+# build da API .NET, que é quem carrega o SonarAnalyzer.
 # O repo usa core.hooksPath=.githooks (junto dos hooks do git-lfs), por isso não usamos husky:
 # instalar husky reaponta core.hooksPath para .husky e desliga os hooks de LFS.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
 WEB="$ROOT/FateConnect/Web"
+API_SOLUTION="$ROOT/FateConnect/FateConnect.Api/FateConnect.Api.sln"
+MIN_NODE_MAJOR=22
 
-# Nada staged em Web/ => nada a fazer.
-if ! git diff --cached --name-only --diff-filter=ACMR | grep -q '^FateConnect/Web/.*\.tsx\?$'; then
-  exit 0
+staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+if grep -q '^FateConnect/Web/.*\.tsx\?$' <<< "$staged"; then
+  # Subshell: o `cd` e o estado que o `nvm` deixa não vazam para o gate da API.
+  (
+    if [[ ! -d "$WEB/node_modules" ]]; then
+      echo "pre-commit: dependências de FateConnect/Web ausentes — rode 'yarn' nessa pasta" >&2
+      exit 1
+    fi
+
+    cd "$WEB"
+
+    NVM_SH="${NVM_DIR:-$HOME/.nvm}/nvm.sh"
+    if [[ -s "$NVM_SH" ]]; then
+      # `nvm.sh` não sobrevive a `set -eu`.
+      set +eu
+      # shellcheck source=/dev/null
+      . "$NVM_SH"
+      nvm use >/dev/null
+      set -eu
+    fi
+
+    node_version="$(node -v 2>/dev/null || true)"
+    node_major="${node_version#v}"
+    node_major="${node_major%%.*}"
+
+    if (( ${node_major:-0} < MIN_NODE_MAJOR )); then
+      echo "pre-commit: o ESLint precisa do Node $MIN_NODE_MAJOR ou maior; o ativo é ${node_version:-nenhum} — rode 'nvm use' em FateConnect/Web" >&2
+      exit 1
+    fi
+
+    npx --no-install lint-staged
+  )
 fi
 
-if [[ ! -d "$WEB/node_modules" ]]; then
-  echo "pre-commit: dependências de FateConnect/Web ausentes — rode 'yarn' nessa pasta" >&2
-  exit 1
-fi
+if grep -q '^FateConnect/FateConnect\.Api' <<< "$staged"; then
+  # Cobre as duas causas: dotnet fora do PATH e SDK que o global.json não aceita.
+  if ! dotnet --version >/dev/null 2>&1; then
+    echo "pre-commit: nenhum SDK .NET utilizável — confira o PATH e a versão que o global.json declara" >&2
+    exit 1
+  fi
 
-cd "$WEB"
-npx --no-install lint-staged
+  # A build é ruidosa mesmo em `--verbosity quiet`: só interessa quando reprova.
+  if ! output="$(dotnet build "$API_SOLUTION" --nologo --verbosity quiet 2>&1)"; then
+    echo "$output" >&2
+    exit 1
+  fi
+
+  echo "pre-commit: API compila."
+fi

@@ -24,7 +24,7 @@ Os hooks locais **não vêm habilitados no clone** — o repositório usa `core.
 git config core.hooksPath .githooks
 ```
 
-O `pre-push` roda só os testes relacionados aos arquivos enviados. A suíte inteira com cobertura fica no CI.
+O `pre-commit` conserta o que dá no front — `eslint --fix` e `prettier --write` sobre o que está preparado — e compila a API quando a mudança a alcança, que é a build por onde entra o SonarAnalyzer. O `pre-push` roda o recorte de testes do front relacionado ao que está sendo enviado e a suíte da API. A suíte inteira com cobertura fica no CI.
 
 ## Branch e commit
 

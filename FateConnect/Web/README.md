@@ -108,7 +108,7 @@ Use o `render` de `@app/test/testing-library`, que já monta tema, rotas e cache
 | `pre-push`   | só os testes **relacionados** aos arquivos enviados | —         |
 | CI (no PR)   | tipos, lint, **suíte inteira**, build e Sonar        | mede      |
 
-⚠️ O hook roda com o Node do seu shell, não com o do `.nvmrc`. Num Node anterior ao 22 ele falha com `mapTypes.union is not a function`, que é uma regra de lint usando `Set.prototype.union` — a saída é `nvm use` antes de commitar.
+⚠️ O `pre-commit` carrega o Node do `.nvmrc` por conta própria, porque uma regra de lint usa `Set.prototype.union` e o ESLint quebra em qualquer Node anterior ao 22. Sem `nvm` na máquina ele não tem como trocar: aí reprova o commit dizendo qual versão está ativa.
 
 O `pre-push` usa `scripts/test-changed.sh`, que segue o grafo de imports com `vitest related`: mudar uma tela roda os testes que a alcançam, não a suíte inteira. Ele cai na suíte inteira quando a mudança sai de `src/` ou remove arquivo — nesses casos o grafo não alcança o efeito, e `vitest related vite.config.ts` sairia com sucesso sem rodar teste nenhum.
 
