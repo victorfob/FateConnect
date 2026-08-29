@@ -1,24 +1,18 @@
 name: Sonar main
 
-# A `main` precisa ser analisada para o Sonar ter linha de base: é contra ela
-# que ele calcula o "código novo" de cada PR. Os checks de PR só disparam em
-# `pull_request`, então sem este workflow nenhuma análise da branch principal
-# existiria — e o painel avisa isso.
-#
-# São dois projetos no Sonar, um por lado, porque um `projectKey` não se divide
-# entre dois scanners: o front usa a action genérica, e C# exige o scanner de
-# .NET em volta do build. Daí também os dois gates, que diferem só na cobertura.
+# A `main` precisa ser analisada para o painel ter linha de base: é sobre ela que
+# o código novo da própria `main` é medido. Análise de PR não depende disto — o
+# código novo de um PR é o diff dele contra a base.
 on:
   push:
     branches:
       - main
   # Disparo manual porque o push na `main` só acontece em release: sem ele, uma
-  # análise fora de ciclo — depois de mexer na configuração do Sonar, por
-  # exemplo — esperaria semanas pela próxima versão.
+  # análise fora de ciclo esperaria semanas pela próxima versão.
   workflow_dispatch:
 
-# Duas análises da mesma branch em sequência não podem correr juntas: a segunda
-# publicaria um resultado calculado sobre um estado que já mudou.
+# Duas análises da mesma branch não podem correr juntas: a segunda publicaria um
+# resultado calculado sobre um estado que já mudou.
 concurrency:
   group: sonar-main
   cancel-in-progress: false
@@ -27,8 +21,6 @@ permissions:
   contents: read
 
 jobs:
-  # Workflow próprio, e não um job no `release.yml`: lá os jobs são sobre
-  # publicar, e análise falha por motivos diferentes de tag e deploy.
   web:
     name: Analyze the front
     runs-on: ubuntu-latest
@@ -38,8 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # Mesmo motivo do `check-front.yml`: sem histórico completo o Sonar não
-          # sabe quem mudou o quê e perde a noção de código novo.
+          # Sem histórico completo o Sonar perde a noção de quem mudou o quê.
           fetch-depth: 0
 
       - uses: actions/setup-node@v5
@@ -48,22 +39,21 @@ jobs:
           cache: yarn
           cache-dependency-path: FateConnect/Web/yarn.lock
 
-      # `--ignore-scripts` porque instalar dependência não deve executar código:
-      # sem ele o `postinstall` de qualquer pacote da árvore roda no runner, com
-      # os segredos do job ao alcance.
+      # Instalar dependência não deve executar código: sem `--ignore-scripts` o
+      # `postinstall` de qualquer pacote da árvore roda com os segredos do job
+      # ao alcance.
       - name: Install dependencies
         run: yarn install --frozen-lockfile --ignore-scripts
 
-      # O scan consome o lcov e o `sonar-report.xml` que esta suíte produz —
-      # sem rodá-la, `sonar.testExecutionReportPaths` aponta para um arquivo que
-      # não existe e o scan falha.
+      # O scan consome o lcov e o `sonar-report.xml` que esta suíte produz — sem
+      # rodá-la, `sonar.testExecutionReportPaths` aponta para um arquivo que não
+      # existe e o scan falha.
       - name: Tests and coverage
         run: yarn test:ci
 
-      # A definição de código novo do projeto é `previous_version`, então sem
-      # versão declarada não há fronteira: as sete condições do gate são todas
-      # sobre código novo, nenhuma métrica `new_*` é calculada, e o veredito sai
-      # `NONE` — que o `sonar.qualitygate.wait` reprova como se fosse falha.
+      # A definição de código novo do projeto é `previous_version`: sem versão
+      # declarada não há fronteira, nenhuma métrica `new_*` é calculada, e o
+      # veredito sai `NONE` — que o `sonar.qualitygate.wait` reprova como falha.
       #
       # Vem daqui e não do `sonar-project.properties` porque o número mora no
       # `package.json` da raiz, fora do `projectBaseDir`.
@@ -71,15 +61,6 @@ jobs:
         id: version
         run: echo "value=$(jq -r .version "$GITHUB_WORKSPACE/package.json")" >> "$GITHUB_OUTPUT"
 
-      # Mesma configuração do PR, pelo `sonar-project.properties`. O
-      # `sonar.qualitygate.wait` de lá vale aqui também: na `main` ele não
-      # bloqueia merge nenhum, mas deixa o run vermelho quando o gate não sai
-      # `OK` — seja porque algo escapou do gate do PR, seja porque não houve
-      # código novo para avaliar.
-      #
-      # A versão só é declarada aqui: é a história de versões da `main` que
-      # forma a linha de base. Análise de PR usa o próprio diff como código
-      # novo e nunca consulta a versão.
       - name: Sonar
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
         with:
@@ -94,8 +75,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # Mesmo motivo do job acima: sem histórico completo o Sonar perde a
-          # noção de quem mudou o quê.
+          # Sem histórico completo o Sonar perde a noção de quem mudou o quê.
           fetch-depth: 0
 
       - uses: actions/setup-dotnet@v4
@@ -115,9 +95,8 @@ jobs:
         id: version
         run: echo "value=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
 
-      # A suíte não roda aqui: o gate `Backend` não tem condição de cobertura,
-      # então nada do que ela produz é consumido. Teste quebrado é reprovado no
-      # check do PR, antes de chegar na main.
+      # A suíte não roda aqui: o gate `Backend` não tem condição de cobertura, e
+      # teste quebrado já foi reprovado no check do PR.
       - name: Sonar begin
         run: >
           dotnet sonarscanner begin

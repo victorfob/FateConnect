@@ -1,14 +1,12 @@
 name: Check version
 
 # A tag da release nasce da versão do `package.json` da raiz, então PR para a
-# `main` é a última chance de pegar versão repetida: ou o bump foi esquecido, ou
-# a versão já foi publicada. Nos dois casos a release entraria sem tag nova.
+# `main` é a última chance de pegar versão repetida.
 #
-# Workflow próprio, e não um passo do check do front, porque a versão é do
-# repositório e não de um lado dele. Como passo de lá, a validação dependia do
-# recorte daquele job: PR para a `main` que não tocasse o front nem o
-# `package.json` a pulava em silêncio — e "não tocou o `package.json`" é
-# precisamente o bump esquecido que ela existe para pegar.
+# Workflow próprio, e não um passo do check do front: como passo de lá, a
+# validação dependia do recorte daquele job, e PR para a `main` que não tocasse
+# o front nem o `package.json` a pulava em silêncio — que é precisamente o bump
+# esquecido que ela existe para pegar.
 on:
   pull_request
 
@@ -26,13 +24,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Só o PR para a `main` é validado — a versão que vale é a que está sendo
-      # publicada. Em PR de feature a versão é a da última release, e a tag dela
-      # existe: validar ali reprovaria toda feature.
+      # Só o PR para a `main` é validado: em PR de feature a versão é a da
+      # última release, e a tag dela existe — validar ali reprovaria toda
+      # feature.
       #
       # A busca é no remoto, não em `git tag -l`: o checkout traz um commit e
-      # nenhuma tag, então a busca local não acharia nada nunca e o passo
-      # aprovaria tudo em silêncio.
+      # nenhuma tag, então a busca local aprovaria tudo em silêncio.
       - name: Version
         if: github.base_ref == 'main'
         run: |

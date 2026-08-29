@@ -1,14 +1,12 @@
 name: Publish
 
-# Publicação de um ambiente, chamada por quem tem o gatilho: o `release.yml`
-# para produção e o `deploy.yml` para homologação. Fica num arquivo só para que
-# os dois ambientes subam exatamente pelos mesmos passos — deploy que difere
+# Chamado pelo `release.yml` para produção e pelo `deploy.yml` para homologação.
+# Um arquivo só para que os dois subam pelos mesmos passos — deploy que difere
 # entre ambientes deixa de valer como ensaio.
 #
-# O front é construído AQUI, e é este `dist` que vai para a VPS. É o que mantém
-# os source maps enviados ao Sentry descrevendo o bundle que está no ar;
-# reconstruir no servidor produziria outro bundle, e o erro apontaria a linha
-# errada sem nada acusar.
+# O front é construído AQUI, e é este `dist` que vai para a VPS: é o que mantém
+# os source maps do Sentry descrevendo o bundle que está no ar. Reconstruir no
+# servidor produziria outro bundle, e o erro apontaria a linha errada.
 on:
   workflow_call:
     inputs:
@@ -25,8 +23,7 @@ jobs:
     name: Build and publish
     runs-on: ubuntu-latest
 
-    # É o ambiente do GitHub que separa as variáveis e os segredos dos dois
-    # destinos.
+    # É o ambiente do GitHub que separa variáveis e segredos dos dois destinos.
     environment:
       name: ${{ inputs.environment }}
       url: ${{ vars.PUBLIC_URL }}
@@ -47,8 +44,7 @@ jobs:
         run: yarn install --frozen-lockfile --ignore-scripts
         working-directory: FateConnect/Web
 
-      # A versão da raiz é a que nomeia a tag, e é ela que amarra o erro no
-      # Sentry à release que o produziu.
+      # É ela que amarra o erro no Sentry à release que o produziu.
       - name: Read version
         id: version
         run: echo "value=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
@@ -77,11 +73,10 @@ jobs:
 
       - name: Send the front to the VPS
         run: |
-          # Quem serve estes arquivos é o nginx do host; a pasta é criada pelo
+          # Quem serve estes arquivos é o nginx do host; a pasta nasce no
           # install-site.sh, com dono no usuário do deploy.
           target="/var/www/fateconnect/${{ inputs.environment }}"
-          # --delete remove o que saiu do build: sem isso um arquivo apagado no
-          # código continuaria servido no ar indefinidamente.
+          # --delete: sem ele, arquivo apagado no código segue servido no ar.
           rsync -az --delete \
             -e "ssh -i ~/.ssh/deploy_key -o BatchMode=yes" \
             FateConnect/Web/dist/ \
@@ -100,8 +95,8 @@ jobs:
             "docker ps --filter 'name=fateconnect-${{ inputs.environment }}' --filter 'status=running' --format '{{.Names}}'" \
             > containers.txt
           echo 'No ar:'; cat containers.txt
-          # Um ambiente é um contêiner, o da API. O banco e o servidor web são
-          # os do próprio host, e não aparecem aqui.
+          # Um ambiente é um contêiner, o da API: banco e servidor web são do
+          # host e não aparecem aqui.
           total=$(grep -c . containers.txt || true)
           if [ "$total" -lt 1 ]; then
             echo "ERRO: nenhum contêiner de pé; esperado 1." >&2

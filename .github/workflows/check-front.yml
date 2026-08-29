@@ -1,28 +1,19 @@
 name: Check front
 
-# Um workflow por lado do repositório: PR de backend não paga a suíte de front,
-# nem o contrário.
-#
-# O recorte é feito DENTRO do job, e não em `paths` no gatilho, porque este é o
-# check obrigatório para mergear. Workflow que não dispara não deixa o check
-# ausente: deixa ele `Pending` para sempre, e o PR fica impossível de mergear.
-# Rodando sempre, o contexto sempre reporta — e o PR que não toca o front paga
-# só a partida do runner, não a suíte.
-#
-# Sem filtro de branch de destino, porque PR empilhado (base em outra feature
-# branch) também precisa ser validado.
+# O recorte é feito DENTRO do job, e não em `paths` no gatilho, porque este é um
+# check obrigatório: workflow que não dispara não deixa o check ausente — deixa
+# ele `Pending` para sempre, e o PR fica impossível de mergear. Sem filtro de
+# branch de destino pelo mesmo tipo de motivo: PR empilhado precisa ser validado.
 on:
   pull_request
 
-# Execução nova na mesma ref cancela a anterior. O grupo leva o nome do
-# workflow: compartilhá-lo com o check da API faria um cancelar o outro.
+# Grupo próprio: compartilhá-lo com o check da API faria um cancelar o outro.
 concurrency:
   group: check-front-${{ github.head_ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
-  # Para ler a lista de arquivos do PR e decidir o que rodar.
   pull-requests: read
 
 jobs:
@@ -35,18 +26,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # Clone completo por causa do Sonar: sem histórico ele não sabe quem
-          # mudou o quê e perde a noção de código novo, que é o que o quality
-          # gate mede.
+          # Clone completo por causa do Sonar: sem histórico ele perde a noção
+          # de código novo, que é o que o quality gate mede.
           fetch-depth: 0
 
-      # A lista vem da API do PR, não de `git diff`: o checkout traz um commit
-      # só, e comparar com a base exigiria clone completo por um dado que o
-      # GitHub já tem pronto.
-      #
       # É a API de arquivos, paginada, e não `gh pr diff`: aquele recusa PR com
       # mais de 300 arquivos (HTTP 406), e a release que trocou o front inteiro
-      # tinha 330. Um check obrigatório reprovaria exatamente no PR de release.
+      # tinha 330 — um check obrigatório reprovaria no PR de release.
       - name: Changed paths
         id: changes
         run: |
@@ -54,11 +40,9 @@ jobs:
 
           changed=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')
 
-          # Documentação fica fora da decisão: nenhum `.md` é importado pelo
-          # código, então mudar um não altera o que o build produz. A lista para
-          # aqui de propósito — `.svg` é ícone que o front importa, e pular por
-          # engano deixa mudança sem validação, enquanto rodar à toa custa
-          # minutos.
+          # Nenhum `.md` é importado pelo código, então documentação não muda o
+          # que o build produz. A lista para aqui de propósito: `.svg` é ícone
+          # que o front importa, e pular por engano deixa mudança sem validação.
           relevant=$(printf '%s\n' "$changed" | grep -vE '\.md$' || true)
 
           if printf '%s\n' "$relevant" | grep -qE '^FateConnect/Web/'; then
@@ -80,9 +64,9 @@ jobs:
           cache: yarn
           cache-dependency-path: FateConnect/Web/yarn.lock
 
-      # `--ignore-scripts` porque instalar dependência não deve executar código:
-      # sem ele o `postinstall` de qualquer pacote da árvore roda no runner, com
-      # os segredos do job ao alcance.
+      # Instalar dependência não deve executar código: sem `--ignore-scripts` o
+      # `postinstall` de qualquer pacote da árvore roda com os segredos do job
+      # ao alcance.
       - name: Install dependencies
         if: steps.changes.outputs.web == 'true'
         run: yarn install --frozen-lockfile --ignore-scripts
@@ -96,13 +80,8 @@ jobs:
         run: yarn lint
 
       # Suíte inteira: os limites de cobertura são globais, então medi-los sobre
-      # um recorte reprovaria código saudável. O recorte por arquivo alterado
-      # fica no hook de pre-push, onde o objetivo é velocidade.
-      #
-      # Não há envio ao GitHub Code Quality: o recurso exige repositório de
-      # organização em plano Team ou Enterprise Cloud, e este é de conta pessoal
-      # — a API responde 404. Quem reprova por cobertura é o limite do Vitest,
-      # aplicado dentro do `test:ci`.
+      # um recorte reprovaria código saudável. Quem roda só o que mudou é o hook
+      # de pre-push, onde o objetivo é velocidade.
       - name: Tests and coverage
         if: steps.changes.outputs.web == 'true'
         run: yarn test:ci
@@ -111,19 +90,13 @@ jobs:
         if: steps.changes.outputs.web == 'true'
         run: yarn build
 
-      # Passo deste job, e não um job à parte, porque é este o check exigido
-      # pelo ruleset da develop: Sonar reprovado tem que impedir o merge, e um
-      # job separado só bloquearia se alguém o marcasse como obrigatório na
-      # configuração do repositório. Aqui a garantia é do próprio repositório.
+      # Passo deste job, e não um job à parte, porque é este o check que a
+      # ruleset exige: Sonar reprovado tem que impedir o merge sem depender de
+      # alguém marcar um segundo check como obrigatório.
       #
-      # Vem depois dos testes porque consome o lcov que eles produzem, e por
-      # último porque é o passo mais lento — o `sonar.qualitygate.wait` do
-      # sonar-project.properties espera o veredito do gate e é ele que faz este
-      # passo reprovar. Sem ele o scan publica o resultado e sai verde.
-      #
-      # Só o front é analisado: o scanner genérico não analisa C#, que exigiria
-      # o SonarScanner for .NET em volta do `dotnet build` e, por não poder
-      # dividir o mesmo projectKey, um projeto próprio no Sonar.
+      # Vem depois dos testes porque consome o lcov que eles produzem. Quem faz
+      # este passo reprovar é o `sonar.qualitygate.wait` do
+      # `sonar-project.properties`; sem ele o scan publica e sai verde.
       - name: Sonar
         if: steps.changes.outputs.web == 'true'
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0

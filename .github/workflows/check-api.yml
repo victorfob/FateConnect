@@ -1,19 +1,17 @@
 name: Check API
 
-# Irmão do `check-front.yml`, com a mesma estrutura e pelos mesmos motivos: o
-# recorte fica dentro do job para que o check sempre reporte, e o gatilho não
-# filtra branch de destino.
+# Como no `check-front.yml`, o recorte fica dentro do job: workflow que não
+# dispara deixa o check obrigatório `Pending` para sempre.
 on:
   pull_request
 
-# Grupo próprio: dividir com o check do front faria um cancelar o outro.
+# Grupo próprio: compartilhá-lo com o check do front faria um cancelar o outro.
 concurrency:
   group: check-api-${{ github.head_ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
-  # Para ler a lista de arquivos do PR e decidir o que rodar.
   pull-requests: read
 
 jobs:
@@ -23,15 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # Clone completo por causa do Sonar: sem histórico ele não sabe quem
-          # mudou o quê e perde a noção de código novo, que é o que o quality
-          # gate mede.
+          # Clone completo por causa do Sonar: sem histórico ele perde a noção
+          # de código novo, que é o que o quality gate mede.
           fetch-depth: 0
 
-      # Mesmo recorte do check do front, e pelo mesmo motivo: o checkout traz um
-      # commit só, então `git diff` contra a base não tem com o que comparar. O
-      # padrão não leva barra ao final para alcançar também o projeto de teste,
-      # que mora em `FateConnect.Api.Tests`, ao lado e não dentro.
       - name: Changed paths
         id: changes
         run: |
@@ -39,13 +32,13 @@ jobs:
 
           changed=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')
 
-          # Documentação fica fora da decisão: nenhum `.md` é importado pelo
-          # código, então mudar um não altera o que o build produz. A lista para
-          # aqui de propósito — `.svg` é ícone que o front importa, e pular por
-          # engano deixa mudança sem validação, enquanto rodar à toa custa
-          # minutos.
+          # Nenhum `.md` é importado pelo código, então documentação não muda o
+          # que o build produz. A lista para aqui de propósito: pular por engano
+          # deixa mudança sem validação.
           relevant=$(printf '%s\n' "$changed" | grep -vE '\.md$' || true)
 
+          # O padrão não leva barra ao final para alcançar também o projeto de
+          # teste, que mora em `FateConnect.Api.Tests`, ao lado e não dentro.
           if printf '%s\n' "$relevant" | grep -qE '^(FateConnect/FateConnect\.Api|global\.json)'; then
             echo 'api=true' >> "$GITHUB_OUTPUT"
             echo 'A mudança alcança a API — validando.'
@@ -63,9 +56,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      # O scanner roda na JVM, mesmo analisando C#. A versão vai declarada para
-      # que uma troca da imagem do runner não derrube a análise sem ninguém ter
-      # tocado nela.
+      # O scanner roda na JVM, mesmo analisando C#.
       - uses: actions/setup-java@v6
         if: steps.changes.outputs.api == 'true'
         with:
@@ -77,27 +68,18 @@ jobs:
         run: dotnet tool install --global dotnet-sonarscanner --version 11.2.1
 
       # C# não é analisado pela action que o front usa: o scanner de .NET precisa
-      # **envolver** o build, porque lê o que o compilador produz. Daí o par
-      # begin/end com a compilação no meio — e daí a análise ser um passo deste
-      # job, e não um job próprio, que teria de construir a solução de novo.
+      # envolver o build, porque lê o que o compilador produz. Daí o par
+      # begin/end com a compilação no meio.
       #
-      # O contexto do PR vai explícito. A action do front recebe isso pronto do
-      # GitHub; aqui quem chama é a linha de comando, e sem os três valores a
-      # análise viraria análise de branch — o gate mediria o repositório inteiro
-      # em vez do que o PR mudou.
+      # ⛔ O contexto do PR chega por `env`, e não interpolado dentro do `run`.
+      # Nome de branch é escolhido por quem abre o PR, e `${{ }}` no comando cola
+      # o texto dele no shell antes de o shell existir: uma branch chamada
+      # `x"; curl ... | sh; #` executa. Sem os três valores, a análise viraria
+      # análise de branch e mediria o repositório inteiro.
       #
-      # ⛔ Os valores chegam por `env`, e não interpolados dentro do `run`. Nome
-      # de branch é escolhido por quem abre o PR: `${{ }}` dentro do comando
-      # cola o texto dele no shell antes de o shell existir, e uma branch
-      # chamada `x"; curl ... | sh; #` executa. Por `env` o valor é dado, não
-      # código. É o mesmo motivo do `PR_NUMBER` no passo de recorte acima.
-      #
-      # `qualitygate.wait` é o que faz o passo reprovar: sem ele o scan publica
-      # o resultado no painel e sai verde. O gate deste projeto é o `Backend`,
-      # igual ao do front menos a condição de cobertura.
-      #
-      # O front fica de fora porque tem projeto e gate próprios: sem a exclusão
-      # o mesmo código seria medido duas vezes, e a segunda com o gate errado.
+      # `qualitygate.wait` é o que faz o passo reprovar; sem ele o scan publica e
+      # sai verde. A exclusão mantém o front fora: ele tem projeto e gate
+      # próprios, e seria medido duas vezes, a segunda com o gate errado.
       - name: Sonar begin
         if: steps.changes.outputs.api == 'true'
         run: >
@@ -118,25 +100,17 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
 
       # Aponta para a solução, e não para cada projeto, porque assim o projeto
-      # novo entra na esteira ao ser adicionado à solução — o mesmo gesto que o
-      # faz aparecer na IDE.
+      # novo entra na esteira ao ser adicionado à solução.
       - name: Build
         if: steps.changes.outputs.api == 'true'
         run: dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
 
-      # `--no-build` aproveita a compilação do passo acima. Sem ele o MSBuild
-      # roda de novo e um erro de compilação chegaria disfarçado de falha de
-      # teste, no passo errado.
-      #
       # A suíte sobe a própria aplicação com banco em memória, então não há
       # Postgres a provisionar aqui.
       - name: Tests
         if: steps.changes.outputs.api == 'true'
         run: dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build
 
-      # Falha na compilação ou na suíte encerra o job antes daqui, e então nada
-      # é publicado no Sonar — o que é o certo: análise de árvore quebrada não
-      # descreve nada.
       - name: Sonar end
         if: steps.changes.outputs.api == 'true'
         run: dotnet sonarscanner end /d:sonar.token=$SONAR_TOKEN
