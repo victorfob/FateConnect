@@ -3,7 +3,6 @@ import { AccessTimeIcon, CalendarTodayIcon, GroupsIcon } from '@design-system/ic
 import { format, parseISO } from 'date-fns';
 
 import * as C from '@app/pages/Rides/constants';
-import { isOwnRide, RIDE_DRIVER } from '@app/pages/Rides/helpers/rideDriver';
 import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
 import type { Ride } from '@app/services/rides/types';
 import { firstCharacters } from '@app/utils/sequence';
@@ -26,7 +25,7 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
   const tone = rideTypeTone(ride.rideType);
 
   return (
-    <ListCard own={isOwnRide(RIDE_DRIVER)} ownLabel={C.OWN_RIDE_LABEL}>
+    <ListCard own={ride.isOwner} ownLabel={C.OWN_RIDE_LABEL}>
       <ListCard.Header>
         <Typography variant="subtitleBold">{ride.destination}</Typography>
 
@@ -34,7 +33,7 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
           <StatusTag tone={tone}>{typeLabel}</StatusTag>
 
           <ListCard.ActionButtons>
-            <RideDriverContact destination={ride.destination} />
+            <RideDriverContact ride={ride} />
 
             <RideOwnerActions ride={ride} onEdit={onEdit} onDelete={onDelete} />
           </ListCard.ActionButtons>

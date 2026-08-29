@@ -3,6 +3,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
+import { tokenWithName } from '@app/test/token';
 
 import { MainLayout } from '.';
 
@@ -46,13 +47,13 @@ describe('MainLayout', () => {
   });
 
   it('should show the initials of the logged user', () => {
-    tokenStorage.save('token-de-teste', 'Maria da Silva');
+    tokenStorage.save(tokenWithName('Maria da Silva'));
     renderLayout();
 
     expect(screen.getByRole('img', { name: 'Maria da Silva' })).toHaveTextContent('MS');
   });
 
-  it('should not show the avatar when no name is stored', () => {
+  it('should not show the avatar when no name comes in the token', () => {
     renderLayout();
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();

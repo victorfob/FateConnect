@@ -20,7 +20,7 @@ describe('authService', () => {
   });
 
   it('should clear the session on logout', () => {
-    tokenStorage.save('abc', 'Fulano');
+    tokenStorage.save('abc');
 
     logout();
 

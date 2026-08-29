@@ -6,7 +6,7 @@ const AUTH_PATH = '/auth';
 
 export async function login(payload: LoginRequest): Promise<TokenResponse> {
   const { data } = await apiClient.post<TokenResponse>(`${AUTH_PATH}/login`, payload);
-  tokenStorage.save(data.token, data.nomeCompleto);
+  tokenStorage.save(data.token);
 
   return data;
 }

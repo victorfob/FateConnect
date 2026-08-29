@@ -1,12 +1,12 @@
 import { ContactButton } from '@app/components/ContactButton';
-import { isOwnRide, RIDE_DRIVER } from '@app/pages/Rides/helpers/rideDriver';
+import type { Ride } from '@app/services/rides/types';
 
 import { contactMessage } from './constants';
 
-type RideDriverContactProps = Readonly<{ destination: string }>;
+type RideDriverContactProps = Readonly<{ ride: Ride }>;
 
-export function RideDriverContact({ destination }: RideDriverContactProps) {
-  if (isOwnRide(RIDE_DRIVER)) return null;
+export function RideDriverContact({ ride }: RideDriverContactProps) {
+  if (ride.isOwner) return null;
 
-  return <ContactButton contact={RIDE_DRIVER} message={contactMessage(destination)} />;
+  return <ContactButton contact={ride.driver} message={contactMessage(ride.destination)} />;
 }

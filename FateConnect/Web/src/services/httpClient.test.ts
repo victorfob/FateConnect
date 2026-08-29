@@ -16,7 +16,7 @@ describe('httpClient', () => {
         return HttpResponse.json({ ok: true });
       }),
     );
-    tokenStorage.save('token-123', 'Fulano');
+    tokenStorage.save('token-123');
 
     await apiClient.get('/ping');
 

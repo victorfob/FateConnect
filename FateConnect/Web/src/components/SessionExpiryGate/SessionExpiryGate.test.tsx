@@ -23,7 +23,7 @@ describe('SessionExpiryGate', () => {
   afterEach(() => tokenStorage.clear());
 
   it('should show the expired session screen when a request with a token is refused', async () => {
-    tokenStorage.save('token-vencido', 'Fulano');
+    tokenStorage.save('token-vencido');
     server.use(http.get(RIDES_URL, () => new HttpResponse(null, { status: 401 })));
 
     renderRides();
@@ -32,14 +32,13 @@ describe('SessionExpiryGate', () => {
   });
 
   it('should clear the stored session so the next request goes out without a token', async () => {
-    tokenStorage.save('token-vencido', 'Fulano');
+    tokenStorage.save('token-vencido');
     server.use(http.get(RIDES_URL, () => new HttpResponse(null, { status: 401 })));
 
     renderRides();
     await screen.findByRole('heading', { name: SESSION_EXPIRED_TITLE });
 
     expect(tokenStorage.getToken()).toBeNull();
-    expect(tokenStorage.getUserName()).toBeNull();
   });
 
   // Sem token não houve sessão: é credencial recusada, que o login trata sozinho.

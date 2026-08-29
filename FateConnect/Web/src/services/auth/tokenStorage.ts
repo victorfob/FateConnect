@@ -1,5 +1,4 @@
 const TOKEN_KEY = 'jwt_token';
-const USER_NAME_KEY = 'user_name';
 
 /**
  * Único ponto que fala com o armazenamento do navegador. Concentrar aqui evita
@@ -10,17 +9,11 @@ export const tokenStorage = {
     return window.localStorage.getItem(TOKEN_KEY);
   },
 
-  getUserName(): string | null {
-    return window.localStorage.getItem(USER_NAME_KEY);
-  },
-
-  save(token: string, userName: string): void {
+  save(token: string): void {
     window.localStorage.setItem(TOKEN_KEY, token);
-    window.localStorage.setItem(USER_NAME_KEY, userName);
   },
 
   clear(): void {
     window.localStorage.removeItem(TOKEN_KEY);
-    window.localStorage.removeItem(USER_NAME_KEY);
   },
 };
