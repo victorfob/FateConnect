@@ -38,8 +38,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # Mesmo motivo do `check.yml`: sem histórico completo o Sonar não sabe
-          # quem mudou o quê e perde a noção de código novo.
+          # Mesmo motivo do `check-front.yml`: sem histórico completo o Sonar não
+          # sabe quem mudou o quê e perde a noção de código novo.
           fetch-depth: 0
 
       - uses: actions/setup-node@v5
