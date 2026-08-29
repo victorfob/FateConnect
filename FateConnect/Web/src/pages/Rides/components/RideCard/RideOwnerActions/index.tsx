@@ -3,7 +3,6 @@ import { IconButton } from '@design-system';
 import { EditIcon } from '@design-system/icons';
 
 import { RIDE_CARD_LABELS } from '@app/pages/Rides/constants';
-import { isOwnRide, RIDE_DRIVER } from '@app/pages/Rides/helpers/rideDriver';
 import type { Ride } from '@app/services/rides/types';
 
 import { RideDeleteConfirmation } from '../RideDeleteConfirmation';
@@ -16,13 +15,13 @@ type RideOwnerActionsProps = Readonly<{
 
 /**
  * Editar e excluir só existem para quem ofertou a carona. Esconder o botão é
- * conveniência, não regra: quem impede de verdade é a API, e ela ainda não sabe
- * de quem é a carona.
+ * conveniência, não regra: quem impede de verdade é a API, que responde 403 a
+ * quem tenta mudar carona alheia.
  */
 export function RideOwnerActions({ ride, onEdit, onDelete }: RideOwnerActionsProps) {
   const handleEdit = useCallback(() => onEdit(ride), [onEdit, ride]);
 
-  if (!isOwnRide(RIDE_DRIVER)) return null;
+  if (!ride.isOwner) return null;
 
   return (
     <>

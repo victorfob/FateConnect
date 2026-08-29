@@ -4,8 +4,7 @@ import { http, HttpResponse } from 'msw';
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
-import { tokenStorage } from '@app/services/auth/tokenStorage';
-import { RideTypeEnum, type Ride } from '@app/services/rides/types';
+import { RideTypeEnum, type Ride, type RideDriver } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
@@ -15,7 +14,6 @@ import {
   FILTER_SUBMIT_LABEL,
 } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
-import { RIDE_DRIVER } from './helpers/rideDriver';
 import * as C from './constants';
 import { Rides } from '.';
 
@@ -23,6 +21,12 @@ const RIDES_URL = 'https://api.fateconnect.test/Rides';
 
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
 const RETRY_WINDOW_MS = 5000;
+
+const DRIVER: RideDriver = {
+  name: 'Ana Ofertante',
+  email: 'ana@example.com',
+  phone: '(15) 90000-0000',
+};
 
 const RIDE: Ride = {
   id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
@@ -33,7 +37,12 @@ const RIDE: Ride = {
   createdAt: '2026-05-01T00:00:00',
   rideType: RideTypeEnum.SOLIDARITY,
   description: 'Saída do centro, com parada no terminal.',
+  driver: DRIVER,
+  isOwner: false,
 };
+
+/** A posse vem calculada pela API; o cartão só a lê. */
+const OWN_RIDE: Ride = { ...RIDE, isOwner: true };
 
 function listReturning(rides: Ride[], onRequest?: (url: URL) => void) {
   server.use(
@@ -43,11 +52,6 @@ function listReturning(rides: Ride[], onRequest?: (url: URL) => void) {
       return HttpResponse.json(rides);
     }),
   );
-}
-
-/** Editar e excluir só existem para quem ofertou; os casos deles partem daqui. */
-function loggedAsTheDriver() {
-  tokenStorage.save('token', RIDE_DRIVER.name);
 }
 
 function renderComponent() {
@@ -204,8 +208,7 @@ describe('Rides', () => {
   });
 
   it('should ask for confirmation before deleting and keep the ride when it is refused', async () => {
-    listReturning([RIDE]);
-    loggedAsTheDriver();
+    listReturning([OWN_RIDE]);
     renderComponent();
     await screen.findByText(RIDE.destination);
 
@@ -224,10 +227,9 @@ describe('Rides', () => {
   });
 
   it('should delete the ride once the removal is confirmed', async () => {
-    loggedAsTheDriver();
     let deleted = false;
     server.use(
-      http.get(RIDES_URL, () => HttpResponse.json(deleted ? [] : [RIDE])),
+      http.get(RIDES_URL, () => HttpResponse.json(deleted ? [] : [OWN_RIDE])),
       http.delete(`${RIDES_URL}/:rideId`, () => {
         deleted = true;
 
@@ -246,8 +248,7 @@ describe('Rides', () => {
   });
 
   it('should report a failure to delete', async () => {
-    listReturning([RIDE]);
-    loggedAsTheDriver();
+    listReturning([OWN_RIDE]);
     server.use(http.delete(`${RIDES_URL}/:rideId`, () => new HttpResponse(null, { status: 500 })));
     renderComponent();
     await screen.findByText(RIDE.destination);
@@ -267,8 +268,8 @@ describe('Rides', () => {
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
 
     const dialog = within(await screen.findByRole('dialog'));
-    expect(dialog.getByText(RIDE_DRIVER.name)).toBeInTheDocument();
-    expect(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` })).toBeInTheDocument();
+    expect(dialog.getByText(DRIVER.name)).toBeInTheDocument();
+    expect(dialog.getByRole('button', { name: `Copiar ${DRIVER.email}` })).toBeInTheDocument();
   });
 
   it('should copy the email and say so', async () => {
@@ -278,10 +279,10 @@ describe('Rides', () => {
 
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
     const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` }));
+    await userEvent.click(dialog.getByRole('button', { name: `Copiar ${DRIVER.email}` }));
 
     expect(await screen.findByText(CONTACT_DIALOG.emailCopied)).toBeInTheDocument();
-    expect(clipboardWrite).toHaveBeenCalledWith(RIDE_DRIVER.email);
+    expect(clipboardWrite).toHaveBeenCalledWith(DRIVER.email);
   });
 
   it('should report a refused copy instead of claiming success', async () => {
@@ -293,7 +294,7 @@ describe('Rides', () => {
 
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
     const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: `Copiar ${RIDE_DRIVER.email}` }));
+    await userEvent.click(dialog.getByRole('button', { name: `Copiar ${DRIVER.email}` }));
 
     expect(await screen.findByText(CONTACT_DIALOG.emailCopyFailed)).toBeInTheDocument();
   });
@@ -306,7 +307,7 @@ describe('Rides', () => {
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
 
     const dialog = within(await screen.findByRole('dialog'));
-    const conversation = dialog.getByRole('link', { name: RIDE_DRIVER.phone });
+    const conversation = dialog.getByRole('link', { name: DRIVER.phone });
 
     expect(conversation).toHaveAttribute(
       'href',
@@ -332,8 +333,7 @@ describe('Rides', () => {
   });
 
   it('should not offer contact on a ride offered by the logged user', async () => {
-    tokenStorage.save('token', RIDE_DRIVER.name);
-    listReturning([RIDE]);
+    listReturning([OWN_RIDE]);
     renderComponent();
     await screen.findByText(RIDE.destination);
 
@@ -353,8 +353,7 @@ describe('Rides', () => {
   });
 
   it('should announce the ride of the logged user, which the border stripe only shows', async () => {
-    tokenStorage.save('token', RIDE_DRIVER.name);
-    listReturning([RIDE]);
+    listReturning([OWN_RIDE]);
     renderComponent();
     await screen.findByText(RIDE.destination);
 
@@ -370,8 +369,7 @@ describe('Rides', () => {
   });
 
   it('should open the edit dialog filled with the ride, without lighting the offer tab', async () => {
-    listReturning([RIDE]);
-    loggedAsTheDriver();
+    listReturning([OWN_RIDE]);
     renderComponent();
     await screen.findByText(RIDE.destination);
 
