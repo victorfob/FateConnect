@@ -1,11 +1,25 @@
 ---
-description: Como escrever teste na API .NET — projeto separado, nome em três partes, sem lógica e sem comentário, e o par positivo que impede a suíte de concordar com o defeito
+description: Os 90% de cobertura que escrevemos aqui — acima do gate de 33% de propósito — e como escrever teste na API .NET — projeto separado, nome em três partes, sem lógica e sem comentário, e o par positivo que impede a suíte de concordar com o defeito
 paths:
   - "FateConnect/FateConnect.Api/**"
   - "FateConnect/FateConnect.Api.Tests/**"
 ---
 
 # Teste na API .NET
+
+## Cobertura de 90% no que escrevemos aqui
+
+⛔ **Código novo escrito nesta sessão nasce com pelo menos 90% de cobertura**, o mesmo piso do front. Não é o número que o portão cobra — é o que a gente entrega.
+
+⚠️ **O gate `Backend` no SonarCloud reprova em 33%, e isso é de propósito.** Aquele é o piso do repositório, para quem escreve à mão sem agente ao lado; escrever teste tem um custo diferente para cada um. Os 90% são o nosso, e ficam **acima** do portão de propósito.
+
+⛔ **A consequência prática: gate verde não é entrega pronta.** Cobertura de código novo em 40% passa no portão e **não** cumpre esta regra. Calibrar pelo que o Sonar aceita é o erro que esta seção existe para impedir.
+
+O relatório sai do `dotnet test` em formato **OpenCover** (`--collect:"XPlat Code Coverage;Format=opencover"`); o Sonar **não lê Cobertura para C#**, que é o padrão do `dotnet test`. Migrations e `obj/` ficam de fora da conta.
+
+**Linha que não dá para cobrir se marca, não se ignora.** Construtor privado que existe só para impedir instanciação nunca é chamado: `[ExcludeFromCodeCoverage]` nele tira a linha do denominador e diz por quê. Baixar o alvo, não.
+
+⚠️ **Cobertura baixa costuma acusar teste que falta, não métrica injusta.** Na primeira medição o PR saiu com 25%: as propriedades de um DTO sem nenhum teste que criasse o recurso, e a linha do middleware de erro sem nenhum teste que disparasse exceção tratada. Um teste que criava carona com vagas fora da faixa cobriu as duas — e ainda passou a garantir a mensagem de erro, que nada verificava.
 
 ## O teste mora em projeto separado
 
