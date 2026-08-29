@@ -54,7 +54,19 @@ echo "==> Conferindo a configuração antes de recarregar"
 nginx -t
 systemctl reload nginx
 
+# O passo acima sobrescreve o arquivo inteiro, e o template só descreve a porta
+# 80 — então o bloco 443 que o certbot escreveu some a cada execução. Reaplicar
+# não reemite certificado: só devolve o TLS ao arquivo recém-gerado.
+if [ -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+  echo "==> Devolvendo o HTTPS à configuração recém-gerada"
+  certbot install --nginx --cert-name "$DOMAIN"
+  nginx -t
+  systemctl reload nginx
+fi
+
 echo
 echo "Pronto: $DOMAIN servido a partir de $TARGET"
-echo "Para ligar o HTTPS depois que o domínio estiver respondendo:"
-echo "  sudo certbot --nginx -d $DOMAIN"
+if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+  echo "Para ligar o HTTPS depois que o domínio estiver respondendo:"
+  echo "  sudo certbot --nginx -d $DOMAIN"
+fi
