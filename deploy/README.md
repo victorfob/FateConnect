@@ -136,6 +136,12 @@ sudo certbot --nginx -d hml.fateconnect.com.br
 O certbot edita a configuração do nginx sozinho e instala um agendamento de
 renovação. Confira com `systemctl list-timers | grep certbot`.
 
+⚠️ **O bloco 443 que ele escreve fica dentro do arquivo que o `install-site.sh`
+gera.** Rodar o script de novo sobrescreveria o arquivo inteiro e derrubaria o
+HTTPS — por isso ele reaplica o TLS sozinho quando já existe certificado para o
+domínio. Se a HTTPS sumir depois de um `install-site.sh`, foi isso, e
+`sudo certbot --nginx -d <domínio>` devolve.
+
 Depois troque `PUBLIC_URL` para `https://` nos dois `.env` e **reconstrua o
 front** — o endereço da API fica gravado dentro do bundle, então reiniciar não
 basta:
@@ -199,30 +205,28 @@ cat ~/.ssh/github-actions.pub >> ~/.ssh/authorized_keys
 O conteúdo de `~/.ssh/github-actions` (sem o `.pub`) vai no secret
 `DEPLOY_SSH_KEY`. Ele nunca deve ser colado em conversa, chamado ou commit.
 
-## Atualizar o código da VPS
+## Como o código chega na VPS
 
-⛔ **A pipeline não faz isso.** Ela envia o `dist/` do front por `rsync` e roda o
-`deploy.sh` que **já está na VPS** — nunca um `git pull`. Tudo o que vem do
-repositório continua no commit do último `pull` manual: o `docker-compose.yml`,
-os scripts daqui, o template do nginx e o **código da API**, que o compose
-constrói de `../FateConnect/FateConnect.Api`.
+O `deploy.sh` se atualiza antes de qualquer outra coisa: `fetch`, `checkout` da
+branch daquele ambiente — `develop` para `hml`, `main` para `prod` —,
+`pull --ff-only`, e então **se re-executa** na versão recém-baixada. Não existe
+`git pull` manual.
 
-```bash
-cd ~/FateConnect && git pull
-```
+O checkout é **um só** para os dois ambientes, então publicar troca a branch
+dele. É daí que vem o comportamento que mais surpreende: **produção continua no
+mundo da última release** mesmo com a `develop` bem à frente, porque o
+`deploy.sh prod` volta para a `main` antes de construir. O contêiner da API é
+construído desse mesmo checkout, então ele segue a branch do ambiente.
 
-Sem isso, uma mudança em `deploy/` ou na API entra no repositório e não chega ao
-ar — e a publicação seguinte roda a versão antiga sem acusar nada.
-
-⚠️ **Mudou o template do nginx?** O `deploy.sh` não toca no nginx. Depois do
-`pull`, rode `sudo ./install-site.sh <ambiente>` para regenerar a configuração,
-uma vez por ambiente.
+⚠️ **O que o deploy não faz é mexer no nginx.** Mudou `nginx/site.conf.template`?
+Rode `sudo ./install-site.sh <ambiente>`, uma vez por ambiente — é o único passo
+manual de uma publicação. Ele reaplica o HTTPS sozinho quando já existe
+certificado para o domínio.
 
 ## Dia a dia
 
 | O que você quer | Comando |
 | --- | --- |
-| Atualizar o código da VPS | `cd ~/FateConnect && git pull` |
 | Publicar a `develop` | `./build-front.sh hml && ./deploy.sh hml` |
 | Publicar uma release | `./build-front.sh prod && ./deploy.sh prod` |
 | Ver o que está de pé | `docker compose -p fateconnect-prod ps` |
