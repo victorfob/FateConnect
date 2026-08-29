@@ -5,6 +5,8 @@ import perfectionist from 'eslint-plugin-perfectionist';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import sonarjs from 'eslint-plugin-sonarjs';
+import unicorn from 'eslint-plugin-unicorn';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -98,6 +100,38 @@ export default defineConfig([
   { ignores: ['dist', 'coverage'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  // As mesmas regras que o Sonar aplica no PR. Sem elas o gate local aprova
+  // código que a análise reprova depois, com o PR já aberto.
+  sonarjs.configs.recommended,
+  {
+    // `TODO` é convenção daqui: o padrão exige a issue que o resolve ao lado,
+    // então ele é rastreio, não dívida esquecida.
+    rules: { 'sonarjs/todo-tag': 'off' },
+  },
+  {
+    // Componente React devolve `null` ou nós conforme o estado — a regra lê isso
+    // como retorno inconsistente, e obedecê-la pioraria o código.
+    files: ['**/*.tsx'],
+    rules: { 'sonarjs/function-return-type': 'off' },
+  },
+  {
+    // Senha de fixture não é segredo: ela existe para o formulário ter o que
+    // validar. Segredo de verdade não entra no repositório, versionado ou não.
+    files: ['**/*.test.{ts,tsx}'],
+    rules: { 'sonarjs/no-hardcoded-passwords': 'off' },
+  },
+  {
+    files: ['**/*.{js,ts,tsx}'],
+    plugins: { unicorn },
+    // Só estas duas do `unicorn`, porque são as que o Sonar toma emprestadas
+    // (`S7758` e `S7781`). A configuração recomendada dele traria 745 violações
+    // de opinião de estilo que este repo contraria de propósito — nome de
+    // arquivo em PascalCase e `null` no contrato da API, entre outras.
+    rules: {
+      'unicorn/prefer-code-point': 'error',
+      'unicorn/prefer-string-replace-all': 'error',
+    },
+  },
   {
     files: ['**/*.{js,ts,tsx}'],
     languageOptions: {
@@ -300,7 +334,6 @@ export default defineConfig([
       '@typescript-eslint/no-magic-numbers': [
         'error',
         {
-          ignore: [0, 1, -1],
           ignoreArrayIndexes: true,
           ignoreDefaultValues: true,
           ignoreEnums: true,

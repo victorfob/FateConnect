@@ -59,6 +59,8 @@ Dois aliases: `@design-system` para a UI (com `@design-system/icons` para ícone
 
 O lint aplica as principais; as demais estão nas regras do projeto.
 
+Ele carrega também as regras do Sonar — `eslint-plugin-sonarjs` e duas do `eslint-plugin-unicorn` que a análise toma emprestadas. Sem elas, esses achados só apareceriam depois, com o PR já aberto.
+
 ### Design system é a única porta
 
 A aplicação importa UI **somente** de `@design-system` — nunca de `@mui/*`, nunca de um caminho interno do design system. Precisa de um componente que o barrel não expõe? Adicione ao barrel.
