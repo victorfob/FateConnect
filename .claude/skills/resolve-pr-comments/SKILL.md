@@ -51,6 +51,13 @@ De `FateConnect/Web`, com o Node do `.nvmrc`:
 ./node_modules/.bin/vitest run <caminho afetado>
 ```
 
+Mexeu na API, da raiz do repositório:
+
+```bash
+dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
+dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build
+```
+
 Erro reprova; warning se ignora. Não reporte como pronto com erro de pé.
 
 ## 6. Commit — peça confirmação antes

@@ -7,7 +7,7 @@ paths:
 
 # Qualidade do C# — o analisador roda no build
 
-Os dois projetos referenciam o `SonarAnalyzer.CSharp`, então as regras que o Sonar aplica no PR rodam também no `dotnet build`, na sua máquina e no CI.
+Os dois projetos referenciam o `SonarAnalyzer.CSharp`, então as regras que o Sonar aplica no PR rodam também no `dotnet build`, na sua máquina e no CI. Na sua máquina isso acontece sem você pedir: o `pre-commit` roda essa build quando o commit toca a API.
 
 ⛔ **Elas reprovam a compilação, não avisam.** O `.csproj` liga `TreatWarningsAsErrors`, e o que o analisador aponta vira **erro**. Build quebrado por `S6964` não é infraestrutura com defeito: é achado esperando correção.
 

@@ -11,7 +11,7 @@ FateConnect/
   FateConnect.Api.Tests/  suíte xUnit da API, pasta irmã e não filha
 .claude/                  contexto que um agente de código carrega ao trabalhar aqui
 .github/workflows/        validação de PR e criação da tag de release
-.githooks/                hooks locais de lint e teste
+.githooks/                hooks locais de lint, build e teste
 deploy/                   publicação em homologação e produção → deploy/README.md
 scripts/                  scripts de manutenção do repositório
 ESII/  ESIII/  LBD/       documentos das disciplinas, versionados por entrega
