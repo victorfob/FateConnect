@@ -60,8 +60,8 @@ jobs:
   # os dois ambientes subam pelo mesmo caminho. As variáveis e os segredos vêm
   # do ambiente `prod` do GitHub.
   #
-  # Independente do job da tag, como o back-merge: falha ao criar a tag não tem
-  # por que impedir a publicação, e vice-versa.
+  # Independente do job da tag: falha ao criar a tag não tem por que impedir a
+  # publicação, e vice-versa.
   publish:
     name: Publish to production
     uses: ./.github/workflows/publish.yml
@@ -69,13 +69,22 @@ jobs:
       environment: prod
     secrets: inherit
 
-  # Independente do job da tag de propósito. A release entra pela main, mas o
-  # trabalho continua na develop: sem trazer o merge de volta, a próxima release
-  # nasce de uma base que não conhece a anterior, e o primeiro PR depois dela já
-  # vem com conflito de changelog e versão. Falha em um dos dois jobs não tem por
-  # que impedir o outro — os dois são corrigíveis à mão.
+  # A release entra pela main, mas o trabalho continua na develop: sem trazer o
+  # merge de volta, a próxima release nasce de uma base que não conhece a
+  # anterior, e o primeiro PR depois dela já vem com conflito de changelog e
+  # versão.
+  #
+  # Espera a publicação porque o push que ele faz na develop dispara a de
+  # homologação, e as duas usam o mesmo checkout na VPS. Quem impede o atropelo é
+  # a trava do `deploy.sh`; esperar aqui evita que a de homologação comece só
+  # para ficar parada nela. Publicação que falha não perde o back-merge: a
+  # correção entra na main, e esse push refaz este workflow inteiro.
+  #
+  # A tag continua independente — falha ao criar tag é corrigível à mão e não
+  # tem por que segurar a develop.
   back-merge:
     name: Sync develop with main
+    needs: publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
