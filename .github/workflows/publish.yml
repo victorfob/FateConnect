@@ -55,8 +55,7 @@ jobs:
         run: yarn build
         working-directory: FateConnect/Web
         env:
-          VITE_API_URL: ${{ vars.PUBLIC_URL }}/api/conta
-          VITE_RIDE_API_URL: ${{ vars.PUBLIC_URL }}/api/carona
+          VITE_API_URL: ${{ vars.PUBLIC_URL }}/api
           VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
@@ -98,11 +97,11 @@ jobs:
             "docker ps --filter 'name=fateconnect-${{ inputs.environment }}' --filter 'status=running' --format '{{.Names}}'" \
             > containers.txt
           echo 'No ar:'; cat containers.txt
-          # Um ambiente são dois contêineres, as duas APIs. O banco e o servidor
-          # web são os do próprio host, e não aparecem aqui.
+          # Um ambiente é um contêiner, o da API. O banco e o servidor web são
+          # os do próprio host, e não aparecem aqui.
           total=$(grep -c . containers.txt || true)
-          if [ "$total" -lt 2 ]; then
-            echo "ERRO: só $total contêiner(es) de pé; esperado 2." >&2
+          if [ "$total" -lt 1 ]; then
+            echo "ERRO: nenhum contêiner de pé; esperado 1." >&2
             exit 1
           fi
 
