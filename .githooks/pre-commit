@@ -18,4 +18,25 @@ if [[ ! -d "$WEB/node_modules" ]]; then
 fi
 
 cd "$WEB"
+
+NVM_SH="${NVM_DIR:-$HOME/.nvm}/nvm.sh"
+if [[ -s "$NVM_SH" ]]; then
+  # `nvm.sh` não sobrevive a `set -eu`.
+  set +eu
+  # shellcheck source=/dev/null
+  . "$NVM_SH"
+  nvm use >/dev/null
+  set -eu
+fi
+
+MIN_NODE_MAJOR=22
+NODE_VERSION="$(node -v 2>/dev/null || true)"
+NODE_MAJOR="${NODE_VERSION#v}"
+NODE_MAJOR="${NODE_MAJOR%%.*}"
+
+if (( ${NODE_MAJOR:-0} < MIN_NODE_MAJOR )); then
+  echo "pre-commit: o ESLint precisa do Node $MIN_NODE_MAJOR ou maior; o ativo é ${NODE_VERSION:-nenhum} — rode 'nvm use' em FateConnect/Web" >&2
+  exit 1
+fi
+
 npx --no-install lint-staged
