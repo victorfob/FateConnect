@@ -65,7 +65,7 @@ A validação consulta as tags no **remoto**. Consultar localmente aprovaria qua
 | `sonar-main.yml`  | push na `main`                                | analisa a `main` dos dois projetos, linha de base do código novo de cada PR |
 | `publish.yml`     | chamado pelos dois de publicação              | constrói o front e sobe um ambiente — os passos que homologação e produção compartilham |
 
-Os dois checks disparam em todo PR, e cada um decide se tem o que fazer olhando os arquivos alterados: PR que só mexe no back-end não paga a suíte de front, nem o contrário. O `package.json` da raiz entra no filtro do front por causa da validação de versão — mudança de versão não pode escapar dela. Os dois são exigidos para mergear.
+Os dois checks disparam em todo PR, e cada um decide se tem o que fazer olhando os arquivos alterados: PR que só mexe no back-end não paga a suíte de front, nem o contrário. O `package.json` da raiz entra no filtro do front por causa da validação de versão — mudança de versão não pode escapar dela. Mudança só de documentação não roda nem uma suíte nem outra: nenhum `.md` é importado pelo código, então não há o que validar. Os dois são exigidos para mergear, e um check que não teve o que fazer reporta verde do mesmo jeito.
 
 São dois workflows, e não dois jobs num só, para que cada lado tenha o seu arquivo. Cada um leva grupo de concorrência próprio: compartilhá-lo faria um cancelar o outro, já que execução nova na mesma branch cancela a anterior.
 

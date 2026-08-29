@@ -57,7 +57,14 @@ jobs:
 
           changed=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')
 
-          if printf '%s\n' "$changed" | grep -qE '^(FateConnect/Web/|package\.json$)'; then
+          # Documentação fica fora da decisão: nenhum `.md` é importado pelo
+          # código, então mudar um não altera o que o build produz. A lista para
+          # aqui de propósito — `.svg` é ícone que o front importa, e pular por
+          # engano deixa mudança sem validação, enquanto rodar à toa custa
+          # minutos.
+          relevant=$(printf '%s\n' "$changed" | grep -vE '\.md$' || true)
+
+          if printf '%s\n' "$relevant" | grep -qE '^(FateConnect/Web/|package\.json$)'; then
             echo 'web=true' >> "$GITHUB_OUTPUT"
             echo 'A mudança alcança o front ou a versão do projeto — validando.'
             exit 0
