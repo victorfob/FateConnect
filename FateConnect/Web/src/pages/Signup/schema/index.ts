@@ -5,6 +5,7 @@ import { onlyDigits } from '@app/utils/masks/caret';
 
 import { EARLIEST_BIRTH_DATE, latestBirthDate, parseBirthDate } from '../helpers/birthDate';
 
+const REQUIRED_MIN_LENGTH = 1;
 const MIN_PASSWORD_LENGTH = 8;
 const MIN_PHONE_DIGITS = 10;
 const ZIP_CODE_DIGITS = 8;
@@ -35,7 +36,7 @@ export const SIGNUP_MESSAGES = {
 
 /** Data real e não anterior ao piso do seletor. */
 function isRealBirthDate(value: string): boolean {
-  if (value.length === 0) return true;
+  if (value === '') return true;
 
   const parsed = parseBirthDate(value);
   if (!parsed) return false;
@@ -56,44 +57,44 @@ function isCompleteZipCode(value: string): boolean {
 
 function hasBrazilianPhoneLength(value: string): boolean {
   const digits = onlyDigits(value);
-  if (digits.length === 0) return true;
+  if (digits === '') return true;
 
   return digits.length >= MIN_PHONE_DIGITS && digits.length <= MAX_PHONE_DIGITS;
 }
 
 export const signupSchema = z.object({
-  fullName: z.string().min(1, SIGNUP_MESSAGES.fullNameRequired),
+  fullName: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.fullNameRequired),
   nickname: z.string(),
   fatecEmail: z
     .string()
-    .min(1, SIGNUP_MESSAGES.fatecEmailRequired)
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.fatecEmailRequired)
     .regex(FATEC_EMAIL_PATTERN, FATEC_EMAIL_MESSAGE),
   birthDate: z
     .string()
-    .min(1, SIGNUP_MESSAGES.birthDateRequired)
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.birthDateRequired)
     .refine(isRealBirthDate, SIGNUP_MESSAGES.birthDateInvalid)
     .refine(isOldEnough, SIGNUP_MESSAGES.birthDateUnderage),
-  gender: z.string().min(1, SIGNUP_MESSAGES.genderRequired),
+  gender: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.genderRequired),
   password: z
     .string()
-    .min(1, SIGNUP_MESSAGES.passwordRequired)
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.passwordRequired)
     .min(MIN_PASSWORD_LENGTH, SIGNUP_MESSAGES.passwordTooShort),
   zipCode: z
     .string()
-    .min(1, SIGNUP_MESSAGES.zipCodeRequired)
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.zipCodeRequired)
     .refine(isCompleteZipCode, SIGNUP_MESSAGES.zipCodeIncomplete),
-  state: z.string().min(1, SIGNUP_MESSAGES.stateRequired),
-  city: z.string().min(1, SIGNUP_MESSAGES.cityRequired),
-  street: z.string().min(1, SIGNUP_MESSAGES.streetRequired),
-  streetNumber: z.string().min(1, SIGNUP_MESSAGES.streetNumberRequired),
+  state: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.stateRequired),
+  city: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.cityRequired),
+  street: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.streetRequired),
+  streetNumber: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.streetNumberRequired),
   complement: z.string(),
   phone: z
     .string()
-    .min(1, SIGNUP_MESSAGES.phoneRequired)
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.phoneRequired)
     .refine(hasBrazilianPhoneLength, SIGNUP_MESSAGES.phoneInvalid),
   contactEmail: z
     .string()
-    .min(1, SIGNUP_MESSAGES.contactEmailRequired)
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.contactEmailRequired)
     .pipe(z.email(SIGNUP_MESSAGES.emailInvalid)),
   acceptTerms: z.boolean().refine((accepted) => accepted, SIGNUP_MESSAGES.termsRequired),
   acceptMarketing: z.boolean(),

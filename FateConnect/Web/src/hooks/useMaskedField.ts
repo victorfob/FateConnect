@@ -2,6 +2,7 @@ import { useCallback, type ChangeEvent } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
 import { caretAfterDigitCount, countDigits } from '@app/utils/masks/caret';
+import { firstCharacters } from '@app/utils/sequence';
 
 type MaskFunction = (value: string) => string;
 
@@ -26,7 +27,7 @@ export function useMaskedField<Field extends UseFormRegisterReturn>(
 
       if (maskedValue !== input.value) {
         const caretIndex = input.selectionStart ?? input.value.length;
-        const digitsBeforeCaret = countDigits(input.value.slice(0, caretIndex));
+        const digitsBeforeCaret = countDigits(firstCharacters(input.value, caretIndex));
 
         input.value = maskedValue;
 

@@ -8,6 +8,7 @@ import * as C from './constants';
 
 /** Células por linha no desktop: quatro campos e o botão cabem em uma. */
 const FILTER_COLUMNS = 5;
+const NO_FILTERS = 0;
 
 type RideFilterProps = Readonly<{ onApply: (filters: RideFilterValues) => void }>;
 
@@ -42,7 +43,7 @@ export function RideFilter({ onApply }: RideFilterProps) {
       if (destination.trim()) filters.destination = destination.trim();
       if (rideType) filters.rideType = rideType as RideTypeEnum;
 
-      setIsFiltered(Object.keys(filters).length > 0);
+      setIsFiltered(Object.keys(filters).length > NO_FILTERS);
       onApply(filters);
     },
     [departureDate, departureTime, destination, rideType, onApply],

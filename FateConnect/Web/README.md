@@ -59,6 +59,8 @@ Dois aliases: `@design-system` para a UI (com `@design-system/icons` para ícone
 
 O lint aplica as principais; as demais estão nas regras do projeto.
 
+Ele carrega também as regras do Sonar — `eslint-plugin-sonarjs` e duas do `eslint-plugin-unicorn` que a análise toma emprestadas. Sem elas, esses achados só apareceriam depois, com o PR já aberto.
+
 ### Design system é a única porta
 
 A aplicação importa UI **somente** de `@design-system` — nunca de `@mui/*`, nunca de um caminho interno do design system. Precisa de um componente que o barrel não expõe? Adicione ao barrel.
@@ -105,6 +107,8 @@ Use o `render` de `@app/test/testing-library`, que já monta tema, rotas e cache
 | `pre-commit` | `lint-staged` sobre os arquivos preparados          | —         |
 | `pre-push`   | só os testes **relacionados** aos arquivos enviados | —         |
 | CI (no PR)   | tipos, lint, **suíte inteira**, build e Sonar        | mede      |
+
+⚠️ O hook roda com o Node do seu shell, não com o do `.nvmrc`. Num Node anterior ao 22 ele falha com `mapTypes.union is not a function`, que é uma regra de lint usando `Set.prototype.union` — a saída é `nvm use` antes de commitar.
 
 O `pre-push` usa `scripts/test-changed.sh`, que segue o grafo de imports com `vitest related`: mudar uma tela roda os testes que a alcançam, não a suíte inteira. Ele cai na suíte inteira quando a mudança sai de `src/` ou remove arquivo — nesses casos o grafo não alcança o efeito, e `vitest related vite.config.ts` sairia com sucesso sem rodar teste nenhum.
 
