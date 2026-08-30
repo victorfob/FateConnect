@@ -13,6 +13,6 @@ public class LoginDto
     public string FatecEmail { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Informe a senha")]
-    [DefaultValue("PasswordForte123!")]
+    [DefaultValue("SenhaForte123!")]
     public string Password { get; set; } = string.Empty;
 }

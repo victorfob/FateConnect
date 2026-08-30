@@ -17,7 +17,7 @@ public class CreateUserDto
 
     [Required(ErrorMessage = "Informe a senha")]
     [MinLength(8, ErrorMessage = "Mínimo de 8 caracteres")]
-    [DefaultValue("PasswordForte123!")]
+    [DefaultValue("SenhaForte123!")]
     public string Password { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Informe o nome completo")]

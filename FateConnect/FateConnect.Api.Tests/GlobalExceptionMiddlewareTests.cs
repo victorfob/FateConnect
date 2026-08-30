@@ -55,10 +55,10 @@ public class GlobalExceptionMiddlewareTests
     public async Task ADuplicateEmail_AnswersConflictWithItsOwnMessage()
     {
         (HttpStatusCode statusCode, string error) =
-            await AnswerFor(new EmailAlreadyRegisteredException("pessoa@aluno.cps.sp.gov.br"));
+            await AnswerFor(new EmailAlreadyRegisteredException("mariana.rocha@aluno.cps.sp.gov.br"));
 
         Assert.Equal(HttpStatusCode.Conflict, statusCode);
-        Assert.Equal("O e-mail 'pessoa@aluno.cps.sp.gov.br' já está em uso no sistema.", error);
+        Assert.Equal("O e-mail 'mariana.rocha@aluno.cps.sp.gov.br' já está em uso no sistema.", error);
     }
 
     [Fact]

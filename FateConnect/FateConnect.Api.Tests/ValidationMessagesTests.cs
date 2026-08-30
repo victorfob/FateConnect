@@ -29,9 +29,9 @@ public class ValidationMessagesTests
     {
         List<ValidationResult> results = Validate(new CreateUserDto
         {
-            FatecEmail = "pessoa@aluno.cps.sp.gov.br",
-            Password = "PasswordForte123!",
-            FullName = "Pessoa de Teste",
+            FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
+            Password = "SenhaForte123!",
+            FullName = "Mariana Alves Rocha",
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             Gender = (EnumGender)99,
             Addresses = [],

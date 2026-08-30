@@ -46,7 +46,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         };
 
         return new TokenService(Options.Create(options))
-            .GenerateJwtToken(new User { Id = userId, FatecEmail = "pessoa@fatec.sp.gov.br" });
+            .GenerateJwtToken(new User { Id = userId, FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br" });
     }
 
     public int SeedUser(string fullName, string phone, string contactEmail)
@@ -57,7 +57,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         User user = new()
         {
             FullName = fullName,
-            FatecEmail = $"{Guid.NewGuid():N}@fatec.sp.gov.br",
+            FatecEmail = $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
             Password = "hash-sem-valor-fora-desta-suite",
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             CreatedAt = DateTime.UtcNow,

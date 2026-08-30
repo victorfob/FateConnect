@@ -12,11 +12,11 @@ public class SignupTests : IClassFixture<ApiFactory>
     private static object SignupPayload(object contacts) => new
     {
         fatecEmail = $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
-        password = "PasswordForte123!",
-        fullName = "Pessoa de Teste",
+        password = "SenhaForte123!",
+        fullName = "Mariana Alves Rocha",
         birthDate = "2000-01-01T00:00:00Z",
         gender = "Male",
-        addresses = new[] { new { zipCode = "18000-000", street = "Rua A", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
+        addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
         contacts = contacts,
     };
 
@@ -25,7 +25,7 @@ public class SignupTests : IClassFixture<ApiFactory>
     {
         HttpResponseMessage r = await _factory.CreateClient().PostAsJsonAsync(
             "/Users/signup",
-            SignupPayload(new[] { new { phone = "15999990000", contactEmail = "pessoa@example.com" } }));
+            SignupPayload(new[] { new { phone = "15999990000", contactEmail = "mariana.rocha@gmail.com" } }));
 
         string corpo = await r.Content.ReadAsStringAsync();
 
@@ -47,11 +47,11 @@ public class SignupTests : IClassFixture<ApiFactory>
         HttpResponseMessage r = await _factory.CreateClient().PostAsJsonAsync("/Users/signup", new
         {
             fatecEmail = $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
-            password = "PasswordForte123!",
-            fullName = "Pessoa de Teste",
+            password = "SenhaForte123!",
+            fullName = "Mariana Alves Rocha",
             birthDate = "2000-01-01T00:00:00Z",
             gender = "Male",
-            addresses = new[] { new { zipCode = "18000-000", street = "Rua A", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
+            addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, r.StatusCode);

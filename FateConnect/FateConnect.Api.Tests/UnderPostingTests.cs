@@ -16,14 +16,14 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
     private static Dictionary<string, object> BaseSignup() => new()
     {
         ["fatecEmail"] = $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
-        ["password"] = "PasswordForte123!",
-        ["fullName"] = "Pessoa de Teste",
+        ["password"] = "SenhaForte123!",
+        ["fullName"] = "Mariana Alves Rocha",
         ["gender"] = "Male",
         ["addresses"] = new[]
         {
-            new { zipCode = "18000-000", street = "Rua A", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" },
+            new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" },
         },
-        ["contacts"] = new[] { new { phone = "15999990000", contactEmail = "pessoa@example.com" } },
+        ["contacts"] = new[] { new { phone = "15999990000", contactEmail = "mariana.rocha@gmail.com" } },
     };
 
     [Fact]
