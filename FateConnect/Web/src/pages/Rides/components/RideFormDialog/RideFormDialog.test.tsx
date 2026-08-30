@@ -9,7 +9,7 @@ import { toApiDate } from '@app/utils/apiDate';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './constants';
 import { RideFormDialog, type RideFormDialogProps } from '.';
 
-const RIDES_URL = 'https://api.fateconnect.test/Rides';
+const RIDES_URL = 'https://api.fateconnect.test/rides';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DAYS_AHEAD = 30;

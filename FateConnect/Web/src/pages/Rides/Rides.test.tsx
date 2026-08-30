@@ -17,7 +17,7 @@ import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDi
 import * as C from './constants';
 import { Rides } from '.';
 
-const RIDES_URL = 'https://api.fateconnect.test/Rides';
+const RIDES_URL = 'https://api.fateconnect.test/rides';
 
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
 const RETRY_WINDOW_MS = 5000;
