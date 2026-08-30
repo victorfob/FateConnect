@@ -2,6 +2,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
+import { DESCRIPTION_TITLE } from '@app/pages/Home/components/LandingDescription/constants';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
@@ -28,7 +29,7 @@ describe('routeConfig', () => {
   });
 
   it.each([
-    [RoutePathEnum.LANDING, 'Conectando a Comunidade Acadêmica'],
+    [RoutePathEnum.LANDING, DESCRIPTION_TITLE],
     [RoutePathEnum.SIGNUP, SIGNUP_TITLE],
     [RoutePathEnum.MENU, MENU_TITLE],
     [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
