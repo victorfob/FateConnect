@@ -66,6 +66,6 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         string body = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("between 1 and 7", body, StringComparison.Ordinal);
+        Assert.Contains("entre 1 e 7 vagas", body, StringComparison.Ordinal);
     }
 }
