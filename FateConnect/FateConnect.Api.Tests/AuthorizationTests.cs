@@ -47,7 +47,7 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
 
     [Theory]
     [InlineData("/auth/login")]
-    [InlineData("/usuario/cadastro")]
+    [InlineData("/Users/signup")]
     public async Task AnonymousEndpoints_WithoutToken_ReachTheController(string route)
     {
         HttpResponseMessage response = await _factory.CreateClient().PostAsJsonAsync(route, new { });

@@ -2,9 +2,9 @@ namespace FateConnect.Api.Infrastructure.Middlewares;
 
 using System.Net;
 using FateConnect.Api.Modules.Auth.Exceptions;
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Exceptions;
-using FateConnect.Api.Modules.Usuarios.Exceptions;
 using Microsoft.Extensions.Logging;
 
 public partial class GlobalExceptionMiddleware(
@@ -40,17 +40,17 @@ public partial class GlobalExceptionMiddleware(
                 errorMessage = ex.Message;
                 break;
 
-            case EmailJaCadastradoException ex:
+            case EmailAlreadyRegisteredException ex:
                 statusCode = HttpStatusCode.Conflict;
                 errorMessage = ex.Message;
                 break;
 
-            case UnidentifiedUserException or CredenciaisInvalidasException:
+            case UnidentifiedUserException or InvalidCredentialsException:
                 statusCode = HttpStatusCode.Unauthorized;
                 errorMessage = exception.Message;
                 break;
 
-            case JwtNaoConfiguradoException ex:
+            case JwtNotConfiguredException ex:
                 statusCode = HttpStatusCode.InternalServerError;
                 errorMessage = ex.Message;
                 break;
@@ -64,7 +64,7 @@ public partial class GlobalExceptionMiddleware(
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        await context.Response.WriteAsJsonAsync(new { error = errorMessage }, context.RequestAborted);
+        await context.Response.WriteAsJsonAsync(new ErrorResponseDto { Error = errorMessage }, context.RequestAborted);
     }
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Unhandled internal server error occurred.")]
