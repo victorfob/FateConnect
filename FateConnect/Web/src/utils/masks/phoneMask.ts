@@ -1,3 +1,4 @@
+import { firstCharacters } from '../sequence';
 import { onlyDigits } from './caret';
 
 const MAX_PHONE_DIGITS = 11;
@@ -12,18 +13,18 @@ function maskSubscriber(subscriber: string): string {
 
   // O traço muda de lugar quando o número passa a ter cara de celular.
   if (subscriber.length > LANDLINE_SUBSCRIBER_LENGTH) {
-    return `${subscriber.slice(0, MOBILE_PREFIX_LENGTH)}-${subscriber.slice(MOBILE_PREFIX_LENGTH)}`;
+    return `${firstCharacters(subscriber, MOBILE_PREFIX_LENGTH)}-${subscriber.slice(MOBILE_PREFIX_LENGTH)}`;
   }
 
-  return `${subscriber.slice(0, LANDLINE_PREFIX_LENGTH)}-${subscriber.slice(LANDLINE_PREFIX_LENGTH)}`;
+  return `${firstCharacters(subscriber, LANDLINE_PREFIX_LENGTH)}-${subscriber.slice(LANDLINE_PREFIX_LENGTH)}`;
 }
 
 /** Formata `(00) 0000-0000` ou `(00) 00000-0000`, conforme o comprimento. */
 export function maskPhone(value: string): string {
-  const digits = onlyDigits(value).slice(0, MAX_PHONE_DIGITS);
+  const digits = firstCharacters(onlyDigits(value), MAX_PHONE_DIGITS);
 
-  if (digits.length === 0) return '';
+  if (digits === '') return '';
   if (digits.length <= AREA_CODE_LENGTH) return `(${digits}`;
 
-  return `(${digits.slice(0, AREA_CODE_LENGTH)}) ${maskSubscriber(digits.slice(AREA_CODE_LENGTH))}`;
+  return `(${firstCharacters(digits, AREA_CODE_LENGTH)}) ${maskSubscriber(digits.slice(AREA_CODE_LENGTH))}`;
 }

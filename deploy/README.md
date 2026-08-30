@@ -218,6 +218,11 @@ mundo da última release** mesmo com a `develop` bem à frente, porque o
 `deploy.sh prod` volta para a `main` antes de construir. O contêiner da API é
 construído desse mesmo checkout, então ele segue a branch do ambiente.
 
+Justamente por ser compartilhado, **duas publicações nunca correm juntas**: o
+`deploy.sh` toma uma trava da máquina antes de trocar a branch, e a segunda
+espera a primeira terminar, dizendo isso no log. Vale para qualquer origem — as
+duas pipelines ou uma sessão SSH.
+
 ⚠️ **O que o deploy não faz é mexer no nginx.** Mudou `nginx/site.conf.template`?
 Rode `sudo ./install-site.sh <ambiente>`, uma vez por ambiente — é o único passo
 manual de uma publicação. Ele reaplica o HTTPS sozinho quando já existe

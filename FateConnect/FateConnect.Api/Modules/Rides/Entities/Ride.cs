@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.Rides.Entities;
 
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Rides.Exceptions;
+using FateConnect.Api.Modules.Users.Entities;
 
 public class Ride
 {
@@ -17,6 +18,8 @@ public class Ride
     public EnumRideType RideType { get; private set; }
     public string? Description { get; private set; }
     public bool IsActive { get; private set; }
+    public int DriverId { get; private set; }
+    public User Driver { get; private set; } = null!;
 
     private Ride() { }
 
@@ -26,14 +29,17 @@ public class Ride
         DateOnly departureDate,
         TimeOnly departureTime,
         EnumRideType rideType,
+        int driverId,
         string? description = null)
     {
         ValidateAvailableSeats(availableSeats);
         ValidateDestination(destination);
         ValidateDepartureDateTime(departureDate, departureTime);
         ValidateRideType(rideType);
+        ValidateDriver(driverId);
 
         Id = Guid.NewGuid();
+        DriverId = driverId;
         AvailableSeats = availableSeats;
         Destination = destination.Trim();
         DepartureDate = departureDate;
@@ -86,6 +92,14 @@ public class Ride
     public void Deactivate()
     {
         IsActive = false;
+    }
+
+    public bool IsDrivenBy(int userId) => DriverId == userId;
+
+    private static void ValidateDriver(int driverId)
+    {
+        if (driverId < 1)
+            throw new InvalidRideDriverException();
     }
 
     private static void ValidateRideType(EnumRideType rideType)

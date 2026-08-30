@@ -17,6 +17,36 @@ O texto da interface é produto, não decoração. Vale para rótulo, botão, av
 | **Prática** | Orienta a saída, não descreve o problema em abstrato |
 | **Ponderada** | Trata quem lê como adulto, sobretudo quando algo falha |
 
+## Landing: vender sem hipérbole
+
+A voz acima descreve texto **transacional** — aviso, botão, erro. A landing tem outra função: convencer quem ainda não usa. O registro muda; a exigência de precisão, não.
+
+⛔ **Persuadir é ser específico, não ser entusiasmado.** Linguagem promocional **derruba** a usabilidade: reescrever um mesmo site em estilo objetivo rendeu +27%, e +124% somado a concisão e escaneabilidade. O custo é de credibilidade — quem lê gasta atenção filtrando exagero e passa a duvidar do resto.
+
+| ❌ | ✅ |
+| --- | --- |
+| Encontre seu objeto de volta de maneira fácil e rápida com a nossa plataforma! | Cadastre o que perdeu e receba o contato de quem achou |
+| Economize dinheiro e faça novos amigos no caminho | Divida o trajeto e o custo com quem estuda com você |
+| com total praticidade e segurança | (corte, ou diga o que garante a segurança) |
+
+**O teste de cada frase: ela sobrevive à pergunta "como assim?".** `Divida o custo` sobrevive; `total praticidade` não.
+
+- **Benefício, não recurso.** O recurso é o que o produto faz; o benefício é o que muda para quem lê.
+- ⛔ **Sem autoelogio** — `nossa plataforma`, `total`, `completo`, `o melhor`.
+- ⛔ **Sem "!"**, pela mesma razão do resto do app.
+- **Frase curta**, porque a web é varrida e não lida palavra por palavra.
+- **Chamada para ação com verbo primeiro** e o ganho junto, nunca `Saiba mais` solto.
+
+### A exceção do escopo planejado
+
+A landing **pode** anunciar funcionalidade que ainda não existe, enquanto ela estiver numa milestone aberta: este é um trabalho acadêmico de escopo público declarado, e a apresentação descreve o produto inteiro.
+
+Hoje vale para o **Portal de denúncias**, na milestone 14/09. Entrando o módulo, esta exceção sai da regra.
+
+⚠️ A exceção é do **que** se anuncia, não de **como**: o texto de uma funcionalidade futura segue a mesma régua acima.
+
+Fundamentando a seção: [Concise, SCANNABLE, and Objective](https://www.nngroup.com/articles/concise-scannable-and-objective-how-to-write-for-the-web/) e [How Users Read on the Web](https://www.nngroup.com/articles/how-users-read-on-the-web/), Nielsen Norman Group.
+
 ## Aviso de sucesso nomeia o que aconteceu
 
 ⛔ **Sem "com sucesso".** O aviso já **é** a confirmação. Particípio e ponto final:

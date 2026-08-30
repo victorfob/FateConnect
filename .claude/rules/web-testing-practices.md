@@ -41,3 +41,27 @@ O import saía de graça em 48 arquivos e ninguém percebia porque o teste passa
 
 - Não testar detalhe de implementação: nada de asserção sobre estado interno, nome de classe CSS ou ordem de chamada de hook.
 - Não duplicar no teste a lógica que ele verifica — valor esperado é literal, não recalculado.
+
+## O nome no `getByRole` sai da constante, nunca do texto
+
+⛔ **Nunca escreva o rótulo literal — nem string, nem regex — para achar um controle.** Importe a constante que o componente usa. Copy muda, e o literal não muda junto: ou o teste quebra, ou — pior — passa a casar **outro** controle.
+
+⛔ Aconteceu na #227. O teste dispensava um diálogo com `getByRole('button', { name: /Cancelar/ })`. Quando o glossário renomeou a ação destrutiva de `Excluir` para `Cancelar`, o mesmo regex passou a casar o botão que **cancela o item** — o teste executou justamente a ação que ele existia para não executar, e só denunciou porque o cartão sumiu da tela depois.
+
+**A regex é o caso mais perigoso**, porque ela sobrevive à mudança em vez de quebrar. `/Cancelar/` continuou achando um botão; só não era o mesmo botão.
+
+⚠️ **Um literal no meio de constantes é o sinal.** No mesmo PR, `routeConfig.test.tsx` importava quatro títulos de tela como constante e escrevia o quinto na mão — dos cinco, foi o único que quebrou.
+
+## Asserção de ausência precisa provar que consegue falhar
+
+⛔ **`expect(queryBy…).not.toBeInTheDocument()` passa quando o elemento nunca existiu, quando a consulta está errada e quando o componente sequer renderizou.** Os três parecem iguais no verde.
+
+Antes de escrever a negativa, monte o **positivo** com a mesma consulta e confirme que ele encontra alguma coisa.
+
+Na #227, o critério era "o login não mostra aviso nenhum". Todo aviso do produto traz um botão `OK` para dispensar, então a asserção virou `queryByRole('button', { name: 'OK' })` na negativa — mas só depois de eu acrescentar a **positiva** ao caso de erro ao lado e ver que ela encontra o botão. Sem esse passo, a negativa passaria para sempre, inclusive se o aviso voltasse com outro rótulo.
+
+## Corpo de requisição se afirma inteiro
+
+⛔ **`toMatchObject` é subconjunto: chave a mais passa calada.** Para o payload que sai para a API, `toEqual` — ele reprova o que sobra, que é justamente o risco.
+
+Na #213 a troca revelou que o cadastro envia `complement` como string vazia, coisa que nenhum teste afirmava. E é ela que impede `acceptTerms` e `acceptMarketing` de vazarem: os dois são do formulário, a API não os recebe, e o `toMatchObject` aceitaria os dois sem reclamar.

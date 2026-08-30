@@ -30,7 +30,7 @@ export function LostItemConfirmAction({
   const [confirming, setConfirming] = useState(false);
 
   const handleAsk = useCallback(() => setConfirming(true), []);
-  const handleCancel = useCallback(() => setConfirming(false), []);
+  const handleDismiss = useCallback(() => setConfirming(false), []);
   const handleConfirm = useCallback(() => {
     setConfirming(false);
     onConfirm();
@@ -40,7 +40,7 @@ export function LostItemConfirmAction({
     <>
       <LostItemConfirmTrigger label={label} icon={icon} iconOnly={iconOnly} onClick={handleAsk} />
 
-      <Dialog open={confirming} onClose={handleCancel} title={dialogTitle}>
+      <Dialog open={confirming} onClose={handleDismiss} title={dialogTitle}>
         <Dialog.Body>
           <S.ConfirmationMessage variant="subtitle">
             {messagePrefix}
@@ -50,8 +50,8 @@ export function LostItemConfirmAction({
         </Dialog.Body>
 
         <Dialog.Footer>
-          <Button type="button" variant="contained" color="primary" onClick={handleCancel}>
-            {CONFIRMATION.cancelLabel}
+          <Button type="button" variant="contained" color="primary" onClick={handleDismiss}>
+            {CONFIRMATION.dismissLabel}
           </Button>
           <Button type="button" variant="contained" color="secondary" onClick={handleConfirm}>
             {confirmLabel}

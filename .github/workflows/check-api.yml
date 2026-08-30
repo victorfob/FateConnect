@@ -1,0 +1,135 @@
+name: Check API
+
+# Como no `check-front.yml`, o recorte fica dentro do job: workflow que não
+# dispara deixa o check obrigatório `Pending` para sempre.
+on:
+  pull_request
+
+# Grupo próprio: compartilhá-lo com o check do front faria um cancelar o outro.
+concurrency:
+  group: check-api-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  api:
+    name: .NET API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Clone completo por causa do Sonar: sem histórico ele perde a noção
+          # de código novo, que é o que o quality gate mede.
+          fetch-depth: 0
+
+      - name: Changed paths
+        id: changes
+        run: |
+          set -euo pipefail
+
+          changed=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')
+
+          # Nenhum `.md` é importado pelo código, então documentação não muda o
+          # que o build produz. A lista para aqui de propósito: pular por engano
+          # deixa mudança sem validação.
+          relevant=$(printf '%s\n' "$changed" | grep -vE '\.md$' || true)
+
+          # O padrão não leva barra ao final para alcançar também o projeto de
+          # teste, que mora em `FateConnect.Api.Tests`, ao lado e não dentro.
+          if printf '%s\n' "$relevant" | grep -qE '^(FateConnect/FateConnect\.Api|global\.json)'; then
+            echo 'api=true' >> "$GITHUB_OUTPUT"
+            echo 'A mudança alcança a API — validando.'
+            exit 0
+          fi
+
+          echo 'api=false' >> "$GITHUB_OUTPUT"
+          echo 'Nada na API — nada a validar aqui.'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.changes.outputs.api == 'true'
+        with:
+          dotnet-version: 8.0.x
+
+      # O scanner roda na JVM, mesmo analisando C#.
+      - uses: actions/setup-java@v6
+        if: steps.changes.outputs.api == 'true'
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install the Sonar scanner
+        if: steps.changes.outputs.api == 'true'
+        run: dotnet tool install --global dotnet-sonarscanner --version 11.2.1
+
+      # C# não é analisado pela action que o front usa: o scanner de .NET precisa
+      # envolver o build, porque lê o que o compilador produz. Daí o par
+      # begin/end com a compilação no meio.
+      #
+      # ⛔ O contexto do PR chega por `env`, e não interpolado dentro do `run`.
+      # Nome de branch é escolhido por quem abre o PR, e `${{ }}` no comando cola
+      # o texto dele no shell antes de o shell existir: uma branch chamada
+      # `x"; curl ... | sh; #` executa. Sem os três valores, a análise viraria
+      # análise de branch e mediria o repositório inteiro.
+      #
+      # `qualitygate.wait` é o que faz o passo reprovar; sem ele o scan publica e
+      # sai verde.
+      #
+      # O scanner varre a pasta base inteira, não só o C#. A exclusão tira o
+      # front, que tem projeto e gate próprios e seria medido duas vezes com o
+      # gate errado, e as pastas das disciplinas, que não são código de produto —
+      # os `.sql` de LBD acionavam o analisador de PL/SQL.
+      #
+      # `Migrations/` sai da cobertura e da duplicação por chaves separadas, e
+      # continua na análise: o `Up` e o `Down` de um rename são blocos espelhados
+      # e batem no limite de duplicação sozinhos.
+      - name: Sonar begin
+        if: steps.changes.outputs.api == 'true'
+        run: >
+          dotnet sonarscanner begin
+          /k:fateconnect_FateConnect-api
+          /o:fateconnect
+          /d:sonar.host.url=https://sonarcloud.io
+          /d:sonar.token=$SONAR_TOKEN
+          /d:sonar.qualitygate.wait=true
+          /d:sonar.exclusions=FateConnect/Web/**,LBD/**,ESII/**,ESIII/**
+          /d:sonar.cs.opencover.reportsPaths=coverage/**/coverage.opencover.xml
+          /d:sonar.coverage.exclusions=**/Migrations/**,**/obj/**
+          /d:sonar.cpd.exclusions=**/Migrations/**
+          /d:sonar.pullrequest.key=$PR_NUMBER
+          /d:sonar.pullrequest.branch=$HEAD_REF
+          /d:sonar.pullrequest.base=$BASE_REF
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+
+      # Aponta para a solução, e não para cada projeto, porque assim o projeto
+      # novo entra na esteira ao ser adicionado à solução.
+      - name: Build
+        if: steps.changes.outputs.api == 'true'
+        run: dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
+
+      # A suíte sobe a própria aplicação com banco em memória, então não há
+      # Postgres a provisionar aqui.
+      #
+      # O formato é OpenCover porque o Sonar não lê Cobertura para C#, que é o
+      # que o `dotnet test` produz por padrão.
+      - name: Tests
+        if: steps.changes.outputs.api == 'true'
+        run: |
+          dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build \
+            --collect:"XPlat Code Coverage;Format=opencover" \
+            --results-directory coverage
+
+      - name: Sonar end
+        if: steps.changes.outputs.api == 'true'
+        run: dotnet sonarscanner end /d:sonar.token=$SONAR_TOKEN
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

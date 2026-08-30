@@ -12,6 +12,8 @@ const RIDE: Ride = {
   createdAt: '2026-05-01T00:00:00',
   rideType: RideTypeEnum.EGALITARIAN,
   description: 'Saída do centro.',
+  driver: { name: 'Ana Ofertante', email: 'ana@example.com', phone: '(15) 90000-0000' },
+  isOwner: true,
 };
 
 describe('toFormValues', () => {

@@ -44,10 +44,10 @@ export const EDIT_MODE: LostItemFormMode = {
 };
 
 export const LOST_ITEM_FORM_LABELS = {
-  name: 'Nome do Item',
+  name: 'Nome do item',
   kind: 'Tipo',
   place: 'Local',
-  occurredOn: 'Data do Ocorrido',
+  occurredOn: 'Data do ocorrido',
   description: 'Descrição',
   photo: 'Foto',
 };
@@ -55,7 +55,7 @@ export const LOST_ITEM_FORM_LABELS = {
 export const LOST_ITEM_FORM_PLACEHOLDERS = {
   name: 'Insira o nome do item',
   place: 'Onde o item foi achado ou perdido',
-  select: 'Selecione',
+  select: 'Selecione...',
   description: 'Descreva o item com detalhes',
 };
 

@@ -3,9 +3,9 @@ import { AccessTimeIcon, CalendarTodayIcon, GroupsIcon } from '@design-system/ic
 import { format, parseISO } from 'date-fns';
 
 import * as C from '@app/pages/Rides/constants';
-import { isOwnRide, RIDE_DRIVER } from '@app/pages/Rides/helpers/rideDriver';
 import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
 import type { Ride } from '@app/services/rides/types';
+import { firstCharacters } from '@app/utils/sequence';
 
 import { RideDriverContact } from './RideDriverContact';
 import { RideOwnerActions } from './RideOwnerActions';
@@ -17,15 +17,15 @@ const TIME_LENGTH = 5;
 type RideCardProps = Readonly<{
   ride: Ride;
   onEdit: (ride: Ride) => void;
-  onDelete: (ride: Ride) => void;
+  onCancel: (ride: Ride) => void;
 }>;
 
-export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
+export function RideCard({ ride, onEdit, onCancel }: RideCardProps) {
   const typeLabel = rideTypeDisplayLabel(ride.rideType);
   const tone = rideTypeTone(ride.rideType);
 
   return (
-    <ListCard own={isOwnRide(RIDE_DRIVER)} ownLabel={C.OWN_RIDE_LABEL}>
+    <ListCard own={ride.isOwner} ownLabel={C.OWN_RIDE_LABEL}>
       <ListCard.Header>
         <Typography variant="subtitleBold">{ride.destination}</Typography>
 
@@ -33,9 +33,9 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
           <StatusTag tone={tone}>{typeLabel}</StatusTag>
 
           <ListCard.ActionButtons>
-            <RideDriverContact destination={ride.destination} />
+            <RideDriverContact ride={ride} />
 
-            <RideOwnerActions ride={ride} onEdit={onEdit} onDelete={onDelete} />
+            <RideOwnerActions ride={ride} onEdit={onEdit} onCancel={onCancel} />
           </ListCard.ActionButtons>
         </ListCard.Actions>
       </ListCard.Header>
@@ -51,7 +51,7 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
         <ListCard.InfoItem>
           <AccessTimeIcon />
           <Typography variant="caption" color="inherit">
-            {ride.departureTime.slice(0, TIME_LENGTH)}
+            {firstCharacters(ride.departureTime, TIME_LENGTH)}
           </Typography>
         </ListCard.InfoItem>
 

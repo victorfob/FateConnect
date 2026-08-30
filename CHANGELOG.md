@@ -6,6 +6,28 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-30
+
+### Changed
+
+- Passa a devolver quem ofertou a carona, com nome e contato, e a indicar se ela é de quem consultou (#201) [Backend]
+- Passa a mostrar quem ofertou cada carona, com nome e contato reais, e a reconhecer as suas — com marcação própria e os botões de editar e excluir (#203) [Frontend]
+- Passa a responder os erros da API em português; validação de carona e de cadastro, formato de hora e o erro genérico vinham em inglês (#218) [Backend]
+- Passa a atender o cadastro e o login com o contrato em inglês: muda o endereço do cadastro e todas as chaves das duas chamadas, na requisição e na resposta (#222) [Backend]
+- Passa a enviar o cadastro e o login no contrato em inglês, acompanhando a API (#224) [Frontend]
+- Padroniza o texto de toda a interface: cada ação passa a ter um nome só, os títulos vão para sentence case, os erros dizem a saída e as listas vazias dizem o que fazer; o aviso de boas-vindas do login sai, porque estar no app já é a confirmação (#229) [Frontend]
+- Passa a entrar no app direto depois do cadastro, sem pedir de novo o e-mail e a senha recém-criados; o login e o cadastro passam a responder só o token (#230) [Frontend] [Backend]
+- Passa a abrir a tela que a sessão permite: quem já entrou não vê mais a landing nem o cadastro, quem não entrou não alcança as telas internas, e quem volta com a sessão vencida é avisado em vez de entrar e ver tudo falhar (#232) [Frontend] [Backend]
+
+### Fixed
+
+- Corrige o cadastro, que aceitava requisição sem data de nascimento e gravava `01/01/0001` no lugar de recusar (#205) [Backend]
+- Corrige a documentação do erro de cadastro, que anunciava um corpo com `mensagem` enquanto a API sempre devolveu `error` (#222) [Backend]
+
+### Security
+
+- Restringe editar e excluir carona a quem a ofertou; antes qualquer pessoa autenticada alterava a carona de outra (#201) [Backend]
+
 ## [0.5.0] - 2026-08-28
 
 ### Changed

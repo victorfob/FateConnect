@@ -3,26 +3,25 @@ import { IconButton } from '@design-system';
 import { EditIcon } from '@design-system/icons';
 
 import { RIDE_CARD_LABELS } from '@app/pages/Rides/constants';
-import { isOwnRide, RIDE_DRIVER } from '@app/pages/Rides/helpers/rideDriver';
 import type { Ride } from '@app/services/rides/types';
 
-import { RideDeleteConfirmation } from '../RideDeleteConfirmation';
+import { RideCancelConfirmation } from '../RideCancelConfirmation';
 
 type RideOwnerActionsProps = Readonly<{
   ride: Ride;
   onEdit: (ride: Ride) => void;
-  onDelete: (ride: Ride) => void;
+  onCancel: (ride: Ride) => void;
 }>;
 
 /**
- * Editar e excluir só existem para quem ofertou a carona. Esconder o botão é
- * conveniência, não regra: quem impede de verdade é a API, e ela ainda não sabe
- * de quem é a carona.
+ * Editar e cancelar só existem para quem ofertou a carona. Esconder o botão é
+ * conveniência, não regra: quem impede de verdade é a API, que responde 403 a
+ * quem tenta mudar carona alheia.
  */
-export function RideOwnerActions({ ride, onEdit, onDelete }: RideOwnerActionsProps) {
+export function RideOwnerActions({ ride, onEdit, onCancel }: RideOwnerActionsProps) {
   const handleEdit = useCallback(() => onEdit(ride), [onEdit, ride]);
 
-  if (!isOwnRide(RIDE_DRIVER)) return null;
+  if (!ride.isOwner) return null;
 
   return (
     <>
@@ -30,7 +29,7 @@ export function RideOwnerActions({ ride, onEdit, onDelete }: RideOwnerActionsPro
         <EditIcon />
       </IconButton>
 
-      <RideDeleteConfirmation ride={ride} onDelete={onDelete} />
+      <RideCancelConfirmation ride={ride} onCancel={onCancel} />
     </>
   );
 }

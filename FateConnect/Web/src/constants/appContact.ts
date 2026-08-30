@@ -9,5 +9,5 @@ export const FOOTER_TITLE = 'Entre em contato';
 
 export const FOOTER_COPYRIGHT_LINES = [
   '© 2026 FateConnect. Todos os direitos reservados.',
-  'Desenvolvido para facilitar a vida do Fatecano.',
+  'Desenvolvido para facilitar a vida de quem estuda na Fatec.',
 ];

@@ -24,7 +24,7 @@ Os hooks locais **não vêm habilitados no clone** — o repositório usa `core.
 git config core.hooksPath .githooks
 ```
 
-O `pre-push` roda só os testes relacionados aos arquivos enviados. A suíte inteira com cobertura fica no CI.
+O `pre-commit` conserta o que dá no front — `eslint --fix` e `prettier --write` sobre o que está preparado — e compila a API quando a mudança a alcança, que é a build por onde entra o SonarAnalyzer. O `pre-push` roda o recorte de testes do front relacionado ao que está sendo enviado e a suíte da API. A suíte inteira com cobertura fica no CI.
 
 ## Branch e commit
 
@@ -50,13 +50,14 @@ Antes de pedir review, rode os mesmos portões que o CI roda:
 cd FateConnect/Web && yarn lint && yarn typecheck && yarn test:ci
 ```
 
-Mexeu na API, rode também a suíte dela:
+Mexeu na API, compile e rode a suíte dela — a compilação é portão à parte, e reprova por aviso:
 
 ```bash
-dotnet test FateConnect/FateConnect.Api.Tests/FateConnect.Api.Tests.csproj
+dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
+dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build
 ```
 
-Erro reprova. Warning não.
+Aviso reprova nos dois lados: o lint do front roda com `--max-warnings=0`, e o `.csproj` da API liga `TreatWarningsAsErrors`.
 
 ## Mudança que o usuário percebe entra no CHANGELOG
 

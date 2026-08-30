@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Roda os testes do front que estão relacionados ao que está sendo enviado.
+# Roda os testes do que está sendo enviado: o recorte do front React e a suíte da
+# API .NET.
 # Habilitar neste clone: git config core.hooksPath .githooks
 #
 # `scripts/test-changed.sh` segue o grafo de imports com `vitest related`, então
@@ -9,6 +10,7 @@ set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
 WEB="$ROOT/FateConnect/Web"
+API_SOLUTION="$ROOT/FateConnect/FateConnect.Api/FateConnect.Api.sln"
 
 # Ref vazia (branch sendo deletada) vem como SHA de zeros.
 EMPTY_SHA="$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')"
@@ -41,14 +43,34 @@ done
 
 sort -u -o "$changed" "$changed"
 
-if ! grep -q '^FateConnect/Web/' "$changed"; then
-  echo "pre-push: nada em FateConnect/Web — nada a testar."
-  exit 0
+tested=0
+
+if grep -q '^FateConnect/Web/' "$changed"; then
+  if [ ! -d "$WEB/node_modules" ]; then
+    echo "pre-push: dependências de FateConnect/Web ausentes — rode 'yarn' nessa pasta" >&2
+    exit 1
+  fi
+
+  grep '^FateConnect/Web/' "$changed" | tr '\n' '\0' | xargs -0 "$WEB/scripts/test-changed.sh"
+  tested=1
 fi
 
-if [ ! -d "$WEB/node_modules" ]; then
-  echo "pre-push: dependências de FateConnect/Web ausentes — rode 'yarn' nessa pasta" >&2
-  exit 1
+if grep -q '^FateConnect/FateConnect\.Api' "$changed"; then
+  # Cobre as duas causas: dotnet fora do PATH e SDK que o global.json não aceita.
+  if ! dotnet --version >/dev/null 2>&1; then
+    echo "pre-push: nenhum SDK .NET utilizável — confira o PATH e a versão que o global.json declara" >&2
+    exit 1
+  fi
+
+  if ! output="$(dotnet test "$API_SOLUTION" --nologo --verbosity quiet 2>&1)"; then
+    echo "$output" >&2
+    exit 1
+  fi
+
+  grep '^Passed!' <<< "$output" || echo "pre-push: API sem teste executado."
+  tested=1
 fi
 
-grep '^FateConnect/Web/' "$changed" | tr '\n' '\0' | xargs -0 "$WEB/scripts/test-changed.sh"
+if [ "$tested" -eq 0 ]; then
+  echo "pre-push: nada em FateConnect/Web nem na API — nada a testar."
+fi

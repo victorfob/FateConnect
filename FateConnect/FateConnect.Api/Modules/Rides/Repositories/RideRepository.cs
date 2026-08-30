@@ -11,7 +11,10 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
     public async Task<IReadOnlyList<Ride>> GetAllAsync(FilterRideDto filter)
     {
 
-        IQueryable<Ride> query = context.Rides.AsNoTracking().Where(r => r.IsActive);
+        IQueryable<Ride> query = context.Rides
+            .AsNoTracking()
+            .Include(r => r.Driver.Contacts)
+            .Where(r => r.IsActive);
 
         if (filter.DepartureDate.HasValue)
             query = query.Where(r => r.DepartureDate == filter.DepartureDate.Value);
@@ -48,6 +51,7 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
     public async Task<Ride?> GetByIdAsync(Guid id)
     {
         return await context.Rides
+            .Include(r => r.Driver.Contacts)
             .FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
     }
 
@@ -55,6 +59,9 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
     {
         context.Rides.Add(ride);
         await context.SaveChangesAsync();
+
+        await context.Entry(ride).Reference(r => r.Driver).LoadAsync();
+        await context.Entry(ride.Driver).Collection(driver => driver.Contacts).LoadAsync();
 
         return ride;
     }

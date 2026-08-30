@@ -1,7 +1,7 @@
 import { apiClient } from '../httpClient';
 import type { Ride, RideFilter, RideInput } from './types';
 
-const RIDES_PATH = '/Rides';
+const RIDES_PATH = '/rides';
 
 const INVALID_LIST_PAYLOAD_MESSAGE = 'A API de caronas respondeu algo que não é uma lista.';
 

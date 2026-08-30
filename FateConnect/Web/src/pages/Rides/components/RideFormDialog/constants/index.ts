@@ -16,18 +16,18 @@ export const RIDE_LIMITS = {
 };
 
 export const OFFER_MODE: RideFormMode = {
-  title: 'Ofertar Carona',
-  submitLabel: 'Ofertar Carona',
+  title: 'Ofertar carona',
+  submitLabel: 'Ofertar carona',
   submitIcon: AddIcon,
-  succeeded: 'Carona ofertada com sucesso.',
+  succeeded: 'Carona ofertada.',
   failed: 'Erro ao ofertar a carona. Tente novamente.',
 };
 
 export const EDIT_MODE: RideFormMode = {
-  title: 'Editar Carona',
-  submitLabel: 'Salvar Alterações',
+  title: 'Editar carona',
+  submitLabel: 'Salvar alterações',
   submitIcon: SaveIcon,
-  succeeded: 'Carona atualizada com sucesso.',
+  succeeded: 'Carona atualizada.',
   failed: 'Erro ao atualizar a carona. Tente novamente.',
 };
 
@@ -36,13 +36,13 @@ export const RIDE_FORM_LABELS = {
   departureDate: 'Data',
   departureTime: 'Hora',
   rideType: 'Tipo',
-  seats: 'Vagas Disponíveis',
+  seats: 'Vagas disponíveis',
   description: 'Descrição',
 };
 
 export const RIDE_FORM_PLACEHOLDERS = {
-  destination: 'Digite o destino',
-  select: 'Selecione',
+  destination: 'Insira o destino',
+  select: 'Selecione...',
   description: 'Conte como será a carona',
 };
 
@@ -56,13 +56,18 @@ export const RIDE_TYPE_SELECT_OPTIONS: readonly SelectOption[] = [
   ...RIDE_TYPE_OPTIONS,
 ];
 
+const INCLUSIVE_END = 1;
+
 export const SEAT_OPTIONS: readonly SelectOption[] = [
   EMPTY_CHOICE,
-  ...Array.from({ length: RIDE_LIMITS.maxSeats - RIDE_LIMITS.minSeats + 1 }, (_value, index) => {
-    const seats = RIDE_LIMITS.minSeats + index;
+  ...Array.from(
+    { length: RIDE_LIMITS.maxSeats - RIDE_LIMITS.minSeats + INCLUSIVE_END },
+    (_value, index) => {
+      const seats = RIDE_LIMITS.minSeats + index;
 
-    return { value: String(seats), label: seatsLabel(seats) };
-  }),
+      return { value: String(seats), label: seatsLabel(seats) };
+    },
+  ),
 ];
 
 export const RIDE_FORM_MESSAGES = {

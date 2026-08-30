@@ -20,7 +20,7 @@ const UNAUTHORIZED = 401;
 export function LandingLoginCard() {
   const navigate = useNavigate();
   const { hash } = useLocation();
-  const { notifySuccess, notifyError } = useNotification();
+  const { notifyError } = useNotification();
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [passwordHidden, setPasswordHidden] = useState(true);
 
@@ -44,8 +44,7 @@ export function LandingLoginCard() {
     mutationFn: login,
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
-    onSuccess: (response) => {
-      notifySuccess(C.welcomeMessage(response.nomeCompleto));
+    onSuccess: () => {
       navigate(RoutePathEnum.MENU);
     },
     onError: (error: ApiError) => {
@@ -61,7 +60,7 @@ export function LandingLoginCard() {
   const handleTogglePassword = useCallback(() => setPasswordHidden((hidden) => !hidden), []);
 
   const onSubmit = handleSubmit(({ email, password }) => {
-    mutate({ emailFatec: email, senha: password });
+    mutate({ fatecEmail: email, password });
   });
 
   const { ref: registerEmailRef, ...emailField } = register('email');

@@ -2,9 +2,14 @@
 
 .claude/ @victorfob
 
+# Integração contínua e configuração do repositório
+
+.github/ @victorfob
+scripts/ @victorfob
+
 # Configuração de deploy
 
-deploy @victorfob
+deploy/ @victorfob
 
 # Frontend
 

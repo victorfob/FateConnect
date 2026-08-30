@@ -77,7 +77,9 @@ Aconteceu **três vezes no mesmo PR**, o #186, sempre pelo mesmo gesto meu:
 
 ⛔ **Afirmação sobre dado, contagem, extensão ou configuração de ambiente exige medição.** Escrevi que uma migração deixaria as caronas órfãs e que a tela ficaria vazia em produção — os bancos não tinham uma linha. No mesmo review, medir transformou um achado hipotético sobre `unaccent` no defeito mais grave da rodada: o filtro por destino já respondia 500 em produção.
 
-⛔ **Meça no ambiente que o projeto usa, não no seu.** No PR #186 eu publiquei que a API não compilava, com a saída do `dotnet build` na mão. Ela compilava: o meu SDK era o 10 e o projeto tem como alvo o `net8.0`, cujo `sdk:8.0` é o que o Dockerfile e a esteira usam. A regra que reprovou nasceu no .NET 9, e o `AnalysisLevel=latest-recommended` liga os analisadores do **SDK instalado**. O autor corrigiu um defeito que não existia para ele.
+⛔ **Meça no ambiente que o projeto usa, não no seu.** No PR #186 publiquei que a API não compilava, com a saída do `dotnet build` na mão; ela compilava, e quem reprovava era um analisador do meu SDK, de outro major — o `AnalysisLevel=latest-recommended` liga os analisadores do **SDK instalado**. O autor corrigiu um defeito que não existia para ele.
+
+O `global.json` fecha essa porta: ele fixa a banda `8.0.x`, e numa máquina com o SDK 10 instalado o `dotnet --version` responde `8.0.424`. Segue derivando o que ele não fixa — ferramenta global, banco, variável de ambiente, versão do Node —, então diga em que ambiente mediu.
 
 **A pergunta antes de publicar:** esta saída viria igual na máquina de quem vai corrigir e no servidor que constrói? Toolchain, versão de runtime e variável de ambiente mudam o veredito, e a saída não avisa qual delas usou.
 

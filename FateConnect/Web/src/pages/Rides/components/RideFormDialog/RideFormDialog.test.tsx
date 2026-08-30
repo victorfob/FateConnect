@@ -9,7 +9,7 @@ import { toApiDate } from '@app/utils/apiDate';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './constants';
 import { RideFormDialog, type RideFormDialogProps } from '.';
 
-const RIDES_URL = 'https://api.fateconnect.test/Rides';
+const RIDES_URL = 'https://api.fateconnect.test/rides';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DAYS_AHEAD = 30;
@@ -27,6 +27,8 @@ const RIDE: Ride = {
   createdAt: '2026-05-01T00:00:00',
   rideType: RideTypeEnum.EGALITARIAN,
   description: 'Saída do centro, com parada no terminal.',
+  driver: { name: 'Ana Ofertante', email: 'ana@example.com', phone: '(15) 90000-0000' },
+  isOwner: true,
 };
 
 const onClose = vi.fn();

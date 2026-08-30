@@ -13,10 +13,10 @@ const GREEN_WEIGHT = 0.7152;
 const BLUE_WEIGHT = 0.0722;
 /** Evita divisão por zero quando uma das cores é preto puro. */
 const CONTRAST_OFFSET = 0.05;
-
 const HEX_RADIX = 16;
 const HEX_CHANNEL_LENGTH = 2;
 const RED_POSITION = 0;
+const ABSENT_CHANNEL = 0;
 const GREEN_POSITION = 1;
 const BLUE_POSITION = 2;
 const ALPHA_POSITION = 3;
@@ -65,9 +65,9 @@ function toRgb(color: string): Rgb {
   const values = toNumbers(channels);
 
   return {
-    red: values[RED_POSITION] ?? 0,
-    green: values[GREEN_POSITION] ?? 0,
-    blue: values[BLUE_POSITION] ?? 0,
+    red: values[RED_POSITION] ?? ABSENT_CHANNEL,
+    green: values[GREEN_POSITION] ?? ABSENT_CHANNEL,
+    blue: values[BLUE_POSITION] ?? ABSENT_CHANNEL,
   };
 }
 
@@ -86,9 +86,9 @@ function flatten(color: string, background: string): Rgb {
     value * alpha + backdropValue * (OPAQUE - alpha);
 
   return {
-    red: blend(values[RED_POSITION] ?? 0, backdrop.red),
-    green: blend(values[GREEN_POSITION] ?? 0, backdrop.green),
-    blue: blend(values[BLUE_POSITION] ?? 0, backdrop.blue),
+    red: blend(values[RED_POSITION] ?? ABSENT_CHANNEL, backdrop.red),
+    green: blend(values[GREEN_POSITION] ?? ABSENT_CHANNEL, backdrop.green),
+    blue: blend(values[BLUE_POSITION] ?? ABSENT_CHANNEL, backdrop.blue),
   };
 }
 

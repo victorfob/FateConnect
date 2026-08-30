@@ -1,8 +1,10 @@
 namespace FateConnect.Api.Infrastructure.Middlewares;
 
 using System.Net;
+using FateConnect.Api.Modules.Auth.Exceptions;
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.Exceptions;
-using FateConnect.Api.Modules.Usuarios.Exceptions;
+using FateConnect.Api.Modules.Users.Exceptions;
 using Microsoft.Extensions.Logging;
 
 public partial class GlobalExceptionMiddleware(
@@ -24,7 +26,7 @@ public partial class GlobalExceptionMiddleware(
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var statusCode = HttpStatusCode.InternalServerError;
-        var errorMessage = "An internal server error occurred.";
+        var errorMessage = "Algo deu errado. Tente novamente.";
 
         switch (exception)
         {
@@ -33,17 +35,22 @@ public partial class GlobalExceptionMiddleware(
                 errorMessage = ex.Message;
                 break;
 
-            case EmailJaCadastradoException ex:
+            case RideNotDrivenByUserException ex:
+                statusCode = HttpStatusCode.Forbidden;
+                errorMessage = ex.Message;
+                break;
+
+            case EmailAlreadyRegisteredException ex:
                 statusCode = HttpStatusCode.Conflict;
                 errorMessage = ex.Message;
                 break;
 
-            case CredenciaisInvalidasException ex:
+            case UnidentifiedUserException or InvalidCredentialsException:
                 statusCode = HttpStatusCode.Unauthorized;
-                errorMessage = ex.Message;
+                errorMessage = exception.Message;
                 break;
 
-            case JwtNaoConfiguradoException ex:
+            case JwtNotConfiguredException ex:
                 statusCode = HttpStatusCode.InternalServerError;
                 errorMessage = ex.Message;
                 break;
@@ -52,17 +59,17 @@ public partial class GlobalExceptionMiddleware(
         if (statusCode is HttpStatusCode.InternalServerError)
             LogUnhandledError(logger, exception);
         else
-            LogBusinessWarning(logger, (int)statusCode, errorMessage);
+            LogBusinessWarning(logger, (int)statusCode, exception.GetType().Name);
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        await context.Response.WriteAsJsonAsync(new { error = errorMessage });
+        await context.Response.WriteAsJsonAsync(new ErrorResponseDto { Error = errorMessage }, context.RequestAborted);
     }
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Unhandled internal server error occurred.")]
     private static partial void LogUnhandledError(ILogger logger, Exception exception);
 
-    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "Handled error ({StatusCode}): {ErrorMessage}")]
-    private static partial void LogBusinessWarning(ILogger logger, int statusCode, string errorMessage);
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "Handled error ({StatusCode}): {ExceptionType}")]
+    private static partial void LogBusinessWarning(ILogger logger, int statusCode, string exceptionType);
 }

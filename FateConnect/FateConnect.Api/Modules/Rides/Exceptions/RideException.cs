@@ -3,13 +3,19 @@ namespace FateConnect.Api.Modules.Rides.Exceptions;
 public abstract class RideDomainException(string message) : Exception(message);
 
 public class InvalidDepartureScheduleException()
-    : RideDomainException("The departure date and time must be in the future.");
+    : RideDomainException("A carona deve ser em data e hora futuras.");
 
 public class InvalidAvailableSeatsException(int seats)
-    : RideDomainException($"The number of seats must be between 1 and 7. Received: {seats}.");
+    : RideDomainException($"A carona deve ter entre 1 e 7 vagas. Recebido: {seats}.");
 
 public class InvalidDestinationException()
-    : RideDomainException("The destination must contain between 3 and 100 characters.");
+    : RideDomainException("O destino deve ter entre 3 e 100 caracteres.");
 
 public class InvalidRideTypeException()
-    : RideDomainException("Invalid ride type.");
+    : RideDomainException("Tipo de carona inválido.");
+
+public class InvalidRideDriverException()
+    : RideDomainException("Não foi possível identificar quem está ofertando a carona. Entre novamente.");
+
+public class RideNotDrivenByUserException()
+    : Exception("Esta carona foi ofertada por outra pessoa. Só quem ofertou pode alterá-la.");

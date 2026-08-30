@@ -6,7 +6,7 @@ import { parseBirthDate, toApiBirthDate } from './birthDate';
 
 /** Campo opcional: o backend prefere a ausência da chave a uma string vazia. */
 function optionalText(value: string): string | undefined {
-  if (value.length === 0) return undefined;
+  if (value === '') return undefined;
 
   return value;
 }
@@ -19,29 +19,28 @@ function toApiBirthDateOrEmpty(value: string): string {
   return toApiBirthDate(parsed);
 }
 
-/** Traduz o formulário para o contrato do backend, que fala pt-BR. */
 export function toSignupRequest(values: SignupFormValues): SignupRequest {
   return {
-    nomeCompleto: values.fullName,
-    apelido: optionalText(values.nickname),
-    emailFatec: values.fatecEmail,
-    senha: values.password,
-    dataNascimento: toApiBirthDateOrEmpty(values.birthDate),
-    genero: values.gender,
-    enderecos: [
+    fullName: values.fullName,
+    nickname: optionalText(values.nickname),
+    fatecEmail: values.fatecEmail,
+    password: values.password,
+    birthDate: toApiBirthDateOrEmpty(values.birthDate),
+    gender: values.gender,
+    addresses: [
       {
-        cep: values.zipCode,
-        logradouro: values.street,
-        numero: values.streetNumber,
-        complemento: values.complement,
-        cidade: values.city,
-        estado: values.state,
+        zipCode: values.zipCode,
+        street: values.street,
+        streetNumber: values.streetNumber,
+        complement: values.complement,
+        city: values.city,
+        state: values.state,
       },
     ],
-    contatos: [
+    contacts: [
       {
-        telefone: onlyDigits(values.phone),
-        emailContato: values.contactEmail,
+        phone: onlyDigits(values.phone),
+        contactEmail: values.contactEmail,
       },
     ],
   };

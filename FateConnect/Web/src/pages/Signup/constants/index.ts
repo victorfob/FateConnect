@@ -1,4 +1,4 @@
-export const SIGNUP_TITLE = 'Crie sua Conta';
+export const SIGNUP_TITLE = 'Criar conta';
 export const ADDRESS_SECTION_TITLE = 'Endereço';
 export const CONTACT_SECTION_TITLE = 'Dados para contato';
 
@@ -28,20 +28,19 @@ export const FIELD_PLACEHOLDERS = {
 
 export const SELECT_PLACEHOLDER = 'Selecione...';
 
-export const SUBMIT_LABEL = 'Cadastrar';
-export const LOGIN_PROMPT = 'Já tem uma conta?';
-export const LOGIN_LINK_LABEL = 'Faça login';
+export const SUBMIT_LABEL = 'Criar conta';
+export const LOGIN_PROMPT = 'Já tem conta?';
+export const LOGIN_LINK_LABEL = 'Entrar';
 
 export const SIGNUP_ERROR_MESSAGES = {
-  emailTaken: 'Este e-mail já está em uso.',
+  emailTaken: 'Este e-mail já está em uso. Entre com ele ou use outro endereço.',
   invalidData: 'Dados inválidos. Verifique os campos preenchidos.',
   generic: 'Erro ao realizar cadastro. Tente novamente.',
 };
 
 export const ZIP_LOOKUP_MESSAGES = {
-  notFound: 'CEP não encontrado.',
+  notFound: 'CEP não encontrado. Preencha o endereço manualmente.',
   failed: 'Não foi possível consultar o CEP. Tente novamente.',
 };
 
-export const signupSuccessMessage = (fullName: string): string =>
-  `Conta criada com sucesso, ${fullName}!`;
+export const SIGNUP_SUCCESS_MESSAGE = 'Conta criada.';
