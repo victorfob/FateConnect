@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using FateConnect.Api.Modules.Auth.DTOs;
 
 namespace FateConnect.Api.Tests;
@@ -9,7 +10,7 @@ public class LoginTests(ApiFactory factory) : IClassFixture<ApiFactory>
     private const string KnownPassword = "SenhaForte123!";
 
     [Fact]
-    public async Task Login_WithTheRightPassword_AnswersTheTokenAndTheName()
+    public async Task Login_WithTheRightPassword_AnswersOnlyTheToken()
     {
         (_, string fatecEmail) = factory.SeedUserWithPassword("Mariana Alves Rocha", KnownPassword);
 
@@ -20,8 +21,12 @@ public class LoginTests(ApiFactory factory) : IClassFixture<ApiFactory>
 
         TokenResponseDto body = (await response.Content.ReadFromJsonAsync<TokenResponseDto>())!;
 
-        Assert.Equal("Mariana Alves Rocha", body.FullName);
         Assert.False(string.IsNullOrWhiteSpace(body.Token));
+
+        JsonElement raw = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+
+        Assert.Single(raw.EnumerateObject());
+        Assert.True(raw.TryGetProperty("token", out _));
     }
 
     [Fact]

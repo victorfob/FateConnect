@@ -8,8 +8,4 @@ public class TokenResponseDto
     [Required]
     [DefaultValue("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")]
     public string Token { get; set; } = string.Empty;
-
-    [Required]
-    [DefaultValue("João da Silva")]
-    public string FullName { get; set; } = string.Empty;
 }
