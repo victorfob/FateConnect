@@ -15,7 +15,7 @@ case "$ENVIRONMENT" in
 esac
 
 ENV_FILE=".env.$ENVIRONMENT"
-if [ ! -f "$ENV_FILE" ]; then
+if [[ ! -f "$ENV_FILE" ]]; then
   echo "ERRO: falta deploy/$ENV_FILE." >&2
   exit 1
 fi
@@ -23,13 +23,13 @@ fi
 # shellcheck disable=SC1090
 set -a; . "./$ENV_FILE"; set +a
 
-if [ -z "${PUBLIC_URL:-}" ]; then
+if [[ -z "${PUBLIC_URL:-}" ]]; then
   echo "ERRO: PUBLIC_URL não está preenchido em deploy/$ENV_FILE." >&2
   exit 1
 fi
 
 TARGET="/var/www/fateconnect/$ENVIRONMENT"
-if [ ! -d "$TARGET" ]; then
+if [[ ! -d "$TARGET" ]]; then
   echo "ERRO: $TARGET não existe. Rode antes:  sudo ./install-site.sh $ENVIRONMENT" >&2
   exit 1
 fi

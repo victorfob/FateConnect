@@ -13,7 +13,7 @@
 # está listado no final como sugestão.
 set -euo pipefail
 
-if [ "$(id -u)" -ne 0 ]; then
+if [[ "$(id -u)" -ne 0 ]]; then
   echo "Rode com sudo: sudo ./vps-setup.sh" >&2
   exit 1
 fi
@@ -83,7 +83,7 @@ for environment in hml prod; do
   # `sudo -u` e não `su -`: o usuário postgres costuma ter /sbin/nologin como
   # shell, e aí o `su` falha sem conseguir sequer abrir a sessão.
   exists=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$database'")
-  if [ "$exists" = "1" ]; then
+  if [[ "$exists" = "1" ]]; then
     echo "    $database já existe; senha não alterada"
     continue
   fi

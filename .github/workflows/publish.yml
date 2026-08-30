@@ -98,7 +98,7 @@ jobs:
           # Um ambiente é um contêiner, o da API: banco e servidor web são do
           # host e não aparecem aqui.
           total=$(grep -c . containers.txt || true)
-          if [ "$total" -lt 1 ]; then
+          if [[ "$total" -lt 1 ]]; then
             echo "ERRO: nenhum contêiner de pé; esperado 1." >&2
             exit 1
           fi
