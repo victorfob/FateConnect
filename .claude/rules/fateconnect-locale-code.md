@@ -45,8 +45,9 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 A API fala **inglês inteira** — caminho, query, corpo e resposta. Não há tradução na borda: o tipo do front vai direto na chamada.
 
 - **Caronas.** Caminho `/Rides`, query (`destination`, `departureDate`, `departureTime`, `rideType`) e propriedades do JSON com os mesmos nomes. Valores do enum: `Solidarity` | `Egalitarian`.
-- **Cadastro.** `POST /Users/signup` com `fullName`, `nickname`, `fatecEmail`, `password`, `birthDate`, `gender`, `addresses` (`zipCode`, `street`, `streetNumber`, `complement`, `city`, `state`) e `contacts` (`phone`, `contactEmail`). Resposta: `{ id, fatecEmail, fullName }`. Valores de gênero: `Male` | `Female` | `Other`.
-- **Login.** `POST /Auth/login` com `{ fatecEmail, password }`, resposta `{ token, fullName }`.
+- **Cadastro.** `POST /Users/signup` com `fullName`, `nickname`, `fatecEmail`, `password`, `birthDate`, `gender`, `addresses` (`zipCode`, `street`, `streetNumber`, `complement`, `city`, `state`) e `contacts` (`phone`, `contactEmail`). Resposta: `{ token }` — o cadastro já autentica. Valores de gênero: `Male` | `Female` | `Other`.
+- **Login.** `POST /Auth/login` com `{ fatecEmail, password }`, resposta `{ token }`.
+- **O nome de quem está logado sai do token**, na claim `unique_name`, e não de nenhuma resposta. Cadastro e login devolvem o mesmo `TokenResponseDto`.
 - **Erro.** Qualquer status de erro devolve `{ "error": "..." }`, com a mensagem em pt-BR. O corpo sai do `ErrorResponseDto`, o mesmo tipo que o `ProducesResponseType` anuncia — documentação e resposta não conseguem divergir.
 
 ⚠️ **A API publica com a inicial maiúscula e o front chama minúsculo.** `[Route("[controller]")]` gera `/Rides`, `/Users` e `/Auth`, que é o que o Swagger mostra; os serviços do front padronizam `/rides`, `/users/signup` e `/auth`, porque o roteamento do ASP.NET é case-insensitive. Não "corrija" nenhum dos dois lados — a divergência é deliberada.
