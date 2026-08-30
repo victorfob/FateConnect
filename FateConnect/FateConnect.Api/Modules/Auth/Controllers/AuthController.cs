@@ -24,4 +24,13 @@ public class AuthController : ControllerBase
         var response = await _authService.LoginAsync(dto);
         return Ok(response);
     }
+
+    [HttpGet("session")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult GetSession()
+    {
+        return NoContent();
+    }
 }
