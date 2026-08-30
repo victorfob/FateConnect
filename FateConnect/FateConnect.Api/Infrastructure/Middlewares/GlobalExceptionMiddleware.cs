@@ -3,6 +3,7 @@ namespace FateConnect.Api.Infrastructure.Middlewares;
 using System.Net;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
+using FateConnect.Api.Modules.Users.Exceptions;
 using FateConnect.Api.Modules.Usuarios.Exceptions;
 using Microsoft.Extensions.Logging;
 

@@ -84,6 +84,10 @@ jobs:
       # front, que tem projeto e gate próprios e seria medido duas vezes com o
       # gate errado, e as pastas das disciplinas, que não são código de produto —
       # os `.sql` de LBD acionavam o analisador de PL/SQL.
+      #
+      # `Migrations/` sai da cobertura e da duplicação por chaves separadas, e
+      # continua na análise: o `Up` e o `Down` de um rename são blocos espelhados
+      # e batem no limite de duplicação sozinhos.
       - name: Sonar begin
         if: steps.changes.outputs.api == 'true'
         run: >
@@ -96,6 +100,7 @@ jobs:
           /d:sonar.exclusions=FateConnect/Web/**,LBD/**,ESII/**,ESIII/**
           /d:sonar.cs.opencover.reportsPaths=coverage/**/coverage.opencover.xml
           /d:sonar.coverage.exclusions=**/Migrations/**,**/obj/**
+          /d:sonar.cpd.exclusions=**/Migrations/**
           /d:sonar.pullrequest.key=$PR_NUMBER
           /d:sonar.pullrequest.branch=$HEAD_REF
           /d:sonar.pullrequest.base=$BASE_REF

@@ -1,19 +1,19 @@
 using FateConnect.Api.Modules.Common.DTOs;
-using FateConnect.Api.Modules.Usuarios.DTOs;
-using FateConnect.Api.Modules.Usuarios.Services;
+using FateConnect.Api.Modules.Users.DTOs;
+using FateConnect.Api.Modules.Users.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FateConnect.Api.Modules.Usuarios.Controllers;
+namespace FateConnect.Api.Modules.Users.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
 public class UsuarioController : ControllerBase
 {
-    private readonly IUsuarioService _usuarioService;
+    private readonly IUserService _usuarioService;
 
-    public UsuarioController(IUsuarioService usuarioService)
+    public UsuarioController(IUserService usuarioService)
     {
         _usuarioService = usuarioService;
     }
@@ -26,7 +26,7 @@ public class UsuarioController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CadastrarAsync([FromBody] CreateUsuarioDto dto)
     {
-        UsuarioResponseDto resposta = await _usuarioService.CadastrarAsync(dto);
+        UsuarioResponseDto resposta = await _usuarioService.SignUpAsync(dto);
 
         return StatusCode(StatusCodes.Status201Created, resposta);
     }

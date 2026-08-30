@@ -2,8 +2,7 @@ using System.Net.Http.Headers;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
-using FateConnect.Api.Modules.Common.Entities;
-using FateConnect.Api.Modules.Usuarios;
+using FateConnect.Api.Modules.Users.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -47,7 +46,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         };
 
         return new TokenService(Options.Create(options))
-            .GerarJwtToken(new Usuario { Id = userId, EmailFatec = "pessoa@fatec.sp.gov.br" });
+            .GerarJwtToken(new User { Id = userId, FatecEmail = "pessoa@fatec.sp.gov.br" });
     }
 
     public int SeedUser(string fullName, string phone, string contactEmail)
@@ -55,18 +54,18 @@ public class ApiFactory : WebApplicationFactory<Program>
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
-        Usuario user = new()
+        User user = new()
         {
-            NomeCompleto = fullName,
-            EmailFatec = $"{Guid.NewGuid():N}@fatec.sp.gov.br",
-            Senha = "hash-sem-valor-fora-desta-suite",
-            DataNascimento = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-            DataCadastro = DateTime.UtcNow,
-            DataAtualizacao = DateTime.UtcNow,
-            Contatos = [new Contato { Telefone = phone, EmailContato = contactEmail }],
+            FullName = fullName,
+            FatecEmail = $"{Guid.NewGuid():N}@fatec.sp.gov.br",
+            Password = "hash-sem-valor-fora-desta-suite",
+            BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Contacts = [new Contact { Phone = phone, ContactEmail = contactEmail }],
         };
 
-        context.Usuarios.Add(user);
+        context.Users.Add(user);
         context.SaveChanges();
 
         return user.Id;

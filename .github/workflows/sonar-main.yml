@@ -107,6 +107,7 @@ jobs:
           /d:sonar.exclusions=FateConnect/Web/**,LBD/**,ESII/**,ESIII/**
           /d:sonar.cs.opencover.reportsPaths=coverage/**/coverage.opencover.xml
           /d:sonar.coverage.exclusions=**/Migrations/**,**/obj/**
+          /d:sonar.cpd.exclusions=**/Migrations/**
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 

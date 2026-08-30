@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
-using FateConnect.Api.Modules.Usuarios;
+using FateConnect.Api.Modules.Users.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -27,11 +27,11 @@ public class TokenServiceTests
         };
 
         string token = new TokenService(Options.Create(options))
-            .GerarJwtToken(new Usuario
+            .GerarJwtToken(new User
             {
                 Id = 7,
-                NomeCompleto = "Pessoa de Teste",
-                EmailFatec = "pessoa@fatec.sp.gov.br",
+                FullName = "Pessoa de Teste",
+                FatecEmail = "pessoa@fatec.sp.gov.br",
             });
 
         ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(

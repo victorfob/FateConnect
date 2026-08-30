@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Enums;
-using FateConnect.Api.Modules.Usuarios.DTOs;
-using FateConnect.Api.Modules.Usuarios.Enums;
+using FateConnect.Api.Modules.Users.DTOs;
+using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Tests;
 
