@@ -47,6 +47,7 @@ A API fala **inglês inteira** — caminho, query, corpo e resposta. Não há tr
 - **Caronas.** Caminho `/Rides`, query (`destination`, `departureDate`, `departureTime`, `rideType`) e propriedades do JSON com os mesmos nomes. Valores do enum: `Solidarity` | `Egalitarian`.
 - **Cadastro.** `POST /Users/signup` com `fullName`, `nickname`, `fatecEmail`, `password`, `birthDate`, `gender`, `addresses` (`zipCode`, `street`, `streetNumber`, `complement`, `city`, `state`) e `contacts` (`phone`, `contactEmail`). Resposta: `{ token }` — o cadastro já autentica. Valores de gênero: `Male` | `Female` | `Other`.
 - **Login.** `POST /Auth/login` com `{ fatecEmail, password }`, resposta `{ token }`.
+- **Sessão.** `GET /Auth/session`, autenticada, responde `204` enquanto o token vale e `401` quando não vale mais. É quem diz se a sessão continua de pé — o front não julga validade por conta própria, e não lê o `exp` do token.
 - **O nome de quem está logado sai do token**, na claim `unique_name`, e não de nenhuma resposta. Cadastro e login devolvem o mesmo `TokenResponseDto`.
 - **Erro.** Qualquer status de erro devolve `{ "error": "..." }`, com a mensagem em pt-BR. O corpo sai do `ErrorResponseDto`, o mesmo tipo que o `ProducesResponseType` anuncia — documentação e resposta não conseguem divergir.
 
