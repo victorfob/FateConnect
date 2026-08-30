@@ -15,6 +15,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 
 - Corrige a listagem de caronas, que continuava exibindo — e no topo — as caronas cujo horário de partida já tinha passado (#236) [Backend]
+- Corrige o controle de páginas da lista de caronas e do mural de achados e perdidos no celular: ele quebrava em duas fileiras, deixava a página seguinte sem número para clicar em parte das páginas, levava a tela ao topo a cada clique e flutuava afastado da lista (#244) [Frontend]
 
 ## [0.6.0] - 2026-08-30
 

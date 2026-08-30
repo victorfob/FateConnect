@@ -1,4 +1,3 @@
-import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
@@ -9,7 +8,9 @@ import {
   LostItemStatusEnum,
   type LostItem,
 } from '@app/services/lostAndFound/types';
-import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
+import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
 import { OWN_ITEM_LABEL } from './components/LostItemCard/constants';
 import {
@@ -51,36 +52,8 @@ function activeFilterDot(title: string) {
   return screen.getByText(title).closest('.MuiBadge-root')?.querySelector('.MuiBadge-badge');
 }
 
-const FIRST_PAGE = 1;
-const PAGE_SIZE = 10;
-
-/**
- * Fatia como a API fatia: o `total` conta o conjunto inteiro e a página além da
- * última sai vazia. Stub mais tolerante que a API é teste que mente.
- */
-function pagedResponse(all: LostItem[], url: URL) {
-  const page = Number(url.searchParams.get('Page') ?? FIRST_PAGE);
-  const pageSize = Number(url.searchParams.get('PageSize') ?? PAGE_SIZE);
-  const start = (page - FIRST_PAGE) * pageSize;
-
-  return {
-    items: all.slice(start, start + pageSize),
-    page,
-    pageSize,
-    total: all.length,
-    totalPages: Math.ceil(all.length / pageSize),
-  };
-}
-
 function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
-  server.use(
-    http.get(LOST_ITEMS_URL, ({ request }) => {
-      const url = new URL(request.url);
-      onRequest?.(url);
-
-      return HttpResponse.json(pagedResponse(items, url));
-    }),
-  );
+  server.use(pagedListHandler(LOST_ITEMS_URL, items, onRequest));
 }
 
 const NO_CONTENT = 204;
@@ -152,16 +125,7 @@ async function filterByStatus(optionLabel: string) {
 }
 
 function renderComponent(search = '') {
-  const router = createMemoryRouter(
-    [
-      { path: RoutePathEnum.LOST_AND_FOUND, element: <LostAndFound /> },
-      { path: RoutePathEnum.MENU, element: <div>menu</div> },
-    ],
-    { initialEntries: [`${RoutePathEnum.LOST_AND_FOUND}${search}`] },
-  );
-  render(<RouterProvider router={router} />);
-
-  return router;
+  return renderAtRoute(RoutePathEnum.LOST_AND_FOUND, <LostAndFound />, search);
 }
 
 describe('LostAndFound', () => {
@@ -496,11 +460,13 @@ describe('LostAndFound', () => {
   describe('paginação e busca na URL', () => {
     const SECOND_PAGE_LABEL = 'Ir para a página 2';
 
+    const manyItemName = (index: number) => `Item ${index}`;
+
     function manyItems(total: number) {
       return Array.from({ length: total }, (_, index) => ({
         ...LOST_ITEM,
         id: `item-${index}`,
-        nome: `Item ${index}`,
+        nome: manyItemName(index),
       }));
     }
 
@@ -521,6 +487,15 @@ describe('LostAndFound', () => {
       renderComponent('?pagina=3');
 
       await waitFor(() => expect(asked!.searchParams.get('Page')).toBe('3'));
+    });
+
+    it('should show the items the requested page holds, and not the ones before it', async () => {
+      listReturning(manyItems(12));
+
+      renderComponent('?pagina=2');
+
+      expect(await screen.findByText(manyItemName(10))).toBeInTheDocument();
+      expect(screen.queryByText(manyItemName(0))).not.toBeInTheDocument();
     });
 
     it('should put the chosen page in the url and leave the first one out', async () => {

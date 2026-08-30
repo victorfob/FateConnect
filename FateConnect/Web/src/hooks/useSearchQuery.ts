@@ -23,8 +23,12 @@ export function useSearchQuery<T>(codec: SearchQueryCodec<T>): SearchQueryResult
 
   // `replace`: paginar e filtrar refazem a mesma tela, então o botão voltar do
   // navegador deve sair dela em vez de desfazer escolha por escolha.
+  //
+  // `preventScrollReset`: o `ScrollRestoration` do RootLayout leva ao topo a
+  // cada navegação, e trocar de página é uma. Sem isto, clicar no controle de
+  // paginação — que fica no rodapé da lista — tira a lista da vista.
   const replace = useCallback(
-    (next: T) => setSearchParams(codec.toParams(next), { replace: true }),
+    (next: T) => setSearchParams(codec.toParams(next), { replace: true, preventScrollReset: true }),
     [codec, setSearchParams],
   );
 
