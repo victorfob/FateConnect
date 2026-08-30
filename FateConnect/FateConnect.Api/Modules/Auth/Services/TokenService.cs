@@ -19,21 +19,21 @@ public class TokenService : ITokenService
         _jwtOptions = jwtOptions.Value;
     }
 
-    public string GerarJwtToken(User usuario)
+    public string GenerateJwtToken(User user)
     {
         JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
-        byte[] chaveSeguranca = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
-        ClaimsIdentity claimsDoUsuario = CriarClaimsDoUsuario(usuario);
+        byte[] securityKey = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
+        ClaimsIdentity userClaims = BuildUserClaims(user);
 
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = claimsDoUsuario,
+            Subject = userClaims,
             Expires = DateTime.UtcNow.AddHours(_jwtOptions.ExpirationHours),
             Issuer = _jwtOptions.Issuer,
             Audience = _jwtOptions.Audience,
             SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(chaveSeguranca),
+                new SymmetricSecurityKey(securityKey),
                 SecurityAlgorithms.HmacSha256Signature)
         };
 
@@ -42,14 +42,14 @@ public class TokenService : ITokenService
         return tokenHandler.WriteToken(token);
     }
 
-    private static ClaimsIdentity CriarClaimsDoUsuario(User usuario)
+    private static ClaimsIdentity BuildUserClaims(User user)
     {
         Claim[] claims =
         [
-            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString(CultureInfo.InvariantCulture)),
-            new Claim(ClaimTypes.Name, usuario.FullName),
-            new Claim(ClaimTypes.Email, usuario.FatecEmail),
-            new Claim(ClaimTypes.Role, usuario.ProfileType.ToString())
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(CultureInfo.InvariantCulture)),
+            new Claim(ClaimTypes.Name, user.FullName),
+            new Claim(ClaimTypes.Email, user.FatecEmail),
+            new Claim(ClaimTypes.Role, user.ProfileType.ToString())
         ];
 
         return new ClaimsIdentity(claims);

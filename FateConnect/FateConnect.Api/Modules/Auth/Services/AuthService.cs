@@ -1,46 +1,46 @@
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Interfaces;
-using FateConnect.Api.Modules.Usuarios.DTOs;
-using FateConnect.Api.Modules.Usuarios.Exceptions;
+using FateConnect.Api.Modules.Auth.DTOs;
+using FateConnect.Api.Modules.Auth.Exceptions;
 using static BCrypt.Net.BCrypt;
 
 namespace FateConnect.Api.Modules.Auth.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IUserRepository _usuarioRepository;
+    private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
 
-    public AuthService(IUserRepository usuarioRepository, ITokenService tokenService)
+    public AuthService(IUserRepository userRepository, ITokenService tokenService)
     {
-        _usuarioRepository = usuarioRepository;
+        _userRepository = userRepository;
         _tokenService = tokenService;
     }
 
     public async Task<TokenResponseDto> LoginAsync(LoginDto dto)
     {
-        User? usuario = await _usuarioRepository.GetByEmailAsync(dto.EmailFatec);
+        User? user = await _userRepository.GetByEmailAsync(dto.FatecEmail);
 
-        bool saoCredenciaisInvalidas = CredenciaisInvalidas(usuario, dto.Senha);
+        bool areCredentialsInvalid = AreCredentialsInvalid(user, dto.Password);
 
-        if (saoCredenciaisInvalidas)
-            throw new CredenciaisInvalidasException();
+        if (areCredentialsInvalid)
+            throw new InvalidCredentialsException();
 
-        string tokenGerado = _tokenService.GerarJwtToken(usuario!);
+        string generatedToken = _tokenService.GenerateJwtToken(user!);
 
         return new TokenResponseDto
         {
-            NomeCompleto = usuario!.FullName,
-            Token = tokenGerado
+            FullName = user!.FullName,
+            Token = generatedToken
         };
     }
 
-    private static bool CredenciaisInvalidas(User? usuario, string senhaInserida)
+    private static bool AreCredentialsInvalid(User? user, string providedPassword)
     {
-        if (usuario == null)
+        if (user == null)
             return true;
 
-        return !Verify(senhaInserida, usuario.Password);
+        return !Verify(providedPassword, user.Password);
     }
 }

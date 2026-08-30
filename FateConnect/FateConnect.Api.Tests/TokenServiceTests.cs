@@ -17,7 +17,7 @@ public class TokenServiceTests
     private const string Audience = "FateConnectTestWeb";
 
     [Fact]
-    public void GerarJwtToken_IsAcceptedByAKeyBuiltInUtf8()
+    public void GenerateJwtToken_IsAcceptedByAKeyBuiltInUtf8()
     {
         JwtOptions options = new()
         {
@@ -27,7 +27,7 @@ public class TokenServiceTests
         };
 
         string token = new TokenService(Options.Create(options))
-            .GerarJwtToken(new User
+            .GenerateJwtToken(new User
             {
                 Id = 7,
                 FullName = "Pessoa de Teste",

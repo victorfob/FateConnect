@@ -46,7 +46,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         };
 
         return new TokenService(Options.Create(options))
-            .GerarJwtToken(new User { Id = userId, FatecEmail = "pessoa@fatec.sp.gov.br" });
+            .GenerateJwtToken(new User { Id = userId, FatecEmail = "pessoa@fatec.sp.gov.br" });
     }
 
     public int SeedUser(string fullName, string phone, string contactEmail)

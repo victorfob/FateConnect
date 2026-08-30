@@ -27,15 +27,15 @@ public class ValidationMessagesTests
     [Fact]
     public void AnUndefinedGender_IsRejectedInPortuguese()
     {
-        List<ValidationResult> results = Validate(new CreateUsuarioDto
+        List<ValidationResult> results = Validate(new CreateUserDto
         {
-            EmailFatec = "pessoa@aluno.cps.sp.gov.br",
-            Senha = "SenhaForte123!",
-            NomeCompleto = "Pessoa de Teste",
-            DataNascimento = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-            Genero = (EnumGender)99,
-            Enderecos = [],
-            Contatos = [],
+            FatecEmail = "pessoa@aluno.cps.sp.gov.br",
+            Password = "PasswordForte123!",
+            FullName = "Pessoa de Teste",
+            BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            Gender = (EnumGender)99,
+            Addresses = [],
+            Contacts = [],
         });
 
         Assert.Contains(results, result => result.ErrorMessage == "Gênero inválido");

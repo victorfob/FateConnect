@@ -4,7 +4,6 @@ using FateConnect.Api.Infrastructure.Middlewares;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Exceptions;
-using FateConnect.Api.Modules.Usuarios.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -56,7 +55,7 @@ public class GlobalExceptionMiddlewareTests
     public async Task ADuplicateEmail_AnswersConflictWithItsOwnMessage()
     {
         (HttpStatusCode statusCode, string error) =
-            await AnswerFor(new EmailJaCadastradoException("pessoa@aluno.cps.sp.gov.br"));
+            await AnswerFor(new EmailAlreadyRegisteredException("pessoa@aluno.cps.sp.gov.br"));
 
         Assert.Equal(HttpStatusCode.Conflict, statusCode);
         Assert.Equal("O e-mail 'pessoa@aluno.cps.sp.gov.br' já está em uso no sistema.", error);
@@ -65,7 +64,7 @@ public class GlobalExceptionMiddlewareTests
     [Fact]
     public async Task InvalidCredentials_AnswerUnauthorizedWithTheirOwnMessage()
     {
-        (HttpStatusCode statusCode, string error) = await AnswerFor(new CredenciaisInvalidasException());
+        (HttpStatusCode statusCode, string error) = await AnswerFor(new InvalidCredentialsException());
 
         Assert.Equal(HttpStatusCode.Unauthorized, statusCode);
         Assert.Equal("E-mail ou senha inválido.", error);
@@ -74,7 +73,7 @@ public class GlobalExceptionMiddlewareTests
     [Fact]
     public async Task AMissingJwtSecret_AnswersInternalServerErrorWithItsOwnMessage()
     {
-        (HttpStatusCode statusCode, string error) = await AnswerFor(new JwtNaoConfiguradoException());
+        (HttpStatusCode statusCode, string error) = await AnswerFor(new JwtNotConfiguredException());
 
         Assert.Equal(HttpStatusCode.InternalServerError, statusCode);
         Assert.Equal("JWT_SECRET não configurado.", error);

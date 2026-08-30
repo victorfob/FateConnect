@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace FateConnect.Api.Modules.Usuarios.DTOs;
+namespace FateConnect.Api.Modules.Auth.DTOs;
 
 public class TokenResponseDto
 {
@@ -11,5 +11,5 @@ public class TokenResponseDto
 
     [Required]
     [DefaultValue("João da Silva")]
-    public string NomeCompleto { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
 }

@@ -6,44 +6,44 @@ using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Modules.Users.DTOs;
 
-public class CreateUsuarioDto
+public class CreateUserDto
 {
     [Required(ErrorMessage = "O email é obrigatório")]
     [EmailAddress(ErrorMessage = "Formato de email inválido")]
-    [RegularExpression(RegexConstants.EmailInstitucionalFatec, ErrorMessage = RegexConstants.MensagemErroEmailFatec)]
+    [RegularExpression(RegexConstants.FatecEmailPattern, ErrorMessage = RegexConstants.FatecEmailErrorMessage)]
     [MaxLength(150)]
     [DefaultValue("joao.silva999@aluno.cps.sp.gov.br")]
-    public string EmailFatec { get; set; } = string.Empty;
+    public string FatecEmail { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "A senha é obrigatória")]
     [MinLength(8, ErrorMessage = "A senha deve ter no mínimo 8 caracteres")]
-    [DefaultValue("SenhaForte123!")]
-    public string Senha { get; set; } = string.Empty;
+    [DefaultValue("PasswordForte123!")]
+    public string Password { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "O nome completo é obrigatório")]
     [MaxLength(200)]
     [DefaultValue("João da Silva")]
-    public string NomeCompleto { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
 
     [MaxLength(50)]
     [DefaultValue("Joãozinho")]
-    public string? Apelido { get; set; }
+    public string? Nickname { get; set; }
 
     [Required]
     [DefaultValue("2000-01-01T00:00:00Z")]
-    required public DateTime DataNascimento { get; set; }
+    required public DateTime BirthDate { get; set; }
 
     [Required]
     [DefaultValue(1)]
     [EnumDataType(typeof(EnumGender), ErrorMessage = "Gênero inválido")]
-    required public EnumGender Genero { get; set; }
+    required public EnumGender Gender { get; set; }
 
     [Required]
-    required public List<CreateEnderecoDto> Enderecos { get; set; } =
+    required public List<CreateAddressDto> Addresses { get; set; } =
     [];
 
     [Required]
     [MinLength(1, ErrorMessage = "É obrigatório informar ao menos um contato")]
-    required public List<CreateContatoDto> Contatos { get; set; } =
+    required public List<CreateContactDto> Contacts { get; set; } =
     [];
 }
