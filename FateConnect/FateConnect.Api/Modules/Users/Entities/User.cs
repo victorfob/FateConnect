@@ -14,6 +14,6 @@ public class User
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public EnumProfileType ProfileType { get; set; }
-    public ICollection<Address> Addresses { get; set; } = new List<Address>();
-    public ICollection<Contact> Contacts { get; set; } = new List<Contact>();
+    public ICollection<Address> Addresses { get; set; } = [];
+    public ICollection<Contact> Contacts { get; set; } = [];
 }
