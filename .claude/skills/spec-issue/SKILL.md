@@ -108,7 +108,24 @@ Os `id` saem de `gh api graphql -f query='{repository(owner:"...",name:"..."){is
 
 Antes de dizer que acabou, cruzar **cada** coisa conversada contra o que entrou. Cada item termina em um de três estados ditos em voz alta: **coberto** (por qual sub-issue), **fora de escopo por decisão** (com o motivo), ou **aberto** (com quem destrava). Item conversado que evapora é o defeito clássico desta skill.
 
-## 7. Fechar o pai é manual, e ninguém avisa
+## 7. Cada merge envelhece as irmãs
+
+⛔ **Ao mergear uma sub-issue, releia as que sobraram.** Uma árvore de sub-issues é escrita de uma vez, com o repositório de um instante — e cada PR que entra invalida um pedaço do que as outras dizem. Nada avisa: o texto continua sintaticamente perfeito.
+
+Quatro vezes na árvore da #207:
+
+| O que ficou falso | Depois de |
+| --- | --- |
+| a #210 mandava renomear serviços e interfaces | a #209 já os ter renomeado no review |
+| a #211 mandava renomear `GerarHashDaSenha`, que deixou de existir | a #209 remover o wrapper |
+| a #212 tinha um checkbox aberto para uma decisão já tomada | o #221 unificar os `.editorconfig` |
+| a #213 escrevia a rota em minúscula e não citava um JSDoc já falso | o #222 publicar `/Users/signup` |
+
+⚠️ **A terceira foi o Victor quem pegou**, perguntando *"editorconfig já foi arrumado, tá lá ainda?"* — depois de eu ter editado aquela seção **antes** do merge e não ter voltado nela.
+
+**O gatilho é o merge, não o fim da árvore.** Ao fechar uma sub-issue, abra as irmãs abertas e procure: escopo que outro PR já entregou, símbolo que deixou de existir, e decisão que mudou. Item entregue vira `[x]` com a nota de onde saiu; item morto sai.
+
+## 8. Fechar o pai é manual, e ninguém avisa
 
 ⛔ **Nada fecha sozinho aqui.** Duas mecânicas somadas deixam a árvore aberta com tudo entregue:
 

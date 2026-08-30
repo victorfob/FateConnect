@@ -114,3 +114,13 @@ O teste que protege isso precisa de um nome **com acento** — `João Ávila` pa
 ## TODO
 
 Comentário `TODO` fora de bloco JSX, referenciando a issue que o resolve.
+
+## Rename em lote não sabe o que é nosso
+
+⛔ **Substituição mecânica atinge chave de contrato que não controlamos.** Antes de trocar um nome em vários arquivos, separe o que é **nosso** do que vem de fora.
+
+Aconteceu na #213, ao levar o cadastro para inglês: o replace `cep` → `zipCode` e `logradouro` → `street` acertou o **stub do ViaCEP**, cujo contrato é do provedor e não muda porque a nossa API mudou. Os testes de preenchimento por CEP quebraram com um erro que não menciona rename — *"Unable to find an element with the display value: Praça da Sé"*.
+
+**Os contratos de terceiro deste repo**, hoje: `services/cep/` (ViaCEP e OpenCEP, com `cep`, `logradouro`, `localidade`, `uf`) e `utils/whatsapp.ts`. A variável que recebe o valor segue as nossas regras de nome; a **chave** copia o provedor exatamente.
+
+⚠️ **O mesmo replace também erra por falta.** Na mesma rodada ele deixou passar `senha:` e `numero:` dentro do payload de um teste, porque a lista de pares não os previa. Errar por excesso e por falta ao mesmo tempo é o normal, não a exceção — por isso a conferência é ler o diff, não confiar na lista.
