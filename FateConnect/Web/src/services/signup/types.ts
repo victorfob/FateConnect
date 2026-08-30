@@ -22,9 +22,3 @@ export type SignupRequest = {
   addresses: SignupAddress[];
   contacts: SignupContact[];
 };
-
-export type SignupResponse = {
-  id: number;
-  fatecEmail: string;
-  fullName: string;
-};

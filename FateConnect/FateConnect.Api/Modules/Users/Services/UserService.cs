@@ -1,3 +1,5 @@
+using FateConnect.Api.Modules.Auth.DTOs;
+using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
@@ -11,13 +13,15 @@ namespace FateConnect.Api.Modules.Users.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly ITokenService _tokenService;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, ITokenService tokenService)
     {
         _userRepository = userRepository;
+        _tokenService = tokenService;
     }
 
-    public async Task<UserResponseDto> SignUpAsync(CreateUserDto dto)
+    public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto)
     {
         await EnsureEmailIsUniqueAsync(dto.FatecEmail);
 
@@ -25,14 +29,9 @@ public class UserService : IUserService
 
         await _userRepository.AddAsync(newUser);
 
-        UserResponseDto response = new UserResponseDto
-        {
-            Id = newUser.Id,
-            FatecEmail = newUser.FatecEmail,
-            FullName = newUser.FullName
-        };
+        string generatedToken = _tokenService.GenerateJwtToken(newUser);
 
-        return response;
+        return new TokenResponseDto { Token = generatedToken };
     }
 
     private async Task EnsureEmailIsUniqueAsync(string email)

@@ -1,5 +1,8 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
+using FateConnect.Api.Modules.Auth.DTOs;
 
 namespace FateConnect.Api.Tests;
 
@@ -30,6 +33,31 @@ public class SignupTests : IClassFixture<ApiFactory>
         string corpo = await r.Content.ReadAsStringAsync();
 
         Assert.True(r.StatusCode == HttpStatusCode.Created, $"status={r.StatusCode} corpo={corpo}");
+    }
+
+    [Fact]
+    public async Task Signup_WithOneContact_AnswersATokenThatOpensTheApi()
+    {
+        HttpResponseMessage signup = await _factory.CreateClient().PostAsJsonAsync(
+            "/Users/signup",
+            SignupPayload(new[] { new { phone = "15999990000", contactEmail = "mariana.rocha@gmail.com" } }));
+
+        Assert.Equal(HttpStatusCode.Created, signup.StatusCode);
+
+        JsonElement raw = JsonDocument.Parse(await signup.Content.ReadAsStringAsync()).RootElement;
+
+        Assert.Single(raw.EnumerateObject());
+        Assert.True(raw.TryGetProperty("token", out _));
+
+        TokenResponseDto body = (await signup.Content.ReadFromJsonAsync<TokenResponseDto>())!;
+
+        HttpClient authenticated = _factory.CreateClient();
+        authenticated.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", body.Token);
+
+        HttpResponseMessage rides = await authenticated.GetAsync("/Rides");
+
+        Assert.Equal(HttpStatusCode.OK, rides.StatusCode);
     }
 
     [Fact]
