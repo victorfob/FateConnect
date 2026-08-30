@@ -51,12 +51,34 @@ function activeFilterDot(title: string) {
   return screen.getByText(title).closest('.MuiBadge-root')?.querySelector('.MuiBadge-badge');
 }
 
+const FIRST_PAGE = 1;
+const PAGE_SIZE = 10;
+
+/**
+ * Fatia como a API fatia: o `total` conta o conjunto inteiro e a página além da
+ * última sai vazia. Stub mais tolerante que a API é teste que mente.
+ */
+function pagedResponse(all: LostItem[], url: URL) {
+  const page = Number(url.searchParams.get('Page') ?? FIRST_PAGE);
+  const pageSize = Number(url.searchParams.get('PageSize') ?? PAGE_SIZE);
+  const start = (page - FIRST_PAGE) * pageSize;
+
+  return {
+    items: all.slice(start, start + pageSize),
+    page,
+    pageSize,
+    total: all.length,
+    totalPages: Math.ceil(all.length / pageSize),
+  };
+}
+
 function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
   server.use(
     http.get(LOST_ITEMS_URL, ({ request }) => {
-      onRequest?.(new URL(request.url));
+      const url = new URL(request.url);
+      onRequest?.(url);
 
-      return HttpResponse.json(items);
+      return HttpResponse.json(pagedResponse(items, url));
     }),
   );
 }
@@ -83,10 +105,11 @@ function boardTracking(initial: LostItem) {
 
   server.use(
     http.get(LOST_ITEMS_URL, ({ request }) => {
-      const wanted = new URL(request.url).searchParams.get('Situacao');
-      if (wanted && wanted !== current.situacao) return HttpResponse.json([]);
+      const url = new URL(request.url);
+      const wanted = url.searchParams.get('Situacao');
+      if (wanted && wanted !== current.situacao) return HttpResponse.json(pagedResponse([], url));
 
-      return HttpResponse.json([current]);
+      return HttpResponse.json(pagedResponse([current], url));
     }),
     http.patch<{ itemId: string }, { situacao: LostItemStatusEnum }>(
       `${LOST_ITEMS_URL}/:itemId/situacao`,
@@ -128,13 +151,13 @@ async function filterByStatus(optionLabel: string) {
   await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 }
 
-function renderComponent() {
+function renderComponent(search = '') {
   const router = createMemoryRouter(
     [
       { path: RoutePathEnum.LOST_AND_FOUND, element: <LostAndFound /> },
       { path: RoutePathEnum.MENU, element: <div>menu</div> },
     ],
-    { initialEntries: [RoutePathEnum.LOST_AND_FOUND] },
+    { initialEntries: [`${RoutePathEnum.LOST_AND_FOUND}${search}`] },
   );
   render(<RouterProvider router={router} />);
 
@@ -468,5 +491,70 @@ describe('LostAndFound', () => {
     const dialog = within(await screen.findByRole('dialog'));
     expect(dialog.getByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
     expect(dialog.getByDisplayValue(OWN_OPEN_ITEM.nome)).toBeInTheDocument();
+  });
+
+  describe('paginação e busca na URL', () => {
+    const SECOND_PAGE_LABEL = 'Ir para a página 2';
+
+    function manyItems(total: number) {
+      return Array.from({ length: total }, (_, index) => ({
+        ...LOST_ITEM,
+        id: `item-${index}`,
+        nome: `Item ${index}`,
+      }));
+    }
+
+    it('should open with the fields already filled from the url', async () => {
+      listReturning([LOST_ITEM]);
+
+      renderComponent('?nome=Garrafa&tipo=perdido');
+
+      expect(await screen.findByDisplayValue('Garrafa')).toBeInTheDocument();
+    });
+
+    it('should ask the api for the page the url names', async () => {
+      let asked: URL | null = null;
+      listReturning(manyItems(30), (url) => {
+        asked = url;
+      });
+
+      renderComponent('?pagina=3');
+
+      await waitFor(() => expect(asked!.searchParams.get('Page')).toBe('3'));
+    });
+
+    it('should put the chosen page in the url and leave the first one out', async () => {
+      listReturning(manyItems(30));
+      const router = renderComponent();
+
+      await userEvent.click(await screen.findByRole('button', { name: SECOND_PAGE_LABEL }));
+
+      await waitFor(() => expect(router.state.location.search).toBe('?pagina=2'));
+    });
+
+    it('should go back to the first page when a filter is applied', async () => {
+      listReturning(manyItems(30));
+      const router = renderComponent('?pagina=3');
+
+      await userEvent.type(await screen.findByLabelText(FILTER_LABELS.name), 'Mochila');
+      await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
+
+      await waitFor(() => expect(router.state.location.search).toBe('?nome=Mochila'));
+    });
+
+    it('should fall back to the last page when the url asks beyond it', async () => {
+      listReturning(manyItems(12));
+      const router = renderComponent('?pagina=9');
+
+      await waitFor(() => expect(router.state.location.search).toBe('?pagina=2'));
+    });
+
+    it('should keep the default status out of the url while showing it on the screen', async () => {
+      listReturning([LOST_ITEM]);
+      const router = renderComponent();
+
+      expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
+      expect(router.state.location.search).toBe('');
+    });
   });
 });

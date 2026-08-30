@@ -21,6 +21,9 @@ const LOST_ITEM_INPUT: LostItemInput = {
 };
 
 const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/achado';
+const FIRST_PAGE = 1;
+const PAGE_SIZE = 10;
+const SINGLE_PAGE = 1;
 const ITEM_ID = 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14';
 
 const NO_CONTENT = 204;
@@ -42,13 +45,23 @@ function statusEndpointRecording(received: StatusRequest[]) {
   );
 }
 
+function pageOf(items: unknown[]) {
+  return {
+    items,
+    page: FIRST_PAGE,
+    pageSize: PAGE_SIZE,
+    total: items.length,
+    totalPages: SINGLE_PAGE,
+  };
+}
+
 describe('lostAndFoundService', () => {
   it('should translate the front filters into the api query parameters', async () => {
     let received: URLSearchParams | null = null;
     server.use(
       http.get(LOST_AND_FOUND_URL, ({ request }) => {
         received = new URL(request.url).searchParams;
-        return HttpResponse.json([]);
+        return HttpResponse.json(pageOf([]));
       }),
     );
 
@@ -72,7 +85,7 @@ describe('lostAndFoundService', () => {
     server.use(
       http.get(LOST_AND_FOUND_URL, ({ request }) => {
         received = new URL(request.url).searchParams;
-        return HttpResponse.json([]);
+        return HttpResponse.json(pageOf([]));
       }),
     );
 
@@ -83,12 +96,14 @@ describe('lostAndFoundService', () => {
 
   it('should list items without filters', async () => {
     server.use(
-      http.get(LOST_AND_FOUND_URL, () => HttpResponse.json([{ id: 'c7d2', nome: 'Guarda-chuva' }])),
+      http.get(LOST_AND_FOUND_URL, () =>
+        HttpResponse.json(pageOf([{ id: 'c7d2', nome: 'Guarda-chuva' }])),
+      ),
     );
 
-    const items = await listLostItems();
+    const page = await listLostItems();
 
-    expect(items).toHaveLength(1);
+    expect(page.items).toHaveLength(1);
   });
 
   it('should conclude the item through the status resource', async () => {
@@ -129,7 +144,7 @@ describe('lostAndFoundService', () => {
       http.get(LOST_AND_FOUND_URL, () => HttpResponse.text('<!doctype html><html></html>')),
     );
 
-    await expect(listLostItems()).rejects.toThrow(/não é uma lista/);
+    await expect(listLostItems()).rejects.toThrow(/não é uma página/);
   });
 
   it('should post the item on creation and return what the api answered', async () => {
