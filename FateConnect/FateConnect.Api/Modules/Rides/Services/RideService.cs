@@ -1,11 +1,10 @@
 namespace FateConnect.Api.Modules.Rides.Services;
 
-using FateConnect.Api.Modules.Common.Entities;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Rides.Interfaces;
-using FateConnect.Api.Modules.Usuarios;
+using FateConnect.Api.Modules.Users.Entities;
 using Microsoft.Extensions.Logging;
 
 public partial class RideService(
@@ -131,11 +130,11 @@ public partial class RideService(
             ride.IsDrivenBy(currentUserId)
         );
 
-    private static RideDriverDto MapDriverToDto(Usuario driver)
+    private static RideDriverDto MapDriverToDto(User driver)
     {
-        Contato contact = driver.Contatos.First();
+        Contact contact = driver.Contacts.First();
 
-        return new RideDriverDto(driver.NomeCompleto, contact.EmailContato, contact.Telefone);
+        return new RideDriverDto(driver.FullName, contact.ContactEmail, contact.Phone);
     }
 
 }

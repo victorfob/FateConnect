@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace FateConnect.Api.Modules.Usuarios.DTOs;
+namespace FateConnect.Api.Modules.Users.DTOs;
 
 public class UsuarioResponseDto
 {
