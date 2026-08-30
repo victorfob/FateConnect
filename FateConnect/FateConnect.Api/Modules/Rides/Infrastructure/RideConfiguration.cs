@@ -8,8 +8,6 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
 {
     public void Configure(EntityTypeBuilder<Ride> builder)
     {
-        builder.ToTable("rides");
-
         builder.HasKey(r => r.Id);
 
         builder.Property(r => r.AvailableSeats)
@@ -36,5 +34,13 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
 
         builder.Property(r => r.IsActive)
               .IsRequired();
+
+        builder.Property(r => r.DriverId)
+              .IsRequired();
+
+        builder.HasOne(r => r.Driver)
+              .WithMany()
+              .HasForeignKey(r => r.DriverId)
+              .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -1,0 +1,42 @@
+name: Check version
+
+# A tag da release nasce da versão do `package.json` da raiz, e este é o último
+# ponto onde uma versão repetida ainda dá para barrar.
+#
+# `edited` está na lista porque trocar a base de um PR emite esse tipo, e não os
+# três padrão: sem ele, um PR reapontado da `develop` para a `main` nunca seria
+# validado.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - main
+
+concurrency:
+  group: check-version-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    name: Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # A busca é no remoto, não em `git tag -l`: o checkout traz um commit e
+      # nenhuma tag, então a busca local aprovaria tudo em silêncio.
+      - name: Version
+        run: |
+          set -euo pipefail
+
+          version=$(jq -r .version package.json)
+
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
+            echo "::error::A versão $version já foi publicada (tag v$version). Atualize a versão no package.json da raiz e abra a seção correspondente no CHANGELOG.md."
+            exit 1
+          fi
+
+          echo "Versão $version disponível para publicação."

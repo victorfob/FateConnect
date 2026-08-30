@@ -1,12 +1,12 @@
 ---
-description: pt-BR para UI e URLs; inglês para código e estrutura — absoluto no front, boy-scout no back-end .NET; domínio Ride e o contrato misto da API
+description: pt-BR para UI, URLs e mensagem ao usuário; inglês para código, estrutura e contrato da API — absoluto dos dois lados; domínio Ride e o prefixo Enum do C#
 paths:
   - "FateConnect/**"
 ---
 
 # FateConnect — idioma da interface vs idioma do código
 
-Separar o que é **experiência do usuário (pt-BR)** do que é **base de código (inglês)**. O que vem a seguir descreve o front; o back-end .NET tem seção própria no fim, com rigor diferente.
+Separar o que é **experiência do usuário (pt-BR)** do que é **base de código (inglês)**. A regra vale igual nos dois lados; o back-end .NET tem seção própria no fim só pelo que é dele — o prefixo `Enum` e o idioma de log e de Swagger.
 
 ## O que fica em **pt-BR**
 
@@ -14,7 +14,7 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 - **URLs visíveis:** segmentos de rota e fragmentos de âncora (`inicio`, `cadastro`, `menu`, `achados-perdidos`, `caronas`, `buscar`, `ofertar`, `servicos`, `contato`, `login`). Trocar um segmento quebra link salvo — só com decisão de produto.
 - **Query string — o nome e o valor.** ⛔ **A regra não para no caminho:** `?meus=true` é errado pela mesma razão que uma rota `/lost-and-found` seria. Booleano é `sim` e `nao`; conjunto fechado usa o **rótulo** da interface, em minúscula e sem acento (`?tipo=solidaria`), nunca o valor que o backend serializa — ver `.claude/rules/product-copy.md`. Leitura tolerante a maiúscula, e valor irreconhecível cai no padrão em vez de quebrar a tela.
 - **`index.html`:** `lang="pt-BR"`, alinhado à interface.
-- **Comentário e JSDoc:** português, citando nome de API em inglês quando necessário.
+- **Comentário e JSDoc do front:** português, citando nome de API em inglês quando necessário. Em C# não há comentário nenhum — ver `.claude/rules/comments.md`.
 
 ## O que fica em **inglês** (código)
 
@@ -24,29 +24,34 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 - **Tokens** do design system: inglês (`primary`, `surfaceWhite`, `textMuted`).
 - **Teste:** `describe` e `it` em inglês, no padrão `should <fazer algo>`. O código dentro do teste também é inglês. Copy de produto em asserção continua em pt-BR, porque é o texto real da tela.
 
-## Back-end .NET: inglês no que nasce, boy-scout no que existe
+## Back-end .NET
 
-O idioma é o mesmo dos dois lados; o **rigor** não.
+**Inglês absoluto, como no front:** identificador, namespace, nome de pasta e nome de arquivo. Módulos são `Auth`, `Common`, `Denunciations`, `LostAndFound`, `Rides` e `Users`; as tabelas são `Users`, `Addresses`, `Contacts` e `Rides`.
 
-**No front é absoluto** — nenhum identificador em português, e `Ride` no lugar de `Carona`.
-
-**No back-end é boy-scout**, porque o C# nasceu misto: verbo em inglês e domínio em português no mesmo símbolo (`GerarJwtToken`, `CriarClaimsDoUsuario`, `chaveSeguranca`, `CaronasController`).
-
-- **Arquivo, classe, método ou variável novo nasce em inglês**, mesmo cercado de português. `AuthorizationTests` ao lado de `GerarJwtToken` é o estado esperado durante a migração, não inconsistência a corrigir.
-- **O que já existe fica.** Renomear símbolo público arrasta interface, chamadas e às vezes migration — PR de funcionalidade não é lugar para isso.
-- **Traduza o símbolo que o próprio PR já estiver reescrevendo** por outro motivo. É o único rename que sai de graça.
 - **Enum leva o prefixo `Enum`** — `EnumRideType`, `EnumGender`, `EnumProfileType` —, enquanto no front a regra é o sufixo (`RideTypeEnum`, `RoutePathEnum`). A divergência não é descuido e **não se corrige**: a análise da Microsoft reprova o sufixo pela **CA1711**, e com o `TreatWarningsAsErrors` do `.csproj` isso é erro de compilação, não preferência. Medido em 2026-08-28: um `public enum SondaEnum` derruba o build com `error CA1711: Rename type name SondaEnum so that it does not end in 'Enum'`.
+- **A rota do controller vem de `[Route("[controller]")]`**, nunca de string literal — daí `/Rides`, `/Users`, `/Auth`, com a inicial maiúscula do nome da classe. O roteamento do ASP.NET é case-insensitive, então minúsculo também resolve; o que muda é o que o Swagger mostra.
 
-⛔ **Comentário continua em pt-BR dos dois lados**, `///` de C# incluído. O idioma do código e o idioma da explicação são decisões separadas.
+### O que fica em pt-BR
+
+⛔ **Mensagem que uma pessoa lê.** Validação de DTO, exceção de domínio, erro genérico do middleware. É copy de produto e segue a `product-copy.md` — inclusive usando **o mesmo texto** que a tela já usa: `Informe o e-mail`, `E-mail inválido`, `Mínimo de 8 caracteres`.
+
+### O que fica em inglês, apesar de ser texto
+
+- **`summary` e `description` do Swagger** — descrevem a API para quem a consome.
+- **Template de `LoggerMessage`** — descreve o log para quem o opera. ⛔ Nunca interpolar a mensagem de produto dentro dele: o log registra o **tipo** da exceção, não a frase traduzida.
 
 ## Contrato com a API
 
-O idioma do contrato vem do backend, não da nossa convenção — e hoje ele é **misto**, um módulo em cada idioma:
+A API fala **inglês inteira** — caminho, query, corpo e resposta. Não há tradução na borda: o tipo do front vai direto na chamada.
 
-- **Caronas, em inglês.** Caminho `/Rides`, query params (`destination`, `departureDate`, `departureTime`, `rideType`) e propriedades do JSON com os mesmos nomes. Valores do enum: `Solidarity` | `Egalitarian`. **Não há tradução na borda** — o `RideFilter` vai direto na query, porque os dois lados falam o mesmo idioma.
-- **Cadastro, em pt-BR.** `emailFatec`, `senha`, `nomeCompleto`, `apelido`, `dataNascimento`, `genero`, `enderecos` (`cep`, `logradouro`, `numero`, `complemento`, `cidade`, `estado`) e `contatos` (`telefone`, `emailContato`) — é o que o `CreateUsuarioDto` expõe. ⛔ Não "corrija" para inglês: o mapper do cadastro traduz do formulário para essas chaves de propósito. Só o **valor** de gênero é inglês: `Male` | `Female` | `Other`.
+- **Caronas.** Caminho `/Rides`, query (`destination`, `departureDate`, `departureTime`, `rideType`) e propriedades do JSON com os mesmos nomes. Valores do enum: `Solidarity` | `Egalitarian`.
+- **Cadastro.** `POST /Users/signup` com `fullName`, `nickname`, `fatecEmail`, `password`, `birthDate`, `gender`, `addresses` (`zipCode`, `street`, `streetNumber`, `complement`, `city`, `state`) e `contacts` (`phone`, `contactEmail`). Resposta: `{ token }` — o cadastro já autentica. Valores de gênero: `Male` | `Female` | `Other`.
+- **Login.** `POST /Auth/login` com `{ fatecEmail, password }`, resposta `{ token }`.
+- **Sessão.** `GET /Auth/session`, autenticada, responde `204` enquanto o token vale e `401` quando não vale mais. É quem diz se a sessão continua de pé — o front não julga validade por conta própria, e não lê o `exp` do token.
+- **O nome de quem está logado sai do token**, na claim `unique_name`, e não de nenhuma resposta. Cadastro e login devolvem o mesmo `TokenResponseDto`.
+- **Erro.** Qualquer status de erro devolve `{ "error": "..." }`, com a mensagem em pt-BR. O corpo sai do `ErrorResponseDto`, o mesmo tipo que o `ProducesResponseType` anuncia — documentação e resposta não conseguem divergir.
 
-⚠️ **A mistura é do backend, não descuido nosso.** Quem migrar o cadastro para inglês muda 14 chaves em três níveis — é tarefa própria, não boy-scout.
+⚠️ **A API publica com a inicial maiúscula e o front chama minúsculo.** `[Route("[controller]")]` gera `/Rides`, `/Users` e `/Auth`, que é o que o Swagger mostra; os serviços do front padronizam `/rides`, `/users/signup` e `/auth`, porque o roteamento do ASP.NET é case-insensitive. Não "corrija" nenhum dos dois lados — a divergência é deliberada.
 
 ## Referência no repositório
 

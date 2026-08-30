@@ -19,6 +19,7 @@ import * as S from '../shell.styles';
 import { HeaderActions } from './components/HeaderActions';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
+const LOGO_LABEL = 'FateConnect';
 
 export function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -27,7 +28,7 @@ export function MainLayout() {
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);
 
   const logo = (
-    <RouterLink to={RoutePathEnum.MENU} aria-label="FateConnect">
+    <RouterLink to={RoutePathEnum.MENU} aria-label={LOGO_LABEL}>
       <Typography variant="logo" color="inherit">
         FateConnect
       </Typography>

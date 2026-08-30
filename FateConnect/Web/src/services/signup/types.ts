@@ -1,31 +1,24 @@
-/** Contratos do endpoint de cadastro (nomes vindos do backend, em pt-BR). */
 export type SignupAddress = {
-  cep: string;
-  logradouro: string;
-  numero: string;
-  complemento: string;
-  cidade: string;
-  estado: string;
+  zipCode: string;
+  street: string;
+  streetNumber: string;
+  complement: string;
+  city: string;
+  state: string;
 };
 
 export type SignupContact = {
-  telefone: string;
-  emailContato: string;
+  phone: string;
+  contactEmail: string;
 };
 
 export type SignupRequest = {
-  emailFatec: string;
-  senha: string;
-  nomeCompleto: string;
-  apelido?: string;
-  dataNascimento: string;
-  genero: string;
-  enderecos: SignupAddress[];
-  contatos: SignupContact[];
-};
-
-export type SignupResponse = {
-  id: number;
-  emailFatec: string;
-  nomeCompleto: string;
+  fatecEmail: string;
+  password: string;
+  fullName: string;
+  nickname?: string;
+  birthDate: string;
+  gender: string;
+  addresses: SignupAddress[];
+  contacts: SignupContact[];
 };

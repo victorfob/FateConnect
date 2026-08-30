@@ -1,4 +1,5 @@
 import type { Ride, RideInput } from '@app/services/rides/types';
+import { firstCharacters } from '@app/utils/sequence';
 
 import { EMPTY_RIDE_FORM, type RideFormInput, type RideFormValues } from '../schema';
 
@@ -13,8 +14,8 @@ export function toFormValues(ride: Ride | undefined): RideFormInput {
 
   return {
     destination: ride.destination,
-    departureDate: ride.departureDate.slice(0, DATE_LENGTH),
-    departureTime: ride.departureTime.slice(0, TIME_LENGTH),
+    departureDate: firstCharacters(ride.departureDate, DATE_LENGTH),
+    departureTime: firstCharacters(ride.departureTime, TIME_LENGTH),
     rideType: ride.rideType,
     seats: String(ride.availableSeats),
     description: ride.description ?? '',

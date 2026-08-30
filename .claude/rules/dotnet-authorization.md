@@ -27,7 +27,7 @@ O nível depende de o controller ser homogêneo ou misto, e são casos diferente
 | Controller | Onde vai | Exemplo |
 | --- | --- | --- |
 | **Homogêneo** — toda action exige token | `[Authorize]` **na classe**, junto de `[ApiController]` e `[Route]` | `RidesController`: listar, ver, ofertar, editar e excluir |
-| **Misto** — tem pelo menos uma action pública | `[Authorize]` **em cada action** protegida, `[AllowAnonymous]` na pública | `UsuarioController`: `cadastro` é anônimo, e o `PATCH` de configurações e preferências vai exigir token |
+| **Misto** — tem pelo menos uma action pública | `[Authorize]` **em cada action** protegida, `[AllowAnonymous]` na pública | `UsersController`: `signup` é anônimo, e o `PATCH` de configurações e preferências vai exigir token |
 
 ⛔ **Ao acrescentar a primeira action pública, o `[Authorize]` desce da classe para as actions.** Deixá-lo na classe com um `[AllowAnonymous]` embaixo afirma duas coisas contrárias no mesmo arquivo: funciona, mas quem lê o topo conclui errado sobre metade das actions.
 
@@ -35,8 +35,8 @@ Endpoint novo entra na teoria de rotas do `AuthorizationTests`, que prova por HT
 
 ## Perfil ainda não se cobra
 
-O token já emite o perfil como `ClaimTypes.Role` (`TokenService.CriarClaimsDoUsuario`), então gate por perfil é `[Authorize(Roles = ...)]` na action — não precisa de guard próprio, o ASP.NET Core já entrega o atributo.
+O token já emite o perfil como `ClaimTypes.Role` (`TokenService.BuildUserClaims`), então gate por perfil é `[Authorize(Roles = ...)]` na action — não precisa de guard próprio, o ASP.NET Core já entrega o atributo.
 
-⛔ **Mas não escreva a policy antes de existir o que ela proteja.** Quem decide o perfil de quem se cadastra é `UsuarioService`, e é lá que se vê qual perfil o sistema realmente produz hoje. Policy sem endpoint administrativo e sem usuário que alcance o perfil nasce sem consumidor e sem teste possível — tem cara de segurança e não barra nada.
+⛔ **Mas não escreva a policy antes de existir o que ela proteja.** Quem decide o perfil de quem se cadastra é `UserService`, e é lá que se vê qual perfil o sistema realmente produz hoje. Policy sem endpoint administrativo e sem usuário que alcance o perfil nasce sem consumidor e sem teste possível — tem cara de segurança e não barra nada.
 
 Quando a hierarquia entre perfis for decidida (um perfil "conter" o outro), ela precisa sair no token ou numa policy nomeada: um `[Authorize(Roles = "Operator")]` **barra** quem tem só a claim de administrador, porque o `TokenService` emite uma claim de role por usuário.

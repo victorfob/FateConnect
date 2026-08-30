@@ -2,7 +2,9 @@ namespace FateConnect.Api.Modules.Rides.Services;
 
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
+using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Rides.Interfaces;
+using FateConnect.Api.Modules.Users.Entities;
 using Microsoft.Extensions.Logging;
 
 public partial class RideService(
@@ -10,7 +12,7 @@ public partial class RideService(
     ILogger<RideService> logger
 ) : IRideService
 {
-    public async Task<ReadRideDto> CreateAsync(CreateRideDto dto)
+    public async Task<ReadRideDto> CreateAsync(CreateRideDto dto, int currentUserId)
     {
         var ride = new Ride(
             dto.AvailableSeats,
@@ -18,6 +20,7 @@ public partial class RideService(
             dto.DepartureDate,
             dto.DepartureTime,
             dto.RideType,
+            currentUserId,
             dto.Description
         );
 
@@ -25,19 +28,19 @@ public partial class RideService(
 
         LogRideCreated(logger, ride.Id);
 
-        return MapToReadDto(ride);
+        return MapToReadDto(ride, currentUserId);
     }
 
-    public async Task<IEnumerable<ReadRideDto>> GetAllAsync(FilterRideDto filter)
+    public async Task<IEnumerable<ReadRideDto>> GetAllAsync(FilterRideDto filter, int currentUserId)
     {
         var rides = await repository.GetAllAsync(filter);
 
         LogRidesRetrieved(logger, rides.Count);
 
-        return rides.Select(MapToReadDto);
+        return rides.Select(ride => MapToReadDto(ride, currentUserId));
     }
 
-    public async Task<ReadRideDto?> GetByIdAsync(Guid id)
+    public async Task<ReadRideDto?> GetByIdAsync(Guid id, int currentUserId)
     {
         var ride = await repository.GetByIdAsync(id);
 
@@ -49,10 +52,10 @@ public partial class RideService(
 
         LogRideFound(logger, id);
 
-        return MapToReadDto(ride);
+        return MapToReadDto(ride, currentUserId);
     }
 
-    public async Task<ReadRideDto?> UpdateAsync(Guid id, UpdateRideDto dto)
+    public async Task<ReadRideDto?> UpdateAsync(Guid id, UpdateRideDto dto, int currentUserId)
     {
         var ride = await repository.GetByIdAsync(id);
 
@@ -61,6 +64,8 @@ public partial class RideService(
             LogRideNotFound(logger, id);
             return null;
         }
+
+        EnsureRideIsDrivenBy(ride, currentUserId);
 
         ride.UpdateBasicAttributes(
             dto.AvailableSeats,
@@ -78,10 +83,10 @@ public partial class RideService(
 
         LogRideUpdated(logger, id);
 
-        return MapToReadDto(ride);
+        return MapToReadDto(ride, currentUserId);
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(Guid id, int currentUserId)
     {
         var ride = await repository.GetByIdAsync(id);
 
@@ -91,6 +96,8 @@ public partial class RideService(
             return false;
         }
 
+        EnsureRideIsDrivenBy(ride, currentUserId);
+
         ride.Deactivate();
 
         await repository.UpdateAsync(ride);
@@ -99,7 +106,17 @@ public partial class RideService(
         return true;
     }
 
-    private static ReadRideDto MapToReadDto(Ride ride) =>
+    private void EnsureRideIsDrivenBy(Ride ride, int currentUserId)
+    {
+        if (ride.IsDrivenBy(currentUserId))
+            return;
+
+        LogRideChangeRefused(logger, currentUserId, ride.Id);
+
+        throw new RideNotDrivenByUserException();
+    }
+
+    private static ReadRideDto MapToReadDto(Ride ride, int currentUserId) =>
         new(
             ride.Id,
             ride.AvailableSeats,
@@ -108,7 +125,16 @@ public partial class RideService(
             ride.DepartureTime,
             ride.CreatedAt,
             ride.RideType,
-            ride.Description
+            ride.Description,
+            MapDriverToDto(ride.Driver),
+            ride.IsDrivenBy(currentUserId)
         );
+
+    private static RideDriverDto MapDriverToDto(User driver)
+    {
+        Contact contact = driver.Contacts.First();
+
+        return new RideDriverDto(driver.FullName, contact.ContactEmail, contact.Phone);
+    }
 
 }

@@ -14,7 +14,7 @@ const NON_DIGIT = /\D/g;
  * fora antes de montar o endereço.
  */
 export function whatsappConversationUrl(phone: string, message: string): string {
-  const digits = phone.replace(NON_DIGIT, '');
+  const digits = phone.replaceAll(NON_DIGIT, '');
   const text = encodeURIComponent(message);
 
   return `${CONVERSATION_URL}/${COUNTRY_CODE}${digits}?text=${text}`;

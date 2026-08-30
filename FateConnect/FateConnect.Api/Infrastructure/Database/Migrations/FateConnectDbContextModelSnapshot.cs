@@ -20,83 +20,8 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Contato", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("EmailContato")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("character varying(11)");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("Contatos");
-                });
-
-            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Endereco", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Cep")
-                        .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("character varying(9)");
-
-                    b.Property<string>("Cidade")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Complemento")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)");
-
-                    b.Property<string>("Logradouro")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Numero")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("Enderecos");
-                });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.Ride", b =>
                 {
@@ -125,6 +50,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int>("DriverId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -133,10 +61,12 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("rides", (string)null);
+                    b.HasIndex("DriverId");
+
+                    b.ToTable("Rides");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Usuarios.Usuario", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Address", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -144,76 +74,163 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Apelido")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime>("DataAtualizacao")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTime>("DataCadastro")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTime>("DataNascimento")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("EmailFatec")
+                    b.Property<string>("City")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
-                    b.Property<int>("Genero")
-                        .HasColumnType("integer");
+                    b.Property<string>("Complement")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
-                    b.Property<string>("NomeCompleto")
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
+                    b.Property<string>("Street")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int>("Perfil")
+                    b.Property<string>("StreetNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Senha")
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("character varying(9)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Addresses");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Contact", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Contacts");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("FatecEmail")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nickname")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<int>("ProfileType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Usuarios");
+                    b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Contato", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.Ride", b =>
                 {
-                    b.HasOne("FateConnect.Api.Modules.Usuarios.Usuario", "Usuario")
-                        .WithMany("Contatos")
-                        .HasForeignKey("UsuarioId")
+                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Driver");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Address", b =>
+                {
+                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
+                        .WithMany("Addresses")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Usuario");
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Common.Entities.Endereco", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Contact", b =>
                 {
-                    b.HasOne("FateConnect.Api.Modules.Usuarios.Usuario", "Usuario")
-                        .WithMany("Enderecos")
-                        .HasForeignKey("UsuarioId")
+                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
+                        .WithMany("Contacts")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Usuario");
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Usuarios.Usuario", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.User", b =>
                 {
-                    b.Navigation("Contatos");
+                    b.Navigation("Addresses");
 
-                    b.Navigation("Enderecos");
+                    b.Navigation("Contacts");
                 });
 #pragma warning restore 612, 618
         }

@@ -36,17 +36,21 @@ Nenhum endereço de API é versionado — só o `.env.example`, com as chaves va
 ## Estrutura
 
 ```
+design-system/       biblioteca de UI, fora de src — a aplicação a consome como pacote
+  tokens/            valores brutos: cor, espaçamento, raio, tipografia, breakpoints
+  theme/             paletas clara e escura, overrides do MUI, contraste
+  components/        cromo e UI reutilizável (topo, rodapé, menu lateral, seletor de tema)
+  index.ts           barrel público de componentes, estilo e tokens
+  icons.ts           barrel público de ícones
 src/
-  design-system/     tokens, tema e componentes compartilhados
-    tokens/          valores brutos: cor, espaçamento, raio, tipografia, breakpoints
-    theme/           paletas clara e escura, overrides do MUI, contraste
-    components/      cromo e UI reutilizável (topo, rodapé, menu lateral, seletor de tema)
-    index.ts         ponto de entrada público — a aplicação importa só daqui
   pages/             uma pasta por tela
   layouts/           cascas de visitante e de área interna
   components/        composições que conhecem o domínio da aplicação
   services/          cliente HTTP, sessão e serviços de API
   providers/         tema, cache de dados e notificação
+  constants/         dados e copy compartilhados entre telas
+  observability/     instrumentação de erro e de navegação
+  mocks/             stubs de API para os testes
   hooks/  utils/     hooks e funções auxiliares
   routes/            caminhos e configuração de rotas
   test/              render de teste com os providers da aplicação
@@ -58,6 +62,8 @@ Dois aliases: `@design-system` para a UI (com `@design-system/icons` para ícone
 ## Convenções
 
 O lint aplica as principais; as demais estão nas regras do projeto.
+
+Ele carrega também as regras do Sonar — `eslint-plugin-sonarjs` e duas do `eslint-plugin-unicorn` que a análise toma emprestadas. Sem elas, esses achados só apareceriam depois, com o PR já aberto.
 
 ### Design system é a única porta
 
@@ -104,7 +110,9 @@ Use o `render` de `@app/test/testing-library`, que já monta tema, rotas e cache
 | ------------ | --------------------------------------------------- | --------- |
 | `pre-commit` | `lint-staged` sobre os arquivos preparados          | —         |
 | `pre-push`   | só os testes **relacionados** aos arquivos enviados | —         |
-| CI (no PR)   | tipos, lint, **suíte inteira**, build               | mede      |
+| CI (no PR)   | tipos, lint, **suíte inteira**, build e Sonar        | mede      |
+
+⚠️ O `pre-commit` carrega o Node do `.nvmrc` por conta própria, porque uma regra de lint usa `Set.prototype.union` e o ESLint quebra em qualquer Node anterior ao 22. Sem `nvm` na máquina ele não tem como trocar: aí reprova o commit dizendo qual versão está ativa.
 
 O `pre-push` usa `scripts/test-changed.sh`, que segue o grafo de imports com `vitest related`: mudar uma tela roda os testes que a alcançam, não a suíte inteira. Ele cai na suíte inteira quando a mudança sai de `src/` ou remove arquivo — nesses casos o grafo não alcança o efeito, e `vitest related vite.config.ts` sairia com sucesso sem rodar teste nenhum.
 

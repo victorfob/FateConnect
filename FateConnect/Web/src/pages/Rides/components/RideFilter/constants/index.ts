@@ -10,12 +10,12 @@ export const FILTER_LABELS = {
   rideType: 'Tipo',
 };
 
-export const FILTER_PLACEHOLDERS = { destination: 'Digite o destino', rideType: 'Selecione' };
+export const FILTER_PLACEHOLDERS = { destination: 'Insira o destino', rideType: 'Selecione...' };
 
 export const TIME_PICKER_LABEL = 'Abrir seletor de horário';
 
 export const RIDE_TYPE_HELP =
-  'Filtrar por tipo de carona: Solidária, com caronas totalmente gratuitas, ou Igualitária, em que os participantes dividem os custos.';
+  'Solidária: a carona é gratuita. Igualitária: os participantes dividem os custos.';
 
 /** `ALL` é sentinela do formulário: não vai para a requisição. */
 export enum RideTypeFilterEnum {

@@ -5,7 +5,7 @@ import { server } from '@app/mocks/server';
 import { createRide, deleteRide, listRides, updateRide } from './ridesService';
 import { RideTypeEnum, type RideInput } from './types';
 
-const RIDES_URL = 'https://api.fateconnect.test/Rides';
+const RIDES_URL = 'https://api.fateconnect.test/rides';
 
 const RIDE_INPUT: RideInput = {
   availableSeats: 3,

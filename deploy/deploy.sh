@@ -15,10 +15,23 @@ case "$ENVIRONMENT" in
   *) echo "Uso: ./deploy.sh hml|prod" >&2; exit 1 ;;
 esac
 
-# A atualização vem antes de tudo que possa falhar. Depois da validação, um
-# defeito nas linhas de cima travaria a publicação para sempre: o script
-# quebrado nunca alcança o `git pull` que traria a própria correção, e só um
-# acesso manual à máquina destrava.
+# Os dois ambientes publicam do mesmo checkout, e a publicação começa trocando a
+# branch dele: duas ao mesmo tempo construiriam a imagem a partir da branch da
+# outra, sem erro e sem aviso. A trava fica no script, e não no workflow, para
+# valer também na execução manual, e vem antes do `git checkout` abaixo porque é
+# ele que ela protege — o `flock` a segura através do `exec`.
+LOCK_FILE=/var/lock/fateconnect-deploy
+if [ -z "${DEPLOY_LOCKED:-}" ]; then
+  if ! flock -n "$LOCK_FILE" true; then
+    echo "==> Outra publicação está em andamento na VPS; esperando ela terminar"
+  fi
+  DEPLOY_LOCKED=1 exec flock -x "$LOCK_FILE" "$0" "$@"
+fi
+
+# Fora a trava, a atualização vem antes de tudo que possa falhar. Depois da
+# validação, um defeito nas linhas de cima travaria a publicação para sempre: o
+# script quebrado nunca alcança o `git pull` que traria a própria correção, e só
+# um acesso manual à máquina destrava.
 if [ -z "${DEPLOY_SELF_UPDATED:-}" ]; then
   echo "==> Atualizando o código a partir da branch $BRANCH"
   # Avisar e seguir não adianta: o `git checkout` abaixo aborta sozinho e a
@@ -71,10 +84,10 @@ if [ ! -f "$WEB_ROOT/index.html" ]; then
   exit 1
 fi
 
-echo "==> Construindo as APIs de $ENVIRONMENT ($PUBLIC_URL)"
+echo "==> Construindo a API de $ENVIRONMENT ($PUBLIC_URL)"
 docker compose -p "$PROJECT" --env-file "$ENV_FILE" build
 
-echo "==> Subindo as APIs de $ENVIRONMENT"
+echo "==> Subindo a API de $ENVIRONMENT"
 docker compose -p "$PROJECT" --env-file "$ENV_FILE" up -d --remove-orphans
 
 echo

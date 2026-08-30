@@ -1,10 +1,13 @@
+import { tokenStorage } from '../auth/tokenStorage';
+import type { TokenResponse } from '../auth/types';
 import { apiClient } from '../httpClient';
-import type { SignupRequest, SignupResponse } from './types';
+import type { SignupRequest } from './types';
 
-const SIGNUP_PATH = '/usuario/cadastro';
+const SIGNUP_PATH = '/users/signup';
 
-export async function signup(payload: SignupRequest): Promise<SignupResponse> {
-  const { data } = await apiClient.post<SignupResponse>(SIGNUP_PATH, payload);
+export async function signup(payload: SignupRequest): Promise<TokenResponse> {
+  const { data } = await apiClient.post<TokenResponse>(SIGNUP_PATH, payload);
+  tokenStorage.save(data.token);
 
   return data;
 }

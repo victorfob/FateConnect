@@ -16,8 +16,8 @@ import * as C from './constants';
 import * as S from './styles';
 
 const SPINNER_SIZE_PX = 60;
+const NO_ITEMS = 0;
 
-/** Uma tela só: a lista com os filtros, e a aba de ofertar abrindo o diálogo. */
 export function Rides() {
   const queryClient = useQueryClient();
   const { notifySuccess } = useNotification();
@@ -34,14 +34,14 @@ export function Rides() {
   const { mutate: removeRide, isPending: isRemoving } = useMutation({
     mutationFn: (ride: Ride) => deleteRide(ride.id),
     onSuccess: async () => {
-      notifySuccess(C.RIDE_LIST_MESSAGES.deleteSucceeded);
+      notifySuccess(C.RIDE_LIST_MESSAGES.cancelSucceeded);
       await queryClient.invalidateQueries({ queryKey: [C.RIDES_QUERY_KEY] });
     },
-    meta: { errorMessage: C.RIDE_LIST_MESSAGES.deleteFailed },
+    meta: { errorMessage: C.RIDE_LIST_MESSAGES.cancelFailed },
   });
 
   const handleApplyFilters = useCallback((applied: RideFilterValues) => setFilters(applied), []);
-  const handleDelete = useCallback((ride: Ride) => removeRide(ride), [removeRide]);
+  const handleCancel = useCallback((ride: Ride) => removeRide(ride), [removeRide]);
 
   const handleOffer = useCallback(() => {
     setEditingRide(undefined);
@@ -97,13 +97,13 @@ export function Rides() {
           </S.LoadingContainer>
         )}
 
-        {!isLoading && rides.length === 0 && (
+        {!isLoading && rides.length === NO_ITEMS && (
           <Typography variant="subtitle">{C.EMPTY_LIST_MESSAGE}</Typography>
         )}
 
         {!isLoading &&
           rides.map((ride) => (
-            <RideCard key={ride.id} ride={ride} onEdit={handleEdit} onDelete={handleDelete} />
+            <RideCard key={ride.id} ride={ride} onEdit={handleEdit} onCancel={handleCancel} />
           ))}
       </S.RideList>
 

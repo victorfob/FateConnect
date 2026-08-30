@@ -1,20 +1,18 @@
 name: Sonar main
 
-# A `main` precisa ser analisada para o Sonar ter linha de base: é contra ela
-# que ele calcula o "código novo" de cada PR. O `check.yml` só dispara em
-# `pull_request`, então até aqui nenhuma análise da branch principal existia — e
-# o painel do projeto avisava isso.
+# A `main` precisa ser analisada para o painel ter linha de base: é sobre ela que
+# o código novo da própria `main` é medido. Análise de PR não depende disto — o
+# código novo de um PR é o diff dele contra a base.
 on:
   push:
     branches:
       - main
   # Disparo manual porque o push na `main` só acontece em release: sem ele, uma
-  # análise fora de ciclo — depois de mexer na configuração do Sonar, por
-  # exemplo — esperaria semanas pela próxima versão.
+  # análise fora de ciclo esperaria semanas pela próxima versão.
   workflow_dispatch:
 
-# Duas análises da mesma branch em sequência não podem correr juntas: a segunda
-# publicaria um resultado calculado sobre um estado que já mudou.
+# Duas análises da mesma branch não podem correr juntas: a segunda publicaria um
+# resultado calculado sobre um estado que já mudou.
 concurrency:
   group: sonar-main
   cancel-in-progress: false
@@ -23,10 +21,8 @@ permissions:
   contents: read
 
 jobs:
-  # Workflow próprio, e não um job no `release.yml`: lá os jobs são sobre
-  # publicar, e análise falha por motivos diferentes de tag e deploy.
-  sonar:
-    name: Analyze the main branch
+  web:
+    name: Analyze the front
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,8 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # Mesmo motivo do `check.yml`: sem histórico completo o Sonar não sabe
-          # quem mudou o quê e perde a noção de código novo.
+          # Sem histórico completo o Sonar perde a noção de quem mudou o quê.
           fetch-depth: 0
 
       - uses: actions/setup-node@v5
@@ -44,19 +39,21 @@ jobs:
           cache: yarn
           cache-dependency-path: FateConnect/Web/yarn.lock
 
+      # Instalar dependência não deve executar código: sem `--ignore-scripts` o
+      # `postinstall` de qualquer pacote da árvore roda com os segredos do job
+      # ao alcance.
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --ignore-scripts
 
-      # O scan consome o lcov e o `sonar-report.xml` que esta suíte produz —
-      # sem rodá-la, `sonar.testExecutionReportPaths` aponta para um arquivo que
-      # não existe e o scan falha.
+      # O scan consome o lcov e o `sonar-report.xml` que esta suíte produz — sem
+      # rodá-la, `sonar.testExecutionReportPaths` aponta para um arquivo que não
+      # existe e o scan falha.
       - name: Tests and coverage
         run: yarn test:ci
 
-      # A definição de código novo do projeto é `previous_version`, então sem
-      # versão declarada não há fronteira: as sete condições do gate são todas
-      # sobre código novo, nenhuma métrica `new_*` é calculada, e o veredito sai
-      # `NONE` — que o `sonar.qualitygate.wait` reprova como se fosse falha.
+      # A definição de código novo do projeto é `previous_version`: sem versão
+      # declarada não há fronteira, nenhuma métrica `new_*` é calculada, e o
+      # veredito sai `NONE` — que o `sonar.qualitygate.wait` reprova como falha.
       #
       # Vem daqui e não do `sonar-project.properties` porque o número mora no
       # `package.json` da raiz, fora do `projectBaseDir`.
@@ -64,19 +61,69 @@ jobs:
         id: version
         run: echo "value=$(jq -r .version "$GITHUB_WORKSPACE/package.json")" >> "$GITHUB_OUTPUT"
 
-      # Mesma configuração do PR, pelo `sonar-project.properties`. O
-      # `sonar.qualitygate.wait` de lá vale aqui também: na `main` ele não
-      # bloqueia merge nenhum, mas deixa o run vermelho quando o gate não sai
-      # `OK` — seja porque algo escapou do gate do PR, seja porque não houve
-      # código novo para avaliar.
-      #
-      # A versão só é declarada aqui: é a história de versões da `main` que
-      # forma a linha de base. Análise de PR usa o próprio diff como código
-      # novo e nunca consulta a versão.
       - name: Sonar
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
         with:
           projectBaseDir: FateConnect/Web
           args: -Dsonar.projectVersion=${{ steps.version.outputs.value }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  api:
+    name: Analyze the API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Sem histórico completo o Sonar perde a noção de quem mudou o quê.
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # O scanner roda na JVM, mesmo analisando C#.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install the Sonar scanner
+        run: dotnet tool install --global dotnet-sonarscanner --version 11.2.1
+
+      - name: Project version
+        id: version
+        run: echo "value=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Sonar begin
+        run: >
+          dotnet sonarscanner begin
+          /k:fateconnect_FateConnect-api
+          /o:fateconnect
+          /v:${{ steps.version.outputs.value }}
+          /d:sonar.host.url=https://sonarcloud.io
+          /d:sonar.token=$SONAR_TOKEN
+          /d:sonar.qualitygate.wait=true
+          /d:sonar.exclusions=FateConnect/Web/**,LBD/**,ESII/**,ESIII/**
+          /d:sonar.cs.opencover.reportsPaths=coverage/**/coverage.opencover.xml
+          /d:sonar.coverage.exclusions=**/Migrations/**,**/obj/**
+          /d:sonar.cpd.exclusions=**/Migrations/**
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Build
+        run: dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
+
+      # A suíte roda para produzir cobertura: sem ela a `main` reportaria 0% e o
+      # painel mentiria sobre o projeto. O formato é OpenCover porque o Sonar não
+      # lê Cobertura para C#.
+      - name: Tests
+        run: |
+          dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build \
+            --collect:"XPlat Code Coverage;Format=opencover" \
+            --results-directory coverage
+
+      - name: Sonar end
+        run: dotnet sonarscanner end /d:sonar.token=$SONAR_TOKEN
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

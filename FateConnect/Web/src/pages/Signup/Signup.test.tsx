@@ -4,7 +4,8 @@ import { http, HttpResponse } from 'msw';
 import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
 import { PRIVACY_URL, TERMS_URL } from '@app/constants/legalDocuments';
 import { server } from '@app/mocks/server';
-import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
+import { RoutePathEnum } from '@app/routes/paths';
+import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
@@ -13,7 +14,8 @@ import { SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
 
-const SIGNUP_URL = 'https://api.fateconnect.test/usuario/cadastro';
+const SIGNUP_URL = 'https://api.fateconnect.test/users/signup';
+const SIGNUP_TOKEN = 'token-do-cadastro';
 const ZIP_URL = 'https://viacep.com.br/ws/:zipCode/json/';
 
 const VALID_SIGNUP = {
@@ -30,6 +32,7 @@ function renderSignup() {
     [
       { path: RoutePathEnum.SIGNUP, element: <Signup /> },
       { path: RoutePathEnum.LANDING, element: <div>landing</div> },
+      { path: RoutePathEnum.MENU, element: <div>menu</div> },
     ],
     { initialEntries: [RoutePathEnum.SIGNUP] },
   );
@@ -63,7 +66,7 @@ async function fillRequiredFields() {
   await screen.findByDisplayValue('Rua das Flores');
   await userEvent.type(screen.getByLabelText(/Número/), '100');
 
-  await userEvent.click(screen.getByRole('checkbox', { name: /Termos de Uso/ }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /Termos de uso/ }));
 }
 
 async function selectOption(fieldLabel: string, optionLabel: string) {
@@ -231,18 +234,18 @@ describe('Signup', () => {
   it('should open each legal document in a new tab, so the form survives', () => {
     renderSignup();
 
-    const terms = screen.getByRole('link', { name: 'Termos de Uso' });
+    const terms = screen.getByRole('link', { name: 'Termos de uso' });
     expect(terms).toHaveAttribute('href', TERMS_URL);
     expect(terms).toHaveAttribute('target', '_blank');
 
-    const privacy = screen.getByRole('link', { name: 'Política de Privacidade' });
+    const privacy = screen.getByRole('link', { name: 'Política de privacidade' });
     expect(privacy).toHaveAttribute('href', PRIVACY_URL);
     expect(privacy).toHaveAttribute('target', '_blank');
   });
 
   it('should toggle the consent when the sentence around the links is clicked', async () => {
     renderSignup();
-    const consent = screen.getByRole('checkbox', { name: /Termos de Uso/ });
+    const consent = screen.getByRole('checkbox', { name: /Termos de uso/ });
 
     await userEvent.click(screen.getByText(/Eu concordo com os/));
 
@@ -251,9 +254,9 @@ describe('Signup', () => {
 
   it('should not toggle the consent when the legal link is clicked', async () => {
     renderSignup();
-    const consent = screen.getByRole('checkbox', { name: /Termos de Uso/ });
+    const consent = screen.getByRole('checkbox', { name: /Termos de uso/ });
 
-    await userEvent.click(screen.getByRole('link', { name: 'Termos de Uso' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Termos de uso' }));
 
     expect(consent).not.toBeChecked();
   });
@@ -267,24 +270,16 @@ describe('Signup', () => {
     expect(options[0]).toHaveTextContent(C.SELECT_PLACEHOLDER);
   });
 
-  it('should create the account and send the user to the login anchor', async () => {
-    server.use(
-      http.post(SIGNUP_URL, () =>
-        HttpResponse.json({
-          id: 1,
-          emailFatec: VALID_SIGNUP.fatecEmail,
-          nomeCompleto: 'Maria Silva',
-        }),
-      ),
-    );
+  it('should create the account and send the user into the app already signed in', async () => {
+    server.use(http.post(SIGNUP_URL, () => HttpResponse.json({ token: SIGNUP_TOKEN })));
     const router = renderSignup();
     await fillRequiredFields();
 
     await submit();
 
-    expect(await screen.findByText(C.signupSuccessMessage('Maria Silva'))).toBeInTheDocument();
-    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING));
-    expect(router.state.location.hash).toBe(`#${LandingSectionEnum.LOGIN}`);
+    expect(await screen.findByText(C.SIGNUP_SUCCESS_MESSAGE)).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
+    expect(tokenStorage.getToken()).toBe(SIGNUP_TOKEN);
   });
 
   it('should send the payload in the contract the backend expects', async () => {
@@ -293,7 +288,7 @@ describe('Signup', () => {
       http.post(SIGNUP_URL, async ({ request }) => {
         payload = await request.json();
 
-        return HttpResponse.json({ id: 1, emailFatec: '', nomeCompleto: 'Maria Silva' });
+        return HttpResponse.json({ id: 1, fatecEmail: '', fullName: 'Maria Silva' });
       }),
     );
     renderSignup();
@@ -302,22 +297,23 @@ describe('Signup', () => {
     await submit();
 
     await waitFor(() => expect(payload).toBeDefined());
-    expect(payload).toMatchObject({
-      nomeCompleto: VALID_SIGNUP.fullName,
-      emailFatec: VALID_SIGNUP.fatecEmail,
-      senha: VALID_SIGNUP.password,
-      genero: 'Female',
-      dataNascimento: '1999-05-22T00:00:00Z',
-      enderecos: [
+    expect(payload).toEqual({
+      fullName: VALID_SIGNUP.fullName,
+      fatecEmail: VALID_SIGNUP.fatecEmail,
+      password: VALID_SIGNUP.password,
+      gender: 'Female',
+      birthDate: '1999-05-22T00:00:00Z',
+      addresses: [
         {
-          cep: '18000-000',
-          logradouro: 'Rua das Flores',
-          numero: '100',
-          cidade: 'Sorocaba',
-          estado: 'SP',
+          zipCode: '18000-000',
+          street: 'Rua das Flores',
+          streetNumber: '100',
+          complement: '',
+          city: 'Sorocaba',
+          state: 'SP',
         },
       ],
-      contatos: [{ telefone: '11912345678', emailContato: VALID_SIGNUP.contactEmail }],
+      contacts: [{ phone: '11912345678', contactEmail: VALID_SIGNUP.contactEmail }],
     });
   });
 
@@ -347,7 +343,7 @@ describe('Signup', () => {
       http.post(SIGNUP_URL, async () => {
         await held;
 
-        return HttpResponse.json({ id: 1, emailFatec: '', nomeCompleto: 'Maria Silva' });
+        return HttpResponse.json({ id: 1, fatecEmail: '', fullName: 'Maria Silva' });
       }),
     );
     renderSignup();

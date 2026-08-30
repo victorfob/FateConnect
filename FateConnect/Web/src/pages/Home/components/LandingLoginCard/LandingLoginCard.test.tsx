@@ -71,19 +71,18 @@ describe('LandingLoginCard', () => {
     expect(screen.getByTestId('VisibilityIcon')).toBeInTheDocument();
   });
 
-  it('should greet the user and go to the menu after a successful login', async () => {
+  it('should go to the menu after a successful login, without any alert', async () => {
     server.use(
-      http.post(LOGIN_URL, () =>
-        HttpResponse.json({ token: 'abc', nomeCompleto: 'Fulano de Tal' }),
-      ),
+      http.post(LOGIN_URL, () => HttpResponse.json({ token: 'abc', fullName: 'Fulano de Tal' })),
     );
     const router = renderCard();
     await preencher('aluno.teste@aluno.cps.sp.gov.br', 'segredo123');
 
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
-    expect(await screen.findByText('Bem-vindo(a), Fulano de Tal!')).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe(RoutePathEnum.MENU);
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
+    // Todo aviso do produto traz um botão "OK" para dispensar; sem ele, não há aviso.
+    expect(screen.queryByRole('button', { name: 'OK' })).not.toBeInTheDocument();
   });
 
   it('should report invalid credentials when the api answers unauthorized', async () => {
@@ -117,7 +116,7 @@ describe('LandingLoginCard', () => {
       http.post(LOGIN_URL, async () => {
         await held;
 
-        return HttpResponse.json({ token: 'abc', nomeCompleto: 'Fulano' });
+        return HttpResponse.json({ token: 'abc', fullName: 'Fulano' });
       }),
     );
     renderCard();

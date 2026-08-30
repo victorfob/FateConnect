@@ -9,6 +9,6 @@ public record FilterRideDto
     public DateOnly? DepartureDate { get; init; }
     public TimeOnly? DepartureTime { get; init; }
 
-    [EnumDataType(typeof(EnumRideType), ErrorMessage = "Invalid ride type.")]
+    [EnumDataType(typeof(EnumRideType), ErrorMessage = "Tipo de carona inválido")]
     public EnumRideType? RideType { get; init; }
 }

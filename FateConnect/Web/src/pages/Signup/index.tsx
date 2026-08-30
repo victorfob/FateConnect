@@ -38,9 +38,9 @@ export function Signup() {
     mutationFn: signup,
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
-    onSuccess: (response) => {
-      notifySuccess(C.signupSuccessMessage(response.nomeCompleto));
-      navigate(LOGIN_ANCHOR);
+    onSuccess: () => {
+      notifySuccess(C.SIGNUP_SUCCESS_MESSAGE);
+      navigate(RoutePathEnum.MENU);
     },
     onError: (error: ApiError) => notifyError(errorMessageFor(error.status)),
   });

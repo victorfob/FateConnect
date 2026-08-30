@@ -33,6 +33,13 @@ Issue que declara "Depende de" só começa quando a base estiver **com o escopo 
 ## Mecânica de worktree
 
 - **A worktree não nasce na branch atual.** Na #123 ela nasceu 16 commits atrás, sem o commit do contrato. Conferir com `git log --oneline -1` e corrigir com `git merge --ff-only <branch-da-tarefa>` **antes** de escrever qualquer linha.
+- ⛔ **A worktree nasce rastreando a base, e um `git push` vai para ela.** `git worktree add -b <nova> <caminho> origin/develop` deixa a branch nova com `origin/develop` como upstream — e a `develop` não aceita commit direto. Desarmar logo depois de criar:
+
+  ```bash
+  git branch --unset-upstream <nova>
+  git rev-parse --abbrev-ref <nova>@{upstream}   # não pode responder nada
+  ```
+
 - **A worktree não tem `node_modules`.** Symlink para o do checkout principal, senão não há ESLint, `tsc` nem Vitest.
 - **`.claude/worktrees/` fica fora do versionamento** — a pasta é ignorada, porque worktree de agente dentro de pasta versionada aparece como arquivo não rastreado na raiz.
 - **Agente cai.** Nesta rodada um morreu em erro 403 de autenticação e outro travou depois de commitar. Quando cair: verificar o que já foi commitado na branch da worktree e assumir a fatia — relançar às cegas refaz trabalho que já existe.

@@ -9,17 +9,19 @@ description: >-
 
 # Cortar uma release
 
-A release entra pela `main`, e o merge dispara três automações de uma vez. O preparo é seu; o resto acontece sozinho, e saber o que é qual evita refazer à mão o que já foi feito.
+A release entra pela `main`, e o merge dispara três automações. O preparo é seu; o resto acontece sozinho, e saber o que é qual evita refazer à mão o que já foi feito.
 
 ## O que acontece sozinho no merge
 
-Saber isto muda o que você precisa fazer à mão. O `release.yml` dispara em todo push na `main` e roda três jobs **independentes**:
+Saber isto muda o que você precisa fazer à mão. O `release.yml` dispara em todo push na `main` e roda três jobs:
 
 | Job | O que faz |
 | --- | --- |
 | `tag` | cria a tag anotada `vX.Y.Z` a partir do `package.json` da **raiz** |
 | `publish` | constrói e publica em produção, pelo mesmo `publish.yml` da homologação |
-| `back-merge` | traz a `main` de volta para a `develop` |
+| `back-merge` | traz a `main` de volta para a `develop`, **depois** que o `publish` termina |
+
+A tag não depende de ninguém. O `back-merge` espera o `publish` porque o push que ele faz na `develop` dispara a publicação de homologação, e as duas trocam a branch do mesmo checkout na VPS.
 
 ⚠️ **Mergear é publicar** — o `publish` sobe para produção sozinho, sem portão de aprovação. O que for conferir, confira antes do merge.
 
@@ -39,13 +41,13 @@ Leia a seção `## [Unreleased]` inteira. Ela é a release: se estiver vazia, n�
 
 Em `0.x`, funcionalidade nova é **minor** — `0.2.0 → 0.3.0`. Só correção é **patch**.
 
-⛔ **A versão do projeto é a do `package.json` da raiz, e só ela.** É o que o `check.yml`, o `release.yml` e o `publish.yml` leem:
+⛔ **A versão do projeto é a do `package.json` da raiz, e só ela.** É o que o `check-version.yml`, o `release.yml`, o `publish.yml` e o `sonar-main.yml` leem:
 
 ```bash
 grep -rn 'jq -r .version' .github/workflows/
 ```
 
-O `check.yml` **reprova o PR para a `main`** se a tag `vX.Y.Z` já existir. Confira antes de abrir:
+O `check-version.yml` **reprova o PR para a `main`** se a tag `vX.Y.Z` já existir. Confira antes de abrir:
 
 ```bash
 git ls-remote --tags origin "refs/tags/v<versão>"     # tem que voltar vazio
@@ -107,7 +109,7 @@ git ls-remote --tags origin | grep "v<versão>"    # a tag saiu?
 gh run list --branch main --limit 1               # os três jobs?
 ```
 
-E confira que a `develop` recebeu o back-merge: `git rev-list --count origin/develop..origin/main` tem que ser **zero**.
+E confira que a `develop` recebeu o back-merge: `git rev-list --count origin/develop..origin/main` tem que ser **zero**. Publicação reprovada **pula** o back-merge, e aí esse número fica diferente de zero de propósito — não sincronize à mão: a correção entra na `main`, e o push dela refaz o workflow inteiro.
 
 ## Armadilhas já pagas
 
