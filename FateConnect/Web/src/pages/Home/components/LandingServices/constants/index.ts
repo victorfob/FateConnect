@@ -8,31 +8,30 @@ import {
 
 export type ServiceCard = { title: string; description: string; Icon: SvgIconComponent };
 
-export const SERVICES_TITLE = 'Nossos Serviços';
+export const SERVICES_TITLE = 'Nossos serviços';
 
 export const SERVICE_CARDS: ServiceCard[] = [
   {
-    title: 'Caronas Universitárias',
+    title: 'Caronas universitárias',
     description:
-      'Encontre ou ofereça caronas para outros estudantes da Fatec. Economize dinheiro e faça novos amigos no caminho.',
+      'Ofereça uma vaga no seu trajeto ou pegue carona com quem faz o mesmo caminho, dividindo o custo ou de graça.',
     Icon: DirectionsCarIcon,
   },
   {
     title: 'Achados & Perdidos',
     description:
-      'Perdeu algo no campus? Encontre seu objeto de volta de maneira fácil e rápida com a nossa plataforma!',
+      'Cadastre o que perdeu ou o que achou no campus e receba o contato de quem procura.',
     Icon: SearchIcon,
   },
   {
-    title: 'Comunidade Verificada',
+    title: 'Comunidade verificada',
     description:
-      'Todos os usuários são verificados através do e-mail institucional, garantindo que você interaja apenas com membros da comunidade acadêmica.',
+      'Só entra quem tem e-mail @aluno.cps.sp.gov.br ou @cps.sp.gov.br: do outro lado há sempre alguém da Fatec.',
     Icon: GroupsIcon,
   },
   {
-    title: 'Portal de Denúncias',
-    description:
-      'Relate situações inadequadas, assédio, bullying ou qualquer comportamento impróprio de forma anônima e segura. Sua denúncia será tratada com total confidencialidade.',
+    title: 'Portal de denúncias',
+    description: 'Relate assédio, bullying ou conduta imprópria sem se identificar.',
     Icon: SecurityIcon,
   },
 ];

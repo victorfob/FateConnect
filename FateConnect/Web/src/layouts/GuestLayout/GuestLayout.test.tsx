@@ -39,7 +39,7 @@ describe('GuestLayout', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Abrir menu', hidden: true }));
 
     const drawer = screen.getByRole('presentation');
-    expect(within(drawer).getByRole('button', { name: 'Como Funciona' })).toBeInTheDocument();
+    expect(within(drawer).getByRole('button', { name: 'Como funciona' })).toBeInTheDocument();
   });
 
   it('should close the drawer and go to the section when a drawer item is selected', async () => {

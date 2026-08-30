@@ -14,7 +14,7 @@ export function LandingDescription() {
         <Typography variant="subtitle">{C.DESCRIPTION_LEAD}</Typography>
       </S.Lead>
 
-      <S.HighlightList component="ul" aria-label="Destaques do FateConnect">
+      <S.HighlightList component="ul" aria-label={C.HIGHLIGHT_LIST_LABEL}>
         {C.DESCRIPTION_HIGHLIGHTS.map(({ label, Icon }) => (
           <S.HighlightItem component="li" key={label}>
             <S.IconDisc component="span" aria-hidden="true">

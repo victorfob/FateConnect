@@ -5,8 +5,8 @@ export type AppLink = { path: RoutePathEnum; label: string };
 
 export const LANDING_LINKS: LandingLink[] = [
   { section: LandingSectionEnum.SERVICES, label: 'Serviços', highlighted: false },
-  { section: LandingSectionEnum.HOW_IT_WORKS, label: 'Como Funciona', highlighted: false },
-  { section: LandingSectionEnum.CONTACT, label: 'Entre em Contato', highlighted: false },
+  { section: LandingSectionEnum.HOW_IT_WORKS, label: 'Como funciona', highlighted: false },
+  { section: LandingSectionEnum.CONTACT, label: 'Entre em contato', highlighted: false },
   { section: LandingSectionEnum.LOGIN, label: 'Entrar', highlighted: true },
 ];
 

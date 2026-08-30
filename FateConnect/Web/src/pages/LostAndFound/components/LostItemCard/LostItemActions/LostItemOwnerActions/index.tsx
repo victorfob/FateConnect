@@ -29,13 +29,13 @@ export function LostItemOwnerActions({ item, onEdit, onCancel }: LostItemOwnerAc
       </IconButton>
 
       <LostItemConfirmAction
-        label={C.LOST_ITEM_ACTION_LABELS.delete}
+        label={C.LOST_ITEM_ACTION_LABELS.cancel}
         icon={<DeleteIcon />}
         iconOnly
-        dialogTitle={C.DELETE_DIALOG.title}
-        messagePrefix={C.DELETE_DIALOG.messagePrefix}
+        dialogTitle={C.CANCEL_DIALOG.title}
+        messagePrefix={C.CANCEL_DIALOG.messagePrefix}
         itemName={item.nome}
-        confirmLabel={C.DELETE_DIALOG.confirmLabel}
+        confirmLabel={C.CANCEL_DIALOG.confirmLabel}
         onConfirm={handleCancel}
       />
     </>
