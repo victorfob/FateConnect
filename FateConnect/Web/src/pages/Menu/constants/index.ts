@@ -4,7 +4,7 @@ import { RoutePathEnum } from '@app/routes/paths';
 
 import type { MenuService } from '../@types';
 
-export const MENU_TITLE = 'Bem-vindo ao FateConnect';
+export const MENU_TITLE = 'Boas-vindas ao FateConnect';
 export const MENU_INTRO = 'Escolha um dos serviços abaixo para começar.';
 
 /** Mesma ordem do produto: achados e perdidos antes de caronas. */

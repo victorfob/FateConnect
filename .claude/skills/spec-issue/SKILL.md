@@ -174,14 +174,24 @@ Quatro vezes na árvore da #207:
 - `Closes #N` só dispara quando o PR merge na **branch padrão**, e os nossos miram a `develop` — a skill `pr-creator` já registra isso para a issue do PR;
 - o relacionamento de **sub-issue** do GitHub **não propaga** o fechamento: fechar a última filha não toca no pai.
 
-Então, ao fechar a última sub-issue, faça as duas coisas no pai:
+Então, ao fechar a última sub-issue, feche o pai — e é só isso:
 
 ```bash
 gh issue close <pai> --comment "As sub-issues foram entregues: #a, #b, #c."
-gh project item-edit --project-id <projeto> --id <card> --field-id <status> --single-select-option-id <Done>
 ```
 
-⚠️ **O card do pai é o que mais escapa**, porque ele nunca se moveu: o trabalho acontece nas filhas, então o guarda-chuva fica em `Todo` do nascimento ao fim. A #136 ficou dias fechada de fato e aberta no GitHub, com o card ainda em `Todo`, e só apareceu porque o Victor perguntou.
+**O card vai para `Done` sozinho**, e não há `gh project item-edit` a rodar aqui. Quem move é o `github-project-automation[bot]`, que reage ao fechamento: na #213 e na #207 o `project_v2_item_status_changed` dele saiu **um segundo** depois do `closed`. O mesmo bot adiciona a issue nova ao board e define o status inicial.
+
+⚠️ **Não generalize para as outras colunas:** `In Progress` e `In Review` continuam manuais. O bot só reage a criar e a fechar.
+
+⛔ **O que escapa é fechar o pai, não mover o card.** O trabalho acontece nas filhas, então ninguém volta ao guarda-chuva. A #136 ficou dias entregue de fato e **aberta** no GitHub — e, estando aberta, o card seguia corretamente em `Todo`. Só apareceu porque o Victor perguntou.
+
+⚠️ **Card em `Done` não prova que o bot o moveu.** Quem responde "quem moveu" é a linha do tempo, não a contagem de cards:
+
+```bash
+gh api repos/<dono>/<repo>/issues/<n>/timeline --paginate \
+  --jq '.[] | select(.event | test("closed|project_v2")) | "\(.event) | \(.actor.login) | \(.created_at)"'
+```
 
 **A varredura que acha os esquecidos**, quando a suspeita surgir:
 

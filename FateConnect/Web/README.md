@@ -36,17 +36,21 @@ Nenhum endereço de API é versionado — só o `.env.example`, com as chaves va
 ## Estrutura
 
 ```
+design-system/       biblioteca de UI, fora de src — a aplicação a consome como pacote
+  tokens/            valores brutos: cor, espaçamento, raio, tipografia, breakpoints
+  theme/             paletas clara e escura, overrides do MUI, contraste
+  components/        cromo e UI reutilizável (topo, rodapé, menu lateral, seletor de tema)
+  index.ts           barrel público de componentes, estilo e tokens
+  icons.ts           barrel público de ícones
 src/
-  design-system/     tokens, tema e componentes compartilhados
-    tokens/          valores brutos: cor, espaçamento, raio, tipografia, breakpoints
-    theme/           paletas clara e escura, overrides do MUI, contraste
-    components/      cromo e UI reutilizável (topo, rodapé, menu lateral, seletor de tema)
-    index.ts         ponto de entrada público — a aplicação importa só daqui
   pages/             uma pasta por tela
   layouts/           cascas de visitante e de área interna
   components/        composições que conhecem o domínio da aplicação
   services/          cliente HTTP, sessão e serviços de API
   providers/         tema, cache de dados e notificação
+  constants/         dados e copy compartilhados entre telas
+  observability/     instrumentação de erro e de navegação
+  mocks/             stubs de API para os testes
   hooks/  utils/     hooks e funções auxiliares
   routes/            caminhos e configuração de rotas
   test/              render de teste com os providers da aplicação

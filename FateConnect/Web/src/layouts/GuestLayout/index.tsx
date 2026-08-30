@@ -13,6 +13,7 @@ import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import * as S from '../shell.styles';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
+const LOGO_LABEL = 'FateConnect';
 
 export function GuestLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -29,7 +30,7 @@ export function GuestLayout() {
   );
 
   const logo = (
-    <RouterLink to={RoutePathEnum.LANDING} aria-label="FateConnect">
+    <RouterLink to={RoutePathEnum.LANDING} aria-label={LOGO_LABEL}>
       <Typography variant="logo" color="inherit">
         FateConnect
       </Typography>

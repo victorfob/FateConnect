@@ -10,7 +10,7 @@ export const FILTER_LABELS = {
   name: 'Nome',
   occurredOn: 'Data do ocorrido',
   kind: 'Tipo',
-  owner: 'Dono',
+  owner: 'Quem cadastrou',
   status: 'Situação',
 };
 

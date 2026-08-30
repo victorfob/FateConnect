@@ -9,13 +9,15 @@ import {
 export type DescriptionHighlight = { label: string; Icon: SvgIconComponent };
 
 export const DESCRIPTION_HIGHLIGHTS: DescriptionHighlight[] = [
-  { label: 'Caronas Seguras', Icon: DirectionsCarIcon },
+  { label: 'Caronas seguras', Icon: DirectionsCarIcon },
   { label: 'Achados & Perdidos', Icon: SearchIcon },
-  { label: 'Portal de Denúncias', Icon: SecurityIcon },
-  { label: 'Comunidade Verificada', Icon: GroupsIcon },
+  { label: 'Portal de denúncias', Icon: SecurityIcon },
+  { label: 'Comunidade verificada', Icon: GroupsIcon },
 ];
 
-export const DESCRIPTION_TITLE = 'Conectando a Comunidade Acadêmica';
+export const HIGHLIGHT_LIST_LABEL = 'Destaques do FateConnect';
+
+export const DESCRIPTION_TITLE = 'Caronas, achados e perdidos e denúncias em um lugar só';
 
 export const DESCRIPTION_LEAD =
-  'Facilite sua vida na Fatec Sorocaba: encontre caronas, recupere pertences, registre denúncias e interaja com outros estudantes com total praticidade e segurança.';
+  'Entre com o e-mail institucional da Fatec Sorocaba e use os serviços com quem estuda com você.';
