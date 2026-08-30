@@ -2,7 +2,7 @@ import { useCallback, useState, type ChangeEvent } from 'react';
 import { FilterPanel, Input } from '@design-system';
 
 import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
-import { toApiDate } from '@app/utils/apiDate';
+import { fromFormDate, toApiDate } from '@app/utils/apiDate';
 
 import * as C from './constants';
 
@@ -10,14 +10,31 @@ import * as C from './constants';
 const FILTER_COLUMNS = 5;
 const NO_FILTERS = 0;
 
-type RideFilterProps = Readonly<{ onApply: (filters: RideFilterValues) => void }>;
+/** Paginação não conta: o ponto ao lado do título é sobre escolha de busca. */
+function hasAnyFilter({
+  destination,
+  departureDate,
+  departureTime,
+  rideType,
+}: RideFilterValues): boolean {
+  return Boolean(destination || departureDate || departureTime || rideType);
+}
 
-export function RideFilter({ onApply }: RideFilterProps) {
-  const [departureDate, setDepartureDate] = useState<Date | null>(null);
-  const [departureTime, setDepartureTime] = useState('');
-  const [destination, setDestination] = useState('');
-  const [rideType, setRideType] = useState<string>(C.RideTypeFilterEnum.ALL);
-  const [isFiltered, setIsFiltered] = useState(false);
+type RideFilterProps = Readonly<{
+  initialFilters: RideFilterValues;
+  onApply: (filters: RideFilterValues) => void;
+}>;
+
+export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
+  const [departureDate, setDepartureDate] = useState<Date | null>(() =>
+    fromFormDate(initialFilters.departureDate ?? ''),
+  );
+  const [departureTime, setDepartureTime] = useState(initialFilters.departureTime ?? '');
+  const [destination, setDestination] = useState(initialFilters.destination ?? '');
+  const [rideType, setRideType] = useState<string>(
+    initialFilters.rideType ?? C.RideTypeFilterEnum.ALL,
+  );
+  const [isFiltered, setIsFiltered] = useState(() => hasAnyFilter(initialFilters));
 
   const handleTimeChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => setDepartureTime(event.target.value),

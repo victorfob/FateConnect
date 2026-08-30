@@ -18,6 +18,9 @@ import * as C from './constants';
 import { Rides } from '.';
 
 const RIDES_URL = 'https://api.fateconnect.test/rides';
+const SECOND_PAGE_LABEL = 'Ir para a página 2';
+const FIRST_PAGE = 1;
+const PAGE_SIZE = 10;
 
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
 const RETRY_WINDOW_MS = 5000;
@@ -44,23 +47,34 @@ const RIDE: Ride = {
 /** A posse vem calculada pela API; o cartão só a lê. */
 const OWN_RIDE: Ride = { ...RIDE, isOwner: true };
 
+/** A API responde uma página; o total acompanha o que o caso semeou. */
+function pageOf(rides: Ride[], total = rides.length) {
+  return {
+    items: rides,
+    page: FIRST_PAGE,
+    pageSize: PAGE_SIZE,
+    total,
+    totalPages: Math.ceil(total / PAGE_SIZE),
+  };
+}
+
 function listReturning(rides: Ride[], onRequest?: (url: URL) => void) {
   server.use(
     http.get(RIDES_URL, ({ request }) => {
       onRequest?.(new URL(request.url));
 
-      return HttpResponse.json(rides);
+      return HttpResponse.json(pageOf(rides));
     }),
   );
 }
 
-function renderComponent() {
+function renderComponent(search = '') {
   const router = createMemoryRouter(
     [
       { path: RoutePathEnum.RIDES, element: <Rides /> },
       { path: RoutePathEnum.MENU, element: <div>menu</div> },
     ],
-    { initialEntries: [RoutePathEnum.RIDES] },
+    { initialEntries: [`${RoutePathEnum.RIDES}${search}`] },
   );
   render(<RouterProvider router={router} />);
 
@@ -229,7 +243,7 @@ describe('Rides', () => {
   it('should delete the ride once the removal is confirmed', async () => {
     let deleted = false;
     server.use(
-      http.get(RIDES_URL, () => HttpResponse.json(deleted ? [] : [OWN_RIDE])),
+      http.get(RIDES_URL, () => HttpResponse.json(pageOf(deleted ? [] : [OWN_RIDE]))),
       http.delete(`${RIDES_URL}/:rideId`, () => {
         deleted = true;
 
@@ -383,5 +397,77 @@ describe('Rides', () => {
       'aria-selected',
       'false',
     );
+  });
+
+  describe('paginação e busca na URL', () => {
+    function listPage(items: Ride[], total: number, onRequest?: (url: URL) => void) {
+      server.use(
+        http.get(RIDES_URL, ({ request }) => {
+          onRequest?.(new URL(request.url));
+
+          return HttpResponse.json({
+            items,
+            page: FIRST_PAGE,
+            pageSize: PAGE_SIZE,
+            total,
+            totalPages: Math.ceil(total / PAGE_SIZE),
+          });
+        }),
+      );
+    }
+
+    it('should open with the fields already filled from the url', async () => {
+      listReturning([RIDE]);
+
+      renderComponent('?destino=Sorocaba&hora=07:30&tipo=solidaria');
+
+      expect(await screen.findByDisplayValue('Sorocaba')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('07:30')).toBeInTheDocument();
+    });
+
+    it('should ask the api for the page the url names', async () => {
+      let asked: URL | null = null;
+      listPage([RIDE], 30, (url) => {
+        asked = url;
+      });
+
+      renderComponent('?pagina=3');
+
+      await waitFor(() => expect(asked!.searchParams.get('page')).toBe('3'));
+    });
+
+    it('should put the chosen page in the url and leave the first one out', async () => {
+      listPage([RIDE], 30);
+      const router = renderComponent();
+
+      await userEvent.click(await screen.findByRole('button', { name: SECOND_PAGE_LABEL }));
+
+      await waitFor(() => expect(router.state.location.search).toBe('?pagina=2'));
+    });
+
+    it('should go back to the first page when a filter is applied', async () => {
+      listPage([RIDE], 30);
+      const router = renderComponent('?pagina=3');
+
+      await userEvent.type(await screen.findByLabelText(FILTER_LABELS.destination), 'Votorantim');
+      await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
+
+      await waitFor(() => expect(router.state.location.search).toBe('?destino=Votorantim'));
+    });
+
+    it('should fall back to the last page when the url asks beyond it', async () => {
+      listPage([RIDE], 12);
+      const router = renderComponent('?pagina=9');
+
+      await waitFor(() => expect(router.state.location.search).toBe('?pagina=2'));
+    });
+
+    it('should hide the control while a single page answers', async () => {
+      listPage([RIDE], 4);
+      renderComponent();
+
+      expect(await screen.findByText(RIDE.destination)).toBeInTheDocument();
+      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    });
   });
 });
