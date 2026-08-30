@@ -38,8 +38,8 @@ export function Signup() {
     mutationFn: signup,
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
-    onSuccess: (response) => {
-      notifySuccess(C.signupSuccessMessage(response.fullName));
+    onSuccess: () => {
+      notifySuccess(C.SIGNUP_SUCCESS_MESSAGE);
       navigate(LOGIN_ANCHOR);
     },
     onError: (error: ApiError) => notifyError(errorMessageFor(error.status)),

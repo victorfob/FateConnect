@@ -5,49 +5,49 @@ import { DeleteIcon } from '@design-system/icons';
 import { RIDE_CARD_LABELS } from '@app/pages/Rides/constants';
 import type { Ride } from '@app/services/rides/types';
 
-import { DELETE_DIALOG } from './constants';
+import { CANCEL_DIALOG } from './constants';
 import * as S from './styles';
 
-type RideDeleteConfirmationProps = Readonly<{
+type RideCancelConfirmationProps = Readonly<{
   ride: Ride;
-  onDelete: (ride: Ride) => void;
+  onCancel: (ride: Ride) => void;
 }>;
 
 /**
- * Exclusão de uma carona: o botão no cartão e a confirmação que ele abre. Nada
+ * Cancelamento de uma carona: o botão no cartão e a confirmação que ele abre. Nada
  * sai sem passar por aqui, porque a ação não tem volta.
  */
-export function RideDeleteConfirmation({ ride, onDelete }: RideDeleteConfirmationProps) {
+export function RideCancelConfirmation({ ride, onCancel }: RideCancelConfirmationProps) {
   const [confirming, setConfirming] = useState(false);
 
   const handleAsk = useCallback(() => setConfirming(true), []);
-  const handleCancel = useCallback(() => setConfirming(false), []);
+  const handleDismiss = useCallback(() => setConfirming(false), []);
   const handleConfirm = useCallback(() => {
     setConfirming(false);
-    onDelete(ride);
-  }, [onDelete, ride]);
+    onCancel(ride);
+  }, [onCancel, ride]);
 
   return (
     <>
-      <IconButton type="button" label={RIDE_CARD_LABELS.delete} onClick={handleAsk}>
+      <IconButton type="button" label={RIDE_CARD_LABELS.cancel} onClick={handleAsk}>
         <DeleteIcon />
       </IconButton>
 
-      <Dialog open={confirming} onClose={handleCancel} title={DELETE_DIALOG.title}>
+      <Dialog open={confirming} onClose={handleDismiss} title={CANCEL_DIALOG.title}>
         <Dialog.Body>
           <S.ConfirmationMessage variant="subtitle">
-            {DELETE_DIALOG.messagePrefix}
+            {CANCEL_DIALOG.messagePrefix}
             <strong>{ride.destination}</strong>
-            {DELETE_DIALOG.messageSuffix}
+            {CANCEL_DIALOG.messageSuffix}
           </S.ConfirmationMessage>
         </Dialog.Body>
 
         <Dialog.Footer>
-          <Button type="button" variant="contained" color="primary" onClick={handleCancel}>
-            {DELETE_DIALOG.cancelLabel}
+          <Button type="button" variant="contained" color="primary" onClick={handleDismiss}>
+            {CANCEL_DIALOG.dismissLabel}
           </Button>
           <Button type="button" variant="contained" color="secondary" onClick={handleConfirm}>
-            {DELETE_DIALOG.confirmLabel}
+            {CANCEL_DIALOG.confirmLabel}
           </Button>
         </Dialog.Footer>
       </Dialog>

@@ -1,7 +1,7 @@
-export const LOST_ITEM_ACTION_LABELS = { edit: 'Editar', delete: 'Excluir' };
+export const LOST_ITEM_ACTION_LABELS = { edit: 'Editar', cancel: 'Cancelar' };
 
-export const DELETE_DIALOG = {
-  title: 'Confirmar exclusão',
-  messagePrefix: 'Tem certeza que deseja excluir o item ',
-  confirmLabel: 'Excluir',
+export const CANCEL_DIALOG = {
+  title: 'Confirmar cancelamento',
+  messagePrefix: 'Tem certeza que deseja cancelar o item ',
+  confirmLabel: 'Cancelar',
 };

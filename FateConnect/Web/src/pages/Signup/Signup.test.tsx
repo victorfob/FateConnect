@@ -63,7 +63,7 @@ async function fillRequiredFields() {
   await screen.findByDisplayValue('Rua das Flores');
   await userEvent.type(screen.getByLabelText(/Número/), '100');
 
-  await userEvent.click(screen.getByRole('checkbox', { name: /Termos de Uso/ }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /Termos de uso/ }));
 }
 
 async function selectOption(fieldLabel: string, optionLabel: string) {
@@ -231,18 +231,18 @@ describe('Signup', () => {
   it('should open each legal document in a new tab, so the form survives', () => {
     renderSignup();
 
-    const terms = screen.getByRole('link', { name: 'Termos de Uso' });
+    const terms = screen.getByRole('link', { name: 'Termos de uso' });
     expect(terms).toHaveAttribute('href', TERMS_URL);
     expect(terms).toHaveAttribute('target', '_blank');
 
-    const privacy = screen.getByRole('link', { name: 'Política de Privacidade' });
+    const privacy = screen.getByRole('link', { name: 'Política de privacidade' });
     expect(privacy).toHaveAttribute('href', PRIVACY_URL);
     expect(privacy).toHaveAttribute('target', '_blank');
   });
 
   it('should toggle the consent when the sentence around the links is clicked', async () => {
     renderSignup();
-    const consent = screen.getByRole('checkbox', { name: /Termos de Uso/ });
+    const consent = screen.getByRole('checkbox', { name: /Termos de uso/ });
 
     await userEvent.click(screen.getByText(/Eu concordo com os/));
 
@@ -251,9 +251,9 @@ describe('Signup', () => {
 
   it('should not toggle the consent when the legal link is clicked', async () => {
     renderSignup();
-    const consent = screen.getByRole('checkbox', { name: /Termos de Uso/ });
+    const consent = screen.getByRole('checkbox', { name: /Termos de uso/ });
 
-    await userEvent.click(screen.getByRole('link', { name: 'Termos de Uso' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Termos de uso' }));
 
     expect(consent).not.toBeChecked();
   });
@@ -282,7 +282,7 @@ describe('Signup', () => {
 
     await submit();
 
-    expect(await screen.findByText(C.signupSuccessMessage('Maria Silva'))).toBeInTheDocument();
+    expect(await screen.findByText(C.SIGNUP_SUCCESS_MESSAGE)).toBeInTheDocument();
     await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING));
     expect(router.state.location.hash).toBe(`#${LandingSectionEnum.LOGIN}`);
   });
