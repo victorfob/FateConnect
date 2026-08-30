@@ -1,4 +1,4 @@
-import { useCallback, useState, type ChangeEvent, type SubmitEvent } from 'react';
+import { useCallback, useState, type ChangeEvent } from 'react';
 import { FilterPanel, Input } from '@design-system';
 
 import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
@@ -32,22 +32,17 @@ export function RideFilter({ onApply }: RideFilterProps) {
     [],
   );
 
-  const handleSubmit = useCallback(
-    (event: SubmitEvent<HTMLElement>) => {
-      event.preventDefault();
+  const handleSubmit = useCallback(() => {
+    const filters: RideFilterValues = {};
 
-      const filters: RideFilterValues = {};
+    if (departureDate) filters.departureDate = toApiDate(departureDate);
+    if (departureTime) filters.departureTime = departureTime;
+    if (destination.trim()) filters.destination = destination.trim();
+    if (rideType) filters.rideType = rideType as RideTypeEnum;
 
-      if (departureDate) filters.departureDate = toApiDate(departureDate);
-      if (departureTime) filters.departureTime = departureTime;
-      if (destination.trim()) filters.destination = destination.trim();
-      if (rideType) filters.rideType = rideType as RideTypeEnum;
-
-      setIsFiltered(Object.keys(filters).length > NO_FILTERS);
-      onApply(filters);
-    },
-    [departureDate, departureTime, destination, rideType, onApply],
-  );
+    setIsFiltered(Object.keys(filters).length > NO_FILTERS);
+    onApply(filters);
+  }, [departureDate, departureTime, destination, rideType, onApply]);
 
   return (
     <FilterPanel
