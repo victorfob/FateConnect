@@ -12,6 +12,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a mostrar quem ofertou cada carona, com nome e contato reais, e a reconhecer as suas — com marcação própria e os botões de editar e excluir (#203) [Frontend]
 - Passa a responder os erros da API em português; validação de carona e de cadastro, formato de hora e o erro genérico vinham em inglês (#218) [Backend]
 - Passa a atender o cadastro e o login com o contrato em inglês: muda o endereço do cadastro e todas as chaves das duas chamadas, na requisição e na resposta (#222) [Backend]
+- Passa a enviar o cadastro e o login no contrato em inglês, acompanhando a API (#224) [Frontend]
 
 ### Fixed
 
