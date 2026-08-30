@@ -36,7 +36,7 @@ echo "==> 2/5 Docker"
 if command -v docker >/dev/null 2>&1; then
   echo "    já instalado: $(docker --version)"
 else
-  curl -fsSL https://get.docker.com | sh
+  curl -fsSL --proto '=https' --tlsv1.2 https://get.docker.com | sh
 fi
 usermod -aG docker "$TARGET_USER"
 echo "    $TARGET_USER adicionado ao grupo docker (vale no próximo login)"
