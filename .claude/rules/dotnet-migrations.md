@@ -28,7 +28,7 @@ Renomear a tabela **não** renomeia o que aponta para ela. Cada um destes precis
 
 ## Provar que os dados sobrevivem
 
-⛔ **Suíte verde não prova nada aqui.** Os testes rodam em `Microsoft.EntityFrameworkCore.InMemory`, que não executa DDL nem gera SQL de Postgres. A prova é aplicar num Postgres de verdade, na versão que a VPS roda:
+⛔ **Suíte verde não prova isto.** A suíte aplica as migrations num PostgreSQL de verdade, então migration que não roda derruba teste — mas sempre num banco **vazio**: nada ali diz se os dados sobreviveram ao rename. A prova é aplicar num Postgres com linhas dentro, na versão que a VPS roda:
 
 ```bash
 docker run -d --name mig-probe -e POSTGRES_HOST_AUTH_METHOD=trust -p 55432:5432 postgres:<versão da VPS>

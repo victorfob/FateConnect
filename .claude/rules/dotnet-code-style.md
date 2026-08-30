@@ -117,7 +117,7 @@ E o `Where` passa a se ler sozinho: `.Where(HasNotDeparted(today, currentTime))`
 
 ⚠️ **Nomeie o conceito inteiro, não as metades.** `HasNotDeparted` diz o que a regra significa; quebrar em `isAfterToday || isTodayAndAfterNow` obriga quem lê a recompor o sentido a partir dos pedaços.
 
-⚠️ **O gate não protege isto.** A suíte roda no provider em memória, que executa LINQ em memória e aceita as duas formas — a que traduz e a que não. Para provar tradução, gere o SQL com `ToQueryString()` contra o `UseNpgsql`, que não precisa de banco no ar.
+✅ **O gate protege isto desde a #237.** A suíte roda contra PostgreSQL de verdade, então predicado que não traduz derruba teste: a mutação para método `bool` fez **20 testes** caírem. Antes, no provedor em memória, as duas formas passavam iguais.
 
 ## DTO de query: opcional é nullable, derivado é `[BindNever]`
 
