@@ -24,6 +24,21 @@ A API já respondia isso com um `401`.
 
 **O sinal de risco é a cadeia de suporte:** quando a peça B só existe para a peça A funcionar, e a C só para a B, pare e procure a fonte que dispensa as três. Deduzir também erra sozinho; perguntar, não.
 
+## Antes de substituir o que a biblioteca faz, ponha o caminho barato na mesa
+
+⛔ **Reescrever o comportamento de um componente de terceiro é decisão de quem revisa, não sua** — mesmo quando a reescrita é pequena e você já a mediu. Traga as alternativas com o **custo de cada uma**, e espere.
+
+⛔ Aconteceu na #242. O controle de páginas do MUI quebrava em duas fileiras no celular, e eu passei direto a computar a janela de páginas por conta própria. Funcionou e estava medido — mas o Victor perguntou *"pq a abordagem foi reescrever completamente o componente do MUI?"*, e a pergunta era justa: existia um caminho sem código nenhum, encolher o item, que eu não tinha mencionado.
+
+O que fechou a conversa foi a tabela que eu devia ter apresentado antes:
+
+| Caminho | Custo |
+| --- | --- |
+| computar a janela | 15 linhas nossas para manter |
+| encolher o item de 44px para 38px | zero código, mas alvo de toque abaixo do mínimo de acessibilidade |
+
+**O sinal de risco é você já ter medido que a biblioteca não resolve.** É exatamente aí que a reescrita parece inevitável — e é aí que o caminho barato precisa ser dito em voz alta, com o custo, para o outro lado escolher.
+
 ## Encontrou duplicação: propor e perguntar
 
 Vale também para duplicação **fora da tarefa**. Se eu vi, eu proponho na hora, sem esperar ser cobrado — a sugestão é obrigação, não favor. Trazer três coisas: o que está repetido, o que fica no lugar dos dois, e **onde** passa a morar. E **esperar o sim**.
