@@ -20,7 +20,7 @@ public class AuthService : IAuthService
 
     public async Task<TokenResponseDto> LoginAsync(LoginDto dto)
     {
-        User? usuario = await _usuarioRepository.ObterUsuarioPorEmailAsync(dto.EmailFatec);
+        User? usuario = await _usuarioRepository.GetByEmailAsync(dto.EmailFatec);
 
         bool saoCredenciaisInvalidas = CredenciaisInvalidas(usuario, dto.Senha);
 

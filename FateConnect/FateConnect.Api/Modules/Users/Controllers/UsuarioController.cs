@@ -26,7 +26,7 @@ public class UsuarioController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CadastrarAsync([FromBody] CreateUsuarioDto dto)
     {
-        UsuarioResponseDto resposta = await _usuarioService.CadastrarAsync(dto);
+        UsuarioResponseDto resposta = await _usuarioService.SignUpAsync(dto);
 
         return StatusCode(StatusCodes.Status201Created, resposta);
     }

@@ -10,70 +10,70 @@ namespace FateConnect.Api.Modules.Users.Services;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _usuarioRepository;
+    private readonly IUserRepository _userRepository;
 
-    public UserService(IUserRepository usuarioRepository)
+    public UserService(IUserRepository userRepository)
     {
-        _usuarioRepository = usuarioRepository;
+        _userRepository = userRepository;
     }
 
-    public async Task<UsuarioResponseDto> CadastrarAsync(CreateUsuarioDto dto)
+    public async Task<UsuarioResponseDto> SignUpAsync(CreateUsuarioDto dto)
     {
-        await GarantirEmailUnicoAsync(dto.EmailFatec);
+        await EnsureEmailIsUniqueAsync(dto.EmailFatec);
 
-        User novoUsuario = MontarEntidadeUsuario(dto);
+        User newUser = BuildUser(dto);
 
-        await _usuarioRepository.AdicionarAsync(novoUsuario);
+        await _userRepository.AddAsync(newUser);
 
-        UsuarioResponseDto resposta = new UsuarioResponseDto
+        UsuarioResponseDto response = new UsuarioResponseDto
         {
-            Id = novoUsuario.Id,
-            EmailFatec = novoUsuario.FatecEmail,
-            NomeCompleto = novoUsuario.FullName
+            Id = newUser.Id,
+            EmailFatec = newUser.FatecEmail,
+            NomeCompleto = newUser.FullName
         };
 
-        return resposta;
+        return response;
     }
 
-    private async Task GarantirEmailUnicoAsync(string email)
+    private async Task EnsureEmailIsUniqueAsync(string email)
     {
-        bool emailEmUso = await _usuarioRepository.ExisteEmailAsync(email);
+        bool emailInUse = await _userRepository.EmailExistsAsync(email);
 
-        if (emailEmUso)
+        if (emailInUse)
             throw new EmailJaCadastradoException(email);
     }
 
-    private static User MontarEntidadeUsuario(CreateUsuarioDto dto)
+    private static User BuildUser(CreateUsuarioDto dto)
     {
-        string senhaComHash = GerarHashDaSenha(dto.Senha);
+        string hashedPassword = HashPassword(dto.Senha);
 
-        List<Address> enderecosMapeados = MontarListaDeEnderecos(dto.Enderecos);
-        List<Contact> contatosMapeados = MontarListaDeContatos(dto.Contatos);
+        List<Address> mappedAddresses = BuildAddresses(dto.Enderecos);
+        List<Contact> mappedContacts = BuildContacts(dto.Contatos);
 
-        User usuario = new User
+        User user = new User
         {
             FatecEmail = dto.EmailFatec,
             FullName = dto.NomeCompleto,
             Nickname = dto.Apelido,
             BirthDate = dto.DataNascimento,
             Gender = dto.Genero,
-            Password = senhaComHash,
+            Password = hashedPassword,
             ProfileType = EnumProfileType.Operator,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            Addresses = enderecosMapeados,
-            Contacts = contatosMapeados
+            Addresses = mappedAddresses,
+            Contacts = mappedContacts
         };
 
-        return usuario;
+        return user;
     }
 
-    private static List<Address> MontarListaDeEnderecos(List<CreateEnderecoDto>? dtos)
+    private static List<Address> BuildAddresses(List<CreateEnderecoDto>? dtos)
     {
         if (dtos is null or { Count: 0 })
-            return new List<Address>();
+            return [];
 
-        List<Address> enderecos = dtos.Select(dto => new Address
+        List<Address> addresses = dtos.Select(dto => new Address
         {
             ZipCode = dto.Cep,
             Street = dto.Logradouro,
@@ -83,25 +83,20 @@ public class UserService : IUserService
             State = dto.Estado
         }).ToList();
 
-        return enderecos;
+        return addresses;
     }
 
-    private static List<Contact> MontarListaDeContatos(List<CreateContatoDto>? dtos)
+    private static List<Contact> BuildContacts(List<CreateContatoDto>? dtos)
     {
         if (dtos is null or { Count: 0 })
-            return new List<Contact>();
+            return [];
 
-        List<Contact> contatos = dtos.Select(dto => new Contact
+        List<Contact> contacts = dtos.Select(dto => new Contact
         {
             Phone = dto.Telefone,
             ContactEmail = dto.EmailContato
         }).ToList();
 
-        return contatos;
-    }
-
-    private static string GerarHashDaSenha(string senhaPadrao)
-    {
-        return HashPassword(senhaPadrao);
+        return contacts;
     }
 }

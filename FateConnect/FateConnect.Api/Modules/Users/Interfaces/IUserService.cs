@@ -4,5 +4,5 @@ namespace FateConnect.Api.Modules.Users.Services;
 
 public interface IUserService
 {
-    Task<UsuarioResponseDto> CadastrarAsync(CreateUsuarioDto dto);
+    Task<UsuarioResponseDto> SignUpAsync(CreateUsuarioDto dto);
 }

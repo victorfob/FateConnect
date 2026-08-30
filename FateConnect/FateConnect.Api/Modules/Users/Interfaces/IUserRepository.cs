@@ -4,7 +4,7 @@ namespace FateConnect.Api.Modules.Users.Interfaces;
 
 public interface IUserRepository
 {
-    Task<bool> ExisteEmailAsync(string email);
-    Task<User?> ObterUsuarioPorEmailAsync(string email);
-    Task AdicionarAsync(User usuario);
+    Task<bool> EmailExistsAsync(string email);
+    Task<User?> GetByEmailAsync(string email);
+    Task AddAsync(User user);
 }
