@@ -9,6 +9,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - Passa a responder a listagem de caronas em páginas de 10, com o total e a quantidade de páginas, e aceita escolher a página e o tamanho dela até um teto de 50; antes devolvia todas as caronas ativas de uma vez (#236) [Backend]
+- Passa a mostrar a lista de caronas em páginas de 10, com a busca guardada no endereço: copiar a URL e abrir noutra aba devolve a mesma página, com os mesmos filtros preenchidos; enquanto a lista carrega, o lugar dos cartões fica marcado em vez de um indicador girando (#239) [Frontend]
 
 ### Fixed
 
