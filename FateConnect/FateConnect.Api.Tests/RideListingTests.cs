@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace FateConnect.Api.Tests;
 
-public class RidePaginationTests
+public class RideListingTests
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -189,5 +189,52 @@ public class RidePaginationTests
         Assert.Equal(1, page.Total);
         Assert.Equal(1, page.TotalPages);
         Assert.Single(page.Items);
+    }
+
+    [Fact]
+    public async Task GetRides_FilteredByDestination_KeepsOnlyTheRidesThatMatch()
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        Guid matching = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), "São Paulo centro");
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(9, 0), "Campinas");
+
+        PagedRides page = await GetPageAsync(factory, driverId, "?Destination=paulo");
+
+        Assert.Equal(1, page.Total);
+        Assert.Equal(matching, Assert.Single(page.Items).Id);
+    }
+
+    [Theory]
+    [InlineData("São Paulo centro", "sao paulo")]
+    [InlineData("Sao Paulo centro", "são paulo")]
+    [InlineData("São Paulo centro", "SÃO PAULO")]
+    public async Task GetRides_FilteredByDestination_IgnoresAccentsAndCase(string destination, string search)
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        Guid expected = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), destination);
+
+        PagedRides page = await GetPageAsync(factory, driverId, $"?Destination={Uri.EscapeDataString(search)}");
+
+        Assert.Equal(expected, Assert.Single(page.Items).Id);
+    }
+
+    [Fact]
+    public async Task GetRides_WithEveryFilterAtOnce_IsTranslatedToSql()
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        Guid expected = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), "Sorocaba centro");
+
+        PagedRides page = await GetPageAsync(
+            factory,
+            driverId,
+            $"?Destination=sorocaba&DepartureDate={tomorrow:yyyy-MM-dd}&DepartureTime=08:30:00&RideType=Solidarity");
+
+        Assert.Equal(expected, Assert.Single(page.Items).Id);
     }
 }
