@@ -72,6 +72,30 @@ Vale para `useQuery` e `useMutation`. Um teste que conte `getAllByRole('alert')`
 - `useRef` em componente funcional, nunca `createRef`.
 - **Apenas exports nomeados** — sem `export default`.
 
+## `let` que guarda estado é estado que o React deveria ter
+
+⛔ **Nada de `let` de módulo guardando estado, nem sinalizador mutável dentro de efeito.** Os dois existem para não usar o que o React oferece, e os dois quebram em silêncio: o de módulo sobrevive entre testes e entre montagens; o de efeito esconde que a limpeza podia não ser necessária.
+
+Aconteceu na #231, os dois no mesmo trabalho:
+
+| O que escrevi | O que era |
+| --- | --- |
+| `let refused = false` no módulo, com funções para marcar e limpar | `useState` num provider, publicado por contexto |
+| `let active = true` no efeito, para não chamar `setState` depois de desmontar | Nada — o provider vive enquanto o app vive, e a proteção guardava contra o que não acontece |
+
+⚠️ **A regra é sobre estado, não sobre a palavra.** `let` local de laço em função pura continua certo — `utils/masks/caret.ts` tem um contador assim, e ele não é estado de ninguém.
+
+## `if` de uma instrução não leva chaves
+
+Corpo com uma instrução só dispensa as chaves. Instrução longa quebra na linha seguinte, indentada — e continua sem chaves:
+
+```tsx
+if (useSessionStatus() === SessionStatusEnum.VALID)
+  return <Navigate to={RoutePathEnum.MENU} replace />;
+```
+
+⚠️ O Prettier mantém essa forma quando a linha estoura a largura; não é ele que reintroduz as chaves.
+
 ## Constante de módulo mora no topo
 
 Depois dos imports, num bloco só, junto das que já existem — não encostada na função que a usa. Constante espalhada pelo arquivo esconde que o mesmo número já tinha nome três linhas acima.

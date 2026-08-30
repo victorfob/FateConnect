@@ -182,7 +182,14 @@ gh issue close <pai> --comment "As sub-issues foram entregues: #a, #b, #c."
 
 **O card vai para `Done` sozinho**, e não há `gh project item-edit` a rodar aqui. Quem move é o `github-project-automation[bot]`, que reage ao fechamento: na #213 e na #207 o `project_v2_item_status_changed` dele saiu **um segundo** depois do `closed`. O mesmo bot adiciona a issue nova ao board e define o status inicial.
 
-⚠️ **Não generalize para as outras colunas:** `In Progress` e `In Review` continuam manuais. O bot só reage a criar e a fechar.
+⚠️ **Não generalize para as outras colunas:** o bot só reage a criar e a fechar. As duas do meio são manuais, e cada uma tem o seu gatilho:
+
+| Coluna | Quando mover |
+| --- | --- |
+| `In Progress` | ao criar a branch e começar o trabalho |
+| `In Review` | ao abrir o PR |
+
+⛔ **A do meio é a que escapa.** Na #226 e na #231 movi as duas para `In Progress` ao começar, abri os dois PRs e não movi nenhuma para `In Review` — quem viu foi o Victor. Mover ao abrir o PR é parte de abrir o PR, não um passo à parte.
 
 ⛔ **O que escapa é fechar o pai, não mover o card.** O trabalho acontece nas filhas, então ninguém volta ao guarda-chuva. A #136 ficou dias entregue de fato e **aberta** no GitHub — e, estando aberta, o card seguia corretamente em `Todo`. Só apareceu porque o Victor perguntou.
 
