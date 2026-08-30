@@ -5,6 +5,14 @@ import { RideTypeEnum } from '@app/services/rides/types';
 const LOWERCASE_TO_RIDE_TYPE: Readonly<Record<string, RideTypeEnum>> = {
   solidarity: RideTypeEnum.SOLIDARITY,
   egalitarian: RideTypeEnum.EGALITARIAN,
+  solidaria: RideTypeEnum.SOLIDARITY,
+  igualitaria: RideTypeEnum.EGALITARIAN,
+};
+
+/** O que vai para a URL: pt-BR, porque a barra de endereço é texto que se lê. */
+const RIDE_TYPE_SLUG: Readonly<Record<RideTypeEnum, string>> = {
+  [RideTypeEnum.SOLIDARITY]: 'solidaria',
+  [RideTypeEnum.EGALITARIAN]: 'igualitaria',
 };
 
 const RIDE_TYPE_LABEL: Readonly<Record<RideTypeEnum, string>> = {
@@ -35,11 +43,15 @@ export function isRideType(value: string): value is RideTypeEnum {
   return RIDE_TYPE_VALUES.has(value);
 }
 
-/** Interpreta o valor da API (PascalCase) ou de query em minúsculas. */
+/** Interpreta o valor da API (PascalCase) e o da URL, em pt-BR minúsculo. */
 export function parseRideType(raw: string | null | undefined): RideTypeEnum | null {
   if (!raw) return null;
 
   return LOWERCASE_TO_RIDE_TYPE[raw.trim().toLowerCase()] ?? null;
+}
+
+export function rideTypeSlug(value: RideTypeEnum): string {
+  return RIDE_TYPE_SLUG[value];
 }
 
 /** Tom da etiqueta do tipo de carona; a cor sai da paleta, nos dois temas. */

@@ -1,17 +1,15 @@
-import { Stack, styled } from '@design-system';
+import { spacingScale, Stack, styled } from '@design-system';
 
-/** Altura reservada enquanto a lista carrega, para o rodapé não pular. */
-const LOADING_MIN_HEIGHT_PX = 300;
+const { sm } = spacingScale;
 
 export const RideList = styled(Stack)({
   flexDirection: 'column',
   width: '100%',
 });
 
-export const LoadingContainer = styled(Stack)({
+export const PaginationRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'center',
-  alignItems: 'center',
-  minHeight: `${LOADING_MIN_HEIGHT_PX}px`,
   width: '100%',
-});
+  paddingTop: theme.space(sm),
+}));

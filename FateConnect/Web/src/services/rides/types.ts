@@ -1,3 +1,5 @@
+import type { PageQuery } from '../types';
+
 /** Valores canônicos alinhados à serialização do backend. */
 export enum RideTypeEnum {
   SOLIDARITY = 'Solidarity',
@@ -32,9 +34,9 @@ export type Ride = {
 export type RideInput = Omit<Ride, 'id' | 'createdAt' | 'driver' | 'isOwner'>;
 
 /** Filtros da listagem, com os mesmos nomes que a API recebe na query. */
-export type RideFilter = {
+export interface RideFilter extends PageQuery {
   destination?: string;
   departureDate?: string;
   departureTime?: string;
   rideType?: RideTypeEnum;
-};
+}
