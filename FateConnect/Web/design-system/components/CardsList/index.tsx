@@ -27,14 +27,15 @@ export function CardsList({
       </S.CardsColumn>
     );
 
+  // A paginação mora dentro da coluna, e não ao lado dela, porque o contêiner da
+  // página separa os filhos com um vão próprio — de fora, o controle flutuaria
+  // longe da lista a que pertence. Aqui quem dá o respiro é a margem do último
+  // cartão, a mesma que separa um cartão do outro.
   return (
-    <>
-      <S.CardsColumn>
-        {isEmpty && <Typography variant="subtitle">{emptyMessage}</Typography>}
-        {!isEmpty && children}
-      </S.CardsColumn>
-
+    <S.CardsColumn>
+      {isEmpty && <Typography variant="subtitle">{emptyMessage}</Typography>}
+      {!isEmpty && children}
       {pagination && <S.PaginationRow>{pagination}</S.PaginationRow>}
-    </>
+    </S.CardsColumn>
   );
 }
