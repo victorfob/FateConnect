@@ -7,30 +7,44 @@ import {
   LostItemStatusEnum,
   type LostItemFilter as LostItemFilterValues,
 } from '@app/services/lostAndFound/types';
-import { toApiDate } from '@app/utils/apiDate';
+import { fromFormDate, toApiDate } from '@app/utils/apiDate';
 
 import * as C from './constants';
 
 /** Células por linha no desktop: cinco campos e o botão quebram em duas. */
 const FILTER_COLUMNS = 3;
-const NO_FILTERS = 0;
 
-/** O mural já abre em Aberto, então isso sozinho não conta como filtro. */
-function isBeyondDefault({ status, ...rest }: LostItemFilterValues): boolean {
-  if (Object.keys(rest).length > NO_FILTERS) return true;
+/** O mural já abre em Aberto, e paginação não é escolha de busca: nenhum dos dois acende o ponto. */
+function isBeyondDefault({
+  name,
+  occurredOn,
+  kind,
+  onlyMine,
+  status,
+}: LostItemFilterValues): boolean {
+  if (name || occurredOn || kind || onlyMine) return true;
 
   return status !== LostItemStatusEnum.OPEN;
 }
 
-type LostItemFilterProps = Readonly<{ onApply: (filters: LostItemFilterValues) => void }>;
+type LostItemFilterProps = Readonly<{
+  initialFilters: LostItemFilterValues;
+  onApply: (filters: LostItemFilterValues) => void;
+}>;
 
-export function LostItemFilter({ onApply }: LostItemFilterProps) {
-  const [itemName, setItemName] = useState('');
-  const [occurredOn, setOccurredOn] = useState<Date | null>(null);
-  const [kind, setKind] = useState<string>(C.LostItemKindFilterEnum.ALL);
-  const [owner, setOwner] = useState<string>(C.LostItemOwnerFilterEnum.ALL);
-  const [status, setStatus] = useState<string>(LostItemStatusEnum.OPEN);
-  const [isFiltered, setIsFiltered] = useState(false);
+export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps) {
+  const [itemName, setItemName] = useState(initialFilters.name ?? '');
+  const [occurredOn, setOccurredOn] = useState<Date | null>(() =>
+    fromFormDate(initialFilters.occurredOn ?? ''),
+  );
+  const [kind, setKind] = useState<string>(initialFilters.kind ?? C.LostItemKindFilterEnum.ALL);
+  const [owner, setOwner] = useState<string>(() => {
+    if (initialFilters.onlyMine) return C.LostItemOwnerFilterEnum.MINE;
+
+    return C.LostItemOwnerFilterEnum.ALL;
+  });
+  const [status, setStatus] = useState<string>(initialFilters.status ?? LostItemStatusEnum.OPEN);
+  const [isFiltered, setIsFiltered] = useState(() => isBeyondDefault(initialFilters));
   // Item achado ou perdido só pode ter ocorrido até hoje.
   const today = useMemo(() => new Date(), []);
 
