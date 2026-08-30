@@ -40,7 +40,7 @@ export function Signup() {
     meta: { notifiesErrorItself: true },
     onSuccess: () => {
       notifySuccess(C.SIGNUP_SUCCESS_MESSAGE);
-      navigate(LOGIN_ANCHOR);
+      navigate(RoutePathEnum.MENU);
     },
     onError: (error: ApiError) => notifyError(errorMessageFor(error.status)),
   });

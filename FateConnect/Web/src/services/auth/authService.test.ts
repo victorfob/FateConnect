@@ -9,11 +9,11 @@ const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
 
 describe('authService', () => {
   it('should store the session after a successful login', async () => {
-    server.use(http.post(LOGIN_URL, () => HttpResponse.json({ token: 'abc', fullName: 'Fulano' })));
+    server.use(http.post(LOGIN_URL, () => HttpResponse.json({ token: 'abc' })));
 
     const response = await login({ fatecEmail: 'a@fatec.sp.gov.br', password: 'segredo123' });
 
-    expect(response.fullName).toBe('Fulano');
+    expect(response).toEqual({ token: 'abc' });
     expect(tokenStorage.getToken()).toBe('abc');
   });
 

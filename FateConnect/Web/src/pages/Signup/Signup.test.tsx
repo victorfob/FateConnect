@@ -4,7 +4,8 @@ import { http, HttpResponse } from 'msw';
 import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
 import { PRIVACY_URL, TERMS_URL } from '@app/constants/legalDocuments';
 import { server } from '@app/mocks/server';
-import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
+import { RoutePathEnum } from '@app/routes/paths';
+import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
@@ -14,6 +15,7 @@ import * as C from './constants';
 import { Signup } from '.';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/users/signup';
+const SIGNUP_TOKEN = 'token-do-cadastro';
 const ZIP_URL = 'https://viacep.com.br/ws/:zipCode/json/';
 
 const VALID_SIGNUP = {
@@ -30,6 +32,7 @@ function renderSignup() {
     [
       { path: RoutePathEnum.SIGNUP, element: <Signup /> },
       { path: RoutePathEnum.LANDING, element: <div>landing</div> },
+      { path: RoutePathEnum.MENU, element: <div>menu</div> },
     ],
     { initialEntries: [RoutePathEnum.SIGNUP] },
   );
@@ -267,24 +270,16 @@ describe('Signup', () => {
     expect(options[0]).toHaveTextContent(C.SELECT_PLACEHOLDER);
   });
 
-  it('should create the account and send the user to the login anchor', async () => {
-    server.use(
-      http.post(SIGNUP_URL, () =>
-        HttpResponse.json({
-          id: 1,
-          fatecEmail: VALID_SIGNUP.fatecEmail,
-          fullName: 'Maria Silva',
-        }),
-      ),
-    );
+  it('should create the account and send the user into the app already signed in', async () => {
+    server.use(http.post(SIGNUP_URL, () => HttpResponse.json({ token: SIGNUP_TOKEN })));
     const router = renderSignup();
     await fillRequiredFields();
 
     await submit();
 
     expect(await screen.findByText(C.SIGNUP_SUCCESS_MESSAGE)).toBeInTheDocument();
-    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING));
-    expect(router.state.location.hash).toBe(`#${LandingSectionEnum.LOGIN}`);
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
+    expect(tokenStorage.getToken()).toBe(SIGNUP_TOKEN);
   });
 
   it('should send the payload in the contract the backend expects', async () => {

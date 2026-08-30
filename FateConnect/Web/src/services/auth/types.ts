@@ -5,5 +5,4 @@ export type LoginRequest = {
 
 export type TokenResponse = {
   token: string;
-  fullName: string;
 };
