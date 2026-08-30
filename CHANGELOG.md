@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-30
+
 ### Changed
 
 - Passa a devolver quem ofertou a carona, com nome e contato, e a indicar se ela é de quem consultou (#201) [Backend]
