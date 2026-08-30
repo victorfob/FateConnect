@@ -1,6 +1,7 @@
 import { LostItemKindEnum, LostItemStatusEnum } from '@app/services/lostAndFound/types';
+import { FIRST_PAGE, PAGE_SIZE } from '@app/utils/searchParams';
 
-import { DEFAULT_STATUS, FIRST_PAGE, lostItemSearchCodec, PAGE_SIZE } from './searchQuery';
+import { DEFAULT_STATUS, lostItemSearchCodec } from './searchQuery';
 
 const read = (search: string) => lostItemSearchCodec.fromParams(new URLSearchParams(search));
 

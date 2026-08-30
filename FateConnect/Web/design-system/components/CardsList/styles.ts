@@ -1,8 +1,11 @@
-import { spacingScale, Stack, styled } from '@design-system';
+import Stack from '@mui/material/Stack';
+
+import { styled } from '@ds-root/styled';
+import { spacingScale } from '@ds-root/tokens';
 
 const { sm } = spacingScale;
 
-export const LostItemList = styled(Stack)({
+export const CardsColumn = styled(Stack)({
   flexDirection: 'column',
   width: '100%',
 });
