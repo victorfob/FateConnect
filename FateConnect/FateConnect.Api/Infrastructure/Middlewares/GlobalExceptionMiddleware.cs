@@ -2,6 +2,7 @@ namespace FateConnect.Api.Infrastructure.Middlewares;
 
 using System.Net;
 using FateConnect.Api.Modules.Auth.Exceptions;
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -63,7 +64,7 @@ public partial class GlobalExceptionMiddleware(
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        await context.Response.WriteAsJsonAsync(new { error = errorMessage }, context.RequestAborted);
+        await context.Response.WriteAsJsonAsync(new ErrorResponseDto { Error = errorMessage }, context.RequestAborted);
     }
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Unhandled internal server error occurred.")]
