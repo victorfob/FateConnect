@@ -35,7 +35,8 @@ public class ApiFactory : WebApplicationFactory<Program>
                 service => service.ServiceType == typeof(DbContextOptions<FateConnectDbContext>));
 
             services.Remove(registration);
-            services.AddDbContext<FateConnectDbContext>(options => options.UseInMemoryDatabase(_databaseName));
+            services.AddDbContext<FateConnectDbContext>(
+                options => options.UseNpgsql(TestDatabase.ConnectionStringFor(_databaseName)));
         });
     }
 

@@ -44,6 +44,8 @@ Medido em 2026-08-28, publicando a `FateConnect.Api` dos dois jeitos:
 
 Vão para dentro do contêiner de produção `xunit.core`, `xunit.assert`, `xunit.execution.dotnet`, `xunit.abstractions`, `Microsoft.AspNetCore.Mvc.Testing`, `Microsoft.EntityFrameworkCore.InMemory` e um `MvcTestingAppManifest.json` — inclusive um provedor de banco alternativo disponível no processo que atende a internet.
 
+⚠️ **A lista é a daquela medição.** Trocado o `InMemory` pelo `Testcontainers.PostgreSql` na #237, o que vaza hoje é um cliente de Docker: o risco não encolheu, mudou de forma.
+
 É também o que a Microsoft manda por escrito — *"Separate unit tests from integration tests into different projects"* — e o que os projetos de referência fazem: o `dotnet/eShop` tem `src/Catalog.API` com `tests/Catalog.FunctionalTests` ao lado, o `dotnet/aspnetcore` repete `src/` e `test/` em cada módulo, o `MediatR` tem `src/` e `test/`.
 
 **A única peça de apoio a teste que pode morar no app** é tornar o `Program` visível para o `WebApplicationFactory`. O eShop faz isso com um arquivo de três linhas, e explica que `InternalsVisibleTo` não resolve porque a acessibilidade do tipo é verificada. Aqui o `Program` já é público, então nem isso é preciso.
@@ -107,15 +109,29 @@ Nunca exponha membro só para testar. O que interessa é o resultado do método 
 
 Aqui isso já espera por alguém: `Ride.ValidateDepartureDateTime` compara a partida com `DateTime.UtcNow`, então testar a regra de "partida no futuro" exige injetar o tempo antes.
 
-## Subir a aplicação sem banco
+## Subir a aplicação contra PostgreSQL de verdade
 
-O `ApiFactory` troca o provedor por `UseInMemoryDatabase`, e o `Program` só chama `Migrate()` quando `database.IsRelational()` — sem essa guarda a aplicação não sobe no teste, porque provedor em memória não tem migration.
+⛔ **A suíte precisa de Docker.** O `TestDatabase` sobe **um** container `postgres:17` para a suíte inteira, e cada `ApiFactory` registra `UseNpgsql` apontando para um banco próprio dentro dele — o isolamento entre classes de teste é o banco, não o container. Sem Docker a suíte falha inteira, com a mensagem que o `TestDatabase` escreve; não há caminho de fallback, porque verde com testes pulados é o falso verde que esta seção existe para impedir.
 
-⚠️ **O provedor em memória não é o Postgres.** Ele não avalia `unaccent` nem `ILike`, então filtro por destino não se prova ali: ou o teste evita esse caminho, ou a prova é gerar o SQL e lê-lo.
+**A tag casa com a produção.** A VPS roda o `postgres-17` do Ubuntu, então a imagem é `postgres:17` e não a mais recente. Não pinamos versão de Docker: o Testcontainers não declara mínimo, e nada no nosso código fixa versão de API.
 
-⛔ **E o risco maior é o inverso: ele aceita o que o Postgres recusa.** O provedor em memória executa LINQ em memória, então uma consulta que o PostgreSQL não sabe traduzir passa verde aqui e quebra em produção. Trocar a `Expression` de um predicado por um método `bool` — ver `dotnet-code-style.md` — é a forma mais fácil de causar isso: a suíte inteira continua passando.
+**O schema nasce das migrations**, porque é o `Migrate()` do `Program` que roda — o mesmo caminho da produção. Migration quebrada aparece no teste, e o `unaccent` vem junto sem passo manual, porque o `FateConnectDbContext` o declara com `HasPostgresExtension`.
 
-**Enquanto for assim, tradução se prova gerando o SQL**, com `ToQueryString()` contra o `UseNpgsql`, que não precisa de banco no ar. A #237 troca o provedor por PostgreSQL real e **reescreve esta seção**.
+⚠️ **O custo é real e conhecido: ~6s contra ~1s do provedor em memória.** São **24 fábricas** — uma por classe com `IClassFixture`, mais uma por caso de teste do `RideListingTests` —, logo 24 bancos criados e migrados. Isso é aceitável para o que compra, e o que compra foi medido na #237, com três mutações:
+
+| mutação | o que cai |
+| --- | --- |
+| `Expression<Func<Ride, bool>>` vira método `bool` — ver `dotnet-code-style.md` | **20 testes** |
+| `Unaccent` sai da coluna | 2 casos de `GetRides_FilteredByDestination_IgnoresAccentsAndCase` |
+| `Unaccent` sai do padrão de busca | 2 casos, e **não os mesmos** |
+
+As três passavam verdes no provedor em memória, que executa LINQ em memória e não conhece função de PostgreSQL.
+
+⚠️ **Não serialize a criação dos bancos, e não desligue o paralelismo do xUnit.** As 24 fábricas criam banco ao mesmo tempo, e a falha clássica disso — `source database "template1" is being accessed by other users` — exige uma sessão aberta **no template**. Medido durante uma corrida real: os únicos bancos que recebem conexão são o `postgres`, onde o Npgsql abre a conexão administrativa, e os `fateconnect-tests-<guid>`; o `template1` recebe **zero**. Pico de **25 conexões contra o teto de 100**, e 120 `CREATE DATABASE` concorrentes numa sonda não produziram uma falha.
+
+⚠️ **Aquele zero só vale por causa do controle positivo.** Antes de acreditar nele, a mesma sonda forçou o erro de propósito — conexão aberta num banco e `CREATE DATABASE ... TEMPLATE` copiando dele — e ele apareceu. Sonda que não consegue produzir a falha não está medindo a ausência dela.
+
+⚠️ **Cada `[InlineData]` de acento precisa provar um lado.** As duas últimas mutações derrubam casos diferentes justamente porque um deles tem acento na coluna e busca sem, e o outro o inverso. Caso que nenhuma mutação derruba é caso que não está provando nada.
 
 ## Suíte verde não prova que ela pega o defeito
 
