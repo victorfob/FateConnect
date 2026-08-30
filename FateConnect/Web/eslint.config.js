@@ -73,6 +73,16 @@ const styleConventions = [
       'Sem tag HTML crua: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
   },
   {
+    // O seletor acima só olha a chamada de `styled`, e por isso deixou passar
+    // três `<li>` escritos direto no JSX da paginação — quem viu foi o Victor.
+    // Ênfase de texto fica de fora: `<strong>` no meio de uma frase é marcação
+    // semântica, não contêiner, e embrulhá-la num `styled` piora o que se lê.
+    selector:
+      'JSXOpeningElement > JSXIdentifier[name=/^[a-z]/]:not([name=/^(strong|em|b|i|u|s|small|sub|sup|abbr|code|kbd|mark|br|wbr)$/])',
+    message:
+      'Sem tag HTML crua no JSX: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
+  },
+  {
     // Os quatro nomes barrados são a diferença entre a união de cor do MUI e o
     // que o produto usa: sobram `inherit`, `primary` e `secondary`. Sete botões
     // pediam `error` só por ser vermelho, e o resultado eram dois vermelhos

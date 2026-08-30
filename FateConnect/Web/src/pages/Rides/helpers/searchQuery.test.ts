@@ -1,6 +1,7 @@
 import { RideTypeEnum } from '@app/services/rides/types';
+import { FIRST_PAGE, PAGE_SIZE } from '@app/utils/searchParams';
 
-import { FIRST_PAGE, PAGE_SIZE, rideSearchCodec } from './searchQuery';
+import { rideSearchCodec } from './searchQuery';
 
 const read = (search: string) => rideSearchCodec.fromParams(new URLSearchParams(search));
 
