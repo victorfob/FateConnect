@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ChangeEvent, type SubmitEvent } from 'react';
+import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 import { FilterPanel, Input } from '@design-system';
 
 import { isLostItemKind } from '@app/pages/LostAndFound/helpers/lostItemKind';
@@ -51,23 +51,18 @@ export function LostItemFilter({ onApply }: LostItemFilterProps) {
     [],
   );
 
-  const handleSubmit = useCallback(
-    (event: SubmitEvent<HTMLElement>) => {
-      event.preventDefault();
+  const handleSubmit = useCallback(() => {
+    const filters: LostItemFilterValues = {};
 
-      const filters: LostItemFilterValues = {};
+    if (itemName.trim()) filters.name = itemName.trim();
+    if (occurredOn) filters.occurredOn = toApiDate(occurredOn);
+    if (isLostItemKind(kind)) filters.kind = kind;
+    if (owner === C.LostItemOwnerFilterEnum.MINE) filters.onlyMine = true;
+    if (isLostItemStatus(status)) filters.status = status;
 
-      if (itemName.trim()) filters.name = itemName.trim();
-      if (occurredOn) filters.occurredOn = toApiDate(occurredOn);
-      if (isLostItemKind(kind)) filters.kind = kind;
-      if (owner === C.LostItemOwnerFilterEnum.MINE) filters.onlyMine = true;
-      if (isLostItemStatus(status)) filters.status = status;
-
-      setIsFiltered(isBeyondDefault(filters));
-      onApply(filters);
-    },
-    [itemName, occurredOn, kind, owner, status, onApply],
-  );
+    setIsFiltered(isBeyondDefault(filters));
+    onApply(filters);
+  }, [itemName, occurredOn, kind, owner, status, onApply]);
 
   return (
     <FilterPanel

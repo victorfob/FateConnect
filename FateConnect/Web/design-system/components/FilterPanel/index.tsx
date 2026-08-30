@@ -14,7 +14,8 @@ export type FilterPanelProps = Readonly<{
   columns: number;
   /** Ponto ao lado do título enquanto a lista está filtrada. */
   active?: boolean;
-  onSubmit: (event: SubmitEvent<HTMLElement>) => void;
+  /** Chamado com o submit nativo já prevenido pelo painel. */
+  onSubmit: VoidFunction;
   children: ReactNode;
 }>;
 
@@ -30,6 +31,11 @@ function FilterPanel({
   onSubmit,
   children,
 }: FilterPanelProps) {
+  const handleSubmit = (event: SubmitEvent<HTMLElement>) => {
+    event.preventDefault();
+    onSubmit();
+  };
+
   return (
     <S.PanelRoot defaultExpanded disableGutters>
       <S.PanelHeader expandIcon={<ChevronRightIcon />}>
@@ -42,7 +48,7 @@ function FilterPanel({
       </S.PanelHeader>
 
       <S.PanelBody>
-        <S.PanelForm component="form" onSubmit={onSubmit}>
+        <S.PanelForm component="form" onSubmit={handleSubmit}>
           <S.FieldsRow columns={columns}>
             {children}
 

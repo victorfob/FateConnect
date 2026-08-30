@@ -21,7 +21,7 @@ esac
 # valer também na execução manual, e vem antes do `git checkout` abaixo porque é
 # ele que ela protege — o `flock` a segura através do `exec`.
 LOCK_FILE=/var/lock/fateconnect-deploy
-if [ -z "${DEPLOY_LOCKED:-}" ]; then
+if [[ -z "${DEPLOY_LOCKED:-}" ]]; then
   if ! flock -n "$LOCK_FILE" true; then
     echo "==> Outra publicação está em andamento na VPS; esperando ela terminar"
   fi
@@ -32,11 +32,11 @@ fi
 # validação, um defeito nas linhas de cima travaria a publicação para sempre: o
 # script quebrado nunca alcança o `git pull` que traria a própria correção, e só
 # um acesso manual à máquina destrava.
-if [ -z "${DEPLOY_SELF_UPDATED:-}" ]; then
+if [[ -z "${DEPLOY_SELF_UPDATED:-}" ]]; then
   echo "==> Atualizando o código a partir da branch $BRANCH"
   # Avisar e seguir não adianta: o `git checkout` abaixo aborta sozinho e a
   # mensagem dele não diz o que fazer. Melhor parar aqui, explicando.
-  if [ -n "$(git -C .. status --porcelain)" ]; then
+  if [[ -n "$(git -C .. status --porcelain)" ]]; then
     echo "ERRO: há alterações não commitadas nesta cópia do repositório." >&2
     echo "Veja o que é com:  git -C '$(cd .. && pwd)' status" >&2
     exit 1
@@ -55,7 +55,7 @@ ENV_FILE=".env.$ENVIRONMENT"
 PROJECT="fateconnect-$ENVIRONMENT"
 WEB_ROOT="/var/www/fateconnect/$ENVIRONMENT"
 
-if [ ! -f "$ENV_FILE" ]; then
+if [[ ! -f "$ENV_FILE" ]]; then
   echo "ERRO: falta o arquivo deploy/$ENV_FILE." >&2
   echo "  cp .env.example $ENV_FILE && nano $ENV_FILE" >&2
   exit 1
@@ -67,17 +67,17 @@ set -a; . "./$ENV_FILE"; set +a
 missing=''
 for name in DOMAIN PUBLIC_URL API_PORT POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD JWT_SECRET; do
   eval "value=\${$name:-}"
-  if [ -z "$value" ]; then
+  if [[ -z "$value" ]]; then
     missing="$missing $name"
   fi
 done
 
-if [ -n "$missing" ]; then
+if [[ -n "$missing" ]]; then
   echo "ERRO: variáveis sem valor em deploy/$ENV_FILE:$missing" >&2
   exit 1
 fi
 
-if [ ! -f "$WEB_ROOT/index.html" ]; then
+if [[ ! -f "$WEB_ROOT/index.html" ]]; then
   echo "ERRO: falta o front em $WEB_ROOT." >&2
   echo "Pela pipeline ele é enviado pelo runner. Publicando à mão, gere antes:" >&2
   echo "  ./build-front.sh $ENVIRONMENT" >&2

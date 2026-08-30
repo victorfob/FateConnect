@@ -24,7 +24,7 @@ dotnet test "$SOLUTION" --nologo \
   --results-directory "$saida" >/dev/null
 
 relatorio="$(find "$saida" -name coverage.opencover.xml | head -1)"
-if [ -z "$relatorio" ]; then
+if [[ -z "$relatorio" ]]; then
   echo "coverage-changed: a suíte não produziu relatório de cobertura" >&2
   exit 1
 fi
