@@ -18,3 +18,17 @@ Os dois projetos referenciam o `SonarAnalyzer.CSharp`, então as regras que o So
 Foi assim que os nove primeiros apareceram, ao referenciar o pacote: seis de `S6964` (campo de tipo-valor sem `required`, que aceitava a omissão e virava o valor padrão), dois de `S1118` e um `WriteAsJsonAsync` sem `CancellationToken`.
 
 ⚠️ **`Program` não pode virar `static`** para satisfazer o `S1118`: `WebApplicationFactory<Program>` a usa como argumento genérico, e classe estática não serve. O construtor privado resolve.
+
+## Regra `IDExxxx` é silenciosa até alguém declarar a severidade
+
+⛔ **`EnforceCodeStyleInBuild` e `TreatWarningsAsErrors` não bastam.** As regras de estilo do Roslyn nascem **abaixo de `warning`**, e o `TreatWarningsAsErrors` só promove o que já é warning — então elas rodam e não reprovam nada.
+
+Medido em 30/08/2026: o Sonar acusou quatro `IDE0028` que o `dotnet build` deixou passar, com as duas propriedades ligadas no `.csproj`. Declarada a severidade no `.editorconfig`, a mesma violação vira erro de build:
+
+```ini
+dotnet_style_prefer_collection_expression = true:warning
+```
+
+⚠️ **A prova de que o mecanismo funciona já estava no arquivo:** `csharp_style_namespace_declarations = file_scoped:warning` reprova de verdade — um namespace block-scoped plantado derruba a build com `IDE0161`. A diferença entre as duas é só o `:warning`.
+
+**A consequência prática:** a regra que você quer cobrada precisa estar escrita. Não existe "o analisador pega" — existe "o analisador pega o que foi declarado".

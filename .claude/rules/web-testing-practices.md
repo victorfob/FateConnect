@@ -41,3 +41,9 @@ O import saía de graça em 48 arquivos e ninguém percebia porque o teste passa
 
 - Não testar detalhe de implementação: nada de asserção sobre estado interno, nome de classe CSS ou ordem de chamada de hook.
 - Não duplicar no teste a lógica que ele verifica — valor esperado é literal, não recalculado.
+
+## Corpo de requisição se afirma inteiro
+
+⛔ **`toMatchObject` é subconjunto: chave a mais passa calada.** Para o payload que sai para a API, `toEqual` — ele reprova o que sobra, que é justamente o risco.
+
+Na #213 a troca revelou que o cadastro envia `complement` como string vazia, coisa que nenhum teste afirmava. E é ela que impede `acceptTerms` e `acceptMarketing` de vazarem: os dois são do formulário, a API não os recebe, e o `toMatchObject` aceitaria os dois sem reclamar.
