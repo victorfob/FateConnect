@@ -74,3 +74,61 @@ git diff <base>..HEAD | grep -E "^\+" | grep -oE '"[^"]*<termo-novo>[^"]*"'   # 
 ⛔ **`[Route("[controller]")]`, nunca string literal.** É o que `RidesController`, `UsersController` e `AuthController` fazem, e é de onde saem `/Rides`, `/Users` e `/Auth`, com a inicial maiúscula.
 
 O roteamento do ASP.NET é case-insensitive, então `/users/signup` também resolve — o que muda é o endereço que o Swagger publica. Decidido em 30/08/2026, ao levar o controller de usuários para inglês: a issue tinha especificado `/users/signup` e ficou `/Users/signup`, pela simetria com `Rides`.
+
+## Exponha o comportamento, não o dado
+
+⛔ **Outra camada precisa de algo que está `private`? Exponha o método que responde à pergunta, não o campo.** Publicar o dado espalha o detalhe: quem consome passa a saber *como* a coisa é representada, e a conversão se repete em cada ponto que a usa.
+
+⛔ Cobrado na #172. O repositório precisava de "que horas são no fuso do produto" para descartar carona já partida, e o fuso era um `private static readonly TimeZoneInfo` na entidade `Ride`. Tornei o campo público — a saída de menor esforço, e a pior: o repositório passou a saber que existe um `TimeZoneInfo`, e a conversão ficou em dois lugares que se ignoram, cada um numa direção. A pergunta foi *"pq ProductTimeZone precisou se tornar público?"*.
+
+O que ficou:
+
+```csharp
+public static DateTime NowInProductTimeZone() =>
+    TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ProductTimeZone);
+```
+
+`TimeZoneInfo` voltou a aparecer só dentro da entidade, e o repositório pergunta as horas em vez do fuso.
+
+**O tell é tornar público um `private` para atender um consumidor.** Antes de mudar o modificador, pergunte o que o consumidor realmente quer saber — quase sempre é uma resposta, não o dado bruto com que ela é calculada.
+
+## Predicado de consulta é `Expression`, não método
+
+⛔ **Dentro de `IQueryable`, condição composta que pede um nome vira `Expression<Func<T, bool>>`.** As duas formas naturais de dar nome não funcionam ali, e falham de maneiras diferentes:
+
+| Forma | O que acontece |
+| --- | --- |
+| variável `bool` dentro do lambda | **não compila** — expression tree não aceita corpo de bloco |
+| método `bool` comum | compila e **quebra em runtime**: `The LINQ expression could not be translated` |
+
+Medido na #172, com o provider do PostgreSQL. A forma correta gera SQL:
+
+```csharp
+private static Expression<Func<Ride, bool>> HasNotDeparted(DateOnly today, TimeOnly currentTime) =>
+    ride => ride.DepartureDate > today
+        || (ride.DepartureDate == today && ride.DepartureTime >= currentTime);
+```
+
+```sql
+WHERE r."DepartureDate" > @__today_0 OR (r."DepartureDate" = @__today_0 AND r."DepartureTime" >= @__currentTime_1)
+```
+
+E o `Where` passa a se ler sozinho: `.Where(HasNotDeparted(today, currentTime))`.
+
+⚠️ **Nomeie o conceito inteiro, não as metades.** `HasNotDeparted` diz o que a regra significa; quebrar em `isAfterToday || isTodayAndAfterNow` obriga quem lê a recompor o sentido a partir dos pedaços.
+
+⚠️ **O gate não protege isto.** A suíte roda no provider em memória, que executa LINQ em memória e aceita as duas formas — a que traduz e a que não. Para provar tradução, gere o SQL com `ToQueryString()` contra o `UseNpgsql`, que não precisa de banco no ar.
+
+## DTO de query: opcional é nullable, derivado é `[BindNever]`
+
+Dois apontamentos diferentes que aparecem no mesmo tipo de DTO — o que o controller recebe com `[FromQuery]`.
+
+⛔ **Tipo-valor cuja ausência é válida precisa ser nullable.** `int Page` num DTO de entrada reprova o build com `S6964`: quem omite o campo recebe o `default` em silêncio. Quando a omissão é intencional — e num filtro paginado ela é, o padrão está no contrato —, `int?` é o que declara isso. `required` também satisfaz o analisador, mas mente: torna o campo obrigatório.
+
+⛔ **Propriedade derivada precisa de `[BindNever]`, ou vira parâmetro público.** O Swashbuckle lista as propriedades do DTO como parâmetros de query, e não distingue as que existem só para normalizar. Na #172, `EffectivePage`, `EffectivePageSize` e `ItemsToSkip` foram publicadas no Swagger junto com `Page` e `PageSize`.
+
+**Isso só aparece lendo o JSON gerado** — o build fica verde e a aplicação funciona:
+
+```csharp
+string json = await factory.CreateClient().GetStringAsync("/swagger/v1/swagger.json");
+```

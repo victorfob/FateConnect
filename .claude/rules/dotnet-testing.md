@@ -113,6 +113,25 @@ O `ApiFactory` troca o provedor por `UseInMemoryDatabase`, e o `Program` só cha
 
 ⚠️ **O provedor em memória não é o Postgres.** Ele não avalia `unaccent` nem `ILike`, então filtro por destino não se prova ali: ou o teste evita esse caminho, ou a prova é gerar o SQL e lê-lo.
 
+⛔ **E o risco maior é o inverso: ele aceita o que o Postgres recusa.** O provedor em memória executa LINQ em memória, então uma consulta que o PostgreSQL não sabe traduzir passa verde aqui e quebra em produção. Trocar a `Expression` de um predicado por um método `bool` — ver `dotnet-code-style.md` — é a forma mais fácil de causar isso: a suíte inteira continua passando.
+
+**Enquanto for assim, tradução se prova gerando o SQL**, com `ToQueryString()` contra o `UseNpgsql`, que não precisa de banco no ar. A #237 troca o provedor por PostgreSQL real e **reescreve esta seção**.
+
+## Suíte verde não prova que ela pega o defeito
+
+⛔ **Quebre o código de propósito e confira que a suíte cai.** É a única forma de saber se o teste testa o que o nome dele diz — e o caso clássico é o teste que passa porque o cenário nunca se montou, não porque o código está certo.
+
+Na #172 foram seis mutações no que a paginação tem de arriscado — corte off-by-one, contar depois de cortar, ignorar o teto do `PageSize`, arredondar `TotalPages` para baixo, remover o filtro de carona partida e tirar o `- FirstPage` do salto. As seis derrubaram testes.
+
+⛔ **A armadilha é o build da mutação.** Se ele falhar, `dotnet test --no-build` roda a **DLL anterior** e tudo passa — o que se lê como "a mutação sobreviveu", quando ela nem chegou a existir. Aconteceu ali: remover um filtro deixou duas variáveis sem uso e, com `TreatWarningsAsErrors`, a compilação reprovou.
+
+```bash
+dotnet build <solução> -v q --nologo; echo "build da mutação exit=$?"   # 0, ou o resto não vale
+dotnet test <solução> --no-build
+```
+
+**Restaure a árvore ao fim de cada mutação** e confirme com `git status` que nada sobrou.
+
 ## Fixture usa dado plausível, e válido
 
 ⛔ **Nada de rótulo no lugar de dado.** `"Pessoa de Teste"`, `"Rua A"` e `"pessoa@example.com"` não são dados — são etiquetas dizendo "isto é um teste". Use nome, endereço e contato que poderiam existir: `"Mariana Alves Rocha"`, `"Rua Cesário Mota"`, `"mariana.rocha@gmail.com"`.
