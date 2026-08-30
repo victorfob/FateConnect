@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.Rides.Controllers;
 
 using FateConnect.Api.Modules.Auth.Extensions;
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -14,8 +15,8 @@ using Swashbuckle.AspNetCore.Annotations;
 public class RidesController(IRideService rideService) : ControllerBase
 {
     [HttpGet]
-    [SwaggerOperation(Summary = "Get active rides", Description = "Returns a list of all rides that are currently active based on optional filters.")]
-    public async Task<ActionResult<IEnumerable<ReadRideDto>>> GetAllAsync([FromQuery] FilterRideDto filters)
+    [SwaggerOperation(Summary = "Get active rides", Description = "Returns a page of active rides whose departure has not passed yet, matching the optional filters.")]
+    public async Task<ActionResult<PagedResultDto<ReadRideDto>>> GetAllAsync([FromQuery] FilterRideDto filters)
     {
         var rides = await rideService.GetAllAsync(filters, User.GetUserId());
         return Ok(rides);

@@ -1,9 +1,10 @@
 namespace FateConnect.Api.Modules.Rides.DTOs;
 
 using System.ComponentModel.DataAnnotations;
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.Enums;
 
-public record FilterRideDto
+public record FilterRideDto : PagedFilterDto
 {
     public string? Destination { get; init; }
     public DateOnly? DepartureDate { get; init; }
