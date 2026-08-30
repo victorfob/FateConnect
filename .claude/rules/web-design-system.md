@@ -33,6 +33,7 @@ paths:
 - ⛔ **O diálogo não tem botão de fechar, e isso é decisão de produto.** `Esc` e clique fora já dispensam, inclusive em toque. Não adicionar um X achando que é melhoria de acessibilidade.
 - ⛔ **Título sempre centralizado**, em qualquer largura.
 - **Conteúdo com um consumidor só não é design system.** Antes de criar componente aqui, conte os consumidores: um só ⇒ ele mora na pasta da tela que o usa. Slot ou token sem consumidor real é o mesmo cheiro.
+- **E a conta se refaz quando alguém sai.** Componente do barrel que fica com um consumidor único **dentro do próprio design system** desce para dentro dele, em `components/`, e sai do barrel — foi o caso do `ListCardSkeleton` quando o `CardsList` passou a ser o único a usá-lo. Exportar o que só um vizinho consome convida a aplicação a montar à mão o que o vizinho já monta.
 
 ## Tokens — proibições
 
