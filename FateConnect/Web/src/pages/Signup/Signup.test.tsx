@@ -13,7 +13,7 @@ import { SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
 
-const SIGNUP_URL = 'https://api.fateconnect.test/usuario/cadastro';
+const SIGNUP_URL = 'https://api.fateconnect.test/users/signup';
 const ZIP_URL = 'https://viacep.com.br/ws/:zipCode/json/';
 
 const VALID_SIGNUP = {
@@ -272,8 +272,8 @@ describe('Signup', () => {
       http.post(SIGNUP_URL, () =>
         HttpResponse.json({
           id: 1,
-          emailFatec: VALID_SIGNUP.fatecEmail,
-          nomeCompleto: 'Maria Silva',
+          fatecEmail: VALID_SIGNUP.fatecEmail,
+          fullName: 'Maria Silva',
         }),
       ),
     );
@@ -293,7 +293,7 @@ describe('Signup', () => {
       http.post(SIGNUP_URL, async ({ request }) => {
         payload = await request.json();
 
-        return HttpResponse.json({ id: 1, emailFatec: '', nomeCompleto: 'Maria Silva' });
+        return HttpResponse.json({ id: 1, fatecEmail: '', fullName: 'Maria Silva' });
       }),
     );
     renderSignup();
@@ -302,22 +302,23 @@ describe('Signup', () => {
     await submit();
 
     await waitFor(() => expect(payload).toBeDefined());
-    expect(payload).toMatchObject({
-      nomeCompleto: VALID_SIGNUP.fullName,
-      emailFatec: VALID_SIGNUP.fatecEmail,
-      senha: VALID_SIGNUP.password,
-      genero: 'Female',
-      dataNascimento: '1999-05-22T00:00:00Z',
-      enderecos: [
+    expect(payload).toEqual({
+      fullName: VALID_SIGNUP.fullName,
+      fatecEmail: VALID_SIGNUP.fatecEmail,
+      password: VALID_SIGNUP.password,
+      gender: 'Female',
+      birthDate: '1999-05-22T00:00:00Z',
+      addresses: [
         {
-          cep: '18000-000',
-          logradouro: 'Rua das Flores',
-          numero: '100',
-          cidade: 'Sorocaba',
-          estado: 'SP',
+          zipCode: '18000-000',
+          street: 'Rua das Flores',
+          streetNumber: '100',
+          complement: '',
+          city: 'Sorocaba',
+          state: 'SP',
         },
       ],
-      contatos: [{ telefone: '11912345678', emailContato: VALID_SIGNUP.contactEmail }],
+      contacts: [{ phone: '11912345678', contactEmail: VALID_SIGNUP.contactEmail }],
     });
   });
 
@@ -347,7 +348,7 @@ describe('Signup', () => {
       http.post(SIGNUP_URL, async () => {
         await held;
 
-        return HttpResponse.json({ id: 1, emailFatec: '', nomeCompleto: 'Maria Silva' });
+        return HttpResponse.json({ id: 1, fatecEmail: '', fullName: 'Maria Silva' });
       }),
     );
     renderSignup();

@@ -22,7 +22,7 @@ describe('routeConfig', () => {
   // Caronas e achados e perdidos listam assim que montam.
   beforeEach(() => {
     server.use(
-      http.get('https://api.fateconnect.test/Rides', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/rides', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/achado', () => HttpResponse.json([])),
     );
   });

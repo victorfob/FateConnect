@@ -9,7 +9,7 @@ import { render, screen, waitFor } from '@app/test/testing-library';
 
 import { SESSION_EXPIRED_TITLE } from '../SessionExpiredScreen/constants';
 
-const RIDES_URL = 'https://api.fateconnect.test/Rides';
+const RIDES_URL = 'https://api.fateconnect.test/rides';
 
 function renderRides() {
   render(

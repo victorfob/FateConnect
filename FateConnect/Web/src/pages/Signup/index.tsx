@@ -39,7 +39,7 @@ export function Signup() {
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
     onSuccess: (response) => {
-      notifySuccess(C.signupSuccessMessage(response.nomeCompleto));
+      notifySuccess(C.signupSuccessMessage(response.fullName));
       navigate(LOGIN_ANCHOR);
     },
     onError: (error: ApiError) => notifyError(errorMessageFor(error.status)),

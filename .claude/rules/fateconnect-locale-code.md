@@ -49,6 +49,8 @@ A API fala **inglês inteira** — caminho, query, corpo e resposta. Não há tr
 - **Login.** `POST /Auth/login` com `{ fatecEmail, password }`, resposta `{ token, fullName }`.
 - **Erro.** Qualquer status de erro devolve `{ "error": "..." }`, com a mensagem em pt-BR. O corpo sai do `ErrorResponseDto`, o mesmo tipo que o `ProducesResponseType` anuncia — documentação e resposta não conseguem divergir.
 
+⚠️ **A API publica com a inicial maiúscula e o front chama minúsculo.** `[Route("[controller]")]` gera `/Rides`, `/Users` e `/Auth`, que é o que o Swagger mostra; os serviços do front padronizam `/rides`, `/users/signup` e `/auth`, porque o roteamento do ASP.NET é case-insensitive. Não "corrija" nenhum dos dois lados — a divergência é deliberada.
+
 ## Referência no repositório
 
 - Feature de exemplo: [`FateConnect/Web/src/pages/Rides/`](FateConnect/Web/src/pages/Rides/)

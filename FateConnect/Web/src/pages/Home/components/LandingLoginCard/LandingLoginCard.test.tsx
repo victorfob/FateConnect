@@ -73,9 +73,7 @@ describe('LandingLoginCard', () => {
 
   it('should greet the user and go to the menu after a successful login', async () => {
     server.use(
-      http.post(LOGIN_URL, () =>
-        HttpResponse.json({ token: 'abc', nomeCompleto: 'Fulano de Tal' }),
-      ),
+      http.post(LOGIN_URL, () => HttpResponse.json({ token: 'abc', fullName: 'Fulano de Tal' })),
     );
     const router = renderCard();
     await preencher('aluno.teste@aluno.cps.sp.gov.br', 'segredo123');
@@ -117,7 +115,7 @@ describe('LandingLoginCard', () => {
       http.post(LOGIN_URL, async () => {
         await held;
 
-        return HttpResponse.json({ token: 'abc', nomeCompleto: 'Fulano' });
+        return HttpResponse.json({ token: 'abc', fullName: 'Fulano' });
       }),
     );
     renderCard();
