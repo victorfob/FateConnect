@@ -2,6 +2,8 @@ using System.Net.Http.Headers;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
+using FateConnect.Api.Modules.Rides.Entities;
+using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -91,6 +93,22 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.SaveChanges();
 
         return (user.Id, user.FatecEmail);
+    }
+
+    public Guid SeedRide(int driverId, DateOnly departureDate, TimeOnly departureTime, string destination = "Sorocaba centro")
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        DateOnly acceptedDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
+        Ride ride = new(3, destination, acceptedDate, departureTime, EnumRideType.Solidarity, driverId);
+
+        context.Rides.Add(ride);
+        context.Entry(ride).Property(entity => entity.DepartureDate).CurrentValue = departureDate;
+        context.Entry(ride).Property(entity => entity.DepartureTime).CurrentValue = departureTime;
+        context.SaveChanges();
+
+        return ride.Id;
     }
 
     public HttpClient CreateClientFor(int userId)

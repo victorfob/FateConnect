@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Rides.Repositories;
 
+using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
@@ -8,13 +9,17 @@ using Microsoft.EntityFrameworkCore;
 
 public class RideRepository(FateConnectDbContext context) : IRideRepository
 {
-    public async Task<IReadOnlyList<Ride>> GetAllAsync(FilterRideDto filter)
+    public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter)
     {
+        DateTime nowInProductTimeZone = Ride.NowInProductTimeZone();
+        DateOnly today = DateOnly.FromDateTime(nowInProductTimeZone);
+        TimeOnly currentTime = TimeOnly.FromDateTime(nowInProductTimeZone);
 
         IQueryable<Ride> query = context.Rides
             .AsNoTracking()
             .Include(r => r.Driver.Contacts)
-            .Where(r => r.IsActive);
+            .Where(r => r.IsActive)
+            .Where(HasNotDeparted(today, currentTime));
 
         if (filter.DepartureDate.HasValue)
             query = query.Where(r => r.DepartureDate == filter.DepartureDate.Value);
@@ -40,13 +45,22 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
         if (filter.RideType.HasValue)
             query = query.Where(r => r.RideType == filter.RideType.Value);
 
-        var orderedRidesQuery = query
+        int total = await query.CountAsync();
+
+        List<Ride> items = await query
             .OrderBy(r => r.DepartureDate)
             .ThenBy(r => r.DepartureTime)
-            .ThenBy(r => r.Id);
+            .ThenBy(r => r.Id)
+            .Skip(filter.ItemsToSkip)
+            .Take(filter.EffectivePageSize)
+            .ToListAsync();
 
-        return await orderedRidesQuery.ToListAsync();
+        return (items, total);
     }
+
+    private static Expression<Func<Ride, bool>> HasNotDeparted(DateOnly today, TimeOnly currentTime) =>
+        ride => ride.DepartureDate > today
+            || (ride.DepartureDate == today && ride.DepartureTime >= currentTime);
 
     public async Task<Ride?> GetByIdAsync(Guid id)
     {
