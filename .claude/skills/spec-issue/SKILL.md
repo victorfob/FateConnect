@@ -27,6 +27,22 @@ Pergunta feita sem ler é pergunta que o repositório já respondia. Antes do pr
 
 Separar o que foi **encontrado** do que é **suposição**. A suposição vai para o corpo da issue com esse nome.
 
+### A premissa do pedido também se mede
+
+⛔ **O pedido carrega afirmações sobre o código, e elas podem estar erradas.** Confira cada uma antes da sabatina: é leitura barata e decide o desenho inteiro da issue.
+
+Aconteceu na #226. O pedido dizia *"o login continua retornando `fullName` mas o front já não usa pra nada"*. Metade certa — o nome do topo vem mesmo do token, mas o aviso de boas-vindas do login ainda lia a resposta. Sem a conferência a issue teria nascido como deleção pura e quebrado o aviso na implementação; com ela, o aviso virou a primeira pergunta, e a resposta — *"esse aviso nem faz sentido"* — mudou o escopo antes de existir código.
+
+**O tell é o verbo no presente sobre o código:** "já não usa", "ninguém chama", "isso é só", "não tem mais". Cada um é um `Grep` que você ainda não fez.
+
+### Issue de "todos os X" começa pelo inventário medido
+
+⛔ **Requisito exaustivo — todo texto, todo endpoint, todo componente — exige um número medido no corpo.** Sem ele ninguém sabe se acabou, e "TODOS" vira opinião.
+
+Na #227 o inventário foi a espinha: **295 strings visíveis em 51 arquivos**. Ele só ficou confiável na terceira tentativa — as duas primeiras varreram com `sed` e `find` e devolveram listas mutiladas sem erro nenhum. O que funcionou foi um script que lista, classifica e conta.
+
+⚠️ **Filtro que devolve pouco é suspeito, não alívio.** Antes de tratar "nenhum achado" como resultado, rode o filtro contra um caso que você sabe que existe.
+
 ## 2. A sabatina
 
 Blocos de **no máximo quatro perguntas** via `AskUserQuestion` — quatro é o teto do formulário, não uma preferência. Repetir blocos até fechar.
@@ -57,6 +73,12 @@ Na #29 o usuário aceitou "item cancelado não aparece na lista" e, na mesma res
 
 Mesma regra quando a resposta cresce o escopo para fora da issue: **diga em qual issue isso cai** e proponha editá-la. O upload de foto da #29 não cabia na #29 — cabia na #106.
 
+### Reconcilie contra o código, não só contra as respostas anteriores
+
+A decisão nova também colide com o que já está escrito, e essa colisão é invisível na conversa.
+
+Na #227, "o estado passa a se chamar **cancelar**" deixaria o diálogo de confirmação com **dois botões escritos `Cancelar`** — um dispensando, o outro destruindo —, porque o rótulo de dispensar já era essa palavra. Nada na sabatina apontaria isso; só abrir o componente aponta. Fechada uma decisão de glossário, vá ler onde o termo novo já aparece.
+
 ## 3. Onde a especificação mora
 
 No **corpo da issue**, que passa a ser o guarda-chuva. Nada de documento à parte: o que não está na issue não é lido por quem implementa.
@@ -78,6 +100,20 @@ O custo real de uma suposição não é ela estar errada: é **alguém ter que v
 ⛔ Aconteceu na #184. Escrevi três suposições — projeto único no Sonar, análise dentro do job existente, chave do projeto sem nome — e o Victor respondeu *"não quero que fique suposições, vamos transformar elas em decisões"*. As três viraram um bloco de `AskUserQuestion` e foram decididas em uma rodada, com o motivo de cada uma registrado na tabela de decisões. A tabela de suposições sumiu do corpo.
 
 **A regra prática:** montou a lista de suposições, releia procurando as que **cabem numa pergunta com duas opções concretas**. Essas não são suposições — são perguntas que você não fez.
+
+### Antes de criar, releia o corpo caçando as suas próprias escolhas
+
+⛔ **O rascunho pronto é o último ponto em que uma escolha sua ainda custa uma pergunta.** Criada a issue, ela custa uma implementação — e ninguém volta a discuti-la, porque no corpo ela está escrita com a mesma voz das decisões de verdade.
+
+**A varredura:** percorra a tabela de decisões linha a linha e aponte, para cada uma, a mensagem em que o usuário decidiu aquilo. Linha sem mensagem correspondente é sua — vira pergunta, não decisão.
+
+⛔ Aconteceu na #227. O corpo já estava escrito quando o Victor perguntou *"antes de escrever, mais alguma dúvida? Tire todas pra não restar suposições"*. A releitura achou **quatro** escolhas minhas passando por decisão, e ele inverteu **três**: caronas também mudava de verbo, os títulos da landing não eram nome de funcionalidade, e o placeholder ia para a forma que eu tinha descartado.
+
+#### A resposta responde o que foi perguntado, não o vizinho parecido
+
+Das quatro, a pior foi a generalização: perguntei o glossário **de achados e perdidos**, ele respondeu, e eu estendi sozinho para **caronas** — escrevendo "caronas segue com `excluir`" na tabela de decisões, com a voz de quem registra o que foi decidido.
+
+**O tell é a frase que estica o alcance da resposta**: "e portanto", "seguindo o mesmo critério", "por consistência". Área vizinha, objeto parecido e tela irmã são perguntas separadas, e costumam ter respostas separadas — esta teve.
 
 ## 4. Dividir em sub-issues
 
@@ -102,7 +138,13 @@ gh issue create --title "<pt-BR>" --body-file <arquivo> --assignee <login> --lab
 gh api graphql -f query='mutation { addSubIssue(input: {issueId: "<id-pai>", subIssueId: "<id-filha>"}) { subIssue { number } } }'
 ```
 
-Os `id` saem de `gh api graphql -f query='{repository(owner:"...",name:"..."){issue(number:N){id}}}'`. O board adota a issue nova sozinho, em `Todo` — conferir com `gh project item-list 1 --owner <owner> --format json`, não supor.
+Os `id` saem de `gh api graphql -f query='{repository(owner:"...",name:"..."){issue(number:N){id}}}'`. O board adota a issue nova sozinho, em `Todo` — conferir, não supor:
+
+```bash
+gh project item-list 1 --owner <owner> --format json --limit 300
+```
+
+⛔ **O `--limit` é obrigatório.** O padrão é **30**, e a resposta truncada não vem com aviso nenhum. Na #226 uma consulta com `--limit 100` num board de 112 itens não achou o card recém-criado; reportei que o board não tinha adotado a issue e o Victor moveu à mão o que já estava lá. Antes de concluir ausência, compare o total que voltou com o tamanho do board.
 
 ## 6. Varredura de fechamento
 
