@@ -36,7 +36,7 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task Signup_WithTheBirthDate_IsAczipCodeted()
+    public async Task Signup_WithTheBirthDate_IsAccepted()
     {
         Dictionary<string, object> payload = BaseSignup();
         payload["birthDate"] = "2000-01-01T00:00:00Z";

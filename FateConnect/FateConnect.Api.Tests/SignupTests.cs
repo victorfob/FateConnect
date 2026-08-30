@@ -21,7 +21,7 @@ public class SignupTests : IClassFixture<ApiFactory>
     };
 
     [Fact]
-    public async Task Signup_WithOneContact_IsAczipCodeted()
+    public async Task Signup_WithOneContact_IsAccepted()
     {
         HttpResponseMessage r = await _factory.CreateClient().PostAsJsonAsync(
             "/Users/signup",
