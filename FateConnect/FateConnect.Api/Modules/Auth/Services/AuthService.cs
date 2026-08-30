@@ -29,11 +29,7 @@ public class AuthService : IAuthService
 
         string generatedToken = _tokenService.GenerateJwtToken(user!);
 
-        return new TokenResponseDto
-        {
-            FullName = user!.FullName,
-            Token = generatedToken
-        };
+        return new TokenResponseDto { Token = generatedToken };
     }
 
     private static bool AreCredentialsInvalid(User? user, string providedPassword)
