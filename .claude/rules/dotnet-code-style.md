@@ -7,6 +7,18 @@ paths:
 
 # Escrita de C#
 
+## `if` de uma instrução não leva chaves
+
+Corpo com uma instrução só dispensa as chaves, e a instrução vai na linha seguinte, indentada. É o que o código já faz:
+
+```csharp
+if (areCredentialsInvalid)
+    throw new InvalidCredentialsException();
+
+if (dtos is null or { Count: 0 })
+    return [];
+```
+
 ## O controller só orquestra
 
 ⛔ **Nada de método auxiliar no corpo do controller.** Ele recebe a requisição, chama o serviço e devolve o resultado. O que ele precisar além disso vira **extension** ou vai para o serviço.
