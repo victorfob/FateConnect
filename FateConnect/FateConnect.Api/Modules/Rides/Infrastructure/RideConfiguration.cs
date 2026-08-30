@@ -8,8 +8,6 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
 {
     public void Configure(EntityTypeBuilder<Ride> builder)
     {
-        builder.ToTable("rides");
-
         builder.HasKey(r => r.Id);
 
         builder.Property(r => r.AvailableSeats)

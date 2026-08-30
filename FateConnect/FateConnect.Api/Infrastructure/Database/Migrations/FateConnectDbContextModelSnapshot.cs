@@ -63,7 +63,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.HasIndex("DriverId");
 
-                    b.ToTable("rides", (string)null);
+                    b.ToTable("Rides");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Address", b =>

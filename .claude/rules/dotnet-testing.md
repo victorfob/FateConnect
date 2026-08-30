@@ -17,6 +17,16 @@ paths:
 
 O relatório sai do `dotnet test` em formato **OpenCover** (`--collect:"XPlat Code Coverage;Format=opencover"`); o Sonar **não lê Cobertura para C#**, que é o padrão do `dotnet test`. Migrations e `obj/` ficam de fora da conta.
 
+### Medir é um comando, e não é `dotnet test`
+
+```bash
+./scripts/coverage-changed.sh            # base padrão: origin/develop
+```
+
+Ele roda a suíte com cobertura, cruza o relatório com os arquivos de produção do diff e **sai com erro** listando quem ficou abaixo dos 90%.
+
+⛔ **Rode antes de dizer que acabou.** `dotnet build` + `dotnet test` não medem nada, e o portão do Sonar aceita 33% — as duas coisas ficam verdes sobre uma regra violada. Aconteceu na #222: o PR chegou a 79,5% no Sonar com o `AuthService` em **22,7%**, porque não existia um único teste de login. O que fechou o buraco foram três testes; o que impede a repetição é este comando.
+
 **Linha que não dá para cobrir se marca, não se ignora.** Construtor privado que existe só para impedir instanciação nunca é chamado: `[ExcludeFromCodeCoverage]` nele tira a linha do denominador e diz por quê. Baixar o alvo, não.
 
 ⚠️ **Cobertura baixa costuma acusar teste que falta, não métrica injusta.** Na primeira medição o PR saiu com 25%: as propriedades de um DTO sem nenhum teste que criasse o recurso, e a linha do middleware de erro sem nenhum teste que disparasse exceção tratada. Um teste que criava carona com vagas fora da faixa cobriu as duas — e ainda passou a garantir a mensagem de erro, que nada verificava.
@@ -46,7 +56,7 @@ Vão para dentro do contêiner de produção `xunit.core`, `xunit.assert`, `xuni
 
 ```csharp
 RideEndpoints_WithoutToken_RespondUnauthorized
-GerarJwtToken_IsAcceptedByAKeyBuiltInUtf8
+GenerateJwtToken_IsAcceptedByAKeyBuiltInUtf8
 ```
 
 Nome de teste é código, então segue a regra de idioma: **inglês**.
@@ -102,3 +112,15 @@ Aqui isso já espera por alguém: `Ride.ValidateDepartureDateTime` compara a par
 O `ApiFactory` troca o provedor por `UseInMemoryDatabase`, e o `Program` só chama `Migrate()` quando `database.IsRelational()` — sem essa guarda a aplicação não sobe no teste, porque provedor em memória não tem migration.
 
 ⚠️ **O provedor em memória não é o Postgres.** Ele não avalia `unaccent` nem `ILike`, então filtro por destino não se prova ali: ou o teste evita esse caminho, ou a prova é gerar o SQL e lê-lo.
+
+## Fixture usa dado plausível, e válido
+
+⛔ **Nada de rótulo no lugar de dado.** `"Pessoa de Teste"`, `"Rua A"` e `"pessoa@example.com"` não são dados — são etiquetas dizendo "isto é um teste". Use nome, endereço e contato que poderiam existir: `"Mariana Alves Rocha"`, `"Rua Cesário Mota"`, `"mariana.rocha@gmail.com"`.
+
+A referência já está no código: os `[DefaultValue]` dos DTOs, que alimentam o Swagger, usam `João da Silva` e `Avenida Engenheiro Carlos Reinaldo Mendes`.
+
+⚠️ **Nome de fixture não carrega papel.** `"Ana Ofertante"` e `"Bruno Passageiro"` viraram `"Ana Beatriz Nogueira"` e `"Bruno Carvalho Souza"`: quem diz o papel é a variável — `driverId`, `otherUserId` —, e o assert passou a verificar que a API devolve o nome de quem ofertou, não a palavra "Ofertante".
+
+⛔ **E o dado precisa ser válido pelas regras da própria aplicação.** `ApiFactory` e `TokenServiceTests` usavam `@fatec.sp.gov.br`, domínio que o `FatecEmailPattern` **recusa** — o institucional é `@(aluno.)?cps.sp.gov.br`. Passava porque emissão de token e seed direto no banco não validam. Fixture inválida não quebra hoje: quebra o próximo teste que passe por validação, e o motivo não aparece no erro.
+
+⚠️ **O valor fica em pt-BR; a chave, em inglês.** `password = "SenhaForte123!"` está certo — os dados são de um produto brasileiro. O que não pode é meia palavra em cada idioma, como o `"PasswordForte123!"` que um rename cego produziu.
