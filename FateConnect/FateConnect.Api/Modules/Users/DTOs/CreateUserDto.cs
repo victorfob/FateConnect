@@ -8,19 +8,19 @@ namespace FateConnect.Api.Modules.Users.DTOs;
 
 public class CreateUserDto
 {
-    [Required(ErrorMessage = "O email é obrigatório")]
-    [EmailAddress(ErrorMessage = "Formato de email inválido")]
+    [Required(ErrorMessage = "Informe o e-mail")]
+    [EmailAddress(ErrorMessage = "E-mail inválido")]
     [RegularExpression(RegexConstants.FatecEmailPattern, ErrorMessage = RegexConstants.FatecEmailErrorMessage)]
     [MaxLength(150)]
     [DefaultValue("joao.silva999@aluno.cps.sp.gov.br")]
     public string FatecEmail { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "A senha é obrigatória")]
-    [MinLength(8, ErrorMessage = "A senha deve ter no mínimo 8 caracteres")]
+    [Required(ErrorMessage = "Informe a senha")]
+    [MinLength(8, ErrorMessage = "Mínimo de 8 caracteres")]
     [DefaultValue("PasswordForte123!")]
     public string Password { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "O nome completo é obrigatório")]
+    [Required(ErrorMessage = "Informe o nome completo")]
     [MaxLength(200)]
     [DefaultValue("João da Silva")]
     public string FullName { get; set; } = string.Empty;
@@ -43,7 +43,7 @@ public class CreateUserDto
     [];
 
     [Required]
-    [MinLength(1, ErrorMessage = "É obrigatório informar ao menos um contato")]
+    [MinLength(1, ErrorMessage = "Informe ao menos um contato")]
     required public List<CreateContactDto> Contacts { get; set; } =
     [];
 }

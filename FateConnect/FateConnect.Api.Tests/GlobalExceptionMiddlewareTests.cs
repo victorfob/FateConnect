@@ -67,7 +67,7 @@ public class GlobalExceptionMiddlewareTests
         (HttpStatusCode statusCode, string error) = await AnswerFor(new InvalidCredentialsException());
 
         Assert.Equal(HttpStatusCode.Unauthorized, statusCode);
-        Assert.Equal("E-mail ou senha inválido.", error);
+        Assert.Equal("E-mail ou senha inválidos.", error);
     }
 
     [Fact]

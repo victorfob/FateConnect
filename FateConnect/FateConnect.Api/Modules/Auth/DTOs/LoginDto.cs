@@ -6,13 +6,13 @@ namespace FateConnect.Api.Modules.Auth.DTOs;
 
 public class LoginDto
 {
-    [Required(ErrorMessage = "O email é obrigatório")]
-    [EmailAddress(ErrorMessage = "Formato de email inválido")]
+    [Required(ErrorMessage = "Informe o e-mail")]
+    [EmailAddress(ErrorMessage = "E-mail inválido")]
     [RegularExpression(RegexConstants.FatecEmailPattern, ErrorMessage = RegexConstants.FatecEmailErrorMessage)]
     [DefaultValue("joao.silva999@aluno.cps.sp.gov.br")]
     public string FatecEmail { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "A senha é obrigatória")]
+    [Required(ErrorMessage = "Informe a senha")]
     [DefaultValue("PasswordForte123!")]
     public string Password { get; set; } = string.Empty;
 }
