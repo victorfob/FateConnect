@@ -114,7 +114,7 @@ public partial class RideService(
 
         LogRideChangeRefused(logger, currentUserId, ride.Id);
 
-        throw new RideNotDrivenByUserException(ride.Id);
+        throw new RideNotDrivenByUserException();
     }
 
     private static ReadRideDto MapToReadDto(Ride ride, int currentUserId) =>
