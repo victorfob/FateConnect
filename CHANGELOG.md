@@ -15,6 +15,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a enviar o cadastro e o login no contrato em inglês, acompanhando a API (#224) [Frontend]
 - Padroniza o texto de toda a interface: cada ação passa a ter um nome só, os títulos vão para sentence case, os erros dizem a saída e as listas vazias dizem o que fazer; o aviso de boas-vindas do login sai, porque estar no app já é a confirmação (#229) [Frontend]
 - Passa a entrar no app direto depois do cadastro, sem pedir de novo o e-mail e a senha recém-criados; o login e o cadastro passam a responder só o token (#230) [Frontend] [Backend]
+- Passa a abrir a tela que a sessão permite: quem já entrou não vê mais a landing nem o cadastro, quem não entrou não alcança as telas internas, e quem volta com a sessão vencida é avisado em vez de entrar e ver tudo falhar (#232) [Frontend] [Backend]
 
 ### Fixed
 
