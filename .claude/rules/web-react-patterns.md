@@ -27,6 +27,10 @@ O arquivo principal da pasta é `index`, então `import { X } from '../../consta
 
 Vale para pasta de componente e de tela. Pastas que **já são** dedicadas por natureza (`src/hooks/`, `src/services/`, `src/utils/`, `design-system/tokens/`) não se aplicam: elas são o destino, não a origem.
 
+⛔ **Arquivo de hook guarda o hook, e nada mais.** Função pura que o hook usa — e que outros também usariam — vai para `src/utils/`, não para o topo do arquivo do hook. Aconteceu na #242: `usePagedSearch.ts` nasceu com os leitores de parâmetro de URL dentro, e o resultado foi um util de **teste** importando de `@app/hooks/` para pegar uma constante. Correção do Victor: *"não faz sentido nenhum elas estarem definidas dentro de um hook, separe os escopos"*.
+
+**O sinal é quem importa de lá.** Se algo que não é componente nem hook precisa importar do arquivo de um hook, o que ele quer não pertence àquele arquivo.
+
 ## Um componente por arquivo
 
 ⛔ **Nunca dois componentes no mesmo arquivo.** Cada componente tem a sua pasta e o seu `index` — inclusive o subcomponente pequeno, usado uma vez só.
@@ -62,6 +66,7 @@ Vale para `useQuery` e `useMutation`. Um teste que conte `getAllByRole('alert')`
 
 - Nome com prefixo `handle`: `handleSubmit`, `handleSectionClick`.
 - **Sem função anônima em callback JSX.** `onClick={() => doThing(id)}` cria função nova a cada render e quebra memoização; extrair um `handle…` com `useCallback` quando o valor vier de fora.
+- **Parâmetro que recebe função se chama pelo que é.** `list` num objeto de entrada se lê como a lista; quem recebe a função que busca a lista é `listFunction`. Cobrado na #242: o nome curto economiza uma palavra e custa uma leitura errada em cada call site.
 
 ## Efeitos
 
