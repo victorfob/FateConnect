@@ -5,16 +5,16 @@ import { server } from '@app/mocks/server';
 import { signup } from './signupService';
 import type { SignupRequest } from './types';
 
-const SIGNUP_URL = 'https://api.fateconnect.test/usuario/cadastro';
+const SIGNUP_URL = 'https://api.fateconnect.test/users/signup';
 
 const PAYLOAD: SignupRequest = {
-  emailFatec: 'aluno.teste@aluno.cps.sp.gov.br',
-  senha: 'segredo123',
-  nomeCompleto: 'Fulano de Tal',
-  dataNascimento: '2000-01-01T00:00:00Z',
-  genero: 'Female',
-  enderecos: [],
-  contatos: [],
+  fatecEmail: 'aluno.teste@aluno.cps.sp.gov.br',
+  password: 'segredo123',
+  fullName: 'Fulano de Tal',
+  birthDate: '2000-01-01T00:00:00Z',
+  gender: 'Female',
+  addresses: [],
+  contacts: [],
 };
 
 describe('signupService', () => {
@@ -25,8 +25,8 @@ describe('signupService', () => {
         receivedBody = await request.json();
         return HttpResponse.json({
           id: 1,
-          emailFatec: PAYLOAD.emailFatec,
-          nomeCompleto: PAYLOAD.nomeCompleto,
+          fatecEmail: PAYLOAD.fatecEmail,
+          fullName: PAYLOAD.fullName,
         });
       }),
     );

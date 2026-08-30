@@ -45,7 +45,7 @@ export function LandingLoginCard() {
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
     onSuccess: (response) => {
-      notifySuccess(C.welcomeMessage(response.nomeCompleto));
+      notifySuccess(C.welcomeMessage(response.fullName));
       navigate(RoutePathEnum.MENU);
     },
     onError: (error: ApiError) => {
@@ -61,7 +61,7 @@ export function LandingLoginCard() {
   const handleTogglePassword = useCallback(() => setPasswordHidden((hidden) => !hidden), []);
 
   const onSubmit = handleSubmit(({ email, password }) => {
-    mutate({ emailFatec: email, senha: password });
+    mutate({ fatecEmail: email, password });
   });
 
   const { ref: registerEmailRef, ...emailField } = register('email');
