@@ -35,6 +35,16 @@ Estudante da faculdade, no celular ou no laptop, geralmente com pressa e no meio
 - Botão no imperativo, verbo primeiro, sentence case.
 - Copy em pt-BR, identificador em inglês.
 
+## A régua pode não alcançar o texto
+
+⛔ **Quando o texto é de um registro que a `product-copy.md` não cobre, a lacuna é da regra — e fechá-la vem antes de propor a copy.** Sugestão escrita contra uma régua que não alcança o caso é sugestão que ninguém consegue julgar: não há critério para aceitá-la nem para recusá-la.
+
+Aconteceu na #227. A regra descreve texto transacional — aviso, botão, erro — e a landing vende. Propor a copy dela ali seria aplicar o critério errado, ou inventar um em silêncio.
+
+**O caminho:** nomeie a lacuna, pesquise fonte externa que a fundamente, escreva a seção na `product-copy.md`, e só então proponha o texto. Seção e copy saem no **mesmo PR** — separadas, cada review se lê pela metade.
+
+⚠️ **A pesquisa pode contrariar a intuição, e é para isso que ela serve.** Na landing a expectativa era que vender pedisse tom mais animado; a medição da Nielsen Norman Group diz o contrário — a versão objetiva de um mesmo site rendeu +27% de usabilidade, e +124% somada a concisão e escaneabilidade, porque hipérbole cobra atenção de quem lê e derruba credibilidade. Leve número e fonte para o corpo do PR: é o que permite discordar da sua sugestão com base em algo.
+
 ## Limites
 
 - Mudar a **rule** de copy → editar `.claude/rules/product-copy.md`, e a mudança sai por PR como qualquer código.
