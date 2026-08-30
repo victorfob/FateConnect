@@ -15,22 +15,22 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
 
     private static Dictionary<string, object> BaseSignup() => new()
     {
-        ["emailFatec"] = $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
-        ["senha"] = "SenhaForte123!",
-        ["nomeCompleto"] = "Pessoa de Teste",
-        ["genero"] = "Male",
-        ["enderecos"] = new[]
+        ["fatecEmail"] = $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+        ["password"] = "SenhaForte123!",
+        ["fullName"] = "Mariana Alves Rocha",
+        ["gender"] = "Male",
+        ["addresses"] = new[]
         {
-            new { cep = "18000-000", logradouro = "Rua A", numero = "1", complemento = "Casa", cidade = "Sorocaba", estado = "SP" },
+            new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" },
         },
-        ["contatos"] = new[] { new { telefone = "15999990000", emailContato = "pessoa@example.com" } },
+        ["contacts"] = new[] { new { phone = "15999990000", contactEmail = "mariana.rocha@gmail.com" } },
     };
 
     [Fact]
     public async Task Signup_WithoutTheBirthDate_IsRejected()
     {
         HttpResponseMessage response = await _factory.CreateClient()
-            .PostAsJsonAsync("/usuario/cadastro", BaseSignup());
+            .PostAsJsonAsync("/Users/signup", BaseSignup());
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -39,10 +39,10 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
     public async Task Signup_WithTheBirthDate_IsAccepted()
     {
         Dictionary<string, object> payload = BaseSignup();
-        payload["dataNascimento"] = "2000-01-01T00:00:00Z";
+        payload["birthDate"] = "2000-01-01T00:00:00Z";
 
         HttpResponseMessage response = await _factory.CreateClient()
-            .PostAsJsonAsync("/usuario/cadastro", payload);
+            .PostAsJsonAsync("/Users/signup", payload);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }

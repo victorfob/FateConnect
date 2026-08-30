@@ -32,8 +32,8 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
 
     private async Task<(ReadRide Ride, int DriverId, int OtherUserId)> OfferRideAsync(string destination)
     {
-        int driverId = _factory.SeedUser("Ana Ofertante", "15999990000", "ana@example.com");
-        int otherUserId = _factory.SeedUser("Bruno Passageiro", "15988880000", "bruno@example.com");
+        int driverId = _factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        int otherUserId = _factory.SeedUser("Bruno Carvalho Souza", "15988880000", "bruno.souza@gmail.com");
 
         HttpResponseMessage response = await _factory
             .CreateClientFor(driverId)
@@ -51,8 +51,8 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
     {
         (ReadRide ride, _, _) = await OfferRideAsync("Sorocaba centro");
 
-        Assert.Equal("Ana Ofertante", ride.Driver.Name);
-        Assert.Equal("ana@example.com", ride.Driver.Email);
+        Assert.Equal("Ana Beatriz Nogueira", ride.Driver.Name);
+        Assert.Equal("ana.nogueira@gmail.com", ride.Driver.Email);
         Assert.Equal("15999990000", ride.Driver.Phone);
         Assert.True(ride.IsOwner);
     }
@@ -70,7 +70,7 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
 
         Assert.True(asDriver.IsOwner);
         Assert.False(asOther.IsOwner);
-        Assert.Equal("Ana Ofertante", asOther.Driver.Name);
+        Assert.Equal("Ana Beatriz Nogueira", asOther.Driver.Name);
     }
 
     [Fact]

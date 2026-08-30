@@ -17,19 +17,19 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public async Task<UsuarioResponseDto> SignUpAsync(CreateUsuarioDto dto)
+    public async Task<UserResponseDto> SignUpAsync(CreateUserDto dto)
     {
-        await EnsureEmailIsUniqueAsync(dto.EmailFatec);
+        await EnsureEmailIsUniqueAsync(dto.FatecEmail);
 
         User newUser = BuildUser(dto);
 
         await _userRepository.AddAsync(newUser);
 
-        UsuarioResponseDto response = new UsuarioResponseDto
+        UserResponseDto response = new UserResponseDto
         {
             Id = newUser.Id,
-            EmailFatec = newUser.FatecEmail,
-            NomeCompleto = newUser.FullName
+            FatecEmail = newUser.FatecEmail,
+            FullName = newUser.FullName
         };
 
         return response;
@@ -40,23 +40,23 @@ public class UserService : IUserService
         bool emailInUse = await _userRepository.EmailExistsAsync(email);
 
         if (emailInUse)
-            throw new EmailJaCadastradoException(email);
+            throw new EmailAlreadyRegisteredException(email);
     }
 
-    private static User BuildUser(CreateUsuarioDto dto)
+    private static User BuildUser(CreateUserDto dto)
     {
-        string hashedPassword = HashPassword(dto.Senha);
+        string hashedPassword = HashPassword(dto.Password);
 
-        List<Address> mappedAddresses = BuildAddresses(dto.Enderecos);
-        List<Contact> mappedContacts = BuildContacts(dto.Contatos);
+        List<Address> mappedAddresses = BuildAddresses(dto.Addresses);
+        List<Contact> mappedContacts = BuildContacts(dto.Contacts);
 
         User user = new User
         {
-            FatecEmail = dto.EmailFatec,
-            FullName = dto.NomeCompleto,
-            Nickname = dto.Apelido,
-            BirthDate = dto.DataNascimento,
-            Gender = dto.Genero,
+            FatecEmail = dto.FatecEmail,
+            FullName = dto.FullName,
+            Nickname = dto.Nickname,
+            BirthDate = dto.BirthDate,
+            Gender = dto.Gender,
             Password = hashedPassword,
             ProfileType = EnumProfileType.Operator,
             CreatedAt = DateTime.UtcNow,
@@ -68,33 +68,33 @@ public class UserService : IUserService
         return user;
     }
 
-    private static List<Address> BuildAddresses(List<CreateEnderecoDto>? dtos)
+    private static List<Address> BuildAddresses(List<CreateAddressDto>? dtos)
     {
         if (dtos is null or { Count: 0 })
             return [];
 
         List<Address> addresses = dtos.Select(dto => new Address
         {
-            ZipCode = dto.Cep,
-            Street = dto.Logradouro,
-            StreetNumber = dto.Numero,
-            Complement = dto.Complemento,
-            City = dto.Cidade,
-            State = dto.Estado
+            ZipCode = dto.ZipCode,
+            Street = dto.Street,
+            StreetNumber = dto.StreetNumber,
+            Complement = dto.Complement,
+            City = dto.City,
+            State = dto.State
         }).ToList();
 
         return addresses;
     }
 
-    private static List<Contact> BuildContacts(List<CreateContatoDto>? dtos)
+    private static List<Contact> BuildContacts(List<CreateContactDto>? dtos)
     {
         if (dtos is null or { Count: 0 })
             return [];
 
         List<Contact> contacts = dtos.Select(dto => new Contact
         {
-            Phone = dto.Telefone,
-            ContactEmail = dto.EmailContato
+            Phone = dto.Phone,
+            ContactEmail = dto.ContactEmail
         }).ToList();
 
         return contacts;

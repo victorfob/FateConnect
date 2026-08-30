@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FateConnect.Api.Modules.Users.DTOs;
 
-public class UsuarioResponseDto
+public class UserResponseDto
 {
     [Required]
     [DefaultValue(1)]
@@ -12,9 +12,9 @@ public class UsuarioResponseDto
     [Required]
     [EmailAddress]
     [DefaultValue("joao.silva99@aluno.cps.sp.gov.br")]
-    public string EmailFatec { get; set; } = string.Empty;
+    public string FatecEmail { get; set; } = string.Empty;
 
     [Required]
     [DefaultValue("João da Silva")]
-    public string NomeCompleto { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
 }

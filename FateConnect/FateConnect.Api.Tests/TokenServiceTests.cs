@@ -17,7 +17,7 @@ public class TokenServiceTests
     private const string Audience = "FateConnectTestWeb";
 
     [Fact]
-    public void GerarJwtToken_IsAcceptedByAKeyBuiltInUtf8()
+    public void GenerateJwtToken_IsAcceptedByAKeyBuiltInUtf8()
     {
         JwtOptions options = new()
         {
@@ -27,11 +27,11 @@ public class TokenServiceTests
         };
 
         string token = new TokenService(Options.Create(options))
-            .GerarJwtToken(new User
+            .GenerateJwtToken(new User
             {
                 Id = 7,
-                FullName = "Pessoa de Teste",
-                FatecEmail = "pessoa@fatec.sp.gov.br",
+                FullName = "Mariana Alves Rocha",
+                FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
             });
 
         ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(
@@ -50,6 +50,6 @@ public class TokenServiceTests
             out SecurityToken _);
 
         Assert.Equal("7", principal.FindFirstValue(ClaimTypes.NameIdentifier));
-        Assert.Equal("Pessoa de Teste", principal.FindFirstValue(ClaimTypes.Name));
+        Assert.Equal("Mariana Alves Rocha", principal.FindFirstValue(ClaimTypes.Name));
     }
 }

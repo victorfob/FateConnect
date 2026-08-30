@@ -4,5 +4,5 @@ namespace FateConnect.Api.Modules.Auth.Interfaces;
 
 public interface ITokenService
 {
-    string GerarJwtToken(User usuario);
+    string GenerateJwtToken(User user);
 }

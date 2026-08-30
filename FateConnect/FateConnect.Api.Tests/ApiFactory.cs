@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using static BCrypt.Net.BCrypt;
 
 namespace FateConnect.Api.Tests;
 
@@ -46,7 +47,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         };
 
         return new TokenService(Options.Create(options))
-            .GerarJwtToken(new User { Id = userId, FatecEmail = "pessoa@fatec.sp.gov.br" });
+            .GenerateJwtToken(new User { Id = userId, FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br" });
     }
 
     public int SeedUser(string fullName, string phone, string contactEmail)
@@ -57,7 +58,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         User user = new()
         {
             FullName = fullName,
-            FatecEmail = $"{Guid.NewGuid():N}@fatec.sp.gov.br",
+            FatecEmail = $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
             Password = "hash-sem-valor-fora-desta-suite",
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             CreatedAt = DateTime.UtcNow,
@@ -69,6 +70,27 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.SaveChanges();
 
         return user.Id;
+    }
+
+    public (int Id, string FatecEmail) SeedUserWithPassword(string fullName, string password)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        User user = new()
+        {
+            FullName = fullName,
+            FatecEmail = $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+            Password = HashPassword(password),
+            BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        context.Users.Add(user);
+        context.SaveChanges();
+
+        return (user.Id, user.FatecEmail);
     }
 
     public HttpClient CreateClientFor(int userId)
