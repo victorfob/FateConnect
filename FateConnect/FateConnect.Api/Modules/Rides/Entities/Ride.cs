@@ -111,6 +111,9 @@ public class Ride
 
     }
 
+    public static DateTime NowInProductTimeZone() =>
+        TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ProductTimeZone);
+
     private static void ValidateDepartureDateTime(DateOnly date, TimeOnly time)
     {
         DateTime departureUtc = TimeZoneInfo.ConvertTimeToUtc(date.ToDateTime(time), ProductTimeZone);

@@ -32,7 +32,7 @@ conhecidos=$(mktemp)
 encontrados=0
 
 while IFS=: read -r arquivo linha citado; do
-  [ -z "${citado:-}" ] && continue
+  [[ -z "${citado:-}" ]] && continue
   citado="${citado%/}"
   grep -qxF "$citado" "$conhecidos" && continue
   echo "  $arquivo:$linha  →  $citado"
@@ -43,7 +43,7 @@ done < <(
 
 rm -f "$conhecidos"
 
-if [ "$encontrados" -gt 0 ]; then
+if [[ "$encontrados" -gt 0 ]]; then
   echo
   echo "$encontrados caminho(s) citado(s) em .claude/ não existem no repositório."
   echo "Atualize o texto — ou, se o caminho é de propósito, acrescente-o a 'ignorados'."

@@ -89,7 +89,7 @@ A pasta **`.claude/`** guarda o contexto que um agente de código carrega ao tra
 | Artefato            | O que é                                                               | Quando carrega                                                         |
 | ------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | `CLAUDE.md`         | Instruções do repositório: idioma, fluxo de trabalho, stack, comandos | sempre                                                                 |
-| `rules/*.md`        | Padrão que vale para uma área do código                               | pelo `paths:` do arquivo — ao abrir um arquivo que casa                |
+| `rules/*.md`        | Padrão que vale para uma área do código                               | com `paths:`, ao abrir um arquivo que casa; sem `paths:`, sempre       |
 | `skills/*/SKILL.md` | Procedimento sob demanda, com passos                                  | quando a tarefa casa com a `description`, ou pelo nome (`/pr-creator`) |
 
 As skills de hoje: **`spec-issue`** (especificar uma issue e dividir em sub-issues), **`pr-creator`** (abrir e atualizar PR), **`resolve-pr-comments`** (triar e responder review), **`write-review-comment`** (comentar o PR de outra pessoa), **`write-commit`** (mensagem de commit e agrupamento em commits), **`changelog-writer`** (entrada do `CHANGELOG.md`), **`create-release`** (cortar uma versão e publicar), **`ux-writing`** (texto de interface) e **`fateconnect-create-component`** (criar componente no front).

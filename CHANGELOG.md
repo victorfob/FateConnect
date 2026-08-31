@@ -6,6 +6,19 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-31
+
+### Changed
+
+- Passa a responder a listagem de caronas em páginas de 10, com o total e a quantidade de páginas, e aceita escolher a página e o tamanho dela até um teto de 50; antes devolvia todas as caronas ativas de uma vez (#236) [Backend]
+- Passa a mostrar a lista de caronas em páginas de 10, com a busca guardada no endereço: copiar a URL e abrir noutra aba devolve a mesma página, com os mesmos filtros preenchidos; enquanto a lista carrega, o lugar dos cartões fica marcado em vez de um indicador girando (#239) [Frontend]
+- Passa a mostrar o mural de achados e perdidos em páginas de 10, com a mesma busca guardada no endereço da tela de caronas — inclusive o filtro de quem cadastrou e o de situação (#241) [Frontend]
+
+### Fixed
+
+- Corrige a listagem de caronas, que continuava exibindo — e no topo — as caronas cujo horário de partida já tinha passado (#236) [Backend]
+- Corrige o controle de páginas da lista de caronas e do mural de achados e perdidos no celular: ele quebrava em duas fileiras, deixava a página seguinte sem número para clicar em parte das páginas, levava a tela ao topo a cada clique e flutuava afastado da lista (#244) [Frontend]
+
 ## [0.6.0] - 2026-08-30
 
 ### Changed

@@ -39,6 +39,8 @@ Format: `pr-type(branch-name): short description`
 
 > ⚠️ **`Closes #N` does NOT auto-close in this repo.** GitHub only closes a referenced issue when the PR merges into the **default branch**, which here is `main`. This repo follows gitflow and PRs target `develop`, so the keyword never fires. Keep the line (it documents intent and works if the branch ever reaches `main`), but **close the issue manually after the merge** — `gh issue close <n> --comment "..."` — and move its card on the project board. Confirmed on PR #61 / issue #60.
 
+⛔ **Mergeou = fechar. Não pergunte.** Fechar a issue é a última etapa de entregá-la, não uma decisão à parte — perguntar "quer que eu feche?" devolve ao usuário um passo que já está combinado. Cobrado em 30/08/2026, depois de eu perguntar sobre a #172 com o PR #236 já mergeado: *"não precisa nem me perguntar. mergeou == fechar a issue"*. O card vai para `Done` pelo bot em seguida.
+
 ## Build PR description (pt-BR)
 
 The PR description must be in **pt-BR** and must include:
