@@ -1,5 +1,6 @@
+import { onlyDigits } from '@design-system';
+
 import { firstCharacters } from '../sequence';
-import { onlyDigits } from './caret';
 
 const MAX_DATE_DIGITS = 8;
 const DAY_END = 2;

@@ -1,5 +1,6 @@
+import { onlyDigits } from '@design-system';
+
 import { firstCharacters } from '../sequence';
-import { onlyDigits } from './caret';
 
 const MAX_ZIP_DIGITS = 8;
 const PREFIX_LENGTH = 5;

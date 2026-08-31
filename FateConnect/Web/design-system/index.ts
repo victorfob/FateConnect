@@ -46,3 +46,5 @@ export { useThemeMode } from './ThemeProvider/context/ThemeModeContext';
 export { ThemeToggleButton } from './components/ThemeToggleButton';
 export { GlobalStyles } from './GlobalStyles';
 export { spacingScale, radiusScale, shadowTokens, iconSizeTokens } from './tokens';
+
+export { caretAfterDigitCount, countDigits, onlyDigits } from './utils/text';
