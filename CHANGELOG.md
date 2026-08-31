@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-31
+
 ### Changed
 
 - Passa a responder a listagem de caronas em páginas de 10, com o total e a quantidade de páginas, e aceita escolher a página e o tamanho dela até um teto de 50; antes devolvia todas as caronas ativas de uma vez (#236) [Backend]
