@@ -30,7 +30,8 @@ paths:
 
 - Toda a aplicação usa o `Dialog` do design system, com conteúdo por composição — `Dialog.Body` para o miolo, `Dialog.Footer` para as ações. **Quem precisa de diálogo monta os slots; não escreve outro.** Foi assim que a confirmação de exclusão e o contato da carona passaram a dividir o mesmo cromo.
 - O `Dialog`, o `DialogActions` e o `DialogContent` do MUI **não** estão no barrel: o diálogo da aplicação é o nosso, e o da biblioteca fica atrás da fronteira.
-- ⛔ **O diálogo não tem botão de fechar, e isso é decisão de produto.** `Esc` e clique fora já dispensam, inclusive em toque. Não adicionar um X achando que é melhoria de acessibilidade.
+- ⛔ **No desktop o diálogo não tem botão de fechar, e isso é decisão de produto.** `Esc` e clique fora já dispensam. Não adicionar um X ali achando que é melhoria de acessibilidade.
+- ⚠️ **No estreito a decisão foi revista**, em 31/08/2026: a 409px o diálogo ocupa 345px e sobram **32px** de faixa clicável de cada lado, alvo pequeno demais para o toque — e alargar a faixa estreitaria o diálogo. O X entra só abaixo do breakpoint de mobile, absoluto no canto superior direito, no mesmo recuo do resto do formulário. A #263 implementa.
 - ⛔ **Título sempre centralizado**, em qualquer largura.
 - **Conteúdo com um consumidor só não é design system.** Antes de criar componente aqui, conte os consumidores: um só ⇒ ele mora na pasta da tela que o usa. Slot ou token sem consumidor real é o mesmo cheiro.
 - **E a conta se refaz quando alguém sai.** Componente do barrel que fica com um consumidor único **dentro do próprio design system** desce para dentro dele, em `components/`, e sai do barrel — foi o caso do `ListCardSkeleton` quando o `CardsList` passou a ser o único a usá-lo. Exportar o que só um vizinho consome convida a aplicação a montar à mão o que o vizinho já monta.

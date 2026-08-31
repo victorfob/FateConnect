@@ -132,6 +132,8 @@ Dividir demais é tão errado quanto juntar tudo — mesmo critério da skill `w
 gh issue create --title "<pt-BR>" --body-file <arquivo> --assignee <login> --label <label> --milestone "<título>"
 ```
 
+⛔ **`gh issue create` roda de dentro do repositório.** Da pasta de rascunho ele responde `fatal: not a git repository` e **não cria nada** — um erro por issue, e a lista de números volta vazia. Rode da raiz do repo, ou passe `--repo <dono>/<nome>`; o `--body-file` aceita caminho absoluto para o rascunho.
+
 `--milestone` casa pelo **título**, não pelo número. Depois, pendurar cada uma na pai:
 
 ```bash

@@ -96,6 +96,10 @@ dotnet build -v q --nologo
 
 Quando a branch de release levar correção junto — esteira, configuração —, ela é **um** commit e o corte é o outro. Dois é o teto.
 
+### O Docker precisa estar de pé antes do push
+
+⛔ **A suíte da API sobe um PostgreSQL em contêiner, e o `pre-push` a roda.** Com o Docker parado, o push da branch de release é **barrado** com dezenas de testes falhando — em 31/08/2026 foram 45 de 86, e a mensagem de cada um diz a causa. Suba o Docker e empurre de novo; `--no-verify` aqui seria pular a suíte inteira da API bem antes de publicar em produção.
+
 ## 5. Abrir o PR
 
 Branch `release/X.Y.Z` a partir da `develop`, PR **para a `main`** pela skill `pr-creator`.

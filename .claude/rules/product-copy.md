@@ -126,6 +126,23 @@ Voltada ao fato: "Item excluído", não "Você excluiu o item". O `você` contin
 - Data em `dd/MM/yyyy`; hora em 24h com dois pontos: `07:30`.
 - Intervalo com hífen espaçado: `07:00 - 09:00`.
 
+## Copy que carrega dado tem largura
+
+⛔ **Rótulo com número, faixa ou unidade ocupa espaço — e o espaço se mede no contêiner real, não no olho.** A régua não é o texto sozinho: é a largura útil de onde ele vai morar, que muda de um lugar para o outro.
+
+Aconteceu em 31/08/2026, ao nomear os turnos do filtro de caronas. Propus `Manhã (04:00 - 11:59)` e a cobrança do Victor foi *"lembrou de validar isso?"*. Eu não tinha.
+
+Medido com a aplicação de pé a 409px:
+
+| | Painel de filtros | Diálogo |
+| --- | --- | --- |
+| Campo | 313px | 281px |
+| Sobra para o texto | **267px** | **235px** |
+
+O candidato mais longo, `Vespertino (12:00 - 17:59)`, ocupa 183,5px em Inter 16px: cabe nos dois. A largura **deixou de decidir** o nome, e a escolha voltou a ser por precisão — que é o critério certo. Sem a medição eu teria descartado ou aceitado um nome pelo motivo errado.
+
+**Como medir:** largura útil pelo `getBoundingClientRect` do campo menos o `padding` computado; largura do texto com `measureText` num `canvas` usando a fonte real, depois de `document.fonts.ready`. Meça no **mais apertado** dos contêineres que vão receber o texto.
+
 ## Idioma
 
 Copy em **pt-BR**, identificador em inglês: a constante é `resolveSucceeded`, o texto dela é `Item resolvido.` — ver `.claude/rules/fateconnect-locale-code.md`.
