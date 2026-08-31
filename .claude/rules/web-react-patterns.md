@@ -27,6 +27,10 @@ O arquivo principal da pasta é `index`, então `import { X } from '../../consta
 
 Vale para pasta de componente e de tela. Pastas que **já são** dedicadas por natureza (`src/hooks/`, `src/services/`, `src/utils/`, `design-system/tokens/`) não se aplicam: elas são o destino, não a origem.
 
+⛔ **Arquivo de hook guarda o hook, e nada mais.** Função pura que o hook usa — e que outros também usariam — vai para `src/utils/`, não para o topo do arquivo do hook. Aconteceu na #242: `usePagedSearch.ts` nasceu com os leitores de parâmetro de URL dentro, e o resultado foi um util de **teste** importando de `@app/hooks/` para pegar uma constante. Correção do Victor: *"não faz sentido nenhum elas estarem definidas dentro de um hook, separe os escopos"*.
+
+**O sinal é quem importa de lá.** Se algo que não é componente nem hook precisa importar do arquivo de um hook, o que ele quer não pertence àquele arquivo.
+
 ## Um componente por arquivo
 
 ⛔ **Nunca dois componentes no mesmo arquivo.** Cada componente tem a sua pasta e o seu `index` — inclusive o subcomponente pequeno, usado uma vez só.
@@ -38,6 +42,8 @@ Vale para pasta de componente e de tela. Pastas que **já são** dedicadas por n
 
 ## Tipagem e imports
 
+- **`type` por padrão; `interface` só quando herda.** Tipo que estende outro usa `interface X extends Y`, não `type X = Y & {...}`. Na #173 o `RideFilter` nasceu como interseção e virou `interface RideFilter extends PageQuery` — os tipos que ele estende (`PagedResult`, `PageQuery`) seguem `type`, porque não herdam nada.
+- ⛔ **`as const` não entra.** Para um conjunto finito de chaves, o que vale é `enum` — é o que `RideTypeFilterEnum` e `LostItemKindFilterEnum` já fazem. Escrevi um objeto `as const` no codec da busca da #173 e ele era o **único** do front inteiro; o ESLint passou nas duas formas, então quem decide é o precedente do repo, não o lint.
 - **Props de componente sempre em `Readonly`**: `type RideCardProps = Readonly<{ ride: Ride; onEdit: (ride: Ride) => void }>`. Props não são para mutar.
 - **`enum` leva o sufixo `Enum`**: `RideTypeEnum`, `RoutePathEnum`, `GenderValueEnum`. O sufixo separa, na leitura, o que é enum do que é tipo ou componente.
 - **O tipo entra no import que já existe.** Se o módulo já é importado por valor, o tipo vai junto com o modificador inline, no fim das chaves — `import { createMemoryRouter, RouterProvider, type LinkProps } from 'react-router'`. Segunda declaração `import type` só quando o módulo entra **apenas** por tipo, como o `ReactNode` num arquivo que não usa nada de valor do React. O lint funde e ordena sozinho.
@@ -60,6 +66,7 @@ Vale para `useQuery` e `useMutation`. Um teste que conte `getAllByRole('alert')`
 
 - Nome com prefixo `handle`: `handleSubmit`, `handleSectionClick`.
 - **Sem função anônima em callback JSX.** `onClick={() => doThing(id)}` cria função nova a cada render e quebra memoização; extrair um `handle…` com `useCallback` quando o valor vier de fora.
+- **Parâmetro que recebe função se chama pelo que é.** `list` num objeto de entrada se lê como a lista; quem recebe a função que busca a lista é `listFunction`. Cobrado na #242: o nome curto economiza uma palavra e custa uma leitura errada em cada call site.
 
 ## Efeitos
 
@@ -99,6 +106,8 @@ if (useSessionStatus() === SessionStatusEnum.VALID)
 ## Constante de módulo mora no topo
 
 Depois dos imports, num bloco só, junto das que já existem — não encostada na função que a usa. Constante espalhada pelo arquivo esconde que o mesmo número já tinha nome três linhas acima.
+
+⛔ **E nada atravessa o bloco.** Na #173 furei essa regra de dois jeitos no mesmo PR: num arquivo deixei `FIRST_PAGE` e `PAGE_SIZE` lá embaixo, colados na função que os usava; no outro enfiei uma função **no meio** do bloco, partindo-o em dois. O segundo é mais fácil de cometer, porque a função parece pertencer às constantes que acabou de usar — ela vai depois do bloco inteiro.
 
 ## Número solto vira nome que explica o significado
 

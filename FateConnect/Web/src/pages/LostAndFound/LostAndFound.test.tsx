@@ -1,4 +1,3 @@
-import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
@@ -9,7 +8,9 @@ import {
   LostItemStatusEnum,
   type LostItem,
 } from '@app/services/lostAndFound/types';
-import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
+import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
 import { OWN_ITEM_LABEL } from './components/LostItemCard/constants';
 import {
@@ -52,13 +53,7 @@ function activeFilterDot(title: string) {
 }
 
 function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
-  server.use(
-    http.get(LOST_ITEMS_URL, ({ request }) => {
-      onRequest?.(new URL(request.url));
-
-      return HttpResponse.json(items);
-    }),
-  );
+  server.use(pagedListHandler(LOST_ITEMS_URL, items, onRequest));
 }
 
 const NO_CONTENT = 204;
@@ -83,10 +78,11 @@ function boardTracking(initial: LostItem) {
 
   server.use(
     http.get(LOST_ITEMS_URL, ({ request }) => {
-      const wanted = new URL(request.url).searchParams.get('Situacao');
-      if (wanted && wanted !== current.situacao) return HttpResponse.json([]);
+      const url = new URL(request.url);
+      const wanted = url.searchParams.get('Situacao');
+      if (wanted && wanted !== current.situacao) return HttpResponse.json(pagedResponse([], url));
 
-      return HttpResponse.json([current]);
+      return HttpResponse.json(pagedResponse([current], url));
     }),
     http.patch<{ itemId: string }, { situacao: LostItemStatusEnum }>(
       `${LOST_ITEMS_URL}/:itemId/situacao`,
@@ -128,17 +124,8 @@ async function filterByStatus(optionLabel: string) {
   await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 }
 
-function renderComponent() {
-  const router = createMemoryRouter(
-    [
-      { path: RoutePathEnum.LOST_AND_FOUND, element: <LostAndFound /> },
-      { path: RoutePathEnum.MENU, element: <div>menu</div> },
-    ],
-    { initialEntries: [RoutePathEnum.LOST_AND_FOUND] },
-  );
-  render(<RouterProvider router={router} />);
-
-  return router;
+function renderComponent(search = '') {
+  return renderAtRoute(RoutePathEnum.LOST_AND_FOUND, <LostAndFound />, search);
 }
 
 describe('LostAndFound', () => {
@@ -468,5 +455,81 @@ describe('LostAndFound', () => {
     const dialog = within(await screen.findByRole('dialog'));
     expect(dialog.getByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
     expect(dialog.getByDisplayValue(OWN_OPEN_ITEM.nome)).toBeInTheDocument();
+  });
+
+  describe('paginação e busca na URL', () => {
+    const SECOND_PAGE_LABEL = 'Ir para a página 2';
+
+    const manyItemName = (index: number) => `Item ${index}`;
+
+    function manyItems(total: number) {
+      return Array.from({ length: total }, (_, index) => ({
+        ...LOST_ITEM,
+        id: `item-${index}`,
+        nome: manyItemName(index),
+      }));
+    }
+
+    it('should open with the fields already filled from the url', async () => {
+      listReturning([LOST_ITEM]);
+
+      renderComponent('?nome=Garrafa&tipo=perdido');
+
+      expect(await screen.findByDisplayValue('Garrafa')).toBeInTheDocument();
+    });
+
+    it('should ask the api for the page the url names', async () => {
+      let asked: URL | null = null;
+      listReturning(manyItems(30), (url) => {
+        asked = url;
+      });
+
+      renderComponent('?pagina=3');
+
+      await waitFor(() => expect(asked!.searchParams.get('Page')).toBe('3'));
+    });
+
+    it('should show the items the requested page holds, and not the ones before it', async () => {
+      listReturning(manyItems(12));
+
+      renderComponent('?pagina=2');
+
+      expect(await screen.findByText(manyItemName(10))).toBeInTheDocument();
+      expect(screen.queryByText(manyItemName(0))).not.toBeInTheDocument();
+    });
+
+    it('should put the chosen page in the url and leave the first one out', async () => {
+      listReturning(manyItems(30));
+      const router = renderComponent();
+
+      await userEvent.click(await screen.findByRole('button', { name: SECOND_PAGE_LABEL }));
+
+      await waitFor(() => expect(router.state.location.search).toBe('?pagina=2'));
+    });
+
+    it('should go back to the first page when a filter is applied', async () => {
+      listReturning(manyItems(30));
+      const router = renderComponent('?pagina=3');
+
+      await userEvent.type(await screen.findByLabelText(FILTER_LABELS.name), 'Mochila');
+      await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
+
+      await waitFor(() => expect(router.state.location.search).toBe('?nome=Mochila'));
+    });
+
+    it('should fall back to the last page when the url asks beyond it', async () => {
+      listReturning(manyItems(12));
+      const router = renderComponent('?pagina=9');
+
+      await waitFor(() => expect(router.state.location.search).toBe('?pagina=2'));
+    });
+
+    it('should keep the default status out of the url while showing it on the screen', async () => {
+      listReturning([LOST_ITEM]);
+      const router = renderComponent();
+
+      expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
+      expect(router.state.location.search).toBe('');
+    });
   });
 });

@@ -22,7 +22,7 @@ paths:
 - **Esconder visualmente sem tirar da acessibilidade é o `HiddenField`.** Serve ao texto que só o leitor de tela ouve e ao campo que só um botão aciona, pela prop `component`. ⛔ Não reescreva o bloco `position: absolute` + `clip` — ele existia duplicado em dois arquivos, byte a byte, até virar componente.
 - Esses componentes são **prop-driven**: recebem conteúdo por propriedade ou slot e **não importam nada de `@app/*`**. O domínio (rotas, hooks, textos) é fornecido por quem os compõe.
 - Composição de domínio (um botão que conhece uma seção da landing, por exemplo) fica em `src/components/`, não no design system.
-- **A prop fala em termos visuais, não em termos do domínio.** A etiqueta de estado recebe `tone="success"`, não `tipo="filantropica"`: quem traduz o domínio para o tom é a tela. Foi o que permitiu o mesmo `StatusTag` servir caronas sem o design system saber o que é uma carona.
+- **A prop fala em termos visuais, não em termos do domínio.** A etiqueta de estado recebe `tone="success"`, não `tipo="solidaria"`: quem traduz o domínio para o tom é a tela. Foi o que permitiu o mesmo `StatusTag` servir caronas sem o design system saber o que é uma carona.
 - **Ação secundária usa `variant="soft"`**, a variante de contorno neutro declarada no tema. ⛔ Não componha uma aparência nova no ponto de uso — `variant="outlined" color="inherit"` apareceu em dois PRs no mesmo dia, escolhido duas vezes sem ninguém combinar. Falta variante para o que você precisa: **declare no tema**, como se faz com token.
 - **Subcomponente interno vai numa pasta dentro do pai**, com o seu `index` (`ConfirmDialog/DialogMessage/`). Se ele faz sentido para quem consome, expor por composição — `ConfirmDialog.Message` — em vez de repassar props do filho pelo pai.
 
@@ -33,6 +33,7 @@ paths:
 - ⛔ **O diálogo não tem botão de fechar, e isso é decisão de produto.** `Esc` e clique fora já dispensam, inclusive em toque. Não adicionar um X achando que é melhoria de acessibilidade.
 - ⛔ **Título sempre centralizado**, em qualquer largura.
 - **Conteúdo com um consumidor só não é design system.** Antes de criar componente aqui, conte os consumidores: um só ⇒ ele mora na pasta da tela que o usa. Slot ou token sem consumidor real é o mesmo cheiro.
+- **E a conta se refaz quando alguém sai.** Componente do barrel que fica com um consumidor único **dentro do próprio design system** desce para dentro dele, em `components/`, e sai do barrel — foi o caso do `ListCardSkeleton` quando o `CardsList` passou a ser o único a usá-lo. Exportar o que só um vizinho consome convida a aplicação a montar à mão o que o vizinho já monta.
 
 ## Tokens — proibições
 

@@ -13,7 +13,7 @@
 # está listado no final como sugestão.
 set -euo pipefail
 
-if [ "$(id -u)" -ne 0 ]; then
+if [[ "$(id -u)" -ne 0 ]]; then
   echo "Rode com sudo: sudo ./vps-setup.sh" >&2
   exit 1
 fi
@@ -36,7 +36,7 @@ echo "==> 2/5 Docker"
 if command -v docker >/dev/null 2>&1; then
   echo "    já instalado: $(docker --version)"
 else
-  curl -fsSL https://get.docker.com | sh
+  curl -fsSL --proto '=https' --tlsv1.2 https://get.docker.com | sh
 fi
 usermod -aG docker "$TARGET_USER"
 echo "    $TARGET_USER adicionado ao grupo docker (vale no próximo login)"
@@ -83,7 +83,7 @@ for environment in hml prod; do
   # `sudo -u` e não `su -`: o usuário postgres costuma ter /sbin/nologin como
   # shell, e aí o `su` falha sem conseguir sequer abrir a sessão.
   exists=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$database'")
-  if [ "$exists" = "1" ]; then
+  if [[ "$exists" = "1" ]]; then
     echo "    $database já existe; senha não alterada"
     continue
   fi

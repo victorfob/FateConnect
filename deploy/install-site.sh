@@ -7,7 +7,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-if [ "$(id -u)" -ne 0 ]; then
+if [[ "$(id -u)" -ne 0 ]]; then
   echo "Rode com sudo: sudo ./install-site.sh hml|prod" >&2
   exit 1
 fi
@@ -19,7 +19,7 @@ case "$ENVIRONMENT" in
 esac
 
 ENV_FILE=".env.$ENVIRONMENT"
-if [ ! -f "$ENV_FILE" ]; then
+if [[ ! -f "$ENV_FILE" ]]; then
   echo "ERRO: falta deploy/$ENV_FILE." >&2
   exit 1
 fi
@@ -29,7 +29,7 @@ set -a; . "./$ENV_FILE"; set +a
 
 for name in DOMAIN API_PORT; do
   eval "value=\${$name:-}"
-  if [ -z "$value" ]; then
+  if [[ -z "$value" ]]; then
     echo "ERRO: $name não está preenchido em deploy/$ENV_FILE." >&2
     exit 1
   fi
@@ -57,7 +57,7 @@ systemctl reload nginx
 # O passo acima sobrescreve o arquivo inteiro, e o template só descreve a porta
 # 80 — então o bloco 443 que o certbot escreveu some a cada execução. Reaplicar
 # não reemite certificado: só devolve o TLS ao arquivo recém-gerado.
-if [ -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+if [[ -d "/etc/letsencrypt/live/$DOMAIN" ]]; then
   echo "==> Devolvendo o HTTPS à configuração recém-gerada"
   certbot install --nginx --cert-name "$DOMAIN"
   nginx -t
@@ -66,7 +66,7 @@ fi
 
 echo
 echo "Pronto: $DOMAIN servido a partir de $TARGET"
-if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+if [[ ! -d "/etc/letsencrypt/live/$DOMAIN" ]]; then
   echo "Para ligar o HTTPS depois que o domínio estiver respondendo:"
   echo "  sudo certbot --nginx -d $DOMAIN"
 fi

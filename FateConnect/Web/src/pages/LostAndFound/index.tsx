@@ -1,45 +1,34 @@
 import { useCallback, useState } from 'react';
 import { NavLink } from 'react-router';
-import { CircularProgress, PageShell, Typography } from '@design-system';
+import { CardsList, PageShell, Pagination } from '@design-system';
 import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
-import { useQuery } from '@tanstack/react-query';
 
+import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import { RoutePathEnum } from '@app/routes/paths';
 import { listLostItems } from '@app/services/lostAndFound/lostAndFoundService';
-import {
-  LostItemStatusEnum,
-  type LostItem,
-  type LostItemFilter as LostItemFilterValues,
-} from '@app/services/lostAndFound/types';
+import type { LostItem } from '@app/services/lostAndFound/types';
 
 import { LostItemCard } from './components/LostItemCard';
 import { LostItemFilter } from './components/LostItemFilter';
 import { LostItemFormDialog } from './components/LostItemFormDialog';
+import { lostItemSearchCodec } from './helpers/searchQuery';
 import { useLostItemTransitions } from './hooks/useLostItemTransitions';
 import * as C from './constants';
-import * as S from './styles';
 
-const SPINNER_SIZE_PX = 60;
 const NO_ITEMS = 0;
 
-const INITIAL_FILTERS: LostItemFilterValues = { status: LostItemStatusEnum.OPEN };
-
 export function LostAndFound() {
-  const [filters, setFilters] = useState<LostItemFilterValues>(INITIAL_FILTERS);
   const [editingItem, setEditingItem] = useState<LostItem | undefined>(undefined);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { resolveItem, cancelItem, reopenItem, isTransitioning } = useLostItemTransitions();
 
-  const { data: items = [], isPending } = useQuery({
-    queryKey: [C.LOST_ITEMS_QUERY_KEY, filters],
-    queryFn: () => listLostItems(filters),
-    meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.loadFailed },
-  });
-
-  const handleApplyFilters = useCallback(
-    (applied: LostItemFilterValues) => setFilters(applied),
-    [],
-  );
+  const { filters, items, totalPages, currentPage, isPending, applyFilters, changePage } =
+    usePagedSearch({
+      codec: lostItemSearchCodec,
+      queryKey: C.LOST_ITEMS_QUERY_KEY,
+      listFunction: listLostItems,
+      errorMessage: C.LOST_ITEM_LIST_MESSAGES.loadFailed,
+    });
 
   const handleRegister = useCallback(() => {
     setEditingItem(undefined);
@@ -84,31 +73,25 @@ export function LostAndFound() {
         </>
       }
     >
-      <LostItemFilter onApply={handleApplyFilters} />
+      <LostItemFilter initialFilters={filters} onApply={applyFilters} />
 
-      <S.LostItemList>
-        {isLoading && (
-          <S.LoadingContainer>
-            <CircularProgress size={SPINNER_SIZE_PX} />
-          </S.LoadingContainer>
-        )}
-
-        {!isLoading && items.length === NO_ITEMS && (
-          <Typography variant="subtitle">{C.EMPTY_LIST_MESSAGE}</Typography>
-        )}
-
-        {!isLoading &&
-          items.map((item) => (
-            <LostItemCard
-              key={item.id}
-              item={item}
-              onEdit={handleEdit}
-              onResolve={resolveItem}
-              onCancel={cancelItem}
-              onReopen={reopenItem}
-            />
-          ))}
-      </S.LostItemList>
+      <CardsList
+        isLoading={isLoading}
+        isEmpty={items.length === NO_ITEMS}
+        emptyMessage={C.EMPTY_LIST_MESSAGE}
+        pagination={<Pagination count={totalPages} page={currentPage} onChange={changePage} />}
+      >
+        {items.map((item) => (
+          <LostItemCard
+            key={item.id}
+            item={item}
+            onEdit={handleEdit}
+            onResolve={resolveItem}
+            onCancel={cancelItem}
+            onReopen={reopenItem}
+          />
+        ))}
+      </CardsList>
 
       <LostItemFormDialog open={isFormOpen} onClose={handleCloseForm} item={editingItem} />
     </PageShell>

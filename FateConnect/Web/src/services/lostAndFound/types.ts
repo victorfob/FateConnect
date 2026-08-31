@@ -1,3 +1,5 @@
+import type { PageQuery } from '../types';
+
 /** Valores canônicos alinhados à serialização do backend. */
 export enum LostItemKindEnum {
   FOUND = 'Achado',
@@ -35,10 +37,10 @@ export type LostItemInput = Pick<
   'nome' | 'tipo' | 'local' | 'dataOcorrido' | 'descricao'
 >;
 
-export type LostItemFilter = {
+export interface LostItemFilter extends PageQuery {
   name?: string;
   occurredOn?: string;
   kind?: LostItemKindEnum;
   onlyMine?: boolean;
   status?: LostItemStatusEnum;
-};
+}

@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Rides.Services;
 
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Exceptions;
@@ -31,13 +32,19 @@ public partial class RideService(
         return MapToReadDto(ride, currentUserId);
     }
 
-    public async Task<IEnumerable<ReadRideDto>> GetAllAsync(FilterRideDto filter, int currentUserId)
+    public async Task<PagedResultDto<ReadRideDto>> GetAllAsync(FilterRideDto filter, int currentUserId)
     {
-        var rides = await repository.GetAllAsync(filter);
+        (IReadOnlyList<Ride> rides, int total) = await repository.GetAllAsync(filter);
 
         LogRidesRetrieved(logger, rides.Count);
 
-        return rides.Select(ride => MapToReadDto(ride, currentUserId));
+        return new PagedResultDto<ReadRideDto>
+        {
+            Items = [.. rides.Select(ride => MapToReadDto(ride, currentUserId))],
+            Page = filter.EffectivePage,
+            PageSize = filter.EffectivePageSize,
+            Total = total,
+        };
     }
 
     public async Task<ReadRideDto?> GetByIdAsync(Guid id, int currentUserId)

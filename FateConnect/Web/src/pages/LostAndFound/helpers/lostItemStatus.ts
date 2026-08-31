@@ -28,6 +28,21 @@ export function isLostItemStatus(value: string): value is LostItemStatusEnum {
   return STATUS_VALUES.has(value);
 }
 
+/** Interpreta o valor canônico e o da URL, que é o mesmo em minúsculo. */
+export function parseLostItemStatus(raw: string | null | undefined): LostItemStatusEnum | null {
+  if (!raw) return null;
+
+  const found = Object.values(LostItemStatusEnum).find(
+    (status) => status.toLowerCase() === raw.trim().toLowerCase(),
+  );
+
+  return found ?? null;
+}
+
+export function lostItemStatusSlug(value: LostItemStatusEnum): string {
+  return value.toLowerCase();
+}
+
 export function lostItemStatusLabel(value: string): string {
   if (!isLostItemStatus(value)) return value.trim() || UNKNOWN_LABEL;
 

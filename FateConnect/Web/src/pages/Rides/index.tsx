@@ -1,34 +1,42 @@
 import { useCallback, useState } from 'react';
 import { NavLink } from 'react-router';
-import { CircularProgress, PageShell, Typography } from '@design-system';
+import { CardsList, PageShell, Pagination } from '@design-system';
 import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useNotification } from '@app/hooks/useNotification';
+import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import { RoutePathEnum } from '@app/routes/paths';
 import { deleteRide, listRides } from '@app/services/rides/ridesService';
-import type { Ride, RideFilter as RideFilterValues } from '@app/services/rides/types';
+import type { Ride } from '@app/services/rides/types';
 
 import { RideCard } from './components/RideCard';
 import { RideFilter } from './components/RideFilter';
 import { RideFormDialog } from './components/RideFormDialog';
+import { rideSearchCodec } from './helpers/searchQuery';
 import * as C from './constants';
-import * as S from './styles';
 
-const SPINNER_SIZE_PX = 60;
 const NO_ITEMS = 0;
 
 export function Rides() {
   const queryClient = useQueryClient();
   const { notifySuccess } = useNotification();
-  const [filters, setFilters] = useState<RideFilterValues>({});
   const [editingRide, setEditingRide] = useState<Ride | undefined>(undefined);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const { data: rides = [], isPending } = useQuery({
-    queryKey: [C.RIDES_QUERY_KEY, filters],
-    queryFn: () => listRides(filters),
-    meta: { errorMessage: C.RIDE_LIST_MESSAGES.loadFailed },
+  const {
+    filters,
+    items: rides,
+    totalPages,
+    currentPage,
+    isPending,
+    applyFilters,
+    changePage,
+  } = usePagedSearch({
+    codec: rideSearchCodec,
+    queryKey: C.RIDES_QUERY_KEY,
+    listFunction: listRides,
+    errorMessage: C.RIDE_LIST_MESSAGES.loadFailed,
   });
 
   const { mutate: removeRide, isPending: isRemoving } = useMutation({
@@ -40,7 +48,6 @@ export function Rides() {
     meta: { errorMessage: C.RIDE_LIST_MESSAGES.cancelFailed },
   });
 
-  const handleApplyFilters = useCallback((applied: RideFilterValues) => setFilters(applied), []);
   const handleCancel = useCallback((ride: Ride) => removeRide(ride), [removeRide]);
 
   const handleOffer = useCallback(() => {
@@ -88,24 +95,18 @@ export function Rides() {
         </>
       }
     >
-      <RideFilter onApply={handleApplyFilters} />
+      <RideFilter initialFilters={filters} onApply={applyFilters} />
 
-      <S.RideList>
-        {isLoading && (
-          <S.LoadingContainer>
-            <CircularProgress size={SPINNER_SIZE_PX} />
-          </S.LoadingContainer>
-        )}
-
-        {!isLoading && rides.length === NO_ITEMS && (
-          <Typography variant="subtitle">{C.EMPTY_LIST_MESSAGE}</Typography>
-        )}
-
-        {!isLoading &&
-          rides.map((ride) => (
-            <RideCard key={ride.id} ride={ride} onEdit={handleEdit} onCancel={handleCancel} />
-          ))}
-      </S.RideList>
+      <CardsList
+        isLoading={isLoading}
+        isEmpty={rides.length === NO_ITEMS}
+        emptyMessage={C.EMPTY_LIST_MESSAGE}
+        pagination={<Pagination count={totalPages} page={currentPage} onChange={changePage} />}
+      >
+        {rides.map((ride) => (
+          <RideCard key={ride.id} ride={ride} onEdit={handleEdit} onCancel={handleCancel} />
+        ))}
+      </CardsList>
 
       <RideFormDialog open={isFormOpen} onClose={handleCloseForm} ride={editingRide} />
     </PageShell>

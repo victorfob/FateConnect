@@ -1,4 +1,5 @@
 import { apiClient } from '../httpClient';
+import type { PagedResult } from '../types';
 import {
   LostItemStatusEnum,
   type LostItem,
@@ -9,7 +10,7 @@ import {
 const LOST_AND_FOUND_PATH = '/achado';
 
 const INVALID_LIST_PAYLOAD_MESSAGE =
-  'A API de achados e perdidos respondeu algo que não é uma lista.';
+  'A API de achados e perdidos respondeu algo que não é uma página.';
 
 function toQueryParams(filters: LostItemFilter = {}): Record<string, string> {
   const params: Record<string, string> = {};
@@ -19,17 +20,19 @@ function toQueryParams(filters: LostItemFilter = {}): Record<string, string> {
   if (filters.kind) params.Tipo = filters.kind;
   if (filters.onlyMine) params.MeusItens = 'true';
   if (filters.status) params.Situacao = filters.status;
+  if (filters.page) params.Page = String(filters.page);
+  if (filters.pageSize) params.PageSize = String(filters.pageSize);
 
   return params;
 }
 
-export async function listLostItems(filters?: LostItemFilter): Promise<LostItem[]> {
-  const { data } = await apiClient.get<LostItem[]>(LOST_AND_FOUND_PATH, {
+export async function listLostItems(filters?: LostItemFilter): Promise<PagedResult<LostItem>> {
+  const { data } = await apiClient.get<PagedResult<LostItem>>(LOST_AND_FOUND_PATH, {
     params: toQueryParams(filters),
   });
 
   // Sem endereço de API a requisição cai no dev server, que responde HTML com 200.
-  if (!Array.isArray(data)) throw new Error(INVALID_LIST_PAYLOAD_MESSAGE);
+  if (!Array.isArray(data?.items)) throw new Error(INVALID_LIST_PAYLOAD_MESSAGE);
 
   return data;
 }

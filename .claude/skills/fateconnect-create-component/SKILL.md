@@ -21,7 +21,7 @@ A pergunta é uma só: **ele conhece o domínio?**
 | Sim — e serve só uma tela | `src/pages/<Tela>/components/<Nome>/` |
 
 - Componente do design system é **prop-driven**: recebe conteúdo por propriedade ou slot e **não importa nada de `@app/*`**. Quem compõe fornece rota, texto e domínio.
-- A prop do design system fala em termos **visuais**, não de domínio: `tone="success"`, nunca `tipo="filantropica"`.
+- A prop do design system fala em termos **visuais**, não de domínio: `tone="success"`, nunca `tipo="solidaria"`.
 - Só entra no barrel o que a aplicação pode usar direto. Matéria-prima do tema (paleta, fábrica do tema, largura crua de breakpoint) fica interna.
 - **Antes de criar, procure:** `Grep` pelo nome e por um componente parecido na mesma pasta. Copiar o vizinho é mais seguro que inventar estrutura.
 

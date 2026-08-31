@@ -26,6 +26,8 @@ git config core.hooksPath .githooks
 
 O `pre-commit` conserta o que dá no front — `eslint --fix` e `prettier --write` sobre o que está preparado — e compila a API quando a mudança a alcança, que é a build por onde entra o SonarAnalyzer. O `pre-push` roda o recorte de testes do front relacionado ao que está sendo enviado e a suíte da API. A suíte inteira com cobertura fica no CI.
 
+**A suíte da API precisa de Docker rodando.** Ela sobe um contêiner `postgres:17` e roda as consultas contra o banco de verdade, porque o filtro por destino usa funções do PostgreSQL e porque consulta que o Postgres não traduz precisa quebrar teste, não produção. Vale para `dotnet test` e, por tabela, para o `git push` que dispara o `pre-push`.
+
 ## Branch e commit
 
 Branch sai da **`develop`**, nomeada `<tipo>/<número-da-issue>` — `feat/56`, `fix/171`, `chore/48`. Sem issue, um slug descritivo.

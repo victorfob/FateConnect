@@ -116,8 +116,8 @@ jobs:
         if: steps.changes.outputs.api == 'true'
         run: dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
 
-      # A suíte sobe a própria aplicação com banco em memória, então não há
-      # Postgres a provisionar aqui.
+      # A suíte sobe o próprio PostgreSQL por Testcontainers, no Docker que já vem
+      # no runner — o serviço não se declara aqui.
       #
       # O formato é OpenCover porque o Sonar não lê Cobertura para C#, que é o
       # que o `dotnet test` produz por padrão.

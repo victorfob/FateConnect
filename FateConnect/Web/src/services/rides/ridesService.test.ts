@@ -6,6 +6,9 @@ import { createRide, deleteRide, listRides, updateRide } from './ridesService';
 import { RideTypeEnum, type RideInput } from './types';
 
 const RIDES_URL = 'https://api.fateconnect.test/rides';
+const FIRST_PAGE = 1;
+const SINGLE_PAGE = 1;
+const PAGE_SIZE = 10;
 
 const RIDE_INPUT: RideInput = {
   availableSeats: 3,
@@ -16,13 +19,23 @@ const RIDE_INPUT: RideInput = {
   description: 'Saída do centro.',
 };
 
+function pageOf(items: unknown[]) {
+  return {
+    items,
+    page: FIRST_PAGE,
+    pageSize: PAGE_SIZE,
+    total: items.length,
+    totalPages: SINGLE_PAGE,
+  };
+}
+
 describe('ridesService', () => {
   it('should translate the front filters into the api query parameters', async () => {
     let received: URLSearchParams | null = null;
     server.use(
       http.get(RIDES_URL, ({ request }) => {
         received = new URL(request.url).searchParams;
-        return HttpResponse.json([]);
+        return HttpResponse.json(pageOf([]));
       }),
     );
 
@@ -39,12 +52,27 @@ describe('ridesService', () => {
     expect(received!.get('rideType')).toBe(RideTypeEnum.EGALITARIAN);
   });
 
+  it('should send the page and the page size the caller asked for', async () => {
+    let received: URLSearchParams | null = null;
+    server.use(
+      http.get(RIDES_URL, ({ request }) => {
+        received = new URL(request.url).searchParams;
+        return HttpResponse.json(pageOf([]));
+      }),
+    );
+
+    await listRides({ page: 3, pageSize: 10 });
+
+    expect(received!.get('page')).toBe('3');
+    expect(received!.get('pageSize')).toBe('10');
+  });
+
   it('should omit parameters that were not filled in', async () => {
     let received: URLSearchParams | null = null;
     server.use(
       http.get(RIDES_URL, ({ request }) => {
         received = new URL(request.url).searchParams;
-        return HttpResponse.json([]);
+        return HttpResponse.json(pageOf([]));
       }),
     );
 
@@ -54,17 +82,20 @@ describe('ridesService', () => {
   });
 
   it('should list rides without filters', async () => {
-    server.use(http.get(RIDES_URL, () => HttpResponse.json([{ id: 1, destination: 'Sorocaba' }])));
+    server.use(
+      http.get(RIDES_URL, () => HttpResponse.json(pageOf([{ id: 1, destination: 'Sorocaba' }]))),
+    );
 
-    const rides = await listRides();
+    const page = await listRides();
 
-    expect(rides).toHaveLength(1);
+    expect(page.items).toHaveLength(1);
+    expect(page.totalPages).toBe(SINGLE_PAGE);
   });
 
-  it('should fail when the response is not a list', async () => {
+  it('should fail when the response is not a page', async () => {
     server.use(http.get(RIDES_URL, () => HttpResponse.text('<!doctype html><html></html>')));
 
-    await expect(listRides()).rejects.toThrow(/não é uma lista/);
+    await expect(listRides()).rejects.toThrow(/não é uma página/);
   });
 
   it('should send the whole ride when creating', async () => {

@@ -1,18 +1,18 @@
 import { apiClient } from '../httpClient';
+import type { PagedResult } from '../types';
 import type { Ride, RideFilter, RideInput } from './types';
 
 const RIDES_PATH = '/rides';
+const INVALID_LIST_PAYLOAD_MESSAGE = 'A API de caronas respondeu algo que não é uma página.';
 
-const INVALID_LIST_PAYLOAD_MESSAGE = 'A API de caronas respondeu algo que não é uma lista.';
-
-export async function listRides(filters?: RideFilter): Promise<Ride[]> {
-  const { data } = await apiClient.get<Ride[]>(RIDES_PATH, { params: filters });
+export async function listRides(filters?: RideFilter): Promise<PagedResult<Ride>> {
+  const { data } = await apiClient.get<PagedResult<Ride>>(RIDES_PATH, { params: filters });
 
   // O tipo do axios é uma promessa de contrato, não uma garantia: sem o endereço
   // da API a requisição cai no próprio servidor de desenvolvimento, que responde
   // o HTML da aplicação com status 200. Falhar aqui transforma isso na
   // notificação de erro da tela, em vez de estourar depois ao percorrer a lista.
-  if (!Array.isArray(data)) throw new Error(INVALID_LIST_PAYLOAD_MESSAGE);
+  if (!Array.isArray(data?.items)) throw new Error(INVALID_LIST_PAYLOAD_MESSAGE);
 
   return data;
 }
