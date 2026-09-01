@@ -1,5 +1,4 @@
 import { useCallback, useRef, type ReactNode, type Ref } from 'react';
-import InputAdornment from '@mui/material/InputAdornment';
 import type { OutlinedTextFieldProps } from '@mui/material/TextField';
 
 import { InputHelpButton } from '../components/InputHelpButton';
@@ -81,11 +80,11 @@ export function InputField({
         htmlInput: maxLength ? { maxLength } : undefined,
         input: {
           endAdornment: hasAdornment ? (
-            <InputAdornment position="end">
+            <S.EndAdornment position="end">
               {endAdornment}
               {isTime ? <TimePickerButton onOpen={handleOpenTimePicker} /> : null}
               {helpText ? <InputHelpButton fieldLabel={label} helpText={helpText} /> : null}
-            </InputAdornment>
+            </S.EndAdornment>
           ) : null,
         },
       }}
