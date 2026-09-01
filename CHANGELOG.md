@@ -14,6 +14,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Corrige a data que a busca recebia enquanto ainda se digitava: com o ano pela metade, `25/12/20` valia como o ano 20 e era enviada assim (#274) [Frontend]
 - Corrige o indicador de carregamento dos botões, que girava num cinza escuro em vez da cor do texto do próprio botão — sobre o botão preenchido ele mal se distinguia do fundo (#275) [Frontend]
+- Aumenta os ícones de ação dos cartões das duas listas, pequenos demais ao lado da etiqueta de situação (#276) [Frontend]
 
 ## [0.7.0] - 2026-08-31
 
