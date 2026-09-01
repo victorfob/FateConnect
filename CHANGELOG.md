@@ -13,6 +13,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - Passa a pedir a data por digitação, com o calendário atrás de um botão, na busca de caronas, no mural de achados e perdidos e nos dois formulários; o campo ganha a mesma borda e o mesmo espaçamento dos campos ao lado, dos quais destoava (#274) [Frontend]
+- Reduz a altura do rodapé no desktop, que ocupava espaço demais e empurrava o conteúdo para cima (#282) [Frontend]
 
 ### Fixed
 
