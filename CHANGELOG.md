@@ -9,6 +9,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Adiciona o botão de fechar nos diálogos quando a tela é estreita: a faixa em volta deles é curta demais para fechar por toque, e alargá-la deixaria o diálogo apertado. No desktop nada muda (#277) [Frontend]
+- Adiciona a marcação da tela atual no topo e no menu lateral, que antes não indicavam onde a pessoa estava; a marca também é anunciada por leitor de tela (#281) [Frontend]
 
 ### Changed
 
@@ -24,6 +25,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o cartão de entrar da página inicial, que era estreito demais para o e-mail institucional completo e o cortava dentro do campo — e é o único formato de e-mail que a tela aceita (#278) [Frontend]
 - Corrige a explicação do tipo de carona, inalcançável no celular: ela abria só ao passar o ponteiro, e agora abre ao toque, num alvo grande o bastante e sem levar o foco para o campo (#279) [Frontend]
 - Corrige o espaçamento dos botões dentro dos campos — o do calendário e o do relógio —, que ficavam mais para dentro que a seta dos campos de seleção ao lado (#279) [Frontend]
+- Corrige o logo dentro do menu lateral, que navegava e deixava o menu aberto por cima da tela nova (#281) [Frontend]
+- Corrige o realce de passar o ponteiro no topo e no menu lateral: no topo ele não chegava a aparecer, e no menu clareava tanto que apagava o próprio rótulo (#281) [Frontend]
 
 ## [0.7.0] - 2026-08-31
 
