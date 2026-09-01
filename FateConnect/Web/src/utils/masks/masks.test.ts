@@ -1,27 +1,5 @@
-import { maskBirthDate } from './birthDateMask';
 import { maskPhone } from './phoneMask';
 import { maskZipCode } from './zipCodeMask';
-
-describe('maskBirthDate', () => {
-  it.each([
-    ['', ''],
-    ['2', '2'],
-    ['22', '22'],
-    ['220', '22/0'],
-    ['2205', '22/05'],
-    ['22051999', '22/05/1999'],
-  ])('should format %s as %s', (input, expected) => {
-    expect(maskBirthDate(input)).toBe(expected);
-  });
-
-  it('should ignore digits beyond the eighth', () => {
-    expect(maskBirthDate('2205199999')).toBe('22/05/1999');
-  });
-
-  it('should reformat a value that already carries separators', () => {
-    expect(maskBirthDate('22/05/1999')).toBe('22/05/1999');
-  });
-});
 
 describe('maskZipCode', () => {
   it.each([

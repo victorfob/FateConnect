@@ -1,5 +1,5 @@
 import { LostItemKindEnum } from '@app/services/lostAndFound/types';
-import { toApiDate } from '@app/utils/apiDate';
+import { toApiDate, toDisplayDate } from '@app/utils/apiDate';
 
 import { LOST_ITEM_FORM_MESSAGES, LOST_ITEM_LIMITS, MAX_PHOTO_BYTES } from '../constants';
 import { lostItemFormSchema, type LostItemFormInput } from '.';
@@ -10,7 +10,7 @@ const VALID: LostItemFormInput = {
   name: 'Garrafa térmica',
   kind: LostItemKindEnum.FOUND,
   place: 'Biblioteca',
-  occurredOn: toApiDate(new Date()),
+  occurredOn: toDisplayDate(toApiDate(new Date())),
   description: 'Garrafa azul, com adesivos na tampa.',
   photo: null,
 };
@@ -79,10 +79,10 @@ describe('lostItemFormSchema', () => {
   });
 
   it('should refuse a day that has not happened yet and accept today', () => {
-    expect(firstErrorOf({ occurredOn: toApiDate(new Date(Date.now() + DAY_MS)) })).toBe(
-      LOST_ITEM_FORM_MESSAGES.occurredOnInFuture,
-    );
-    expect(firstErrorOf({ occurredOn: toApiDate(new Date()) })).toBeUndefined();
+    expect(
+      firstErrorOf({ occurredOn: toDisplayDate(toApiDate(new Date(Date.now() + DAY_MS))) }),
+    ).toBe(LOST_ITEM_FORM_MESSAGES.occurredOnInFuture);
+    expect(firstErrorOf({ occurredOn: toDisplayDate(toApiDate(new Date())) })).toBeUndefined();
     expect(firstErrorOf({ occurredOn: toApiDate(new Date(Date.now() - DAY_MS)) })).toBeUndefined();
   });
 

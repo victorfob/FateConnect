@@ -168,10 +168,10 @@ describe('LostItemFormDialog', () => {
       screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.place) }),
       'Bloco C',
     );
-    await userEvent.click(
-      screen.getByRole('group', { name: new RegExp(LOST_ITEM_FORM_LABELS.occurredOn) }),
+    await userEvent.type(
+      screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.occurredOn) }),
+      TYPED_DATE,
     );
-    await userEvent.keyboard(TYPED_DATE);
 
     await userEvent.click(screen.getByRole('button', { name: REGISTER_MODE.submitLabel }));
 

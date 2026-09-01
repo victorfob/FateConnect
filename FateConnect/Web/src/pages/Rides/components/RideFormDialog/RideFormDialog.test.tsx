@@ -129,10 +129,10 @@ describe('RideFormDialog', () => {
     await screen.findByRole('heading', { name: OFFER_MODE.title });
 
     await userEvent.type(destinationField(), 'Terminal Santo Antônio');
-    await userEvent.click(
-      screen.getByRole('group', { name: new RegExp(RIDE_FORM_LABELS.departureDate) }),
+    await userEvent.type(
+      screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.departureDate) }),
+      TYPED_DATE,
     );
-    await userEvent.keyboard(TYPED_DATE);
     await userEvent.type(
       screen.getByLabelText(new RegExp(RIDE_FORM_LABELS.departureTime)),
       '18:30',

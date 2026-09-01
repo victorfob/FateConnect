@@ -1,99 +1,33 @@
-import { useCallback, useState, type MouseEvent } from 'react';
-import { DateCalendar, IconButton, Input, Popover } from '@design-system';
-import { CalendarTodayIcon } from '@design-system/icons';
-import { useFormContext } from 'react-hook-form';
+import { Input } from '@design-system';
+import { Controller, useFormContext } from 'react-hook-form';
 
-import { useMaskedField } from '@app/hooks/useMaskedField';
-import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
-import {
-  EARLIEST_BIRTH_DATE,
-  formatBirthDate,
-  latestBirthDate,
-  parseBirthDate,
-} from '@app/pages/Signup/helpers/birthDate';
-import { useFilledLabel } from '@app/pages/Signup/hooks/useFilledLabel';
+import { FIELD_LABELS } from '@app/pages/Signup/constants';
+import { EARLIEST_BIRTH_DATE, latestBirthDate } from '@app/pages/Signup/helpers/birthDate';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
-import { maskBirthDate } from '@app/utils/masks/birthDateMask';
 
-import { CALENDAR_TOGGLE_LABEL } from './constants';
-
-/** `dd/mm/aaaa` — o campo não aceita mais que isso. */
-const MASKED_DATE_LENGTH = 10;
-
-/**
- * Data de nascimento: texto com máscara `dd/mm/aaaa` como fonte de verdade e um
- * calendário auxiliar. Digitar continua sendo o caminho principal, com o cursor
- * preservado ao editar no meio — comportamento herdado do produto.
- */
 export function BirthDateField() {
   const {
-    register,
-    getValues,
-    setValue,
+    control,
     formState: { errors },
   } = useFormContext<SignupFormValues>();
 
-  const [calendarAnchor, setCalendarAnchor] = useState<HTMLElement | null>(null);
-  const [pickedDate, setPickedDate] = useState<Date | null>(null);
-  const birthDateField = useMaskedField(register('birthDate'), maskBirthDate);
-  const isBirthDateFilled = useFilledLabel('birthDate');
-
-  const handleOpenCalendar = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      setPickedDate(parseBirthDate(getValues('birthDate')));
-      setCalendarAnchor(event.currentTarget);
-    },
-    [getValues],
-  );
-
-  const handleCloseCalendar = useCallback(() => setCalendarAnchor(null), []);
-
-  const handleDatePick = useCallback(
-    (date: Date | null) => {
-      if (!date) return;
-
-      setPickedDate(date);
-      setValue('birthDate', formatBirthDate(date), { shouldValidate: true });
-      setCalendarAnchor(null);
-    },
-    [setValue],
-  );
-
   return (
-    <>
-      <Input
-        {...birthDateField}
-        label={FIELD_LABELS.birthDate}
-        required
-        fullWidth
-        type="text"
-        inputMode="numeric"
-        autoComplete="bday"
-        placeholder={FIELD_PLACEHOLDERS.birthDate}
-        error={errors.birthDate?.message}
-        shrinkLabel={isBirthDateFilled}
-        maxLength={MASKED_DATE_LENGTH}
-        endAdornment={
-          <IconButton type="button" label={CALENDAR_TOGGLE_LABEL} onClick={handleOpenCalendar}>
-            <CalendarTodayIcon fontSize="small" />
-          </IconButton>
-        }
-      />
-
-      <Popover
-        open={Boolean(calendarAnchor)}
-        anchorEl={calendarAnchor}
-        onClose={handleCloseCalendar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <DateCalendar
-          value={pickedDate}
-          onChange={handleDatePick}
+    <Controller
+      name="birthDate"
+      control={control}
+      render={({ field }) => (
+        <Input.Date
+          name={field.name}
+          value={field.value}
+          onChange={field.onChange}
+          onBlur={field.onBlur}
+          label={FIELD_LABELS.birthDate}
+          required
+          error={errors.birthDate?.message}
           minDate={EARLIEST_BIRTH_DATE}
           maxDate={latestBirthDate()}
         />
-      </Popover>
-    </>
+      )}
+    />
   );
 }
