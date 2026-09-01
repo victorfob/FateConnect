@@ -24,7 +24,7 @@ describe('toFormValues', () => {
   it('should cut the api date and time down to what the fields accept', () => {
     const values = toFormValues(RIDE);
 
-    expect(values.departureDate).toBe('2026-05-22');
+    expect(values.departureDate).toBe('22/05/2026');
     expect(values.departureTime).toBe('07:30');
     expect(values.seats).toBe('4');
     expect(values.rideType).toBe(RideTypeEnum.EGALITARIAN);
@@ -39,7 +39,7 @@ describe('toRideInput', () => {
   it('should send the seats as a number and carry every field', () => {
     const values: RideFormValues = {
       destination: 'Fatec Sorocaba',
-      departureDate: '2026-05-22',
+      departureDate: '22/05/2026',
       departureTime: '07:30',
       rideType: RideTypeEnum.EGALITARIAN,
       seats: '4',

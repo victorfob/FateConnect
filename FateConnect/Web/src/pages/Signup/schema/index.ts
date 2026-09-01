@@ -1,7 +1,7 @@
+import { onlyDigits } from '@design-system';
 import { z } from 'zod';
 
 import { FATEC_EMAIL_MESSAGE, FATEC_EMAIL_PATTERN } from '@app/constants/fatecEmail';
-import { onlyDigits } from '@app/utils/masks/caret';
 
 import { EARLIEST_BIRTH_DATE, latestBirthDate, parseBirthDate } from '../helpers/birthDate';
 

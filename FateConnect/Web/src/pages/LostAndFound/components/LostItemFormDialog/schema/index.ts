@@ -1,4 +1,4 @@
-import { isAfter, isValid, parseISO, startOfDay } from 'date-fns';
+import { isAfter, isValid, parse, startOfDay } from 'date-fns';
 import { z } from 'zod';
 
 import { isLostItemKind } from '@app/pages/LostAndFound/helpers/lostItemKind';
@@ -11,12 +11,14 @@ import {
 } from '../constants';
 
 const REQUIRED = 1;
+/** O campo entrega o que a pessoa digitou, não o formato da API. */
+const DISPLAY_DATE_FORMAT = 'dd/MM/yyyy';
 
 /** Campo vazio passa de propósito: quem reclama disso é a obrigatoriedade. */
 function hasAlreadyHappened(value: string): boolean {
   if (!value) return true;
 
-  const occurred = parseISO(value);
+  const occurred = parse(value, DISPLAY_DATE_FORMAT, new Date());
   if (!isValid(occurred)) return true;
 
   return !isAfter(startOfDay(occurred), startOfDay(new Date()));

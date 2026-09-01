@@ -2,7 +2,7 @@ import { useCallback, useState, type ChangeEvent } from 'react';
 import { FilterPanel, Input } from '@design-system';
 
 import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
-import { fromFormDate, toApiDate } from '@app/utils/apiDate';
+import { toApiDateText, toDisplayDate } from '@app/utils/apiDate';
 
 import * as C from './constants';
 
@@ -26,8 +26,8 @@ type RideFilterProps = Readonly<{
 }>;
 
 export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
-  const [departureDate, setDepartureDate] = useState<Date | null>(() =>
-    fromFormDate(initialFilters.departureDate ?? ''),
+  const [departureDate, setDepartureDate] = useState(() =>
+    toDisplayDate(initialFilters.departureDate ?? ''),
   );
   const [departureTime, setDepartureTime] = useState(initialFilters.departureTime ?? '');
   const [destination, setDestination] = useState(initialFilters.destination ?? '');
@@ -52,7 +52,7 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
   const handleSubmit = useCallback(() => {
     const filters: RideFilterValues = {};
 
-    if (departureDate) filters.departureDate = toApiDate(departureDate);
+    if (departureDate) filters.departureDate = toApiDateText(departureDate);
     if (departureTime) filters.departureTime = departureTime;
     if (destination.trim()) filters.destination = destination.trim();
     if (rideType) filters.rideType = rideType as RideTypeEnum;

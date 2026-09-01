@@ -1,8 +1,6 @@
 import { Input } from '@design-system';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { fromFormDate, toFormDate } from '@app/utils/apiDate';
-
 import type { RideFormInput, RideFormValues } from '../schema';
 import * as C from '../constants';
 import * as S from './styles';
@@ -33,8 +31,8 @@ export function RideFormFields() {
             name={field.name}
             label={C.RIDE_FORM_LABELS.departureDate}
             required
-            value={fromFormDate(field.value)}
-            onChange={(date) => field.onChange(toFormDate(date))}
+            value={field.value}
+            onChange={field.onChange}
             onBlur={field.onBlur}
             disabled={field.disabled}
             error={errors.departureDate?.message}

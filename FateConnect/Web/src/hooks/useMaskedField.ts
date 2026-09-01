@@ -1,7 +1,7 @@
 import { useCallback, type ChangeEvent } from 'react';
+import { caretAfterDigitCount, countDigits } from '@design-system';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
-import { caretAfterDigitCount, countDigits } from '@app/utils/masks/caret';
 import { firstCharacters } from '@app/utils/sequence';
 
 type MaskFunction = (value: string) => string;
