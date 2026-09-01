@@ -17,17 +17,13 @@ export const CardRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.space(md),
   padding: theme.space(lg),
-  // Largura desejada, não imposta: a base é a largura do cartão e ele encolhe
-  // quando a linha aperta, para a landing caber já a partir do desktop estreito.
-  flex: `0 1 ${CARD_WIDTH_PX}px`,
+  // Largura de verdade, e não `flex-basis`: a âncora entre o cartão e a faixa se
+  // mede pelo conteúdo, e a base de 360px chegava ao cartão como 300px.
+  width: `${CARD_WIDTH_PX}px`,
+  maxWidth: '100%',
   background: theme.palette.background.paper,
   borderRadius: theme.radius(radiusScale.component),
   boxShadow: shadowTokens.component,
-
-  [theme.breakpoints.down('md')]: {
-    justifySelf: 'center',
-    maxWidth: '24rem',
-  },
 }));
 
 export const CardTitle = styled(Box)(({ theme }) => ({
