@@ -21,6 +21,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o indicador de carregamento dos botões, que girava num cinza escuro em vez da cor do texto do próprio botão — sobre o botão preenchido ele mal se distinguia do fundo (#275) [Frontend]
 - Aumenta os ícones de ação dos cartões das duas listas, pequenos demais ao lado da etiqueta de situação (#276) [Frontend]
 - Corrige o cartão de entrar da página inicial, que era estreito demais para o e-mail institucional completo e o cortava dentro do campo — e é o único formato de e-mail que a tela aceita (#278) [Frontend]
+- Corrige a explicação do tipo de carona, inalcançável no celular: ela abria só ao passar o ponteiro, e agora abre ao toque, num alvo grande o bastante e sem levar o foco para o campo (#279) [Frontend]
+- Corrige o espaçamento dos botões dentro dos campos — o do calendário e o do relógio —, que ficavam mais para dentro que a seta dos campos de seleção ao lado (#279) [Frontend]
 
 ## [0.7.0] - 2026-08-31
 
