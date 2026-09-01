@@ -137,6 +137,16 @@ Para decidir em JS, `useMediaQuery(theme.breakpoints.up('md'))` — não meça `
 <S.Container>
 ```
 
+## Alinhe o desenho, não a caixa
+
+⛔ **`getBoundingClientRect` de um ícone devolve a caixa dele, e a arte quase nunca a preenche.** Alinhar caixa com caixa deixa o desenho fora da linha, e a medição confirma um alinhamento que o olho recusa.
+
+Medido em 01/09/2026, no X do diálogo: a arte ocupa **14px numa caixa de 24px** — 5px de margem própria de cada lado. Somados aos 8px de recuo do botão, o desenho caía a **37px** da borda do papel, enquanto os campos estavam a 32px. A caixa estava exatamente onde eu a tinha posicionado; o X, não.
+
+**Como medir o desenho:** `path.getBBox()` no `svg`, convertido para a escala da tela pela razão entre a largura renderizada e a do `viewBox`. Para texto, `Range.selectNodeContents` no elemento — a caixa do parágrafo inclui entrelinha que o olho não vê.
+
+⚠️ **Quem reclama é sempre a pessoa que olha a tela**, porque o número mente com confiança: eu tinha `32px` de um lado e `32px` do outro, e mesmo assim estava torto. Ao receber "não está alinhado" sobre algo que você mediu, desconfie do **que** foi medido antes de duvidar do relato.
+
 ## Sobrescrever estado do MUI: repita a classe do componente
 
 ⛔ **`& .Mui-selected` empata com o seletor da biblioteca e perde no desempate por ordem de fonte.** Use `& .MuiPaginationItem-root.Mui-selected` — a classe do componente mais a do estado —, que sobe a especificidade acima da do MUI. Vale para `.Mui-selected`, `.Mui-disabled`, `.Mui-focused`, `.Mui-checked` e companhia.
