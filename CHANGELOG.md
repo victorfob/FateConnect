@@ -6,6 +6,14 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Passa a pedir a data por digitação, com o calendário atrás de um botão, na busca de caronas, no mural de achados e perdidos e nos dois formulários; o campo ganha a mesma borda e o mesmo espaçamento dos campos ao lado, dos quais destoava (#274) [Frontend]
+
+### Fixed
+
+- Corrige a data que a busca recebia enquanto ainda se digitava: com o ano pela metade, `25/12/20` valia como o ano 20 e era enviada assim (#274) [Frontend]
+
 ## [0.7.0] - 2026-08-31
 
 ### Changed
