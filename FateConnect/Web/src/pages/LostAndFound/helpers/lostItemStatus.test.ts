@@ -13,6 +13,11 @@ describe('lostItemStatusLabel', () => {
     expect(lostItemStatusLabel('Arquivado')).toBe('Arquivado');
     expect(lostItemStatusLabel('  ')).toBe('—');
   });
+
+  it('should fall back to the unknown label when the api omits the status', () => {
+    expect(lostItemStatusLabel(undefined)).toBe('—');
+    expect(lostItemStatusLabel(null)).toBe('—');
+  });
 });
 
 describe('lostItemStatusTone', () => {
@@ -24,5 +29,6 @@ describe('lostItemStatusTone', () => {
 
   it('should leave the unknown status without a box', () => {
     expect(lostItemStatusTone('Arquivado')).toBe('neutral');
+    expect(lostItemStatusTone(undefined)).toBe('neutral');
   });
 });

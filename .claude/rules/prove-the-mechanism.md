@@ -41,6 +41,18 @@ Duas na mesma #237: `DOCKER_HOST` apontando para porta morta não desligou o Doc
 
 ⛔ **Correção com duas pontas se confere nas duas, enumerando.** Consertei a página 4 e entreguei; a 9 tinha o defeito espelhado e quem viu foi o Victor. O que resolveu foi listar **todos** os estados de 1 a 12 numa tabela e olhar a coluna inteira — as duas faixas usavam medidas diferentes, e isso só aparece lado a lado.
 
+### Pior que alcançar metade: destruir a outra
+
+⛔ **Instrumento que transforma texto precisa contar o que consumiu contra o que emitiu.** O que só mede erra devolvendo um número torto; o que reescreve erra **apagando** — e o arquivo salvo não denuncia o que sumiu.
+
+Aconteceu em 01/09/2026, rebaseando cinco PRs cujas entradas de changelog caíam no mesmo ponto do arquivo. Escrevi um resolvedor que atribui cada linha à seção pelo cabeçalho `###` acima dela. Nos quatro primeiros o conflito envolvia o cabeçalho e funcionou. No quinto ele ficou **dentro** da lista, sem cabeçalho nenhum no bloco: o script não encontrou seção, atribuiu zero linhas e **gravou o arquivo sem elas**. Sumiram duas entradas — uma delas já mergeada na `develop`.
+
+Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase` seguiu feliz.
+
+**A guarda é aritmética, não cuidado:** conte as entradas do bloco de entrada, conte as que você atribuiu, e **aborte** quando os dois números não baterem. Uma linha de `assert` teria transformado uma perda silenciosa numa parada barulhenta.
+
+⚠️ **O sinal é a saída vazia onde deveria haver enumeração.** "0 arquivos alterados", "nenhuma seção", "nada a fazer" — num passo que existe justamente para alterar algo, isso não é sucesso, é o instrumento dizendo que não entendeu a entrada.
+
 ## O que esta rule não é
 
 Não é ordem de esgotar toda dúvida antes de abrir a boca. Ela vale no **fechamento** — ao dizer "pronto", abrir PR ou pedir confirmação. No meio do trabalho, resíduo em aberto é normal, e dizer que está em aberto é o certo.

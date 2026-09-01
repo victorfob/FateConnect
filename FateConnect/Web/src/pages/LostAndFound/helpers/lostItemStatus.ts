@@ -43,14 +43,20 @@ export function lostItemStatusSlug(value: LostItemStatusEnum): string {
   return value.toLowerCase();
 }
 
-export function lostItemStatusLabel(value: string): string {
+/**
+ * A situação vem da API, então o tipo aceita a ausência dela: o rótulo de
+ * desconhecido existe para esse caso, e chamar `trim` antes de checar derrubava
+ * a tela inteira em vez de exibi-lo.
+ */
+export function lostItemStatusLabel(value: string | null | undefined): string {
+  if (!value) return UNKNOWN_LABEL;
   if (!isLostItemStatus(value)) return value.trim() || UNKNOWN_LABEL;
 
   return STATUS_LABEL[value];
 }
 
-export function lostItemStatusTone(value: string): StatusTagTone {
-  if (!isLostItemStatus(value)) return 'neutral';
+export function lostItemStatusTone(value: string | null | undefined): StatusTagTone {
+  if (!value || !isLostItemStatus(value)) return 'neutral';
 
   return STATUS_TONE[value];
 }
