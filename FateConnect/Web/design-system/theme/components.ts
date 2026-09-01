@@ -51,6 +51,18 @@ export const components: Components<Theme> = {
 
         return { ...veil, '&:hover': { backgroundColor: theme.palette[ownerState.color].main } };
       },
+      // Herdar do botão não pinta o indicador: no carregamento centrado o MUI
+      // deixa o rótulo `transparent`, então a cor do texto é nomeada de novo aqui.
+      loadingIndicator: ({ theme, ownerState }) => {
+        const { color, variant } = ownerState;
+
+        if (variant === 'soft') return { color: theme.palette.text.primary };
+        // `color="inherit"` recebe a cor de quem envolve o botão, que este slot não lê.
+        if (!color || color === 'inherit') return {};
+        if (variant === 'contained') return { color: theme.palette[color].contrastText };
+
+        return { color: theme.palette[color].main };
+      },
     },
     variants: [
       {
