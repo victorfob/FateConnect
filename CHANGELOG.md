@@ -6,6 +6,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Adiciona o botão de fechar nos diálogos quando a tela é estreita: a faixa em volta deles é curta demais para fechar por toque, e alargá-la deixaria o diálogo apertado. No desktop nada muda (#277) [Frontend]
+
 ### Changed
 
 - Passa a pedir a data por digitação, com o calendário atrás de um botão, na busca de caronas, no mural de achados e perdidos e nos dois formulários; o campo ganha a mesma borda e o mesmo espaçamento dos campos ao lado, dos quais destoava (#274) [Frontend]
