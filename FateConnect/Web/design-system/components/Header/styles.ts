@@ -31,6 +31,14 @@ export const HeaderToolbar = styled(Toolbar)(({ theme }) => ({
   padding: theme.space(none, giant),
   color: theme.palette.chrome.contrastText,
 
+  // O realce de hover que o tema dá aos botões é o de superfície clara — preto a
+  // 3,5%, que sobre o cromo escuro não aparece. Aqui vale o realce do próprio
+  // cromo. O botão preenchido fica de fora: ele traz a sua própria cor.
+  '& .MuiButton-root:not(.MuiButton-contained)::after': {
+    backgroundColor: theme.palette.chrome.hover,
+  },
+  '& .MuiIconButton-root:hover': { backgroundColor: theme.palette.chrome.hover },
+
   [theme.breakpoints.down('md')]: { padding: theme.space(none, lg) },
 }));
 
