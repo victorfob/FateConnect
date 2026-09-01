@@ -1,4 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
+import { DATE_PICKER_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
@@ -9,7 +10,6 @@ import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
-import { CALENDAR_TOGGLE_LABEL } from './components/BirthDateField/constants';
 import { SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
@@ -364,7 +364,7 @@ describe('Signup', () => {
     const birthDate = screen.getByLabelText(/Data de nascimento/);
     await userEvent.type(birthDate, '22051999');
 
-    await userEvent.click(screen.getByRole('button', { name: CALENDAR_TOGGLE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
     const calendar = await screen.findByRole('grid');
     await userEvent.click(within(calendar).getByRole('gridcell', { name: '10' }));
 

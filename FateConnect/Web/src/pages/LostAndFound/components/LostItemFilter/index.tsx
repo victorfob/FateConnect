@@ -7,7 +7,7 @@ import {
   LostItemStatusEnum,
   type LostItemFilter as LostItemFilterValues,
 } from '@app/services/lostAndFound/types';
-import { fromFormDate, toApiDate } from '@app/utils/apiDate';
+import { toApiDateText, toDisplayDate } from '@app/utils/apiDate';
 
 import * as C from './constants';
 
@@ -34,8 +34,8 @@ type LostItemFilterProps = Readonly<{
 
 export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps) {
   const [itemName, setItemName] = useState(initialFilters.name ?? '');
-  const [occurredOn, setOccurredOn] = useState<Date | null>(() =>
-    fromFormDate(initialFilters.occurredOn ?? ''),
+  const [occurredOn, setOccurredOn] = useState(() =>
+    toDisplayDate(initialFilters.occurredOn ?? ''),
   );
   const [kind, setKind] = useState<string>(initialFilters.kind ?? C.LostItemKindFilterEnum.ALL);
   const [owner, setOwner] = useState<string>(() => {
@@ -69,7 +69,7 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
     const filters: LostItemFilterValues = {};
 
     if (itemName.trim()) filters.name = itemName.trim();
-    if (occurredOn) filters.occurredOn = toApiDate(occurredOn);
+    if (occurredOn) filters.occurredOn = toApiDateText(occurredOn);
     if (isLostItemKind(kind)) filters.kind = kind;
     if (owner === C.LostItemOwnerFilterEnum.MINE) filters.onlyMine = true;
     if (isLostItemStatus(status)) filters.status = status;

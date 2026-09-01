@@ -1,5 +1,6 @@
+import { onlyDigits } from '@design-system';
+
 import type { SignupRequest } from '@app/services/signup/types';
-import { onlyDigits } from '@app/utils/masks/caret';
 
 import type { SignupFormValues } from '../schema';
 import { parseBirthDate, toApiBirthDate } from './birthDate';

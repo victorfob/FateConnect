@@ -29,7 +29,7 @@ describe('toFormValues', () => {
   it('should cut the api date down to what the field accepts', () => {
     const values = toFormValues(LOST_ITEM);
 
-    expect(values.occurredOn).toBe('2026-08-11');
+    expect(values.occurredOn).toBe('11/08/2026');
     expect(values.name).toBe('Carteira preta');
     expect(values.place).toBe('Biblioteca');
     expect(values.kind).toBe(LostItemKindEnum.LOST);
@@ -50,7 +50,7 @@ describe('toLostItemInput', () => {
       name: 'Carteira preta',
       kind: LostItemKindEnum.LOST,
       place: 'Biblioteca',
-      occurredOn: '2026-08-11',
+      occurredOn: '11/08/2026',
       description: 'Carteira de couro preta.',
       photo: new File(['foto'], 'carteira.png', { type: 'image/png' }),
     };

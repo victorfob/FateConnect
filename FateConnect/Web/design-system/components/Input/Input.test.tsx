@@ -129,7 +129,7 @@ describe('Input.Select', () => {
 
   it('should not offer a day after the max date', async () => {
     const pickedDay = new Date(2026, 7, 10);
-    render(<Input.Date label="Data" value={pickedDay} maxDate={pickedDay} onChange={vi.fn()} />);
+    render(<Input.Date label="Data" value="10/08/2026" maxDate={pickedDay} onChange={vi.fn()} />);
 
     await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
 
