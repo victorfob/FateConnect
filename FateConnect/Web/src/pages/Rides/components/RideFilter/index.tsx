@@ -99,11 +99,8 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
 
       <FilterPanel.Field>
         <Input.Select
-          label={
-            <Input.HelpLabel helpText={C.RIDE_TYPE_HELP}>
-              {C.FILTER_LABELS.rideType}
-            </Input.HelpLabel>
-          }
+          label={C.FILTER_LABELS.rideType}
+          helpText={C.RIDE_TYPE_HELP}
           options={C.RIDE_TYPE_FILTER_OPTIONS}
           value={rideType}
           onChange={handleRideTypeChange}

@@ -1,8 +1,16 @@
 import { createRef } from 'react';
 
-import { act, render, screen, userEvent, within } from '@app/test/testing-library';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  userEvent,
+  waitFor,
+  within,
+} from '@app/test/testing-library';
 
-import { DATE_PICKER_LABEL, TIME_PICKER_LABEL } from './constants';
+import { DATE_PICKER_LABEL, HELP_TRIGGER_LABEL_PREFIX, TIME_PICKER_LABEL } from './constants';
 import { Input, type InputProps } from '.';
 
 const DEFAULT_PROPS: InputProps = { label: 'Destino' };
@@ -91,14 +99,59 @@ describe('Input', () => {
   });
 });
 
-describe('Input.HelpLabel', () => {
-  it('should explain the field through a hint next to the label', () => {
-    render(<Input label={<Input.HelpLabel helpText="Como escolher">Tipo</Input.HelpLabel>} />);
+const HELP_TEXT = 'Como escolher';
+const HELP_FIELD_LABEL = 'Tipo';
+const HELP_TRIGGER = `${HELP_TRIGGER_LABEL_PREFIX} ${HELP_FIELD_LABEL}`;
 
-    const field = screen.getByRole('textbox', { name: /Tipo/ });
+const helpTrigger = () => screen.getByRole('button', { name: HELP_TRIGGER });
 
-    expect(field).toBeInTheDocument();
-    expect(labelOf(field)?.querySelector('svg')).toBeInTheDocument();
+describe('Input help', () => {
+  const renderHelp = () => render(<Input label={HELP_FIELD_LABEL} helpText={HELP_TEXT} />);
+
+  it('should keep the hint outside the label, which is what would hand the field the focus', () => {
+    renderHelp();
+
+    expect(helpTrigger().closest('label')).toBeNull();
+    expect(labelOf(screen.getByRole('textbox', { name: /Tipo/ }))).not.toContainElement(
+      helpTrigger(),
+    );
+  });
+
+  it('should open the hint on a plain tap, which carries no pointer', async () => {
+    renderHelp();
+
+    fireEvent.click(helpTrigger());
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(HELP_TEXT);
+  });
+
+  it('should close the hint when the next tap lands outside', async () => {
+    renderHelp();
+    fireEvent.click(helpTrigger());
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(HELP_TEXT);
+
+    fireEvent.click(document.body);
+
+    await waitFor(() => expect(screen.queryByRole('tooltip')).not.toBeInTheDocument());
+  });
+
+  it('should leave the field alone, so asking for help does not raise the keyboard', async () => {
+    renderHelp();
+
+    await userEvent.click(helpTrigger());
+
+    expect(helpTrigger()).toHaveFocus();
+    expect(screen.getByRole('textbox', { name: /Tipo/ })).not.toHaveFocus();
+  });
+
+  it('should hand the hint to the keyboard, one stop after the field', async () => {
+    renderHelp();
+
+    await userEvent.tab();
+    await userEvent.tab();
+
+    expect(helpTrigger()).toHaveFocus();
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(HELP_TEXT);
   });
 });
 
@@ -125,6 +178,28 @@ describe('Input.Select', () => {
       'data-shrink',
       'true',
     );
+  });
+
+  it('should carry the hint at the end of the field, in a single copy', async () => {
+    render(
+      <Input.Select
+        label={HELP_FIELD_LABEL}
+        helpText={HELP_TEXT}
+        options={OPTIONS}
+        value="a"
+        onChange={vi.fn()}
+      />,
+    );
+
+    expect(labelOf(screen.getByRole('combobox', { name: /Tipo/ }))).not.toContainElement(
+      helpTrigger(),
+    );
+    // O MUI repete o rótulo dentro da `legend` que mede o entalhe do contorno.
+    expect(document.querySelectorAll(`[aria-label="${HELP_TRIGGER}"]`)).toHaveLength(1);
+
+    fireEvent.click(helpTrigger());
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(HELP_TEXT);
   });
 
   it('should not offer a day after the max date', async () => {

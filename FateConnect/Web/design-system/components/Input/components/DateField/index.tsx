@@ -6,7 +6,6 @@ import {
   type ChangeEvent,
   type FocusEvent,
   type MouseEvent,
-  type ReactNode,
 } from 'react';
 import Popover from '@mui/material/Popover';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
@@ -24,7 +23,7 @@ const TEXT_START = 0;
 const NO_CARET = -1;
 
 export type DateFieldProps = Readonly<{
-  label: ReactNode;
+  label: string;
   /** Texto mascarado, possivelmente incompleto — é o que a pessoa digitou. */
   value: string;
   onChange: (masked: string) => void;
