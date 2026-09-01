@@ -1,5 +1,4 @@
 import { DateField } from './components/DateField';
-import { InputHelpLabel } from './components/InputHelpLabel';
 import { SelectInput } from './components/SelectInput';
 import { InputField, type InputProps } from './InputField';
 
@@ -15,6 +14,5 @@ function Input(inputProps: InputProps) {
 
 Input.Date = DateField;
 Input.Select = SelectInput;
-Input.HelpLabel = InputHelpLabel;
 
 export { Input };

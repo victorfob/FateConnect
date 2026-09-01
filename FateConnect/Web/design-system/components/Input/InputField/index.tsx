@@ -2,6 +2,7 @@ import { useCallback, useRef, type ReactNode, type Ref } from 'react';
 import InputAdornment from '@mui/material/InputAdornment';
 import type { OutlinedTextFieldProps } from '@mui/material/TextField';
 
+import { InputHelpButton } from '../components/InputHelpButton';
 import { TimePickerButton } from '../components/TimePickerButton';
 import * as S from '../styles';
 
@@ -11,8 +12,9 @@ const TIME_TYPE = 'time';
 const ALWAYS_SHRUNK_TYPES: ReadonlySet<string> = new Set([TIME_TYPE]);
 
 type InputFieldOwnProps = {
-  /** Uma string, quase sempre; `Input.HelpLabel` quando o campo precisa se explicar. */
-  label: ReactNode;
+  label: string;
+  /** Explicação do campo, atrás de um ícone de ajuda no fim do campo. */
+  helpText?: string;
   /** A presença da mensagem **é** o estado de erro do campo. */
   error?: string;
   endAdornment?: ReactNode;
@@ -34,6 +36,7 @@ export type InputProps = InputFieldOwnProps &
  */
 export function InputField({
   label,
+  helpText,
   error,
   endAdornment,
   shrinkLabel,
@@ -61,7 +64,7 @@ export function InputField({
   const handleOpenTimePicker = useCallback(() => inputRef.current?.showPicker(), []);
 
   const isTime = type === TIME_TYPE;
-  const hasAdornment = Boolean(endAdornment) || isTime;
+  const hasAdornment = Boolean(endAdornment) || isTime || Boolean(helpText);
   const shrunk = shrinkLabel || ALWAYS_SHRUNK_TYPES.has(type ?? '');
 
   return (
@@ -81,6 +84,7 @@ export function InputField({
             <InputAdornment position="end">
               {endAdornment}
               {isTime ? <TimePickerButton onOpen={handleOpenTimePicker} /> : null}
+              {helpText ? <InputHelpButton fieldLabel={label} helpText={helpText} /> : null}
             </InputAdornment>
           ) : null,
         },
