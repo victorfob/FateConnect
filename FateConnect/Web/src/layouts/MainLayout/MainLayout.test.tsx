@@ -2,12 +2,12 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
-import { render, screen, userEvent, within } from '@app/test/testing-library';
+import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
 import { MainLayout } from '.';
 
-function renderLayout() {
+function renderLayout(initialEntry: RoutePathEnum = RoutePathEnum.MENU) {
   const router = createMemoryRouter(
     [
       {
@@ -18,7 +18,7 @@ function renderLayout() {
         ],
       },
     ],
-    { initialEntries: [RoutePathEnum.MENU] },
+    { initialEntries: [initialEntry] },
   );
   render(<RouterProvider router={router} />);
 
@@ -66,5 +66,16 @@ describe('MainLayout', () => {
       'href',
       RoutePathEnum.MENU,
     );
+  });
+
+  it('should navigate and close the drawer when the logo inside it is used', async () => {
+    const router = renderLayout(RoutePathEnum.RIDES);
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menu', hidden: true }));
+
+    const drawer = screen.getByRole('presentation');
+    await userEvent.click(within(drawer).getByRole('link', { name: 'FateConnect' }));
+
+    expect(router.state.location.pathname).toBe(RoutePathEnum.MENU);
+    await waitFor(() => expect(screen.queryByRole('presentation')).not.toBeInTheDocument());
   });
 });
