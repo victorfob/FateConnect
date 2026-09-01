@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Outlet, Link as RouterLink } from 'react-router';
+import { Outlet, Link as RouterLink, useLocation } from 'react-router';
 import {
   Button,
   Footer,
@@ -7,9 +7,9 @@ import {
   ListItemButton,
   ListItemText,
   NavigationDrawer,
-  Typography,
 } from '@design-system';
 
+import { BrandLogo } from '@app/components/BrandLogo';
 import { LegalFooterLinks } from '@app/components/LegalFooterLinks';
 import * as C from '@app/constants/appContact';
 import { APP_LINKS } from '@app/constants/navigation';
@@ -19,39 +19,47 @@ import * as S from '../shell.styles';
 import { HeaderActions } from './components/HeaderActions';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
-const LOGO_LABEL = 'FateConnect';
 
 export function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { pathname } = useLocation();
 
   const handleMenuClick = useCallback(() => setDrawerOpen(true), []);
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);
 
-  const logo = (
-    <RouterLink to={RoutePathEnum.MENU} aria-label={LOGO_LABEL}>
-      <Typography variant="logo" color="inherit">
-        FateConnect
-      </Typography>
-    </RouterLink>
-  );
-
   return (
     <S.ShellRoot>
       <Header
-        logo={logo}
+        logo={<BrandLogo to={RoutePathEnum.MENU} />}
         actions={<HeaderActions />}
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
         navigation={APP_LINKS.map(({ path, label }) => (
-          <Button key={path} color="inherit" component={RouterLink} to={path}>
+          <Button
+            key={path}
+            color="inherit"
+            component={RouterLink}
+            to={path}
+            aria-current={path === pathname ? 'page' : undefined}
+          >
             {label}
           </Button>
         ))}
       />
 
-      <NavigationDrawer open={drawerOpen} onClose={handleDrawerClose} header={logo}>
+      <NavigationDrawer
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+        header={<BrandLogo to={RoutePathEnum.MENU} onClick={handleDrawerClose} />}
+      >
         {APP_LINKS.map(({ path, label }) => (
-          <ListItemButton key={path} component={RouterLink} to={path} onClick={handleDrawerClose}>
+          <ListItemButton
+            key={path}
+            component={RouterLink}
+            to={path}
+            onClick={handleDrawerClose}
+            aria-current={path === pathname ? 'page' : undefined}
+          >
             <ListItemText primary={label} />
           </ListItemButton>
         ))}

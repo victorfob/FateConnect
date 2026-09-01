@@ -13,8 +13,12 @@ export const colorTokens = {
 
   surfaceGray: '#F0F2F4',
   surfaceWhite: '#FFFFFF',
-  /** Realce sobre o cromo colorido — menu lateral. Some sobre superfície clara. */
-  chromeHover: 'rgba(255, 255, 255, 0.6)',
+  /**
+   * Realce sobre o cromo colorido — menu lateral. Some sobre superfície clara.
+   * O véu clareia o cromo, então ele tem teto: a 0,6 o rótulo branco caía para
+   * 1,84:1 sobre ele, e a 0,16 já roça o mínimo de 4,5:1.
+   */
+  chromeHover: 'rgba(255, 255, 255, 0.12)',
   /**
    * Realce genérico sobre superfície clara: o produto usa a cor de conteúdo a
    * 3,5%, que é o que o Material desenha na opção do `select`.
