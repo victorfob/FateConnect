@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Outlet, Link as RouterLink } from 'react-router';
+import { Outlet, Link as RouterLink, useLocation } from 'react-router';
 import {
   Button,
   Footer,
@@ -22,6 +22,7 @@ const MENU_BUTTON_LABEL = 'Abrir menu';
 
 export function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { pathname } = useLocation();
 
   const handleMenuClick = useCallback(() => setDrawerOpen(true), []);
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);
@@ -34,7 +35,13 @@ export function MainLayout() {
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
         navigation={APP_LINKS.map(({ path, label }) => (
-          <Button key={path} color="inherit" component={RouterLink} to={path}>
+          <Button
+            key={path}
+            color="inherit"
+            component={RouterLink}
+            to={path}
+            aria-current={path === pathname ? 'page' : undefined}
+          >
             {label}
           </Button>
         ))}
@@ -46,7 +53,13 @@ export function MainLayout() {
         header={<BrandLogo to={RoutePathEnum.MENU} onClick={handleDrawerClose} />}
       >
         {APP_LINKS.map(({ path, label }) => (
-          <ListItemButton key={path} component={RouterLink} to={path} onClick={handleDrawerClose}>
+          <ListItemButton
+            key={path}
+            component={RouterLink}
+            to={path}
+            onClick={handleDrawerClose}
+            aria-current={path === pathname ? 'page' : undefined}
+          >
             <ListItemText primary={label} />
           </ListItemButton>
         ))}

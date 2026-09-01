@@ -12,6 +12,8 @@ const DRAWER_WIDTH_PX = 300;
 /** Altura e recuo padrão de item de lista do Material, preservados. */
 const ITEM_MIN_HEIGHT_PX = 48;
 
+const CURRENT_MARK_THICKNESS_PX = 3;
+
 export const DrawerRoot = styled(Drawer)(({ theme }) => ({
   '& .MuiDrawer-paper': {
     width: `${DRAWER_WIDTH_PX}px`,
@@ -41,11 +43,21 @@ export const DrawerList = styled(List)(({ theme }) => ({
   paddingLeft: theme.space(none),
 
   '& .MuiListItemButton-root': {
+    position: 'relative',
     minHeight: `${ITEM_MIN_HEIGHT_PX}px`,
     paddingLeft: theme.space(md),
     paddingRight: theme.space(md),
   },
   '& .MuiListItemButton-root:hover': { backgroundColor: theme.palette.chrome.hover },
+  '& .MuiListItemButton-root[aria-current="page"]::before': {
+    content: '""',
+    position: 'absolute',
+    left: theme.space(none),
+    top: theme.space(none),
+    bottom: theme.space(none),
+    width: `${CURRENT_MARK_THICKNESS_PX}px`,
+    backgroundColor: 'currentColor',
+  },
   '& .MuiListItemText-primary': {
     color: theme.palette.chrome.contrastText,
     ...theme.typography.body,

@@ -78,4 +78,24 @@ describe('MainLayout', () => {
     expect(router.state.location.pathname).toBe(RoutePathEnum.MENU);
     await waitFor(() => expect(screen.queryByRole('presentation')).not.toBeInTheDocument());
   });
+
+  it('should mark the current screen in the header and in the drawer', async () => {
+    renderLayout(RoutePathEnum.RIDES);
+
+    expect(screen.getByRole('link', { name: 'Caronas' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Achados & Perdidos' })).not.toHaveAttribute(
+      'aria-current',
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menu', hidden: true }));
+    const drawer = screen.getByRole('presentation');
+
+    expect(within(drawer).getByRole('link', { name: 'Caronas' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(within(drawer).getByRole('link', { name: 'Achados & Perdidos' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
 });

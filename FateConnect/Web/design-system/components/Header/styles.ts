@@ -5,7 +5,7 @@ import { PolymorphicBox, PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { shadowTokens, spacingScale } from '@ds-root/tokens';
 
-const { none, xs, lg, giant } = spacingScale;
+const { none, xxs, xs, lg, giant } = spacingScale;
 
 /** Altura do topo; a casca reserva esse espaço porque o header é fixo. */
 export const HEADER_HEIGHT_PX = 64;
@@ -15,6 +15,8 @@ const NAV_FONT_WEIGHT = 500;
 const CTA_FONT_WEIGHT = 400;
 
 const MENU_BUTTON_WIDTH = '48px';
+
+const CURRENT_MARK_THICKNESS_PX = 2;
 
 export const HeaderBar = styled(AppBar)({
   boxShadow: shadowTokens.component,
@@ -52,9 +54,23 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   marginLeft: 'auto',
 
   '& .MuiButton-root': {
+    position: 'relative',
     fontSize: NAV_FONT_SIZE,
     fontWeight: NAV_FONT_WEIGHT,
     color: theme.palette.chrome.contrastText,
+  },
+  // A marca da tela atual pende do atributo que o leitor de tela já lê, e não de
+  // uma classe própria: assim o traço e o anúncio não têm como divergir.
+  // Vai no `::before` porque o `::after` do botão é o véu de hover do MUI, que
+  // nasce com `opacity: 0` — o traço escrito ali fica invisível.
+  '& .MuiButton-root[aria-current="page"]::before': {
+    content: '""',
+    position: 'absolute',
+    left: theme.space(xs),
+    right: theme.space(xs),
+    bottom: theme.space(xxs),
+    height: `${CURRENT_MARK_THICKNESS_PX}px`,
+    backgroundColor: 'currentColor',
   },
   // O destaque não recebe o peso reforçado, como no produto.
   '& .MuiButton-contained': { fontWeight: CTA_FONT_WEIGHT },
