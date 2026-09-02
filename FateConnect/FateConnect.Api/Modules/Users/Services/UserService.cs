@@ -24,6 +24,7 @@ public class UserService : IUserService
     public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto)
     {
         await EnsureEmailIsUniqueAsync(dto.FatecEmail);
+        await EnsureContactsAreUniqueAsync(dto.Contacts);
 
         User newUser = BuildUser(dto);
 
@@ -40,6 +41,25 @@ public class UserService : IUserService
 
         if (emailInUse)
             throw new EmailAlreadyRegisteredException(email);
+    }
+
+    private async Task EnsureContactsAreUniqueAsync(List<CreateContactDto> dtos)
+    {
+        HashSet<string> phonesInRequest = [];
+        HashSet<string> emailsInRequest = [];
+
+        foreach (CreateContactDto dto in dtos)
+        {
+            bool phoneRepeatedInRequest = !phonesInRequest.Add(dto.Phone);
+
+            if (phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.Phone))
+                throw new ContactPhoneAlreadyRegisteredException(dto.Phone);
+
+            bool emailRepeatedInRequest = !emailsInRequest.Add(dto.ContactEmail);
+
+            if (emailRepeatedInRequest || await _userRepository.ContactEmailExistsAsync(dto.ContactEmail))
+                throw new ContactEmailAlreadyRegisteredException(dto.ContactEmail);
+        }
     }
 
     private static User BuildUser(CreateUserDto dto)

@@ -23,12 +23,25 @@ public class SignupTests : IClassFixture<ApiFactory>
         contacts = contacts,
     };
 
+    private async Task<(HttpStatusCode StatusCode, string? Field)> SignupAnswerFor(object payload)
+    {
+        HttpResponseMessage response = await _factory.CreateClient().PostAsJsonAsync("/Users/signup", payload);
+
+        if (response.StatusCode == HttpStatusCode.Created)
+            return (response.StatusCode, null);
+
+        JsonElement raw = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        string? field = raw.TryGetProperty("field", out JsonElement value) ? value.GetString() : null;
+
+        return (response.StatusCode, field);
+    }
+
     [Fact]
     public async Task Signup_WithOneContact_IsAccepted()
     {
         HttpResponseMessage r = await _factory.CreateClient().PostAsJsonAsync(
             "/Users/signup",
-            SignupPayload(new[] { new { phone = "15999990000", contactEmail = "mariana.rocha@gmail.com" } }));
+            SignupPayload(new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = ApiFactory.UniqueContactEmail() } }));
 
         string corpo = await r.Content.ReadAsStringAsync();
 
@@ -40,7 +53,7 @@ public class SignupTests : IClassFixture<ApiFactory>
     {
         HttpResponseMessage signup = await _factory.CreateClient().PostAsJsonAsync(
             "/Users/signup",
-            SignupPayload(new[] { new { phone = "15999990000", contactEmail = "mariana.rocha@gmail.com" } }));
+            SignupPayload(new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = ApiFactory.UniqueContactEmail() } }));
 
         Assert.Equal(HttpStatusCode.Created, signup.StatusCode);
 
@@ -97,11 +110,88 @@ public class SignupTests : IClassFixture<ApiFactory>
             birthDate = "2000-01-01T00:00:00Z",
             gender = "Male",
             addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
-            contacts = new[] { new { phone = "15999990000", contactEmail = "mariana.rocha@gmail.com" } },
+            contacts = new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = ApiFactory.UniqueContactEmail() } },
         });
 
         string corpo = await r.Content.ReadAsStringAsync();
 
         Assert.True(r.StatusCode == HttpStatusCode.Created, $"status={r.StatusCode} corpo={corpo}");
+    }
+
+    [Fact]
+    public async Task Signup_WithAPhoneAlreadyRegistered_IsRejectedNamingThePhone()
+    {
+        string takenPhone = ApiFactory.UniquePhone();
+
+        (HttpStatusCode first, _) = await SignupAnswerFor(
+            SignupPayload(new[] { new { phone = takenPhone, contactEmail = ApiFactory.UniqueContactEmail() } }));
+
+        Assert.Equal(HttpStatusCode.Created, first);
+
+        (HttpStatusCode second, string? field) = await SignupAnswerFor(
+            SignupPayload(new[] { new { phone = takenPhone, contactEmail = ApiFactory.UniqueContactEmail() } }));
+
+        Assert.Equal(HttpStatusCode.Conflict, second);
+        Assert.Equal("phone", field);
+    }
+
+    [Fact]
+    public async Task Signup_WithAContactEmailAlreadyRegistered_IsRejectedNamingTheContactEmail()
+    {
+        string takenEmail = ApiFactory.UniqueContactEmail();
+
+        (HttpStatusCode first, _) = await SignupAnswerFor(
+            SignupPayload(new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = takenEmail } }));
+
+        Assert.Equal(HttpStatusCode.Created, first);
+
+        (HttpStatusCode second, string? field) = await SignupAnswerFor(
+            SignupPayload(new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = takenEmail } }));
+
+        Assert.Equal(HttpStatusCode.Conflict, second);
+        Assert.Equal("contactEmail", field);
+    }
+
+    [Fact]
+    public async Task Signup_RepeatingThePhoneWithinTheSameRequest_IsRejectedNamingThePhone()
+    {
+        string repeated = ApiFactory.UniquePhone();
+
+        (HttpStatusCode statusCode, string? field) = await SignupAnswerFor(SignupPayload(new[]
+        {
+            new { phone = repeated, contactEmail = ApiFactory.UniqueContactEmail() },
+            new { phone = repeated, contactEmail = ApiFactory.UniqueContactEmail() },
+        }));
+
+        Assert.Equal(HttpStatusCode.Conflict, statusCode);
+        Assert.Equal("phone", field);
+    }
+
+    [Fact]
+    public async Task Signup_WithTheLoginEmailAlreadyRegistered_IsRejectedNamingTheLoginEmail()
+    {
+        string takenEmail = $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br";
+
+        object PayloadFor(string phone, string contactEmail) => new
+        {
+            fatecEmail = takenEmail,
+            password = "SenhaForte123!",
+            fullName = "Mariana Alves Rocha",
+            birthDate = "2000-01-01T00:00:00Z",
+            gender = "Male",
+            addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
+            contacts = new[] { new { phone, contactEmail } },
+        };
+
+        (HttpStatusCode first, _) = await SignupAnswerFor(
+            PayloadFor(ApiFactory.UniquePhone(), ApiFactory.UniqueContactEmail()));
+
+        Assert.Equal(HttpStatusCode.Created, first);
+
+        (HttpStatusCode second, string? field) = await SignupAnswerFor(
+            PayloadFor(ApiFactory.UniquePhone(), ApiFactory.UniqueContactEmail()));
+
+        Assert.Equal(HttpStatusCode.Conflict, second);
+        Assert.Equal("fatecEmail", field);
     }
 }

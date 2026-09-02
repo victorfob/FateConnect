@@ -30,39 +30,39 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
         description = "Vaga para quem sai do campus.",
     };
 
-    private async Task<(ReadRide Ride, int DriverId, int OtherUserId)> OfferRideAsync(string destination)
+    private async Task<(ReadRide Ride, SeededUser Driver, int OtherUserId)> OfferRideAsync(string destination)
     {
-        int driverId = _factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
-        int otherUserId = _factory.SeedUser("Bruno Carvalho Souza", "15988880000", "bruno.souza@gmail.com");
+        SeededUser driver = _factory.SeedUser("Ana Beatriz Nogueira");
+        SeededUser otherUser = _factory.SeedUser("Bruno Carvalho Souza");
 
         HttpResponseMessage response = await _factory
-            .CreateClientFor(driverId)
+            .CreateClientFor(driver.Id)
             .PostAsJsonAsync("/Rides", NewRidePayload(destination));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
         ReadRide ride = (await response.Content.ReadFromJsonAsync<ReadRide>(JsonOptions))!;
 
-        return (ride, driverId, otherUserId);
+        return (ride, driver, otherUser.Id);
     }
 
     [Fact]
     public async Task CreateRide_RecordsTheAuthenticatedUserAsTheDriver()
     {
-        (ReadRide ride, _, _) = await OfferRideAsync("Sorocaba centro");
+        (ReadRide ride, SeededUser driver, _) = await OfferRideAsync("Sorocaba centro");
 
         Assert.Equal("Ana Beatriz Nogueira", ride.Driver.Name);
-        Assert.Equal("ana.nogueira@gmail.com", ride.Driver.Email);
-        Assert.Equal("15999990000", ride.Driver.Phone);
+        Assert.Equal(driver.ContactEmail, ride.Driver.Email);
+        Assert.Equal(driver.Phone, ride.Driver.Phone);
         Assert.True(ride.IsOwner);
     }
 
     [Fact]
     public async Task ReadRide_FlagsOwnershipForEachReader()
     {
-        (ReadRide ride, int driverId, int otherUserId) = await OfferRideAsync("Votorantim");
+        (ReadRide ride, SeededUser driver, int otherUserId) = await OfferRideAsync("Votorantim");
 
-        ReadRide asDriver = (await _factory.CreateClientFor(driverId)
+        ReadRide asDriver = (await _factory.CreateClientFor(driver.Id)
             .GetFromJsonAsync<ReadRide>($"/Rides/{ride.Id}", JsonOptions))!;
 
         ReadRide asOther = (await _factory.CreateClientFor(otherUserId)
@@ -98,8 +98,8 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task UpdateAndDeleteRide_ByTheDriver_Succeed()
     {
-        (ReadRide ride, int driverId, _) = await OfferRideAsync("Piedade");
-        HttpClient driver = _factory.CreateClientFor(driverId);
+        (ReadRide ride, SeededUser owner, _) = await OfferRideAsync("Piedade");
+        HttpClient driver = _factory.CreateClientFor(owner.Id);
 
         HttpResponseMessage update = await driver
             .PutAsJsonAsync($"/Rides/{ride.Id}", new { availableSeats = 1 });

@@ -137,6 +137,12 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ContactEmail")
+                        .IsUnique();
+
+                    b.HasIndex("Phone")
+                        .IsUnique();
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Contacts");

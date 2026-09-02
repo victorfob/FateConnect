@@ -15,6 +15,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Passa a pedir a data por digitação, com o calendário atrás de um botão, na busca de caronas, no mural de achados e perdidos e nos dois formulários; o campo ganha a mesma borda e o mesmo espaçamento dos campos ao lado, dos quais destoava (#274) [Frontend]
 - Reduz a altura do rodapé no desktop, que ocupava espaço demais e empurrava o conteúdo para cima (#282) [Frontend]
+- Passa a recusar cadastro cujo telefone ou e-mail de contato já pertença a outra pessoa, com o mesmo 409 que o e-mail de login já respondia; a unicidade passa a valer também no banco, e para isso os cadastros que repetiam um contato são apagados junto com as caronas que ofertaram, ficando o mais antigo (#284) [Backend]
+- Passa a dizer qual campo está em uso na resposta de conflito do cadastro, que antes trazia só a mensagem (#284) [Backend]
 
 ### Fixed
 
