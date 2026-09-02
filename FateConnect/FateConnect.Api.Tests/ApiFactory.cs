@@ -57,10 +57,13 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public static string UniqueContactEmail() => $"contato{Guid.NewGuid():N}@gmail.com";
 
-    public int SeedUser(string fullName, string phone, string contactEmail)
+    public SeededUser SeedUser(string fullName)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        string phone = UniquePhone();
+        string contactEmail = UniqueContactEmail();
 
         User user = new()
         {
@@ -76,7 +79,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.Users.Add(user);
         context.SaveChanges();
 
-        return user.Id;
+        return new SeededUser(user.Id, phone, contactEmail);
     }
 
     public (int Id, string FatecEmail) SeedUserWithPassword(string fullName, string password)

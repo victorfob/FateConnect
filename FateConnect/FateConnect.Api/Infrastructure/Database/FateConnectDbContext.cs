@@ -51,6 +51,9 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
             entity.Property(c => c.Phone).IsRequired().HasMaxLength(11);
             entity.Property(c => c.ContactEmail).IsRequired().HasMaxLength(150);
 
+            entity.HasIndex(c => c.Phone).IsUnique();
+            entity.HasIndex(c => c.ContactEmail).IsUnique();
+
             entity.HasOne(c => c.User)
                   .WithMany(u => u.Contacts)
                   .HasForeignKey(c => c.UserId)
