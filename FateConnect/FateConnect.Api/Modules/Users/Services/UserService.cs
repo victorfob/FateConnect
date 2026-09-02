@@ -51,13 +51,15 @@ public class UserService : IUserService
         foreach (CreateContactDto dto in dtos)
         {
             bool phoneRepeatedInRequest = !phonesInRequest.Add(dto.Phone);
+            bool phoneIsTaken = phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.Phone);
 
-            if (phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.Phone))
+            if (phoneIsTaken)
                 throw new ContactPhoneAlreadyRegisteredException(dto.Phone);
 
             bool emailRepeatedInRequest = !emailsInRequest.Add(dto.ContactEmail);
+            bool emailIsTaken = emailRepeatedInRequest || await _userRepository.ContactEmailExistsAsync(dto.ContactEmail);
 
-            if (emailRepeatedInRequest || await _userRepository.ContactEmailExistsAsync(dto.ContactEmail))
+            if (emailIsTaken)
                 throw new ContactEmailAlreadyRegisteredException(dto.ContactEmail);
         }
     }
