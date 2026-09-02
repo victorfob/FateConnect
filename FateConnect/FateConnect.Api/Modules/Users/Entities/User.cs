@@ -8,7 +8,6 @@ public class User
     public string FatecEmail { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
-    public string? Nickname { get; set; }
     public DateTime BirthDate { get; set; }
     public EnumGender Gender { get; set; }
     public DateTime CreatedAt { get; set; }
