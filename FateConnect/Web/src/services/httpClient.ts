@@ -9,11 +9,14 @@ import { tokenStorage } from './auth/tokenStorage';
  */
 export class ApiError extends Error {
   readonly status?: number;
+  /** Campo que a API aponta como causa — hoje só o conflito de cadastro manda. */
+  readonly field?: string;
 
-  constructor(message: string, status?: number) {
+  constructor(message: string, status?: number, field?: string) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
+    this.field = field;
   }
 }
 
@@ -34,6 +37,18 @@ export const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
 export const SESSION_EXPIRED_MESSAGE = 'Sessão expirada. Entre novamente para continuar.';
 
 const UNAUTHORIZED = 401;
+
+function hasField(body: unknown): body is { field: string } {
+  return (
+    typeof body === 'object' && body !== null && 'field' in body && typeof body.field === 'string'
+  );
+}
+
+function fieldOf(body: unknown): string | undefined {
+  if (!hasField(body)) return undefined;
+
+  return body.field;
+}
 
 function withInterceptors(client: AxiosInstance): AxiosInstance {
   client.interceptors.request.use((config) => {
@@ -66,7 +81,9 @@ function withInterceptors(client: AxiosInstance): AxiosInstance {
         return Promise.reject(new SessionExpiredError(error.response.status));
       }
 
-      return Promise.reject(new ApiError(GENERIC_ERROR_MESSAGE, error.response.status));
+      return Promise.reject(
+        new ApiError(GENERIC_ERROR_MESSAGE, error.response.status, fieldOf(error.response.data)),
+      );
     },
   );
 

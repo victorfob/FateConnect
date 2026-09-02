@@ -9,6 +9,7 @@ import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
+import { SignupConflictFieldEnum } from './@types';
 import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
 import { SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
@@ -330,6 +331,26 @@ describe('Signup', () => {
 
     expect(await screen.findByText(message)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: C.SUBMIT_LABEL })).toBeEnabled();
+  });
+
+  it.each([
+    [SignupConflictFieldEnum.FATEC_EMAIL, /E-mail Fatec/],
+    [SignupConflictFieldEnum.PHONE, /Telefone/],
+    [SignupConflictFieldEnum.CONTACT_EMAIL, /E-mail para contato/],
+  ])('should point the conflict of %s at its own field', async (field, label) => {
+    server.use(
+      http.post(SIGNUP_URL, () =>
+        HttpResponse.json({ error: 'já está em uso no sistema', field }, { status: 409 }),
+      ),
+    );
+    renderSignup();
+    await fillRequiredFields();
+
+    await submit();
+
+    expect(await screen.findByText(C.SIGNUP_CONFLICT_MESSAGES[field])).toBeInTheDocument();
+    expect(screen.getByLabelText(label)).toHaveFocus();
+    expect(screen.queryByText(C.SIGNUP_ERROR_MESSAGES.emailTaken)).not.toBeInTheDocument();
   });
 
   it('should disable the form while the account is being created', async () => {
