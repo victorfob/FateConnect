@@ -3,6 +3,7 @@ using System;
 using FateConnect.Api.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FateConnect.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(FateConnectDbContext))]
-    partial class FateConnectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260901232951_RemoveUserNickname")]
+    partial class RemoveUserNickname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

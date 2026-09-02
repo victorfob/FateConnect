@@ -53,7 +53,6 @@ public class UserService : IUserService
         {
             FatecEmail = dto.FatecEmail,
             FullName = dto.FullName,
-            Nickname = dto.Nickname,
             BirthDate = dto.BirthDate,
             Gender = dto.Gender,
             Password = hashedPassword,
