@@ -28,6 +28,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o logo dentro do menu lateral, que navegava e deixava o menu aberto por cima da tela nova (#281) [Frontend]
 - Corrige o realce de passar o ponteiro no topo e no menu lateral: no topo ele não chegava a aparecer, e no menu clareava tanto que apagava o próprio rótulo (#281) [Frontend]
 
+### Removed
+
+- Remove o apelido do cadastro: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A coluna é apagada, então o apelido de quem já se cadastrou se perde (#283) [Backend]
+
 ## [0.7.0] - 2026-08-31
 
 ### Changed
