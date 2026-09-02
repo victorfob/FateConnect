@@ -12,7 +12,7 @@ namespace FateConnect.Api.Tests;
 
 public class GlobalExceptionMiddlewareTests
 {
-    private static async Task<(HttpStatusCode StatusCode, string Error)> AnswerFor(Exception thrown)
+    private static async Task<(HttpStatusCode StatusCode, string Error, string? Field)> AnswerFor(Exception thrown)
     {
         await using ServiceProvider services = new ServiceCollection().BuildServiceProvider();
 
@@ -30,13 +30,15 @@ public class GlobalExceptionMiddlewareTests
         body.Position = 0;
         using JsonDocument document = await JsonDocument.ParseAsync(body);
 
-        return ((HttpStatusCode)context.Response.StatusCode, document.RootElement.GetProperty("error").GetString()!);
+        string? field = document.RootElement.TryGetProperty("field", out JsonElement raw) ? raw.GetString() : null;
+
+        return ((HttpStatusCode)context.Response.StatusCode, document.RootElement.GetProperty("error").GetString()!, field);
     }
 
     [Fact]
     public async Task AnUnmappedException_AnswersTheFallbackMessageInPortuguese()
     {
-        (HttpStatusCode statusCode, string error) = await AnswerFor(new TimeoutException("connection dropped"));
+        (HttpStatusCode statusCode, string error, _) = await AnswerFor(new TimeoutException("connection dropped"));
 
         Assert.Equal(HttpStatusCode.InternalServerError, statusCode);
         Assert.Equal("Algo deu errado. Tente novamente.", error);
@@ -45,7 +47,7 @@ public class GlobalExceptionMiddlewareTests
     [Fact]
     public async Task ARideDomainException_AnswersBadRequestWithItsOwnMessage()
     {
-        (HttpStatusCode statusCode, string error) = await AnswerFor(new InvalidRideTypeException());
+        (HttpStatusCode statusCode, string error, _) = await AnswerFor(new InvalidRideTypeException());
 
         Assert.Equal(HttpStatusCode.BadRequest, statusCode);
         Assert.Equal("Tipo de carona inválido.", error);
@@ -54,17 +56,26 @@ public class GlobalExceptionMiddlewareTests
     [Fact]
     public async Task ADuplicateEmail_AnswersConflictWithItsOwnMessage()
     {
-        (HttpStatusCode statusCode, string error) =
+        (HttpStatusCode statusCode, string error, string? field) =
             await AnswerFor(new EmailAlreadyRegisteredException("mariana.rocha@aluno.cps.sp.gov.br"));
 
         Assert.Equal(HttpStatusCode.Conflict, statusCode);
         Assert.Equal("O e-mail 'mariana.rocha@aluno.cps.sp.gov.br' já está em uso no sistema.", error);
+        Assert.Equal("fatecEmail", field);
+    }
+
+    [Fact]
+    public async Task AnErrorWithoutAField_OmitsTheFieldFromTheBody()
+    {
+        (_, _, string? field) = await AnswerFor(new InvalidRideTypeException());
+
+        Assert.Null(field);
     }
 
     [Fact]
     public async Task InvalidCredentials_AnswerUnauthorizedWithTheirOwnMessage()
     {
-        (HttpStatusCode statusCode, string error) = await AnswerFor(new InvalidCredentialsException());
+        (HttpStatusCode statusCode, string error, _) = await AnswerFor(new InvalidCredentialsException());
 
         Assert.Equal(HttpStatusCode.Unauthorized, statusCode);
         Assert.Equal("E-mail ou senha inválidos.", error);
@@ -73,7 +84,7 @@ public class GlobalExceptionMiddlewareTests
     [Fact]
     public async Task AMissingJwtSecret_AnswersInternalServerErrorWithItsOwnMessage()
     {
-        (HttpStatusCode statusCode, string error) = await AnswerFor(new JwtNotConfiguredException());
+        (HttpStatusCode statusCode, string error, _) = await AnswerFor(new JwtNotConfiguredException());
 
         Assert.Equal(HttpStatusCode.InternalServerError, statusCode);
         Assert.Equal("JWT_SECRET não configurado.", error);
@@ -82,7 +93,7 @@ public class GlobalExceptionMiddlewareTests
     [Fact]
     public async Task AnUnidentifiedUser_AnswersUnauthorizedInPortuguese()
     {
-        (HttpStatusCode statusCode, string error) = await AnswerFor(new UnidentifiedUserException());
+        (HttpStatusCode statusCode, string error, _) = await AnswerFor(new UnidentifiedUserException());
 
         Assert.Equal(HttpStatusCode.Unauthorized, statusCode);
         Assert.Equal("Sessão expirada. Entre novamente para continuar.", error);
