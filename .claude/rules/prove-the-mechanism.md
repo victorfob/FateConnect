@@ -35,6 +35,14 @@ Duas na mesma #237: `DOCKER_HOST` apontando para porta morta não desligou o Doc
 | a regra `no-restricted-syntax` de tag crua | chamadas de `styled('nav')` | no JSX: três `<li>` passaram no código novo |
 | a correção da fileira de paginação | a ponta inicial, onde a página 4 quebrava | na ponta final, onde a 9 quebrava igual |
 
+Em 02/09/2026 entrou um quarto, de outra natureza: o predicado que é verdadeiro **por vacuidade**. Esperando o CI de um PR com `until gh pr checks <n> --json name,bucket | jq -e 'all(.bucket != "pending")'`, o laço saiu na primeira olhada e eu anunciei quatro checks verdes — havia **um** registrado, e `all()` sobre lista de um elemento é verdadeiro. Os outros três nem existiam, incluindo o único que importava naquele PR. A âncora que faltava é de cardinalidade:
+
+```bash
+until gh pr checks <n> --json name,bucket | jq -e 'length >= 4 and all(.bucket != "pending")'; do sleep 20; done
+```
+
+⛔ **`all`, `every` e `none` sobre coleção que ainda está sendo preenchida respondem "sim" sem medir nada.** Predicado de espera precisa dizer **quantos** itens espera, ou nomear o item que espera.
+
 ⚠️ **`| head` num `grep` de investigação é o pior dos três**, porque some com a evidência sem avisar e a saída parece completa. Em busca que vai sustentar conclusão, conte antes (`grep -c`) ou não trunque.
 
 ⛔ **Regra nova se prova nas duas formas.** O controle positivo de uma regra de lint não é só "reprova o que deve" — é também "aceita o que deve". Ao estender a de tag crua, rodei um arquivo com `<div>` **e** `<strong>` no mesmo JSX: o primeiro reprova, o segundo passa. Sem a segunda metade eu teria proibido ênfase de texto sem perceber.

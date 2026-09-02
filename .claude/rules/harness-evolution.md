@@ -47,6 +47,30 @@ Antes de escrever, escolha o lugar — os quatro não são intercambiáveis:
 - `description` em rule é documentação para humanos — mantenha precisa, mas não espere que condicione nada. **Só skill dispara por `description`.**
 - Esta rule é uma das exceções sem `paths`: os gatilhos disparam em qualquer arquivo.
 
+### O gatilho é o **Read**, e trabalhar por Bash desliga todas elas
+
+⛔ **Rule com `paths` carrega quando um arquivo que casa é lido pela ferramenta `Read`.** `cat`, `sed`, `grep`, `head` e heredoc de python leem o mesmo arquivo e **não** disparam nada: o conteúdo entra na conversa, a rule não.
+
+Aconteceu em 02/09/2026, nas #255, #253 e #254. Escrevi C# para três PRs de API inspecionando tudo por Bash — e as **cinco** rules de `FateConnect/FateConnect.Api/**` ficaram fora de contexto a sessão inteira: `dotnet-migrations`, `dotnet-testing`, `dotnet-code-style`, `dotnet-code-quality` e `dotnet-authorization`.
+
+O custo, medido depois:
+
+| O que eu fiz sem a rule | O que a rule já dizia |
+| --- | --- |
+| Amostrei dois arquivos para inferir se o `/// <inheritdoc />` gerado sai da migration, e generalizei errado | `dotnet-migrations.md` diz exatamente quais saem e quais ficam |
+| Medi cobertura parseando OpenCover à mão, e só depois de ser cobrado | `./scripts/coverage-changed.sh` existe para isso, e a rule manda rodá-lo **antes** de dizer que acabou |
+| Escrevi três testes de borda sobre `DateTime.UtcNow` | "enquanto a costura não existir, **não escreva o teste que depende do relógio**" |
+
+⚠️ **A tentação é escrever uma rule sem `paths` para garantir que ela carregue.** Não é a saída: sem `paths` ela custa contexto em toda sessão, inclusive nas que não tocam a pasta — o problema é o meu gesto, não o escopo dela.
+
+**O que fazer, antes de escrever a primeira linha numa área:** abrir **um** arquivo daquela pasta com o `Read`, ou ler as rules dela diretamente. Um `Read` num arquivo qualquer de `FateConnect/FateConnect.Api/` traz as cinco de uma vez.
+
+```bash
+ls .claude/rules/            # e ler as que casam com a área da tarefa
+```
+
+⛔ **O sinal de risco é o modo Bash-primeiro.** Ele é pedido de propósito para economizar ferramenta, e o efeito colateral é silencioso: nada avisa que uma rule não carregou. Área nova na sessão ⇒ um `Read` de propósito, mesmo que eu já tenha o arquivo na tela.
+
 ## Caminho citado no harness tem check
 
 Rule e skill citam código por caminho, e nada as avisa quando o código sai — o texto continua sintaticamente perfeito descrevendo algo que não existe.
