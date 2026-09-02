@@ -6,9 +6,9 @@ export const FullWidthCell = styled(Box)({
   width: '100%',
 });
 
-/** Um terço da linha no desktop: 2 de 6 colunas. */
-export const ThirdWidthCell = styled(Box)(({ theme }) => ({
+/** Metade da linha no desktop: 3 de 6 colunas. */
+export const HalfWidthCell = styled(Box)(({ theme }) => ({
   width: '100%',
 
-  [theme.breakpoints.up('md')]: { gridColumn: 'span 2' },
+  [theme.breakpoints.up('md')]: { gridColumn: 'span 3' },
 }));

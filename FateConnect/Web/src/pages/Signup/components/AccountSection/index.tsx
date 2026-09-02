@@ -34,24 +34,11 @@ export function AccountSection() {
         />
       </S.FullWidthCell>
 
-      <S.ThirdWidthCell>
-        <Input
-          {...register('fatecEmail')}
-          label={FIELD_LABELS.fatecEmail}
-          required
-          fullWidth
-          type="email"
-          autoComplete="work email"
-          placeholder={FIELD_PLACEHOLDERS.fatecEmail}
-          error={errors.fatecEmail?.message}
-        />
-      </S.ThirdWidthCell>
-
-      <S.ThirdWidthCell>
+      <S.HalfWidthCell>
         <BirthDateField />
-      </S.ThirdWidthCell>
+      </S.HalfWidthCell>
 
-      <S.ThirdWidthCell>
+      <S.HalfWidthCell>
         <Controller
           name="gender"
           control={control}
@@ -66,9 +53,22 @@ export function AccountSection() {
             />
           )}
         />
-      </S.ThirdWidthCell>
+      </S.HalfWidthCell>
 
-      <S.ThirdWidthCell>
+      <S.HalfWidthCell>
+        <Input
+          {...register('fatecEmail')}
+          label={FIELD_LABELS.fatecEmail}
+          required
+          fullWidth
+          type="email"
+          autoComplete="work email"
+          placeholder={FIELD_PLACEHOLDERS.fatecEmail}
+          error={errors.fatecEmail?.message}
+        />
+      </S.HalfWidthCell>
+
+      <S.HalfWidthCell>
         <Input
           {...register('password')}
           label={FIELD_LABELS.password}
@@ -89,7 +89,7 @@ export function AccountSection() {
             </IconButton>
           }
         />
-      </S.ThirdWidthCell>
+      </S.HalfWidthCell>
     </>
   );
 }
