@@ -24,7 +24,6 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
             entity.HasKey(e => e.Id);
             entity.Property(e => e.FatecEmail).IsRequired().HasMaxLength(150);
             entity.Property(e => e.FullName).IsRequired().HasMaxLength(200);
-            entity.Property(e => e.Nickname).HasMaxLength(50);
             entity.Property(e => e.Password).IsRequired().HasMaxLength(255);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");

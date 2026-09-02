@@ -25,10 +25,6 @@ public class CreateUserDto
     [DefaultValue("João da Silva")]
     public string FullName { get; set; } = string.Empty;
 
-    [MaxLength(50)]
-    [DefaultValue("Joãozinho")]
-    public string? Nickname { get; set; }
-
     [Required]
     [DefaultValue("2000-01-01T00:00:00Z")]
     required public DateTime BirthDate { get; set; }

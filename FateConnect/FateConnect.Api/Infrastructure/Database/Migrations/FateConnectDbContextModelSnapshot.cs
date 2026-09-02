@@ -171,10 +171,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Nickname")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
