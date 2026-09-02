@@ -53,10 +53,17 @@ public class ApiFactory : WebApplicationFactory<Program>
             .GenerateJwtToken(new User { Id = userId, FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br" });
     }
 
-    public int SeedUser(string fullName, string phone, string contactEmail)
+    public static string UniquePhone() => $"15{Random.Shared.Next(100_000_000, 999_999_999)}";
+
+    public static string UniqueContactEmail() => $"contato{Guid.NewGuid():N}@gmail.com";
+
+    public SeededUser SeedUser(string fullName)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        string phone = UniquePhone();
+        string contactEmail = UniqueContactEmail();
 
         User user = new()
         {
@@ -72,7 +79,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.Users.Add(user);
         context.SaveChanges();
 
-        return user.Id;
+        return new SeededUser(user.Id, phone, contactEmail);
     }
 
     public (int Id, string FatecEmail) SeedUserWithPassword(string fullName, string password)

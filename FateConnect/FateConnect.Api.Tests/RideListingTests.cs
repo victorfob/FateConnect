@@ -18,7 +18,7 @@ public class RideListingTests
 
     private static int SeedRides(ApiFactory factory, int count)
     {
-        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
 
         for (int index = 0; index < count; index++)
@@ -124,7 +124,7 @@ public class RideListingTests
     public async Task GetRides_WithoutAnyResult_ReportsZeroTotalPages()
     {
         using ApiFactory factory = new();
-        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
 
         PagedRides page = await GetPageAsync(factory, driverId);
 
@@ -137,7 +137,7 @@ public class RideListingTests
     public async Task GetRides_WithARideAlreadyDeparted_LeavesItOutAndOutOfTheTotal()
     {
         using ApiFactory factory = new();
-        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
 
         DateOnly yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
@@ -154,7 +154,7 @@ public class RideListingTests
     public async Task GetRides_FilteredByDepartureTime_KeepsOnlyTheRidesThatLeaveAtThatHour()
     {
         using ApiFactory factory = new();
-        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
         factory.SeedRide(driverId, tomorrow, new TimeOnly(7, 0));
         factory.SeedRide(driverId, tomorrow, new TimeOnly(22, 0));
@@ -195,7 +195,7 @@ public class RideListingTests
     public async Task GetRides_FilteredByDestination_KeepsOnlyTheRidesThatMatch()
     {
         using ApiFactory factory = new();
-        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
         Guid matching = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), "São Paulo centro");
         factory.SeedRide(driverId, tomorrow, new TimeOnly(9, 0), "Campinas");
@@ -213,7 +213,7 @@ public class RideListingTests
     public async Task GetRides_FilteredByDestination_IgnoresAccentsAndCase(string destination, string search)
     {
         using ApiFactory factory = new();
-        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
         Guid expected = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), destination);
 
@@ -226,7 +226,7 @@ public class RideListingTests
     public async Task GetRides_WithEveryFilterAtOnce_IsTranslatedToSql()
     {
         using ApiFactory factory = new();
-        int driverId = factory.SeedUser("Ana Beatriz Nogueira", "15999990000", "ana.nogueira@gmail.com");
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
         Guid expected = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), "Sorocaba centro");
 

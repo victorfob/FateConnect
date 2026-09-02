@@ -19,6 +19,16 @@ public class UserRepository : IUserRepository
         return await _context.Users.AnyAsync(u => u.FatecEmail == email);
     }
 
+    public async Task<bool> ContactPhoneExistsAsync(string phone)
+    {
+        return await _context.Contacts.AnyAsync(c => c.Phone == phone);
+    }
+
+    public async Task<bool> ContactEmailExistsAsync(string contactEmail)
+    {
+        return await _context.Contacts.AnyAsync(c => c.ContactEmail == contactEmail);
+    }
+
     public async Task<User?> GetByEmailAsync(string email)
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.FatecEmail == email);

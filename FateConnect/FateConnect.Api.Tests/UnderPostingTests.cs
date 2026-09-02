@@ -23,7 +23,7 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         {
             new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" },
         },
-        ["contacts"] = new[] { new { phone = "15999990000", contactEmail = "mariana.rocha@gmail.com" } },
+        ["contacts"] = new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = ApiFactory.UniqueContactEmail() } },
     };
 
     [Fact]
