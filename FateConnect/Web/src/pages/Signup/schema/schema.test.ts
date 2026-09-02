@@ -37,7 +37,7 @@ describe('signupSchema', () => {
   });
 
   it('should accept the form without the optional fields', () => {
-    const result = parse({ nickname: '', complement: '', acceptMarketing: false });
+    const result = parse({ complement: '', acceptMarketing: false });
 
     expect(result.success).toBe(true);
   });

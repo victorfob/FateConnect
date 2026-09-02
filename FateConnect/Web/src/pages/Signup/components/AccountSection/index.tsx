@@ -36,16 +36,6 @@ export function AccountSection() {
 
       <S.ThirdWidthCell>
         <Input
-          {...register('nickname')}
-          label={FIELD_LABELS.nickname}
-          fullWidth
-          type="text"
-          autoComplete="nickname"
-        />
-      </S.ThirdWidthCell>
-
-      <S.ThirdWidthCell>
-        <Input
           {...register('fatecEmail')}
           label={FIELD_LABELS.fatecEmail}
           required

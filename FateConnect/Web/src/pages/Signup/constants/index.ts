@@ -4,7 +4,6 @@ export const CONTACT_SECTION_TITLE = 'Dados para contato';
 
 export const FIELD_LABELS = {
   fullName: 'Nome completo',
-  nickname: 'Apelido',
   fatecEmail: 'E-mail Fatec',
   birthDate: 'Data de nascimento',
   gender: 'Gênero',
