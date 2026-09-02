@@ -53,6 +53,10 @@ public class ApiFactory : WebApplicationFactory<Program>
             .GenerateJwtToken(new User { Id = userId, FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br" });
     }
 
+    public static string UniquePhone() => $"15{Random.Shared.Next(100_000_000, 999_999_999)}";
+
+    public static string UniqueContactEmail() => $"contato{Guid.NewGuid():N}@gmail.com";
+
     public int SeedUser(string fullName, string phone, string contactEmail)
     {
         using IServiceScope scope = Services.CreateScope();

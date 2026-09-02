@@ -65,6 +65,28 @@ public class GlobalExceptionMiddlewareTests
     }
 
     [Fact]
+    public async Task ADuplicatePhone_AnswersConflictNamingThePhoneField()
+    {
+        (HttpStatusCode statusCode, string error, string? field) =
+            await AnswerFor(new ContactPhoneAlreadyRegisteredException("15999990000"));
+
+        Assert.Equal(HttpStatusCode.Conflict, statusCode);
+        Assert.Equal("O telefone '15999990000' já está em uso no sistema.", error);
+        Assert.Equal("phone", field);
+    }
+
+    [Fact]
+    public async Task ADuplicateContactEmail_AnswersConflictNamingTheContactEmailField()
+    {
+        (HttpStatusCode statusCode, string error, string? field) =
+            await AnswerFor(new ContactEmailAlreadyRegisteredException("mariana.rocha@gmail.com"));
+
+        Assert.Equal(HttpStatusCode.Conflict, statusCode);
+        Assert.Equal("O e-mail de contato 'mariana.rocha@gmail.com' já está em uso no sistema.", error);
+        Assert.Equal("contactEmail", field);
+    }
+
+    [Fact]
     public async Task AnErrorWithoutAField_OmitsTheFieldFromTheBody()
     {
         (_, _, string? field) = await AnswerFor(new InvalidRideTypeException());
