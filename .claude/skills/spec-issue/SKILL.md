@@ -21,11 +21,28 @@ Pergunta feita sem ler é pergunta que o repositório já respondia. Antes do pr
 - **Quando a issue ainda não existe**, não há o que abrir: leia no lugar as issues que ela vai
   encostar — a que ela destrava, a que vai desfazer parte do que ela monta — e confira com
   `gh issue list --state all --search` se alguém já abriu a mesma coisa
-- O **protótipo anexado**, quando houver: o corpo traz um `<img src="https://github.com/user-attachments/...">` e `curl -sL` baixa. Export de tela inteira vem alto demais para uma leitura só — fatiar com `sips` e ler banda a banda
+- O **protótipo anexado**, quando houver: o corpo traz um `<img src="https://github.com/user-attachments/...">` e `curl -sL` baixa. Export de tela inteira vem alto demais para uma leitura só — fatiar com `sips` e ler banda a banda. **Link do Figma** se lê com `get_screenshot`, passando o `fileKey` e o `nodeId` extraídos da URL — em `/design/:fileKey/...?node-id=143-2`, o nó é `143:2`
 - A tela ou o módulo mais parecido que já existe — é dele que saem as opções fundamentadas
 - Os arquivos que a mudança vai tocar, com `Grep` e `Read`
 
 Separar o que foi **encontrado** do que é **suposição**. A suposição vai para o corpo da issue com esse nome.
+
+### O protótipo dá a ideia; o código dá a verdade
+
+⛔ **Onde o protótipo divergir do código, o código vence — e a divergência vai escrita no corpo da issue.** O protótipo foi desenhado numa data e não é reprocessado quando o produto anda: ele carrega copy que a régua já corrigiu, nome que já mudou e elemento que já saiu.
+
+⛔ **O tell é o protótipo mostrando algo que o código contradiz.** Não é um erro de desenho a esclarecer: é o desenho estando velho. Resolver em silêncio, para qualquer um dos lados, é o defeito — quem implementa abre o Figma, vê a diferença e não sabe qual vale.
+
+Quatro na mesma rodada, ao especificar o menu da conta:
+
+| O protótipo dizia | O que valeu, e por quê |
+| --- | --- |
+| "Bem-vindo ao FateConnect" | **"Boas-vindas"**, que é o que o código diz — linguagem neutra, pela `product-copy.md` |
+| "Configurações" no item | **"Preferências"**, porque a seção que o abriga tem esse nome e dois nomes para um conceito é proibido |
+| nenhum nome no popover | **o nome entra**, porque ele era o rótulo acessível do gatilho e sairia de lá |
+| o botão de tema ausente do topo | **decisão de produto**, não detalhe de desenho — virou item de escopo |
+
+**Onde a divergência mora:** uma lista no corpo da issue, junto do link do protótipo, dizendo o que difere e qual lado vale. Sem ela, cada uma volta como pergunta durante a implementação.
 
 ### A premissa do pedido também se mede
 
@@ -34,6 +51,8 @@ Separar o que foi **encontrado** do que é **suposição**. A suposição vai pa
 Aconteceu na #226. O pedido dizia *"o login continua retornando `fullName` mas o front já não usa pra nada"*. Metade certa — o nome do topo vem mesmo do token, mas o aviso de boas-vindas do login ainda lia a resposta. Sem a conferência a issue teria nascido como deleção pura e quebrado o aviso na implementação; com ela, o aviso virou a primeira pergunta, e a resposta — *"esse aviso nem faz sentido"* — mudou o escopo antes de existir código.
 
 **O tell é o verbo no presente sobre o código:** "já não usa", "ninguém chama", "isso é só", "não tem mais". Cada um é um `Grep` que você ainda não fez.
+
+⚠️ **O tell no passado cobra busca mais funda:** "aquela tela que tínhamos antes", "o componente que a gente removeu", "como era na versão anterior". Ali o `Grep` no código atual não responde — precisa do histórico, com `git log --all -S "<termo>" -i --name-only` —, e a resposta pode ser que **nunca existiu**. Aconteceu em 03/09/2026: "aquela tela de em breve que tínhamos antes" não estava no código nem no histórico, e o que havia era um componente do design system escrito para aquele caso e sem consumidor nenhum. Especificar sobre a lembrança teria mandado ressuscitar o inexistente.
 
 ### Issue de "todos os X" começa pelo inventário medido
 

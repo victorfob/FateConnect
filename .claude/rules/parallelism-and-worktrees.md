@@ -50,8 +50,8 @@ Issue que declara "Depende de" só começa quando a base estiver **com o escopo 
 ⛔ **Antes de aceitar o que um agente entregou, meça a densidade de comentário.** As rules do repo carregam para dentro da worktree, mas o agente as pondera menos que o resto do prompt — e comentário é o item que ele mais acrescenta por conta própria.
 
 ```bash
-git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+[^+]"                 # linhas adicionadas
-git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+\s*(/\*\*|\*|//)" # dessas, comentário
+git diff <base>..HEAD --numstat -- '*.ts' '*.tsx' | awk '{total += $1} END {print total}'   # linhas adicionadas
+rtk proxy git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+\s*(/\*\*|\*|//)"      # dessas, comentário
 ```
 
 Na #156 deram **37 de 157 linhas — 24%**. Sete reprovaram no teste da `comments.md` e saíram: um JSDoc que repetia o que o `types.ts` já dizia e ainda pousava sobre a constante errada, um que só reafirmava a linha logo abaixo, e uma enumeração de consumidores que **envelheceu no próprio PR** que a escreveu.

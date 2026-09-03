@@ -27,6 +27,22 @@ Para cada comentário: **veredicto** — aplicar, recusar (com motivo) ou já re
 
 Apresente em tabela curta (comentário → veredicto → plano) e **espere a confirmação antes de tocar no código**. O passo é deliberado: quem revisa conhece contexto que você não tem — algo combinado noutro lugar, mudança que vem em outra PR, enquadramento que ele quer. É o momento mais barato de redirecionar.
 
+### Camada de pilha: a tabela de custos precisa do merge-base
+
+⛔ **PR que é camada de uma pilha muda o cálculo, e o custo que escapa é o das camadas de cima.** Emendar a camada revisada reescreve a história dela, o merge-base das seguintes recua, e o diff delas passa a incluir os commits da camada de baixo — o PR de cima infla sem ninguém ter tocado nele.
+
+Aconteceu em 03/09/2026 no #284, fundo de uma pilha de três. Montei a tabela do caminho "emendar" citando só que o force-push desancora o comentário de linha de quem revisou, e **omiti a inflação do diff**. A escolha foi feita sobre a tabela incompleta e revertida quando o custo apareceu.
+
+| Caminho | Custo |
+| --- | --- |
+| emendar na camada revisada | reescreve as camadas de cima, o merge-base recua e infla o diff delas; o comentário de linha desancora |
+| aplicar na camada **de cima**, ainda sem review | um push; o approve e a âncora do comentário ficam intactos, e a mudança aparece num PR que não é o dela |
+| acrescentar commit na camada revisada | os mesmos pushes que emendar, e ainda um commit de correção no histórico |
+
+**Aplicada noutra camada, a resposta na thread diz qual PR a levou** — senão o comentário fica sem o commit ao lado e quem revisou não acha a correção.
+
+⚠️ Leia a topologia antes de propor caminho: `gh pr view <n> --json baseRefName` em cada PR aberto diz quem aponta para quem.
+
 ## 3. Confira contra o código atual — este é o passo que mais protege
 
 ⛔ **Não confie no diff citado no comentário.** Abra o arquivo na linha real e confirme se o apontamento ainda se sustenta. Comentário sobre código que já mudou é recusa, não mudança.
