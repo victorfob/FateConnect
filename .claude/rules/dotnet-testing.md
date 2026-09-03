@@ -25,6 +25,8 @@ O relatório sai do `dotnet test` em formato **OpenCover** (`--collect:"XPlat Co
 
 Ele roda a suíte com cobertura, cruza o relatório com os arquivos de produção do diff e **sai com erro** listando quem ficou abaixo dos 90%.
 
+⛔ **Commite antes de medir.** O script cruza o relatório com `git diff origin/develop` — o estado **commitado**. Rodado com o trabalho solto na árvore ele mede o conjunto de arquivos errado e sai com **exit 0** dizendo que todos atingem 90%. Em 03/09/2026 isso aconteceu duas vezes na mesma sessão: uma sobre **zero** arquivos (`nenhum arquivo de produção da API no diff`), outra listando 8 e deixando de fora justamente os dois novos, porque o diff commitado ainda descrevia o desenho anterior. **O sinal é a contagem não bater com os arquivos que você mexeu.**
+
 ⛔ **Rode antes de dizer que acabou.** `dotnet build` + `dotnet test` não medem nada, e o portão do Sonar aceita 33% — as duas coisas ficam verdes sobre uma regra violada. Aconteceu na #222: o PR chegou a 79,5% no Sonar com o `AuthService` em **22,7%**, porque não existia um único teste de login. O que fechou o buraco foram três testes; o que impede a repetição é este comando.
 
 **Linha que não dá para cobrir se marca, não se ignora.** Construtor privado que existe só para impedir instanciação nunca é chamado: `[ExcludeFromCodeCoverage]` nele tira a linha do denominador e diz por quê. Baixar o alvo, não.
