@@ -145,6 +145,20 @@ Medido em 01/09/2026, no X do diálogo: a arte ocupa **14px numa caixa de 24px**
 
 **Como medir o desenho:** `path.getBBox()` no `svg`, convertido para a escala da tela pela razão entre a largura renderizada e a do `viewBox`. Para texto, `Range.selectNodeContents` no elemento — a caixa do parágrafo inclui entrelinha que o olho não vê.
 
+### Vão entre elementos: da tinta até a **faixa de fundo** do vizinho
+
+⛔ **Vão entre um rótulo e o item abaixo dele não se mede de caixa a caixa nem de tinta a tinta.** O item de lista tem 48px de altura e a tinta dele fica no meio; o que o olho vê começar é o **fundo**. A medida que corresponde ao que se enxerga é da tinta do rótulo até a borda da faixa do item.
+
+Medido de três jeitos na #291, e os dois primeiros levaram a conclusões erradas:
+
+| Instrumento | Respondeu | O que produziu |
+| --- | --- | --- |
+| caixa → caixa | **0px**, antes e depois da correção | quase concluí que a correção não pegou |
+| tinta → tinta | 20px | pareceu folgado, e a devolução foi *"ainda ta mto colado"* |
+| tinta → **faixa de fundo** | **6px** | era o número |
+
+⚠️ **O sinal é o número que não se move.** `padding` acrescentado a um elemento para afastá-lo do vizinho **não altera** a distância entre as caixas — só `margin` alteraria. Se a medida é a mesma depois de uma correção que você sabe que aplicou, o instrumento está medindo a caixa.
+
 ⚠️ **Quem reclama é sempre a pessoa que olha a tela**, porque o número mente com confiança: eu tinha `32px` de um lado e `32px` do outro, e mesmo assim estava torto. Ao receber "não está alinhado" sobre algo que você mediu, desconfie do **que** foi medido antes de duvidar do relato.
 
 ## Sobrescrever estado do MUI: repita a classe do componente
