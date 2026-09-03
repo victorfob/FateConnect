@@ -10,6 +10,8 @@ export * from './ui';
 export { styled, css, keyframes, darken, lighten, alpha } from './styled';
 export { PolymorphicBox, PolymorphicStack } from './polymorphic';
 
+export { AnchoredPopover } from './components/AnchoredPopover';
+export type { AnchoredPopoverProps } from './components/AnchoredPopover';
 export { Header } from './components/Header';
 export { HEADER_HEIGHT_PX } from './components/Header/styles';
 export { Footer } from './components/Footer';

@@ -62,6 +62,34 @@ function nonTextColours(theme: Theme): [string, string][] {
   ];
 }
 
+/**
+ * A superfície flutuante não entra em `surfaces` porque não carrega tudo: botão
+ * preenchido não vai dentro de menu, e erro nesta casa sai como notificação, que
+ * tem superfície própria. O que ela carrega é texto, a marca e o esqueleto — e
+ * é o mesmo tratamento que o cromo recebe, também por par explícito.
+ *
+ * ⛔ Pôr conteúdo novo no popover ancorado obriga a acrescentar o par aqui.
+ */
+function floatingSurfaceText(theme: Theme): Par[] {
+  const { palette } = theme;
+
+  return [
+    ['body text on a floating surface', palette.text.primary, palette.surfaceFloating],
+    ['secondary text on a floating surface', palette.text.secondary, palette.surfaceFloating],
+    ['brand text on a floating surface', palette.brandText, palette.surfaceFloating],
+  ];
+}
+
+function floatingSurfaceNonText(theme: Theme): Par[] {
+  return [
+    [
+      'the loading skeleton on a floating surface',
+      theme.palette.skeleton,
+      theme.palette.surfaceFloating,
+    ],
+  ];
+}
+
 function against(theme: Theme, colours: (theme: Theme) => [string, string][]): Par[] {
   return colours(theme).flatMap(([content, foreground]) =>
     surfaces(theme).map(([surface, background]): Par => [
@@ -97,14 +125,14 @@ describe.each([
   ['light', lightTheme],
   ['dark', darkTheme],
 ])('%s theme contrast', (_, theme) => {
-  it.each([...against(theme, contentColours), ...boundPairs(theme)])(
+  it.each([...against(theme, contentColours), ...boundPairs(theme), ...floatingSurfaceText(theme)])(
     'should meet AA for %s',
     (_name, foreground, background) => {
       expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
     },
   );
 
-  it.each(against(theme, nonTextColours))(
+  it.each([...against(theme, nonTextColours), ...floatingSurfaceNonText(theme)])(
     'should meet the non-text threshold for %s',
     (_name, foreground, background) => {
       expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NON_TEXT);
