@@ -16,7 +16,6 @@ export type SignupRequest = {
   fatecEmail: string;
   password: string;
   fullName: string;
-  nickname?: string;
   birthDate: string;
   gender: string;
   addresses: SignupAddress[];

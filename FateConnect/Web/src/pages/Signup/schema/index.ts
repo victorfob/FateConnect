@@ -64,7 +64,6 @@ function hasBrazilianPhoneLength(value: string): boolean {
 
 export const signupSchema = z.object({
   fullName: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.fullNameRequired),
-  nickname: z.string(),
   fatecEmail: z
     .string()
     .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.fatecEmailRequired)
@@ -104,7 +103,6 @@ export type SignupFormValues = z.infer<typeof signupSchema>;
 
 export const SIGNUP_DEFAULT_VALUES: SignupFormValues = {
   fullName: '',
-  nickname: '',
   fatecEmail: '',
   birthDate: '',
   gender: '',

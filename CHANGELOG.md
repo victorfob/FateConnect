@@ -18,6 +18,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a recusar cadastro cujo telefone ou e-mail de contato já pertença a outra pessoa, com o mesmo 409 que o e-mail de login já respondia; a unicidade passa a valer também no banco, e para isso os cadastros que repetiam um contato são apagados junto com as caronas que ofertaram, ficando o mais antigo (#284) [Backend]
 - Passa a dizer qual campo está em uso na resposta de conflito do cadastro, que antes trazia só a mensagem (#284) [Backend]
 - Passa a exigir 18 anos completos no cadastro também na API, que aceitava conta de menor de idade em requisição feita fora do formulário; quem completa 18 anos no dia é aceito (#285) [Backend]
+- Passa a distribuir os campos da conta em dois por linha no cadastro — nascimento com gênero, e-mail com senha —, em vez de três (#287) [Frontend]
 
 ### Fixed
 
@@ -31,10 +32,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o logo dentro do menu lateral, que navegava e deixava o menu aberto por cima da tela nova (#281) [Frontend]
 - Corrige o realce de passar o ponteiro no topo e no menu lateral: no topo ele não chegava a aparecer, e no menu clareava tanto que apagava o próprio rótulo (#281) [Frontend]
 - Corrige a recusa de cadastro sem data de nascimento, que respondia em inglês enquanto os outros erros da API já vinham em português (#285) [Backend]
+- Corrige o erro de cadastro já em uso, que avisava sempre sobre o e-mail mesmo quando o repetido era o telefone; agora ele aparece embaixo do campo certo, que recebe o foco (#287) [Frontend]
 
 ### Removed
 
 - Remove o apelido do cadastro: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A coluna é apagada, então o apelido de quem já se cadastrou se perde (#283) [Backend]
+- Remove o campo de apelido do formulário de cadastro, que era opcional e não aparecia em nenhuma tela (#287) [Frontend]
 
 ## [0.7.0] - 2026-08-31
 
