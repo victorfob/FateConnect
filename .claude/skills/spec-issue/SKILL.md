@@ -84,6 +84,14 @@ Priorize o que trava decisão adiante: contrato e modelo de dados primeiro, depo
 
 ⛔ Aconteceu na #163. A sabatina perguntou onde a rota morava, como os links abriam e se o rodapé linkava — implementação, toda ela — e **fechou calada as duas decisões que eram de produto**: que o texto seria renderizado como página React, e que entraria como rascunho. As duas foram para o corpo da issue escritas como decisão, sem nunca terem sido oferecidas como opção. As duas foram derrubadas durante a implementação, uma em cada mensagem — *"não ter texto na página, a ideia é que os links abram o PDF numa nova guia"* —, e o que já estava construído foi jogado fora. A cobrança foi exatamente esta: *"vc tomou uma decisão de renderizar o texto na página sem nem abordar outras opções e nem me perguntar"*.
 
+### Mecanismo recomendado se confere contra o roteiro
+
+⛔ **Antes de recomendar um mecanismo, procure no roteiro o que ele **também** vai ter de servir.** Um desenho que resolve o pedido de hoje e não alcança o item de três semanas adiante é uma recomendação errada — e o custo aparece com o código já escrito.
+
+⛔ Aconteceu na #290. Recomendei lista de revogados por `jti` para o encerramento de sessão, e o Victor escolheu. O que eu não pesei: a **#114** tem *"troca de senha exigindo a senha atual"* no escopo, e a lista de revogados **não consegue** invalidar ali — ela guarda os tokens já revogados, não os que estão vivos, então na troca de senha não há o que revogar. A saída correta era versão de sessão, que derruba todos incrementando uma coluna. A troca custou reescrever a branch inteira.
+
+**A conferência é uma busca:** `gh issue list --state open --search "<o conceito>"` e a leitura do escopo das que aparecerem. Vale sobretudo quando o mecanismo guarda ou invalida estado — sessão, permissão, cache —, porque é aí que um item futuro muda a resposta.
+
 ### A resposta em texto livre é a que muda o desenho
 
 A opção que o usuário digita vale mais que as que você ofereceu — e costuma contradizer algo já decidido. **Antes do bloco seguinte, reconcilie.**
