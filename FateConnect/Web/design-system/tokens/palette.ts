@@ -108,12 +108,23 @@ export const darkColorTokens = {
    * AA em cima, a cor precisa de luminância ≤ 0.183; para ela mesma ser texto
    * legível sobre a **superfície elevada**, ≥ 0.233. Nenhuma cor cabe nas duas.
    */
-  brandText: '#E06055',
+  brandText: '#E7867E',
   error: '#F44336',
 
   surface: '#121212',
   /** Superfície elevada: sobreposição branca de 5%, como o M2 prescreve para 1dp. */
   surfaceElevated: '#1E1E1E',
+  /**
+   * Superfície que flutua **sobre** o cromo — hoje o popover ancorado no topo.
+   * É o degrau de 24dp do M2 (16% de branco sobre `surface`), e existe como
+   * token porque o véu de elevação do `Paper` está desligado: ele clareia em
+   * runtime uma cor que `contrast.test.ts` mede no token, e o medido deixaria
+   * de ser o desenhado.
+   *
+   * ⛔ Clarear a superfície custou retonar `brandText` e `skeleton`: sobre ela
+   * os valores antigos caíam para 3,34 e 2,14.
+   */
+  surfaceFloating: '#383838',
 
   /**
    * Estados sobre superfície escura — servem à etiqueta e ao aviso. No tema
@@ -130,8 +141,12 @@ export const darkColorTokens = {
   mutedTagBackground: '#37393B',
   mutedTagText: '#CFD8DC',
 
-  /** Bloco-fantasma: 33% de branco já achatado sobre a superfície elevada. */
-  skeleton: '#696969',
+  /**
+   * Bloco-fantasma: 44% de branco já achatado sobre a superfície elevada. Subiu
+   * de 33% quando a superfície flutuante entrou — sobre ela o tom antigo caía
+   * para 2,14:1, abaixo do mínimo de 3:1 para não-texto.
+   */
+  skeleton: '#818181',
 
   onSurfaceHigh: 'rgba(255, 255, 255, 0.87)',
   onSurfaceMedium: 'rgba(255, 255, 255, 0.60)',

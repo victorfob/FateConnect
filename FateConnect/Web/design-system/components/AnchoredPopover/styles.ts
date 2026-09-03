@@ -20,7 +20,7 @@ export const PopoverSurface = styled(Popover)(({ theme }) => ({
   '& .MuiPopover-paper': {
     marginTop: theme.space(xs),
     borderRadius: theme.radius(component),
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.surfaceFloating,
     // O papel do `Popover` nasce `overflowY: auto` e `overflowX: hidden`, e os
     // dois recortam a seta, que vive fora da caixa. Não remova por parecer
     // redundante: sem isto ela desaparece sem erro nenhum.
