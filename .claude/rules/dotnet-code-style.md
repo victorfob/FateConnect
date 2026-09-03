@@ -91,7 +91,7 @@ if (phoneIsTaken)
 **O detector precisa ser o certo, senão ninguém o usa duas vezes.** Procurar o termo "colado a letra dos dois lados" devolve dezenas de camelCase legítimo (`isZipCodeFilled`, `mappedAddresses`); procurar o termo **seguido** de minúscula acusa todo plural (`Users`, `Addresses`). O que discrimina é **termo minúsculo precedido de letra minúscula** — fronteira que camelCase nunca produz.
 
 ```bash
-git diff <base>..HEAD | grep -E "^\+" | grep -oE '"[^"]*<termo-novo>[^"]*"'   # dentro de aspas
+rtk proxy git diff <base>..HEAD | grep -E "^\+" | grep -oE '"[^"]*<termo-novo>[^"]*"'   # dentro de aspas
 ```
 
 ## A rota do controller vem do nome da classe
