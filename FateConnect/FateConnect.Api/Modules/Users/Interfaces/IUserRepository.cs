@@ -9,4 +9,6 @@ public interface IUserRepository
     Task<bool> ContactEmailExistsAsync(string contactEmail);
     Task<User?> GetByEmailAsync(string email);
     Task AddAsync(User user);
+    Task<int?> GetTokenVersionAsync(int userId);
+    Task IncrementTokenVersionAsync(int userId);
 }

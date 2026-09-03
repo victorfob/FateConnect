@@ -185,6 +185,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("ProfileType")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TokenVersion")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")

@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 namespace FateConnect.Api;
 
+using System.Globalization;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using DotNetEnv;
@@ -8,6 +10,7 @@ using FateConnect.Api.Infrastructure.Converters;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Infrastructure.Middlewares;
 using FateConnect.Api.Modules.Auth.Entities;
+using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Rides.Interfaces;
@@ -151,6 +154,10 @@ public class Program
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ClockSkew = TimeSpan.Zero
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = RejectRevokedTokenAsync
+                };
             });
 
         builder.Services.AddAuthorizationBuilder()
@@ -183,5 +190,29 @@ public class Program
         app.MapControllers();
 
         app.Run();
+    }
+
+    private static async Task RejectRevokedTokenAsync(TokenValidatedContext context)
+    {
+        string? carriedVersion = context.Principal?.FindFirstValue(TokenClaimNames.TokenVersion);
+        string? identifier = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        bool isVersionReadable = int.TryParse(carriedVersion, CultureInfo.InvariantCulture, out int tokenVersion);
+        bool isIdentifierReadable = int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId);
+        bool canCompareVersions = isVersionReadable && isIdentifierReadable;
+
+        if (!canCompareVersions)
+        {
+            context.Fail("The token carries no readable version and cannot be checked against the current one.");
+
+            return;
+        }
+
+        IUserRepository users = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+
+        int? currentVersion = await users.GetTokenVersionAsync(userId);
+
+        if (currentVersion != tokenVersion)
+            context.Fail("The token version no longer matches the one the session carries.");
     }
 }

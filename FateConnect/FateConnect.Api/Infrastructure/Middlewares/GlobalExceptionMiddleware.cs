@@ -47,7 +47,7 @@ public partial class GlobalExceptionMiddleware(
                 conflictingField = ex.Field;
                 break;
 
-            case UnidentifiedUserException or InvalidCredentialsException:
+            case UnidentifiedUserException or UnidentifiedTokenException or InvalidCredentialsException:
                 statusCode = HttpStatusCode.Unauthorized;
                 errorMessage = exception.Message;
                 break;
