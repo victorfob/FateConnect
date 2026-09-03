@@ -50,9 +50,7 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task CreateRide_WithSeatsOutOfRange_AnswersTheDomainMessage()
     {
-        HttpClient client = _factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", ApiFactory.IssueToken());
+        HttpClient client = _factory.CreateClientForNewUser("Ana Beatriz Nogueira");
 
         HttpResponseMessage response = await client.PostAsJsonAsync("/Rides", new
         {

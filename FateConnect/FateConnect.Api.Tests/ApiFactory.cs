@@ -1,4 +1,8 @@
+using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
@@ -10,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using static BCrypt.Net.BCrypt;
 
 namespace FateConnect.Api.Tests;
@@ -40,7 +45,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         });
     }
 
-    public static string IssueToken(int userId = 1)
+    public static string IssueToken(int userId = 1, int tokenVersion = 0)
     {
         JwtOptions options = new()
         {
@@ -50,7 +55,39 @@ public class ApiFactory : WebApplicationFactory<Program>
         };
 
         return new TokenService(Options.Create(options))
-            .GenerateJwtToken(new User { Id = userId, FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br" });
+            .GenerateJwtToken(new User
+            {
+                Id = userId,
+                FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
+                TokenVersion = tokenVersion
+            });
+    }
+
+    public static string IssueTokenWithoutVersion(int userId = 1)
+    {
+        JwtSecurityTokenHandler handler = new();
+        byte[] securityKey = Encoding.UTF8.GetBytes(FakeSecret);
+
+        ClaimsIdentity claims = new(
+        [
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString(CultureInfo.InvariantCulture)),
+            new Claim(ClaimTypes.Name, "Mariana Alves Rocha"),
+            new Claim(ClaimTypes.Role, "Operator"),
+            new Claim(ClaimTypes.Email, "mariana.rocha@aluno.cps.sp.gov.br")
+        ]);
+
+        SecurityToken token = handler.CreateToken(new SecurityTokenDescriptor
+        {
+            Subject = claims,
+            Expires = DateTime.UtcNow.AddHours(1),
+            Issuer = "FateConnectTest",
+            Audience = "FateConnectTestWeb",
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(securityKey),
+                SecurityAlgorithms.HmacSha256Signature)
+        });
+
+        return handler.WriteToken(token);
     }
 
     public static string UniquePhone() => $"15{Random.Shared.Next(100_000_000, 999_999_999)}";
@@ -119,12 +156,17 @@ public class ApiFactory : WebApplicationFactory<Program>
         return ride.Id;
     }
 
-    public HttpClient CreateClientFor(int userId)
+    public HttpClient CreateClientFor(int userId, int tokenVersion = 0)
     {
         HttpClient client = CreateClient();
         client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", IssueToken(userId));
+            new AuthenticationHeaderValue("Bearer", IssueToken(userId, tokenVersion));
 
         return client;
+    }
+
+    public HttpClient CreateClientForNewUser(string fullName)
+    {
+        return CreateClientFor(SeedUser(fullName).Id);
     }
 }
