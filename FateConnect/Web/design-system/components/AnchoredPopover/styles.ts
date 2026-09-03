@@ -8,9 +8,13 @@ const { component } = radiusScale;
 
 const ARROW_SIZE_PX = 10;
 
-/** Do centro da seta até a borda direita do papel, que o `anchorOrigin` alinha
- * com a do gatilho — cai sobre o meio de um controle de 32 a 40px. */
-const ARROW_CENTRE_FROM_RIGHT_PX = 18;
+/**
+ * Do centro da seta até a borda direita do papel, que o `anchorOrigin` alinha
+ * com a do gatilho. É **metade** do controle padrão de 40px — o `IconButton` —,
+ * então a seta cai no centro dele. Gatilho de outro tamanho desalinha a seta
+ * pela diferença: o consumidor envolve o conteúdo num controle de 40px.
+ */
+const ARROW_CENTRE_FROM_RIGHT_PX = 20;
 
 export const PopoverSurface = styled(Popover)(({ theme }) => ({
   '& .MuiPopover-paper': {
