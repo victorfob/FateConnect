@@ -7,6 +7,7 @@ import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
+import * as C from '@app/pages/Unavailable/constants';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
@@ -57,6 +58,19 @@ describe('routeConfig', () => {
     renderRoute(path);
 
     await expectTitle(title);
+  });
+
+  it.each([
+    [RoutePathEnum.PROFILE, C.PROFILE_DESCRIPTION],
+    [RoutePathEnum.DENUNCIATIONS, C.DENUNCIATIONS_DESCRIPTION],
+    [RoutePathEnum.NOTIFICATIONS, C.NOTIFICATIONS_DESCRIPTION],
+  ])('should resolve %s with the screen that has no owner yet', async (path, description) => {
+    tokenStorage.save(tokenWithName('Maria da Silva'));
+
+    renderRoute(path);
+
+    await expectTitle(C.UNAVAILABLE_TITLE);
+    expect(screen.getByText(description)).toBeInTheDocument();
   });
 
   it.each([
