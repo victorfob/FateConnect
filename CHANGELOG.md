@@ -17,6 +17,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Reduz a altura do rodapé no desktop, que ocupava espaço demais e empurrava o conteúdo para cima (#282) [Frontend]
 - Passa a recusar cadastro cujo telefone ou e-mail de contato já pertença a outra pessoa, com o mesmo 409 que o e-mail de login já respondia; a unicidade passa a valer também no banco, e para isso os cadastros que repetiam um contato são apagados junto com as caronas que ofertaram, ficando o mais antigo (#284) [Backend]
 - Passa a dizer qual campo está em uso na resposta de conflito do cadastro, que antes trazia só a mensagem (#284) [Backend]
+- Passa a exigir 18 anos completos no cadastro também na API, que aceitava conta de menor de idade em requisição feita fora do formulário; quem completa 18 anos no dia é aceito (#285) [Backend]
 
 ### Fixed
 
@@ -29,6 +30,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o espaçamento dos botões dentro dos campos — o do calendário e o do relógio —, que ficavam mais para dentro que a seta dos campos de seleção ao lado (#279) [Frontend]
 - Corrige o logo dentro do menu lateral, que navegava e deixava o menu aberto por cima da tela nova (#281) [Frontend]
 - Corrige o realce de passar o ponteiro no topo e no menu lateral: no topo ele não chegava a aparecer, e no menu clareava tanto que apagava o próprio rótulo (#281) [Frontend]
+- Corrige a recusa de cadastro sem data de nascimento, que respondia em inglês enquanto os outros erros da API já vinham em português (#285) [Backend]
 
 ### Removed
 

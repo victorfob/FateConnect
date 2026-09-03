@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Common.Constants;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
@@ -25,7 +26,8 @@ public class CreateUserDto
     [DefaultValue("João da Silva")]
     public string FullName { get; set; } = string.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Informe a data de nascimento")]
+    [MinimumAge(18, ErrorMessage = "É necessário ter pelo menos 18 anos")]
     [DefaultValue("2000-01-01T00:00:00Z")]
     required public DateTime BirthDate { get; set; }
 
