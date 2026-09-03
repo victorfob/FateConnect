@@ -8,9 +8,7 @@ public class SessionEndpointTests(ApiFactory factory) : IClassFixture<ApiFactory
     [Fact]
     public async Task Session_WithAValidToken_AnswersNoContent()
     {
-        HttpClient client = factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", ApiFactory.IssueToken());
+        HttpClient client = factory.CreateClientForNewUser("Bruno Carvalho Souza");
 
         HttpResponseMessage response = await client.GetAsync("/Auth/session");
 

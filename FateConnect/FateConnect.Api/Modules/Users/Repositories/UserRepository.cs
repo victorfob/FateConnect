@@ -14,6 +14,22 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public async Task<int?> GetTokenVersionAsync(int userId)
+    {
+        return await _context.Users
+            .Where(user => user.Id == userId)
+            .Select(user => (int?)user.TokenVersion)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task IncrementTokenVersionAsync(int userId)
+    {
+        await _context.Users
+            .Where(user => user.Id == userId)
+            .ExecuteUpdateAsync(update =>
+                update.SetProperty(user => user.TokenVersion, user => user.TokenVersion + 1));
+    }
+
     public async Task<bool> EmailExistsAsync(string email)
     {
         return await _context.Users.AnyAsync(u => u.FatecEmail == email);

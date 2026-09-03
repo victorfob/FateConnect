@@ -36,9 +36,7 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task RideEndpoints_WithAValidToken_ReachTheController()
     {
-        HttpClient client = _factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", ApiFactory.IssueToken());
+        HttpClient client = _factory.CreateClientForNewUser("Mariana Alves Rocha");
 
         HttpResponseMessage response = await client.GetAsync("/Rides");
 
