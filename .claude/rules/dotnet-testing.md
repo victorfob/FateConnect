@@ -105,9 +105,13 @@ Nunca exponha membro só para testar. O que interessa é o resultado do método 
 
 ## Estático precisa de costura
 
-`DateTime.UtcNow`, `TimeZoneInfo` e afins tiram o controle do teste. Enquanto a costura não existir, **não escreva o teste que depende do relógio** — ele passa hoje e falha sozinho depois.
+`DateTime.UtcNow`, `TimeZoneInfo` e afins tiram o controle do teste. **Onde a costura não existir, não escreva o teste que depende do relógio** — ele passa hoje e falha sozinho depois.
 
-Aqui isso já espera por alguém: `Ride.ValidateDepartureDateTime` compara a partida com `DateTime.UtcNow`, então testar a regra de "partida no futuro" exige injetar o tempo antes.
+**O padrão é o `MinimumAgeAttribute`:** ele pergunta o relógio ao `ValidationContext` — `GetService(typeof(TimeProvider))` — e cai para `TimeProvider.System` quando ninguém fornece. O teste entrega um `TimeProvider` fixo por um `IServiceProvider` de duas linhas, e cada borda vira caso determinístico. `TimeProvider` é do .NET 8: não escreva interface de relógio própria.
+
+⛔ **`Ride.ValidateDepartureDateTime` continua sem costura**: compara a partida com `DateTime.UtcNow` direto, então testar "partida no futuro" ainda exige injetar o tempo antes.
+
+⚠️ **Depender do relógio não é ser sensível a ele.** O caso **na borda** é o que quebra: na virada de meia-noite UTC o limite anda um dia e a data muda de lado — e quem cai é o teste de **recusa**, não o de aceitação. Teste de endpoint com uma década de folga do limite lê o relógio e nunca vira. Data literal fixa não é a saída: ela envelhece calada, porque um dia deixa de ser menor de idade. A borda fica no teste de unidade com relógio fixo; o endpoint fica com o caso folgado, provando só a fiação.
 
 ## Subir a aplicação contra PostgreSQL de verdade
 
@@ -117,7 +121,7 @@ Aqui isso já espera por alguém: `Ride.ValidateDepartureDateTime` compara a par
 
 **O schema nasce das migrations**, porque é o `Migrate()` do `Program` que roda — o mesmo caminho da produção. Migration quebrada aparece no teste, e o `unaccent` vem junto sem passo manual, porque o `FateConnectDbContext` o declara com `HasPostgresExtension`.
 
-⚠️ **O custo é real e conhecido: ~6s contra ~1s do provedor em memória.** São **24 fábricas** — uma por classe com `IClassFixture`, mais uma por caso de teste do `RideListingTests` —, logo 24 bancos criados e migrados. Isso é aceitável para o que compra, e o que compra foi medido na #237, com três mutações:
+⚠️ **O custo é real e conhecido: ~6s contra ~1s do provedor em memória.** São **25 fábricas** — uma por classe com `IClassFixture`, mais uma por caso de teste do `RideListingTests` —, logo 25 bancos criados e migrados. Isso é aceitável para o que compra, e o que compra foi medido na #237, com três mutações:
 
 | mutação | o que cai |
 | --- | --- |
@@ -127,7 +131,7 @@ Aqui isso já espera por alguém: `Ride.ValidateDepartureDateTime` compara a par
 
 As três passavam verdes no provedor em memória, que executa LINQ em memória e não conhece função de PostgreSQL.
 
-⚠️ **Não serialize a criação dos bancos, e não desligue o paralelismo do xUnit.** As 24 fábricas criam banco ao mesmo tempo, e a falha clássica disso — `source database "template1" is being accessed by other users` — exige uma sessão aberta **no template**. Medido durante uma corrida real: os únicos bancos que recebem conexão são o `postgres`, onde o Npgsql abre a conexão administrativa, e os `fateconnect-tests-<guid>`; o `template1` recebe **zero**. Pico de **25 conexões contra o teto de 100**, e 120 `CREATE DATABASE` concorrentes numa sonda não produziram uma falha.
+⚠️ **Não serialize a criação dos bancos, e não desligue o paralelismo do xUnit.** As 25 fábricas criam banco ao mesmo tempo, e a falha clássica disso — `source database "template1" is being accessed by other users` — exige uma sessão aberta **no template**. Medido durante uma corrida real: os únicos bancos que recebem conexão são o `postgres`, onde o Npgsql abre a conexão administrativa, e os `fateconnect-tests-<guid>`; o `template1` recebe **zero**. Pico de **26 conexões de cliente contra o teto de 100**, e 120 `CREATE DATABASE` concorrentes numa sonda não produziram uma falha.
 
 ⚠️ **Aquele zero só vale por causa do controle positivo.** Antes de acreditar nele, a mesma sonda forçou o erro de propósito — conexão aberta num banco e `CREATE DATABASE ... TEMPLATE` copiando dele — e ele apareceu. Sonda que não consegue produzir a falha não está medindo a ausência dela.
 
