@@ -161,6 +161,22 @@ Medido de três jeitos na #291, e os dois primeiros levaram a conclusões errada
 
 ⚠️ **Quem reclama é sempre a pessoa que olha a tela**, porque o número mente com confiança: eu tinha `32px` de um lado e `32px` do outro, e mesmo assim estava torto. Ao receber "não está alinhado" sobre algo que você mediu, desconfie do **que** foi medido antes de duvidar do relato.
 
+## Propriedade em transição devolve o valor congelado
+
+⛔ **Com o painel do navegador oculto a página não compõe quadros, e a transição CSS não avança** — `getComputedStyle` devolve o valor do estado **anterior**, por mais que você espere.
+
+Medido em 03/09/2026 no interruptor de tema: desligado, sem a classe `Mui-checked`, com a única regra que casava dizendo `background-color: rgb(0, 0, 0)`, o computado devolvia o vermelho do estado ligado — em três leituras seguidas, com 800ms de espera cada. Ia para o relatório como "o interruptor parece sempre ligado", defeito que não existe.
+
+**O controle é desligar a transição antes de ler:**
+
+```js
+elemento.style.transition = 'none';
+const cor = getComputedStyle(elemento).backgroundColor;
+elemento.style.transition = '';
+```
+
+⚠️ **O sinal é o computado discordar da folha de estilo.** Antes de concluir que a cor está errada, liste as regras que de fato casam com o elemento — percorrer `document.styleSheets` testando `elemento.matches(regra.selectorText)`. Uma regra só, dizendo outra coisa, é a transição respondendo no lugar dela.
+
 ## Sobrescrever estado do MUI: repita a classe do componente
 
 ⛔ **`& .Mui-selected` empata com o seletor da biblioteca e perde no desempate por ordem de fonte.** Use `& .MuiPaginationItem-root.Mui-selected` — a classe do componente mais a do estado —, que sobe a especificidade acima da do MUI. Vale para `.Mui-selected`, `.Mui-disabled`, `.Mui-focused`, `.Mui-checked` e companhia.
