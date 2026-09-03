@@ -5,13 +5,6 @@ import type { SignupRequest } from '@app/services/signup/types';
 import type { SignupFormValues } from '../schema';
 import { parseBirthDate, toApiBirthDate } from './birthDate';
 
-/** Campo opcional: o backend prefere a ausência da chave a uma string vazia. */
-function optionalText(value: string): string | undefined {
-  if (value === '') return undefined;
-
-  return value;
-}
-
 /** O schema já garantiu a data; o vazio só existe para o tipo fechar. */
 function toApiBirthDateOrEmpty(value: string): string {
   const parsed = parseBirthDate(value);
@@ -23,7 +16,6 @@ function toApiBirthDateOrEmpty(value: string): string {
 export function toSignupRequest(values: SignupFormValues): SignupRequest {
   return {
     fullName: values.fullName,
-    nickname: optionalText(values.nickname),
     fatecEmail: values.fatecEmail,
     password: values.password,
     birthDate: toApiBirthDateOrEmpty(values.birthDate),
