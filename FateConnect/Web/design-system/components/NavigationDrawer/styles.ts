@@ -19,7 +19,7 @@ export const DrawerRoot = styled(Drawer)(({ theme }) => ({
     width: `${DRAWER_WIDTH_PX}px`,
     backgroundColor: theme.palette.chrome.main,
     color: theme.palette.chrome.contrastText,
-    padding: theme.space(lg, none),
+    paddingTop: theme.space(lg),
     overflowX: 'hidden',
 
     // O item de lista se estiliza aqui, no papel, e não na lista: o rodapé
@@ -45,6 +45,26 @@ export const DrawerRoot = styled(Drawer)(({ theme }) => ({
       color: theme.palette.chrome.contrastText,
       ...theme.typography.body,
     },
+    // O ícone do MUI nasce em `action.active`, que é preto a 54% — sobre o
+    // cromo isso dá 1,93:1, abaixo do mínimo de 3:1 para não-texto.
+    '& .MuiListItemIcon-root': {
+      color: theme.palette.chrome.contrastText,
+      minWidth: 'unset',
+      marginRight: theme.space(sm),
+    },
+    // O cabeçalho de seção do MUI nasce com o fundo de `background.paper`, que
+    // é branco: sem isto ele desenha uma faixa clara atravessando o cromo.
+    '& .MuiListSubheader-root': {
+      backgroundColor: 'transparent',
+      color: theme.palette.chrome.contrastText,
+      ...theme.typography.captionBold,
+      padding: theme.space(lg, md, sm),
+    },
+    // O primeiro rótulo mede a partir do cabeçalho, que já tem margem própria:
+    // o recuo cheio somaria às duas coisas e abriria um vão sob o logo.
+    '& .MuiListSubheader-root:first-of-type': {
+      paddingTop: theme.space(xs),
+    },
   },
 }));
 
@@ -65,6 +85,7 @@ export const DrawerHeader = styled(Stack)(({ theme }) => ({
 
 export const DrawerList = styled(List)(({ theme }) => ({
   paddingLeft: theme.space(none),
+  paddingBottom: theme.space(lg),
 }));
 
 /**
@@ -74,6 +95,6 @@ export const DrawerList = styled(List)(({ theme }) => ({
  */
 export const DrawerFooter = styled(Stack)(({ theme }) => ({
   marginTop: 'auto',
-  paddingTop: theme.space(xs),
+  padding: theme.space(xs, none),
   borderTop: `1px solid ${theme.palette.chrome.divider}`,
 }));
