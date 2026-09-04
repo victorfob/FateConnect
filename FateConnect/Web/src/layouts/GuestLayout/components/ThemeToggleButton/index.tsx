@@ -1,6 +1,5 @@
-import { IconButton } from '@ds-root/components/IconButton';
-import { DarkModeIcon, LightModeIcon } from '@ds-root/icons';
-import { useThemeMode } from '@ds-root/ThemeProvider/context/ThemeModeContext';
+import { IconButton, useThemeMode } from '@design-system';
+import { DarkModeIcon, LightModeIcon } from '@design-system/icons';
 
 const SWITCH_TO_DARK_LABEL = 'Ativar tema escuro';
 const SWITCH_TO_LIGHT_LABEL = 'Ativar tema claro';

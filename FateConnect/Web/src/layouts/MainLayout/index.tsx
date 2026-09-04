@@ -1,13 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Outlet, Link as RouterLink, useLocation } from 'react-router';
-import {
-  Button,
-  Footer,
-  Header,
-  ListItemButton,
-  ListItemText,
-  NavigationDrawer,
-} from '@design-system';
+import { Button, Footer, Header, NavigationDrawer } from '@design-system';
 
 import { BrandLogo } from '@app/components/BrandLogo';
 import { LegalFooterLinks } from '@app/components/LegalFooterLinks';
@@ -17,6 +10,8 @@ import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 import * as S from '../shell.styles';
 import { AccountMenu } from './components/AccountMenu';
+import { DrawerNavigation } from './components/DrawerNavigation';
+import { DrawerSignOut } from './components/DrawerSignOut';
 import { NotificationsMenu } from './components/NotificationsMenu';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
@@ -57,18 +52,9 @@ export function MainLayout() {
         open={drawerOpen}
         onClose={handleDrawerClose}
         header={<BrandLogo to={RoutePathEnum.MENU} onClick={handleDrawerClose} />}
+        footer={<DrawerSignOut />}
       >
-        {APP_LINKS.map(({ path, label }) => (
-          <ListItemButton
-            key={path}
-            component={RouterLink}
-            to={path}
-            onClick={handleDrawerClose}
-            aria-current={path === pathname ? 'page' : undefined}
-          >
-            <ListItemText primary={label} />
-          </ListItemButton>
-        ))}
+        <DrawerNavigation onNavigate={handleDrawerClose} />
       </NavigationDrawer>
 
       <S.ShellContent component="main">

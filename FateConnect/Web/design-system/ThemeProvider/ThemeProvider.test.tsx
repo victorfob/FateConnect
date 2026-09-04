@@ -2,11 +2,28 @@ import Typography from '@mui/material/Typography';
 
 import { render, screen, userEvent } from '@app/test/testing-library';
 
-import { ThemeToggleButton } from '../components/ThemeToggleButton';
+import { useThemeMode } from './context/ThemeModeContext';
 import { themeModeStorage } from './storage/themeModeStorage';
 
-const SWITCH_TO_DARK = 'Ativar tema escuro';
-const SWITCH_TO_LIGHT = 'Ativar tema claro';
+const PROBE_LABEL = 'Alternar';
+
+/**
+ * A sonda vive aqui porque nenhum componente do design system lê o modo: o
+ * interruptor mora na tela de preferências, e daqui não se importa de `@app`.
+ */
+function ModeProbe() {
+  const { mode, toggleMode } = useThemeMode();
+
+  return (
+    <button aria-label={PROBE_LABEL} onClick={toggleMode}>
+      {mode}
+    </button>
+  );
+}
+
+function probe(): HTMLElement {
+  return screen.getByRole('button', { name: PROBE_LABEL });
+}
 
 describe('ThemeProvider', () => {
   it('should provide the theme to components in the tree', () => {
@@ -21,15 +38,15 @@ describe('ThemeProvider', () => {
   it('should open in the mode chosen on the last visit', () => {
     themeModeStorage.save('dark');
 
-    render(<ThemeToggleButton />);
+    render(<ModeProbe />);
 
-    expect(screen.getByRole('button', { name: SWITCH_TO_LIGHT })).toBeInTheDocument();
+    expect(probe()).toHaveTextContent('dark');
   });
 
   it('should remember the mode the reader switches to', async () => {
-    render(<ThemeToggleButton />);
+    render(<ModeProbe />);
 
-    await userEvent.click(screen.getByRole('button', { name: SWITCH_TO_DARK }));
+    await userEvent.click(probe());
 
     expect(themeModeStorage.read()).toBe('dark');
   });

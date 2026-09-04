@@ -1,5 +1,6 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 
+import { APP_LINKS } from '@app/constants/navigation';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
 
@@ -33,11 +34,9 @@ describe('Menu', () => {
 
     const links = screen.getAllByRole('link');
 
-    expect(links.map((link) => link.textContent)).toEqual(
-      C.MENU_SERVICES.map(({ label }) => label),
-    );
+    expect(links.map((link) => link.textContent)).toEqual(APP_LINKS.map(({ label }) => label));
     expect(links.map((link) => link.getAttribute('href'))).toEqual(
-      C.MENU_SERVICES.map(({ path }) => path),
+      APP_LINKS.map(({ path }) => path),
     );
   });
 
