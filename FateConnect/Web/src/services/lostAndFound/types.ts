@@ -2,39 +2,39 @@ import type { PageQuery } from '../types';
 
 /** Valores canônicos alinhados à serialização do backend. */
 export enum LostItemKindEnum {
-  FOUND = 'Achado',
-  LOST = 'Perdido',
+  FOUND = 'Found',
+  LOST = 'Lost',
 }
 
 export enum LostItemStatusEnum {
-  OPEN = 'Aberto',
-  RESOLVED = 'Resolvido',
-  CANCELLED = 'Cancelado',
+  OPEN = 'Open',
+  RESOLVED = 'Resolved',
+  DELETED = 'Deleted',
 }
 
-export enum CancellationReasonEnum {
-  OWNER = 'Usuario',
-  INACTIVITY = 'Inatividade',
+export enum DeletionReasonEnum {
+  USER = 'User',
+  INACTIVITY = 'Inactivity',
 }
 
 export type LostItem = {
   id: string;
-  nome: string;
-  tipo: LostItemKindEnum;
-  local: string;
-  dataOcorrido: string;
-  descricao: string | null;
-  fotoUrl: string | null;
-  situacao: LostItemStatusEnum;
-  motivoCancelamento: CancellationReasonEnum | null;
-  meuItem: boolean;
-  dataCadastro: string;
+  name: string;
+  type: LostItemKindEnum;
+  place: string;
+  occurredOn: string;
+  description: string | null;
+  photoUrl: string | null;
+  status: LostItemStatusEnum;
+  deletionReason: DeletionReasonEnum | null;
+  isMine: boolean;
+  createdAt: string;
 };
 
-/** A foto fica de fora: quem devolve a `fotoUrl` é o servidor. */
+/** A foto fica de fora: quem devolve a `photoUrl` é o servidor. */
 export type LostItemInput = Pick<
   LostItem,
-  'nome' | 'tipo' | 'local' | 'dataOcorrido' | 'descricao'
+  'name' | 'type' | 'place' | 'occurredOn' | 'description'
 >;
 
 export interface LostItemFilter extends PageQuery {

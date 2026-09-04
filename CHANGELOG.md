@@ -27,6 +27,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Clareia o texto de marca e os blocos de carregamento no tema escuro, que ganham contraste contra o fundo (#297) [Frontend]
 - Move a preferência de tema do topo da área logada para uma tela própria, em Preferências, alcançada pelo menu; na página inicial o botão continua no topo, para quem ainda não entrou (#301) [Frontend]
 - Divide o menu lateral da área logada em seções — serviços e conta —, cada item com o seu ícone e a saída de sessão separada no rodapé; ele passa a levar também a notificações, ao perfil e às preferências, e abaixo do desktop passa a ser o único caminho para a conta, com o avatar saindo do topo onde o botão de menu aparece (#306) [Frontend]
+- Renomeia para `Excluir` a ação que remove item e carona, antes chamada `Cancelar` e lida como desistir da operação em vez de destruir o registro; a confirmação, os avisos, a etiqueta e o filtro acompanham, o botão que dispensa o diálogo volta a ser `Cancelar`, e recuperar um item excluído passa a ser `Restaurar`. A nota do item excluído passa a distinguir a exclusão manual da automática por inatividade, e deixa de existir quando o motivo não vem — antes ela repetia a palavra da etiqueta ao lado (#314) [Frontend]
 
 ### Fixed
 

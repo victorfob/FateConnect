@@ -11,36 +11,36 @@ import * as S from './styles';
 type LostItemStatusActionProps = Readonly<{
   item: LostItem;
   onResolve: (item: LostItem) => void;
-  onReopen: (item: LostItem) => void;
+  onRestore: (item: LostItem) => void;
 }>;
 
-export function LostItemStatusAction({ item, onResolve, onReopen }: LostItemStatusActionProps) {
+export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemStatusActionProps) {
   const handleResolve = useCallback(() => onResolve(item), [onResolve, item]);
-  const handleReopen = useCallback(() => onReopen(item), [onReopen, item]);
+  const handleRestore = useCallback(() => onRestore(item), [onRestore, item]);
 
-  if (!item.meuItem) return null;
+  if (!item.isMine) return null;
 
-  if (item.situacao === LostItemStatusEnum.CANCELLED) {
+  if (item.status === LostItemStatusEnum.DELETED) {
     return (
       <S.ActionRow>
-        <Button type="button" variant="soft" onClick={handleReopen}>
+        <Button type="button" variant="soft" onClick={handleRestore}>
           <RestoreIcon fontSize="small" />
-          {C.REOPEN_LABEL}
+          {C.RESTORE_LABEL}
         </Button>
       </S.ActionRow>
     );
   }
 
-  if (item.situacao !== LostItemStatusEnum.OPEN) return null;
+  if (item.status !== LostItemStatusEnum.OPEN) return null;
 
   return (
     <S.ActionRow>
       <LostItemConfirmAction
-        label={C.lostItemResolveLabel(item.tipo)}
+        label={C.lostItemResolveLabel(item.type)}
         icon={<CheckCircleIcon fontSize="small" />}
         dialogTitle={C.RESOLVE_DIALOG.title}
         messagePrefix={C.RESOLVE_DIALOG.messagePrefix}
-        itemName={item.nome}
+        itemName={item.name}
         confirmLabel={C.RESOLVE_DIALOG.confirmLabel}
         onConfirm={handleResolve}
       />
