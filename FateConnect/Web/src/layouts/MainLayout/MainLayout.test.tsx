@@ -5,7 +5,11 @@ import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
+import { TRIGGER_LABEL } from './components/AccountMenu/constants';
 import { MainLayout } from '.';
+
+/** O botão de menu e o gatilho do menu da conta. */
+const HEADER_BUTTONS = 2;
 
 function renderLayout(initialEntry: RoutePathEnum = RoutePathEnum.MENU) {
   const router = createMemoryRouter(
@@ -60,16 +64,17 @@ describe('MainLayout', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  // É a contagem que denuncia um segundo botão voltando para o topo; buscar
-  // pelo nome do alternador passaria se ele voltasse com outro rótulo.
+  // É a contagem que denuncia o alternador voltando ao topo; buscar pelo rótulo
+  // dele passaria se ele voltasse com outro nome.
   it('should leave the theme toggle out of the header', () => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
     renderLayout();
 
     const header = within(screen.getByRole('banner'));
 
-    expect(header.getAllByRole('button', { hidden: true })).toHaveLength(1);
+    expect(header.getAllByRole('button', { hidden: true })).toHaveLength(HEADER_BUTTONS);
     expect(header.getByRole('button', { name: 'Abrir menu', hidden: true })).toBeInTheDocument();
+    expect(header.getByRole('button', { name: TRIGGER_LABEL })).toBeInTheDocument();
   });
 
   it('should point the logo to the menu', () => {

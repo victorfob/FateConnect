@@ -11,7 +11,14 @@ export async function login(payload: LoginRequest): Promise<TokenResponse> {
   return data;
 }
 
-export function logout(): void {
+export async function logout(): Promise<void> {
+  try {
+    await apiClient.post(`${AUTH_PATH}/logout`);
+  } catch {
+    // Rede fora não pode prender a pessoa dentro da aplicação — e nesse cenário
+    // o token sobreviveria no servidor de todo jeito.
+  }
+
   tokenStorage.clear();
 }
 
