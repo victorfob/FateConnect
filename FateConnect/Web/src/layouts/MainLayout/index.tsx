@@ -16,7 +16,7 @@ import { APP_LINKS } from '@app/constants/navigation';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 import * as S from '../shell.styles';
-import { HeaderActions } from './components/HeaderActions';
+import { AccountMenu } from './components/AccountMenu';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
@@ -31,7 +31,7 @@ export function MainLayout() {
     <S.ShellRoot>
       <Header
         logo={<BrandLogo to={RoutePathEnum.MENU} />}
-        actions={<HeaderActions />}
+        actions={<AccountMenu />}
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
         navigation={APP_LINKS.map(({ path, label }) => (

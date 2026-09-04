@@ -19,8 +19,6 @@ function renderProbe(refused: boolean) {
 }
 
 describe('useSessionStatus', () => {
-  afterEach(() => tokenStorage.clear());
-
   it('should report no session when nothing was stored and nothing was refused', () => {
     renderProbe(false);
 
