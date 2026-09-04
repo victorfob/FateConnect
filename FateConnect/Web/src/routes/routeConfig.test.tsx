@@ -5,6 +5,7 @@ import { server } from '@app/mocks/server';
 import { DESCRIPTION_TITLE } from '@app/pages/Home/components/LandingDescription/constants';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
+import { PREFERENCES_TITLE } from '@app/pages/Preferences/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
 import * as C from '@app/pages/Unavailable/constants';
@@ -52,6 +53,7 @@ describe('routeConfig', () => {
     [RoutePathEnum.MENU, MENU_TITLE],
     [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
     [RoutePathEnum.RIDES, RIDES_TITLE],
+    [RoutePathEnum.PREFERENCES, PREFERENCES_TITLE],
   ])('should resolve %s with a session', async (path, title) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
 

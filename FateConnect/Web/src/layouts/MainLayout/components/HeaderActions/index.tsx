@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { InitialsAvatar, ThemeToggleButton } from '@design-system';
+import { InitialsAvatar } from '@design-system';
 
 import { loggedUserName } from '@app/services/auth/loggedUser';
 import { getInitials } from '@app/utils/initials';
@@ -12,10 +12,7 @@ export function HeaderActions() {
   const userName = loggedUserName() ?? '';
   const initials = useMemo(() => getInitials(userName), [userName]);
 
-  return (
-    <>
-      <ThemeToggleButton />
-      {initials ? <InitialsAvatar initials={initials} label={userName} /> : null}
-    </>
-  );
+  if (!initials) return null;
+
+  return <InitialsAvatar initials={initials} label={userName} />;
 }
