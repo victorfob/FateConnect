@@ -17,4 +17,5 @@ export const LANDING_LINKS: LandingLink[] = [
 export const APP_LINKS: AppLink[] = [
   { path: RoutePathEnum.LOST_AND_FOUND, label: 'Achados & Perdidos' },
   { path: RoutePathEnum.RIDES, label: 'Caronas' },
+  { path: RoutePathEnum.DENUNCIATIONS, label: 'Denúncias' },
 ];

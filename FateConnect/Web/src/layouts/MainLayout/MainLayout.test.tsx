@@ -15,6 +15,7 @@ function renderLayout(initialEntry: RoutePathEnum = RoutePathEnum.MENU) {
         children: [
           { path: RoutePathEnum.MENU, element: <div>menu</div> },
           { path: RoutePathEnum.RIDES, element: <div>caronas</div> },
+          { path: RoutePathEnum.DENUNCIATIONS, element: <div>denúncias</div> },
         ],
       },
     ],
@@ -96,6 +97,20 @@ describe('MainLayout', () => {
     );
     expect(within(drawer).getByRole('link', { name: 'Achados & Perdidos' })).not.toHaveAttribute(
       'aria-current',
+    );
+  });
+
+  it('should carry the denunciations entry in the header and in the drawer', async () => {
+    renderLayout(RoutePathEnum.DENUNCIATIONS);
+
+    expect(screen.getByRole('link', { name: 'Denúncias' })).toHaveAttribute('aria-current', 'page');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menu', hidden: true }));
+    const drawer = screen.getByRole('presentation');
+
+    expect(within(drawer).getByRole('link', { name: 'Denúncias' })).toHaveAttribute(
+      'aria-current',
+      'page',
     );
   });
 });

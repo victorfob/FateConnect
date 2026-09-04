@@ -11,6 +11,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona o botão de fechar nos diálogos quando a tela é estreita: a faixa em volta deles é curta demais para fechar por toque, e alargá-la deixaria o diálogo apertado. No desktop nada muda (#277) [Frontend]
 - Adiciona a marcação da tela atual no topo e no menu lateral, que antes não indicavam onde a pessoa estava; a marca também é anunciada por leitor de tela (#281) [Frontend]
 - Adiciona o encerramento de sessão na API, que invalida o token no servidor em vez de apenas descartá-lo no navegador: depois de sair, nenhum token daquela pessoa é aceito, em qualquer aparelho (#298) [Backend]
+- Adiciona Denúncias à navegação e ao menu, e faz perfil, denúncias e notificações abrirem uma tela avisando que a área ainda não está disponível, com a volta ao menu — antes os três endereços caíam na página inicial (#300) [Frontend]
 
 ### Changed
 
