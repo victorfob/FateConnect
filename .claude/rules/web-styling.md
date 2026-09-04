@@ -145,7 +145,39 @@ Medido em 01/09/2026, no X do diálogo: a arte ocupa **14px numa caixa de 24px**
 
 **Como medir o desenho:** `path.getBBox()` no `svg`, convertido para a escala da tela pela razão entre a largura renderizada e a do `viewBox`. Para texto, `Range.selectNodeContents` no elemento — a caixa do parágrafo inclui entrelinha que o olho não vê.
 
+### Vão entre elementos: da tinta até a **faixa de fundo** do vizinho
+
+⛔ **Vão entre um rótulo e o item abaixo dele não se mede de caixa a caixa nem de tinta a tinta.** O item de lista tem 48px de altura e a tinta dele fica no meio; o que o olho vê começar é o **fundo**. A medida que corresponde ao que se enxerga é da tinta do rótulo até a borda da faixa do item.
+
+Medido de três jeitos na #291, e os dois primeiros levaram a conclusões erradas:
+
+| Instrumento | Respondeu | O que produziu |
+| --- | --- | --- |
+| caixa → caixa | **0px**, antes e depois da correção | quase concluí que a correção não pegou |
+| tinta → tinta | 20px | pareceu folgado, e a devolução foi *"ainda ta mto colado"* |
+| tinta → **faixa de fundo** | **6px** | era o número |
+
+⚠️ **O sinal é o número que não se move.** `padding` acrescentado a um elemento para afastá-lo do vizinho **não altera** a distância entre as caixas — só `margin` alteraria. Se a medida é a mesma depois de uma correção que você sabe que aplicou, o instrumento está medindo a caixa.
+
 ⚠️ **Quem reclama é sempre a pessoa que olha a tela**, porque o número mente com confiança: eu tinha `32px` de um lado e `32px` do outro, e mesmo assim estava torto. Ao receber "não está alinhado" sobre algo que você mediu, desconfie do **que** foi medido antes de duvidar do relato.
+
+## Propriedade em transição devolve o valor congelado
+
+⛔ **Com o painel do navegador oculto a página não compõe quadros, e a transição CSS não avança** — `getComputedStyle` devolve o valor do estado **anterior**, por mais que você espere.
+
+Medido em 03/09/2026 no interruptor de tema: desligado, sem a classe `Mui-checked`, com a única regra que casava dizendo `background-color: rgb(0, 0, 0)`, o computado devolvia o vermelho do estado ligado — em três leituras seguidas, com 800ms de espera cada. Ia para o relatório como "o interruptor parece sempre ligado", defeito que não existe.
+
+**O controle é desligar a transição antes de ler:**
+
+```js
+elemento.style.transition = 'none';
+const cor = getComputedStyle(elemento).backgroundColor;
+elemento.style.transition = '';
+```
+
+⚠️ **E o fundo contra o qual você mede pode não pintar nada.** `getComputedStyle(elemento).backgroundColor` devolve `rgba(0, 0, 0, 0)` no elemento transparente, e a fórmula de contraste trata isso como **preto** — no tema claro o número despenca e parece reprovação. Suba na árvore até o primeiro fundo com alfa diferente de zero antes de calcular. Medido na mesma tela: **2,66:1** contra o transparente e **7,89:1** contra o branco real do cartão.
+
+⚠️ **O sinal é o computado discordar da folha de estilo.** Antes de concluir que a cor está errada, liste as regras que de fato casam com o elemento — percorrer `document.styleSheets` testando `elemento.matches(regra.selectorText)`. Uma regra só, dizendo outra coisa, é a transição respondendo no lugar dela.
 
 ## Sobrescrever estado do MUI: repita a classe do componente
 

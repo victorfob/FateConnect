@@ -33,6 +33,24 @@ O nível depende de o controller ser homogêneo ou misto, e são casos diferente
 
 Endpoint novo entra na teoria de rotas do `AuthorizationTests`, que prova por HTTP (401 sem token, 200 com token). O par positivo é obrigatório — ver `dotnet-testing.md`.
 
+## Encerrar sessão exige estado no servidor
+
+⛔ **Limpar o token no cliente não encerra nada.** O JWT é uma string assinada e autossuficiente: a API não guarda registro dele, só confere a assinatura e lê as claims. O `exp` está **dentro** do payload assinado, e quem interceptou o token tem a própria cópia — apagar o `localStorage` apaga a cópia de quem saiu.
+
+Para um token que era válido parar de passar, o servidor tem de lembrar de algo. São **três** famílias, e todas guardam estado; o que se escolhe é onde ele mora:
+
+| Caminho | O que o servidor guarda |
+| --- | --- |
+| lista de revogados (`jti`) | os tokens mortos, mais o descarte dos vencidos |
+| **versão de sessão** | um inteiro por usuário — o que está implementado |
+| access curto + refresh | o refresh token |
+
+⚠️ **Memória de processo não é opção:** reinício esquece tudo e o token volta a valer, e reinício acontece em **todo deploy**.
+
+**O que está de pé:** `Users.TokenVersion` viaja como claim em cada token, `POST /Auth/logout` incrementa a coluna, e o gancho `OnTokenValidated` recusa quem carrega valor diferente. O login **lê** a coluna e estampa o valor atual — ⛔ nunca incremente no login: depois de emitir você mata o token que acabou de entregar, e antes de emitir você encerra as outras sessões da pessoa a cada entrada.
+
+⚠️ **Requisição autenticada passa a exigir que o usuário exista**, porque a comparação lê a coluna. Fixture que emite token para um id sem semear usuário recebe 401 — e um token de conta apagada deixa de ser aceito, o que é o comportamento desejado.
+
 ## Perfil ainda não se cobra
 
 O token já emite o perfil como `ClaimTypes.Role` (`TokenService.BuildUserClaims`), então gate por perfil é `[Authorize(Roles = ...)]` na action — não precisa de guard próprio, o ASP.NET Core já entrega o atributo.

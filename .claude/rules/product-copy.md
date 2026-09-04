@@ -89,9 +89,17 @@ Diz o que aconteceu e o que fazer: `Erro ao carregar os itens. Tente novamente.`
 
 ## Caixa: sentence case
 
-Rótulo de botão, aba e título de diálogo levam maiúscula **só na primeira palavra** — "Cadastrar item", "Confirmar exclusão". Nome próprio e sigla mantêm a caixa.
+Rótulo de botão, aba, título de diálogo e **cabeçalho de seção** levam maiúscula **só na primeira palavra** — "Cadastrar item", "Confirmar exclusão", "Dados para contato". Nome próprio e sigla mantêm a caixa.
 
 ⚠️ **Dívida conhecida:** caronas e cadastro ainda usam Title Case ("Ofertar Carona", "Salvar Alterações"), herdado do protótipo. Achados e perdidos já está em sentence case; a conversão do resto acontece quando alguém tocar em cada tela.
+
+## Cabeçalho de seção nomeia o que está dentro
+
+Frase nominal curta dizendo o conteúdo, como o cadastro já faz: `Endereço` e `Dados para contato`.
+
+⛔ **Não nomeie a seção pela natureza do ajuste.** `Ajustes do sistema` não separa nada para quem lê — a tela inteira é o sistema — e "ajustes" repete o nome da tela que a contém. Em preferências, a seção que reúne tema, e-mails e notificações chama-se `Aparência e notificações`.
+
+⚠️ **Nomeie pelo que a seção vai reunir, não só pelo que já está dentro dela.** Enquanto não houver usuários no sistema, descrever uma linha que ainda vai entrar custa menos que renomear a seção depois — é a mesma tolerância da exceção de escopo planejado acima, aplicada dentro da aplicação.
 
 ## Tooltip
 
