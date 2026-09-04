@@ -26,6 +26,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a recusar os tokens emitidos antes desta versão, que não carregam a versão de sessão e por isso não podem ser invalidados; quem estiver com a sessão aberta no momento da publicação entra de novo, uma vez (#298) [Backend]
 - Clareia o texto de marca e os blocos de carregamento no tema escuro, que ganham contraste contra o fundo (#297) [Frontend]
 - Move a preferência de tema do topo da área logada para uma tela própria, em Preferências, alcançada pelo menu; na página inicial o botão continua no topo, para quem ainda não entrou (#301) [Frontend]
+- Divide o menu lateral da área logada em seções — serviços e conta —, cada item com o seu ícone e a saída de sessão separada no rodapé; ele passa a levar também a notificações, ao perfil e às preferências, e abaixo do desktop passa a ser o único caminho para a conta, com o avatar saindo do topo onde o botão de menu aparece (#306) [Frontend]
 
 ### Fixed
 
