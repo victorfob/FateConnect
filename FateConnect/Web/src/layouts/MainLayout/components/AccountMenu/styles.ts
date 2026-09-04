@@ -8,6 +8,11 @@ const { none, xxs } = spacingScale;
  */
 export const AvatarTrigger = styled(IconButton)(({ theme }) => ({
   padding: theme.space(xxs),
+
+  // Abaixo do desktop quem responde pela conta é a gaveta, que leva os mesmos
+  // itens deste painel. A consulta é a mesma em que o botão de menu aparece, de
+  // modo que um substitui o outro em vez de os dois conviverem.
+  [theme.breakpoints.down('md')]: { display: 'none' },
 }));
 
 /** O vermelho da marca como texto — `secondary.main` é cor de fundo e dá 3,24:1. */

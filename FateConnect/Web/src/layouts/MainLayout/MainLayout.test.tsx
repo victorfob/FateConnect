@@ -33,8 +33,9 @@ function renderLayout(initialEntry: RoutePathEnum = RoutePathEnum.MENU) {
   return router;
 }
 
-// O botão de menu só aparece abaixo de 768px, por CSS. O jsdom não avalia media
-// query, então ele fica com `display: none` e precisa ser buscado com `hidden`.
+// O botão de menu aparece abaixo do desktop e o gatilho da conta, acima — os dois
+// por CSS, na mesma consulta. O jsdom não avalia media query, então valem os
+// estados base: o botão nasce com `display: none` e precisa de `hidden`.
 describe('MainLayout', () => {
   it('should render the logged header and the footer around the routed content', () => {
     renderLayout();
