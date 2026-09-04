@@ -33,7 +33,7 @@ Issue que declara "Depende de" só começa quando a base estiver **com o escopo 
 ## Mecânica de worktree
 
 - **A worktree não nasce na branch atual.** Na #123 ela nasceu 16 commits atrás, sem o commit do contrato. Conferir com `git log --oneline -1` e corrigir com `git merge --ff-only <branch-da-tarefa>` **antes** de escrever qualquer linha.
-- ⛔ **A worktree nasce rastreando a base, e um `git push` vai para ela.** `git worktree add -b <nova> <caminho> origin/develop` deixa a branch nova com `origin/develop` como upstream — e a `develop` não aceita commit direto. Desarmar logo depois de criar:
+- ⛔ **Branch criada a partir de `origin/<base>` nasce rastreando a base, e um `git push` vai para ela.** Vale para `git worktree add -b <nova> <caminho> origin/develop` **e** para o `git checkout -b <nova> origin/develop` do checkout principal: os dois deixam `origin/develop` como upstream, e a `develop` não aceita commit direto. Desarmar logo depois de criar:
 
   ```bash
   git branch --unset-upstream <nova>
