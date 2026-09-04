@@ -175,6 +175,8 @@ const cor = getComputedStyle(elemento).backgroundColor;
 elemento.style.transition = '';
 ```
 
+⚠️ **E o fundo contra o qual você mede pode não pintar nada.** `getComputedStyle(elemento).backgroundColor` devolve `rgba(0, 0, 0, 0)` no elemento transparente, e a fórmula de contraste trata isso como **preto** — no tema claro o número despenca e parece reprovação. Suba na árvore até o primeiro fundo com alfa diferente de zero antes de calcular. Medido na mesma tela: **2,66:1** contra o transparente e **7,89:1** contra o branco real do cartão.
+
 ⚠️ **O sinal é o computado discordar da folha de estilo.** Antes de concluir que a cor está errada, liste as regras que de fato casam com o elemento — percorrer `document.styleSheets` testando `elemento.matches(regra.selectorText)`. Uma regra só, dizendo outra coisa, é a transição respondendo no lugar dela.
 
 ## Sobrescrever estado do MUI: repita a classe do componente
