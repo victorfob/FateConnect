@@ -40,6 +40,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige a recusa de cadastro sem data de nascimento, que respondia em inglês enquanto os outros erros da API já vinham em português (#285) [Backend]
 - Corrige o erro de cadastro já em uso, que avisava sempre sobre o e-mail mesmo quando o repetido era o telefone; agora ele aparece embaixo do campo certo, que recebe o foco (#287) [Frontend]
 - Corrige o atraso ao sair da conta: a sessão só era encerrada depois da resposta do servidor, então o clique ficava esperando a rede; agora ela sai no clique e a invalidação segue por trás (#304) [Frontend]
+- Corrige a cor do campo preenchido pelo autocompletar no tema escuro, que o navegador pintava de azul e destoava do resto da tela; o tema claro segue como estava (#305) [Frontend]
 
 ### Removed
 

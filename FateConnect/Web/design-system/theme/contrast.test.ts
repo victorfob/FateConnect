@@ -36,6 +36,8 @@ describe('contrastRatio', () => {
 
 type Par = [string, string, string];
 
+const TRANSPARENT = 'transparent';
+
 /** Toda cor de conteúdo é medida contra **todas** as superfícies daqui. */
 function surfaces(theme: Theme): [string, string][] {
   return [
@@ -79,6 +81,18 @@ function floatingSurfaceText(theme: Theme): Par[] {
     ['secondary text on a floating surface', palette.text.secondary, palette.surfaceFloating],
     ['brand text on a floating surface', palette.brandText, palette.surfaceFloating],
   ];
+}
+
+/**
+ * O campo preenchido pelo navegador carrega texto, então precisa do par. No
+ * claro o valor é `transparent` de propósito — quem pinta ali é o navegador, e
+ * não há cor nossa para medir.
+ */
+function autofilledFieldText(theme: Theme): Par[] {
+  const { palette } = theme;
+  if (palette.inputAutofill === TRANSPARENT) return [];
+
+  return [['body text on an autofilled field', palette.text.primary, palette.inputAutofill]];
 }
 
 function floatingSurfaceNonText(theme: Theme): Par[] {
@@ -126,12 +140,14 @@ describe.each([
   ['light', lightTheme],
   ['dark', darkTheme],
 ])('%s theme contrast', (_, theme) => {
-  it.each([...against(theme, contentColours), ...boundPairs(theme), ...floatingSurfaceText(theme)])(
-    'should meet AA for %s',
-    (_name, foreground, background) => {
-      expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
-    },
-  );
+  it.each([
+    ...against(theme, contentColours),
+    ...boundPairs(theme),
+    ...floatingSurfaceText(theme),
+    ...autofilledFieldText(theme),
+  ])('should meet AA for %s', (_name, foreground, background) => {
+    expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
+  });
 
   it.each([...against(theme, nonTextColours), ...floatingSurfaceNonText(theme)])(
     'should meet the non-text threshold for %s',

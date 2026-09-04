@@ -59,6 +59,12 @@ export const colorTokens = {
    * Trilho do interruptor desligado. O cinza do iOS fica em 1,2:1 e some sobre
    * o cartão branco; este alcança os 3:1 da WCAG 1.4.11 para não-texto.
    */
+  /**
+   * Fundo do campo preenchido pelo navegador. `transparent` de propósito: no
+   * claro o azul que o Chrome pinta já fica a 1,15 do cartão branco, e cobri-lo
+   * trocaria um realce leve por nenhum.
+   */
+  inputAutofill: 'transparent',
   switchTrack: '#848C92',
 
   /** Divisor sobre superfície neutra. */
@@ -155,6 +161,11 @@ export const darkColorTokens = {
   skeleton: '#818181',
 
   /** Trilho do interruptor desligado, no mesmo mínimo de 3:1 do tema claro. */
+  /**
+   * O azul-aço que o Chrome pinta no escuro fica muito além do realce do claro.
+   * Este tom repete o afastamento de lá — 1,16 contra o cartão `#1E1E1E`.
+   */
+  inputAutofill: '#2A2A2A',
   switchTrack: '#818181',
 
   onSurfaceHigh: 'rgba(255, 255, 255, 0.87)',
