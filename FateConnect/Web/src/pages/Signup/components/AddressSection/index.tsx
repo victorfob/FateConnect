@@ -108,6 +108,7 @@ export function AddressSection() {
         <Input
           {...register('complement')}
           label={FIELD_LABELS.complement}
+          error={errors.complement?.message}
           fullWidth
           type="text"
           autoComplete="address-line2"
