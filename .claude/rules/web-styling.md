@@ -47,6 +47,8 @@ O `styled` do Emotion resolve as props do `Box` e do `Stack` pela última assina
 
 ⛔ **Não estenda a lista de alvos pré-tipados para componente que não aceita `component`.** Foi medido: `AccordionDetails` é função simples, sem a prop, e o repo faz `styled(AccordionDetails)`. Prometê-la ali compila, mas em runtime o `component` chega ao DOM como atributo cru e a semântica se perde calada. Por isso a injeção **não** vive no `styled` — se vivesse, valeria para todo alvo.
 
+⚠️ **Outro componente do MUI que aceita `component` cai na mesma armadilha.** `styled(Divider)` também perde a prop na tipagem, e a saída **não** é criar um terceiro alvo pré-tipado: é declará-la no genérico com o valor que você usa — `styled(Divider)<{ component?: 'li' }>`, que dentro de uma lista é o que mantém o HTML válido.
+
 Se o alvo tem props próprias — um `NavLink` com `to`, um `button` com `type` —, declare-as no genérico em vez de forçar cast:
 
 ```ts
@@ -178,6 +180,20 @@ elemento.style.transition = '';
 ⚠️ **E o fundo contra o qual você mede pode não pintar nada.** `getComputedStyle(elemento).backgroundColor` devolve `rgba(0, 0, 0, 0)` no elemento transparente, e a fórmula de contraste trata isso como **preto** — no tema claro o número despenca e parece reprovação. Suba na árvore até o primeiro fundo com alfa diferente de zero antes de calcular. Medido na mesma tela: **2,66:1** contra o transparente e **7,89:1** contra o branco real do cartão.
 
 ⚠️ **O sinal é o computado discordar da folha de estilo.** Antes de concluir que a cor está errada, liste as regras que de fato casam com o elemento — percorrer `document.styleSheets` testando `elemento.matches(regra.selectorText)`. Uma regra só, dizendo outra coisa, é a transição respondendo no lugar dela.
+
+## O painel escala, e o retângulo mente junto
+
+⛔ **Com uma largura emulada maior que o painel do navegador, a página é reduzida por transformação — e `getBoundingClientRect` devolve pixel *visual*, não pixel de CSS.** O `getComputedStyle` continua devolvendo o valor real, então os dois discordam e o número menor se lê como defeito.
+
+Medido em 04/09/2026, no menu da conta: o ícone tinha `width: 20px` no computado e **15px** no retângulo, e um item de 44px apareceu como **24,5px**. Eu ia relatar que a linha tinha colapsado.
+
+**A âncora é `offsetHeight`/`offsetWidth`, que são de layout e não sofrem a transformação** — e o fator sai de uma divisão:
+
+```js
+const escala = el.getBoundingClientRect().width / el.offsetWidth;   // 1 = sem redução
+```
+
+⚠️ **E o painel oculto mede zero.** Escondido, `window.innerWidth` responde `0`, e toda geometria tirada dali é lixo — inclusive a posição de um popover, que aparece ancorado no canto errado sem nada acusar. Leia a largura junto de cada medição, como já se faz com a porta: `{ porta: location.port, largura: window.innerWidth }`.
 
 ## Sobrescrever estado do MUI: repita a classe do componente
 
