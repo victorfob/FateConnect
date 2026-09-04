@@ -60,6 +60,18 @@ describe('MainLayout', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
+  // É a contagem que denuncia um segundo botão voltando para o topo; buscar
+  // pelo nome do alternador passaria se ele voltasse com outro rótulo.
+  it('should leave the theme toggle out of the header', () => {
+    tokenStorage.save(tokenWithName('Maria da Silva'));
+    renderLayout();
+
+    const header = within(screen.getByRole('banner'));
+
+    expect(header.getAllByRole('button', { hidden: true })).toHaveLength(1);
+    expect(header.getByRole('button', { name: 'Abrir menu', hidden: true })).toBeInTheDocument();
+  });
+
   it('should point the logo to the menu', () => {
     renderLayout();
 

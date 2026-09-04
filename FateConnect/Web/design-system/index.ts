@@ -45,6 +45,7 @@ export type { DialogProps } from './components/Dialog';
 export { ThemeProvider } from './ThemeProvider';
 export { DateLocalizationProvider } from './DateLocalizationProvider';
 export { useThemeMode } from './ThemeProvider/context/ThemeModeContext';
+export type { ThemeMode } from './theme';
 export { ThemeToggleButton } from './components/ThemeToggleButton';
 export { GlobalStyles } from './GlobalStyles';
 export { spacingScale, radiusScale, shadowTokens, iconSizeTokens } from './tokens';

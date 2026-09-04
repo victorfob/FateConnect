@@ -58,6 +58,7 @@ export const lightPalette: PaletteOptions = {
   inputOutline: colorTokens.inputOutline,
   surfaceFloating: colorTokens.surfaceWhite,
   skeleton: colorTokens.skeleton,
+  switchTrack: colorTokens.switchTrack,
   statusTag: {
     neutral: { surface: NO_SURFACE, content: INHERITED_CONTENT },
     muted: { surface: colorTokens.mutedBackground, content: colorTokens.mutedText },
@@ -124,6 +125,7 @@ export const darkPalette: PaletteOptions = {
   inputOutline: darkColorTokens.onSurfaceDisabled,
   surfaceFloating: darkColorTokens.surfaceFloating,
   skeleton: darkColorTokens.skeleton,
+  switchTrack: darkColorTokens.switchTrack,
   // No escuro o par da etiqueta e o do aviso invertem de claridade, não de papel.
   statusTag: {
     neutral: { surface: NO_SURFACE, content: INHERITED_CONTENT },

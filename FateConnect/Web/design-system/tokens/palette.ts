@@ -55,6 +55,12 @@ export const colorTokens = {
    */
   skeleton: '#848C92',
 
+  /**
+   * Trilho do interruptor desligado. O cinza do iOS fica em 1,2:1 e some sobre
+   * o cartão branco; este alcança os 3:1 da WCAG 1.4.11 para não-texto.
+   */
+  switchTrack: '#848C92',
+
   /** Divisor sobre superfície neutra. */
   divider: '#D9D9D9',
   /** Divisor sobre o cromo colorido, onde a linha precisa ser clara. */
@@ -147,6 +153,9 @@ export const darkColorTokens = {
    * para 2,14:1, abaixo do mínimo de 3:1 para não-texto.
    */
   skeleton: '#818181',
+
+  /** Trilho do interruptor desligado, no mesmo mínimo de 3:1 do tema claro. */
+  switchTrack: '#818181',
 
   onSurfaceHigh: 'rgba(255, 255, 255, 0.87)',
   onSurfaceMedium: 'rgba(255, 255, 255, 0.60)',
