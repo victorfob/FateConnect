@@ -11,13 +11,16 @@ import { render, screen, userEvent, waitFor, within } from '@app/test/testing-li
 
 import { SignupConflictFieldEnum } from './@types';
 import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
-import { SIGNUP_MESSAGES } from './schema';
+import { maxLengthMessage, SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/users/signup';
 const SIGNUP_TOKEN = 'token-do-cadastro';
 const ZIP_URL = 'https://viacep.com.br/ws/:zipCode/json/';
+/** O que o `CreateAddressDto` aceita no complemento. */
+const COMPLEMENT_MAX_LENGTH = 100;
+const ONE_CHARACTER = 1;
 
 const VALID_SIGNUP = {
   fullName: 'Maria Silva',
@@ -122,6 +125,18 @@ describe('Signup', () => {
     await submit();
 
     expect(await screen.findByText(FATEC_EMAIL_MESSAGE)).toBeInTheDocument();
+  });
+
+  // O complemento é o único campo opcional com limite de comprimento: o schema
+  // recusa, e sem a prop de erro no campo a mensagem não chega à tela.
+  it('should show the length message on the optional complement', async () => {
+    renderSignup();
+    await userEvent.click(screen.getByLabelText(C.FIELD_LABELS.complement));
+    await userEvent.paste('a'.repeat(COMPLEMENT_MAX_LENGTH + ONE_CHARACTER));
+
+    await submit();
+
+    expect(await screen.findByText(maxLengthMessage(COMPLEMENT_MAX_LENGTH))).toBeInTheDocument();
   });
 
   it('should reject a phone number outside ten or eleven digits', async () => {
