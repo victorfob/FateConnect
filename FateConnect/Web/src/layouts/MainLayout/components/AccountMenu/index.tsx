@@ -11,7 +11,7 @@ import {
 } from '@design-system';
 import { LogoutIcon } from '@design-system/icons';
 
-import { useLogout } from '@app/hooks/useLogout';
+import { logout } from '@app/services/auth/authService';
 import { loggedUserName } from '@app/services/auth/loggedUser';
 import { getInitials } from '@app/utils/initials';
 
@@ -29,17 +29,12 @@ export function AccountMenu() {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const userName = loggedUserName() ?? '';
   const initials = useMemo(() => getInitials(userName), [userName]);
-  const signOut = useLogout();
 
   const handleOpen = useCallback(
     (event: MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget),
     [],
   );
   const handleClose = useCallback(() => setAnchorEl(null), []);
-  const handleSignOut = useCallback(() => {
-    setAnchorEl(null);
-    signOut();
-  }, [signOut]);
 
   if (!initials) return null;
 
@@ -67,7 +62,7 @@ export function AccountMenu() {
 
           <S.MenuDivider component="li" />
 
-          <S.SignOutItem onClick={handleSignOut}>
+          <S.SignOutItem onClick={logout}>
             <ListItemIcon>
               <LogoutIcon fontSize="small" />
             </ListItemIcon>
