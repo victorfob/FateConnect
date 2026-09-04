@@ -28,6 +28,7 @@ export { default as LocationOnIcon } from '@mui/icons-material/LocationOn';
 export { default as LogoutIcon } from '@mui/icons-material/Logout';
 export { default as MenuIcon } from '@mui/icons-material/Menu';
 export { default as NoBackpackOutlinedIcon } from '@mui/icons-material/NoBackpackOutlined';
+export { default as NotificationsIcon } from '@mui/icons-material/Notifications';
 export { default as PersonIcon } from '@mui/icons-material/Person';
 export { default as PhoneIcon } from '@mui/icons-material/Phone';
 export { default as RestoreIcon } from '@mui/icons-material/Restore';

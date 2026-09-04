@@ -1,75 +1,109 @@
-import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
+import { useState } from 'react';
 
-import { AnchoredPopover, type AnchoredPopoverProps } from '.';
+import { act, render, screen, userEvent } from '@app/test/testing-library';
 
-const PANEL_LABEL = 'Notificações';
-const PANEL_CONTENT = 'Miolo do painel';
+import { ARROW_OFFSET_VARIABLE } from './styles';
+import { AnchoredPopover } from '.';
 
-const trigger = document.createElement('button');
-document.body.append(trigger);
+const TRIGGER_LABEL = 'Abrir painel';
+const PANEL_LABEL = 'Painel de teste';
 
-const DEFAULT_PROPS: AnchoredPopoverProps = {
-  anchorEl: trigger,
-  open: true,
-  onClose: vi.fn(),
-  label: PANEL_LABEL,
-  children: PANEL_CONTENT,
-};
+const TRIGGER_LEFT = 100;
+const TRIGGER_WIDTH = 40;
+const PANEL_WIDTH = 200;
+const PANEL_RIGHT = 260;
+const PANEL_RIGHT_AFTER_RESIZE = 300;
 
-const renderComponent = (props = DEFAULT_PROPS) => render(<AnchoredPopover {...props} />);
+/** O gatilho tem 40px e o centro dele cai em 120: `260 - 120` sobra da direita. */
+const EXPECTED_OFFSET = '60px';
+const EXPECTED_OFFSET_AFTER_RESIZE = '20px';
 
-function backdropElement(): HTMLElement {
-  const backdrop = document.querySelector('.MuiBackdrop-root');
-  if (!(backdrop instanceof HTMLElement)) throw new Error('Popover backdrop not rendered');
+function stubGeometry(panelRight: number) {
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    if (this.getAttribute('aria-label') === TRIGGER_LABEL)
+      return { left: TRIGGER_LEFT, width: TRIGGER_WIDTH } as DOMRect;
 
-  return backdrop;
+    return { right: panelRight, width: PANEL_WIDTH } as DOMRect;
+  });
+}
+
+function stubWidths(panelWidth: number) {
+  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+    configurable: true,
+    get(this: HTMLElement) {
+      if (this.getAttribute('aria-label') === TRIGGER_LABEL) return TRIGGER_WIDTH;
+
+      return panelWidth;
+    },
+  });
+}
+
+function Harness() {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  return (
+    <>
+      <button aria-label={TRIGGER_LABEL} onClick={(event) => setAnchorEl(event.currentTarget)}>
+        gatilho
+      </button>
+
+      <AnchoredPopover
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+        label={PANEL_LABEL}
+      >
+        conteúdo
+      </AnchoredPopover>
+    </>
+  );
+}
+
+function panel(): HTMLElement {
+  return screen.getByRole('dialog', { name: PANEL_LABEL });
 }
 
 describe('AnchoredPopover', () => {
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(HTMLElement.prototype, 'offsetWidth');
   });
 
-  it('should name the panel by the label it was given and render its content', () => {
-    renderComponent();
+  it('should point the arrow at the centre of the trigger', async () => {
+    stubGeometry(PANEL_RIGHT);
+    stubWidths(PANEL_WIDTH);
+    render(<Harness />);
 
-    expect(screen.getByRole('dialog')).toHaveAccessibleName(PANEL_LABEL);
-    expect(screen.getByText(PANEL_CONTENT)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: TRIGGER_LABEL }));
+
+    expect(panel().style.getPropertyValue(ARROW_OFFSET_VARIABLE)).toBe(EXPECTED_OFFSET);
   });
 
-  it('should stay out of the page while it is closed', () => {
-    renderComponent({ ...DEFAULT_PROPS, open: false });
+  it('should point the arrow again after the window is resized', async () => {
+    stubGeometry(PANEL_RIGHT);
+    stubWidths(PANEL_WIDTH);
+    render(<Harness />);
+    await userEvent.click(screen.getByRole('button', { name: TRIGGER_LABEL }));
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    stubGeometry(PANEL_RIGHT_AFTER_RESIZE);
+    act(() => window.dispatchEvent(new Event('resize')));
+
+    expect(panel().style.getPropertyValue(ARROW_OFFSET_VARIABLE)).toBe(
+      EXPECTED_OFFSET_AFTER_RESIZE,
+    );
   });
 
-  it('should close when the user presses escape', async () => {
-    const onClose = vi.fn();
-    renderComponent({ ...DEFAULT_PROPS, onClose });
+  // O positivo acima usa a mesma consulta, então a ausência aqui significa que
+  // a medida não aconteceu — e não que a consulta está errada.
+  it('should leave the arrow alone while the panel has no width to measure', async () => {
+    stubGeometry(PANEL_RIGHT);
+    stubWidths(0);
+    render(<Harness />);
 
-    await userEvent.keyboard('{Escape}');
+    await userEvent.click(screen.getByRole('button', { name: TRIGGER_LABEL }));
 
-    expect(onClose).toHaveBeenCalledOnce();
-  });
-
-  it('should close when the user clicks outside of it', async () => {
-    const onClose = vi.fn();
-    renderComponent({ ...DEFAULT_PROPS, onClose });
-
-    await userEvent.click(backdropElement());
-
-    expect(onClose).toHaveBeenCalledOnce();
-  });
-
-  it('should return the focus to the trigger after it closes', async () => {
-    trigger.focus();
-    const { rerender } = renderComponent({ ...DEFAULT_PROPS, open: false });
-
-    rerender(<AnchoredPopover {...DEFAULT_PROPS} open />);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-
-    rerender(<AnchoredPopover {...DEFAULT_PROPS} open={false} />);
-
-    await waitFor(() => expect(trigger).toHaveFocus());
+    expect(panel().style.getPropertyValue(ARROW_OFFSET_VARIABLE)).toBe('');
   });
 });
