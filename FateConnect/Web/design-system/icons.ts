@@ -33,6 +33,7 @@ export { default as ScheduleIcon } from '@mui/icons-material/Schedule';
 export { default as SaveIcon } from '@mui/icons-material/Save';
 export { default as SearchIcon } from '@mui/icons-material/Search';
 export { default as SecurityIcon } from '@mui/icons-material/Security';
+export { default as SettingsIcon } from '@mui/icons-material/Settings';
 export { default as VisibilityIcon } from '@mui/icons-material/Visibility';
 export { default as VisibilityOffIcon } from '@mui/icons-material/VisibilityOff';
 

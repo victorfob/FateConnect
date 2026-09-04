@@ -9,6 +9,7 @@ export enum RoutePathEnum {
   MENU = '/menu',
   LOST_AND_FOUND = '/achados-perdidos',
   RIDES = '/caronas',
+  PREFERENCES = '/preferencias',
   PROFILE = '/perfil',
   DENUNCIATIONS = '/denuncias',
   NOTIFICATIONS = '/notificacoes',
