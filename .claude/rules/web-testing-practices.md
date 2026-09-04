@@ -84,6 +84,19 @@ Antes de escrever a negativa, monte o **positivo** com a mesma consulta e confir
 
 Na #227, o critério era "o login não mostra aviso nenhum". Todo aviso do produto traz um botão `OK` para dispensar, então a asserção virou `queryByRole('button', { name: 'OK' })` na negativa — mas só depois de eu acrescentar a **positiva** ao caso de erro ao lado e ver que ela encontra o botão. Sem esse passo, a negativa passaria para sempre, inclusive se o aviso voltasse com outro rótulo.
 
+⛔ **E a negativa se ancora no lugar, não no texto que você espera encontrar.** Provar que a consulta acha alguma coisa não basta quando ela procura **a frase**: qualquer outro conteúdo naquele espaço passa por baixo dela.
+
+Na #310 o critério era "sem motivo, o cartão não mostra nota". Duas versões passaram com o defeito reposto de propósito:
+
+| Asserção | Escapou de |
+| --- | --- |
+| `queryByText(NOTA.manual)` e `queryByText(NOTA.inatividade)` | nota de reserva com qualquer outra redação |
+| contar quantas vezes a palavra `Excluído` aparece no cartão | nota que não repete a palavra da etiqueta |
+
+A terceira funcionou porque afirma **o que vem logo depois da descrição**: havendo nota, é a nota; não havendo, é o botão de ação. Aí qualquer texto naquele espaço derruba o caso.
+
+**O tell é a asserção nomear o conteúdo que não deve existir.** Se você consegue escrever a frase proibida, está testando aquela frase — não a ausência.
+
 ## Corpo de requisição se afirma inteiro
 
 ⛔ **`toMatchObject` é subconjunto: chave a mais passa calada.** Para o payload que sai para a API, `toEqual` — ele reprova o que sobra, que é justamente o risco.

@@ -62,6 +62,8 @@ Na #227 o inventário foi a espinha: **295 strings visíveis em 51 arquivos**. E
 
 ⚠️ **Filtro que devolve pouco é suspeito, não alívio.** Antes de tratar "nenhum achado" como resultado, rode o filtro contra um caso que você sabe que existe.
 
+⚠️ **E o número envelhece — ou nasce errado.** Quem implementa herda o inventário como marcador de "acabou", então **meça de novo antes de escrever a primeira linha**. Na #310 o corpo dizia 154 ocorrências em 13 arquivos; medido na hora de implementar, eram 198 em 18 — e 330 em 25 contando os enums. O escopo não muda, mas o marcador de fim, sim: corrija o corpo da issue em vez de deixar os dois valores convivendo.
+
 ## 2. A sabatina
 
 Blocos de **no máximo quatro perguntas** via `AskUserQuestion` — quatro é o teto do formulário, não uma preferência. Repetir blocos até fechar.
