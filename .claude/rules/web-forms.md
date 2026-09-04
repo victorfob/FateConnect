@@ -21,6 +21,10 @@ Padrão estabelecido no cartão de login e válido para as telas de formulário 
 - `autoComplete` coerente com o campo; em senha, alternar entre `current-password` e `off` conforme a visibilidade.
 - Ação dentro do campo vai em `InputAdornment` com `IconButton`, `aria-label` descrevendo a **ação** e `aria-pressed` comunicando o estado.
 
+⛔ **Campo que ganha a primeira regra de validação precisa ganhar a prop de erro junto.** Enquanto ele não tem regra, ninguém sente falta da ligação — e no dia em que a regra entra, o schema recusa e a **tela fica muda**: o envio trava e nada explica por quê.
+
+Aconteceu na #309, no `Complemento` do endereço. Ele era o único campo opcional e sem limite, então nasceu sem `error={errors.complement?.message}`. O limite de comprimento entrou e o formulário passou a recusar em silêncio. ⚠️ **O teste de schema não vê isso** — o schema estava certo; quem não exibia era o campo. Quem pegou foi a medição na aplicação, e o caso que protege agora é de componente, não de schema.
+
 ## Ícone reflete estado
 
 O ícone mostra a situação atual, não o destino do clique: olho aberto quando o texto está visível. O rótulo acessível continua descrevendo a ação.
