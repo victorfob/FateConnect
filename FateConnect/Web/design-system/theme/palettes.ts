@@ -55,6 +55,7 @@ export const lightPalette: PaletteOptions = {
    * Borda do campo de formulário. O padrão do MUI é mais claro que o do produto
    * (23% contra 38%), o que deixaria todo formulário mais lavado que hoje.
    */
+  inputAutofill: colorTokens.inputAutofill,
   inputOutline: colorTokens.inputOutline,
   surfaceFloating: colorTokens.surfaceWhite,
   skeleton: colorTokens.skeleton,
@@ -122,6 +123,7 @@ export const darkPalette: PaletteOptions = {
     hover: darkColorTokens.hover,
   },
   /** 38% de branco é a ênfase desabilitada do sistema de cor do Material Design. */
+  inputAutofill: darkColorTokens.inputAutofill,
   inputOutline: darkColorTokens.onSurfaceDisabled,
   surfaceFloating: darkColorTokens.surfaceFloating,
   skeleton: darkColorTokens.skeleton,

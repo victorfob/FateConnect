@@ -36,6 +36,7 @@ declare module '@mui/material/styles' {
   interface Palette {
     brandText: string;
     chrome: ChromeColors;
+    inputAutofill: string;
     inputOutline: string;
     surfaceFloating: string;
     skeleton: string;
@@ -47,6 +48,7 @@ declare module '@mui/material/styles' {
   interface PaletteOptions {
     brandText: string;
     chrome: ChromeColors;
+    inputAutofill: string;
     inputOutline: string;
     surfaceFloating: string;
     skeleton: string;
