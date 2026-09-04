@@ -6,6 +6,13 @@ import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
 
 import type { RideFormMode } from '../types';
 
+/**
+ * O fuso em que a API valida a partida (`Ride.ValidateDepartureDateTime`). Sem
+ * ele o formulário julga pelo relógio de quem preenche e aceita o que o
+ * servidor recusa.
+ */
+export const PRODUCT_TIME_ZONE = 'America/Sao_Paulo';
+
 /** Limites do `CreateCaronaDto` e da entidade `Carona`, espelhados no front. */
 export const RIDE_LIMITS = {
   minDestination: 3,

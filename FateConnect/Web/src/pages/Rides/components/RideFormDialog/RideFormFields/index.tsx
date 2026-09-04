@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { Input } from '@design-system';
+import { toZonedTime } from 'date-fns-tz';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import type { RideFormInput, RideFormValues } from '../schema';
@@ -11,6 +13,9 @@ export function RideFormFields() {
     register,
     formState: { errors },
   } = useFormContext<RideFormInput, unknown, RideFormValues>();
+  // No fuso do produto, e não no de quem preenche: a leste daqui o dia já virou,
+  // e o calendário desabilitaria uma partida que a API ainda aceita.
+  const today = useMemo(() => toZonedTime(new Date(), C.PRODUCT_TIME_ZONE), []);
 
   return (
     <S.FieldsGrid>
@@ -35,6 +40,7 @@ export function RideFormFields() {
             onChange={field.onChange}
             onBlur={field.onBlur}
             disabled={field.disabled}
+            minDate={today}
             error={errors.departureDate?.message}
           />
         )}

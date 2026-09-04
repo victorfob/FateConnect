@@ -43,6 +43,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o erro de cadastro já em uso, que avisava sempre sobre o e-mail mesmo quando o repetido era o telefone; agora ele aparece embaixo do campo certo, que recebe o foco (#287) [Frontend]
 - Corrige o atraso ao sair da conta: a sessão só era encerrada depois da resposta do servidor, então o clique ficava esperando a rede; agora ela sai no clique e a invalidação segue por trás (#304) [Frontend]
 - Corrige a cor do campo preenchido pelo autocompletar no tema escuro, que o navegador pintava de azul e destoava do resto da tela; o tema claro segue como estava (#305) [Frontend]
+- Corrige a oferta de carona, que aceitava data e hora já passadas e deixava a recusa para a API: o formulário passa a recusar no próprio campo, no mesmo fuso em que a API valida, e o calendário não oferece mais dia anterior a hoje (#312) [Frontend]
+- Corrige o cadastro, que aceitava texto acima do limite da API em sete campos e recebia de volta um erro que não dizia qual deles reprovou; cada campo passa a avisar o máximo que aceita (#312) [Frontend]
 
 ### Removed
 

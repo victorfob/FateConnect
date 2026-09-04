@@ -11,6 +11,25 @@ const MIN_PHONE_DIGITS = 10;
 const ZIP_CODE_DIGITS = 8;
 const MAX_PHONE_DIGITS = 11;
 
+/**
+ * Comprimento máximo de cada campo, como o `CreateUserDto`, o
+ * `CreateAddressDto` e o `CreateContactDto` os declaram. Sem eles a API recusa
+ * com o 400 genérico, que não diz qual campo passou do limite.
+ */
+const MAX_LENGTH = {
+  fullName: 200,
+  fatecEmail: 150,
+  street: 200,
+  streetNumber: 20,
+  complement: 100,
+  city: 100,
+  contactEmail: 150,
+};
+
+export function maxLengthMessage(max: number): string {
+  return `Máximo de ${max} caracteres`;
+}
+
 /** Mensagens iguais às do produto. */
 export const SIGNUP_MESSAGES = {
   fullNameRequired: 'Informe o nome completo',
@@ -63,10 +82,14 @@ function hasBrazilianPhoneLength(value: string): boolean {
 }
 
 export const signupSchema = z.object({
-  fullName: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.fullNameRequired),
+  fullName: z
+    .string()
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.fullNameRequired)
+    .max(MAX_LENGTH.fullName, maxLengthMessage(MAX_LENGTH.fullName)),
   fatecEmail: z
     .string()
     .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.fatecEmailRequired)
+    .max(MAX_LENGTH.fatecEmail, maxLengthMessage(MAX_LENGTH.fatecEmail))
     .regex(FATEC_EMAIL_PATTERN, FATEC_EMAIL_MESSAGE),
   birthDate: z
     .string()
@@ -83,10 +106,19 @@ export const signupSchema = z.object({
     .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.zipCodeRequired)
     .refine(isCompleteZipCode, SIGNUP_MESSAGES.zipCodeIncomplete),
   state: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.stateRequired),
-  city: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.cityRequired),
-  street: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.streetRequired),
-  streetNumber: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.streetNumberRequired),
-  complement: z.string(),
+  city: z
+    .string()
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.cityRequired)
+    .max(MAX_LENGTH.city, maxLengthMessage(MAX_LENGTH.city)),
+  street: z
+    .string()
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.streetRequired)
+    .max(MAX_LENGTH.street, maxLengthMessage(MAX_LENGTH.street)),
+  streetNumber: z
+    .string()
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.streetNumberRequired)
+    .max(MAX_LENGTH.streetNumber, maxLengthMessage(MAX_LENGTH.streetNumber)),
+  complement: z.string().max(MAX_LENGTH.complement, maxLengthMessage(MAX_LENGTH.complement)),
   phone: z
     .string()
     .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.phoneRequired)
@@ -94,6 +126,7 @@ export const signupSchema = z.object({
   contactEmail: z
     .string()
     .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.contactEmailRequired)
+    .max(MAX_LENGTH.contactEmail, maxLengthMessage(MAX_LENGTH.contactEmail))
     .pipe(z.email(SIGNUP_MESSAGES.emailInvalid)),
   acceptTerms: z.boolean().refine((accepted) => accepted, SIGNUP_MESSAGES.termsRequired),
   acceptMarketing: z.boolean(),

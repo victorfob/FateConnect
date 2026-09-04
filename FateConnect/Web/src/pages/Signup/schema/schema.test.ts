@@ -3,6 +3,15 @@ import { formatBirthDate, latestBirthDate } from '../helpers/birthDate';
 import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from '.';
 
 const ONE_DAY_MS = 86_400_000;
+const ONE_CHARACTER = 1;
+
+/** Os campos de texto que a API corta por comprimento. */
+type TextField =
+  'fullName' | 'fatecEmail' | 'street' | 'streetNumber' | 'complement' | 'city' | 'contactEmail';
+
+function textOfLength(total: number, suffix: string): string {
+  return 'a'.repeat(total - suffix.length) + suffix;
+}
 
 const VALID: SignupFormValues = {
   ...SIGNUP_DEFAULT_VALUES,
@@ -95,6 +104,28 @@ describe('signupSchema', () => {
     expect(parse({ birthDate: formatBirthDate(eighteenToday) }).success).toBe(true);
     expect(firstIssuePath(parse({ birthDate: formatBirthDate(oneDayShort) }))).toEqual([
       'birthDate',
+    ]);
+  });
+
+  /**
+   * Cada campo com o comprimento que o DTO da API declara, e o sufixo que o
+   * valor precisa manter para continuar válido — sem ele o e-mail deixaria de
+   * ser e-mail antes de estourar o limite.
+   */
+  const MAX_LENGTHS: [TextField, number, string][] = [
+    ['fullName', 200, ''],
+    ['fatecEmail', 150, '@aluno.cps.sp.gov.br'],
+    ['street', 200, ''],
+    ['streetNumber', 20, ''],
+    ['complement', 100, ''],
+    ['city', 100, ''],
+    ['contactEmail', 150, '@exemplo.com'],
+  ];
+
+  it.each(MAX_LENGTHS)('should hold %s to the length the api accepts', (field, max, suffix) => {
+    expect(parse({ [field]: textOfLength(max, suffix) }).success).toBe(true);
+    expect(firstIssuePath(parse({ [field]: textOfLength(max + ONE_CHARACTER, suffix) }))).toEqual([
+      field,
     ]);
   });
 
