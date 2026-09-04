@@ -22,7 +22,7 @@ Planejamento e rastreio ficam no **GitHub** (issues + Project board do repositó
 
 ## Fluxo de trabalho
 
-- Branch base: **`develop`**. ⛔ **Nunca commitar direto nela** — toda mudança sai numa branch a partir da `develop` e volta por PR, **inclusive mudança em `.claude/`**. Nomear branch como `<tipo>/<número-da-issue>` (ex.: `chore/48`); quando não houver issue, um slug descritivo (`docs/spec-issue-skill`).
+- Branch base: **`develop`**. ⛔ **Nunca commitar direto nela** — toda mudança sai numa branch a partir da `develop` e volta por PR, **inclusive mudança em `.claude/`**. Nomear branch como `<tipo>/<número-da-issue>` (ex.: `chore/48`); quando não houver issue, um slug descritivo **em inglês** (`docs/spec-issue-skill`) — o idioma do fluxo git, como no commit e no título do PR.
 - Toda correção ou alteração começa por uma **issue no GitHub** — o número dela alimenta a branch, o título do PR e o corpo do PR.
 - Abrir PR: usar a skill `pr-creator`. Commitar: usar a skill `write-commit` — e **pedir confirmação antes de qualquer comando git**.
 - ⛔ **Nunca escrever changelog à mão** — usar a skill `changelog-writer`. À mão sai um bullet por commit, que é o oposto do formato: uma entrada principal descrevendo o efeito para quem usa. O formato está em `.claude/rules/changelog-format.md`.

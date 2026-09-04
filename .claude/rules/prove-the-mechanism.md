@@ -75,6 +75,23 @@ Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase`
 
 ⚠️ **O sinal é a saída vazia onde deveria haver enumeração.** "0 arquivos alterados", "nenhuma seção", "nada a fazer" — num passo que existe justamente para alterar algo, isso não é sucesso, é o instrumento dizendo que não entendeu a entrada.
 
+## O artefato publicado não é o que você quis escrever
+
+⛔ **Antes de afirmar o que um PR, uma issue ou um comentário seu diz, releia o publicado.** A lembrança guarda a **decisão** de registrar algo, e ela se lê exatamente igual a ter registrado — não há sensação diferente entre as duas.
+
+Aconteceu em 03/09/2026, fechando a rodada do #297. Eu disse que o resíduo de contraste do popover estava declarado no corpo do PR, *"junto das duas alternativas medidas e recusadas"*. O corpo não mencionava a paleta em linha nenhuma, e o único comentário do PR era o do Sonar. Eu tinha decidido registrar aquilo enquanto media, e li a decisão como o registro.
+
+**O gatilho é a frase que descreve conteúdo seu no passado** — "está no corpo do PR", "já registrei na issue", "o comentário explica". Cada uma é um comando que você ainda não rodou:
+
+```bash
+gh pr view <n> --json body -q .body
+gh api repos/<dono>/<repo>/issues/<n>/comments --jq '.[].body'
+```
+
+⚠️ **O custo não é a frase errada, é o que ela desliga.** Quem lê para de procurar: o Victor ia mergear achando que a limitação estava documentada para quem viesse depois.
+
+⚠️ **É diferente de afirmar sobre o que não li.** Ali a fonte é de outra pessoa e eu pulei a leitura; aqui a fonte é minha, e é justamente por isso que releitura não parece necessária.
+
 ## O que esta rule não é
 
 Não é ordem de esgotar toda dúvida antes de abrir a boca. Ela vale no **fechamento** — ao dizer "pronto", abrir PR ou pedir confirmação. No meio do trabalho, resíduo em aberto é normal, e dizer que está em aberto é o certo.

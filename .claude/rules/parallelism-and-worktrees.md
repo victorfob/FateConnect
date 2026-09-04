@@ -68,6 +68,26 @@ Aconteceu na #171. O agente relatou, de boa-fé, ter medido a página selecionad
 
 **O que rodar:** suba a aplicação, ligue o componente numa tela de verdade — fiação temporária, fora de commit — e meça com `getComputedStyle` **ali**. Depois desfaça a fiação e confira que ela não entrou em commit nenhum.
 
+⛔ **A fiação vai no cromo de verdade, não numa barra própria.** Andaime com `zIndex` acima do Modal do MUI (1300) cria um mundo onde o backdrop não intercepta nada — e ali o componente ganha defeitos que não tem. Na #291 uma barra em `zIndex: 1500` produziu **três** achados aparentes: dois popovers abertos ao mesmo tempo, clique no gatilho que não fechava, e a seta de um coberta pelo papel do outro. No `Header` real (`AppBar` em 1100) o pixel sobre o gatilho pertence ao backdrop e os três desaparecem.
+
+⚠️ Baixar o `zIndex` do andaime não resolve: a 1100 ele empata com o cromo real e os cliques deixam de alcançar qualquer coisa. O caminho é passar os gatilhos como `actions` do próprio `Header`.
+
+⛔ **Fiação que existe para o Victor capturar evidência vive até ele dizer que acabou** — ela é ferramenta dele, não resíduo meu. Commitar e desmontar o andaime parecem o mesmo gesto de limpeza e não são: o commit fecha o meu trabalho, o andaime fecha o dele. Na #291 eu desmontei ao empurrar, tendo escrito *"me avise quando terminar de capturar"*, e a devolução foi *"eu preciso da demo pra coletar as evidências"*.
+
+## Dois servidores no ar, um painel de navegador só
+
+⛔ **O agente da worktree sobe o servidor dele, e o painel do navegador é compartilhado.** A aba que parece sua pode estar servindo o checkout do vizinho, em outra branch — e a página é idêntica o bastante para você não desconfiar.
+
+Aconteceu em 03/09/2026: eu media a #292 na 5173 enquanto o agente da #293 media a dele na 5293. Uma captura minha pegou a 5293 e mostrou **dois** cartões no menu onde a minha branch tinha três. Ia virar defeito da minha própria mudança.
+
+**A âncora é a porta, lida da própria página, junto de toda medição:**
+
+```js
+({ porta: location.port, rota: location.pathname })
+```
+
+E `lsof -nP -iTCP -sTCP:LISTEN | grep 517` diz quantos servidores existem. Mais de um ⇒ nenhuma medição vale sem dizer de qual porta veio.
+
 ## Fatiação do agente: cada commit precisa compilar sozinho
 
 ⛔ **Confira o corte, não só o conteúdo.** O agente agrupa por assunto e esquece a ordem de dependência, e nenhum gate pega: eles rodam sempre na ponta da branch, nunca em cada commit.
