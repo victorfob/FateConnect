@@ -9,12 +9,17 @@ const { component } = radiusScale;
 const ARROW_SIZE_PX = 10;
 
 /**
- * Do centro da seta até a borda direita do papel, que o `anchorOrigin` alinha
- * com a do gatilho. É **metade** do controle padrão de 40px — o `IconButton` —,
- * então a seta cai no centro dele. Gatilho de outro tamanho desalinha a seta
- * pela diferença: o consumidor envolve o conteúdo num controle de 40px.
+ * Até onde a seta pode chegar perto da borda do papel: metade dela mais o raio,
+ * senão a ponta entra no canto arredondado e aparece cortada.
  */
-const ARROW_CENTRE_FROM_RIGHT_PX = 20;
+const ARROW_MIN_INSET_PX = 20;
+
+/**
+ * Onde o centro do gatilho cai dentro do papel. Quem mede é o componente, na
+ * abertura e a cada redimensionamento — o `50%` só vale no quadro em que a
+ * medida ainda não chegou.
+ */
+export const ARROW_OFFSET_VARIABLE = '--anchored-popover-arrow-offset';
 
 export const PopoverSurface = styled(Popover)(({ theme }) => ({
   '& .MuiPopover-paper': {
@@ -30,11 +35,14 @@ export const PopoverSurface = styled(Popover)(({ theme }) => ({
       content: '""',
       position: 'absolute',
       top: 0,
-      right: `${ARROW_CENTRE_FROM_RIGHT_PX}px`,
+      // O papel se desloca quando não cabe alinhado ao gatilho, e uma distância
+      // fixa da borda dele levaria a seta junto. O `clamp` prende a ponta dentro
+      // do papel quando o gatilho fica fora do alcance dela.
+      left: `clamp(${ARROW_MIN_INSET_PX}px, var(${ARROW_OFFSET_VARIABLE}, 50%), calc(100% - ${ARROW_MIN_INSET_PX}px))`,
       width: `${ARROW_SIZE_PX}px`,
       height: `${ARROW_SIZE_PX}px`,
       backgroundColor: 'inherit',
-      transform: 'translate(50%, -50%) rotate(45deg)',
+      transform: 'translate(-50%, -50%) rotate(45deg)',
     },
   },
 }));

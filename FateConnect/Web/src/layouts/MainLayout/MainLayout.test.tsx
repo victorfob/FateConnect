@@ -5,11 +5,12 @@ import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
-import { TRIGGER_LABEL } from './components/AccountMenu/constants';
+import { TRIGGER_LABEL as ACCOUNT_TRIGGER_LABEL } from './components/AccountMenu/constants';
+import { TRIGGER_LABEL as NOTIFICATIONS_TRIGGER_LABEL } from './components/NotificationsMenu/constants';
 import { MainLayout } from '.';
 
-/** O botão de menu e o gatilho do menu da conta. */
-const HEADER_BUTTONS = 2;
+/** O botão de menu, a campainha e o gatilho do menu da conta. */
+const HEADER_BUTTONS = 3;
 
 function renderLayout(initialEntry: RoutePathEnum = RoutePathEnum.MENU) {
   const router = createMemoryRouter(
@@ -74,7 +75,8 @@ describe('MainLayout', () => {
 
     expect(header.getAllByRole('button', { hidden: true })).toHaveLength(HEADER_BUTTONS);
     expect(header.getByRole('button', { name: 'Abrir menu', hidden: true })).toBeInTheDocument();
-    expect(header.getByRole('button', { name: TRIGGER_LABEL })).toBeInTheDocument();
+    expect(header.getByRole('button', { name: NOTIFICATIONS_TRIGGER_LABEL })).toBeInTheDocument();
+    expect(header.getByRole('button', { name: ACCOUNT_TRIGGER_LABEL })).toBeInTheDocument();
   });
 
   it('should point the logo to the menu', () => {

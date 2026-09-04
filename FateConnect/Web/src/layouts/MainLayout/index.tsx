@@ -17,6 +17,7 @@ import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 import * as S from '../shell.styles';
 import { AccountMenu } from './components/AccountMenu';
+import { NotificationsMenu } from './components/NotificationsMenu';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
@@ -31,7 +32,12 @@ export function MainLayout() {
     <S.ShellRoot>
       <Header
         logo={<BrandLogo to={RoutePathEnum.MENU} />}
-        actions={<AccountMenu />}
+        actions={
+          <>
+            <NotificationsMenu />
+            <AccountMenu />
+          </>
+        }
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
         navigation={APP_LINKS.map(({ path, label }) => (
