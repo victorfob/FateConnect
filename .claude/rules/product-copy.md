@@ -70,7 +70,9 @@ O mesmo objeto ou estado se chama igual em **toda** a tela — etiqueta, botão,
 
 Aconteceu ao especificar a paginação: escrevi `?tipo=filantropica` chamando aquilo de "o termo em pt-BR do produto". Não era — era a serialização do backend, e a palavra que a interface usa é outra. Eu tinha lido o `types.ts`; o valor estava certo e o **papel** dele, errado.
 
-Coincidir é o caso feliz, não a regra: em achados e perdidos `lostItemKind.ts` diz que "o valor canônico já é o rótulo", e é por isso que lá não há armadilha.
+Coincidir era o caso feliz, e deixou de existir: achados e perdidos também levou o contrato para inglês, e `src/pages/LostAndFound/helpers/lostItemKind.ts` passou a ter mapa de rótulo como o de caronas — `Found` na tela é **Achado**, `Deleted` é **Excluído**. Não há mais tela em que o valor sirva de rótulo; **procure o mapa sempre**.
+
+⚠️ O tell de que alguém confundiu os dois papéis é um teste que escolhe uma opção pelo valor do enum. Ele passa enquanto os dois coincidem e cai no dia da tradução, apontando para a linha errada — a mensagem diz que não existe opção chamada `Found`, e não que o rótulo mudou de dono.
 
 ## Erro: o problema e a saída
 
@@ -106,6 +108,14 @@ Frase nominal curta dizendo o conteúdo, como o cadastro já faz: `Endereço` e 
 ## Tooltip
 
 Complementa, não repete. A exceção é o **botão só de ícone**: ali o tooltip é o nome do botão e repete o rótulo acessível de propósito — sem ele, o ícone não diz nada. Primeira letra maiúscula, no máximo duas linhas.
+
+## Nota ao lado de etiqueta
+
+Nota ao lado de uma etiqueta diz o que a etiqueta não diz. Repetir a palavra dela gasta a linha e sai duas vezes em leitor de tela — havendo só a repetição a dizer, a nota não existe.
+
+⛔ Aconteceu no cartão de achados e perdidos. A etiqueta dizia `Excluído` e, quando a API não mandava o motivo, a nota logo abaixo dizia `Excluído.` — a mesma palavra, duas vezes, uma delas sem acrescentar nada. Ela saiu: a nota passou a existir **só quando há motivo**, e aí ela conta o que a etiqueta não conta (`Excluído manualmente.`, `Excluído automaticamente por inatividade.`).
+
+⚠️ **Texto de reserva é onde essa repetição nasce**, porque ele é escrito para preencher um espaço e não para dizer algo. Antes de escrever um, pergunte o que ele acrescenta à etiqueta ao lado; não havendo resposta, o espaço fica vazio.
 
 ## Estado vazio
 

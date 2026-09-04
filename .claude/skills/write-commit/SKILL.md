@@ -91,3 +91,11 @@ Lote de mudanças mecânicas (rename, `Readonly`, namespace de import) costuma t
 ⚠️ **Reaplique o script da transformação; não copie o arquivo pronto do snapshot** — o arquivo pronto traz junto as outras transformações. Aconteceu no PR #77: o commit da navegação levou o rename de enum e teve que ser refeito reconstruindo o trecho a partir de `git show HEAD:<arquivo>`.
 
 ⚠️ **Antes do primeiro commit, conferir que o índice está limpo** (`git diff --cached --stat` vazio). Índice sujo faz o primeiro commit engolir o lote inteiro — aconteceu no PR #76.
+
+### O commit do meio não exibe palavra que não é nem a antiga nem a final
+
+⛔ **Ao dividir um rename em dois commits, confira o que cada um mostra na tela.** Quem revisa lê commit a commit, e um estado intermediário que não é o produto de antes nem o de depois se lê como sobra.
+
+Na #310 o corte foi "contrato para inglês" e depois "rename da copy", nessa ordem, para que nenhum commit escrevesse inglês na barra de endereço. O efeito colateral: no primeiro, o `STATUS_SLUG` dizia `cancelado` enquanto o PR inteiro era sobre `excluido`. O Victor apontou **duas vezes** achando que era resíduo.
+
+**A ordem que evita isso põe o visível primeiro:** o commit da copy já mostra a palavra final, e o do contrato, depois dele, não toca em rótulo nem em URL. Escolhendo a outra ordem, diga no corpo do PR o que o commit do meio exibe — e conte com a pergunta assim mesmo.

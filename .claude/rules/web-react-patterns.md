@@ -166,3 +166,11 @@ Aconteceu na #213, ao levar o cadastro para inglês: o replace `cep` → `zipCod
 **Os contratos de terceiro deste repo**, hoje: `services/cep/` (ViaCEP e OpenCEP, com `cep`, `logradouro`, `localidade`, `uf`) e `utils/whatsapp.ts`. A variável que recebe o valor segue as nossas regras de nome; a **chave** copia o provedor exatamente.
 
 ⚠️ **O mesmo replace também erra por falta.** Na mesma rodada ele deixou passar `senha:` e `numero:` dentro do payload de um teste, porque a lista de pares não os previa. Errar por excesso e por falta ao mesmo tempo é o normal, não a exceção — por isso a conferência é ler o diff, não confiar na lista.
+
+⛔ **A vítima mais cara não é o contrato de terceiro: é a nossa própria copy.** `nome`, `tipo` e `local` são campo da entidade, palavra de português e nome de parâmetro de URL ao mesmo tempo — e `\bnome\b` casa os três. Na #310 o replace produziu `Insira o name do item`, `Selecione o type` e `O place deve ter ao menos 100 caracteres`: sete strings que a pessoa lê, em dois arquivos, mais dois comentários em português e cinco literais de query.
+
+⛔ **E ele traduz a asserção do teste junto, então a suíte fica verde.** O `LostItemFormDialog.test.tsx` guardava essa copy com `findByText(/nome deve ter ao menos/i)`; o replace virou o regex em `/name deve ter ao menos/i`. Os dois lados se moveram juntos, e **o único teste que guardava aquele texto parou de guardar no mesmo commit em que o texto quebrou**. Só apareceu quando a copy foi corrigida e o teste ficou para trás — quem viu antes disso foi o Victor, no review.
+
+**A guarda é escopo, não cuidado.** Aplique o replace só nas posições de identificador, ou liste as ocorrências dentro de string, regex e comentário e decida uma a uma. Depois releia o diff procurando **texto em português com palavra inglesa no meio**: é o sintoma, e ele não reprova em lint, em `tsc` nem em teste.
+
+⚠️ **E a lista de telas a medir na aplicação sai dos arquivos tocados, não do escopo da issue.** Rename mecânico atravessa arquivo que a issue não previa. Na #310 eu medi mural, cartão, diálogo e filtro — tudo o que a issue mandava provar — e as sete strings quebradas estavam no formulário de cadastro, que a issue não esperava que mudasse.
