@@ -9,6 +9,9 @@ export enum RoutePathEnum {
   MENU = '/menu',
   LOST_AND_FOUND = '/achados-perdidos',
   RIDES = '/caronas',
+  PROFILE = '/perfil',
+  DENUNCIATIONS = '/denuncias',
+  NOTIFICATIONS = '/notificacoes',
 }
 
 /** Fragmentos das seções da landing, usados na navegação por âncora. */
