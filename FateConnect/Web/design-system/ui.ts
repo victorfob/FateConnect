@@ -16,6 +16,7 @@ export { default as Divider } from '@mui/material/Divider';
 export { default as Drawer } from '@mui/material/Drawer';
 export { default as FormControlLabel } from '@mui/material/FormControlLabel';
 export { default as List } from '@mui/material/List';
+export { default as ListItem } from '@mui/material/ListItem';
 export { default as ListItemButton } from '@mui/material/ListItemButton';
 export { default as ListItemIcon } from '@mui/material/ListItemIcon';
 export { default as ListItemText } from '@mui/material/ListItemText';

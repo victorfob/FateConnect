@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Outlet } from 'react-router';
-import { Footer, Header, NavigationDrawer, ThemeToggleButton } from '@design-system';
+import { Footer, Header, NavigationDrawer } from '@design-system';
 
 import { BrandLogo } from '@app/components/BrandLogo';
 import { DrawerSectionItem } from '@app/components/DrawerSectionItem';
@@ -12,6 +12,7 @@ import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 import * as S from '../shell.styles';
+import { ThemeToggleButton } from './components/ThemeToggleButton';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 

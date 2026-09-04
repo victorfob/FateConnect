@@ -62,7 +62,10 @@ export const DrawerRoot = styled(Drawer)(({ theme }) => ({
     },
     // O primeiro rótulo mede a partir do cabeçalho, que já tem margem própria:
     // o recuo cheio somaria às duas coisas e abriria um vão sob o logo.
-    '& .MuiListSubheader-root:first-of-type': {
+    // ⛔ O `:first-of-type` é do item, não do rótulo: cada seção põe o dela num
+    // `li` próprio, então `.MuiListSubheader-root:first-of-type` casaria com
+    // todas e fecharia o vão entre as seções.
+    '& li:first-of-type > .MuiListSubheader-root': {
       paddingTop: theme.space(xs),
     },
   },
