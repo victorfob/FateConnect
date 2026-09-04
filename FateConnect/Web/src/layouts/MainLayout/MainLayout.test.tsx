@@ -6,7 +6,9 @@ import { render, screen, userEvent, waitFor, within } from '@app/test/testing-li
 import { tokenWithName } from '@app/test/token';
 
 import { TRIGGER_LABEL as ACCOUNT_TRIGGER_LABEL } from './components/AccountMenu/constants';
+import { SIGN_OUT_LABEL } from './components/DrawerSignOut/constants';
 import { TRIGGER_LABEL as NOTIFICATIONS_TRIGGER_LABEL } from './components/NotificationsMenu/constants';
+import * as C from './components/DrawerNavigation/constants';
 import { MainLayout } from '.';
 
 /** O botão de menu, a campainha e o gatilho do menu da conta. */
@@ -117,6 +119,21 @@ describe('MainLayout', () => {
     expect(within(drawer).getByRole('link', { name: 'Achados & Perdidos' })).not.toHaveAttribute(
       'aria-current',
     );
+  });
+
+  it('should split the drawer into labelled sections, with the sign out apart', async () => {
+    renderLayout();
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menu', hidden: true }));
+
+    const drawer = within(screen.getByRole('presentation'));
+
+    [C.SERVICES_LABEL, C.ACCOUNT_LABEL].forEach((label) => {
+      expect(drawer.getByRole('heading', { name: label })).toBeInTheDocument();
+    });
+    expect(drawer.getByRole('button', { name: SIGN_OUT_LABEL })).toBeInTheDocument();
+    drawer.getAllByRole('list').forEach((list) => {
+      expect(within(list).queryByRole('button', { name: SIGN_OUT_LABEL })).not.toBeInTheDocument();
+    });
   });
 
   it('should carry the denunciations entry in the header and in the drawer', async () => {
