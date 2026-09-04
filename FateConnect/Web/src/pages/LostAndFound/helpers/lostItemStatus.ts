@@ -5,13 +5,20 @@ import { LostItemStatusEnum } from '@app/services/lostAndFound/types';
 const STATUS_LABEL: Readonly<Record<LostItemStatusEnum, string>> = {
   [LostItemStatusEnum.OPEN]: 'Aberto',
   [LostItemStatusEnum.RESOLVED]: 'Resolvido',
-  [LostItemStatusEnum.CANCELLED]: 'Cancelado',
+  [LostItemStatusEnum.DELETED]: 'Excluído',
+};
+
+/** O que vai para a URL: o rótulo sem acento, porque a barra de endereço se lê. */
+const STATUS_SLUG: Readonly<Record<LostItemStatusEnum, string>> = {
+  [LostItemStatusEnum.OPEN]: 'aberto',
+  [LostItemStatusEnum.RESOLVED]: 'resolvido',
+  [LostItemStatusEnum.DELETED]: 'excluido',
 };
 
 const STATUS_TONE: Readonly<Record<LostItemStatusEnum, StatusTagTone>> = {
   [LostItemStatusEnum.OPEN]: 'warning',
   [LostItemStatusEnum.RESOLVED]: 'success',
-  [LostItemStatusEnum.CANCELLED]: 'danger',
+  [LostItemStatusEnum.DELETED]: 'danger',
 };
 
 const STATUS_VALUES: ReadonlySet<string> = new Set(Object.values(LostItemStatusEnum));
@@ -21,26 +28,25 @@ const UNKNOWN_LABEL = '—';
 export const LOST_ITEM_STATUS_OPTIONS: readonly { value: LostItemStatusEnum; label: string }[] = [
   { value: LostItemStatusEnum.OPEN, label: STATUS_LABEL[LostItemStatusEnum.OPEN] },
   { value: LostItemStatusEnum.RESOLVED, label: STATUS_LABEL[LostItemStatusEnum.RESOLVED] },
-  { value: LostItemStatusEnum.CANCELLED, label: STATUS_LABEL[LostItemStatusEnum.CANCELLED] },
+  { value: LostItemStatusEnum.DELETED, label: STATUS_LABEL[LostItemStatusEnum.DELETED] },
 ];
 
 export function isLostItemStatus(value: string): value is LostItemStatusEnum {
   return STATUS_VALUES.has(value);
 }
 
-/** Interpreta o valor canônico e o da URL, que é o mesmo em minúsculo. */
+export function lostItemStatusSlug(value: LostItemStatusEnum): string {
+  return STATUS_SLUG[value];
+}
+
+/** Interpreta o que a URL escreve, que é o rótulo sem acento e em minúsculo. */
 export function parseLostItemStatus(raw: string | null | undefined): LostItemStatusEnum | null {
   if (!raw) return null;
 
-  const found = Object.values(LostItemStatusEnum).find(
-    (status) => status.toLowerCase() === raw.trim().toLowerCase(),
-  );
+  const slug = raw.trim().toLowerCase();
+  const found = Object.values(LostItemStatusEnum).find((status) => STATUS_SLUG[status] === slug);
 
   return found ?? null;
-}
-
-export function lostItemStatusSlug(value: LostItemStatusEnum): string {
-  return value.toLowerCase();
 }
 
 /**

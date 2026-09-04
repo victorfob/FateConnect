@@ -42,13 +42,13 @@ export function Rides() {
   const { mutate: removeRide, isPending: isRemoving } = useMutation({
     mutationFn: (ride: Ride) => deleteRide(ride.id),
     onSuccess: async () => {
-      notifySuccess(C.RIDE_LIST_MESSAGES.cancelSucceeded);
+      notifySuccess(C.RIDE_LIST_MESSAGES.deleteSucceeded);
       await queryClient.invalidateQueries({ queryKey: [C.RIDES_QUERY_KEY] });
     },
-    meta: { errorMessage: C.RIDE_LIST_MESSAGES.cancelFailed },
+    meta: { errorMessage: C.RIDE_LIST_MESSAGES.deleteFailed },
   });
 
-  const handleCancel = useCallback((ride: Ride) => removeRide(ride), [removeRide]);
+  const handleDelete = useCallback((ride: Ride) => removeRide(ride), [removeRide]);
 
   const handleOffer = useCallback(() => {
     setEditingRide(undefined);
@@ -104,7 +104,7 @@ export function Rides() {
         pagination={<Pagination count={totalPages} page={currentPage} onChange={changePage} />}
       >
         {rides.map((ride) => (
-          <RideCard key={ride.id} ride={ride} onEdit={handleEdit} onCancel={handleCancel} />
+          <RideCard key={ride.id} ride={ride} onEdit={handleEdit} onDelete={handleDelete} />
         ))}
       </CardsList>
 

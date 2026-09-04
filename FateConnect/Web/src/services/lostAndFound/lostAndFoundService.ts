@@ -58,11 +58,11 @@ export async function resolveLostItem(itemId: string): Promise<void> {
   await changeLostItemStatus(itemId, LostItemStatusEnum.RESOLVED);
 }
 
-export async function reopenLostItem(itemId: string): Promise<void> {
+export async function restoreLostItem(itemId: string): Promise<void> {
   await changeLostItemStatus(itemId, LostItemStatusEnum.OPEN);
 }
 
-/** Exclusão lógica: o servidor marca Cancelado e registra o motivo. */
-export async function cancelLostItem(itemId: string): Promise<void> {
+/** Exclusão lógica: o servidor marca Excluído e registra o motivo. */
+export async function deleteLostItem(itemId: string): Promise<void> {
   await apiClient.delete(`${LOST_AND_FOUND_PATH}/${itemId}`);
 }

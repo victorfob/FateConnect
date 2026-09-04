@@ -12,8 +12,8 @@ export const LOST_ITEM_LIST_MESSAGES = {
   loadFailed: 'Erro ao carregar os itens. Tente novamente.',
   resolveSucceeded: 'Item resolvido.',
   resolveFailed: 'Erro ao resolver o item. Tente novamente.',
-  cancelSucceeded: 'Item cancelado.',
-  cancelFailed: 'Erro ao cancelar o item. Tente novamente.',
-  reopenSucceeded: 'Item reaberto.',
-  reopenFailed: 'Erro ao reabrir o item. Tente novamente.',
+  deleteSucceeded: 'Item excluído.',
+  deleteFailed: 'Erro ao excluir o item. Tente novamente.',
+  restoreSucceeded: 'Item restaurado.',
+  restoreFailed: 'Erro ao restaurar o item. Tente novamente.',
 };

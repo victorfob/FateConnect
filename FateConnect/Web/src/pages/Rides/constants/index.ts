@@ -11,11 +11,11 @@ export const EMPTY_LIST_MESSAGE =
 
 export const RIDE_LIST_MESSAGES = {
   loadFailed: 'Erro ao carregar caronas. Tente novamente.',
-  cancelSucceeded: 'Carona cancelada.',
-  cancelFailed: 'Erro ao cancelar a carona. Tente novamente.',
+  deleteSucceeded: 'Carona excluída.',
+  deleteFailed: 'Erro ao excluir a carona. Tente novamente.',
 };
 
-export const RIDE_CARD_LABELS = { edit: 'Editar', cancel: 'Cancelar' };
+export const RIDE_CARD_LABELS = { edit: 'Editar', delete: 'Excluir' };
 
 /** A faixa na borda não fala com leitor de tela; este texto é quem conta. */
 export const OWN_RIDE_LABEL = 'Minha carona';
