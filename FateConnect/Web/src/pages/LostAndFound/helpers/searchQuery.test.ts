@@ -43,7 +43,7 @@ describe('lostItemSearchCodec', () => {
     it('should not care about the case of the words', () => {
       expect(read('tipo=ACHADO&situacao=Cancelado')).toMatchObject({
         kind: LostItemKindEnum.FOUND,
-        status: LostItemStatusEnum.CANCELLED,
+        status: LostItemStatusEnum.DELETED,
       });
     });
 
@@ -71,7 +71,7 @@ describe('lostItemSearchCodec', () => {
         page: 3,
         pageSize: PAGE_SIZE,
         kind: LostItemKindEnum.FOUND,
-        status: LostItemStatusEnum.CANCELLED,
+        status: LostItemStatusEnum.DELETED,
         onlyMine: true,
       });
 

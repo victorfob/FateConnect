@@ -17,10 +17,10 @@ export function LostItemOwnerActions({ item, onEdit, onCancel }: LostItemOwnerAc
   const handleEdit = useCallback(() => onEdit?.(item), [onEdit, item]);
   const handleCancel = useCallback(() => onCancel(item), [onCancel, item]);
 
-  if (!item.meuItem) return null;
+  if (!item.isMine) return null;
 
   // Vale para concluído, para cancelado e para o que a API venha a inventar.
-  if (item.situacao !== LostItemStatusEnum.OPEN) return null;
+  if (item.status !== LostItemStatusEnum.OPEN) return null;
 
   return (
     <>
@@ -34,7 +34,7 @@ export function LostItemOwnerActions({ item, onEdit, onCancel }: LostItemOwnerAc
         iconOnly
         dialogTitle={C.CANCEL_DIALOG.title}
         messagePrefix={C.CANCEL_DIALOG.messagePrefix}
-        itemName={item.nome}
+        itemName={item.name}
         confirmLabel={C.CANCEL_DIALOG.confirmLabel}
         onConfirm={handleCancel}
       />

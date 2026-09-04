@@ -18,9 +18,9 @@ export function LostItemStatusAction({ item, onResolve, onReopen }: LostItemStat
   const handleResolve = useCallback(() => onResolve(item), [onResolve, item]);
   const handleReopen = useCallback(() => onReopen(item), [onReopen, item]);
 
-  if (!item.meuItem) return null;
+  if (!item.isMine) return null;
 
-  if (item.situacao === LostItemStatusEnum.CANCELLED) {
+  if (item.status === LostItemStatusEnum.DELETED) {
     return (
       <S.ActionRow>
         <Button type="button" variant="soft" onClick={handleReopen}>
@@ -31,16 +31,16 @@ export function LostItemStatusAction({ item, onResolve, onReopen }: LostItemStat
     );
   }
 
-  if (item.situacao !== LostItemStatusEnum.OPEN) return null;
+  if (item.status !== LostItemStatusEnum.OPEN) return null;
 
   return (
     <S.ActionRow>
       <LostItemConfirmAction
-        label={C.lostItemResolveLabel(item.tipo)}
+        label={C.lostItemResolveLabel(item.type)}
         icon={<CheckCircleIcon fontSize="small" />}
         dialogTitle={C.RESOLVE_DIALOG.title}
         messagePrefix={C.RESOLVE_DIALOG.messagePrefix}
-        itemName={item.nome}
+        itemName={item.name}
         confirmLabel={C.RESOLVE_DIALOG.confirmLabel}
         onConfirm={handleResolve}
       />

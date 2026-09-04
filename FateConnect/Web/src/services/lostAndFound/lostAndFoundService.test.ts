@@ -13,11 +13,11 @@ import {
 import { LostItemKindEnum, LostItemStatusEnum, type LostItemInput } from './types';
 
 const LOST_ITEM_INPUT: LostItemInput = {
-  nome: 'Garrafa térmica',
-  tipo: LostItemKindEnum.FOUND,
-  local: 'Biblioteca',
-  dataOcorrido: '2026-08-20',
-  descricao: 'Garrafa azul, com adesivos na tampa.',
+  name: 'Garrafa térmica',
+  type: LostItemKindEnum.FOUND,
+  place: 'Biblioteca',
+  occurredOn: '2026-08-20',
+  description: 'Garrafa azul, com adesivos na tampa.',
 };
 
 const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/achado';
@@ -97,7 +97,7 @@ describe('lostAndFoundService', () => {
   it('should list items without filters', async () => {
     server.use(
       http.get(LOST_AND_FOUND_URL, () =>
-        HttpResponse.json(pageOf([{ id: 'c7d2', nome: 'Guarda-chuva' }])),
+        HttpResponse.json(pageOf([{ id: 'c7d2', name: 'Guarda-chuva' }])),
       ),
     );
 

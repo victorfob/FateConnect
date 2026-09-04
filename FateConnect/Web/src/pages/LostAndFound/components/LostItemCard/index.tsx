@@ -2,6 +2,7 @@ import { ListCard, StatusTag, Typography } from '@design-system';
 import { CalendarTodayIcon, LocationOnIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
+import { lostItemKindLabel } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import {
   lostItemStatusLabel,
   lostItemStatusTone,
@@ -26,17 +27,17 @@ type LostItemCardProps = Readonly<{
 }>;
 
 export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: LostItemCardProps) {
-  const statusTone = lostItemStatusTone(item.situacao);
-  const statusLabel = lostItemStatusLabel(item.situacao);
+  const statusTone = lostItemStatusTone(item.status);
+  const statusLabel = lostItemStatusLabel(item.status);
 
   return (
     <ListCard
-      own={item.meuItem}
+      own={item.isMine}
       ownLabel={C.OWN_ITEM_LABEL}
-      media={<LostItemPhoto url={item.fotoUrl} itemName={item.nome} />}
+      media={<LostItemPhoto url={item.photoUrl} itemName={item.name} />}
     >
       <ListCard.Header>
-        <Typography variant="subtitleBold">{item.nome}</Typography>
+        <Typography variant="subtitleBold">{item.name}</Typography>
 
         <ListCard.Actions>
           <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
@@ -49,37 +50,37 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
         <ListCard.InfoItem>
           <LocationOnIcon />
           <Typography variant="caption" color="inherit">
-            {item.local}
+            {item.place}
           </Typography>
         </ListCard.InfoItem>
 
         <ListCard.InfoItem>
           <CalendarTodayIcon />
           <Typography variant="caption" color="inherit">
-            {format(parseISO(item.dataOcorrido), DATE_FORMAT)}
+            {format(parseISO(item.occurredOn), DATE_FORMAT)}
           </Typography>
         </ListCard.InfoItem>
 
         <ListCard.InfoItem>
-          <LostItemKindIcon kind={item.tipo} />
+          <LostItemKindIcon kind={item.type} />
           <Typography variant="caption" color="inherit">
-            {item.tipo}
+            {lostItemKindLabel(item.type)}
           </Typography>
         </ListCard.InfoItem>
       </ListCard.InfoRow>
 
-      {item.descricao && (
+      {item.description && (
         <ListCard.Description>
           <Typography variant="subtitle" color="inherit">
-            {item.descricao}
+            {item.description}
           </Typography>
         </ListCard.Description>
       )}
 
-      {item.situacao === LostItemStatusEnum.CANCELLED && (
+      {item.status === LostItemStatusEnum.DELETED && (
         <S.CancellationNote>
           <Typography variant="caption" color="inherit">
-            {C.cancellationNote(item.motivoCancelamento)}
+            {C.cancellationNote(item.deletionReason)}
           </Typography>
         </S.CancellationNote>
       )}
