@@ -1,16 +1,21 @@
-import { RideTypeEnum } from '@app/services/rides/types';
-import { toApiDate } from '@app/utils/apiDate';
+import { format } from 'date-fns';
 
-import { RIDE_FORM_MESSAGES, RIDE_LIMITS } from '../constants';
+import { RideTypeEnum } from '@app/services/rides/types';
+
+import { PRODUCT_TIME_ZONE, RIDE_FORM_MESSAGES, RIDE_LIMITS } from '../constants';
 import { rideFormSchema, type RideFormInput } from '.';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DAYS_AHEAD = 30;
-const AN_HOUR_MS = 60 * 60 * 1000;
+
+/** O que o campo guarda, e não o que a API recebe — é o que o schema lê. */
+function toFieldDate(date: Date): string {
+  return format(date, 'dd/MM/yyyy');
+}
 
 const VALID: RideFormInput = {
   destination: 'Fatec Sorocaba',
-  departureDate: toApiDate(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
+  departureDate: toFieldDate(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
   departureTime: '07:30',
   rideType: RideTypeEnum.SOLIDARITY,
   seats: '3',
@@ -55,15 +60,43 @@ describe('rideFormSchema', () => {
     expect(firstErrorOf({ departureTime: '' })).toBe(RIDE_FORM_MESSAGES.departureTimeRequired);
   });
 
-  it('should refuse a departure that already happened', () => {
-    const pastMoment = new Date(Date.now() - AN_HOUR_MS);
+  it('should stay quiet while the date is still half typed', () => {
+    expect(firstErrorOf({ departureDate: '22/0' })).toBeUndefined();
+  });
 
-    expect(
-      firstErrorOf({
-        departureDate: toApiDate(pastMoment),
-        departureTime: `${String(pastMoment.getHours()).padStart(2, '0')}:00`,
-      }),
-    ).toBe(RIDE_FORM_MESSAGES.departureInPast);
+  // Relógio fixo porque a partida é lida no fuso do produto: sem isso, a máquina
+  // que roda o teste decide de que lado do limite a hora cai. Às 12:00 em UTC são
+  // 09:00 em São Paulo, então 08:00 já passou e 10:00 ainda não.
+  describe('at a fixed clock', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-05-22T12:00:00Z'));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should refuse a departure that already happened', () => {
+      expect(firstErrorOf({ departureDate: '22/05/2026', departureTime: '08:00' })).toBe(
+        RIDE_FORM_MESSAGES.departureInPast,
+      );
+    });
+
+    it('should accept a departure still to come on the same day', () => {
+      expect(firstErrorOf({ departureDate: '22/05/2026', departureTime: '10:00' })).toBeUndefined();
+    });
+
+    // A suíte fixa o fuso do processo no do produto, que é onde os dois jeitos de
+    // comparar concordam — sem trocá-lo, nada aqui prova que a leitura é do fuso
+    // do produto e não do de quem preenche.
+    it('should read the departure in the product time zone, not in the reader one', () => {
+      process.env.TZ = 'UTC';
+
+      expect(firstErrorOf({ departureDate: '22/05/2026', departureTime: '10:00' })).toBeUndefined();
+
+      process.env.TZ = PRODUCT_TIME_ZONE;
+    });
   });
 
   it('should require a ride type from the api vocabulary', () => {

@@ -1,11 +1,14 @@
-import { isValid, parseISO } from 'date-fns';
+import { isValid, parse } from 'date-fns';
+import { fromZonedTime } from 'date-fns-tz';
 import { z } from 'zod';
 
 import { isRideType } from '@app/pages/Rides/helpers/rideType';
 
-import { RIDE_FORM_MESSAGES, RIDE_LIMITS } from '../constants';
+import { PRODUCT_TIME_ZONE, RIDE_FORM_MESSAGES, RIDE_LIMITS } from '../constants';
 
 const REQUIRED = 1;
+/** Os campos entregam o que a pessoa digitou, não o formato da API. */
+const DEPARTURE_FORMAT = 'dd/MM/yyyy HH:mm';
 
 type DepartureFields = { departureDate: string; departureTime: string };
 
@@ -23,10 +26,10 @@ function isSeatCount(value: string): boolean {
 function isFutureDeparture({ departureDate, departureTime }: DepartureFields): boolean {
   if (!departureDate || !departureTime) return true;
 
-  const departure = parseISO(`${departureDate}T${departureTime}`);
+  const departure = parse(`${departureDate} ${departureTime}`, DEPARTURE_FORMAT, new Date());
   if (!isValid(departure)) return true;
 
-  return departure.getTime() > Date.now();
+  return fromZonedTime(departure, PRODUCT_TIME_ZONE).getTime() > Date.now();
 }
 
 export const rideFormSchema = z
