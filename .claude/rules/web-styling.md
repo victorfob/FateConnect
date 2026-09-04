@@ -195,6 +195,12 @@ const escala = el.getBoundingClientRect().width / el.offsetWidth;   // 1 = sem r
 
 ⚠️ **E o painel oculto mede zero.** Escondido, `window.innerWidth` responde `0`, e toda geometria tirada dali é lixo — inclusive a posição de um popover, que aparece ancorado no canto errado sem nada acusar. Leia a largura junto de cada medição, como já se faz com a porta: `{ porta: location.port, largura: window.innerWidth }`.
 
+## Editar arquivo servido por HMR e medir sem navegar mede o estado anterior
+
+⛔ **Depois de editar, só uma navegação de verdade garante que a página reavaliou.** Esperar não basta, e `location.reload()` também não bastou aqui. Em 04/09/2026 li duas vezes um CSS que já não existia no arquivo — uma depois de remover a regra, outra depois de restaurá-la —, e as duas leituras alimentaram conclusões erradas.
+
+**A conferência é o próprio resultado:** o valor lido tem de corresponder ao arquivo em disco. Discordando, é a página que está velha, não o código que está errado.
+
 ## Sobrescrever estado do MUI: repita a classe do componente
 
 ⛔ **`& .Mui-selected` empata com o seletor da biblioteca e perde no desempate por ordem de fonte.** Use `& .MuiPaginationItem-root.Mui-selected` — a classe do componente mais a do estado —, que sobe a especificidade acima da do MUI. Vale para `.Mui-selected`, `.Mui-disabled`, `.Mui-focused`, `.Mui-checked` e companhia.

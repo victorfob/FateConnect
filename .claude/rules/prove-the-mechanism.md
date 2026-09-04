@@ -63,6 +63,10 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 
 ⛔ **Correção com duas pontas se confere nas duas, enumerando.** Consertei a página 4 e entreguei; a 9 tinha o defeito espelhado e quem viu foi o Victor. O que resolveu foi listar **todos** os estados de 1 a 12 numa tabela e olhar a coluna inteira — as duas faixas usavam medidas diferentes, e isso só aparece lado a lado.
 
+⛔ **Zero de comando composto não vale sem saber onde ele rodou.** Um `cd` que falha em `cd X && grep ...` deixa o `grep` rodar no diretório anterior, e o zero se lê como "não existe". Em 04/09/2026 afirmei que o projeto não tinha regra de autofill nenhuma; tinha zero **naquele** diretório, que não era o do front. `pwd` entra na mesma saída sempre que o zero vai sustentar conclusão.
+
+⛔ **Antes de atribuir um artefato à sua mudança, remova a mudança.** Correlação não é autoria. No mesmo dia vi seletores quebrados aparecerem junto da minha regra de CSS e disse ao Victor que eram meus; removendo a regra e recarregando frio, os nove continuavam lá — eram do MUI. O tell é a frase *"isso apareceu depois que eu mexi"*.
+
 ### Pior que alcançar metade: destruir a outra
 
 ⛔ **Instrumento que transforma texto precisa contar o que consumiu contra o que emitiu.** O que só mede erra devolvendo um número torto; o que reescreve erra **apagando** — e o arquivo salvo não denuncia o que sumiu.
@@ -91,6 +95,20 @@ gh api repos/<dono>/<repo>/issues/<n>/comments --jq '.[].body'
 ⚠️ **O custo não é a frase errada, é o que ela desliga.** Quem lê para de procurar: o Victor ia mergear achando que a limitação estava documentada para quem viesse depois.
 
 ⚠️ **É diferente de afirmar sobre o que não li.** Ali a fonte é de outra pessoa e eu pulei a leitura; aqui a fonte é minha, e é justamente por isso que releitura não parece necessária.
+
+## O contorno pode ter mais de um motivo, e o comentário registra um
+
+⛔ **Antes de remover um contorno, enumere todos os motivos dele.** O painel de notificações estreitava no celular e o comentário justificava pela seta, que saía do gatilho. Consertada a seta, tirei o estreitamento achando que a razão tinha acabado — havia uma segunda, não escrita: 320px numa tela de 412 ocupam quase quatro quintos, e o painel deixa de parecer painel. Quem viu foi o Victor, com captura.
+
+**O comentário diz por que aquilo nasceu, não a lista completa do que ele sustenta.** Ao apagar, pergunte o que mais depende daquilo — e meça a consequência, em vez de deduzi-la do texto ao lado.
+
+## O controle que mede um caminho já corrigido
+
+⛔ **Controle positivo só vale se nada mais tiver consertado aquele caminho antes.** Em 04/09/2026 removi um efeito que eu suspeitava ser desnecessário e medi desvio zero — mas naquele cenário eu tinha redimensionado a janela com o painel **aberto**, e o listener de `resize` já havia recalculado o valor. O verde era de outro mecanismo, e eu removi uma correção correta.
+
+**O tell é o controle passar quando você esperava que falhasse.** Ali, em vez de concluir, liste o que mais poderia produzir aquele resultado.
+
+⚠️ **Comportamento de biblioteca se lê no `node_modules`, não se infere da tela.** O que fechou a questão foi ver que o `Popover` do MUI chama `setPositioningStyles` num efeito passivo sem lista de dependências — três rodadas de medição não tinham chegado lá.
 
 ## O que esta rule não é
 

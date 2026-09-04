@@ -99,6 +99,8 @@ Frase nominal curta dizendo o conteúdo, como o cadastro já faz: `Endereço` e 
 
 ⛔ **Não nomeie a seção pela natureza do ajuste.** `Ajustes do sistema` não separa nada para quem lê — a tela inteira é o sistema — e "ajustes" repete o nome da tela que a contém. Em preferências, a seção que reúne tema, e-mails e notificações chama-se `Aparência e notificações`.
 
+⛔ **E o rótulo não repete o nome de um item de dentro.** Seção `Preferências` contendo o item `Preferências` põe a palavra duas vezes em duas linhas seguidas e não organiza nada: no menu lateral a seção saiu, e os itens subiram para a vizinha. O teste é ler os rótulos em voz alta, do cabeçalho para baixo — repetiu, ou o cabeçalho está errado ou ele não devia existir.
+
 ⚠️ **Nomeie pelo que a seção vai reunir, não só pelo que já está dentro dela.** Enquanto não houver usuários no sistema, descrever uma linha que ainda vai entrar custa menos que renomear a seção depois — é a mesma tolerância da exceção de escopo planejado acima, aplicada dentro da aplicação.
 
 ## Tooltip
