@@ -36,12 +36,17 @@ describe('lostItemSearchCodec', () => {
       expect(read('situacao=extraviado').status).toBe(DEFAULT_STATUS);
     });
 
+    // A palavra da ação mudou e não há retroatividade: o link antigo cai no padrão.
+    it('should no longer answer to the word the deletion used to have', () => {
+      expect(read('situacao=cancelado').status).toBe(DEFAULT_STATUS);
+    });
+
     it('should ignore a kind it does not recognise', () => {
       expect(read('tipo=emprestado').kind).toBeUndefined();
     });
 
     it('should not care about the case of the words', () => {
-      expect(read('tipo=ACHADO&situacao=Cancelado')).toMatchObject({
+      expect(read('tipo=ACHADO&situacao=Excluido')).toMatchObject({
         kind: LostItemKindEnum.FOUND,
         status: LostItemStatusEnum.DELETED,
       });
@@ -75,7 +80,7 @@ describe('lostItemSearchCodec', () => {
         onlyMine: true,
       });
 
-      expect(params).toEqual({ pagina: '3', tipo: 'achado', situacao: 'cancelado', meus: 'sim' });
+      expect(params).toEqual({ pagina: '3', tipo: 'achado', situacao: 'excluido', meus: 'sim' });
     });
 
     it('should survive a round trip through the url', () => {

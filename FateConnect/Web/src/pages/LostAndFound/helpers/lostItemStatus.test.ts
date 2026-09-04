@@ -8,10 +8,10 @@ import {
 } from './lostItemStatus';
 
 describe('lostItemStatusLabel', () => {
-  it('should accent the label the api sends without accent', () => {
+  it('should give each situation the word the screen shows', () => {
     expect(lostItemStatusLabel(LostItemStatusEnum.RESOLVED)).toBe('Resolvido');
     expect(lostItemStatusLabel(LostItemStatusEnum.OPEN)).toBe('Aberto');
-    expect(lostItemStatusLabel(LostItemStatusEnum.DELETED)).toBe('Cancelado');
+    expect(lostItemStatusLabel(LostItemStatusEnum.DELETED)).toBe('Excluído');
   });
 
   it('should fall back to the raw value when the status is unknown', () => {
@@ -42,13 +42,13 @@ describe('lostItemStatusSlug', () => {
   it('should write the word of the screen in the url, never the one of the contract', () => {
     expect(lostItemStatusSlug(LostItemStatusEnum.OPEN)).toBe('aberto');
     expect(lostItemStatusSlug(LostItemStatusEnum.RESOLVED)).toBe('resolvido');
-    expect(lostItemStatusSlug(LostItemStatusEnum.DELETED)).toBe('cancelado');
+    expect(lostItemStatusSlug(LostItemStatusEnum.DELETED)).toBe('excluido');
   });
 });
 
 describe('parseLostItemStatus', () => {
   it('should read back the slug it writes, whatever the case', () => {
-    expect(parseLostItemStatus('cancelado')).toBe(LostItemStatusEnum.DELETED);
+    expect(parseLostItemStatus('excluido')).toBe(LostItemStatusEnum.DELETED);
     expect(parseLostItemStatus(' Aberto ')).toBe(LostItemStatusEnum.OPEN);
   });
 

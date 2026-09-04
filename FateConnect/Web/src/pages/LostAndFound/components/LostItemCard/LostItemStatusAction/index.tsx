@@ -11,21 +11,21 @@ import * as S from './styles';
 type LostItemStatusActionProps = Readonly<{
   item: LostItem;
   onResolve: (item: LostItem) => void;
-  onReopen: (item: LostItem) => void;
+  onRestore: (item: LostItem) => void;
 }>;
 
-export function LostItemStatusAction({ item, onResolve, onReopen }: LostItemStatusActionProps) {
+export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemStatusActionProps) {
   const handleResolve = useCallback(() => onResolve(item), [onResolve, item]);
-  const handleReopen = useCallback(() => onReopen(item), [onReopen, item]);
+  const handleRestore = useCallback(() => onRestore(item), [onRestore, item]);
 
   if (!item.isMine) return null;
 
   if (item.status === LostItemStatusEnum.DELETED) {
     return (
       <S.ActionRow>
-        <Button type="button" variant="soft" onClick={handleReopen}>
+        <Button type="button" variant="soft" onClick={handleRestore}>
           <RestoreIcon fontSize="small" />
-          {C.REOPEN_LABEL}
+          {C.RESTORE_LABEL}
         </Button>
       </S.ActionRow>
     );

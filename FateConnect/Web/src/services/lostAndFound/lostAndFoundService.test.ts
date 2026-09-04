@@ -3,11 +3,11 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 
 import {
-  cancelLostItem,
   createLostItem,
+  deleteLostItem,
   listLostItems,
-  reopenLostItem,
   resolveLostItem,
+  restoreLostItem,
   updateLostItem,
 } from './lostAndFoundService';
 import { LostItemKindEnum, LostItemStatusEnum, type LostItemInput } from './types';
@@ -115,16 +115,16 @@ describe('lostAndFoundService', () => {
     expect(received).toEqual([{ itemId: ITEM_ID, situacao: LostItemStatusEnum.RESOLVED }]);
   });
 
-  it('should reopen the item through the status resource', async () => {
+  it('should restore the item through the status resource', async () => {
     const received: StatusRequest[] = [];
     statusEndpointRecording(received);
 
-    await reopenLostItem(ITEM_ID);
+    await restoreLostItem(ITEM_ID);
 
     expect(received).toEqual([{ itemId: ITEM_ID, situacao: LostItemStatusEnum.OPEN }]);
   });
 
-  it('should cancel the item by deleting it, leaving the reason to the server', async () => {
+  it('should delete the item, leaving the reason to the server', async () => {
     const deleted: string[] = [];
     server.use(
       http.delete<{ itemId: string }>(`${LOST_AND_FOUND_URL}/:itemId`, ({ params }) => {
@@ -134,7 +134,7 @@ describe('lostAndFoundService', () => {
       }),
     );
 
-    await cancelLostItem(ITEM_ID);
+    await deleteLostItem(ITEM_ID);
 
     expect(deleted).toEqual([ITEM_ID]);
   });

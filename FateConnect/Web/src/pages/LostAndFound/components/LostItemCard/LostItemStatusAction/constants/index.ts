@@ -8,7 +8,7 @@ const RESOLVE_LABEL: Readonly<Record<LostItemKindEnum, string>> = {
 
 const GENERIC_RESOLVE_LABEL = 'Resolver';
 
-export const REOPEN_LABEL = 'Reabrir';
+export const RESTORE_LABEL = 'Restaurar';
 
 export function lostItemResolveLabel(kind: string): string {
   if (!isLostItemKind(kind)) return GENERIC_RESOLVE_LABEL;

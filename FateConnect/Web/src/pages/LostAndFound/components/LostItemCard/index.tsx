@@ -7,7 +7,7 @@ import {
   lostItemStatusLabel,
   lostItemStatusTone,
 } from '@app/pages/LostAndFound/helpers/lostItemStatus';
-import { LostItemStatusEnum, type LostItem } from '@app/services/lostAndFound/types';
+import type { LostItem } from '@app/services/lostAndFound/types';
 
 import { LostItemActions } from './LostItemActions';
 import { LostItemKindIcon } from './LostItemKindIcon';
@@ -22,13 +22,14 @@ type LostItemCardProps = Readonly<{
   item: LostItem;
   onEdit?: (item: LostItem) => void;
   onResolve: (item: LostItem) => void;
-  onCancel: (item: LostItem) => void;
-  onReopen: (item: LostItem) => void;
+  onDelete: (item: LostItem) => void;
+  onRestore: (item: LostItem) => void;
 }>;
 
-export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: LostItemCardProps) {
+export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: LostItemCardProps) {
   const statusTone = lostItemStatusTone(item.status);
   const statusLabel = lostItemStatusLabel(item.status);
+  const deletionNote = C.deletionNote(item.deletionReason);
 
   return (
     <ListCard
@@ -42,7 +43,7 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
         <ListCard.Actions>
           <StatusTag tone={statusTone}>{statusLabel}</StatusTag>
 
-          <LostItemActions item={item} onEdit={onEdit} onCancel={onCancel} />
+          <LostItemActions item={item} onEdit={onEdit} onDelete={onDelete} />
         </ListCard.Actions>
       </ListCard.Header>
 
@@ -77,15 +78,15 @@ export function LostItemCard({ item, onEdit, onResolve, onCancel, onReopen }: Lo
         </ListCard.Description>
       )}
 
-      {item.status === LostItemStatusEnum.DELETED && (
-        <S.CancellationNote>
+      {deletionNote && (
+        <S.DeletionNote>
           <Typography variant="caption" color="inherit">
-            {C.cancellationNote(item.deletionReason)}
+            {deletionNote}
           </Typography>
-        </S.CancellationNote>
+        </S.DeletionNote>
       )}
 
-      <LostItemStatusAction item={item} onResolve={onResolve} onReopen={onReopen} />
+      <LostItemStatusAction item={item} onResolve={onResolve} onRestore={onRestore} />
     </ListCard>
   );
 }

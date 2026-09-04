@@ -5,14 +5,14 @@ import { LostItemStatusEnum } from '@app/services/lostAndFound/types';
 const STATUS_LABEL: Readonly<Record<LostItemStatusEnum, string>> = {
   [LostItemStatusEnum.OPEN]: 'Aberto',
   [LostItemStatusEnum.RESOLVED]: 'Resolvido',
-  [LostItemStatusEnum.DELETED]: 'Cancelado',
+  [LostItemStatusEnum.DELETED]: 'Excluído',
 };
 
 /** O que vai para a URL: o rótulo sem acento, porque a barra de endereço se lê. */
 const STATUS_SLUG: Readonly<Record<LostItemStatusEnum, string>> = {
   [LostItemStatusEnum.OPEN]: 'aberto',
   [LostItemStatusEnum.RESOLVED]: 'resolvido',
-  [LostItemStatusEnum.DELETED]: 'cancelado',
+  [LostItemStatusEnum.DELETED]: 'excluido',
 };
 
 const STATUS_TONE: Readonly<Record<LostItemStatusEnum, StatusTagTone>> = {
