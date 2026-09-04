@@ -92,13 +92,13 @@ describe('AccountMenu', () => {
     expect(screen.getByRole('button', { name: C.TRIGGER_LABEL })).toHaveFocus();
   });
 
-  it('should end the session from the sign out item', async () => {
+  it('should end the session as soon as the sign out item is used', async () => {
     renderMenu();
     await openMenu();
 
     await userEvent.click(screen.getByRole('button', { name: C.SIGN_OUT_LABEL }));
 
-    await waitFor(() => expect(tokenStorage.getToken()).toBeNull());
+    expect(tokenStorage.getToken()).toBeNull();
   });
 
   it('should end the session even when the logout request fails', async () => {
@@ -108,6 +108,6 @@ describe('AccountMenu', () => {
 
     await userEvent.click(screen.getByRole('button', { name: C.SIGN_OUT_LABEL }));
 
-    await waitFor(() => expect(tokenStorage.getToken()).toBeNull());
+    expect(tokenStorage.getToken()).toBeNull();
   });
 });
