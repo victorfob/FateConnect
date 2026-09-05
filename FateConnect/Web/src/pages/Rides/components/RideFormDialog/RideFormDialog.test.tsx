@@ -1,10 +1,11 @@
+import { onlyDigits } from '@design-system';
 import { format } from 'date-fns';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 import { RideTypeEnum, type Ride, type RideInput } from '@app/services/rides/types';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
-import { toApiDate } from '@app/utils/apiDate';
+import { toApiDate, toDisplayDate } from '@app/utils/apiDate';
 
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './constants';
 import { RideFormDialog, type RideFormDialogProps } from '.';
@@ -15,8 +16,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const DAYS_AHEAD = 30;
 
 const OFFERED_AT = new Date(Date.now() + DAYS_AHEAD * DAY_MS);
-/** O seletor do MUI recebe a data seção a seção, na ordem de pt-BR. */
-const TYPED_DATE = format(OFFERED_AT, 'ddMMyyyy');
+const OFFERED_HOUR = '18:30';
+/** O campo é mascarado: chegam só os dígitos, do dia ao minuto. */
+const TYPED_DEPARTURE = `${format(OFFERED_AT, 'ddMMyyyy')}${onlyDigits(OFFERED_HOUR)}`;
 
 const RIDE: Ride = {
   id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
@@ -40,6 +42,9 @@ const renderComponent = (props = DEFAULT_PROPS) => render(<RideFormDialog {...pr
 const destinationField = () =>
   screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.destination) });
 
+const departureField = () =>
+  screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.departure) });
+
 describe('RideFormDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,6 +64,7 @@ describe('RideFormDialog', () => {
     expect(await screen.findByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: EDIT_MODE.submitLabel })).toBeInTheDocument();
     expect(destinationField()).toHaveValue(RIDE.destination);
+    expect(departureField()).toHaveValue(`${toDisplayDate(RIDE.departureDate)} 07:30`);
     expect(
       screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.description) }),
     ).toHaveValue(RIDE.description);
@@ -129,14 +135,7 @@ describe('RideFormDialog', () => {
     await screen.findByRole('heading', { name: OFFER_MODE.title });
 
     await userEvent.type(destinationField(), 'Terminal Santo Antônio');
-    await userEvent.type(
-      screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.departureDate) }),
-      TYPED_DATE,
-    );
-    await userEvent.type(
-      screen.getByLabelText(new RegExp(RIDE_FORM_LABELS.departureTime)),
-      '18:30',
-    );
+    await userEvent.type(departureField(), TYPED_DEPARTURE);
     await userEvent.click(
       screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.rideType) }),
     );
@@ -153,7 +152,7 @@ describe('RideFormDialog', () => {
       availableSeats: 3,
       destination: 'Terminal Santo Antônio',
       departureDate: toApiDate(OFFERED_AT),
-      departureTime: '18:30',
+      departureTime: OFFERED_HOUR,
       rideType: RideTypeEnum.SOLIDARITY,
       description: '',
     });

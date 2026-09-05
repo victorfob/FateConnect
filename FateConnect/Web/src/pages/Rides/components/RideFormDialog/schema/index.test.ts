@@ -9,14 +9,13 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const DAYS_AHEAD = 30;
 
 /** O que o campo guarda, e não o que a API recebe — é o que o schema lê. */
-function toFieldDate(date: Date): string {
-  return format(date, 'dd/MM/yyyy');
+function toFieldDeparture(date: Date): string {
+  return format(date, 'dd/MM/yyyy HH:mm');
 }
 
 const VALID: RideFormInput = {
   destination: 'Fatec Sorocaba',
-  departureDate: toFieldDate(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
-  departureTime: '07:30',
+  departure: toFieldDeparture(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
   rideType: RideTypeEnum.SOLIDARITY,
   seats: '3',
   description: 'Saída do centro.',
@@ -55,13 +54,22 @@ describe('rideFormSchema', () => {
     );
   });
 
-  it('should require the departure date and time', () => {
-    expect(firstErrorOf({ departureDate: '' })).toBe(RIDE_FORM_MESSAGES.departureDateRequired);
-    expect(firstErrorOf({ departureTime: '' })).toBe(RIDE_FORM_MESSAGES.departureTimeRequired);
+  it('should require the departure', () => {
+    expect(firstErrorOf({ departure: '' })).toBe(RIDE_FORM_MESSAGES.departureRequired);
   });
 
-  it('should stay quiet while the date is still half typed', () => {
-    expect(firstErrorOf({ departureDate: '22/0' })).toBeUndefined();
+  it('should refuse a departure that is still half typed', () => {
+    expect(firstErrorOf({ departure: '22/0' })).toBe(RIDE_FORM_MESSAGES.departureInvalid);
+    expect(firstErrorOf({ departure: '22/05/2026' })).toBe(RIDE_FORM_MESSAGES.departureInvalid);
+  });
+
+  it('should refuse a departure whose day or hour does not exist', () => {
+    expect(firstErrorOf({ departure: '31/02/2026 10:00' })).toBe(
+      RIDE_FORM_MESSAGES.departureInvalid,
+    );
+    expect(firstErrorOf({ departure: '22/05/2026 25:00' })).toBe(
+      RIDE_FORM_MESSAGES.departureInvalid,
+    );
   });
 
   // Relógio fixo porque a partida é lida no fuso do produto: sem isso, a máquina
@@ -78,13 +86,19 @@ describe('rideFormSchema', () => {
     });
 
     it('should refuse a departure that already happened', () => {
-      expect(firstErrorOf({ departureDate: '22/05/2026', departureTime: '08:00' })).toBe(
+      expect(firstErrorOf({ departure: '22/05/2026 08:00' })).toBe(
         RIDE_FORM_MESSAGES.departureInPast,
       );
     });
 
     it('should accept a departure still to come on the same day', () => {
-      expect(firstErrorOf({ departureDate: '22/05/2026', departureTime: '10:00' })).toBeUndefined();
+      expect(firstErrorOf({ departure: '22/05/2026 10:00' })).toBeUndefined();
+    });
+
+    it('should hand the departure over already read, not as the typed text', () => {
+      const result = rideFormSchema.safeParse({ ...VALID, departure: '22/05/2026 10:00' });
+
+      expect(result.data?.departure).toEqual(new Date(2026, 4, 22, 10, 0));
     });
 
     // A suíte fixa o fuso do processo no do produto, que é onde os dois jeitos de
@@ -93,7 +107,7 @@ describe('rideFormSchema', () => {
     it('should read the departure in the product time zone, not in the reader one', () => {
       process.env.TZ = 'UTC';
 
-      expect(firstErrorOf({ departureDate: '22/05/2026', departureTime: '10:00' })).toBeUndefined();
+      expect(firstErrorOf({ departure: '22/05/2026 10:00' })).toBeUndefined();
 
       process.env.TZ = PRODUCT_TIME_ZONE;
     });
