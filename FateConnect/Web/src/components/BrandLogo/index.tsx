@@ -3,16 +3,22 @@ import { Typography } from '@design-system';
 
 import type { RoutePathEnum } from '@app/routes/paths';
 
-const LOGO_LABEL = 'FateConnect';
+import { BrandMark } from './BrandMark';
+import { BrandMarkToneEnum } from './BrandMark/@types';
+import * as C from './constants';
+import * as S from './styles';
 
 type BrandLogoProps = Readonly<{ to: RoutePathEnum; onClick?: VoidFunction }>;
 
 export function BrandLogo({ to, onClick }: BrandLogoProps) {
   return (
-    <RouterLink to={to} aria-label={LOGO_LABEL} onClick={onClick}>
+    <S.LogoLink component={RouterLink} to={to} aria-label={C.LOGO_LABEL} onClick={onClick}>
+      <BrandMark tone={BrandMarkToneEnum.CHROME} />
       <Typography variant="logo" color="inherit">
-        {LOGO_LABEL}
+        {C.LOGO_FIRST_WORD}
+        <S.AccentInitial component="span">{C.LOGO_ACCENT_INITIAL}</S.AccentInitial>
+        {C.LOGO_SECOND_WORD}
       </Typography>
-    </RouterLink>
+    </S.LogoLink>
   );
 }

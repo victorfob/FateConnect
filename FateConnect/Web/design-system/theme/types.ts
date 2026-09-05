@@ -14,4 +14,11 @@ export type SurfacePair = { surface: string; content: string };
  * `palette.divider` e `palette.action.hover` são de superfície neutra e
  * desapareceriam sobre a cor de marca.
  */
-export type ChromeColors = { main: string; contrastText: string; divider: string; hover: string };
+export type ChromeColors = {
+  main: string;
+  contrastText: string;
+  /** A marca desenhada sobre o cromo — capelo do símbolo e inicial de `Connect`. */
+  accent: string;
+  divider: string;
+  hover: string;
+};

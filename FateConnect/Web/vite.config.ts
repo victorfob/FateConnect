@@ -1,6 +1,7 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
+import svgr from 'vite-plugin-svgr';
 import { defineConfig } from 'vitest/config';
 
 /**
@@ -18,6 +19,9 @@ const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
 export default defineConfig({
   plugins: [
     react(),
+    // `import arte from './arte.svg?react'` vira componente na build, então a
+    // marcação de desenho nasce no código gerado e não no nosso.
+    svgr(),
     sentryVitePlugin({
       disable: !sentryAuthToken,
       authToken: sentryAuthToken,

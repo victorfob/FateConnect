@@ -48,6 +48,7 @@ export const lightPalette: PaletteOptions = {
   chrome: {
     main: colorTokens.primary,
     contrastText: colorTokens.textOnAccent,
+    accent: colorTokens.brandOnChrome,
     divider: colorTokens.chromeDivider,
     hover: colorTokens.chromeHover,
   },
@@ -119,6 +120,7 @@ export const darkPalette: PaletteOptions = {
   chrome: {
     main: darkColorTokens.surfaceElevated,
     contrastText: darkColorTokens.onSurfaceHigh,
+    accent: darkColorTokens.brandOnChrome,
     divider: darkColorTokens.divider,
     hover: darkColorTokens.hover,
   },
