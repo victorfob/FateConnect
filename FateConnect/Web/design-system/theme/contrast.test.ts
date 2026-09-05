@@ -155,4 +155,16 @@ describe.each([
       expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NON_TEXT);
     },
   );
+
+  // O logotipo é isento do mínimo da WCAG, então não há limite a cobrar dele — e
+  // um limite que não se exige não entra na lista acima só para parecer medido.
+  // O que se cobra é o que a escolha decidiu: sobre o cromo, a marca nunca é
+  // menos legível do que o vermelho de botão seria ali.
+  it('should keep the brand mark on the chrome at least as legible as the button red', () => {
+    const { palette } = theme;
+
+    expect(contrastRatio(palette.chrome.accent, palette.chrome.main)).toBeGreaterThanOrEqual(
+      contrastRatio(palette.secondary.main, palette.chrome.main),
+    );
+  });
 });
