@@ -29,6 +29,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Divide o menu lateral da área logada em seções — serviços e conta —, cada item com o seu ícone e a saída de sessão separada no rodapé; ele passa a levar também a notificações, ao perfil e às preferências, e abaixo do desktop passa a ser o único caminho para a conta, com o avatar saindo do topo onde o botão de menu aparece (#306) [Frontend]
 - Renomeia para `Excluir` a ação que remove item e carona, antes chamada `Cancelar` e lida como desistir da operação em vez de destruir o registro; a confirmação, os avisos, a etiqueta e o filtro acompanham, o botão que dispensa o diálogo volta a ser `Cancelar`, e recuperar um item excluído passa a ser `Restaurar`. A nota do item excluído passa a distinguir a exclusão manual da automática por inatividade, e deixa de existir quando o motivo não vem — antes ela repetia a palavra da etiqueta ao lado (#314) [Frontend]
 - Junta data e hora da carona num campo só, digitado com máscara e com um painel que a aplicação desenha, mostrando o dia e a hora um passo por vez com o valor escolhido no topo: o campo de hora usava o seletor do navegador, que saía claro sobre o diálogo escuro e com moldura que não é a dos nossos campos. O formulário passa a recusar a partida escrita pela metade, que antes seguia com a data vazia (#316) [Frontend]
+- Troca o ícone da aplicação pelo símbolo da marca e o leva também para o logo do topo, ao lado da palavra, com a inicial de `Connect` na cor da marca; na aba escura do navegador a roda do símbolo clareia, porque no tom original ela sumia contra o fundo da aba (#319) [Frontend]
 
 ### Fixed
 
@@ -48,6 +49,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige a cor do campo preenchido pelo autocompletar no tema escuro, que o navegador pintava de azul e destoava do resto da tela; o tema claro segue como estava (#305) [Frontend]
 - Corrige a oferta de carona, que aceitava data e hora já passadas e deixava a recusa para a API: o formulário passa a recusar no próprio campo, no mesmo fuso em que a API valida, e o calendário não oferece mais dia anterior a hoje (#312) [Frontend]
 - Corrige o cadastro, que aceitava texto acima do limite da API em sete campos e recebia de volta um erro que não dizia qual deles reprovou; cada campo passa a avisar o máximo que aceita (#312) [Frontend]
+- Corrige o campo preenchido pelo navegador, que saía em dois tons quando tem botão dentro dele: a faixa atrás do olho da senha ficava com o branco do cartão enquanto o resto do campo era pintado. No tema escuro já estava correto (#319) [Frontend]
 
 ### Removed
 
