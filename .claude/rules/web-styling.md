@@ -163,6 +163,16 @@ Medido de três jeitos na #291, e os dois primeiros levaram a conclusões errada
 
 ⚠️ **Quem reclama é sempre a pessoa que olha a tela**, porque o número mente com confiança: eu tinha `32px` de um lado e `32px` do outro, e mesmo assim estava torto. Ao receber "não está alinhado" sobre algo que você mediu, desconfie do **que** foi medido antes de duvidar do relato.
 
+## A cor se julga ao lado do vizinho, não sozinha no fundo
+
+⛔ **Sonda que mostra o elemento isolado num retângulo mede a coisa certa no contexto errado.** Quem olha a tela não compara a cor com o fundo dela: compara com o que está ao lado.
+
+⛔ Aconteceu na #318, três vezes seguidas. O vermelho da marca no topo foi ao Victor em três sondas, todas com o logo sozinho sobre um retângulo da cor do cromo, cada uma com o contraste medido. As três respostas foram sobre outra coisa: *"parece mais escuro que os botões"*, depois *"ta mto opaco"*, e por fim *"olha como ele ta mais opaco em relação ao restante"* — o `Entrar` fica a poucos pixels do logo, e era com ele que a comparação estava sendo feita o tempo todo. Só quando a sonda passou a clonar a **faixa inteira**, com o botão do lado, a escolha fechou em uma rodada.
+
+**A sonda leva os vizinhos que dividem a tela com o elemento** — o botão ao lado, o texto acima, a etiqueta da mesma linha. Custa o mesmo `cloneNode(true)` do pai em vez do filho.
+
+⚠️ **O contraste medido continua necessário e deixa de ser suficiente.** Ele responde "dá para enxergar"; a pergunta que sobra — "combina com o resto da tela?" — não tem número, e é de quem olha.
+
 ## Propriedade em transição devolve o valor congelado
 
 ⛔ **Com o painel do navegador oculto a página não compõe quadros, e a transição CSS não avança** — `getComputedStyle` devolve o valor do estado **anterior**, por mais que você espere.
