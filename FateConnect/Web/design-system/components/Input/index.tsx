@@ -1,4 +1,5 @@
 import { DateField } from './components/DateField';
+import { DateTimeField } from './components/DateTimeField';
 import { SelectInput } from './components/SelectInput';
 import { InputField, type InputProps } from './InputField';
 
@@ -13,6 +14,7 @@ function Input(inputProps: InputProps) {
 }
 
 Input.Date = DateField;
+Input.DateTime = DateTimeField;
 Input.Select = SelectInput;
 
 export { Input };

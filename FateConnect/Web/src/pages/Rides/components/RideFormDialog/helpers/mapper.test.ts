@@ -21,11 +21,10 @@ describe('toFormValues', () => {
     expect(toFormValues(undefined)).toEqual(EMPTY_RIDE_FORM);
   });
 
-  it('should cut the api date and time down to what the fields accept', () => {
+  it('should join the api date and time into the single field', () => {
     const values = toFormValues(RIDE);
 
-    expect(values.departureDate).toBe('22/05/2026');
-    expect(values.departureTime).toBe('07:30');
+    expect(values.departure).toBe('22/05/2026 07:30');
     expect(values.seats).toBe('4');
     expect(values.rideType).toBe(RideTypeEnum.EGALITARIAN);
   });
@@ -36,11 +35,10 @@ describe('toFormValues', () => {
 });
 
 describe('toRideInput', () => {
-  it('should send the seats as a number and carry every field', () => {
+  it('should split the departure back into the two fields the api keeps', () => {
     const values: RideFormValues = {
       destination: 'Fatec Sorocaba',
-      departureDate: '22/05/2026',
-      departureTime: '07:30',
+      departure: new Date(2026, 4, 22, 7, 30),
       rideType: RideTypeEnum.EGALITARIAN,
       seats: '4',
       description: 'Saída do centro.',

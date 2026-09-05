@@ -43,6 +43,16 @@ describe('ThemeProvider', () => {
     expect(probe()).toHaveTextContent('dark');
   });
 
+  // Sem esta declaração o Chrome desenha todo controle nativo no claro, por mais
+  // escuro que o tema esteja — e nada no produto acusa.
+  it('should tell the browser which scheme to draw its own controls in', () => {
+    themeModeStorage.save('dark');
+
+    render(<ModeProbe />);
+
+    expect(getComputedStyle(document.documentElement).colorScheme).toBe('dark');
+  });
+
   it('should remember the mode the reader switches to', async () => {
     render(<ModeProbe />);
 
