@@ -25,6 +25,12 @@ Duas na mesma #237: `DOCKER_HOST` apontando para porta morta não desligou o Doc
 
 ⚠️ **Desligar por variável de ambiente não é desligar.** Ferramenta com descoberta automática de endpoint — Docker, proxy, DNS, resolvedor de pacote — trata a variável como preferência, não como ordem. Para medir a ausência, tire o recurso do ar.
 
+⛔ **Pseudo-classe que o navegador não deixa forçar não tem controle positivo — e aí a medição é outra.** O `CSS.forcePseudoState` do protocolo cobre `:hover`, `:focus`, `:active`, `:visited`, `:focus-within` e `:focus-visible`, e **não** cobre `:-webkit-autofill`. Em 05/09/2026, ao conferir se declarar `color-scheme` tinha tornado redundante a sombra que pinta o campo preenchido, não havia como pôr o campo naquele estado — nem forçando, nem digitando, porque credencial não se digita em formulário.
+
+O que respondeu foi ler a **cascata**, não o pixel: percorrer `document.styleSheets` juntando toda regra cujo `cssText` cita a pseudo-classe. Saíram duas, na ordem em que o navegador as aplica — a da própria biblioteca e a nossa, depois dela —, e a ordem **é** a resposta.
+
+⚠️ **Relatar isso como "medi o preenchimento automático" seria falso.** O que se mediu foi qual regra vence; que a regra vencedora pinta o que promete continua por conferir. Diga a frase que descreve o instrumento, não a que descreve o que você queria saber.
+
 ## O instrumento que alcança metade
 
 ⛔ **Sonda, regra e correção nascem cobrindo uma forma, e a resposta está na outra.** Não basta que o instrumento funcione: ele precisa alcançar **onde o problema mora**. Três vezes na #242, cada uma de um jeito:
@@ -59,6 +65,10 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 | `rtk proxy git diff \| grep -E "^\+" \| wc -l` | **19** ✅ |
 
 **A saída depende do que você quer:** contagem vem de `--numstat`, que é machine-readable e não passa por filtro; linha crua para **classificar** (comentário, string, termo) exige `rtk proxy git diff`, que desvia o filtro. As duas rules que prescreviam a forma ingênua — a densidade de comentário em `parallelism-and-worktrees.md` e o detector de rename em `dotnet-code-style.md` — foram corrigidas por causa disto.
+
+⛔ **O mesmo filtro engole a saída do `grep`, e devolve uma contagem no lugar dela.** Procurando cor cravada dentro de um pacote publicado, `rtk grep` respondeu **`4 matches in 0 files`** e não imprimiu uma linha sequer. Não é zero achados e não é erro: os quatro existiam e eram exatamente o que eu procurava — `/usr/bin/grep` imprimiu os quatro na hora.
+
+⚠️ **O tell é a contagem discordar da listagem**: `N matches` com nada embaixo. Vale para qualquer comando que passe por filtro — quando a saída vai sustentar conclusão, confira que o que foi contado é o que foi mostrado.
 
 ⛔ **E o complemento de "passou" não é "falhou".** No mesmo `gh pr checks`, tratar `bucket != "pass"` como falha reporta vermelho onde há `pending`: em 02/09/2026 anunciei um check falhando no #287 quando o front ainda estava `IN_PROGRESS`, porque a cascata da pilha havia reiniciado o CI. Estado de terceira via — `pending`, `skipping`, `neutral` — se nomeia, não se deduz por exclusão.
 
