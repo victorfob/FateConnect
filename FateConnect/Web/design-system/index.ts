@@ -50,4 +50,4 @@ export { GlobalStyles } from './GlobalStyles';
 export { spacingScale, radiusScale, shadowTokens, iconSizeTokens } from './tokens';
 
 export { caretAfterDigitCount, countDigits, onlyDigits } from './utils/text';
-export { DATE_PICKER_LABEL } from './components/Input/constants';
+export { DATE_PICKER_LABEL, DATE_TIME_PICKER_LABEL } from './components/Input/constants';
