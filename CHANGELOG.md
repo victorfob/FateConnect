@@ -28,6 +28,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Move a preferência de tema do topo da área logada para uma tela própria, em Preferências, alcançada pelo menu; na página inicial o botão continua no topo, para quem ainda não entrou (#301) [Frontend]
 - Divide o menu lateral da área logada em seções — serviços e conta —, cada item com o seu ícone e a saída de sessão separada no rodapé; ele passa a levar também a notificações, ao perfil e às preferências, e abaixo do desktop passa a ser o único caminho para a conta, com o avatar saindo do topo onde o botão de menu aparece (#306) [Frontend]
 - Renomeia para `Excluir` a ação que remove item e carona, antes chamada `Cancelar` e lida como desistir da operação em vez de destruir o registro; a confirmação, os avisos, a etiqueta e o filtro acompanham, o botão que dispensa o diálogo volta a ser `Cancelar`, e recuperar um item excluído passa a ser `Restaurar`. A nota do item excluído passa a distinguir a exclusão manual da automática por inatividade, e deixa de existir quando o motivo não vem — antes ela repetia a palavra da etiqueta ao lado (#314) [Frontend]
+- Junta data e hora da carona num campo só, digitado com máscara e com um painel que a aplicação desenha, mostrando o dia e a hora um passo por vez com o valor escolhido no topo: o campo de hora usava o seletor do navegador, que saía claro sobre o diálogo escuro e com moldura que não é a dos nossos campos. O formulário passa a recusar a partida escrita pela metade, que antes seguia com a data vazia (#316) [Frontend]
 
 ### Fixed
 
@@ -38,6 +39,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o cartão de entrar da página inicial, que era estreito demais para o e-mail institucional completo e o cortava dentro do campo — e é o único formato de e-mail que a tela aceita (#278) [Frontend]
 - Corrige a explicação do tipo de carona, inalcançável no celular: ela abria só ao passar o ponteiro, e agora abre ao toque, num alvo grande o bastante e sem levar o foco para o campo (#279) [Frontend]
 - Corrige o espaçamento dos botões dentro dos campos — o do calendário e o do relógio —, que ficavam mais para dentro que a seta dos campos de seleção ao lado (#279) [Frontend]
+- Corrige os controles que o navegador desenha por conta — como a listinha do campo de hora dos filtros —, que saíam sempre no claro por mais escuro que o tema estivesse (#316) [Frontend]
 - Corrige o logo dentro do menu lateral, que navegava e deixava o menu aberto por cima da tela nova (#281) [Frontend]
 - Corrige o realce de passar o ponteiro no topo e no menu lateral: no topo ele não chegava a aparecer, e no menu clareava tanto que apagava o próprio rótulo (#281) [Frontend]
 - Corrige a recusa de cadastro sem data de nascimento, que respondia em inglês enquanto os outros erros da API já vinham em português (#285) [Backend]

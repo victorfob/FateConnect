@@ -1,4 +1,4 @@
-import { createRef } from 'react';
+import { createRef, useState } from 'react';
 
 import {
   act,
@@ -9,8 +9,14 @@ import {
   waitFor,
   within,
 } from '@app/test/testing-library';
+import { themeModeStorage } from '@ds-root/ThemeProvider/storage/themeModeStorage';
 
-import { DATE_PICKER_LABEL, HELP_TRIGGER_LABEL_PREFIX, TIME_PICKER_LABEL } from './constants';
+import {
+  DATE_PICKER_LABEL,
+  DATE_TIME_PICKER_LABEL,
+  HELP_TRIGGER_LABEL_PREFIX,
+  TIME_PICKER_LABEL,
+} from './constants';
 import { Input, type InputProps } from '.';
 
 const DEFAULT_PROPS: InputProps = { label: 'Destino' };
@@ -201,7 +207,9 @@ describe('Input.Select', () => {
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent(HELP_TEXT);
   });
+});
 
+describe('Input.Date', () => {
   it('should not offer a day after the max date', async () => {
     const pickedDay = new Date(2026, 7, 10);
     render(<Input.Date label="Data" value="10/08/2026" maxDate={pickedDay} onChange={vi.fn()} />);
@@ -211,5 +219,224 @@ describe('Input.Select', () => {
     const calendar = within(await screen.findByRole('grid'));
     expect(calendar.getByRole('gridcell', { name: '10' })).toBeEnabled();
     expect(calendar.getByRole('gridcell', { name: '11' })).toBeDisabled();
+  });
+
+  it('should close the calendar once the day is picked, which is all it asks for', async () => {
+    render(<Input.Date label="Data" value="10/08/2026" onChange={vi.fn()} />);
+    await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
+
+    await userEvent.click(
+      within(await screen.findByRole('grid')).getByRole('gridcell', { name: '11' }),
+    );
+
+    await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
+  });
+});
+
+const DEPARTURE = '22/05/2026 18:30';
+const DEPARTURE_HOUR = '18:30';
+/** Dia antes do mês: o adaptador crava a ordem inversa em qualquer idioma. */
+const DEPARTURE_SHORT_DATE = '22 mai';
+const DEPARTURE_YEAR = '2026';
+/** Vem do idioma da biblioteca, não das nossas constantes. */
+const PICKER_TITLE = 'Selecione data e hora';
+
+function DateTimeHarness() {
+  const [departure, setDeparture] = useState('');
+
+  return <Input.DateTime label="Data e hora" value={departure} onChange={setDeparture} />;
+}
+
+const openDateTimePicker = () =>
+  userEvent.click(screen.getByRole('button', { name: DATE_TIME_PICKER_LABEL }));
+
+describe('Input.DateTime', () => {
+  it('should offer the day and the hour behind one tab each, not both at once', async () => {
+    render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
+
+    await openDateTimePicker();
+
+    expect(await screen.findByRole('grid')).toBeInTheDocument();
+    expect(screen.getAllByRole('tab')).toHaveLength(2);
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+
+  it('should reach the hour through the other tab', async () => {
+    render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
+    await openDateTimePicker();
+    const [, hourTab] = await screen.findAllByRole('tab');
+
+    await userEvent.click(hourTab as HTMLElement);
+
+    expect(await screen.findAllByRole('listbox')).not.toHaveLength(0);
+    expect(screen.queryByRole('grid')).not.toBeInTheDocument();
+  });
+
+  it('should show what was picked so far, since the panel covers the field', async () => {
+    render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
+
+    await openDateTimePicker();
+
+    // O topo do painel parte o valor em botões, um por trecho editável.
+    const top = (await screen.findByText(PICKER_TITLE)).parentElement;
+
+    expect(top).toHaveTextContent(DEPARTURE_SHORT_DATE);
+    expect(top).toHaveTextContent(DEPARTURE_HOUR);
+  });
+
+  it('should keep the hour already typed when the day changes', async () => {
+    const onChange = vi.fn();
+    render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={onChange} />);
+    await openDateTimePicker();
+
+    await userEvent.click(
+      within(await screen.findByRole('grid')).getByRole('gridcell', { name: '23' }),
+    );
+
+    expect(onChange).toHaveBeenCalledWith('23/05/2026 18:30');
+  });
+
+  it('should go straight to the hour once the day is picked, panel still open', async () => {
+    render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
+    await openDateTimePicker();
+
+    await userEvent.click(
+      within(await screen.findByRole('grid')).getByRole('gridcell', { name: '23' }),
+    );
+
+    expect(await screen.findAllByRole('listbox')).not.toHaveLength(0);
+    expect(screen.queryByRole('grid')).not.toBeInTheDocument();
+  });
+
+  // O painel não traz botão nenhum: os da biblioteca não funcionam num painel
+  // que não é dono do próprio ciclo. Quem fecha é escolher o minuto.
+  it('should close itself once the minute is picked, and offer no button', async () => {
+    render(<DateTimeHarness />);
+    const field = screen.getByRole('textbox', { name: /Data e hora/ });
+    await userEvent.type(field, '22052026');
+    await openDateTimePicker();
+    // Escolher o dia é o que leva à hora — o painel não tem botão de avançar.
+    await userEvent.click(
+      within(await screen.findByRole('grid')).getByRole('gridcell', { name: '23' }),
+    );
+    // O nome acessível da opção traz a unidade junto (`18 horas`); o texto, não.
+    const [hours, minutes] = await screen.findAllByRole('listbox');
+    await userEvent.click(within(hours as HTMLElement).getByText('18'));
+
+    await userEvent.click(within(minutes as HTMLElement).getByText('30'));
+
+    await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+    expect(field).toHaveValue('23/05/2026 18:30');
+  });
+
+  // O caminho de quem edita: a hora já está certa e só o minuto muda. Aqui não
+  // há troca de vista nenhuma — as duas colunas ficam na tela ao mesmo tempo.
+  it('should close when only the minute changes, without the day being touched', async () => {
+    render(<DateTimeHarness />);
+    const field = screen.getByRole('textbox', { name: /Data e hora/ });
+    await userEvent.type(field, '220520261830');
+    await openDateTimePicker();
+    const [, hourTab] = await screen.findAllByRole('tab');
+    await userEvent.click(hourTab as HTMLElement);
+    const [, minutes] = await screen.findAllByRole('listbox');
+
+    await userEvent.click(within(minutes as HTMLElement).getByText('45'));
+
+    await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+    expect(field).toHaveValue('22/05/2026 18:45');
+  });
+
+  it('should leave the year out of the panel top, since the calendar already shows it', async () => {
+    render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
+
+    await openDateTimePicker();
+
+    const top = (await screen.findByText(PICKER_TITLE)).parentElement;
+    expect(top).not.toHaveTextContent(DEPARTURE_YEAR);
+  });
+
+  it('should size the day and the hour at the top alike', async () => {
+    render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
+    await openDateTimePicker();
+
+    const top = (await screen.findByText(PICKER_TITLE)).parentElement as HTMLElement;
+    const [day, hour] = [...top.querySelectorAll('button')];
+
+    expect(getComputedStyle(hour as HTMLElement).fontSize).toBe(
+      getComputedStyle(day as HTMLElement).fontSize,
+    );
+  });
+
+  // A sobrescrita vive no `styles.ts` do campo, porque a biblioteca desenha o
+  // título sem gancho no tema — e ela some sem nada acusar.
+  it('should draw the panel title in our own type, not in the library caps', async () => {
+    render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
+
+    await openDateTimePicker();
+
+    expect(getComputedStyle(await screen.findByText(PICKER_TITLE)).textTransform).toBe('none');
+  });
+
+  it('should not offer a day before the min date', async () => {
+    const minDay = new Date(2026, 4, 22);
+    render(
+      <Input.DateTime label="Data e hora" value={DEPARTURE} minDate={minDay} onChange={vi.fn()} />,
+    );
+
+    await openDateTimePicker();
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '22' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '21' })).toBeDisabled();
+  });
+
+  it('should mask what is typed and stop at the minute', async () => {
+    render(<DateTimeHarness />);
+
+    const field = screen.getByRole('textbox', { name: /Data e hora/ });
+    await userEvent.type(field, '22052026183099');
+
+    expect(field).toHaveValue(DEPARTURE);
+  });
+
+  it('should leave the caret where the typing was, not at the end of the field', async () => {
+    render(<DateTimeHarness />);
+    const field: HTMLInputElement = screen.getByRole('textbox', { name: /Data e hora/ });
+    await userEvent.type(field, '22052026');
+
+    await userEvent.type(field, '9', { initialSelectionStart: 1, initialSelectionEnd: 1 });
+
+    expect(field).toHaveValue('29/20/5202 6');
+    expect(field.selectionStart).toBe(2);
+  });
+});
+
+/**
+ * A cor primária do tema claro **é** a cor de texto, então lá as duas coincidem
+ * e nada distingue a sobrescrita da ausência dela. O defeito mora só no escuro,
+ * onde a primária é a superfície do cromo e como texto fica em 4,11:1.
+ */
+describe('Input.DateTime in the dark theme', () => {
+  beforeEach(() => {
+    themeModeStorage.save('dark');
+  });
+
+  afterEach(() => {
+    themeModeStorage.save('light');
+  });
+
+  it('should draw the panel text in the reading colour, not in the chrome one', async () => {
+    render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
+    await openDateTimePicker();
+    await screen.findByRole('grid');
+
+    const [dayTab] = screen.getAllByRole('tab');
+    const readingColour = getComputedStyle(document.body).color;
+
+    const top = (await screen.findByText(PICKER_TITLE)).parentElement as HTMLElement;
+    const [day] = [...top.querySelectorAll('button')];
+
+    expect(getComputedStyle(dayTab as HTMLElement).color).toBe(readingColour);
+    expect(getComputedStyle(day as HTMLElement).color).toBe(readingColour);
   });
 });

@@ -29,30 +29,21 @@ export function RideFormFields() {
       />
 
       <Controller
-        name="departureDate"
+        name="departure"
         control={control}
         render={({ field }) => (
-          <Input.Date
+          <Input.DateTime
             name={field.name}
-            label={C.RIDE_FORM_LABELS.departureDate}
+            label={C.RIDE_FORM_LABELS.departure}
             required
             value={field.value}
             onChange={field.onChange}
             onBlur={field.onBlur}
             disabled={field.disabled}
             minDate={today}
-            error={errors.departureDate?.message}
+            error={errors.departure?.message}
           />
         )}
-      />
-
-      <Input
-        {...register('departureTime')}
-        type="time"
-        label={C.RIDE_FORM_LABELS.departureTime}
-        required
-        fullWidth
-        error={errors.departureTime?.message}
       />
 
       <Controller

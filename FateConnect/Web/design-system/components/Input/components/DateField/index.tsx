@@ -1,26 +1,15 @@
-import {
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type FocusEvent,
-  type MouseEvent,
-} from 'react';
+import { useCallback, type FocusEvent } from 'react';
 import Popover from '@mui/material/Popover';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 
 import { IconButton } from '@ds-root/components/IconButton';
 import { CalendarTodayIcon } from '@ds-root/icons';
-import { caretAfterDigitCount, countDigits } from '@ds-root/utils/text';
 
 import { DATE_PICKER_LABEL } from '../../constants';
+import { useMaskedPicker } from '../../hooks/useMaskedPicker';
 import { InputField } from '../../InputField';
 import { DATE_PLACEHOLDER, MASKED_DATE_LENGTH } from './constants';
 import { formatDate, maskDate, parseDate } from './helpers';
-
-const TEXT_START = 0;
-const NO_CARET = -1;
 
 export type DateFieldProps = Readonly<{
   label: string;
@@ -37,11 +26,7 @@ export type DateFieldProps = Readonly<{
   maxDate?: Date;
 }>;
 
-/**
- * Campo de data do produto: o texto mascarado é a fonte de verdade e o
- * calendário é auxiliar. Digitar é o caminho principal, com o cursor preservado
- * ao editar no meio — sem isso ele pula para o fim a cada tecla.
- */
+/** Campo de data do produto: o calendário é auxiliar do texto mascarado. */
 export function DateField({
   label,
   value,
@@ -54,48 +39,19 @@ export function DateField({
   minDate,
   maxDate,
 }: DateFieldProps) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const caretRef = useRef(NO_CARET);
-  const [calendarAnchor, setCalendarAnchor] = useState<HTMLElement | null>(null);
-
-  useLayoutEffect(() => {
-    const input = inputRef.current;
-    if (!input || caretRef.current === NO_CARET) return;
-
-    input.setSelectionRange(caretRef.current, caretRef.current);
-    caretRef.current = NO_CARET;
-  });
-
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const typed = event.target.value;
-      const masked = maskDate(typed);
-      const caretIndex = event.target.selectionStart ?? typed.length;
-
-      caretRef.current = caretAfterDigitCount(
-        masked,
-        countDigits(typed.slice(TEXT_START, caretIndex)),
-      );
-      onChange(masked);
-    },
-    [onChange],
+  const { inputRef, anchor, handleChange, handleOpenPicker, handleClosePicker } = useMaskedPicker(
+    maskDate,
+    onChange,
   );
-
-  const handleOpenCalendar = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => setCalendarAnchor(event.currentTarget),
-    [],
-  );
-
-  const handleCloseCalendar = useCallback(() => setCalendarAnchor(null), []);
 
   const handleDatePick = useCallback(
     (date: Date | null) => {
       if (!date) return;
 
       onChange(formatDate(date));
-      setCalendarAnchor(null);
+      handleClosePicker();
     },
-    [onChange],
+    [onChange, handleClosePicker],
   );
 
   return (
@@ -120,7 +76,7 @@ export function DateField({
           <IconButton
             type="button"
             label={DATE_PICKER_LABEL}
-            onClick={handleOpenCalendar}
+            onClick={handleOpenPicker}
             disabled={disabled}
           >
             <CalendarTodayIcon fontSize="small" />
@@ -129,9 +85,9 @@ export function DateField({
       />
 
       <Popover
-        open={Boolean(calendarAnchor)}
-        anchorEl={calendarAnchor}
-        onClose={handleCloseCalendar}
+        open={Boolean(anchor)}
+        anchorEl={anchor}
+        onClose={handleClosePicker}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
