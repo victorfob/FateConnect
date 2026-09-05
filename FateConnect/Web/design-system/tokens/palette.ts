@@ -69,11 +69,14 @@ export const colorTokens = {
    * o cartão branco; este alcança os 3:1 da WCAG 1.4.11 para não-texto.
    */
   /**
-   * Fundo do campo preenchido pelo navegador. `transparent` de propósito: no
-   * claro o azul que o Chrome pinta já fica a 1,15 do cartão branco, e cobri-lo
-   * trocaria um realce leve por nenhum.
+   * Fundo do campo preenchido pelo navegador — o mesmo azul que o Chrome pinta,
+   * a 1,15 do cartão branco, agora declarado por nós.
+   *
+   * ⛔ Não volte para `transparent`. O navegador pinta só o `input`, e o campo
+   * com adorno é mais largo que ele: sem cor aqui, a faixa atrás do botão de
+   * senha fica branca e o campo sai em dois tons.
    */
-  inputAutofill: 'transparent',
+  inputAutofill: '#E8F0FE',
   switchTrack: '#848C92',
 
   /** Divisor sobre superfície neutra. */
