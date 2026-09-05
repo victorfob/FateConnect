@@ -39,6 +39,16 @@ O que fechou a conversa foi a tabela que eu devia ter apresentado antes:
 
 **O sinal de risco é você já ter medido que a biblioteca não resolve.** É exatamente aí que a reescrita parece inevitável — e é aí que o caminho barato precisa ser dito em voz alta, com o custo, para o outro lado escolher.
 
+## Antes de afrouxar uma regra do projeto, procure a ferramenta padrão
+
+⛔ **Código que não passa numa regra daqui é sinal de que falta uma ferramenta, não de que a regra está larga demais.** Editar a regra é o caminho mais curto e o mais caro: ela deixa de valer para todo mundo, para sempre, por causa de um caso.
+
+⛔ Aconteceu na #318. O símbolo da marca precisava de `<svg>` e `<path>` no JSX, e a regra de tag crua reprova tag minúscula. Eu acrescentei os dois nomes à lista de exceção do `eslint.config.js`, provei que o `<div>` continuava reprovando, e segui. O Victor viu — *"vc usou tag svg crua"* — e devolveu a saída que eu não tinha procurado: `import arte from './arte.svg?react'`, o `vite-plugin-svgr`, que é como todo projeto Vite resolve isso. A marcação de desenho passa a nascer no código gerado, e o `eslint.config.js` voltou ao que era.
+
+**O gesto que denuncia:** você está editando configuração de lint no meio de uma tarefa que não é de lint. Antes de salvar, pergunte qual é o jeito padrão do ecossistema de fazer aquilo — a resposta costuma ser um plugin de uma linha.
+
+⚠️ **Vale mesmo com a exceção bem medida.** A minha estava: recorte mínimo, controle positivo nas duas formas, comentário explicando. Continuava sendo a regra cedendo ao meu caso, quando existia caso nenhum a abrir.
+
 ## Encontrou duplicação: propor e perguntar
 
 Vale também para duplicação **fora da tarefa**. Se eu vi, eu proponho na hora, sem esperar ser cobrado — a sugestão é obrigação, não favor. Trazer três coisas: o que está repetido, o que fica no lugar dos dois, e **onde** passa a morar. E **esperar o sim**.
