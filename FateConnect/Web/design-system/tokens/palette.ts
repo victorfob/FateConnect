@@ -4,6 +4,15 @@ export const colorTokens = {
   accent: '#CF2E2E',
 
   /**
+   * A marca sobre o cromo — o capelo do símbolo e a inicial de `Connect`. O
+   * `accent` acima é fundo de botão e ali some, a 1.53:1; este chega a 2.47:1
+   * com saturação cheia. Logotipo é isento do mínimo da WCAG, e o que decidiu o
+   * tom foi o vizinho: mais claro que isto ele destoa do vermelho do botão ao
+   * lado, mais escuro ele afunda no cinza do cromo.
+   */
+  brandOnChrome: '#FF5252',
+
+  /**
    * Erro, hoje só como texto. Precisa de 4.5:1 sobre os **dois** fundos claros:
    * o `#E81C0D` anterior passava no branco do diálogo e dava 4.07:1 no cinza da
    * página. O tom herdado fica como `error.light`.
@@ -114,6 +123,12 @@ export const darkColorTokens = {
   primary: '#68828E',
   /** Fundo de botão: escuro o bastante para o texto branco, que aqui é regra. */
   secondary: '#CF2E2E',
+  /**
+   * A marca sobre o cromo escuro, que aqui é a superfície elevada: 3.24:1. O
+   * cromo claro precisa de um vermelho mais claro, e por isso o tom não é o
+   * mesmo nos dois temas.
+   */
+  brandOnChrome: '#CF2E2E',
   /**
    * A mesma marca **como texto**, e por isso mais clara que o fundo de botão
    * acima. São dois tons porque os dois papéis se excluem: para o branco passar
