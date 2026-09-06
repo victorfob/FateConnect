@@ -1,5 +1,6 @@
+import { onlyDigits } from '@design-system';
+
 import { firstCharacters } from '../sequence';
-import { onlyDigits } from './caret';
 
 const MAX_PHONE_DIGITS = 11;
 const AREA_CODE_LENGTH = 2;

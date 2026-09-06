@@ -40,4 +40,21 @@ public class ValidationMessagesTests
 
         Assert.Contains(results, result => result.ErrorMessage == "Gênero inválido");
     }
+
+    [Fact]
+    public void AnUnderageBirthDate_IsRejectedInPortuguese()
+    {
+        List<ValidationResult> results = Validate(new CreateUserDto
+        {
+            FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
+            Password = "SenhaForte123!",
+            FullName = "Mariana Alves Rocha",
+            BirthDate = DateTime.UtcNow.Date.AddYears(-10),
+            Gender = EnumGender.Female,
+            Addresses = [],
+            Contacts = [],
+        });
+
+        Assert.Contains(results, result => result.ErrorMessage == "É necessário ter pelo menos 18 anos");
+    }
 }

@@ -48,6 +48,7 @@ export const lightPalette: PaletteOptions = {
   chrome: {
     main: colorTokens.primary,
     contrastText: colorTokens.textOnAccent,
+    accent: colorTokens.brandOnChrome,
     divider: colorTokens.chromeDivider,
     hover: colorTokens.chromeHover,
   },
@@ -55,8 +56,11 @@ export const lightPalette: PaletteOptions = {
    * Borda do campo de formulário. O padrão do MUI é mais claro que o do produto
    * (23% contra 38%), o que deixaria todo formulário mais lavado que hoje.
    */
+  inputAutofill: colorTokens.inputAutofill,
   inputOutline: colorTokens.inputOutline,
+  surfaceFloating: colorTokens.surfaceWhite,
   skeleton: colorTokens.skeleton,
+  switchTrack: colorTokens.switchTrack,
   statusTag: {
     neutral: { surface: NO_SURFACE, content: INHERITED_CONTENT },
     muted: { surface: colorTokens.mutedBackground, content: colorTokens.mutedText },
@@ -116,12 +120,16 @@ export const darkPalette: PaletteOptions = {
   chrome: {
     main: darkColorTokens.surfaceElevated,
     contrastText: darkColorTokens.onSurfaceHigh,
+    accent: darkColorTokens.brandOnChrome,
     divider: darkColorTokens.divider,
     hover: darkColorTokens.hover,
   },
   /** 38% de branco é a ênfase desabilitada do sistema de cor do Material Design. */
+  inputAutofill: darkColorTokens.inputAutofill,
   inputOutline: darkColorTokens.onSurfaceDisabled,
+  surfaceFloating: darkColorTokens.surfaceFloating,
   skeleton: darkColorTokens.skeleton,
+  switchTrack: darkColorTokens.switchTrack,
   // No escuro o par da etiqueta e o do aviso invertem de claridade, não de papel.
   statusTag: {
     neutral: { surface: NO_SURFACE, content: INHERITED_CONTENT },

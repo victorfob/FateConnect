@@ -6,6 +6,13 @@ import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
 
 import type { RideFormMode } from '../types';
 
+/**
+ * O fuso em que a API valida a partida (`Ride.ValidateDepartureDateTime`). Sem
+ * ele o formulário julga pelo relógio de quem preenche e aceita o que o
+ * servidor recusa.
+ */
+export const PRODUCT_TIME_ZONE = 'America/Sao_Paulo';
+
 /** Limites do `CreateCaronaDto` e da entidade `Carona`, espelhados no front. */
 export const RIDE_LIMITS = {
   minDestination: 3,
@@ -33,8 +40,7 @@ export const EDIT_MODE: RideFormMode = {
 
 export const RIDE_FORM_LABELS = {
   destination: 'Destino',
-  departureDate: 'Data',
-  departureTime: 'Hora',
+  departure: 'Data e hora',
   rideType: 'Tipo',
   seats: 'Vagas disponíveis',
   description: 'Descrição',
@@ -73,8 +79,8 @@ export const SEAT_OPTIONS: readonly SelectOption[] = [
 export const RIDE_FORM_MESSAGES = {
   destinationTooShort: `O destino deve ter ao menos ${RIDE_LIMITS.minDestination} caracteres`,
   destinationTooLong: `O destino deve ter no máximo ${RIDE_LIMITS.maxDestination} caracteres`,
-  departureDateRequired: 'Informe a data',
-  departureTimeRequired: 'Informe a hora',
+  departureRequired: 'Informe a data e a hora',
+  departureInvalid: 'Data e hora inválidas',
   departureInPast: 'A carona deve ser em data e hora futuras',
   rideTypeRequired: 'Selecione o tipo',
   seatsRequired: 'Selecione a quantidade de vagas',

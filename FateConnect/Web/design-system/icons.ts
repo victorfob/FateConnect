@@ -25,14 +25,18 @@ export { default as InfoIcon } from '@mui/icons-material/Info';
 export { default as LightModeIcon } from '@mui/icons-material/LightMode';
 export { default as LocalOfferIcon } from '@mui/icons-material/LocalOffer';
 export { default as LocationOnIcon } from '@mui/icons-material/LocationOn';
+export { default as LogoutIcon } from '@mui/icons-material/Logout';
 export { default as MenuIcon } from '@mui/icons-material/Menu';
 export { default as NoBackpackOutlinedIcon } from '@mui/icons-material/NoBackpackOutlined';
+export { default as NotificationsIcon } from '@mui/icons-material/Notifications';
+export { default as PersonIcon } from '@mui/icons-material/Person';
 export { default as PhoneIcon } from '@mui/icons-material/Phone';
 export { default as RestoreIcon } from '@mui/icons-material/Restore';
 export { default as ScheduleIcon } from '@mui/icons-material/Schedule';
 export { default as SaveIcon } from '@mui/icons-material/Save';
 export { default as SearchIcon } from '@mui/icons-material/Search';
 export { default as SecurityIcon } from '@mui/icons-material/Security';
+export { default as SettingsIcon } from '@mui/icons-material/Settings';
 export { default as VisibilityIcon } from '@mui/icons-material/Visibility';
 export { default as VisibilityOffIcon } from '@mui/icons-material/VisibilityOff';
 

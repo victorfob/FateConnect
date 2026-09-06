@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
+import { onlyDigits } from '@design-system';
 import { useQuery } from '@tanstack/react-query';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import { useDebouncedValue } from '@app/hooks/useDebouncedValue';
 import { useNotification } from '@app/hooks/useNotification';
 import { isCepNotFound, lookupCep } from '@app/services/cep/cepService';
-import { onlyDigits } from '@app/utils/masks/caret';
 
 import { ZIP_LOOKUP_MESSAGES } from '../constants';
 import type { SignupFormValues } from '../schema';

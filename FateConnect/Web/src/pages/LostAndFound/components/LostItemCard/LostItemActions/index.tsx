@@ -8,16 +8,16 @@ import { LostItemOwnerActions } from './LostItemOwnerActions';
 type LostItemActionsProps = Readonly<{
   item: LostItem;
   onEdit?: (item: LostItem) => void;
-  onCancel: (item: LostItem) => void;
+  onDelete: (item: LostItem) => void;
 }>;
 
 /** Existe mesmo sem ações do dono: o contato entra aqui e é de todo mundo. */
-export function LostItemActions({ item, onEdit, onCancel }: LostItemActionsProps) {
+export function LostItemActions({ item, onEdit, onDelete }: LostItemActionsProps) {
   return (
     <ListCard.ActionButtons>
       <LostItemOwnerContact item={item} />
 
-      <LostItemOwnerActions item={item} onEdit={onEdit} onCancel={onCancel} />
+      <LostItemOwnerActions item={item} onEdit={onEdit} onDelete={onDelete} />
     </ListCard.ActionButtons>
   );
 }

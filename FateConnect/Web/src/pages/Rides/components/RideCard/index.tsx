@@ -17,10 +17,10 @@ const TIME_LENGTH = 5;
 type RideCardProps = Readonly<{
   ride: Ride;
   onEdit: (ride: Ride) => void;
-  onCancel: (ride: Ride) => void;
+  onDelete: (ride: Ride) => void;
 }>;
 
-export function RideCard({ ride, onEdit, onCancel }: RideCardProps) {
+export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
   const typeLabel = rideTypeDisplayLabel(ride.rideType);
   const tone = rideTypeTone(ride.rideType);
 
@@ -35,7 +35,7 @@ export function RideCard({ ride, onEdit, onCancel }: RideCardProps) {
           <ListCard.ActionButtons>
             <RideDriverContact ride={ride} />
 
-            <RideOwnerActions ride={ride} onEdit={onEdit} onCancel={onCancel} />
+            <RideOwnerActions ride={ride} onEdit={onEdit} onDelete={onDelete} />
           </ListCard.ActionButtons>
         </ListCard.Actions>
       </ListCard.Header>

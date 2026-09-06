@@ -1,7 +1,14 @@
+import {
+  DirectionsCarIcon,
+  SearchIcon,
+  SecurityIcon,
+  type SvgIconComponent,
+} from '@design-system/icons';
+
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 export type LandingLink = { section: LandingSectionEnum; label: string; highlighted: boolean };
-export type AppLink = { path: RoutePathEnum; label: string };
+export type AppLink = { path: RoutePathEnum; label: string; Icon: SvgIconComponent };
 
 export const LANDING_LINKS: LandingLink[] = [
   { section: LandingSectionEnum.SERVICES, label: 'Serviços', highlighted: false },
@@ -15,6 +22,7 @@ export const LANDING_LINKS: LandingLink[] = [
  * como âncora na landing, não como rota de quem já entrou.
  */
 export const APP_LINKS: AppLink[] = [
-  { path: RoutePathEnum.LOST_AND_FOUND, label: 'Achados & Perdidos' },
-  { path: RoutePathEnum.RIDES, label: 'Caronas' },
+  { path: RoutePathEnum.LOST_AND_FOUND, label: 'Achados & Perdidos', Icon: SearchIcon },
+  { path: RoutePathEnum.RIDES, label: 'Caronas', Icon: DirectionsCarIcon },
+  { path: RoutePathEnum.DENUNCIATIONS, label: 'Denúncias', Icon: SecurityIcon },
 ];

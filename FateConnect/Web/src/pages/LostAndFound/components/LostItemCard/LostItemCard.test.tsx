@@ -1,32 +1,58 @@
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { LOST_ITEM_OWNER } from '@app/pages/LostAndFound/helpers/lostItemOwner';
 import {
+  DeletionReasonEnum,
   LostItemKindEnum,
   LostItemStatusEnum,
   type LostItem,
 } from '@app/services/lostAndFound/types';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
 
+import { RESTORE_LABEL } from './LostItemStatusAction/constants';
 import { LostItemCard } from '.';
 
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
-  nome: 'Carteira preta',
-  tipo: LostItemKindEnum.LOST,
-  local: 'Biblioteca',
-  dataOcorrido: '2026-08-11T00:00:00',
-  descricao: 'Carteira de couro preta com documentos e cartões.',
-  fotoUrl: null,
-  situacao: LostItemStatusEnum.OPEN,
-  motivoCancelamento: null,
-  meuItem: false,
-  dataCadastro: '2026-08-12T00:00:00',
+  name: 'Carteira preta',
+  type: LostItemKindEnum.LOST,
+  place: 'Biblioteca',
+  occurredOn: '2026-08-11T00:00:00',
+  description: 'Carteira de couro preta com documentos e cartões.',
+  photoUrl: null,
+  status: LostItemStatusEnum.OPEN,
+  deletionReason: null,
+  isMine: false,
+  createdAt: '2026-08-12T00:00:00',
 };
 
 const COPY_EMAIL_LABEL = `Copiar ${LOST_ITEM_OWNER.email}`;
 
+const DELETION_NOTE = {
+  manual: 'Excluído manualmente.',
+  inactivity: 'Excluído automaticamente por inatividade.',
+};
+
+const DELETED_ITEM: LostItem = {
+  ...LOST_ITEM,
+  isMine: true,
+  status: LostItemStatusEnum.DELETED,
+  deletionReason: DeletionReasonEnum.USER,
+};
+
+/**
+ * A nota mora entre a descrição e a ação, então o que vem depois da descrição diz
+ * se ela existe. Procurar as duas frases nomeadas deixaria passar uma nota de
+ * reserva escrita com outras palavras, que é justamente o que saiu daqui.
+ */
+function textAfterTheDescription() {
+  return screen
+    .getByRole('article')
+    .textContent?.split(LOST_ITEM.description ?? '')
+    .at(-1);
+}
+
 const renderComponent = (item = LOST_ITEM) =>
-  render(<LostItemCard item={item} onResolve={vi.fn()} onCancel={vi.fn()} onReopen={vi.fn()} />);
+  render(<LostItemCard item={item} onResolve={vi.fn()} onDelete={vi.fn()} onRestore={vi.fn()} />);
 
 async function openContact() {
   await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
@@ -63,13 +89,13 @@ describe('LostItemCard', () => {
   });
 
   it('should not offer contact on the item registered by the logged user', () => {
-    renderComponent({ ...LOST_ITEM, meuItem: true });
+    renderComponent({ ...LOST_ITEM, isMine: true });
 
     expect(screen.queryByRole('button', { name: CONTACT_LABEL })).not.toBeInTheDocument();
   });
 
   it('should keep the contact reachable after the item is resolved', async () => {
-    renderComponent({ ...LOST_ITEM, situacao: LostItemStatusEnum.RESOLVED });
+    renderComponent({ ...LOST_ITEM, status: LostItemStatusEnum.RESOLVED });
 
     const dialog = await openContact();
 
@@ -83,7 +109,7 @@ describe('LostItemCard', () => {
 
     expect(dialog.getByRole('link', { name: LOST_ITEM_OWNER.phone })).toHaveAttribute(
       'href',
-      expect.stringContaining(encodeURIComponent(LOST_ITEM.nome)),
+      expect.stringContaining(encodeURIComponent(LOST_ITEM.name)),
     );
   });
 
@@ -105,5 +131,23 @@ describe('LostItemCard', () => {
     await userEvent.click(dialog.getByRole('button', { name: COPY_EMAIL_LABEL }));
 
     expect(await screen.findByText(CONTACT_DIALOG.emailCopyFailed)).toBeInTheDocument();
+  });
+
+  it('should tell apart the hand that deleted the item from the routine that did', () => {
+    renderComponent(DELETED_ITEM);
+
+    expect(textAfterTheDescription()).toBe(`${DELETION_NOTE.manual}${RESTORE_LABEL}`);
+  });
+
+  it('should say the routine deleted the item when the reason is inactivity', () => {
+    renderComponent({ ...DELETED_ITEM, deletionReason: DeletionReasonEnum.INACTIVITY });
+
+    expect(textAfterTheDescription()).toBe(`${DELETION_NOTE.inactivity}${RESTORE_LABEL}`);
+  });
+
+  it('should leave the note out when the item comes deleted without a reason', () => {
+    renderComponent({ ...DELETED_ITEM, deletionReason: null });
+
+    expect(textAfterTheDescription()).toBe(RESTORE_LABEL);
   });
 });

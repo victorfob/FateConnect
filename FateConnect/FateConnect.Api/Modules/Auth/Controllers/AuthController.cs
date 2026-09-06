@@ -1,5 +1,7 @@
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Auth.DTOs;
+using FateConnect.Api.Modules.Auth.Extensions;
+using FateConnect.Api.Modules.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +25,17 @@ public class AuthController : ControllerBase
     {
         var response = await _authService.LoginAsync(dto);
         return Ok(response);
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> LogoutAsync()
+    {
+        await _authService.LogoutAsync(User.GetUserId());
+
+        return NoContent();
     }
 
     [HttpGet("session")]

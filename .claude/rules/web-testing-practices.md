@@ -42,6 +42,30 @@ O import saía de graça em 48 arquivos e ninguém percebia porque o teste passa
 - Não testar detalhe de implementação: nada de asserção sobre estado interno, nome de classe CSS ou ordem de chamada de hook.
 - Não duplicar no teste a lógica que ele verifica — valor esperado é literal, não recalculado.
 
+## Suíte verde não prova que ela pega o defeito
+
+⛔ **Quebre o código de propósito e confira que o teste cai.** É a única forma de saber se ele testa o que o nome dele diz — e o caso clássico aqui não é o teste frouxo, é o teste que **alimenta o formato errado**.
+
+Aconteceu em 04/09/2026, na #309. A regra de partida futura do formulário de carona nunca disparava: o campo guarda `22/05/2026` e ela lia com `parseISO`, que só entende ISO. O teste passava verde porque montava a entrada com o formato da **API** — ele passaria igual com a regra apagada. Quatro mutações fecharam a rodada, cada uma derrubando o teste escrito para ela: voltar o `parseISO`, tirar a conversão de fuso, tirar um `.max()` do schema e tirar a prop de erro de um campo.
+
+**Restaure a árvore ao fim de cada mutação** e confirme com `git status` que nada sobrou.
+
+## O fuso do processo vem fixado, e a linha de comando não o vence
+
+⛔ **`vitest.setup.ts` executa `process.env.TZ = 'America/Sao_Paulo'` para toda a suíte.** Rodar `TZ=UTC npx vitest` **não muda nada**: o setup roda depois e sobrescreve.
+
+Isso importa porque o fuso do produto é exatamente onde uma comparação feita no relógio local e uma feita no fuso do produto **concordam** — nenhum teste as distingue enquanto o processo estiver ali. Na #309 o controle rodou `TZ=UTC` na linha de comando, a suíte passou 9/9 com a conversão de fuso removida, e a conclusão natural teria sido que a conversão era desnecessária.
+
+Para discriminar, troque a variável **dentro do caso** e restaure ao fim — medido, funciona a partir da atribuição:
+
+```ts
+process.env.TZ = 'UTC';
+// … a asserção que só passa lendo o fuso do produto
+process.env.TZ = PRODUCT_TIME_ZONE;
+```
+
+⚠️ **O sinal é o controle passar quando você esperava que falhasse.** Antes de concluir que o código sob mutação é desnecessário, pergunte se o cenário chega a alcançá-lo.
+
 ## O nome no `getByRole` sai da constante, nunca do texto
 
 ⛔ **Nunca escreva o rótulo literal — nem string, nem regex — para achar um controle.** Importe a constante que o componente usa. Copy muda, e o literal não muda junto: ou o teste quebra, ou — pior — passa a casar **outro** controle.
@@ -59,6 +83,19 @@ O import saía de graça em 48 arquivos e ninguém percebia porque o teste passa
 Antes de escrever a negativa, monte o **positivo** com a mesma consulta e confirme que ele encontra alguma coisa.
 
 Na #227, o critério era "o login não mostra aviso nenhum". Todo aviso do produto traz um botão `OK` para dispensar, então a asserção virou `queryByRole('button', { name: 'OK' })` na negativa — mas só depois de eu acrescentar a **positiva** ao caso de erro ao lado e ver que ela encontra o botão. Sem esse passo, a negativa passaria para sempre, inclusive se o aviso voltasse com outro rótulo.
+
+⛔ **E a negativa se ancora no lugar, não no texto que você espera encontrar.** Provar que a consulta acha alguma coisa não basta quando ela procura **a frase**: qualquer outro conteúdo naquele espaço passa por baixo dela.
+
+Na #310 o critério era "sem motivo, o cartão não mostra nota". Duas versões passaram com o defeito reposto de propósito:
+
+| Asserção | Escapou de |
+| --- | --- |
+| `queryByText(NOTA.manual)` e `queryByText(NOTA.inatividade)` | nota de reserva com qualquer outra redação |
+| contar quantas vezes a palavra `Excluído` aparece no cartão | nota que não repete a palavra da etiqueta |
+
+A terceira funcionou porque afirma **o que vem logo depois da descrição**: havendo nota, é a nota; não havendo, é o botão de ação. Aí qualquer texto naquele espaço derruba o caso.
+
+**O tell é a asserção nomear o conteúdo que não deve existir.** Se você consegue escrever a frase proibida, está testando aquela frase — não a ausência.
 
 ## Corpo de requisição se afirma inteiro
 

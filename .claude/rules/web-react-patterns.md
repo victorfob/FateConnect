@@ -38,7 +38,15 @@ Vale para pasta de componente e de tela. Pastas que **já são** dedicadas por n
 - **Interno** (não faz sentido fora do pai): pasta dentro do pai — `ConfirmDialog/DialogMessage/index.tsx`. Quando forem vários, agrupar em `components/`.
 - **Reutilizável a partir do design system**: expor por composição — `ConfirmDialog` e `ConfirmDialog.Message` — em vez de um segundo export solto do mesmo arquivo.
 
-⛔ **Constante com JSX no corpo do pai é corpo do pai.** A regra não é sobre a palavra `function` — é sobre onde o JSX mora. As ações do topo montadas como `const actions = (<>…</>)` dentro do `MainLayout` são um componente escondido numa variável, refeita a cada render: virou `HeaderActions`, com pasta e `index`. Se o trecho tem condição, estado ou hook, é componente com pasta — não variável no meio do pai.
+⛔ **Constante com JSX no corpo do pai é corpo do pai.** A regra não é sobre a palavra `function` — é sobre onde o JSX mora. As ações do topo montadas como `const actions = (<>…</>)` dentro do `MainLayout` são um componente escondido numa variável, refeita a cada render: viraram `AccountMenu`, com pasta e `index`. Se o trecho tem condição, estado ou hook, é componente com pasta — não variável no meio do pai.
+
+## Componente que virou repasse sai
+
+⛔ **Ao extrair o miolo de um componente para um filho com pasta própria, releia o pai.** Sobrando só `return <Filho />;`, o pai é indireção pura: quem lê atravessa um arquivo para descobrir que não há nada nele.
+
+Aconteceu em 04/09/2026. O `HeaderActions` existia para montar as ações do topo; quando o menu da conta virou componente próprio, o corpo dele virou uma linha só. Cobrado como *"se `HeaderActions` só reexporta `AccountMenu`, ele não precisa existir"* — o `MainLayout` passou a pôr o `AccountMenu` direto no slot `actions`.
+
+⚠️ **"Vou precisar dele depois" não segura o arquivo.** A issue seguinte acrescenta a campainha ao lado, e mesmo assim o certo foi apagar: o slot de ações do `Header` já espaça os filhos, então o invólucro nasce de novo se e quando fizer falta — não antes.
 
 ## Tipagem e imports
 
@@ -49,6 +57,7 @@ Vale para pasta de componente e de tela. Pastas que **já são** dedicadas por n
 - **O tipo entra no import que já existe.** Se o módulo já é importado por valor, o tipo vai junto com o modificador inline, no fim das chaves — `import { createMemoryRouter, RouterProvider, type LinkProps } from 'react-router'`. Segunda declaração `import type` só quando o módulo entra **apenas** por tipo, como o `ReactNode` num arquivo que não usa nada de valor do React. O lint funde e ordena sozinho.
 - **A ordem dos imports é do lint, não da mão.** Pacotes (react na frente, e `@design-system` entre eles) → alias da aplicação → relativos → `.`. O design system conta como **pacote**, não como alias interno: ele mora fora de `src` e é consumido como biblioteca, então fica no bloco do react, sem linha em branco separando. Dentro do bloco relativo: `../` antes de `./`, e o namespace desce para o fim do seu bloco — primeiro o que vem por nome, depois `* as C` e por último `* as S`. `yarn lint:fix` arruma; não vale reordenar à mão contra a regra.
 - **Constantes em namespace a partir de três**: com três ou mais nomes vindos de um módulo de constantes, importar `import * as C from './constants'` e usar `C.NOME`, mesmo padrão do `import * as S from './styles'`. Com um ou dois, import nomeado.
+- ⛔ **As letras de namespace são `C` e `S`, e não há terceira.** Precisando de um **segundo** módulo de constantes no mesmo arquivo — tipicamente a constante de outro componente, importada para o teste achar o rótulo por nome —, ela entra por **import nomeado**. Em 04/09/2026 escrevi `import * as A from '.../AccountMenu/constants'` em dois testes e a cobrança foi *"pq usou `* as A`, num faz sentido nenhum"*: `A` não descreve nada, e a regra de contagem acima já respondia — eram um e dois nomes, que é import nomeado de qualquer forma.
 - **`import * as S` com alias é sempre erro.** O estilo de um componente mora ao lado do `index` dele, então o import é `'./styles'` e nada mais. `import * as S from '@app/pages/Signup/styles'` em três seções do cadastro queria dizer que a grade do formulário estava na página e as células, que são de cada seção, junto: a página passou a envolver as seções em `FieldGrid` e cada seção ganhou o seu `styles.ts` com as células que usa. Vale também para o `styles.ts` do **pai**: `import * as S from '../styles'` põe o estilo de um componente na pasta de outro. O `FilterPanel` do design system nasceu assim, com a célula do campo desenhada no estilo do painel — a célula é do campo, e foi para a pasta dele.
 - **`import * as C` com alias só vale para constante compartilhada.** Constante geral da tela (`FIELD_LABELS`, usada por quatro seções) ou global (`appContact`) pode vir por alias. Constante consumida por **um** componente só vai para a pasta dele — `DELETE_DIALOG` saiu de `pages/Rides/constants` para `RideDeleteConfirmation/constants`. Antes de mover, conte os consumidores: `seatsLabel` parecia exclusivo do `RideCard` e o `RideFormDialog` também o usava.
 
@@ -157,3 +166,11 @@ Aconteceu na #213, ao levar o cadastro para inglês: o replace `cep` → `zipCod
 **Os contratos de terceiro deste repo**, hoje: `services/cep/` (ViaCEP e OpenCEP, com `cep`, `logradouro`, `localidade`, `uf`) e `utils/whatsapp.ts`. A variável que recebe o valor segue as nossas regras de nome; a **chave** copia o provedor exatamente.
 
 ⚠️ **O mesmo replace também erra por falta.** Na mesma rodada ele deixou passar `senha:` e `numero:` dentro do payload de um teste, porque a lista de pares não os previa. Errar por excesso e por falta ao mesmo tempo é o normal, não a exceção — por isso a conferência é ler o diff, não confiar na lista.
+
+⛔ **A vítima mais cara não é o contrato de terceiro: é a nossa própria copy.** `nome`, `tipo` e `local` são campo da entidade, palavra de português e nome de parâmetro de URL ao mesmo tempo — e `\bnome\b` casa os três. Na #310 o replace produziu `Insira o name do item`, `Selecione o type` e `O place deve ter ao menos 100 caracteres`: sete strings que a pessoa lê, em dois arquivos, mais dois comentários em português e cinco literais de query.
+
+⛔ **E ele traduz a asserção do teste junto, então a suíte fica verde.** O `LostItemFormDialog.test.tsx` guardava essa copy com `findByText(/nome deve ter ao menos/i)`; o replace virou o regex em `/name deve ter ao menos/i`. Os dois lados se moveram juntos, e **o único teste que guardava aquele texto parou de guardar no mesmo commit em que o texto quebrou**. Só apareceu quando a copy foi corrigida e o teste ficou para trás — quem viu antes disso foi o Victor, no review.
+
+**A guarda é escopo, não cuidado.** Aplique o replace só nas posições de identificador, ou liste as ocorrências dentro de string, regex e comentário e decida uma a uma. Depois releia o diff procurando **texto em português com palavra inglesa no meio**: é o sintoma, e ele não reprova em lint, em `tsc` nem em teste.
+
+⚠️ **E a lista de telas a medir na aplicação sai dos arquivos tocados, não do escopo da issue.** Rename mecânico atravessa arquivo que a issue não previa. Na #310 eu medi mural, cartão, diálogo e filtro — tudo o que a issue mandava provar — e as sete strings quebradas estavam no formulário de cadastro, que a issue não esperava que mudasse.

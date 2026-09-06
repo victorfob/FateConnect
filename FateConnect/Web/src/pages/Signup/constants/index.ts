@@ -1,10 +1,11 @@
+import { SignupConflictFieldEnum } from '../@types';
+
 export const SIGNUP_TITLE = 'Criar conta';
 export const ADDRESS_SECTION_TITLE = 'Endereço';
 export const CONTACT_SECTION_TITLE = 'Dados para contato';
 
 export const FIELD_LABELS = {
   fullName: 'Nome completo',
-  nickname: 'Apelido',
   fatecEmail: 'E-mail Fatec',
   birthDate: 'Data de nascimento',
   gender: 'Gênero',
@@ -36,6 +37,12 @@ export const SIGNUP_ERROR_MESSAGES = {
   emailTaken: 'Este e-mail já está em uso. Entre com ele ou use outro endereço.',
   invalidData: 'Dados inválidos. Verifique os campos preenchidos.',
   generic: 'Erro ao realizar cadastro. Tente novamente.',
+};
+
+export const SIGNUP_CONFLICT_MESSAGES: Record<SignupConflictFieldEnum, string> = {
+  [SignupConflictFieldEnum.FATEC_EMAIL]: 'E-mail já cadastrado — entre com ele',
+  [SignupConflictFieldEnum.PHONE]: 'Telefone já cadastrado',
+  [SignupConflictFieldEnum.CONTACT_EMAIL]: 'E-mail já cadastrado',
 };
 
 export const ZIP_LOOKUP_MESSAGES = {

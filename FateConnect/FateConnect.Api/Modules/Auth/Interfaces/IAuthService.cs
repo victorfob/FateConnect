@@ -5,4 +5,5 @@ namespace FateConnect.Api.Modules.Auth.Interfaces;
 public interface IAuthService
 {
     Task<TokenResponseDto> LoginAsync(LoginDto dto);
+    Task LogoutAsync(int userId);
 }

@@ -23,6 +23,8 @@ Tudo vive no próprio repositório e é editável direto — não há package ne
 - **Onde a mudança de harness entra é decisão de quem revisa — pergunte.** O instinto é mandar rule e código juntos, para não divergirem; mas abrir um PR inteiro por uma frase de rule é cerimônia que não paga, e levar uma rule sem relação nenhuma dentro de um PR de funcionalidade polui o review dele. Com a mudança na mão, ofereça as duas saídas: aproveitar um PR já aberto, ou abrir um só de harness.
 - ⛔ **Indo para PR próprio, vai `.claude/` inteiro — não metade.** Em 2026-08-28 escolhi sozinho levar a rule dentro do PR de autenticação; mandado separar, separei só o que não tinha relação com aquele PR e deixei para trás o que ele mesmo havia causado. A correção foi *"falei tudo relacionado a harness num PR proprio"*. **Documentação do repositório não é harness:** `README.md` e `CONTRIBUTING.md` continuam com o código que os motivou.
 
+  ⚠️ **Nem a rule que a própria issue mandou escrever é exceção.** Na #310 o escopo da issue listava a linha nova da `product-copy.md`, e a skill `ux-writing` manda a seção da régua e a copy que se apoia nela saírem no mesmo PR. Usei os dois para manter a rule no PR de código, anunciei a escolha, e a decisão foi *"pode abrir e inclusive levar a regra que ta nesse PR pra ele"*. Escopo de issue e regra de skill não vencem esta: **o critério é o arquivo, não o motivo.**
+
 ## Gatilhos — quando escrever em vez de só corrigir
 
 1. **O usuário corrigiu um padrão.** É o gatilho dominante aqui: sem review de terceiro, quase toda regra nasce de uma frase do usuário ("nunca dois componentes no mesmo arquivo", "use `Readonly` nas props"). Corrigir só o arquivo apontado é garantir que o próximo arquivo repita o erro. **A correção entra em rule na mesma rodada.**
@@ -46,6 +48,30 @@ Antes de escrever, escolha o lugar — os quatro não são intercambiáveis:
 - **Escope pelo caminho.** Rule que vale só para o front vai em `FateConnect/Web/**`; rule que vale só para a API, no caminho dela. Sem `paths`, ela passa a custar contexto em toda sessão, inclusive nas que não tocam aquela pasta.
 - `description` em rule é documentação para humanos — mantenha precisa, mas não espere que condicione nada. **Só skill dispara por `description`.**
 - Esta rule é uma das exceções sem `paths`: os gatilhos disparam em qualquer arquivo.
+
+### O gatilho é o **Read**, e trabalhar por Bash desliga todas elas
+
+⛔ **Rule com `paths` carrega quando um arquivo que casa é lido pela ferramenta `Read`.** `cat`, `sed`, `grep`, `head` e heredoc de python leem o mesmo arquivo e **não** disparam nada: o conteúdo entra na conversa, a rule não.
+
+Aconteceu em 02/09/2026, nas #255, #253 e #254. Escrevi C# para três PRs de API inspecionando tudo por Bash — e as **cinco** rules de `FateConnect/FateConnect.Api/**` ficaram fora de contexto a sessão inteira: `dotnet-migrations`, `dotnet-testing`, `dotnet-code-style`, `dotnet-code-quality` e `dotnet-authorization`.
+
+O custo, medido depois:
+
+| O que eu fiz sem a rule | O que a rule já dizia |
+| --- | --- |
+| Amostrei dois arquivos para inferir se o `/// <inheritdoc />` gerado sai da migration, e generalizei errado | `dotnet-migrations.md` diz exatamente quais saem e quais ficam |
+| Medi cobertura parseando OpenCover à mão, e só depois de ser cobrado | `./scripts/coverage-changed.sh` existe para isso, e a rule manda rodá-lo **antes** de dizer que acabou |
+| Escrevi três testes de borda sobre `DateTime.UtcNow` | "enquanto a costura não existir, **não escreva o teste que depende do relógio**" |
+
+⚠️ **A tentação é escrever uma rule sem `paths` para garantir que ela carregue.** Não é a saída: sem `paths` ela custa contexto em toda sessão, inclusive nas que não tocam a pasta — o problema é o meu gesto, não o escopo dela.
+
+**O que fazer, antes de escrever a primeira linha numa área:** abrir **um** arquivo daquela pasta com o `Read`, ou ler as rules dela diretamente. Um `Read` num arquivo qualquer de `FateConnect/FateConnect.Api/` traz as cinco de uma vez.
+
+```bash
+ls .claude/rules/            # e ler as que casam com a área da tarefa
+```
+
+⛔ **O sinal de risco é o modo Bash-primeiro.** Ele é pedido de propósito para economizar ferramenta, e o efeito colateral é silencioso: nada avisa que uma rule não carregou. Área nova na sessão ⇒ um `Read` de propósito, mesmo que eu já tenha o arquivo na tela.
 
 ## Caminho citado no harness tem check
 
@@ -105,6 +131,7 @@ Em 2026-08-28 o README dizia **4 skills** quando eram 8 e **2 workflows** quando
   - **Nenhum budget de token como justificativa.** Rodar script antes de editar à mão é certo por ser completo e repetível — justifique assim. Agente instruído a economizar token começa a pular etapa.
   - **Nenhuma hedge condicional.** Sem "se disponível" ou "senão use como fallback". Nomeie a ferramenta: `AskUserQuestion` para perguntar, `Grep`/`Glob`/`Read` para inspecionar.
 - **Não deixe origem interna vazar do harness para o repo.** O harness é local, mas o que sai dele — código, commit, issue, PR, comentário — é **público**. Quando a orientação vier de fonte interna, registre no repo apenas a **decisão e a justificativa autônoma**, nunca a fonte, o nome do empregador, repositório interno, pacote privado ou ferramenta corporativa.
+- **Código de fonte interna é referência de comportamento, nunca origem de código.** Apontado um componente interno como base, leia-o para entender **o que ele faz** — estados, entradas, o que a interação precisa cobrir — e escreva o nosso. Não copie trecho, e não cite a origem em lugar nenhum do repo: nem na issue, nem no commit, nem no comentário. Aconteceu em 31/08/2026, ao especificar o campo de intervalo de datas: a leitura deu os requisitos e a implementação nasce aqui.
 - **Não abra issue para mudar o harness — mas o PR é obrigatório.** A dispensa é só da issue. Editar `.claude/` é editar o repositório: sai numa branch a partir da `develop` e volta por PR, como qualquer código. ⛔ **Nada vai direto para a `develop`**, nem uma linha de rule. Já commitei rule e skill direto na `develop` achando que "harness não abre PR" me liberava disso; liberava da issue, e só.
 
 ## Como escrever

@@ -33,7 +33,7 @@ Issue que declara "Depende de" só começa quando a base estiver **com o escopo 
 ## Mecânica de worktree
 
 - **A worktree não nasce na branch atual.** Na #123 ela nasceu 16 commits atrás, sem o commit do contrato. Conferir com `git log --oneline -1` e corrigir com `git merge --ff-only <branch-da-tarefa>` **antes** de escrever qualquer linha.
-- ⛔ **A worktree nasce rastreando a base, e um `git push` vai para ela.** `git worktree add -b <nova> <caminho> origin/develop` deixa a branch nova com `origin/develop` como upstream — e a `develop` não aceita commit direto. Desarmar logo depois de criar:
+- ⛔ **Branch criada a partir de `origin/<base>` nasce rastreando a base, e um `git push` vai para ela.** Vale para `git worktree add -b <nova> <caminho> origin/develop` **e** para o `git checkout -b <nova> origin/develop` do checkout principal: os dois deixam `origin/develop` como upstream, e a `develop` não aceita commit direto. Desarmar logo depois de criar:
 
   ```bash
   git branch --unset-upstream <nova>
@@ -50,8 +50,8 @@ Issue que declara "Depende de" só começa quando a base estiver **com o escopo 
 ⛔ **Antes de aceitar o que um agente entregou, meça a densidade de comentário.** As rules do repo carregam para dentro da worktree, mas o agente as pondera menos que o resto do prompt — e comentário é o item que ele mais acrescenta por conta própria.
 
 ```bash
-git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+[^+]"                 # linhas adicionadas
-git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+\s*(/\*\*|\*|//)" # dessas, comentário
+git diff <base>..HEAD --numstat -- '*.ts' '*.tsx' | awk '{total += $1} END {print total}'   # linhas adicionadas
+rtk proxy git diff <base>..HEAD -- '*.ts' '*.tsx' | grep -cE "^\+\s*(/\*\*|\*|//)"      # dessas, comentário
 ```
 
 Na #156 deram **37 de 157 linhas — 24%**. Sete reprovaram no teste da `comments.md` e saíram: um JSDoc que repetia o que o `types.ts` já dizia e ainda pousava sobre a constante errada, um que só reafirmava a linha logo abaixo, e uma enumeração de consumidores que **envelheceu no próprio PR** que a escreveu.
@@ -67,6 +67,26 @@ Na #156 deram **37 de 157 linhas — 24%**. Sete reprovaram no teste da `comment
 Aconteceu na #171. O agente relatou, de boa-fé, ter medido a página selecionada em `#CF2E2E` com texto branco. No app o fundo era o **cinza do MUI**: o seletor `& .Mui-selected` tem a mesma especificidade do seletor da biblioteca e perdia no desempate por ordem de fonte. A cor do texto aplicava — o MUI não disputa essa propriedade —, então o número saía **branco sobre cinza claro**, quase ilegível. Atravessou ESLint, `tsc`, 436 testes e o teste de contraste. Quem pegou foi o Victor, mandando testar antes de abrir o PR.
 
 **O que rodar:** suba a aplicação, ligue o componente numa tela de verdade — fiação temporária, fora de commit — e meça com `getComputedStyle` **ali**. Depois desfaça a fiação e confira que ela não entrou em commit nenhum.
+
+⛔ **A fiação vai no cromo de verdade, não numa barra própria.** Andaime com `zIndex` acima do Modal do MUI (1300) cria um mundo onde o backdrop não intercepta nada — e ali o componente ganha defeitos que não tem. Na #291 uma barra em `zIndex: 1500` produziu **três** achados aparentes: dois popovers abertos ao mesmo tempo, clique no gatilho que não fechava, e a seta de um coberta pelo papel do outro. No `Header` real (`AppBar` em 1100) o pixel sobre o gatilho pertence ao backdrop e os três desaparecem.
+
+⚠️ Baixar o `zIndex` do andaime não resolve: a 1100 ele empata com o cromo real e os cliques deixam de alcançar qualquer coisa. O caminho é passar os gatilhos como `actions` do próprio `Header`.
+
+⛔ **Fiação que existe para o Victor capturar evidência vive até ele dizer que acabou** — ela é ferramenta dele, não resíduo meu. Commitar e desmontar o andaime parecem o mesmo gesto de limpeza e não são: o commit fecha o meu trabalho, o andaime fecha o dele. Na #291 eu desmontei ao empurrar, tendo escrito *"me avise quando terminar de capturar"*, e a devolução foi *"eu preciso da demo pra coletar as evidências"*.
+
+## Dois servidores no ar, um painel de navegador só
+
+⛔ **O agente da worktree sobe o servidor dele, e o painel do navegador é compartilhado.** A aba que parece sua pode estar servindo o checkout do vizinho, em outra branch — e a página é idêntica o bastante para você não desconfiar.
+
+Aconteceu em 03/09/2026: eu media a #292 na 5173 enquanto o agente da #293 media a dele na 5293. Uma captura minha pegou a 5293 e mostrou **dois** cartões no menu onde a minha branch tinha três. Ia virar defeito da minha própria mudança.
+
+**A âncora é a porta, lida da própria página, junto de toda medição:**
+
+```js
+({ porta: location.port, rota: location.pathname })
+```
+
+E `lsof -nP -iTCP -sTCP:LISTEN | grep 517` diz quantos servidores existem. Mais de um ⇒ nenhuma medição vale sem dizer de qual porta veio.
 
 ## Fatiação do agente: cada commit precisa compilar sozinho
 

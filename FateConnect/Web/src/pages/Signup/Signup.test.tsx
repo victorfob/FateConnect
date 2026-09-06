@@ -1,4 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
+import { DATE_PICKER_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
@@ -8,15 +9,18 @@ import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
+import { SignupConflictFieldEnum } from './@types';
 import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
-import { CALENDAR_TOGGLE_LABEL } from './components/BirthDateField/constants';
-import { SIGNUP_MESSAGES } from './schema';
+import { maxLengthMessage, SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/users/signup';
 const SIGNUP_TOKEN = 'token-do-cadastro';
 const ZIP_URL = 'https://viacep.com.br/ws/:zipCode/json/';
+/** O que o `CreateAddressDto` aceita no complemento. */
+const COMPLEMENT_MAX_LENGTH = 100;
+const ONE_CHARACTER = 1;
 
 const VALID_SIGNUP = {
   fullName: 'Maria Silva',
@@ -121,6 +125,18 @@ describe('Signup', () => {
     await submit();
 
     expect(await screen.findByText(FATEC_EMAIL_MESSAGE)).toBeInTheDocument();
+  });
+
+  // O complemento é o único campo opcional com limite de comprimento: o schema
+  // recusa, e sem a prop de erro no campo a mensagem não chega à tela.
+  it('should show the length message on the optional complement', async () => {
+    renderSignup();
+    await userEvent.click(screen.getByLabelText(C.FIELD_LABELS.complement));
+    await userEvent.paste('a'.repeat(COMPLEMENT_MAX_LENGTH + ONE_CHARACTER));
+
+    await submit();
+
+    expect(await screen.findByText(maxLengthMessage(COMPLEMENT_MAX_LENGTH))).toBeInTheDocument();
   });
 
   it('should reject a phone number outside ten or eleven digits', async () => {
@@ -332,6 +348,26 @@ describe('Signup', () => {
     expect(screen.getByRole('button', { name: C.SUBMIT_LABEL })).toBeEnabled();
   });
 
+  it.each([
+    [SignupConflictFieldEnum.FATEC_EMAIL, /E-mail Fatec/],
+    [SignupConflictFieldEnum.PHONE, /Telefone/],
+    [SignupConflictFieldEnum.CONTACT_EMAIL, /E-mail para contato/],
+  ])('should point the conflict of %s at its own field', async (field, label) => {
+    server.use(
+      http.post(SIGNUP_URL, () =>
+        HttpResponse.json({ error: 'já está em uso no sistema', field }, { status: 409 }),
+      ),
+    );
+    renderSignup();
+    await fillRequiredFields();
+
+    await submit();
+
+    expect(await screen.findByText(C.SIGNUP_CONFLICT_MESSAGES[field])).toBeInTheDocument();
+    expect(screen.getByLabelText(label)).toHaveFocus();
+    expect(screen.queryByText(C.SIGNUP_ERROR_MESSAGES.emailTaken)).not.toBeInTheDocument();
+  });
+
   it('should disable the form while the account is being created', async () => {
     // A resposta só chega quando o teste soltar: espera por tempo torna o caso
     // instável, porque a requisição pode terminar antes da verificação.
@@ -364,7 +400,7 @@ describe('Signup', () => {
     const birthDate = screen.getByLabelText(/Data de nascimento/);
     await userEvent.type(birthDate, '22051999');
 
-    await userEvent.click(screen.getByRole('button', { name: CALENDAR_TOGGLE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
     const calendar = await screen.findByRole('grid');
     await userEvent.click(within(calendar).getByRole('gridcell', { name: '10' }));
 

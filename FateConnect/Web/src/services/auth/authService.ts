@@ -11,8 +11,27 @@ export async function login(payload: LoginRequest): Promise<TokenResponse> {
   return data;
 }
 
+/**
+ * O cabeçalho vai à mão porque o interceptor lê o token do armazenamento, que a
+ * saída já limpou — sem isto a requisição parte sem credencial e o servidor não
+ * invalida sessão nenhuma.
+ */
+async function endServerSession(token: string): Promise<void> {
+  try {
+    await apiClient.post(`${AUTH_PATH}/logout`, undefined, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    // Falhar aqui não muda nada para quem clicou: a sessão local já saiu.
+  }
+}
+
+/** Não espera o servidor: a sessão local sai no clique, e o resto vai atrás. */
 export function logout(): void {
+  const token = tokenStorage.getToken();
   tokenStorage.clear();
+
+  if (token) void endServerSession(token);
 }
 
 export async function isSessionStillValid(): Promise<boolean> {

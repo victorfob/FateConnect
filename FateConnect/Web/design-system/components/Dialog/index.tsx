@@ -1,6 +1,10 @@
 import { useId, type ReactNode } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
 import MuiDialog from '@mui/material/Dialog';
 
+import { IconButton } from '@ds-root/components/IconButton';
+
+import { CLOSE_LABEL } from './constants';
 import { DialogBody } from './DialogBody';
 import { DialogFooter } from './DialogFooter';
 import * as S from './styles';
@@ -30,9 +34,17 @@ function Dialog({ open, onClose, title, children }: DialogProps) {
     // não sobrescrevemos; `maxWidth="md"` aqui significaria 933px.
     <MuiDialog open={open} onClose={onClose} aria-labelledby={titleId} fullWidth maxWidth="sm">
       <S.DialogSurface>
-        <S.DialogTitleText variant="h2" id={titleId}>
-          {title}
-        </S.DialogTitleText>
+        <S.TitleRow>
+          <S.DialogTitleText variant="h2" id={titleId}>
+            {title}
+          </S.DialogTitleText>
+
+          <S.CloseButtonSlot>
+            <IconButton label={CLOSE_LABEL} onClick={onClose}>
+              <CloseIcon />
+            </IconButton>
+          </S.CloseButtonSlot>
+        </S.TitleRow>
 
         {children}
       </S.DialogSurface>

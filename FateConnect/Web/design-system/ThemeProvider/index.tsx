@@ -35,7 +35,11 @@ export function ThemeProvider({ children, defaultMode = 'light' }: ThemeProvider
   return (
     <ThemeModeContext.Provider value={themeMode}>
       <MuiThemeProvider theme={theme}>
-        <CssBaseline />
+        {/*
+          Sem a prop o `CssBaseline` não declara `color-scheme`, e o Chrome
+          desenha todo controle nativo no claro por mais escuro que o tema seja.
+        */}
+        <CssBaseline enableColorScheme />
         <GlobalStyles />
         {children}
       </MuiThemeProvider>

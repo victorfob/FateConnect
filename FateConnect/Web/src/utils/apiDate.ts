@@ -1,28 +1,33 @@
-import { format, isValid, parseISO } from 'date-fns';
+import { format, isValid, parse, parseISO } from 'date-fns';
 
 /** A API troca data em `aaaa-mm-dd`, no fuso local. */
 const API_DATE_FORMAT = 'yyyy-MM-dd';
+/** O campo mostra e recebe `dd/mm/aaaa`. */
+const DISPLAY_DATE_FORMAT = 'dd/MM/yyyy';
 
 export function toApiDate(date: Date): string {
   return format(date, API_DATE_FORMAT);
 }
 
 /**
- * Data do seletor para o texto que o formulário guarda. Enquanto se digita, o
- * seletor entrega `Invalid Date` — formatar isso lança, então vira campo vazio.
+ * Texto do campo para o que a API e o endereço guardam. Texto incompleto vira
+ * vazio: `22/0` não é data, e a consulta não deve inventar uma.
  */
-export function toFormDate(date: Date | null): string {
-  if (!date || !isValid(date)) return '';
+export function toApiDateText(displayed: string): string {
+  if (!displayed) return '';
 
-  return toApiDate(date);
+  const parsed = parse(displayed, DISPLAY_DATE_FORMAT, new Date());
+  if (!isValid(parsed)) return '';
+
+  return toApiDate(parsed);
 }
 
-/** Caminho inverso: o texto guardado volta a ser `Date` para o seletor. */
-export function fromFormDate(value: string): Date | null {
-  if (!value) return null;
+/** Caminho inverso: o que estava guardado volta para o campo. */
+export function toDisplayDate(stored: string): string {
+  if (!stored) return '';
 
-  const parsed = parseISO(value);
-  if (!isValid(parsed)) return null;
+  const parsed = parseISO(stored);
+  if (!isValid(parsed)) return '';
 
-  return parsed;
+  return format(parsed, DISPLAY_DATE_FORMAT);
 }

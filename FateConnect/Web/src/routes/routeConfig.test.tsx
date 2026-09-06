@@ -1,14 +1,20 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
+import {
+  SIGN_OUT_LABEL,
+  TRIGGER_LABEL,
+} from '@app/layouts/MainLayout/components/AccountMenu/constants';
 import { server } from '@app/mocks/server';
 import { DESCRIPTION_TITLE } from '@app/pages/Home/components/LandingDescription/constants';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
+import { PREFERENCES_TITLE } from '@app/pages/Preferences/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
+import * as C from '@app/pages/Unavailable/constants';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
-import { render, screen, waitFor, within } from '@app/test/testing-library';
+import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
 import { RoutePathEnum } from './paths';
@@ -20,6 +26,8 @@ function renderRoute(initialPath: string) {
 
   return router;
 }
+
+const NO_CONTENT = 204;
 
 describe('routeConfig', () => {
   // Caronas e achados e perdidos listam assim que montam.
@@ -51,12 +59,26 @@ describe('routeConfig', () => {
     [RoutePathEnum.MENU, MENU_TITLE],
     [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
     [RoutePathEnum.RIDES, RIDES_TITLE],
+    [RoutePathEnum.PREFERENCES, PREFERENCES_TITLE],
   ])('should resolve %s with a session', async (path, title) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
 
     renderRoute(path);
 
     await expectTitle(title);
+  });
+
+  it.each([
+    [RoutePathEnum.PROFILE, C.PROFILE_DESCRIPTION],
+    [RoutePathEnum.DENUNCIATIONS, C.DENUNCIATIONS_DESCRIPTION],
+    [RoutePathEnum.NOTIFICATIONS, C.NOTIFICATIONS_DESCRIPTION],
+  ])('should resolve %s with the screen that has no owner yet', async (path, description) => {
+    tokenStorage.save(tokenWithName('Maria da Silva'));
+
+    renderRoute(path);
+
+    await expectTitle(C.UNAVAILABLE_TITLE);
+    expect(screen.getByText(description)).toBeInTheDocument();
   });
 
   it.each([
@@ -86,5 +108,22 @@ describe('routeConfig', () => {
     const router = renderRoute(path);
 
     expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
+  });
+
+  it('should send the person to the landing page after signing out', async () => {
+    tokenStorage.save(tokenWithName('Maria da Silva'));
+    server.use(
+      http.post(
+        'https://api.fateconnect.test/auth/logout',
+        () => new HttpResponse(null, { status: NO_CONTENT }),
+      ),
+    );
+    const router = renderRoute(RoutePathEnum.MENU);
+
+    await userEvent.click(await screen.findByRole('button', { name: TRIGGER_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: SIGN_OUT_LABEL }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING));
+    expect(tokenStorage.getToken()).toBeNull();
   });
 });

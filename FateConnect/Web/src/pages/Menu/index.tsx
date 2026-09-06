@@ -1,6 +1,8 @@
 import { Link as RouterLink } from 'react-router';
 import { Typography } from '@design-system';
 
+import { APP_LINKS } from '@app/constants/navigation';
+
 import * as C from './constants';
 import * as S from './styles';
 
@@ -16,7 +18,7 @@ export function Menu() {
       </S.MenuIntro>
 
       <S.CardsContainer>
-        {C.MENU_SERVICES.map(({ label, path, Icon }) => (
+        {APP_LINKS.map(({ label, path, Icon }) => (
           <S.ServiceCard key={path} component={RouterLink} to={path}>
             <S.IconDisc aria-hidden="true">
               <Icon />

@@ -47,6 +47,8 @@ O `styled` do Emotion resolve as props do `Box` e do `Stack` pela última assina
 
 ⛔ **Não estenda a lista de alvos pré-tipados para componente que não aceita `component`.** Foi medido: `AccordionDetails` é função simples, sem a prop, e o repo faz `styled(AccordionDetails)`. Prometê-la ali compila, mas em runtime o `component` chega ao DOM como atributo cru e a semântica se perde calada. Por isso a injeção **não** vive no `styled` — se vivesse, valeria para todo alvo.
 
+⚠️ **Outro componente do MUI que aceita `component` cai na mesma armadilha.** `styled(Divider)` também perde a prop na tipagem, e a saída **não** é criar um terceiro alvo pré-tipado: é declará-la no genérico com o valor que você usa — `styled(Divider)<{ component?: 'li' }>`, que dentro de uma lista é o que mantém o HTML válido.
+
 Se o alvo tem props próprias — um `NavLink` com `to`, um `button` com `type` —, declare-as no genérico em vez de forçar cast:
 
 ```ts
@@ -136,6 +138,78 @@ Para decidir em JS, `useMediaQuery(theme.breakpoints.up('md'))` — não meça `
 // ✅ Recomendado
 <S.Container>
 ```
+
+## Alinhe o desenho, não a caixa
+
+⛔ **`getBoundingClientRect` de um ícone devolve a caixa dele, e a arte quase nunca a preenche.** Alinhar caixa com caixa deixa o desenho fora da linha, e a medição confirma um alinhamento que o olho recusa.
+
+Medido em 01/09/2026, no X do diálogo: a arte ocupa **14px numa caixa de 24px** — 5px de margem própria de cada lado. Somados aos 8px de recuo do botão, o desenho caía a **37px** da borda do papel, enquanto os campos estavam a 32px. A caixa estava exatamente onde eu a tinha posicionado; o X, não.
+
+**Como medir o desenho:** `path.getBBox()` no `svg`, convertido para a escala da tela pela razão entre a largura renderizada e a do `viewBox`. Para texto, `Range.selectNodeContents` no elemento — a caixa do parágrafo inclui entrelinha que o olho não vê.
+
+### Vão entre elementos: da tinta até a **faixa de fundo** do vizinho
+
+⛔ **Vão entre um rótulo e o item abaixo dele não se mede de caixa a caixa nem de tinta a tinta.** O item de lista tem 48px de altura e a tinta dele fica no meio; o que o olho vê começar é o **fundo**. A medida que corresponde ao que se enxerga é da tinta do rótulo até a borda da faixa do item.
+
+Medido de três jeitos na #291, e os dois primeiros levaram a conclusões erradas:
+
+| Instrumento | Respondeu | O que produziu |
+| --- | --- | --- |
+| caixa → caixa | **0px**, antes e depois da correção | quase concluí que a correção não pegou |
+| tinta → tinta | 20px | pareceu folgado, e a devolução foi *"ainda ta mto colado"* |
+| tinta → **faixa de fundo** | **6px** | era o número |
+
+⚠️ **O sinal é o número que não se move.** `padding` acrescentado a um elemento para afastá-lo do vizinho **não altera** a distância entre as caixas — só `margin` alteraria. Se a medida é a mesma depois de uma correção que você sabe que aplicou, o instrumento está medindo a caixa.
+
+⚠️ **Quem reclama é sempre a pessoa que olha a tela**, porque o número mente com confiança: eu tinha `32px` de um lado e `32px` do outro, e mesmo assim estava torto. Ao receber "não está alinhado" sobre algo que você mediu, desconfie do **que** foi medido antes de duvidar do relato.
+
+## A cor se julga ao lado do vizinho, não sozinha no fundo
+
+⛔ **Sonda que mostra o elemento isolado num retângulo mede a coisa certa no contexto errado.** Quem olha a tela não compara a cor com o fundo dela: compara com o que está ao lado.
+
+⛔ Aconteceu na #318, três vezes seguidas. O vermelho da marca no topo foi ao Victor em três sondas, todas com o logo sozinho sobre um retângulo da cor do cromo, cada uma com o contraste medido. As três respostas foram sobre outra coisa: *"parece mais escuro que os botões"*, depois *"ta mto opaco"*, e por fim *"olha como ele ta mais opaco em relação ao restante"* — o `Entrar` fica a poucos pixels do logo, e era com ele que a comparação estava sendo feita o tempo todo. Só quando a sonda passou a clonar a **faixa inteira**, com o botão do lado, a escolha fechou em uma rodada.
+
+**A sonda leva os vizinhos que dividem a tela com o elemento** — o botão ao lado, o texto acima, a etiqueta da mesma linha. Custa o mesmo `cloneNode(true)` do pai em vez do filho.
+
+⚠️ **O contraste medido continua necessário e deixa de ser suficiente.** Ele responde "dá para enxergar"; a pergunta que sobra — "combina com o resto da tela?" — não tem número, e é de quem olha.
+
+## Propriedade em transição devolve o valor congelado
+
+⛔ **Com o painel do navegador oculto a página não compõe quadros, e a transição CSS não avança** — `getComputedStyle` devolve o valor do estado **anterior**, por mais que você espere.
+
+Medido em 03/09/2026 no interruptor de tema: desligado, sem a classe `Mui-checked`, com a única regra que casava dizendo `background-color: rgb(0, 0, 0)`, o computado devolvia o vermelho do estado ligado — em três leituras seguidas, com 800ms de espera cada. Ia para o relatório como "o interruptor parece sempre ligado", defeito que não existe.
+
+**O controle é desligar a transição antes de ler:**
+
+```js
+elemento.style.transition = 'none';
+const cor = getComputedStyle(elemento).backgroundColor;
+elemento.style.transition = '';
+```
+
+⚠️ **E o fundo contra o qual você mede pode não pintar nada.** `getComputedStyle(elemento).backgroundColor` devolve `rgba(0, 0, 0, 0)` no elemento transparente, e a fórmula de contraste trata isso como **preto** — no tema claro o número despenca e parece reprovação. Suba na árvore até o primeiro fundo com alfa diferente de zero antes de calcular. Medido na mesma tela: **2,66:1** contra o transparente e **7,89:1** contra o branco real do cartão.
+
+⚠️ **O sinal é o computado discordar da folha de estilo.** Antes de concluir que a cor está errada, liste as regras que de fato casam com o elemento — percorrer `document.styleSheets` testando `elemento.matches(regra.selectorText)`. Uma regra só, dizendo outra coisa, é a transição respondendo no lugar dela.
+
+## O painel escala, e o retângulo mente junto
+
+⛔ **Com uma largura emulada maior que o painel do navegador, a página é reduzida por transformação — e `getBoundingClientRect` devolve pixel *visual*, não pixel de CSS.** O `getComputedStyle` continua devolvendo o valor real, então os dois discordam e o número menor se lê como defeito.
+
+Medido em 04/09/2026, no menu da conta: o ícone tinha `width: 20px` no computado e **15px** no retângulo, e um item de 44px apareceu como **24,5px**. Eu ia relatar que a linha tinha colapsado.
+
+**A âncora é `offsetHeight`/`offsetWidth`, que são de layout e não sofrem a transformação** — e o fator sai de uma divisão:
+
+```js
+const escala = el.getBoundingClientRect().width / el.offsetWidth;   // 1 = sem redução
+```
+
+⚠️ **E o painel oculto mede zero.** Escondido, `window.innerWidth` responde `0`, e toda geometria tirada dali é lixo — inclusive a posição de um popover, que aparece ancorado no canto errado sem nada acusar. Leia a largura junto de cada medição, como já se faz com a porta: `{ porta: location.port, largura: window.innerWidth }`.
+
+## Editar arquivo servido por HMR e medir sem navegar mede o estado anterior
+
+⛔ **Depois de editar, só uma navegação de verdade garante que a página reavaliou.** Esperar não basta, e `location.reload()` também não bastou aqui. Em 04/09/2026 li duas vezes um CSS que já não existia no arquivo — uma depois de remover a regra, outra depois de restaurá-la —, e as duas leituras alimentaram conclusões erradas.
+
+**A conferência é o próprio resultado:** o valor lido tem de corresponder ao arquivo em disco. Discordando, é a página que está velha, não o código que está errado.
 
 ## Sobrescrever estado do MUI: repita a classe do componente
 

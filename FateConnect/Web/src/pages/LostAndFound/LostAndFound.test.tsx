@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import {
-  CancellationReasonEnum,
+  DeletionReasonEnum,
   LostItemKindEnum,
   LostItemStatusEnum,
   type LostItem,
@@ -14,13 +14,13 @@ import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
 import { OWN_ITEM_LABEL } from './components/LostItemCard/constants';
 import {
-  CANCEL_DIALOG,
+  DELETE_DIALOG,
   LOST_ITEM_ACTION_LABELS,
 } from './components/LostItemCard/LostItemActions/constants';
 import { CONFIRMATION } from './components/LostItemCard/LostItemConfirmAction/constants';
 import {
-  REOPEN_LABEL,
   RESOLVE_DIALOG,
+  RESTORE_LABEL,
 } from './components/LostItemCard/LostItemStatusAction/constants';
 import {
   FILTER_LABELS,
@@ -35,16 +35,16 @@ const LOST_ITEMS_URL = 'https://api.fateconnect.test/achado';
 
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
-  nome: 'Carteira preta',
-  tipo: LostItemKindEnum.LOST,
-  local: 'Biblioteca',
-  dataOcorrido: '2026-08-11T00:00:00',
-  descricao: 'Carteira de couro preta com documentos e cartões.',
-  fotoUrl: null,
-  situacao: LostItemStatusEnum.OPEN,
-  motivoCancelamento: null,
-  meuItem: false,
-  dataCadastro: '2026-08-12T00:00:00',
+  name: 'Carteira preta',
+  type: LostItemKindEnum.LOST,
+  place: 'Biblioteca',
+  occurredOn: '2026-08-11T00:00:00',
+  description: 'Carteira de couro preta com documentos e cartões.',
+  photoUrl: null,
+  status: LostItemStatusEnum.OPEN,
+  deletionReason: null,
+  isMine: false,
+  createdAt: '2026-08-12T00:00:00',
 };
 
 /** O ponto do painel não tem papel de acessibilidade: chega-se a ele pelo título. */
@@ -58,16 +58,16 @@ function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
 
 const NO_CONTENT = 204;
 
-const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', cancelled: 'Cancelado' };
+const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', deleted: 'Excluído' };
 
 const RESOLVE_LABEL = { lost: 'Marcar como encontrado', found: 'Marcar como devolvido' };
 
-const CANCELLATION_NOTE = {
-  owner: 'Cancelado por quem cadastrou.',
-  inactivity: 'Cancelado por inatividade.',
+const DELETION_NOTE = {
+  owner: 'Excluído manualmente.',
+  inactivity: 'Excluído automaticamente por inatividade.',
 };
 
-const OWN_OPEN_ITEM: LostItem = { ...LOST_ITEM, meuItem: true };
+const OWN_OPEN_ITEM: LostItem = { ...LOST_ITEM, isMine: true };
 
 /**
  * Mural que guarda o que as ações mudaram e respeita o filtro de situação, como
@@ -80,7 +80,7 @@ function boardTracking(initial: LostItem) {
     http.get(LOST_ITEMS_URL, ({ request }) => {
       const url = new URL(request.url);
       const wanted = url.searchParams.get('Situacao');
-      if (wanted && wanted !== current.situacao) return HttpResponse.json(pagedResponse([], url));
+      if (wanted && wanted !== current.status) return HttpResponse.json(pagedResponse([], url));
 
       return HttpResponse.json(pagedResponse([current], url));
     }),
@@ -88,7 +88,7 @@ function boardTracking(initial: LostItem) {
       `${LOST_ITEMS_URL}/:itemId/situacao`,
       async ({ request }) => {
         const { situacao } = await request.json();
-        current = { ...current, situacao, motivoCancelamento: null };
+        current = { ...current, status: situacao, deletionReason: null };
 
         return new HttpResponse(null, { status: NO_CONTENT });
       },
@@ -96,8 +96,8 @@ function boardTracking(initial: LostItem) {
     http.delete(`${LOST_ITEMS_URL}/:itemId`, () => {
       current = {
         ...current,
-        situacao: LostItemStatusEnum.CANCELLED,
-        motivoCancelamento: CancellationReasonEnum.OWNER,
+        status: LostItemStatusEnum.DELETED,
+        deletionReason: DeletionReasonEnum.USER,
       };
 
       return new HttpResponse(null, { status: NO_CONTENT });
@@ -135,9 +135,9 @@ describe('LostAndFound', () => {
     renderComponent();
 
     expect(screen.getByRole('heading', { name: C.LOST_AND_FOUND_TITLE })).toBeInTheDocument();
-    expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
-    expect(screen.getByText(LOST_ITEM.local)).toBeInTheDocument();
-    expect(screen.getByText(LOST_ITEM.descricao!)).toBeInTheDocument();
+    expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
+    expect(screen.getByText(LOST_ITEM.place)).toBeInTheDocument();
+    expect(screen.getByText(LOST_ITEM.description!)).toBeInTheDocument();
   });
 
   it('should open the board on the items that are still open', async () => {
@@ -196,11 +196,11 @@ describe('LostAndFound', () => {
   });
 
   it('should mark only the item that belongs to the user', async () => {
-    listReturning([{ ...LOST_ITEM, meuItem: true }]);
+    listReturning([{ ...LOST_ITEM, isMine: true }]);
 
     renderComponent();
 
-    await screen.findByText(LOST_ITEM.nome);
+    await screen.findByText(LOST_ITEM.name);
     expect(screen.queryAllByText(OWN_ITEM_LABEL)).not.toHaveLength(0);
   });
 
@@ -209,7 +209,7 @@ describe('LostAndFound', () => {
 
     renderComponent();
 
-    await screen.findByText(LOST_ITEM.nome);
+    await screen.findByText(LOST_ITEM.name);
     expect(screen.queryAllByText(OWN_ITEM_LABEL)).toHaveLength(0);
   });
 
@@ -231,11 +231,11 @@ describe('LostAndFound', () => {
   });
 
   it('should tell lost from found by the icon on the card', async () => {
-    listReturning([LOST_ITEM, { ...LOST_ITEM, id: 'outro', tipo: LostItemKindEnum.FOUND }]);
+    listReturning([LOST_ITEM, { ...LOST_ITEM, id: 'outro', type: LostItemKindEnum.FOUND }]);
 
     renderComponent();
 
-    await screen.findAllByText(LOST_ITEM.nome);
+    await screen.findAllByText(LOST_ITEM.name);
     expect(screen.getByTestId('NoBackpackOutlinedIcon')).toBeInTheDocument();
     expect(screen.getByTestId('BackHandOutlinedIcon')).toBeInTheDocument();
   });
@@ -289,29 +289,29 @@ describe('LostAndFound', () => {
     );
   });
 
-  it('should walk the item from open to cancelled, back to open and then to concluded', async () => {
+  it('should walk the item from open to deleted, back to open and then to concluded', async () => {
     boardTracking(OWN_OPEN_ITEM);
     renderComponent();
-    await screen.findByText(LOST_ITEM.nome);
+    await screen.findByText(LOST_ITEM.name);
 
-    await confirmAction(LOST_ITEM_ACTION_LABELS.cancel, CANCEL_DIALOG.confirmLabel);
+    await confirmAction(LOST_ITEM_ACTION_LABELS.delete, DELETE_DIALOG.confirmLabel);
 
-    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.cancelSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.deleteSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
 
-    await filterByStatus(STATUS_TAG_LABEL.cancelled);
+    await filterByStatus(STATUS_TAG_LABEL.deleted);
 
-    expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
-    expect(card().getAllByText(STATUS_TAG_LABEL.cancelled)).toHaveLength(1);
-    expect(card().getByText(CANCELLATION_NOTE.owner)).toBeInTheDocument();
+    expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
+    expect(card().getAllByText(STATUS_TAG_LABEL.deleted)).toHaveLength(1);
+    expect(card().getByText(DELETION_NOTE.owner)).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: REOPEN_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: RESTORE_LABEL }));
 
-    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.reopenSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.restoreSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
 
     await filterByStatus(STATUS_TAG_LABEL.open);
-    await screen.findByText(LOST_ITEM.nome);
+    await screen.findByText(LOST_ITEM.name);
     await confirmAction(RESOLVE_LABEL.lost, RESOLVE_DIALOG.confirmLabel);
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.resolveSucceeded)).toBeInTheDocument();
@@ -319,7 +319,7 @@ describe('LostAndFound', () => {
 
     await filterByStatus(STATUS_TAG_LABEL.resolved);
 
-    expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
+    expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
     expect(card().getAllByText(STATUS_TAG_LABEL.resolved)).toHaveLength(1);
   });
 
@@ -328,70 +328,85 @@ describe('LostAndFound', () => {
 
     renderComponent();
 
-    await screen.findByText(LOST_ITEM.nome);
+    await screen.findByText(LOST_ITEM.name);
     expect(
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.cancel }),
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
     ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: RESOLVE_LABEL.lost })).not.toBeInTheDocument();
   });
 
   it('should leave a concluded item without any action of its own', async () => {
-    listReturning([{ ...OWN_OPEN_ITEM, situacao: LostItemStatusEnum.RESOLVED }]);
+    listReturning([{ ...OWN_OPEN_ITEM, status: LostItemStatusEnum.RESOLVED }]);
 
     renderComponent();
 
-    await screen.findByText(LOST_ITEM.nome);
+    await screen.findByText(LOST_ITEM.name);
     expect(
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.cancel }),
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
     ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: RESOLVE_LABEL.lost })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: REOPEN_LABEL })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: RESTORE_LABEL })).not.toBeInTheDocument();
   });
 
-  it('should offer only the way back on a cancelled item', async () => {
+  it('should offer only the way back on a deleted item', async () => {
     listReturning([
       {
         ...OWN_OPEN_ITEM,
-        situacao: LostItemStatusEnum.CANCELLED,
-        motivoCancelamento: CancellationReasonEnum.INACTIVITY,
+        status: LostItemStatusEnum.DELETED,
+        deletionReason: DeletionReasonEnum.INACTIVITY,
       },
     ]);
 
     renderComponent();
 
-    await screen.findByText(LOST_ITEM.nome);
-    expect(screen.getByRole('button', { name: REOPEN_LABEL })).toBeInTheDocument();
+    await screen.findByText(LOST_ITEM.name);
+    expect(screen.getByRole('button', { name: RESTORE_LABEL })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.cancel }),
+      screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText(CANCELLATION_NOTE.inactivity)).toBeInTheDocument();
+    expect(screen.getByText(DELETION_NOTE.inactivity)).toBeInTheDocument();
   });
 
   it('should name the ending after the kind of the item', async () => {
-    listReturning([OWN_OPEN_ITEM, { ...OWN_OPEN_ITEM, id: 'outro', tipo: LostItemKindEnum.FOUND }]);
+    listReturning([OWN_OPEN_ITEM, { ...OWN_OPEN_ITEM, id: 'outro', type: LostItemKindEnum.FOUND }]);
 
     renderComponent();
 
-    await screen.findAllByText(LOST_ITEM.nome);
+    await screen.findAllByText(LOST_ITEM.name);
     expect(screen.getByRole('button', { name: RESOLVE_LABEL.lost })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: RESOLVE_LABEL.found })).toBeInTheDocument();
+  });
+
+  // A palavra destrutiva e a de dispensar dividem a mesma caixa: o que separa uma
+  // da outra é só o texto, então ele é o que o caso afirma.
+  it('should put the destructive word apart from the dismissing one in the dialog', async () => {
+    listReturning([OWN_OPEN_ITEM]);
+    renderComponent();
+    await screen.findByText(LOST_ITEM.name);
+
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
+
+    const dialog = within(await screen.findByRole('dialog'));
+    expect(dialog.getByRole('heading', { name: 'Confirmar exclusão' })).toBeInTheDocument();
+    expect(dialog.getByRole('button', { name: 'Excluir' })).toBeInTheDocument();
+    expect(dialog.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument();
   });
 
   it('should keep the item as it is while the confirmation is not given', async () => {
     boardTracking(OWN_OPEN_ITEM);
     renderComponent();
-    await screen.findByText(LOST_ITEM.nome);
+    await screen.findByText(LOST_ITEM.name);
 
-    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.cancel }));
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
     const dialog = within(await screen.findByRole('dialog'));
     await userEvent.click(dialog.getByRole('button', { name: CONFIRMATION.dismissLabel }));
 
@@ -400,19 +415,19 @@ describe('LostAndFound', () => {
     expect(card().getAllByText(STATUS_TAG_LABEL.open)).toHaveLength(1);
   });
 
-  it('should reopen the item without asking anything first', async () => {
+  it('should restore the item without asking anything first', async () => {
     boardTracking({
       ...OWN_OPEN_ITEM,
-      situacao: LostItemStatusEnum.CANCELLED,
-      motivoCancelamento: CancellationReasonEnum.OWNER,
+      status: LostItemStatusEnum.DELETED,
+      deletionReason: DeletionReasonEnum.USER,
     });
     renderComponent();
-    await filterByStatus(STATUS_TAG_LABEL.cancelled);
-    await screen.findByText(LOST_ITEM.nome);
+    await filterByStatus(STATUS_TAG_LABEL.deleted);
+    await screen.findByText(LOST_ITEM.name);
 
-    await userEvent.click(screen.getByRole('button', { name: REOPEN_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: RESTORE_LABEL }));
 
-    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.reopenSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.restoreSucceeded)).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
@@ -425,7 +440,7 @@ describe('LostAndFound', () => {
       ),
     );
     renderComponent();
-    await screen.findByText(LOST_ITEM.nome);
+    await screen.findByText(LOST_ITEM.name);
 
     await confirmAction(RESOLVE_LABEL.lost, RESOLVE_DIALOG.confirmLabel);
 
@@ -438,23 +453,23 @@ describe('LostAndFound', () => {
       http.delete(`${LOST_ITEMS_URL}/:itemId`, () => new HttpResponse(null, { status: 500 })),
     );
     renderComponent();
-    await screen.findByText(LOST_ITEM.nome);
+    await screen.findByText(LOST_ITEM.name);
 
-    await confirmAction(LOST_ITEM_ACTION_LABELS.cancel, CANCEL_DIALOG.confirmLabel);
+    await confirmAction(LOST_ITEM_ACTION_LABELS.delete, DELETE_DIALOG.confirmLabel);
 
-    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.cancelFailed)).toBeInTheDocument();
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.deleteFailed)).toBeInTheDocument();
   });
 
   it('should open the dialog filled in when the item is edited from the card', async () => {
     listReturning([OWN_OPEN_ITEM]);
 
     renderComponent();
-    await screen.findByText(OWN_OPEN_ITEM.nome);
+    await screen.findByText(OWN_OPEN_ITEM.name);
     await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.edit }));
 
     const dialog = within(await screen.findByRole('dialog'));
     expect(dialog.getByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
-    expect(dialog.getByDisplayValue(OWN_OPEN_ITEM.nome)).toBeInTheDocument();
+    expect(dialog.getByDisplayValue(OWN_OPEN_ITEM.name)).toBeInTheDocument();
   });
 
   describe('paginação e busca na URL', () => {
@@ -466,7 +481,7 @@ describe('LostAndFound', () => {
       return Array.from({ length: total }, (_, index) => ({
         ...LOST_ITEM,
         id: `item-${index}`,
-        nome: manyItemName(index),
+        name: manyItemName(index),
       }));
     }
 
@@ -528,7 +543,7 @@ describe('LostAndFound', () => {
       listReturning([LOST_ITEM]);
       const router = renderComponent();
 
-      expect(await screen.findByText(LOST_ITEM.nome)).toBeInTheDocument();
+      expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
       expect(router.state.location.search).toBe('');
     });
   });

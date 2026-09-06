@@ -20,7 +20,7 @@ const NO_ITEMS = 0;
 export function LostAndFound() {
   const [editingItem, setEditingItem] = useState<LostItem | undefined>(undefined);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const { resolveItem, cancelItem, reopenItem, isTransitioning } = useLostItemTransitions();
+  const { resolveItem, deleteItem, restoreItem, isTransitioning } = useLostItemTransitions();
 
   const { filters, items, totalPages, currentPage, isPending, applyFilters, changePage } =
     usePagedSearch({
@@ -87,8 +87,8 @@ export function LostAndFound() {
             item={item}
             onEdit={handleEdit}
             onResolve={resolveItem}
-            onCancel={cancelItem}
-            onReopen={reopenItem}
+            onDelete={deleteItem}
+            onRestore={restoreItem}
           />
         ))}
       </CardsList>

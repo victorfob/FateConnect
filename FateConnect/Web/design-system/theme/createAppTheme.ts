@@ -36,8 +36,11 @@ declare module '@mui/material/styles' {
   interface Palette {
     brandText: string;
     chrome: ChromeColors;
+    inputAutofill: string;
     inputOutline: string;
+    surfaceFloating: string;
     skeleton: string;
+    switchTrack: string;
     statusTag: Record<StatusTagTone, SurfacePair>;
     notification: Record<NotificationVariant, SurfacePair>;
   }
@@ -45,8 +48,11 @@ declare module '@mui/material/styles' {
   interface PaletteOptions {
     brandText: string;
     chrome: ChromeColors;
+    inputAutofill: string;
     inputOutline: string;
+    surfaceFloating: string;
     skeleton: string;
+    switchTrack: string;
     statusTag: Record<StatusTagTone, SurfacePair>;
     notification: Record<NotificationVariant, SurfacePair>;
   }

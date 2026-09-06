@@ -24,7 +24,6 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
             entity.HasKey(e => e.Id);
             entity.Property(e => e.FatecEmail).IsRequired().HasMaxLength(150);
             entity.Property(e => e.FullName).IsRequired().HasMaxLength(200);
-            entity.Property(e => e.Nickname).HasMaxLength(50);
             entity.Property(e => e.Password).IsRequired().HasMaxLength(255);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -51,6 +50,9 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
             entity.HasKey(c => c.Id);
             entity.Property(c => c.Phone).IsRequired().HasMaxLength(11);
             entity.Property(c => c.ContactEmail).IsRequired().HasMaxLength(150);
+
+            entity.HasIndex(c => c.Phone).IsUnique();
+            entity.HasIndex(c => c.ContactEmail).IsUnique();
 
             entity.HasOne(c => c.User)
                   .WithMany(u => u.Contacts)

@@ -25,6 +25,12 @@ Duas na mesma #237: `DOCKER_HOST` apontando para porta morta não desligou o Doc
 
 ⚠️ **Desligar por variável de ambiente não é desligar.** Ferramenta com descoberta automática de endpoint — Docker, proxy, DNS, resolvedor de pacote — trata a variável como preferência, não como ordem. Para medir a ausência, tire o recurso do ar.
 
+⛔ **Pseudo-classe que o navegador não deixa forçar não tem controle positivo — e aí a medição é outra.** O `CSS.forcePseudoState` do protocolo cobre `:hover`, `:focus`, `:active`, `:visited`, `:focus-within` e `:focus-visible`, e **não** cobre `:-webkit-autofill`. Em 05/09/2026, ao conferir se declarar `color-scheme` tinha tornado redundante a sombra que pinta o campo preenchido, não havia como pôr o campo naquele estado — nem forçando, nem digitando, porque credencial não se digita em formulário.
+
+O que respondeu foi ler a **cascata**, não o pixel: percorrer `document.styleSheets` juntando toda regra cujo `cssText` cita a pseudo-classe. Saíram duas, na ordem em que o navegador as aplica — a da própria biblioteca e a nossa, depois dela —, e a ordem **é** a resposta.
+
+⚠️ **Relatar isso como "medi o preenchimento automático" seria falso.** O que se mediu foi qual regra vence; que a regra vencedora pinta o que promete continua por conferir. Diga a frase que descreve o instrumento, não a que descreve o que você queria saber.
+
 ## O instrumento que alcança metade
 
 ⛔ **Sonda, regra e correção nascem cobrindo uma forma, e a resposta está na outra.** Não basta que o instrumento funcione: ele precisa alcançar **onde o problema mora**. Três vezes na #242, cada uma de um jeito:
@@ -34,12 +40,92 @@ Duas na mesma #237: `DOCKER_HOST` apontando para porta morta não desligou o Doc
 | `grep ... \| head` procurando quem mexia no scroll | as 10 primeiras linhas | na 11ª — e eu **descartei a hipótese certa** por causa disso |
 | a regra `no-restricted-syntax` de tag crua | chamadas de `styled('nav')` | no JSX: três `<li>` passaram no código novo |
 | a correção da fileira de paginação | a ponta inicial, onde a página 4 quebrava | na ponta final, onde a 9 quebrava igual |
+| a varredura que comparava **toda string** do diff | `'…'`, `"…"` e `` `…` `` | num **regex literal**: `/nome deve ter ao menos/i` |
+
+A quarta linha custou uma segunda rodada de review. Em 04/09/2026 a varredura devolveu 11 achados, eu corrigi os 11 e declarei o PR limpo; faltavam dois — as asserções do teste que guardava a copy, escritas como regex. Eles só apareceram porque a suíte ficou **vermelha** depois da correção.
+
+⚠️ **Texto de código mora em quatro formas: string, template, regex e comentário.** Instrumento que lê três responde com a mesma confiança sobre as três, e o silêncio sobre a quarta se lê como ausência.
+
+Em 02/09/2026 entrou um quarto, de outra natureza: o predicado que é verdadeiro **por vacuidade**. Esperando o CI de um PR com `until gh pr checks <n> --json name,bucket | jq -e 'all(.bucket != "pending")'`, o laço saiu na primeira olhada e eu anunciei quatro checks verdes — havia **um** registrado, e `all()` sobre lista de um elemento é verdadeiro. Os outros três nem existiam, incluindo o único que importava naquele PR. A âncora que faltava é de cardinalidade:
+
+```bash
+until gh pr checks <n> --json name,bucket | jq -e 'length >= 4 and all(.bucket != "pending")'; do sleep 20; done
+```
+
+⛔ **`all`, `every` e `none` sobre coleção que ainda está sendo preenchida respondem "sim" sem medir nada.** Predicado de espera precisa dizer **quantos** itens espera, ou nomear o item que espera.
+
+⛔ **`grep` ancorado sobre diff filtrado responde zero.** O `git diff` desta máquina sai em **formato compacto**, e a forma dele não é estável: numa invocação ele renderiza as linhas `+` indentadas, noutra ele resume. Então `grep -E "^\+"` não casa nada — e o zero se lê como "nenhuma linha", que é justamente a resposta tranquilizadora.
+
+Medido em 03/09/2026 sobre um diff de 18 adições:
+
+| Comando | Responde |
+| --- | --- |
+| `git diff \| grep -cE "^\+[^+]"` | **0** |
+| `git diff --numstat` | **18** ✅ |
+| `rtk proxy git diff \| grep -E "^\+" \| wc -l` | **19** ✅ |
+
+**A saída depende do que você quer:** contagem vem de `--numstat`, que é machine-readable e não passa por filtro; linha crua para **classificar** (comentário, string, termo) exige `rtk proxy git diff`, que desvia o filtro. As duas rules que prescreviam a forma ingênua — a densidade de comentário em `parallelism-and-worktrees.md` e o detector de rename em `dotnet-code-style.md` — foram corrigidas por causa disto.
+
+⛔ **O mesmo filtro engole a saída do `grep`, e devolve uma contagem no lugar dela.** Procurando cor cravada dentro de um pacote publicado, `rtk grep` respondeu **`4 matches in 0 files`** e não imprimiu uma linha sequer. Não é zero achados e não é erro: os quatro existiam e eram exatamente o que eu procurava — `/usr/bin/grep` imprimiu os quatro na hora.
+
+⚠️ **O tell é a contagem discordar da listagem**: `N matches` com nada embaixo. Vale para qualquer comando que passe por filtro — quando a saída vai sustentar conclusão, confira que o que foi contado é o que foi mostrado.
+
+⛔ **E o complemento de "passou" não é "falhou".** No mesmo `gh pr checks`, tratar `bucket != "pass"` como falha reporta vermelho onde há `pending`: em 02/09/2026 anunciei um check falhando no #287 quando o front ainda estava `IN_PROGRESS`, porque a cascata da pilha havia reiniciado o CI. Estado de terceira via — `pending`, `skipping`, `neutral` — se nomeia, não se deduz por exclusão.
+
+⛔ **`performance.getEntriesByType('resource')` não enxerga requisição que falha na conexão.** Em 04/09/2026, provando que um formulário deixara de chamar a API, ele devolveu **zero** nos dois casos — no que não devia chamar e no que devia. O zero era do instrumento. Quem responde é o log de rede do navegador (`read_network_requests`), que registra a tentativa com o motivo da falha; e o par positivo — o caso que **deve** disparar a requisição — é o que separa "não chamou" de "não medi".
 
 ⚠️ **`| head` num `grep` de investigação é o pior dos três**, porque some com a evidência sem avisar e a saída parece completa. Em busca que vai sustentar conclusão, conte antes (`grep -c`) ou não trunque.
 
 ⛔ **Regra nova se prova nas duas formas.** O controle positivo de uma regra de lint não é só "reprova o que deve" — é também "aceita o que deve". Ao estender a de tag crua, rodei um arquivo com `<div>` **e** `<strong>` no mesmo JSX: o primeiro reprova, o segundo passa. Sem a segunda metade eu teria proibido ênfase de texto sem perceber.
 
 ⛔ **Correção com duas pontas se confere nas duas, enumerando.** Consertei a página 4 e entreguei; a 9 tinha o defeito espelhado e quem viu foi o Victor. O que resolveu foi listar **todos** os estados de 1 a 12 numa tabela e olhar a coluna inteira — as duas faixas usavam medidas diferentes, e isso só aparece lado a lado.
+
+⛔ **Zero de comando composto não vale sem saber onde ele rodou.** Um `cd` que falha em `cd X && grep ...` deixa o `grep` rodar no diretório anterior, e o zero se lê como "não existe". Em 04/09/2026 afirmei que o projeto não tinha regra de autofill nenhuma; tinha zero **naquele** diretório, que não era o do front. `pwd` entra na mesma saída sempre que o zero vai sustentar conclusão.
+
+⛔ **Antes de atribuir um artefato à sua mudança, remova a mudança.** Correlação não é autoria. No mesmo dia vi seletores quebrados aparecerem junto da minha regra de CSS e disse ao Victor que eram meus; removendo a regra e recarregando frio, os nove continuavam lá — eram do MUI. O tell é a frase *"isso apareceu depois que eu mexi"*.
+
+### Pior que alcançar metade: destruir a outra
+
+⛔ **Instrumento que transforma texto precisa contar o que consumiu contra o que emitiu.** O que só mede erra devolvendo um número torto; o que reescreve erra **apagando** — e o arquivo salvo não denuncia o que sumiu.
+
+Aconteceu em 01/09/2026, rebaseando cinco PRs cujas entradas de changelog caíam no mesmo ponto do arquivo. Escrevi um resolvedor que atribui cada linha à seção pelo cabeçalho `###` acima dela. Nos quatro primeiros o conflito envolvia o cabeçalho e funcionou. No quinto ele ficou **dentro** da lista, sem cabeçalho nenhum no bloco: o script não encontrou seção, atribuiu zero linhas e **gravou o arquivo sem elas**. Sumiram duas entradas — uma delas já mergeada na `develop`.
+
+Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase` seguiu feliz.
+
+**A guarda é aritmética, não cuidado:** conte as entradas do bloco de entrada, conte as que você atribuiu, e **aborte** quando os dois números não baterem. Uma linha de `assert` teria transformado uma perda silenciosa numa parada barulhenta.
+
+⚠️ **O sinal é a saída vazia onde deveria haver enumeração.** "0 arquivos alterados", "nenhuma seção", "nada a fazer" — num passo que existe justamente para alterar algo, isso não é sucesso, é o instrumento dizendo que não entendeu a entrada.
+
+## O artefato publicado não é o que você quis escrever
+
+⛔ **Antes de afirmar o que um PR, uma issue ou um comentário seu diz, releia o publicado.** A lembrança guarda a **decisão** de registrar algo, e ela se lê exatamente igual a ter registrado — não há sensação diferente entre as duas.
+
+Aconteceu em 03/09/2026, fechando a rodada do #297. Eu disse que o resíduo de contraste do popover estava declarado no corpo do PR, *"junto das duas alternativas medidas e recusadas"*. O corpo não mencionava a paleta em linha nenhuma, e o único comentário do PR era o do Sonar. Eu tinha decidido registrar aquilo enquanto media, e li a decisão como o registro.
+
+**O gatilho é a frase que descreve conteúdo seu no passado** — "está no corpo do PR", "já registrei na issue", "o comentário explica". Cada uma é um comando que você ainda não rodou:
+
+```bash
+gh pr view <n> --json body -q .body
+gh api repos/<dono>/<repo>/issues/<n>/comments --jq '.[].body'
+```
+
+⚠️ **O custo não é a frase errada, é o que ela desliga.** Quem lê para de procurar: o Victor ia mergear achando que a limitação estava documentada para quem viesse depois.
+
+⚠️ **É diferente de afirmar sobre o que não li.** Ali a fonte é de outra pessoa e eu pulei a leitura; aqui a fonte é minha, e é justamente por isso que releitura não parece necessária.
+
+## O contorno pode ter mais de um motivo, e o comentário registra um
+
+⛔ **Antes de remover um contorno, enumere todos os motivos dele.** O painel de notificações estreitava no celular e o comentário justificava pela seta, que saía do gatilho. Consertada a seta, tirei o estreitamento achando que a razão tinha acabado — havia uma segunda, não escrita: 320px numa tela de 412 ocupam quase quatro quintos, e o painel deixa de parecer painel. Quem viu foi o Victor, com captura.
+
+**O comentário diz por que aquilo nasceu, não a lista completa do que ele sustenta.** Ao apagar, pergunte o que mais depende daquilo — e meça a consequência, em vez de deduzi-la do texto ao lado.
+
+## O controle que mede um caminho já corrigido
+
+⛔ **Controle positivo só vale se nada mais tiver consertado aquele caminho antes.** Em 04/09/2026 removi um efeito que eu suspeitava ser desnecessário e medi desvio zero — mas naquele cenário eu tinha redimensionado a janela com o painel **aberto**, e o listener de `resize` já havia recalculado o valor. O verde era de outro mecanismo, e eu removi uma correção correta.
+
+**O tell é o controle passar quando você esperava que falhasse.** Ali, em vez de concluir, liste o que mais poderia produzir aquele resultado.
+
+⚠️ **Comportamento de biblioteca se lê no `node_modules`, não se infere da tela.** O que fechou a questão foi ver que o `Popover` do MUI chama `setPositioningStyles` num efeito passivo sem lista de dependências — três rodadas de medição não tinham chegado lá.
 
 ## O que esta rule não é
 

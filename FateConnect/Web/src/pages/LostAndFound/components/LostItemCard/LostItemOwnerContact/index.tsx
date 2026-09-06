@@ -8,7 +8,7 @@ type LostItemOwnerContactProps = Readonly<{ item: LostItem }>;
 
 /** Não olha para a situação: combinar a devolução vale depois de concluído. */
 export function LostItemOwnerContact({ item }: LostItemOwnerContactProps) {
-  if (item.meuItem) return null;
+  if (item.isMine) return null;
 
-  return <ContactButton contact={LOST_ITEM_OWNER} message={contactMessage(item.nome)} />;
+  return <ContactButton contact={LOST_ITEM_OWNER} message={contactMessage(item.name)} />;
 }

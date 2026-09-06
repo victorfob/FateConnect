@@ -23,7 +23,7 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         {
             new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" },
         },
-        ["contacts"] = new[] { new { phone = "15999990000", contactEmail = "mariana.rocha@gmail.com" } },
+        ["contacts"] = new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = ApiFactory.UniqueContactEmail() } },
     };
 
     [Fact]
@@ -50,9 +50,7 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task CreateRide_WithSeatsOutOfRange_AnswersTheDomainMessage()
     {
-        HttpClient client = _factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", ApiFactory.IssueToken());
+        HttpClient client = _factory.CreateClientForNewUser("Ana Beatriz Nogueira");
 
         HttpResponseMessage response = await client.PostAsJsonAsync("/Rides", new
         {

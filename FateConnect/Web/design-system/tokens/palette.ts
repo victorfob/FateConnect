@@ -4,6 +4,15 @@ export const colorTokens = {
   accent: '#CF2E2E',
 
   /**
+   * A marca sobre o cromo — o capelo do símbolo e a inicial de `Connect`. O
+   * `accent` acima é fundo de botão e ali some, a 1.53:1; este chega a 2.47:1
+   * com saturação cheia. Logotipo é isento do mínimo da WCAG, e o que decidiu o
+   * tom foi o vizinho: mais claro que isto ele destoa do vermelho do botão ao
+   * lado, mais escuro ele afunda no cinza do cromo.
+   */
+  brandOnChrome: '#FF5252',
+
+  /**
    * Erro, hoje só como texto. Precisa de 4.5:1 sobre os **dois** fundos claros:
    * o `#E81C0D` anterior passava no branco do diálogo e dava 4.07:1 no cinza da
    * página. O tom herdado fica como `error.light`.
@@ -13,8 +22,12 @@ export const colorTokens = {
 
   surfaceGray: '#F0F2F4',
   surfaceWhite: '#FFFFFF',
-  /** Realce sobre o cromo colorido — menu lateral. Some sobre superfície clara. */
-  chromeHover: 'rgba(255, 255, 255, 0.6)',
+  /**
+   * Realce sobre o cromo colorido — menu lateral. Some sobre superfície clara.
+   * O véu clareia o cromo, então ele tem teto: a 0,6 o rótulo branco caía para
+   * 1,84:1 sobre ele, e a 0,16 já roça o mínimo de 4,5:1.
+   */
+  chromeHover: 'rgba(255, 255, 255, 0.12)',
   /**
    * Realce genérico sobre superfície clara: o produto usa a cor de conteúdo a
    * 3,5%, que é o que o Material desenha na opção do `select`.
@@ -50,6 +63,21 @@ export const colorTokens = {
    * fundos claros.
    */
   skeleton: '#848C92',
+
+  /**
+   * Trilho do interruptor desligado. O cinza do iOS fica em 1,2:1 e some sobre
+   * o cartão branco; este alcança os 3:1 da WCAG 1.4.11 para não-texto.
+   */
+  /**
+   * Fundo do campo preenchido pelo navegador — o mesmo azul que o Chrome pinta,
+   * a 1,15 do cartão branco, agora declarado por nós.
+   *
+   * ⛔ Não volte para `transparent`. O navegador pinta só o `input`, e o campo
+   * com adorno é mais largo que ele: sem cor aqui, a faixa atrás do botão de
+   * senha fica branca e o campo sai em dois tons.
+   */
+  inputAutofill: '#E8F0FE',
+  switchTrack: '#848C92',
 
   /** Divisor sobre superfície neutra. */
   divider: '#D9D9D9',
@@ -99,17 +127,34 @@ export const darkColorTokens = {
   /** Fundo de botão: escuro o bastante para o texto branco, que aqui é regra. */
   secondary: '#CF2E2E',
   /**
+   * A marca sobre o cromo escuro, que aqui é a superfície elevada: 3.24:1. O
+   * cromo claro precisa de um vermelho mais claro, e por isso o tom não é o
+   * mesmo nos dois temas.
+   */
+  brandOnChrome: '#CF2E2E',
+  /**
    * A mesma marca **como texto**, e por isso mais clara que o fundo de botão
    * acima. São dois tons porque os dois papéis se excluem: para o branco passar
    * AA em cima, a cor precisa de luminância ≤ 0.183; para ela mesma ser texto
    * legível sobre a **superfície elevada**, ≥ 0.233. Nenhuma cor cabe nas duas.
    */
-  brandText: '#E06055',
+  brandText: '#E7867E',
   error: '#F44336',
 
   surface: '#121212',
   /** Superfície elevada: sobreposição branca de 5%, como o M2 prescreve para 1dp. */
   surfaceElevated: '#1E1E1E',
+  /**
+   * Superfície que flutua **sobre** o cromo — hoje o popover ancorado no topo.
+   * É o degrau de 24dp do M2 (16% de branco sobre `surface`), e existe como
+   * token porque o véu de elevação do `Paper` está desligado: ele clareia em
+   * runtime uma cor que `contrast.test.ts` mede no token, e o medido deixaria
+   * de ser o desenhado.
+   *
+   * ⛔ Clarear a superfície custou retonar `brandText` e `skeleton`: sobre ela
+   * os valores antigos caíam para 3,34 e 2,14.
+   */
+  surfaceFloating: '#383838',
 
   /**
    * Estados sobre superfície escura — servem à etiqueta e ao aviso. No tema
@@ -126,8 +171,20 @@ export const darkColorTokens = {
   mutedTagBackground: '#37393B',
   mutedTagText: '#CFD8DC',
 
-  /** Bloco-fantasma: 33% de branco já achatado sobre a superfície elevada. */
-  skeleton: '#696969',
+  /**
+   * Bloco-fantasma: 44% de branco já achatado sobre a superfície elevada. Subiu
+   * de 33% quando a superfície flutuante entrou — sobre ela o tom antigo caía
+   * para 2,14:1, abaixo do mínimo de 3:1 para não-texto.
+   */
+  skeleton: '#818181',
+
+  /** Trilho do interruptor desligado, no mesmo mínimo de 3:1 do tema claro. */
+  /**
+   * O azul-aço que o Chrome pinta no escuro fica muito além do realce do claro.
+   * Este tom repete o afastamento de lá — 1,16 contra o cartão `#1E1E1E`.
+   */
+  inputAutofill: '#2A2A2A',
+  switchTrack: '#818181',
 
   onSurfaceHigh: 'rgba(255, 255, 255, 0.87)',
   onSurfaceMedium: 'rgba(255, 255, 255, 0.60)',

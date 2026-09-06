@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
-import { Outlet, Link as RouterLink } from 'react-router';
-import { Footer, Header, NavigationDrawer, ThemeToggleButton, Typography } from '@design-system';
+import { Outlet } from 'react-router';
+import { Footer, Header, NavigationDrawer } from '@design-system';
 
+import { BrandLogo } from '@app/components/BrandLogo';
 import { DrawerSectionItem } from '@app/components/DrawerSectionItem';
 import { LandingNavButton } from '@app/components/LandingNavButton';
 import { LegalFooterLinks } from '@app/components/LegalFooterLinks';
@@ -11,9 +12,9 @@ import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 import * as S from '../shell.styles';
+import { ThemeToggleButton } from './components/ThemeToggleButton';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
-const LOGO_LABEL = 'FateConnect';
 
 export function GuestLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -29,18 +30,10 @@ export function GuestLayout() {
     [goToSection],
   );
 
-  const logo = (
-    <RouterLink to={RoutePathEnum.LANDING} aria-label={LOGO_LABEL}>
-      <Typography variant="logo" color="inherit">
-        FateConnect
-      </Typography>
-    </RouterLink>
-  );
-
   return (
     <S.ShellRoot>
       <Header
-        logo={logo}
+        logo={<BrandLogo to={RoutePathEnum.LANDING} />}
         actions={<ThemeToggleButton />}
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
@@ -55,7 +48,11 @@ export function GuestLayout() {
         ))}
       />
 
-      <NavigationDrawer open={drawerOpen} onClose={handleDrawerClose} header={logo}>
+      <NavigationDrawer
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+        header={<BrandLogo to={RoutePathEnum.LANDING} onClick={handleDrawerClose} />}
+      >
         {LANDING_LINKS.map(({ section, label }) => (
           <DrawerSectionItem
             key={section}

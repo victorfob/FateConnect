@@ -8,7 +8,7 @@ import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
-import { CANCEL_DIALOG } from './components/RideCard/RideCancelConfirmation/constants';
+import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
 import {
   FILTER_LABELS,
   FILTER_PANEL_TITLE,
@@ -209,13 +209,13 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(RIDE.destination);
 
-    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.cancel }));
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
 
     const dialog = within(await screen.findByRole('dialog'));
-    expect(dialog.getByRole('heading', { name: CANCEL_DIALOG.title })).toBeInTheDocument();
+    expect(dialog.getByRole('heading', { name: DELETE_DIALOG.title })).toBeInTheDocument();
     expect(dialog.getByText(RIDE.destination)).toBeInTheDocument();
 
-    await userEvent.click(dialog.getByRole('button', { name: CANCEL_DIALOG.dismissLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.dismissLabel }));
 
     // O cartão só volta a ser alcançável quando o diálogo termina de fechar.
     expect(
@@ -238,11 +238,11 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(RIDE.destination);
 
-    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.cancel }));
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
     const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: CANCEL_DIALOG.confirmLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.confirmLabel }));
 
-    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.cancelSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.deleteSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
   });
 
@@ -252,11 +252,11 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(RIDE.destination);
 
-    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.cancel }));
+    await userEvent.click(screen.getByRole('button', { name: C.RIDE_CARD_LABELS.delete }));
     const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: CANCEL_DIALOG.confirmLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: DELETE_DIALOG.confirmLabel }));
 
-    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.cancelFailed)).toBeInTheDocument();
+    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.deleteFailed)).toBeInTheDocument();
   });
 
   it('should show the contact of whoever offered the ride', async () => {
@@ -346,7 +346,7 @@ describe('Rides', () => {
 
     expect(screen.queryByRole('button', { name: C.RIDE_CARD_LABELS.edit })).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: C.RIDE_CARD_LABELS.cancel }),
+      screen.queryByRole('button', { name: C.RIDE_CARD_LABELS.delete }),
     ).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: CONTACT_LABEL })).toBeInTheDocument();
   });

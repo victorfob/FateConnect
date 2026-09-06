@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router';
 import { Button, Typography } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,13 +7,14 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
-import type { ApiError } from '@app/services/httpClient';
+import { ApiError } from '@app/services/httpClient';
 import { signup } from '@app/services/signup/signupService';
 
 import { AccountSection } from './components/AccountSection';
 import { AddressSection } from './components/AddressSection';
 import { ConsentSection } from './components/ConsentSection';
 import { ContactSection } from './components/ContactSection';
+import { conflictFieldOf } from './helpers/conflictField';
 import { toSignupRequest } from './helpers/mapper';
 import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from './schema';
 import * as C from './constants';
@@ -34,7 +36,7 @@ export function Signup() {
   const navigate = useNavigate();
   const { notifySuccess, notifyError } = useNotification();
 
-  const { mutate, isPending } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: signup,
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
@@ -42,7 +44,6 @@ export function Signup() {
       notifySuccess(C.SIGNUP_SUCCESS_MESSAGE);
       navigate(RoutePathEnum.MENU);
     },
-    onError: (error: ApiError) => notifyError(errorMessageFor(error.status)),
   });
 
   const form = useForm<SignupFormValues>({
@@ -51,7 +52,32 @@ export function Signup() {
     disabled: isPending,
   });
 
-  const handleSubmit = form.handleSubmit((values) => mutate(toSignupRequest(values)));
+  const reportFailure = useCallback(
+    (error: unknown) => {
+      if (!(error instanceof ApiError)) {
+        notifyError(C.SIGNUP_ERROR_MESSAGES.generic);
+        return;
+      }
+
+      const field = conflictFieldOf(error);
+
+      if (field) {
+        form.setError(field, { message: C.SIGNUP_CONFLICT_MESSAGES[field] }, { shouldFocus: true });
+        return;
+      }
+
+      notifyError(errorMessageFor(error.status));
+    },
+    [form, notifyError],
+  );
+
+  const handleSubmit = form.handleSubmit(async (values) => {
+    try {
+      await mutateAsync(toSignupRequest(values));
+    } catch (error) {
+      reportFailure(error);
+    }
+  });
 
   return (
     <S.PageRoot>

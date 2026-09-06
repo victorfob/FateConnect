@@ -70,7 +70,9 @@ O mesmo objeto ou estado se chama igual em **toda** a tela — etiqueta, botão,
 
 Aconteceu ao especificar a paginação: escrevi `?tipo=filantropica` chamando aquilo de "o termo em pt-BR do produto". Não era — era a serialização do backend, e a palavra que a interface usa é outra. Eu tinha lido o `types.ts`; o valor estava certo e o **papel** dele, errado.
 
-Coincidir é o caso feliz, não a regra: em achados e perdidos `lostItemKind.ts` diz que "o valor canônico já é o rótulo", e é por isso que lá não há armadilha.
+Coincidir era o caso feliz, e deixou de existir: achados e perdidos também levou o contrato para inglês, e `src/pages/LostAndFound/helpers/lostItemKind.ts` passou a ter mapa de rótulo como o de caronas — `Found` na tela é **Achado**, `Deleted` é **Excluído**. Não há mais tela em que o valor sirva de rótulo; **procure o mapa sempre**.
+
+⚠️ O tell de que alguém confundiu os dois papéis é um teste que escolhe uma opção pelo valor do enum. Ele passa enquanto os dois coincidem e cai no dia da tradução, apontando para a linha errada — a mensagem diz que não existe opção chamada `Found`, e não que o rótulo mudou de dono.
 
 ## Erro: o problema e a saída
 
@@ -89,13 +91,31 @@ Diz o que aconteceu e o que fazer: `Erro ao carregar os itens. Tente novamente.`
 
 ## Caixa: sentence case
 
-Rótulo de botão, aba e título de diálogo levam maiúscula **só na primeira palavra** — "Cadastrar item", "Confirmar exclusão". Nome próprio e sigla mantêm a caixa.
+Rótulo de botão, aba, título de diálogo e **cabeçalho de seção** levam maiúscula **só na primeira palavra** — "Cadastrar item", "Confirmar exclusão", "Dados para contato". Nome próprio e sigla mantêm a caixa.
 
 ⚠️ **Dívida conhecida:** caronas e cadastro ainda usam Title Case ("Ofertar Carona", "Salvar Alterações"), herdado do protótipo. Achados e perdidos já está em sentence case; a conversão do resto acontece quando alguém tocar em cada tela.
+
+## Cabeçalho de seção nomeia o que está dentro
+
+Frase nominal curta dizendo o conteúdo, como o cadastro já faz: `Endereço` e `Dados para contato`.
+
+⛔ **Não nomeie a seção pela natureza do ajuste.** `Ajustes do sistema` não separa nada para quem lê — a tela inteira é o sistema — e "ajustes" repete o nome da tela que a contém. Em preferências, a seção que reúne tema, e-mails e notificações chama-se `Aparência e notificações`.
+
+⛔ **E o rótulo não repete o nome de um item de dentro.** Seção `Preferências` contendo o item `Preferências` põe a palavra duas vezes em duas linhas seguidas e não organiza nada: no menu lateral a seção saiu, e os itens subiram para a vizinha. O teste é ler os rótulos em voz alta, do cabeçalho para baixo — repetiu, ou o cabeçalho está errado ou ele não devia existir.
+
+⚠️ **Nomeie pelo que a seção vai reunir, não só pelo que já está dentro dela.** Enquanto não houver usuários no sistema, descrever uma linha que ainda vai entrar custa menos que renomear a seção depois — é a mesma tolerância da exceção de escopo planejado acima, aplicada dentro da aplicação.
 
 ## Tooltip
 
 Complementa, não repete. A exceção é o **botão só de ícone**: ali o tooltip é o nome do botão e repete o rótulo acessível de propósito — sem ele, o ícone não diz nada. Primeira letra maiúscula, no máximo duas linhas.
+
+## Nota ao lado de etiqueta
+
+Nota ao lado de uma etiqueta diz o que a etiqueta não diz. Repetir a palavra dela gasta a linha e sai duas vezes em leitor de tela — havendo só a repetição a dizer, a nota não existe.
+
+⛔ Aconteceu no cartão de achados e perdidos. A etiqueta dizia `Excluído` e, quando a API não mandava o motivo, a nota logo abaixo dizia `Excluído.` — a mesma palavra, duas vezes, uma delas sem acrescentar nada. Ela saiu: a nota passou a existir **só quando há motivo**, e aí ela conta o que a etiqueta não conta (`Excluído manualmente.`, `Excluído automaticamente por inatividade.`).
+
+⚠️ **Texto de reserva é onde essa repetição nasce**, porque ele é escrito para preencher um espaço e não para dizer algo. Antes de escrever um, pergunte o que ele acrescenta à etiqueta ao lado; não havendo resposta, o espaço fica vazio.
 
 ## Estado vazio
 
@@ -125,6 +145,23 @@ Voltada ao fato: "Item excluído", não "Você excluiu o item". O `você` contin
 - Sempre dígito, nunca por extenso, com zero à esquerda: `05`, não `5`.
 - Data em `dd/MM/yyyy`; hora em 24h com dois pontos: `07:30`.
 - Intervalo com hífen espaçado: `07:00 - 09:00`.
+
+## Copy que carrega dado tem largura
+
+⛔ **Rótulo com número, faixa ou unidade ocupa espaço — e o espaço se mede no contêiner real, não no olho.** A régua não é o texto sozinho: é a largura útil de onde ele vai morar, que muda de um lugar para o outro.
+
+Aconteceu em 31/08/2026, ao nomear os turnos do filtro de caronas. Propus `Manhã (04:00 - 11:59)` e a cobrança do Victor foi *"lembrou de validar isso?"*. Eu não tinha.
+
+Medido com a aplicação de pé a 409px:
+
+| | Painel de filtros | Diálogo |
+| --- | --- | --- |
+| Campo | 313px | 281px |
+| Sobra para o texto | **267px** | **235px** |
+
+O candidato mais longo, `Vespertino (12:00 - 17:59)`, ocupa 183,5px em Inter 16px: cabe nos dois. A largura **deixou de decidir** o nome, e a escolha voltou a ser por precisão — que é o critério certo. Sem a medição eu teria descartado ou aceitado um nome pelo motivo errado.
+
+**Como medir:** largura útil pelo `getBoundingClientRect` do campo menos o `padding` computado; largura do texto com `measureText` num `canvas` usando a fonte real, depois de `document.fonts.ready`. Meça no **mais apertado** dos contêineres que vão receber o texto.
 
 ## Idioma
 

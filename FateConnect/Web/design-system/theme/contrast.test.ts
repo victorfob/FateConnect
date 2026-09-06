@@ -36,6 +36,8 @@ describe('contrastRatio', () => {
 
 type Par = [string, string, string];
 
+const TRANSPARENT = 'transparent';
+
 /** Toda cor de conteúdo é medida contra **todas** as superfícies daqui. */
 function surfaces(theme: Theme): [string, string][] {
   return [
@@ -59,6 +61,47 @@ function nonTextColours(theme: Theme): [string, string][] {
     ['the field outline', theme.palette.inputOutline],
     ['the button fill', theme.palette.secondary.main],
     ['the loading skeleton', theme.palette.skeleton],
+    ['the switch track', theme.palette.switchTrack],
+  ];
+}
+
+/**
+ * A superfície flutuante não entra em `surfaces` porque não carrega tudo: botão
+ * preenchido não vai dentro de menu, e erro nesta casa sai como notificação, que
+ * tem superfície própria. O que ela carrega é texto, a marca e o esqueleto — e
+ * é o mesmo tratamento que o cromo recebe, também por par explícito.
+ *
+ * ⛔ Pôr conteúdo novo no popover ancorado obriga a acrescentar o par aqui.
+ */
+function floatingSurfaceText(theme: Theme): Par[] {
+  const { palette } = theme;
+
+  return [
+    ['body text on a floating surface', palette.text.primary, palette.surfaceFloating],
+    ['secondary text on a floating surface', palette.text.secondary, palette.surfaceFloating],
+    ['brand text on a floating surface', palette.brandText, palette.surfaceFloating],
+  ];
+}
+
+/**
+ * O campo preenchido pelo navegador carrega texto, então precisa do par. No
+ * claro o valor é `transparent` de propósito — quem pinta ali é o navegador, e
+ * não há cor nossa para medir.
+ */
+function autofilledFieldText(theme: Theme): Par[] {
+  const { palette } = theme;
+  if (palette.inputAutofill === TRANSPARENT) return [];
+
+  return [['body text on an autofilled field', palette.text.primary, palette.inputAutofill]];
+}
+
+function floatingSurfaceNonText(theme: Theme): Par[] {
+  return [
+    [
+      'the loading skeleton on a floating surface',
+      theme.palette.skeleton,
+      theme.palette.surfaceFloating,
+    ],
   ];
 }
 
@@ -97,17 +140,31 @@ describe.each([
   ['light', lightTheme],
   ['dark', darkTheme],
 ])('%s theme contrast', (_, theme) => {
-  it.each([...against(theme, contentColours), ...boundPairs(theme)])(
-    'should meet AA for %s',
-    (_name, foreground, background) => {
-      expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
-    },
-  );
+  it.each([
+    ...against(theme, contentColours),
+    ...boundPairs(theme),
+    ...floatingSurfaceText(theme),
+    ...autofilledFieldText(theme),
+  ])('should meet AA for %s', (_name, foreground, background) => {
+    expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
+  });
 
-  it.each(against(theme, nonTextColours))(
+  it.each([...against(theme, nonTextColours), ...floatingSurfaceNonText(theme)])(
     'should meet the non-text threshold for %s',
     (_name, foreground, background) => {
       expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NON_TEXT);
     },
   );
+
+  // O logotipo é isento do mínimo da WCAG, então não há limite a cobrar dele — e
+  // um limite que não se exige não entra na lista acima só para parecer medido.
+  // O que se cobra é o que a escolha decidiu: sobre o cromo, a marca nunca é
+  // menos legível do que o vermelho de botão seria ali.
+  it('should keep the brand mark on the chrome at least as legible as the button red', () => {
+    const { palette } = theme;
+
+    expect(contrastRatio(palette.chrome.accent, palette.chrome.main)).toBeGreaterThanOrEqual(
+      contrastRatio(palette.secondary.main, palette.chrome.main),
+    );
+  });
 });

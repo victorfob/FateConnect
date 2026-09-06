@@ -9,16 +9,16 @@ import { toFormValues, toLostItemInput } from './mapper';
 
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
-  nome: 'Carteira preta',
-  tipo: LostItemKindEnum.LOST,
-  local: 'Biblioteca',
-  dataOcorrido: '2026-08-11T00:00:00',
-  descricao: 'Carteira de couro preta.',
-  fotoUrl: 'https://fotos.fateconnect.test/carteira.png',
-  situacao: LostItemStatusEnum.OPEN,
-  motivoCancelamento: null,
-  meuItem: true,
-  dataCadastro: '2026-08-12T00:00:00',
+  name: 'Carteira preta',
+  type: LostItemKindEnum.LOST,
+  place: 'Biblioteca',
+  occurredOn: '2026-08-11T00:00:00',
+  description: 'Carteira de couro preta.',
+  photoUrl: 'https://fotos.fateconnect.test/carteira.png',
+  status: LostItemStatusEnum.OPEN,
+  deletionReason: null,
+  isMine: true,
+  createdAt: '2026-08-12T00:00:00',
 };
 
 describe('toFormValues', () => {
@@ -29,7 +29,7 @@ describe('toFormValues', () => {
   it('should cut the api date down to what the field accepts', () => {
     const values = toFormValues(LOST_ITEM);
 
-    expect(values.occurredOn).toBe('2026-08-11');
+    expect(values.occurredOn).toBe('11/08/2026');
     expect(values.name).toBe('Carteira preta');
     expect(values.place).toBe('Biblioteca');
     expect(values.kind).toBe(LostItemKindEnum.LOST);
@@ -40,7 +40,7 @@ describe('toFormValues', () => {
   });
 
   it('should turn a missing description into an empty field', () => {
-    expect(toFormValues({ ...LOST_ITEM, descricao: null }).description).toBe('');
+    expect(toFormValues({ ...LOST_ITEM, description: null }).description).toBe('');
   });
 });
 
@@ -50,17 +50,17 @@ describe('toLostItemInput', () => {
       name: 'Carteira preta',
       kind: LostItemKindEnum.LOST,
       place: 'Biblioteca',
-      occurredOn: '2026-08-11',
+      occurredOn: '11/08/2026',
       description: 'Carteira de couro preta.',
       photo: new File(['foto'], 'carteira.png', { type: 'image/png' }),
     };
 
     expect(toLostItemInput(values)).toEqual({
-      nome: 'Carteira preta',
-      tipo: LostItemKindEnum.LOST,
-      local: 'Biblioteca',
-      dataOcorrido: '2026-08-11',
-      descricao: 'Carteira de couro preta.',
+      name: 'Carteira preta',
+      type: LostItemKindEnum.LOST,
+      place: 'Biblioteca',
+      occurredOn: '2026-08-11',
+      description: 'Carteira de couro preta.',
     });
   });
 });

@@ -25,6 +25,8 @@ O relatório sai do `dotnet test` em formato **OpenCover** (`--collect:"XPlat Co
 
 Ele roda a suíte com cobertura, cruza o relatório com os arquivos de produção do diff e **sai com erro** listando quem ficou abaixo dos 90%.
 
+⛔ **Commite antes de medir.** O script cruza o relatório com `git diff origin/develop` — o estado **commitado**. Rodado com o trabalho solto na árvore ele mede o conjunto de arquivos errado e sai com **exit 0** dizendo que todos atingem 90%. Em 03/09/2026 isso aconteceu duas vezes na mesma sessão: uma sobre **zero** arquivos (`nenhum arquivo de produção da API no diff`), outra listando 8 e deixando de fora justamente os dois novos, porque o diff commitado ainda descrevia o desenho anterior. **O sinal é a contagem não bater com os arquivos que você mexeu.**
+
 ⛔ **Rode antes de dizer que acabou.** `dotnet build` + `dotnet test` não medem nada, e o portão do Sonar aceita 33% — as duas coisas ficam verdes sobre uma regra violada. Aconteceu na #222: o PR chegou a 79,5% no Sonar com o `AuthService` em **22,7%**, porque não existia um único teste de login. O que fechou o buraco foram três testes; o que impede a repetição é este comando.
 
 **Linha que não dá para cobrir se marca, não se ignora.** Construtor privado que existe só para impedir instanciação nunca é chamado: `[ExcludeFromCodeCoverage]` nele tira a linha do denominador e diz por quê. Baixar o alvo, não.
@@ -105,9 +107,13 @@ Nunca exponha membro só para testar. O que interessa é o resultado do método 
 
 ## Estático precisa de costura
 
-`DateTime.UtcNow`, `TimeZoneInfo` e afins tiram o controle do teste. Enquanto a costura não existir, **não escreva o teste que depende do relógio** — ele passa hoje e falha sozinho depois.
+`DateTime.UtcNow`, `TimeZoneInfo` e afins tiram o controle do teste. **Onde a costura não existir, não escreva o teste que depende do relógio** — ele passa hoje e falha sozinho depois.
 
-Aqui isso já espera por alguém: `Ride.ValidateDepartureDateTime` compara a partida com `DateTime.UtcNow`, então testar a regra de "partida no futuro" exige injetar o tempo antes.
+**O padrão é o `MinimumAgeAttribute`:** ele pergunta o relógio ao `ValidationContext` — `GetService(typeof(TimeProvider))` — e cai para `TimeProvider.System` quando ninguém fornece. O teste entrega um `TimeProvider` fixo por um `IServiceProvider` de duas linhas, e cada borda vira caso determinístico. `TimeProvider` é do .NET 8: não escreva interface de relógio própria.
+
+⛔ **`Ride.ValidateDepartureDateTime` continua sem costura**: compara a partida com `DateTime.UtcNow` direto, então testar "partida no futuro" ainda exige injetar o tempo antes.
+
+⚠️ **Depender do relógio não é ser sensível a ele.** O caso **na borda** é o que quebra: na virada de meia-noite UTC o limite anda um dia e a data muda de lado — e quem cai é o teste de **recusa**, não o de aceitação. Teste de endpoint com uma década de folga do limite lê o relógio e nunca vira. Data literal fixa não é a saída: ela envelhece calada, porque um dia deixa de ser menor de idade. A borda fica no teste de unidade com relógio fixo; o endpoint fica com o caso folgado, provando só a fiação.
 
 ## Subir a aplicação contra PostgreSQL de verdade
 
@@ -117,7 +123,7 @@ Aqui isso já espera por alguém: `Ride.ValidateDepartureDateTime` compara a par
 
 **O schema nasce das migrations**, porque é o `Migrate()` do `Program` que roda — o mesmo caminho da produção. Migration quebrada aparece no teste, e o `unaccent` vem junto sem passo manual, porque o `FateConnectDbContext` o declara com `HasPostgresExtension`.
 
-⚠️ **O custo é real e conhecido: ~6s contra ~1s do provedor em memória.** São **24 fábricas** — uma por classe com `IClassFixture`, mais uma por caso de teste do `RideListingTests` —, logo 24 bancos criados e migrados. Isso é aceitável para o que compra, e o que compra foi medido na #237, com três mutações:
+⚠️ **O custo é real e conhecido: ~6s contra ~1s do provedor em memória.** São **25 fábricas** — uma por classe com `IClassFixture`, mais uma por caso de teste do `RideListingTests` —, logo 25 bancos criados e migrados. Isso é aceitável para o que compra, e o que compra foi medido na #237, com três mutações:
 
 | mutação | o que cai |
 | --- | --- |
@@ -127,7 +133,7 @@ Aqui isso já espera por alguém: `Ride.ValidateDepartureDateTime` compara a par
 
 As três passavam verdes no provedor em memória, que executa LINQ em memória e não conhece função de PostgreSQL.
 
-⚠️ **Não serialize a criação dos bancos, e não desligue o paralelismo do xUnit.** As 24 fábricas criam banco ao mesmo tempo, e a falha clássica disso — `source database "template1" is being accessed by other users` — exige uma sessão aberta **no template**. Medido durante uma corrida real: os únicos bancos que recebem conexão são o `postgres`, onde o Npgsql abre a conexão administrativa, e os `fateconnect-tests-<guid>`; o `template1` recebe **zero**. Pico de **25 conexões contra o teto de 100**, e 120 `CREATE DATABASE` concorrentes numa sonda não produziram uma falha.
+⚠️ **Não serialize a criação dos bancos, e não desligue o paralelismo do xUnit.** As 25 fábricas criam banco ao mesmo tempo, e a falha clássica disso — `source database "template1" is being accessed by other users` — exige uma sessão aberta **no template**. Medido durante uma corrida real: os únicos bancos que recebem conexão são o `postgres`, onde o Npgsql abre a conexão administrativa, e os `fateconnect-tests-<guid>`; o `template1` recebe **zero**. Pico de **26 conexões de cliente contra o teto de 100**, e 120 `CREATE DATABASE` concorrentes numa sonda não produziram uma falha.
 
 ⚠️ **Aquele zero só vale por causa do controle positivo.** Antes de acreditar nele, a mesma sonda forçou o erro de propósito — conexão aberta num banco e `CREATE DATABASE ... TEMPLATE` copiando dele — e ele apareceu. Sonda que não consegue produzir a falha não está medindo a ausência dela.
 

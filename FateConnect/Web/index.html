@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Caminho absoluto: sem `<base>`, um href relativo viraria
          `/caronas/favicon.ico` nas rotas aninhadas. -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any" />
+    <!-- Quem entende SVG prefere este, e é ele que clareia a roda quando a aba
+         é escura — o `.ico` é um raster só e não acompanha o esquema. -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <title>FateConnect</title>
   </head>
   <body>
