@@ -137,6 +137,12 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ContactEmail")
+                        .IsUnique();
+
+                    b.HasIndex("Phone")
+                        .IsUnique();
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Contacts");
@@ -171,16 +177,15 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Nickname")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
                     b.Property<int>("ProfileType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TokenVersion")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")

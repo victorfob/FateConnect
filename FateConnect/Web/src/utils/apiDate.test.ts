@@ -1,4 +1,4 @@
-import { fromFormDate, toApiDate, toFormDate } from './apiDate';
+import { toApiDate, toApiDateText, toDisplayDate } from './apiDate';
 
 describe('toApiDate', () => {
   it('should pad the day and the month to two digits', () => {
@@ -11,24 +11,25 @@ describe('toApiDate', () => {
   });
 });
 
-describe('toFormDate', () => {
-  it('should format a valid date', () => {
-    expect(toFormDate(new Date(2026, 4, 7))).toBe('2026-05-07');
+describe('toApiDateText', () => {
+  it('should turn what the field shows into what the API stores', () => {
+    expect(toApiDateText('07/05/2026')).toBe('2026-05-07');
   });
 
   it('should fall back to an empty value for no date and for a half typed one', () => {
-    expect(toFormDate(null)).toBe('');
-    expect(toFormDate(new Date('nope'))).toBe('');
+    expect(toApiDateText('')).toBe('');
+    expect(toApiDateText('07/0')).toBe('');
+    expect(toApiDateText('32/05/2026')).toBe('');
   });
 });
 
-describe('fromFormDate', () => {
+describe('toDisplayDate', () => {
   it('should read back the date the form stored', () => {
-    expect(fromFormDate('2026-05-07')).toEqual(new Date(2026, 4, 7));
+    expect(toDisplayDate('2026-05-07')).toBe('07/05/2026');
   });
 
-  it('should return null for an empty or unreadable value', () => {
-    expect(fromFormDate('')).toBeNull();
-    expect(fromFormDate('07/05/2026')).toBeNull();
+  it('should return an empty value for an empty or unreadable one', () => {
+    expect(toDisplayDate('')).toBe('');
+    expect(toDisplayDate('nope')).toBe('');
   });
 });

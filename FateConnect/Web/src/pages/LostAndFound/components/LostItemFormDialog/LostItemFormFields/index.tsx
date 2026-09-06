@@ -2,8 +2,6 @@ import { useMemo } from 'react';
 import { Input } from '@design-system';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { fromFormDate, toFormDate } from '@app/utils/apiDate';
-
 import type { LostItemFormInput, LostItemFormValues } from '../schema';
 import * as C from '../constants';
 import { LostItemPhotoField } from './LostItemPhotoField';
@@ -59,8 +57,8 @@ export function LostItemFormFields() {
             name={field.name}
             label={C.LOST_ITEM_FORM_LABELS.occurredOn}
             required
-            value={fromFormDate(field.value)}
-            onChange={(date) => field.onChange(toFormDate(date))}
+            value={field.value}
+            onChange={field.onChange}
             onBlur={field.onBlur}
             disabled={field.disabled}
             maxDate={today}

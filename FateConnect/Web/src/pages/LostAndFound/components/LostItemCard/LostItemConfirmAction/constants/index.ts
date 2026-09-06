@@ -1,1 +1,1 @@
-export const CONFIRMATION = { messageSuffix: '?', dismissLabel: 'Voltar' };
+export const CONFIRMATION = { messageSuffix: '?', dismissLabel: 'Cancelar' };

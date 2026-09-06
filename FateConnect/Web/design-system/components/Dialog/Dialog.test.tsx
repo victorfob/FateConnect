@@ -1,5 +1,6 @@
 import { render, screen, userEvent } from '@app/test/testing-library';
 
+import { CLOSE_LABEL } from './constants';
 import { Dialog, type DialogProps } from '.';
 
 const DEFAULT_PROPS: DialogProps = {
@@ -11,6 +12,9 @@ const DEFAULT_PROPS: DialogProps = {
 
 const renderComponent = (props = DEFAULT_PROPS) => render(<Dialog {...props} />);
 
+// O botão de fechar só aparece abaixo do breakpoint mobile, por CSS. O jsdom não
+// avalia media query, então ele fica com `display: none` e precisa ser buscado
+// com `hidden`.
 describe('Dialog', () => {
   it('should name itself by the title it was given', () => {
     renderComponent();
@@ -40,8 +44,22 @@ describe('Dialog', () => {
     const onClose = vi.fn();
     renderComponent({ ...DEFAULT_PROPS, onClose });
 
-    // Não há botão de fechar: o diálogo sai por tecla ou por clique fora dele.
     await userEvent.keyboard('{Escape}');
+
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it('should keep the close button out of the desktop', () => {
+    renderComponent();
+
+    expect(screen.queryByRole('button', { name: CLOSE_LABEL })).not.toBeInTheDocument();
+  });
+
+  it('should close when the user activates the close button', async () => {
+    const onClose = vi.fn();
+    renderComponent({ ...DEFAULT_PROPS, onClose });
+
+    await userEvent.click(screen.getByRole('button', { name: CLOSE_LABEL, hidden: true }));
 
     expect(onClose).toHaveBeenCalledOnce();
   });

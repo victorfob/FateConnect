@@ -12,18 +12,24 @@ export { default as Box } from '@mui/material/Box';
 export { default as Button } from '@mui/material/Button';
 export { default as Checkbox } from '@mui/material/Checkbox';
 export { default as CircularProgress } from '@mui/material/CircularProgress';
+export { default as Divider } from '@mui/material/Divider';
 export { default as Drawer } from '@mui/material/Drawer';
 export { default as FormControlLabel } from '@mui/material/FormControlLabel';
 export { default as List } from '@mui/material/List';
+export { default as ListItem } from '@mui/material/ListItem';
 export { default as ListItemButton } from '@mui/material/ListItemButton';
+export { default as ListItemIcon } from '@mui/material/ListItemIcon';
 export { default as ListItemText } from '@mui/material/ListItemText';
+export { default as ListSubheader } from '@mui/material/ListSubheader';
 export { default as Popover } from '@mui/material/Popover';
 export { default as Stack } from '@mui/material/Stack';
+export { default as Switch } from '@mui/material/Switch';
 export { default as Toolbar } from '@mui/material/Toolbar';
 export { default as Typography } from '@mui/material/Typography';
 
 export type { BoxProps } from '@mui/material/Box';
 export type { ButtonProps } from '@mui/material/Button';
+export type { ListItemTextProps } from '@mui/material/ListItemText';
 export type { TypographyProps } from '@mui/material/Typography';
 
 /** Calendário avulso; o do campo de data mora dentro do `Input`. */

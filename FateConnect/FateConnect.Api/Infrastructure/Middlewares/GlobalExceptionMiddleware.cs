@@ -27,6 +27,7 @@ public partial class GlobalExceptionMiddleware(
     {
         var statusCode = HttpStatusCode.InternalServerError;
         var errorMessage = "Algo deu errado. Tente novamente.";
+        string? conflictingField = null;
 
         switch (exception)
         {
@@ -40,12 +41,13 @@ public partial class GlobalExceptionMiddleware(
                 errorMessage = ex.Message;
                 break;
 
-            case EmailAlreadyRegisteredException ex:
+            case AlreadyRegisteredException ex:
                 statusCode = HttpStatusCode.Conflict;
                 errorMessage = ex.Message;
+                conflictingField = ex.Field;
                 break;
 
-            case UnidentifiedUserException or InvalidCredentialsException:
+            case UnidentifiedUserException or UnidentifiedTokenException or InvalidCredentialsException:
                 statusCode = HttpStatusCode.Unauthorized;
                 errorMessage = exception.Message;
                 break;
@@ -64,7 +66,9 @@ public partial class GlobalExceptionMiddleware(
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        await context.Response.WriteAsJsonAsync(new ErrorResponseDto { Error = errorMessage }, context.RequestAborted);
+        await context.Response.WriteAsJsonAsync(
+            new ErrorResponseDto { Error = errorMessage, Field = conflictingField },
+            context.RequestAborted);
     }
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Unhandled internal server error occurred.")]

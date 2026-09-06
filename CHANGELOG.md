@@ -6,6 +6,58 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-05
+
+### Added
+
+- Adiciona o botão de fechar nos diálogos quando a tela é estreita: a faixa em volta deles é curta demais para fechar por toque, e alargá-la deixaria o diálogo apertado. No desktop nada muda (#277) [Frontend]
+- Adiciona a marcação da tela atual no topo e no menu lateral, que antes não indicavam onde a pessoa estava; a marca também é anunciada por leitor de tela (#281) [Frontend]
+- Adiciona o encerramento de sessão na API, que invalida o token no servidor em vez de apenas descartá-lo no navegador: depois de sair, nenhum token daquela pessoa é aceito, em qualquer aparelho (#298) [Backend]
+- Adiciona Denúncias à navegação e ao menu, e faz perfil, denúncias e notificações abrirem uma tela avisando que a área ainda não está disponível, com a volta ao menu — antes os três endereços caíam na página inicial (#300) [Frontend]
+- Adiciona o menu da conta no avatar do topo, com o caminho para perfil, para preferências e a saída de sessão — que até aqui não existia em lugar nenhum da área logada; sair invalida o token no servidor, leva à página inicial, e encerra a sessão do mesmo jeito quando a chamada falha (#302) [Frontend]
+- Adiciona a campainha de notificações no topo da área logada, com o painel ancorado nela e o caminho para a central; sem notificação ainda, ele mostra o estado vazio, que é o único que existe até a API passar a emiti-las (#307) [Frontend]
+
+### Changed
+
+- Passa a pedir a data por digitação, com o calendário atrás de um botão, na busca de caronas, no mural de achados e perdidos e nos dois formulários; o campo ganha a mesma borda e o mesmo espaçamento dos campos ao lado, dos quais destoava (#274) [Frontend]
+- Reduz a altura do rodapé no desktop, que ocupava espaço demais e empurrava o conteúdo para cima (#282) [Frontend]
+- Passa a recusar cadastro cujo telefone ou e-mail de contato já pertença a outra pessoa, com o mesmo 409 que o e-mail de login já respondia; a unicidade passa a valer também no banco, e para isso os cadastros que repetiam um contato são apagados junto com as caronas que ofertaram, ficando o mais antigo (#284) [Backend]
+- Passa a dizer qual campo está em uso na resposta de conflito do cadastro, que antes trazia só a mensagem (#284) [Backend]
+- Passa a exigir 18 anos completos no cadastro também na API, que aceitava conta de menor de idade em requisição feita fora do formulário; quem completa 18 anos no dia é aceito (#285) [Backend]
+- Passa a distribuir os campos da conta em dois por linha no cadastro — nascimento com gênero, e-mail com senha —, em vez de três (#287) [Frontend]
+- Passa a recusar os tokens emitidos antes desta versão, que não carregam a versão de sessão e por isso não podem ser invalidados; quem estiver com a sessão aberta no momento da publicação entra de novo, uma vez (#298) [Backend]
+- Clareia o texto de marca e os blocos de carregamento no tema escuro, que ganham contraste contra o fundo (#297) [Frontend]
+- Move a preferência de tema do topo da área logada para uma tela própria, em Preferências, alcançada pelo menu; na página inicial o botão continua no topo, para quem ainda não entrou (#301) [Frontend]
+- Divide o menu lateral da área logada em seções — serviços e conta —, cada item com o seu ícone e a saída de sessão separada no rodapé; ele passa a levar também a notificações, ao perfil e às preferências, e abaixo do desktop passa a ser o único caminho para a conta, com o avatar saindo do topo onde o botão de menu aparece (#306) [Frontend]
+- Renomeia para `Excluir` a ação que remove item e carona, antes chamada `Cancelar` e lida como desistir da operação em vez de destruir o registro; a confirmação, os avisos, a etiqueta e o filtro acompanham, o botão que dispensa o diálogo volta a ser `Cancelar`, e recuperar um item excluído passa a ser `Restaurar`. A nota do item excluído passa a distinguir a exclusão manual da automática por inatividade, e deixa de existir quando o motivo não vem — antes ela repetia a palavra da etiqueta ao lado (#314) [Frontend]
+- Junta data e hora da carona num campo só, digitado com máscara e com um painel que a aplicação desenha, mostrando o dia e a hora um passo por vez com o valor escolhido no topo: o campo de hora usava o seletor do navegador, que saía claro sobre o diálogo escuro e com moldura que não é a dos nossos campos. O formulário passa a recusar a partida escrita pela metade, que antes seguia com a data vazia (#316) [Frontend]
+- Troca o ícone da aplicação pelo símbolo da marca e o leva também para o logo do topo, ao lado da palavra, com a inicial de `Connect` na cor da marca; na aba escura do navegador a roda do símbolo clareia, porque no tom original ela sumia contra o fundo da aba (#319) [Frontend]
+
+### Fixed
+
+- Corrige o mural de achados e perdidos, que trocava a tela inteira por um aviso de erro quando a situação de um item não vinha; agora o item aparece com a situação vazia (#280) [Frontend]
+- Corrige a data que a busca recebia enquanto ainda se digitava: com o ano pela metade, `25/12/20` valia como o ano 20 e era enviada assim (#274) [Frontend]
+- Corrige o indicador de carregamento dos botões, que girava num cinza escuro em vez da cor do texto do próprio botão — sobre o botão preenchido ele mal se distinguia do fundo (#275) [Frontend]
+- Aumenta os ícones de ação dos cartões das duas listas, pequenos demais ao lado da etiqueta de situação (#276) [Frontend]
+- Corrige o cartão de entrar da página inicial, que era estreito demais para o e-mail institucional completo e o cortava dentro do campo — e é o único formato de e-mail que a tela aceita (#278) [Frontend]
+- Corrige a explicação do tipo de carona, inalcançável no celular: ela abria só ao passar o ponteiro, e agora abre ao toque, num alvo grande o bastante e sem levar o foco para o campo (#279) [Frontend]
+- Corrige o espaçamento dos botões dentro dos campos — o do calendário e o do relógio —, que ficavam mais para dentro que a seta dos campos de seleção ao lado (#279) [Frontend]
+- Corrige os controles que o navegador desenha por conta — como a listinha do campo de hora dos filtros —, que saíam sempre no claro por mais escuro que o tema estivesse (#316) [Frontend]
+- Corrige o logo dentro do menu lateral, que navegava e deixava o menu aberto por cima da tela nova (#281) [Frontend]
+- Corrige o realce de passar o ponteiro no topo e no menu lateral: no topo ele não chegava a aparecer, e no menu clareava tanto que apagava o próprio rótulo (#281) [Frontend]
+- Corrige a recusa de cadastro sem data de nascimento, que respondia em inglês enquanto os outros erros da API já vinham em português (#285) [Backend]
+- Corrige o erro de cadastro já em uso, que avisava sempre sobre o e-mail mesmo quando o repetido era o telefone; agora ele aparece embaixo do campo certo, que recebe o foco (#287) [Frontend]
+- Corrige o atraso ao sair da conta: a sessão só era encerrada depois da resposta do servidor, então o clique ficava esperando a rede; agora ela sai no clique e a invalidação segue por trás (#304) [Frontend]
+- Corrige a cor do campo preenchido pelo autocompletar no tema escuro, que o navegador pintava de azul e destoava do resto da tela; o tema claro segue como estava (#305) [Frontend]
+- Corrige a oferta de carona, que aceitava data e hora já passadas e deixava a recusa para a API: o formulário passa a recusar no próprio campo, no mesmo fuso em que a API valida, e o calendário não oferece mais dia anterior a hoje (#312) [Frontend]
+- Corrige o cadastro, que aceitava texto acima do limite da API em sete campos e recebia de volta um erro que não dizia qual deles reprovou; cada campo passa a avisar o máximo que aceita (#312) [Frontend]
+- Corrige o campo preenchido pelo navegador, que saía em dois tons quando tem botão dentro dele: a faixa atrás do olho da senha ficava com o branco do cartão enquanto o resto do campo era pintado. No tema escuro já estava correto (#319) [Frontend]
+
+### Removed
+
+- Remove o apelido do cadastro: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A coluna é apagada, então o apelido de quem já se cadastrou se perde (#283) [Backend]
+- Remove o campo de apelido do formulário de cadastro, que era opcional e não aparecia em nenhuma tela (#287) [Frontend]
+
 ## [0.7.0] - 2026-08-31
 
 ### Changed

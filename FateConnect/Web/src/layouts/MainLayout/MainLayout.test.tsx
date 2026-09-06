@@ -2,12 +2,19 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
-import { render, screen, userEvent, within } from '@app/test/testing-library';
+import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
+import { TRIGGER_LABEL as ACCOUNT_TRIGGER_LABEL } from './components/AccountMenu/constants';
+import { SIGN_OUT_LABEL } from './components/DrawerSignOut/constants';
+import { TRIGGER_LABEL as NOTIFICATIONS_TRIGGER_LABEL } from './components/NotificationsMenu/constants';
+import * as C from './components/DrawerNavigation/constants';
 import { MainLayout } from '.';
 
-function renderLayout() {
+/** O botão de menu, a campainha e o gatilho do menu da conta. */
+const HEADER_BUTTONS = 3;
+
+function renderLayout(initialEntry: RoutePathEnum = RoutePathEnum.MENU) {
   const router = createMemoryRouter(
     [
       {
@@ -15,18 +22,20 @@ function renderLayout() {
         children: [
           { path: RoutePathEnum.MENU, element: <div>menu</div> },
           { path: RoutePathEnum.RIDES, element: <div>caronas</div> },
+          { path: RoutePathEnum.DENUNCIATIONS, element: <div>denúncias</div> },
         ],
       },
     ],
-    { initialEntries: [RoutePathEnum.MENU] },
+    { initialEntries: [initialEntry] },
   );
   render(<RouterProvider router={router} />);
 
   return router;
 }
 
-// O botão de menu só aparece abaixo de 768px, por CSS. O jsdom não avalia media
-// query, então ele fica com `display: none` e precisa ser buscado com `hidden`.
+// O botão de menu aparece abaixo do desktop e o gatilho da conta, acima — os dois
+// por CSS, na mesma consulta. O jsdom não avalia media query, então valem os
+// estados base: o botão nasce com `display: none` e precisa de `hidden`.
 describe('MainLayout', () => {
   it('should render the logged header and the footer around the routed content', () => {
     renderLayout();
@@ -59,12 +68,86 @@ describe('MainLayout', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
+  // É a contagem que denuncia o alternador voltando ao topo; buscar pelo rótulo
+  // dele passaria se ele voltasse com outro nome.
+  it('should leave the theme toggle out of the header', () => {
+    tokenStorage.save(tokenWithName('Maria da Silva'));
+    renderLayout();
+
+    const header = within(screen.getByRole('banner'));
+
+    expect(header.getAllByRole('button', { hidden: true })).toHaveLength(HEADER_BUTTONS);
+    expect(header.getByRole('button', { name: 'Abrir menu', hidden: true })).toBeInTheDocument();
+    expect(header.getByRole('button', { name: NOTIFICATIONS_TRIGGER_LABEL })).toBeInTheDocument();
+    expect(header.getByRole('button', { name: ACCOUNT_TRIGGER_LABEL })).toBeInTheDocument();
+  });
+
   it('should point the logo to the menu', () => {
     renderLayout();
 
     expect(screen.getAllByRole('link', { name: 'FateConnect' })[0]).toHaveAttribute(
       'href',
       RoutePathEnum.MENU,
+    );
+  });
+
+  it('should navigate and close the drawer when the logo inside it is used', async () => {
+    const router = renderLayout(RoutePathEnum.RIDES);
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menu', hidden: true }));
+
+    const drawer = screen.getByRole('presentation');
+    await userEvent.click(within(drawer).getByRole('link', { name: 'FateConnect' }));
+
+    expect(router.state.location.pathname).toBe(RoutePathEnum.MENU);
+    await waitFor(() => expect(screen.queryByRole('presentation')).not.toBeInTheDocument());
+  });
+
+  it('should mark the current screen in the header and in the drawer', async () => {
+    renderLayout(RoutePathEnum.RIDES);
+
+    expect(screen.getByRole('link', { name: 'Caronas' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Achados & Perdidos' })).not.toHaveAttribute(
+      'aria-current',
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menu', hidden: true }));
+    const drawer = screen.getByRole('presentation');
+
+    expect(within(drawer).getByRole('link', { name: 'Caronas' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(within(drawer).getByRole('link', { name: 'Achados & Perdidos' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
+  it('should split the drawer into labelled sections, with the sign out apart', async () => {
+    renderLayout();
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menu', hidden: true }));
+
+    const drawer = within(screen.getByRole('presentation'));
+
+    [C.SERVICES_LABEL, C.ACCOUNT_LABEL].forEach((label) => {
+      expect(drawer.getByRole('heading', { name: label })).toBeInTheDocument();
+    });
+    expect(drawer.getByRole('button', { name: SIGN_OUT_LABEL })).toBeInTheDocument();
+    drawer.getAllByRole('list').forEach((list) => {
+      expect(within(list).queryByRole('button', { name: SIGN_OUT_LABEL })).not.toBeInTheDocument();
+    });
+  });
+
+  it('should carry the denunciations entry in the header and in the drawer', async () => {
+    renderLayout(RoutePathEnum.DENUNCIATIONS);
+
+    expect(screen.getByRole('link', { name: 'Denúncias' })).toHaveAttribute('aria-current', 'page');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menu', hidden: true }));
+    const drawer = screen.getByRole('presentation');
+
+    expect(within(drawer).getByRole('link', { name: 'Denúncias' })).toHaveAttribute(
+      'aria-current',
+      'page',
     );
   });
 });

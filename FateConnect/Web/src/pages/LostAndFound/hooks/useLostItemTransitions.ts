@@ -3,9 +3,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useNotification } from '@app/hooks/useNotification';
 import {
-  cancelLostItem,
-  reopenLostItem,
+  deleteLostItem,
   resolveLostItem,
+  restoreLostItem,
 } from '@app/services/lostAndFound/lostAndFoundService';
 import type { LostItem } from '@app/services/lostAndFound/types';
 
@@ -13,8 +13,8 @@ import * as C from '../constants';
 
 type LostItemTransitions = {
   resolveItem: (item: LostItem) => void;
-  cancelItem: (item: LostItem) => void;
-  reopenItem: (item: LostItem) => void;
+  deleteItem: (item: LostItem) => void;
+  restoreItem: (item: LostItem) => void;
   isTransitioning: boolean;
 };
 
@@ -37,28 +37,28 @@ export function useLostItemTransitions(): LostItemTransitions {
     meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.resolveFailed },
   });
 
-  const { mutate: cancelItem, isPending: isCancelling } = useMutation({
-    mutationFn: (item: LostItem) => cancelLostItem(item.id),
+  const { mutate: deleteItem, isPending: isDeleting } = useMutation({
+    mutationFn: (item: LostItem) => deleteLostItem(item.id),
     onSuccess: async () => {
-      notifySuccess(C.LOST_ITEM_LIST_MESSAGES.cancelSucceeded);
+      notifySuccess(C.LOST_ITEM_LIST_MESSAGES.deleteSucceeded);
       await invalidateList();
     },
-    meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.cancelFailed },
+    meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.deleteFailed },
   });
 
-  const { mutate: reopenItem, isPending: isReopening } = useMutation({
-    mutationFn: (item: LostItem) => reopenLostItem(item.id),
+  const { mutate: restoreItem, isPending: isRestoring } = useMutation({
+    mutationFn: (item: LostItem) => restoreLostItem(item.id),
     onSuccess: async () => {
-      notifySuccess(C.LOST_ITEM_LIST_MESSAGES.reopenSucceeded);
+      notifySuccess(C.LOST_ITEM_LIST_MESSAGES.restoreSucceeded);
       await invalidateList();
     },
-    meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.reopenFailed },
+    meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.restoreFailed },
   });
 
   return {
     resolveItem,
-    cancelItem,
-    reopenItem,
-    isTransitioning: isResolving || isCancelling || isReopening,
+    deleteItem,
+    restoreItem,
+    isTransitioning: isResolving || isDeleting || isRestoring,
   };
 }

@@ -5,14 +5,14 @@ import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { spacingScale } from '@ds-root/tokens';
 
-const { xs, md, lg, xxl, giant } = spacingScale;
+const { xs, md, lg, giant } = spacingScale;
 
 export const FooterRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   backgroundColor: theme.palette.chrome.main,
   color: theme.palette.chrome.contrastText,
-  padding: theme.space(xxl, giant),
+  padding: theme.space(lg, giant),
   gap: theme.space(md),
   width: '100%',
 

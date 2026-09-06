@@ -51,6 +51,31 @@ if (!int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId))
 
 ⚠️ **Condição que já se lê não ganha linha.** `if (ride is null)` e `if (!isValidUserId)` ficam como estão — a regra é sobre expressão que esconde o teste, não sobre proibir condição no `if`.
 
+⛔ **Nomear metade da disjunção não cumpre esta regra — cumpre pela metade.** É o caso mais difícil de enxergar, porque o nome que já está ali faz o `if` parecer revisado.
+
+⛔ Cobrado no review do PR #284, no `EnsureContactsAreUniqueAsync`: o primeiro operando tinha nome e o segundo entrava cru.
+
+```csharp
+bool phoneRepeatedInRequest = !phonesInRequest.Add(dto.Phone);
+
+if (phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.Phone))
+    throw new ContactPhoneAlreadyRegisteredException(dto.Phone);
+```
+
+O que ficou:
+
+```csharp
+bool phoneRepeatedInRequest = !phonesInRequest.Add(dto.Phone);
+bool phoneIsTaken = phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.Phone);
+
+if (phoneIsTaken)
+    throw new ContactPhoneAlreadyRegisteredException(dto.Phone);
+```
+
+**O nome cobre os dois operandos, não o mais fácil.** `phoneIsTaken` diz *este telefone não está disponível*; `phoneAlreadyRegistered` seria falso para metade da disjunção, porque contato repetido dentro da própria requisição ainda não está registrado em lugar nenhum. É a mesma exigência do `HasNotDeparted`, mais abaixo. E são **duas** variáveis de propósito: `phonesInRequest.Add` muda o conjunto, e colapsar as duas enterraria essa mutação dentro de uma condição.
+
+⚠️ **Subir o `||` para a atribuição não gasta consulta a mais.** O curto-circuito é do operador, não do `if`: o segundo operando segue avaliado só quando o primeiro é falso. Sem isso dito, a mudança parece trocar legibilidade por uma ida ao banco.
+
 ## Rename atinge mais do que o identificador alvo
 
 ⛔ **Substituição em lote acerta o que você não pediu, e nenhum gate reclama.** Depois de qualquer rename mecânico, procure separadamente as três formas de estrago — todas pagas na #222, todas com a build verde:
@@ -66,7 +91,7 @@ if (!int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId))
 **O detector precisa ser o certo, senão ninguém o usa duas vezes.** Procurar o termo "colado a letra dos dois lados" devolve dezenas de camelCase legítimo (`isZipCodeFilled`, `mappedAddresses`); procurar o termo **seguido** de minúscula acusa todo plural (`Users`, `Addresses`). O que discrimina é **termo minúsculo precedido de letra minúscula** — fronteira que camelCase nunca produz.
 
 ```bash
-git diff <base>..HEAD | grep -E "^\+" | grep -oE '"[^"]*<termo-novo>[^"]*"'   # dentro de aspas
+rtk proxy git diff <base>..HEAD | grep -E "^\+" | grep -oE '"[^"]*<termo-novo>[^"]*"'   # dentro de aspas
 ```
 
 ## A rota do controller vem do nome da classe

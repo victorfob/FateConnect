@@ -71,6 +71,14 @@ A regra é **uma mudança lógica por commit** — não um commit por arquivo, n
 
 Sinal de divisão excessiva: dois commits seguidos tocando **o mesmo arquivo** pelo **mesmo motivo**. Hook e CI são assuntos diferentes (um roda na máquina, outro no servidor) — filtro e recorte *dentro* do CI, não.
 
+### Reescrever a história: os blocos saem do diff final, não dos commits antigos
+
+⛔ **Ao refazer a história de uma branch, derive os commits do diff contra a base — nunca da lista de commits que existia.** Os limites antigos guardam a **ordem em que o trabalho aconteceu**, incluindo o vaivém do review que a reescrita existe justamente para apagar. Reaproveitá-los reproduz a divisão errada com mensagens novas.
+
+Aconteceu em 04/09/2026, na #296. A branch tinha 7 commits e eu propus 8 — um por bloco antigo, mais o novo. O Victor perguntou *"não tem como reduzir a quantidade de commits?"*, e a releitura mostrou que **quatro** contavam o mesmo assunto: expor o `ListItem`, montar as seções, criar o `Sair` e ligar tudo na casca não se revertem um sem o outro. Viraram um, e a branch fechou em 4.
+
+**O sinal é a contagem não cair.** Reescrita que sai com tantos commits quantos entraram não reagrupou nada — só renomeou.
+
 ### Quando as mudanças se sobrepõem nos mesmos arquivos
 
 Lote de mudanças mecânicas (rename, `Readonly`, namespace de import) costuma tocar os **mesmos arquivos**. Reconstruir "como o arquivo estava depois do commit 3" à mão é lento e erra em silêncio. Em vez disso, **replay**:
@@ -83,3 +91,11 @@ Lote de mudanças mecânicas (rename, `Readonly`, namespace de import) costuma t
 ⚠️ **Reaplique o script da transformação; não copie o arquivo pronto do snapshot** — o arquivo pronto traz junto as outras transformações. Aconteceu no PR #77: o commit da navegação levou o rename de enum e teve que ser refeito reconstruindo o trecho a partir de `git show HEAD:<arquivo>`.
 
 ⚠️ **Antes do primeiro commit, conferir que o índice está limpo** (`git diff --cached --stat` vazio). Índice sujo faz o primeiro commit engolir o lote inteiro — aconteceu no PR #76.
+
+### O commit do meio não exibe palavra que não é nem a antiga nem a final
+
+⛔ **Ao dividir um rename em dois commits, confira o que cada um mostra na tela.** Quem revisa lê commit a commit, e um estado intermediário que não é o produto de antes nem o de depois se lê como sobra.
+
+Na #310 o corte foi "contrato para inglês" e depois "rename da copy", nessa ordem, para que nenhum commit escrevesse inglês na barra de endereço. O efeito colateral: no primeiro, o `STATUS_SLUG` dizia `cancelado` enquanto o PR inteiro era sobre `excluido`. O Victor apontou **duas vezes** achando que era resíduo.
+
+**A ordem que evita isso põe o visível primeiro:** o commit da copy já mostra a palavra final, e o do contrato, depois dele, não toca em rótulo nem em URL. Escolhendo a outra ordem, diga no corpo do PR o que o commit do meio exibe — e conte com a pergunta assim mesmo.

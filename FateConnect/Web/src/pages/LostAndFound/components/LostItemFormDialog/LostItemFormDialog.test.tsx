@@ -2,6 +2,7 @@ import { format } from 'date-fns';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
+import { lostItemKindLabel } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import {
   LostItemKindEnum,
   LostItemStatusEnum,
@@ -30,16 +31,16 @@ const TYPED_DATE = format(OCCURRED_AT, 'ddMMyyyy');
 
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
-  nome: 'Carteira preta',
-  tipo: LostItemKindEnum.LOST,
-  local: 'Biblioteca',
-  dataOcorrido: '2026-08-11T00:00:00',
-  descricao: 'Carteira de couro preta com documentos.',
-  fotoUrl: null,
-  situacao: LostItemStatusEnum.OPEN,
-  motivoCancelamento: null,
-  meuItem: true,
-  dataCadastro: '2026-08-12T00:00:00',
+  name: 'Carteira preta',
+  type: LostItemKindEnum.LOST,
+  place: 'Biblioteca',
+  occurredOn: '2026-08-11T00:00:00',
+  description: 'Carteira de couro preta com documentos.',
+  photoUrl: null,
+  status: LostItemStatusEnum.OPEN,
+  deletionReason: null,
+  isMine: true,
+  createdAt: '2026-08-12T00:00:00',
 };
 
 const onClose = vi.fn();
@@ -84,13 +85,13 @@ describe('LostItemFormDialog', () => {
 
     expect(await screen.findByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: EDIT_MODE.submitLabel })).toBeInTheDocument();
-    expect(nameField()).toHaveValue(LOST_ITEM.nome);
+    expect(nameField()).toHaveValue(LOST_ITEM.name);
     expect(
       screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.place) }),
-    ).toHaveValue(LOST_ITEM.local);
+    ).toHaveValue(LOST_ITEM.place);
     expect(
       screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.description) }),
-    ).toHaveValue(LOST_ITEM.descricao);
+    ).toHaveValue(LOST_ITEM.description);
   });
 
   it('should refuse to submit an empty form and say what is missing', async () => {
@@ -126,11 +127,11 @@ describe('LostItemFormDialog', () => {
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
-      nome: LOST_ITEM.nome,
-      tipo: LOST_ITEM.tipo,
-      local: LOST_ITEM.local,
-      dataOcorrido: '2026-08-11',
-      descricao: LOST_ITEM.descricao,
+      name: LOST_ITEM.name,
+      type: LOST_ITEM.type,
+      place: LOST_ITEM.place,
+      occurredOn: '2026-08-11',
+      description: LOST_ITEM.description,
     });
   });
 
@@ -145,7 +146,7 @@ describe('LostItemFormDialog', () => {
 
     expect(await screen.findByText(EDIT_MODE.failed)).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
-    expect(nameField()).toHaveValue(LOST_ITEM.nome);
+    expect(nameField()).toHaveValue(LOST_ITEM.name);
   });
 
   it('should register the item the form describes', async () => {
@@ -163,25 +164,27 @@ describe('LostItemFormDialog', () => {
     await userEvent.click(
       screen.getByRole('combobox', { name: new RegExp(LOST_ITEM_FORM_LABELS.kind) }),
     );
-    await userEvent.click(await screen.findByRole('option', { name: LostItemKindEnum.FOUND }));
+    await userEvent.click(
+      await screen.findByRole('option', { name: lostItemKindLabel(LostItemKindEnum.FOUND) }),
+    );
     await userEvent.type(
       screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.place) }),
       'Bloco C',
     );
-    await userEvent.click(
-      screen.getByRole('group', { name: new RegExp(LOST_ITEM_FORM_LABELS.occurredOn) }),
+    await userEvent.type(
+      screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.occurredOn) }),
+      TYPED_DATE,
     );
-    await userEvent.keyboard(TYPED_DATE);
 
     await userEvent.click(screen.getByRole('button', { name: REGISTER_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
-      nome: 'Garrafa térmica',
-      tipo: LostItemKindEnum.FOUND,
-      local: 'Bloco C',
-      dataOcorrido: toApiDate(OCCURRED_AT),
-      descricao: '',
+      name: 'Garrafa térmica',
+      type: LostItemKindEnum.FOUND,
+      place: 'Bloco C',
+      occurredOn: toApiDate(OCCURRED_AT),
+      description: '',
     });
   });
 

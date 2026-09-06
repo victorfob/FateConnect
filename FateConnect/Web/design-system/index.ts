@@ -10,6 +10,8 @@ export * from './ui';
 export { styled, css, keyframes, darken, lighten, alpha } from './styled';
 export { PolymorphicBox, PolymorphicStack } from './polymorphic';
 
+export { AnchoredPopover } from './components/AnchoredPopover';
+export type { AnchoredPopoverProps } from './components/AnchoredPopover';
 export { Header } from './components/Header';
 export { HEADER_HEIGHT_PX } from './components/Header/styles';
 export { Footer } from './components/Footer';
@@ -43,6 +45,9 @@ export type { DialogProps } from './components/Dialog';
 export { ThemeProvider } from './ThemeProvider';
 export { DateLocalizationProvider } from './DateLocalizationProvider';
 export { useThemeMode } from './ThemeProvider/context/ThemeModeContext';
-export { ThemeToggleButton } from './components/ThemeToggleButton';
+export type { ThemeMode } from './theme';
 export { GlobalStyles } from './GlobalStyles';
 export { spacingScale, radiusScale, shadowTokens, iconSizeTokens } from './tokens';
+
+export { caretAfterDigitCount, countDigits, onlyDigits } from './utils/text';
+export { DATE_PICKER_LABEL, DATE_TIME_PICKER_LABEL } from './components/Input/constants';

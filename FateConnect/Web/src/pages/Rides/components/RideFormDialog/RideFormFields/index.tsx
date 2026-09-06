@@ -1,7 +1,7 @@
+import { useMemo } from 'react';
 import { Input } from '@design-system';
+import { toZonedTime } from 'date-fns-tz';
 import { Controller, useFormContext } from 'react-hook-form';
-
-import { fromFormDate, toFormDate } from '@app/utils/apiDate';
 
 import type { RideFormInput, RideFormValues } from '../schema';
 import * as C from '../constants';
@@ -13,6 +13,9 @@ export function RideFormFields() {
     register,
     formState: { errors },
   } = useFormContext<RideFormInput, unknown, RideFormValues>();
+  // No fuso do produto, e não no de quem preenche: a leste daqui o dia já virou,
+  // e o calendário desabilitaria uma partida que a API ainda aceita.
+  const today = useMemo(() => toZonedTime(new Date(), C.PRODUCT_TIME_ZONE), []);
 
   return (
     <S.FieldsGrid>
@@ -26,29 +29,21 @@ export function RideFormFields() {
       />
 
       <Controller
-        name="departureDate"
+        name="departure"
         control={control}
         render={({ field }) => (
-          <Input.Date
+          <Input.DateTime
             name={field.name}
-            label={C.RIDE_FORM_LABELS.departureDate}
+            label={C.RIDE_FORM_LABELS.departure}
             required
-            value={fromFormDate(field.value)}
-            onChange={(date) => field.onChange(toFormDate(date))}
+            value={field.value}
+            onChange={field.onChange}
             onBlur={field.onBlur}
             disabled={field.disabled}
-            error={errors.departureDate?.message}
+            minDate={today}
+            error={errors.departure?.message}
           />
         )}
-      />
-
-      <Input
-        {...register('departureTime')}
-        type="time"
-        label={C.RIDE_FORM_LABELS.departureTime}
-        required
-        fullWidth
-        error={errors.departureTime?.message}
       />
 
       <Controller

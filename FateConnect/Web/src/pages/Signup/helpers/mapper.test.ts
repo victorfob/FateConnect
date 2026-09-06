@@ -5,7 +5,6 @@ import { toSignupRequest } from './mapper';
 const FILLED: SignupFormValues = {
   ...SIGNUP_DEFAULT_VALUES,
   fullName: 'Maria Silva',
-  nickname: 'Mari',
   fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
   password: 'segredo123',
   birthDate: '22/05/1999',
@@ -26,17 +25,9 @@ describe('toSignupRequest', () => {
     const request = toSignupRequest(FILLED);
 
     expect(request.fullName).toBe('Maria Silva');
-    expect(request.nickname).toBe('Mari');
     expect(request.fatecEmail).toBe('maria.silva@aluno.cps.sp.gov.br');
     expect(request.birthDate).toContain('1999-05-22');
     expect(request.gender).toBe(GenderValueEnum.FEMALE);
-  });
-
-  // O backend prefere a ausência da chave a uma string vazia.
-  it('should omit the optional nickname instead of sending it empty', () => {
-    const request = toSignupRequest({ ...FILLED, nickname: '' });
-
-    expect(request.nickname).toBeUndefined();
   });
 
   // A API documenta o CEP com o hífen e o telefone só com dígitos.

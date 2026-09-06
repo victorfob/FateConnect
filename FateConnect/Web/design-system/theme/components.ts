@@ -4,6 +4,9 @@ import { radiusScale, shadowTokens, spacingScale, typographyTokens } from '../to
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
 
+/** Fundo suficiente para cobrir o campo inteiro, de qualquer altura. */
+const AUTOFILL_COVER_PX = 100;
+
 const { none, xxs, xs, md } = spacingScale;
 
 const SELECT_OPTION_MIN_HEIGHT_PX = 48;
@@ -51,6 +54,18 @@ export const components: Components<Theme> = {
 
         return { ...veil, '&:hover': { backgroundColor: theme.palette[ownerState.color].main } };
       },
+      // Herdar do botão não pinta o indicador: no carregamento centrado o MUI
+      // deixa o rótulo `transparent`, então a cor do texto é nomeada de novo aqui.
+      loadingIndicator: ({ theme, ownerState }) => {
+        const { color, variant } = ownerState;
+
+        if (variant === 'soft') return { color: theme.palette.text.primary };
+        // `color="inherit"` recebe a cor de quem envolve o botão, que este slot não lê.
+        if (!color || color === 'inherit') return {};
+        if (variant === 'contained') return { color: theme.palette[color].contrastText };
+
+        return { color: theme.palette[color].main };
+      },
     },
     variants: [
       {
@@ -73,8 +88,32 @@ export const components: Components<Theme> = {
     styleOverrides: {
       // O raio de 10px vale para cartão, diálogo e botão — não para o campo, que
       // no produto usa o raio padrão do Material.
-      root: { borderRadius: radius(radiusScale.sm) },
+      root: ({ theme }) => ({
+        borderRadius: radius(radiusScale.sm),
+        // A sombra abaixo alcança só o `input`, e o campo com adorno é mais
+        // largo que ele: sem isto a faixa atrás do botão fica com a cor do
+        // cartão e o campo sai em dois tons.
+        '&:has(input:-webkit-autofill)': { backgroundColor: theme.palette.inputAutofill },
+      }),
       notchedOutline: ({ theme }) => ({ borderColor: theme.palette.inputOutline }),
+      // O navegador pinta o campo preenchido pela folha dele, e `background-color`
+      // não vence: o fundo se cobre com sombra interna, e o glifo e o cursor têm
+      // chaves próprias. Cada estado repete a regra porque o Chrome repinta a
+      // cada hover e foco.
+      input: ({ theme }) => {
+        const filled: CSSObject = {
+          boxShadow: `inset 0 0 0 ${AUTOFILL_COVER_PX}px ${theme.palette.inputAutofill}`,
+          WebkitTextFillColor: theme.palette.text.primary,
+          caretColor: theme.palette.text.primary,
+        };
+
+        return {
+          '&:-webkit-autofill': filled,
+          '&:-webkit-autofill:hover': filled,
+          '&:-webkit-autofill:focus': filled,
+          '&:-webkit-autofill:active': filled,
+        };
+      },
     },
   },
   MuiFormHelperText: {

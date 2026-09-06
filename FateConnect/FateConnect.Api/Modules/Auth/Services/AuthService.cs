@@ -32,6 +32,11 @@ public class AuthService : IAuthService
         return new TokenResponseDto { Token = generatedToken };
     }
 
+    public async Task LogoutAsync(int userId)
+    {
+        await _userRepository.IncrementTokenVersionAsync(userId);
+    }
+
     private static bool AreCredentialsInvalid(User? user, string providedPassword)
     {
         if (user == null)

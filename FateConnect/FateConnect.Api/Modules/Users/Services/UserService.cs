@@ -24,6 +24,7 @@ public class UserService : IUserService
     public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto)
     {
         await EnsureEmailIsUniqueAsync(dto.FatecEmail);
+        await EnsureContactsAreUniqueAsync(dto.Contacts);
 
         User newUser = BuildUser(dto);
 
@@ -42,6 +43,27 @@ public class UserService : IUserService
             throw new EmailAlreadyRegisteredException(email);
     }
 
+    private async Task EnsureContactsAreUniqueAsync(List<CreateContactDto> dtos)
+    {
+        HashSet<string> phonesInRequest = [];
+        HashSet<string> emailsInRequest = [];
+
+        foreach (CreateContactDto dto in dtos)
+        {
+            bool phoneRepeatedInRequest = !phonesInRequest.Add(dto.Phone);
+            bool phoneIsTaken = phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.Phone);
+
+            if (phoneIsTaken)
+                throw new ContactPhoneAlreadyRegisteredException(dto.Phone);
+
+            bool emailRepeatedInRequest = !emailsInRequest.Add(dto.ContactEmail);
+            bool emailIsTaken = emailRepeatedInRequest || await _userRepository.ContactEmailExistsAsync(dto.ContactEmail);
+
+            if (emailIsTaken)
+                throw new ContactEmailAlreadyRegisteredException(dto.ContactEmail);
+        }
+    }
+
     private static User BuildUser(CreateUserDto dto)
     {
         string hashedPassword = HashPassword(dto.Password);
@@ -53,7 +75,6 @@ public class UserService : IUserService
         {
             FatecEmail = dto.FatecEmail,
             FullName = dto.FullName,
-            Nickname = dto.Nickname,
             BirthDate = dto.BirthDate,
             Gender = dto.Gender,
             Password = hashedPassword,

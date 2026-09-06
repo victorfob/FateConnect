@@ -10,17 +10,17 @@ import * as C from '../constants';
 type LostItemOwnerActionsProps = Readonly<{
   item: LostItem;
   onEdit?: (item: LostItem) => void;
-  onCancel: (item: LostItem) => void;
+  onDelete: (item: LostItem) => void;
 }>;
 
-export function LostItemOwnerActions({ item, onEdit, onCancel }: LostItemOwnerActionsProps) {
+export function LostItemOwnerActions({ item, onEdit, onDelete }: LostItemOwnerActionsProps) {
   const handleEdit = useCallback(() => onEdit?.(item), [onEdit, item]);
-  const handleCancel = useCallback(() => onCancel(item), [onCancel, item]);
+  const handleDelete = useCallback(() => onDelete(item), [onDelete, item]);
 
-  if (!item.meuItem) return null;
+  if (!item.isMine) return null;
 
-  // Vale para concluído, para cancelado e para o que a API venha a inventar.
-  if (item.situacao !== LostItemStatusEnum.OPEN) return null;
+  // Vale para resolvido, para excluído e para o que a API venha a inventar.
+  if (item.status !== LostItemStatusEnum.OPEN) return null;
 
   return (
     <>
@@ -29,14 +29,14 @@ export function LostItemOwnerActions({ item, onEdit, onCancel }: LostItemOwnerAc
       </IconButton>
 
       <LostItemConfirmAction
-        label={C.LOST_ITEM_ACTION_LABELS.cancel}
+        label={C.LOST_ITEM_ACTION_LABELS.delete}
         icon={<DeleteIcon />}
         iconOnly
-        dialogTitle={C.CANCEL_DIALOG.title}
-        messagePrefix={C.CANCEL_DIALOG.messagePrefix}
-        itemName={item.nome}
-        confirmLabel={C.CANCEL_DIALOG.confirmLabel}
-        onConfirm={handleCancel}
+        dialogTitle={C.DELETE_DIALOG.title}
+        messagePrefix={C.DELETE_DIALOG.messagePrefix}
+        itemName={item.name}
+        confirmLabel={C.DELETE_DIALOG.confirmLabel}
+        onConfirm={handleDelete}
       />
     </>
   );

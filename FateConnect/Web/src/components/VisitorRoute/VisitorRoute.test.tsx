@@ -21,8 +21,6 @@ function renderLanding() {
 }
 
 describe('VisitorRoute', () => {
-  afterEach(() => tokenStorage.clear());
-
   it('should send whoever already has a session to the menu', async () => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
 
