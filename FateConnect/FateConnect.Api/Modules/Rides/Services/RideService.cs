@@ -6,6 +6,7 @@ using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Rides.Interfaces;
 using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Extensions;
 using Microsoft.Extensions.Logging;
 
 public partial class RideService(
@@ -133,15 +134,7 @@ public partial class RideService(
             ride.CreatedAt,
             ride.RideType,
             ride.Description,
-            MapDriverToDto(ride.Driver),
+            ride.Driver.ToContactDto(),
             ride.IsDrivenBy(currentUserId)
         );
-
-    private static UserContactDto MapDriverToDto(User driver)
-    {
-        Contact contact = driver.Contacts.First();
-
-        return new UserContactDto(driver.FullName, contact.ContactEmail, contact.Phone);
-    }
-
 }

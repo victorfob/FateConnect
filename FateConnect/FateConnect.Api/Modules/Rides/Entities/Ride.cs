@@ -1,14 +1,12 @@
 namespace FateConnect.Api.Modules.Rides.Entities;
 
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Entities;
 
 public class Ride
 {
-    private static readonly TimeZoneInfo ProductTimeZone =
-        TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
-
     public Guid Id { get; private set; }
     public int AvailableSeats { get; private set; }
     public string Destination { get; private set; } = default!;
@@ -118,12 +116,9 @@ public class Ride
 
     }
 
-    public static DateTime NowInProductTimeZone() =>
-        TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ProductTimeZone);
-
     private static void ValidateDepartureDateTime(DateOnly date, TimeOnly time)
     {
-        DateTime departureUtc = TimeZoneInfo.ConvertTimeToUtc(date.ToDateTime(time), ProductTimeZone);
+        DateTime departureUtc = TimeZoneInfo.ConvertTimeToUtc(date.ToDateTime(time), DateTimeUtils.ProductTimeZone);
 
         if (departureUtc < DateTime.UtcNow)
             throw new InvalidDepartureScheduleException();

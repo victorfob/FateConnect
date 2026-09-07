@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.Rides.Repositories;
 
 using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Interfaces;
@@ -11,7 +12,7 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
 {
     public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter)
     {
-        DateTime nowInProductTimeZone = Ride.NowInProductTimeZone();
+        DateTime nowInProductTimeZone = DateTimeUtils.NowInProductTimeZone();
         DateOnly today = DateOnly.FromDateTime(nowInProductTimeZone);
         TimeOnly currentTime = TimeOnly.FromDateTime(nowInProductTimeZone);
 

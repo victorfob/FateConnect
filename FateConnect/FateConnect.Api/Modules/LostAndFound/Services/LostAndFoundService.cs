@@ -10,6 +10,7 @@ using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Enums;
 using Microsoft.Extensions.Logging;
+using FateConnect.Api.Modules.Users.Extensions;
 
 public partial class LostAndFoundService(
     ILostAndFoundRepository repository,
@@ -158,15 +159,9 @@ public partial class LostAndFoundService(
             record.OcurredOn,
             record.Description,
             record.ImageUrl,
-            MapUserToContactDto(record.User),
+            record.User.ToContactDto(),
             record.IsReportedBy(currentUserId),
             record.Status,
             record.CreatedAt
         );
-
-    private static UserContactDto MapUserToContactDto(User user)
-    {
-        Contact contact = user.Contacts.First();
-        return new UserContactDto(user.FullName, contact.ContactEmail, contact.Phone);
-    }
 }

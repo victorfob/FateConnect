@@ -1,14 +1,12 @@
 namespace FateConnect.Api.Modules.LostAndFound.Entities;
 
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.Users.Entities;
 
 public class LostAndFoundRecord
 {
-    private static readonly TimeZoneInfo ProductTimeZone =
-        TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
-
     public Guid Id { get; private set; }
     public string Name { get; private set; } = default!;
     public EnumLostAndFoundType LostAndFoundType { get; private set; }
@@ -117,9 +115,6 @@ public class LostAndFoundRecord
 
     public bool IsReportedBy(int userId) => UserId == userId;
 
-    public static DateTime NowInProductTimeZone() =>
-        TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ProductTimeZone);
-
     private static void ValidateUser(int userId)
     {
         if (userId < 1)
@@ -164,7 +159,7 @@ public class LostAndFoundRecord
 
     private static void ValidateOcurredOn(DateOnly date)
     {
-        DateOnly todayInProductTimeZone = DateOnly.FromDateTime(NowInProductTimeZone());
+        DateOnly todayInProductTimeZone = DateOnly.FromDateTime(DateTimeUtils.NowInProductTimeZone());
 
         if (date > todayInProductTimeZone)
             throw new InvalidOccurrenceDateException();
