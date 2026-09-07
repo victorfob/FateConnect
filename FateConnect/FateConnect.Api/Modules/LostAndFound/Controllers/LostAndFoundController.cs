@@ -17,7 +17,7 @@ public class LostAndFoundController(ILostAndFoundService service) : ControllerBa
     {
         var result = await service.CreateAsync(dto, User.GetUserId());
 
-        return CreatedAtAction("GetLostAndFoundById", new { id = result.Id }, result);
+        return CreatedAtRoute("GetLostAndFoundById", new { id = result.Id }, result);
     }
 
     [HttpGet]
