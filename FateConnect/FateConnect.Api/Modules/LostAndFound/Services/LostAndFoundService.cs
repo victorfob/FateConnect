@@ -120,7 +120,7 @@ public partial class LostAndFoundService(
 
         if (record is null)
         {
-            LogRecordDeactivationFailed(logger, id);
+            LogRecordDeletionFailed(logger, id);
             return false;
         }
 
@@ -130,7 +130,7 @@ public partial class LostAndFoundService(
 
         await repository.UpdateAsync(record);
 
-        LogRecordDeactivated(logger, id);
+        LogRecordDeleted(logger, id);
 
         return true;
     }
