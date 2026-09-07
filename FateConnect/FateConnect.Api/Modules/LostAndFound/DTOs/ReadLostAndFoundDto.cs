@@ -14,5 +14,6 @@ public record ReadLostAndFoundDto(
     UserContactDto Contact,
     bool IsOwner,
     EnumStatusLostAndFound Status,
+    EnumDeletionReason? DeletionReason,
     DateTime CreatedAt
 );

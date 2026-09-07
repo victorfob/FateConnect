@@ -131,7 +131,7 @@ public partial class LostAndFoundService(
 
         EnsureRecordIsReportedBy(record, currentUserId);
 
-        record.MarkAsDeleted();
+        record.MarkAsDeleted(EnumDeletionReason.User);
 
         await repository.UpdateAsync(record);
 
@@ -162,6 +162,7 @@ public partial class LostAndFoundService(
             record.User.ToContactDto(),
             record.IsReportedBy(currentUserId),
             record.Status,
+            record.DeletionReason,
             record.CreatedAt
         );
 }

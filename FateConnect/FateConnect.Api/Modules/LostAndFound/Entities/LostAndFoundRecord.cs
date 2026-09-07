@@ -19,6 +19,7 @@ public class LostAndFoundRecord
     public DateTime? UpdatedAt { get; private set; }
     public int UserId { get; private set; }
     public User User { get; private set; } = null!;
+    public EnumDeletionReason? DeletionReason { get; private set; }
 
     private LostAndFoundRecord() { }
 
@@ -104,11 +105,11 @@ public class LostAndFoundRecord
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void MarkAsDeleted()
+    public void MarkAsDeleted(EnumDeletionReason reason)
     {
         Status = EnumStatusLostAndFound.Deleted;
+        DeletionReason = reason;
         UpdatedAt = DateTime.UtcNow;
-
     }
 
     public bool IsReportedBy(int userId) => UserId == userId;
