@@ -25,8 +25,7 @@ public class LostAndFoundRecordConfiguration : IEntityTypeConfiguration<LostAndF
                .IsRequired();
 
         builder.Property(r => r.Description)
-               .HasMaxLength(300)
-               .IsRequired();
+               .HasMaxLength(300);
 
         builder.Property(r => r.ImageUrl)
                .HasMaxLength(500);
