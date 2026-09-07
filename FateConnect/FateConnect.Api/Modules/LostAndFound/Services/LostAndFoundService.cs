@@ -131,11 +131,6 @@ public partial class LostAndFoundService(
         // Nas Caronas apenas mudamos um boolean para inativo e o usuário não consegue ver mais. Por que não fazer a mesma coisa aqui?
         record.MarkAsDeleted();
 
-        if (!string.IsNullOrWhiteSpace(record.ImageUrl))
-        {
-            await storageService.DeleteImageAsync(record.ImageUrl);
-        }
-
         await repository.UpdateAsync(record);
 
         LogRecordDeactivated(logger, id);
