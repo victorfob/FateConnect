@@ -17,8 +17,8 @@ public class LostAndFoundRecord
     public string Description { get; private set; } = default!;
     public string? ImageUrl { get; private set; }
     public EnumStatusLostAndFound Status { get; private set; }
-    public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
     public int UserId { get; private set; }
     public User User { get; private set; } = null!;
 
@@ -52,7 +52,7 @@ public class LostAndFoundRecord
         ImageUrl = imageUrl?.Trim();
         Status = initialStatus;
         CreatedAt = DateTime.UtcNow;
-        IsActive = true;
+        UpdatedAt = null;
     }
 
     public void UpdateBasicAttributes(
@@ -104,16 +104,15 @@ public class LostAndFoundRecord
         {
             ImageUrl = imageUrl.Trim();
         }
-    }
 
-    public void Deactivate()
-    {
-        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void MarkAsDeleted()
     {
         Status = EnumStatusLostAndFound.Deleted;
+        UpdatedAt = DateTime.UtcNow;
+
     }
 
     public bool IsReportedBy(int userId) => UserId == userId;

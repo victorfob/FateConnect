@@ -126,9 +126,6 @@ public partial class LostAndFoundService(
 
         EnsureRecordIsReportedBy(record, currentUserId);
 
-        // fiquei confuso com a regra de marcar como excluído.
-        // Não entendi muito bem o porquê de marcar como excluído e continuar mostrando para o usuário
-        // Nas Caronas apenas mudamos um boolean para inativo e o usuário não consegue ver mais. Por que não fazer a mesma coisa aqui?
         record.MarkAsDeleted();
 
         await repository.UpdateAsync(record);

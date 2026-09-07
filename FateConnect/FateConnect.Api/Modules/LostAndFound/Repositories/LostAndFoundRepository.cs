@@ -3,6 +3,7 @@ namespace FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
+using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +13,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
     {
         IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
             .AsNoTracking()
-            .Include(r => r.User.Contacts)
-            .Where(r => r.IsActive);
+            .Include(r => r.User.Contacts);
 
         if (currentUserId.HasValue)
             query = query.Where(r => r.UserId == currentUserId.Value);
@@ -37,8 +37,9 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         if (filter.LostAndFoundType.HasValue)
             query = query.Where(r => r.LostAndFoundType == filter.LostAndFoundType.Value);
 
-        if (filter.Status.HasValue)
-            query = query.Where(r => r.Status == filter.Status.Value);
+        query = filter.Status is not null
+            ? query.Where(r => r.Status == filter.Status)
+            : query.Where(r => r.Status == EnumStatusLostAndFound.Open);
 
         if (filter.OcurredOn.HasValue)
             query = query.Where(r => r.OcurredOn == filter.OcurredOn.Value);
@@ -59,7 +60,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
     {
         return await context.LostAndFoundRecords
             .Include(r => r.User.Contacts)
-            .FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
+            .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord)
