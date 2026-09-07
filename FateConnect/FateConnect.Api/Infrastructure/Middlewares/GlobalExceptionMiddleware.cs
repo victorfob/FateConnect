@@ -3,6 +3,7 @@ namespace FateConnect.Api.Infrastructure.Middlewares;
 using System.Net;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -31,14 +32,16 @@ public partial class GlobalExceptionMiddleware(
 
         switch (exception)
         {
-            case RideDomainException ex:
+            case LostAndFoundDomainException:
+            case RideDomainException:
                 statusCode = HttpStatusCode.BadRequest;
-                errorMessage = ex.Message;
+                errorMessage = exception.Message;
                 break;
 
-            case RideNotDrivenByUserException ex:
+            case LostAndFoundNotReportedByUserException:
+            case RideNotDrivenByUserException:
                 statusCode = HttpStatusCode.Forbidden;
-                errorMessage = ex.Message;
+                errorMessage = exception.Message;
                 break;
 
             case AlreadyRegisteredException ex:
@@ -47,7 +50,9 @@ public partial class GlobalExceptionMiddleware(
                 conflictingField = ex.Field;
                 break;
 
-            case UnidentifiedUserException or UnidentifiedTokenException or InvalidCredentialsException:
+            case UnidentifiedTokenException:
+            case InvalidCredentialsException:
+            case UnidentifiedUserException:
                 statusCode = HttpStatusCode.Unauthorized;
                 errorMessage = exception.Message;
                 break;
