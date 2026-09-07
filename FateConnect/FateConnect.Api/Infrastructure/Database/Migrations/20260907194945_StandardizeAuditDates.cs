@@ -81,7 +81,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 table: "LostAndFoundRecords",
                 type: "boolean",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: true);
         }
     }
 }
