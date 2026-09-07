@@ -42,9 +42,8 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         if (filter.LostAndFoundType.HasValue)
             query = query.Where(r => r.LostAndFoundType == filter.LostAndFoundType.Value);
 
-        query = filter.Status is not null
-            ? query.Where(r => r.Status == filter.Status)
-            : query.Where(r => r.Status == EnumStatusLostAndFound.Open);
+        if (filter.Status.HasValue)
+            query = query.Where(r => r.Status == filter.Status.Value);
 
         if (filter.OcurredOn.HasValue)
             query = query.Where(r => r.OcurredOn == filter.OcurredOn.Value);
