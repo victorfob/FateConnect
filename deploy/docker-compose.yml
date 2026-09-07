@@ -27,4 +27,9 @@ services:
       # Só em 127.0.0.1: quem fala com a internet é o nginx do host.
       - '127.0.0.1:${API_PORT}:8080'
     mem_limit: 220m
-
+    # 1. Mapeamento do volume: Conecta a pasta interna com o volume externo
+    volumes:
+      - api_uploads:/app/wwwroot/uploads
+  # 2. Declaração do volume: Instrui o Docker a criar e gerenciar o volume persistente
+  volumes:
+    api_uploads:
