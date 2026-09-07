@@ -25,12 +25,17 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
                 .Replace("%", @"\%")
                 .Replace("_", @"\_");
 
-            string searchPattern = "%" + EF.Functions.Unaccent(escapedName) + "%";
-
-            // pesquisa abrangente tanto para o nome quanto para a descricao
             query = query.Where(r =>
-                EF.Functions.ILike(EF.Functions.Unaccent(r.Name), searchPattern, @"\") ||
-                EF.Functions.ILike(EF.Functions.Unaccent(r.Description), searchPattern, @"\")
+                EF.Functions.ILike(
+                    EF.Functions.Unaccent(r.Name),
+                    "%" + EF.Functions.Unaccent(escapedName) + "%",
+                    @"\"
+                ) ||
+                EF.Functions.ILike(
+                    EF.Functions.Unaccent(r.Description),
+                    "%" + EF.Functions.Unaccent(escapedName) + "%",
+                    @"\"
+                )
             );
         }
 

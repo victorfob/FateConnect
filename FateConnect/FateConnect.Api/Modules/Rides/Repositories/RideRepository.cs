@@ -29,7 +29,7 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
 
         if (!string.IsNullOrWhiteSpace(filter.Destination))
         {
-            string escapedDestination = filter.Destination
+            string escapedSearchTerm = filter.Destination
                 .Replace(@"\", @"\\")
                 .Replace("%", @"\%")
                 .Replace("_", @"\_");
@@ -37,7 +37,12 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
             query = query.Where(r =>
                 EF.Functions.ILike(
                     EF.Functions.Unaccent(r.Destination),
-                    "%" + EF.Functions.Unaccent(escapedDestination) + "%",
+                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
+                    @"\"
+                ) ||
+                EF.Functions.ILike(
+                    EF.Functions.Unaccent(r.Description ?? ""),
+                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
                     @"\"
                 ));
         }
