@@ -81,19 +81,16 @@ public partial class LostAndFoundService(
         if (record is null)
         {
             LogRecordNotFound(logger, id);
-
             return null;
         }
 
         EnsureRecordIsReportedBy(record, currentUserId);
 
-
-        string? newImageUrl = record.ImageUrl;
+        string? oldImageUrl = record.ImageUrl;
+        string? newImageUrl = oldImageUrl;
 
         if (dto.Image is not null)
         {
-            await storageService.DeleteImageAsync(record.ImageUrl!);
-
             newImageUrl = await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
         }
 
@@ -108,6 +105,13 @@ public partial class LostAndFoundService(
         );
 
         await repository.UpdateAsync(record);
+
+        bool shouldDeleteOldImage = dto.Image is not null && !string.IsNullOrWhiteSpace(oldImageUrl);
+
+        if (shouldDeleteOldImage)
+        {
+            await storageService.DeleteImageAsync(oldImageUrl!);
+        }
 
         LogRecordUpdated(logger, id);
 
