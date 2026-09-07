@@ -25,6 +25,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using FateConnect.Api.Modules.LostAndFound.Interfaces;
+using FateConnect.Api.Modules.LostAndFound.Repositories;
+using FateConnect.Api.Modules.LostAndFound.Services;
+using FateConnect.Api.Modules.Common.Interfaces;
+using FateConnect.Api.Modules.Common.Services;
 
 public class Program
 {
@@ -79,6 +84,11 @@ public class Program
 
         builder.Services.AddScoped<IRideRepository, RideRepository>();
         builder.Services.AddScoped<IRideService, RideService>();
+
+        builder.Services.AddScoped<ILostAndFoundRepository, LostAndFoundRepository>();
+        builder.Services.AddScoped<ILostAndFoundService, LostAndFoundService>();
+
+        builder.Services.AddScoped<IStorageService, StorageService>();
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -180,6 +190,8 @@ public class Program
         app.UseMiddleware<GlobalExceptionMiddleware>();
 
         app.UseCors(corsPolicy);
+
+        app.UseStaticFiles();
 
         app.UseSwagger();
         app.UseSwaggerUI();

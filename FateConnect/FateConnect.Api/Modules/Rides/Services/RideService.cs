@@ -137,11 +137,11 @@ public partial class RideService(
             ride.IsDrivenBy(currentUserId)
         );
 
-    private static RideDriverDto MapDriverToDto(User driver)
+    private static UserContactDto MapDriverToDto(User driver)
     {
         Contact contact = driver.Contacts.First();
 
-        return new RideDriverDto(driver.FullName, contact.ContactEmail, contact.Phone);
+        return new UserContactDto(driver.FullName, contact.ContactEmail, contact.Phone);
     }
 
 }
