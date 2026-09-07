@@ -12,7 +12,7 @@ public class LostAndFoundRecord
     public EnumLostAndFoundType LostAndFoundType { get; private set; }
     public string Place { get; private set; } = default!;
     public DateOnly OcurredOn { get; private set; }
-    public string Description { get; private set; } = default!;
+    public string? Description { get; private set; }
     public string? ImageUrl { get; private set; }
     public EnumStatusLostAndFound Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -27,7 +27,7 @@ public class LostAndFoundRecord
         EnumLostAndFoundType lostAndFoundType,
         string place,
         DateOnly ocurredOn,
-        string description,
+        string? description,
         int userId,
         EnumStatusLostAndFound initialStatus,
         string? imageUrl = null)
@@ -36,7 +36,6 @@ public class LostAndFoundRecord
         ValidatePlace(place);
         ValidateOcurredOn(ocurredOn);
         ValidateType(lostAndFoundType);
-        ValidateDescription(description);
         ValidateStatus(initialStatus);
         ValidateUser(userId);
 
@@ -46,7 +45,7 @@ public class LostAndFoundRecord
         LostAndFoundType = lostAndFoundType;
         Place = place.Trim();
         OcurredOn = ocurredOn;
-        Description = description.Trim();
+        Description = description?.Trim();
         ImageUrl = imageUrl?.Trim();
         Status = initialStatus;
         CreatedAt = DateTime.UtcNow;
@@ -88,7 +87,6 @@ public class LostAndFoundRecord
 
         if (description is not null)
         {
-            ValidateDescription(description);
             Description = description.Trim();
         }
 
@@ -147,14 +145,6 @@ public class LostAndFoundRecord
 
         if (isInvalidPlace)
             throw new InvalidLostAndFoundPlaceException();
-    }
-
-    private static void ValidateDescription(string? description)
-    {
-        bool isInvalidDescription = string.IsNullOrWhiteSpace(description) || description.Trim().Length < 5;
-
-        if (isInvalidDescription)
-            throw new InvalidLostAndFoundDescriptionException();
     }
 
     private static void ValidateOcurredOn(DateOnly date)

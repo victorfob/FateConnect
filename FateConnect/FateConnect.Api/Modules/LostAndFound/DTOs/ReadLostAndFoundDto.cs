@@ -9,7 +9,7 @@ public record ReadLostAndFoundDto(
     EnumLostAndFoundType LostAndFoundType,
     string Place,
     DateOnly OcurredOn,
-    string Description,
+    string? Description,
     string? ImageUrl,
     UserContactDto Contact,
     bool IsOwner,

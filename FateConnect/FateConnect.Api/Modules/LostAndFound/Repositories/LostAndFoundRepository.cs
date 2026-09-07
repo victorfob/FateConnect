@@ -32,7 +32,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
                     @"\"
                 ) ||
                 EF.Functions.ILike(
-                    EF.Functions.Unaccent(r.Description),
+                    EF.Functions.Unaccent(r.Description ?? ""),
                     "%" + EF.Functions.Unaccent(escapedName) + "%",
                     @"\"
                 )
