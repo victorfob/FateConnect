@@ -15,6 +15,7 @@ public class Ride
     public DateOnly DepartureDate { get; private set; }
     public TimeOnly DepartureTime { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
     public EnumRideType RideType { get; private set; }
     public string? Description { get; private set; }
     public bool IsActive { get; private set; }
@@ -45,6 +46,7 @@ public class Ride
         DepartureDate = departureDate;
         DepartureTime = departureTime;
         CreatedAt = DateTime.UtcNow;
+        UpdatedAt = null;
         RideType = rideType;
         Description = description?.Trim();
         IsActive = true;
@@ -76,6 +78,8 @@ public class Ride
 
         if (description is not null)
             Description = description.Trim();
+
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void ChangeDepartureSchedule(DateOnly? departureDate, TimeOnly? departureTime)
@@ -87,11 +91,14 @@ public class Ride
 
         DepartureDate = newDate;
         DepartureTime = newTime;
+
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void Deactivate()
     {
         IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public bool IsDrivenBy(int userId) => DriverId == userId;
