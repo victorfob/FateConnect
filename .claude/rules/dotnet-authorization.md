@@ -18,6 +18,23 @@ paths:
 
 ⚠️ **Com `[Authorize]` explícito em todo endpoint, a suíte deixa de exercitar o piso** — todo endpoint testado passa pelo atributo. O piso segue valendo só para o endpoint que ninguém anotou, que por definição ainda não existe para ser testado. É o argumento de por que ele não sai, não de que ele é redundante.
 
+## O piso responde 401 até para rota que não existe
+
+⛔ **Não use o código de status para decidir se uma rota existe.** A fallback policy vale para requisição que **não casa endpoint nenhum**, então caminho inexistente sob a API responde **401**, não 404. Medido em 08/09/2026: produção devolvia 401 em `/LostAndFound` antes de aquele módulo existir lá.
+
+Duas consequências práticas:
+
+- **Para saber se o código novo subiu, leia o documento do Swagger**, que lista as rotas registradas — não o status de uma chamada. Foi assim que se confirmou que um deploy tinha levado o módulo, e não apenas que a porta estava aberta.
+- **Para saber se a aplicação está viva, qualquer caminho serve.** É o que a sonda de `.github/workflows/publish.yml` usa: ela pede um caminho que de propósito não existe e cobra ter havido resposta, porque 401 vem da aplicação e 502 vem do nginx sem ninguém atrás. Assim a checagem não quebra quando uma rota é renomeada.
+
+## Quem é registrado antes da autorização não passa por ela
+
+⛔ **Middleware que roda antes de `UseAuthentication`/`UseAuthorization` no `Program.cs` responde sem token, e o piso não o alcança.** O Swagger é o caso vivo: ele curto-circuita a requisição antes de a autorização existir. Mudar a ordem não resolveria — ele não é endpoint, e a autorização só decide sobre endpoint.
+
+**Então o que precisa de token precisa ser endpoint.** É por isso que a imagem de achados e perdidos é servida por `UploadsController`, com `[Authorize]`, e não por middleware de arquivo estático: como estático ela era legível por qualquer pessoa com a URL, e o nome em GUID é obscuridade, não autorização.
+
+⚠️ **O Swagger é público de propósito** — `swagger.json` e a interface respondem 200 sem token, nos dois ambientes. É documentação, e a decisão é do Victor, em 08/09/2026. Não "corrija" isso como se fosse vazamento.
+
 ## Onde o `[Authorize]` mora: onde a regra vale para todo mundo
 
 ⛔ **Endpoint novo nasce com `[Authorize]` explícito.** Não é o que protege — é o que faz a proteção aparecer para quem abre o controller em vez de ficar só no `Program.cs`. Pedido no review do #191.
