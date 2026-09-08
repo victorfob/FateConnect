@@ -40,6 +40,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 name: "UpdatedAt",
                 table: "Rides");
 
+            migrationBuilder.Sql(
+                @"UPDATE ""Users"" SET ""UpdatedAt"" = ""CreatedAt"" WHERE ""UpdatedAt"" IS NULL;");
+
             migrationBuilder.AlterColumn<DateTime>(
                 name: "UpdatedAt",
                 table: "Users",
