@@ -12,9 +12,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- Amplia a busca de caronas, que passa a casar também a descrição da carona e não só o destino; o campo de busca do site deixa de filtrar até o ajuste do front sair, e volta a filtrar com ele (#322) [Backend]
+- Amplia a busca de caronas, que passa a casar também a descrição da carona e não só o destino (#322) [Backend]
 - Passa a guardar os itens do mural de achados e perdidos: cadastro, edição, foto, conclusão, exclusão e restauração chegam ao servidor, e o item continua lá depois de recarregar a página — antes nada do que a tela fazia era gravado (#328) [Frontend]
 - Passa a buscar item de achados e perdidos por nome ou descrição, com o campo do filtro dizendo isso; o endereço da busca vai de `?nome=` para `?busca=`, e link salvo com o antigo abre a lista sem filtro (#328) [Frontend]
+- Passa a buscar carona por destino ou descrição, com o campo do filtro dizendo isso; o endereço da busca vai de `?destino=` para `?busca=`, e link salvo com o antigo abre a lista sem filtro (#329) [Frontend]
 
 ### Fixed
 
