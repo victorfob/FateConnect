@@ -155,6 +155,9 @@ public class LostAndFoundRecord
 
     private static void ValidateOcurredOn(DateOnly date)
     {
+        if (date == default)
+            throw new MissingOccurrenceDateException();
+
         DateOnly todayInProductTimeZone = DateOnly.FromDateTime(DateTimeUtils.NowInProductTimeZone());
 
         if (date > todayInProductTimeZone)

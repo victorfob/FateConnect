@@ -339,6 +339,40 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task CreateItem_WithoutTheOccurrenceDate_IsRejected()
+    {
+        SeededUser reporter = _factory.SeedUser("Carla Menezes Dias");
+
+        MultipartFormDataContent form = new()
+        {
+            { new StringContent("Caderno de anotações"), "Name" },
+            { new StringContent(EnumLostAndFoundType.Lost.ToString()), "LostAndFoundType" },
+            { new StringContent("Biblioteca do bloco B"), "Place" },
+        };
+
+        HttpResponseMessage response = await _factory.CreateClientFor(reporter.Id).PostAsync("/LostAndFound", form);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("Informe a data do ocorrido.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+    }
+
+    public async Task CreateItem_WithoutTheType_IsRejected()
+    {
+        SeededUser reporter = _factory.SeedUser("Diego Prado Ramos");
+
+        MultipartFormDataContent form = new()
+        {
+            { new StringContent("Mochila cinza"), "Name" },
+            { new StringContent("Biblioteca do bloco B"), "Place" },
+            { new StringContent(Yesterday.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OcurredOn" },
+        };
+
+        HttpResponseMessage response = await _factory.CreateClientFor(reporter.Id).PostAsync("/LostAndFound", form);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("Informe se o item foi perdido ou achado.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+    }
+
     public async Task ReadItem_CarriesTheCreationInstantAsUtc()
     {
         (ReadItem item, int reporterId, _) = await ReportItemAsync("Cachecol de lã");

@@ -22,9 +22,9 @@ public partial class LostAndFoundService(
     {
         var record = new LostAndFoundRecord(
             dto.Name,
-            dto.LostAndFoundType,
+            dto.LostAndFoundType.GetValueOrDefault(),
             dto.Place,
-            dto.OcurredOn,
+            dto.OcurredOn.GetValueOrDefault(),
             dto.Description,
             currentUserId
         );

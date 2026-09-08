@@ -149,6 +149,27 @@ public class LostAndFoundRecordTests
     }
 
     [Fact]
+    public void Constructor_WithoutAnOccurrenceDate_IsRejected()
+    {
+        Assert.Throws<MissingOccurrenceDateException>(() => new LostAndFoundRecord(
+            "Garrafa térmica azul",
+            EnumLostAndFoundType.Lost,
+            "Biblioteca do bloco B",
+            default,
+            null,
+            1));
+    }
+
+    [Fact]
+    public void UpdateBasicAttributes_WithoutAnOccurrenceDate_IsRejected()
+    {
+        LostAndFoundRecord record = NewRecord();
+
+        Assert.Throws<MissingOccurrenceDateException>(
+            () => record.UpdateBasicAttributes(null, null, null, default(DateOnly), null, null));
+    }
+
+    [Fact]
     public void UpdateBasicAttributes_WithAnUnusableName_IsRejected()
     {
         LostAndFoundRecord record = NewRecord();

@@ -5,6 +5,9 @@ public abstract class LostAndFoundDomainException(string message) : Exception(me
 public class InvalidOccurrenceDateException()
     : LostAndFoundDomainException("A data do ocorrido não pode ser no futuro.");
 
+public class MissingOccurrenceDateException()
+    : LostAndFoundDomainException("Informe a data do ocorrido.");
+
 public class InvalidLostAndFoundNameException()
     : LostAndFoundDomainException("O nome do item deve ter entre 3 e 100 caracteres.");
 
