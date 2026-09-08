@@ -11,7 +11,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace FateConnect.Api.Tests;
 
-public class ImageStorageTests : IDisposable
+public sealed class ImageStorageTests : IDisposable
 {
     private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-uploads-{Guid.NewGuid():N}");
 
@@ -43,8 +43,6 @@ public class ImageStorageTests : IDisposable
     {
         if (Directory.Exists(_webRoot))
             Directory.Delete(_webRoot, recursive: true);
-
-        GC.SuppressFinalize(this);
     }
 
     [Theory]

@@ -24,7 +24,8 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
 
     [Theory]
     [MemberData(nameof(RideRoutes))]
-    public async Task RideEndpoints_WithoutToken_RespondUnauthorized(string method, string route)
+    [MemberData(nameof(LostAndFoundRoutes))]
+    public async Task ProtectedEndpoints_WithoutToken_RespondUnauthorized(string method, string route)
     {
         var request = new HttpRequestMessage(new HttpMethod(method), route);
 
@@ -51,17 +52,6 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
         { "PATCH", "/LostAndFound/8a1b0f2e-0000-4000-8000-000000000000" },
         { "DELETE", "/LostAndFound/8a1b0f2e-0000-4000-8000-000000000000" }
     };
-
-    [Theory]
-    [MemberData(nameof(LostAndFoundRoutes))]
-    public async Task LostAndFoundEndpoints_WithoutToken_RespondUnauthorized(string method, string route)
-    {
-        var request = new HttpRequestMessage(new HttpMethod(method), route);
-
-        HttpResponseMessage response = await _factory.CreateClient().SendAsync(request);
-
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-    }
 
     [Fact]
     public async Task LostAndFoundEndpoints_WithAValidToken_ReachTheController()

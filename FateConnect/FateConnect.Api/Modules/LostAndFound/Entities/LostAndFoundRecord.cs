@@ -30,14 +30,12 @@ public class LostAndFoundRecord
         DateOnly ocurredOn,
         string? description,
         int userId,
-        EnumStatusLostAndFound initialStatus,
         string? imageUrl = null)
     {
         ValidateName(name);
         ValidatePlace(place);
         ValidateOcurredOn(ocurredOn);
         ValidateType(lostAndFoundType);
-        ValidateStatus(initialStatus);
         ValidateUser(userId);
 
         Id = Guid.NewGuid();
@@ -48,7 +46,7 @@ public class LostAndFoundRecord
         OcurredOn = ocurredOn;
         Description = description?.Trim();
         ImageUrl = imageUrl?.Trim();
-        Status = initialStatus;
+        Status = EnumStatusLostAndFound.Open;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
     }

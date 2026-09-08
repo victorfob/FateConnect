@@ -31,7 +31,6 @@ public partial class LostAndFoundService(
             dto.OcurredOn,
             dto.Description,
             currentUserId,
-            EnumStatusLostAndFound.Open,
             imageUrl
         );
 

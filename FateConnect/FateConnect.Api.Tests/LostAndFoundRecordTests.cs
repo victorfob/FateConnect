@@ -15,7 +15,7 @@ public class LostAndFoundRecordTests
         EnumLostAndFoundType type = EnumLostAndFoundType.Lost,
         string place = "Biblioteca do bloco B",
         string? description = "Ficou na mesa do fundo.") =>
-        new(name, type, place, Yesterday, description, ReporterId, EnumStatusLostAndFound.Open);
+        new(name, type, place, Yesterday, description, ReporterId);
 
     [Fact]
     public void Constructor_WithValidData_StartsOpenAndWithoutDeletionReason()
@@ -40,7 +40,6 @@ public class LostAndFoundRecordTests
             Yesterday,
             "  Ficou na mesa do fundo.  ",
             ReporterId,
-            EnumStatusLostAndFound.Open,
             "  /uploads/lostandfound/foto.png  ");
 
         Assert.Equal("Garrafa térmica azul", record.Name);
@@ -87,27 +86,13 @@ public class LostAndFoundRecordTests
             "Biblioteca do bloco B",
             tomorrow,
             null,
-            ReporterId,
-            EnumStatusLostAndFound.Open));
+            ReporterId));
     }
 
     [Fact]
     public void Constructor_WithATypeOutsideTheEnum_IsRejected()
     {
         Assert.Throws<InvalidLostAndFoundTypeException>(() => NewRecord(type: (EnumLostAndFoundType)99));
-    }
-
-    [Fact]
-    public void Constructor_WithAStatusOutsideTheEnum_IsRejected()
-    {
-        Assert.Throws<InvalidLostAndFoundStatusException>(() => new LostAndFoundRecord(
-            "Garrafa térmica azul",
-            EnumLostAndFoundType.Lost,
-            "Biblioteca do bloco B",
-            Yesterday,
-            null,
-            ReporterId,
-            (EnumStatusLostAndFound)99));
     }
 
     [Fact]
@@ -119,8 +104,7 @@ public class LostAndFoundRecordTests
             "Biblioteca do bloco B",
             Yesterday,
             null,
-            0,
-            EnumStatusLostAndFound.Open));
+            0));
     }
 
     [Fact]
