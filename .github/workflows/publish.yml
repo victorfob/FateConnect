@@ -112,7 +112,7 @@ jobs:
             "$DEPLOY_USER@$DEPLOY_HOST" \
             "cd '$DEPLOY_PATH/deploy' && ./deploy.sh '${{ inputs.environment }}'"
 
-      - name: Check that the containers stayed up
+      - name: Check that the environment answers
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -129,6 +129,41 @@ jobs:
             echo "ERRO: nenhum contêiner de pé; esperado 1." >&2
             exit 1
           fi
+
+          # Contêiner de pé não prova aplicação viva. Em 08/09/2026 este passo
+          # ficou verde com a API caindo em laço por erro de migration: ele roda
+          # logo depois do `up -d`, e pegou o contêiner na primeira execução,
+          # antes de a exceção matá-lo — é corrida, não cegueira. Quem morreu e
+          # voltou tem `RestartCount` acima de zero, e o `up -d` zera o contador
+          # ao recriar o contêiner, então aqui zero é o único valor aceitável.
+          reinicios=$(ssh $SSH_OPTIONS "$DEPLOY_USER@$DEPLOY_HOST" \
+            "docker inspect -f '{{.RestartCount}}' '$(head -1 containers.txt)'")
+          echo "Reinícios desde a subida: $reinicios"
+          if [[ "$reinicios" -gt 0 ]]; then
+            echo "ERRO: o contêiner reiniciou $reinicios vez(es) desde a subida; a aplicação não está estável." >&2
+            exit 1
+          fi
+
+          # E contêiner estável ainda não prova que o nginx alcança a
+          # aplicação: a mesma queda devolvia 502 aqui. Qualquer caminho sob
+          # `/api/` responde quando a aplicação está servindo, porque a
+          # fallback policy do `Program.cs` atende requisição que não casa
+          # endpoint nenhum — por isso a sonda não cita rota de produto, e o
+          # que se cobra é ter havido resposta, não um código específico.
+          sonda="${{ vars.PUBLIC_URL }}/api/__deploy_probe"
+          for tentativa in $(seq 1 20); do
+            codigo=$(curl -s -o /dev/null -m 10 -w '%{http_code}' "$sonda") || codigo=000
+            case "$codigo" in
+              000|502|503|504) echo "  tentativa $tentativa: $codigo"; sleep 6 ;;
+              *) break ;;
+            esac
+          done
+          case "$codigo" in
+            000|502|503|504)
+              echo "ERRO: a aplicação não respondeu em 2min; último código: $codigo." >&2
+              exit 1 ;;
+          esac
+          echo "A aplicação respondeu $codigo."
 
       - name: Remove the deploy key
         if: always()
