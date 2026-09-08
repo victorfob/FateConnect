@@ -28,9 +28,9 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
         if (filter.DepartureTime.HasValue)
             query = query.Where(r => r.DepartureTime == filter.DepartureTime.Value);
 
-        if (!string.IsNullOrWhiteSpace(filter.Destination))
+        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            string escapedSearchTerm = filter.Destination
+            string escapedSearchTerm = filter.SearchTerm
                 .Replace(@"\", @"\\")
                 .Replace("%", @"\%")
                 .Replace("_", @"\_");

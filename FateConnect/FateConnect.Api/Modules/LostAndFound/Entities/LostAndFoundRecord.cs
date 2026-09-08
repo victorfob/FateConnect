@@ -95,6 +95,9 @@ public class LostAndFoundRecord
         {
             ValidateStatus(status.Value);
             Status = status.Value;
+            DeletionReason = status.Value == EnumStatusLostAndFound.Deleted
+                ? EnumDeletionReason.User
+                : null;
         }
 
         if (imageUrl is not null)

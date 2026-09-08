@@ -17,7 +17,8 @@ public record UpdateLostAndFoundDto
 
     public DateOnly? OcurredOn { get; init; }
 
-    [StringLength(300, MinimumLength = 5, ErrorMessage = "A descrição deve ter entre 5 e 300 caracteres.")]
+    [DisplayFormat(ConvertEmptyStringToNull = false)]
+    [StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
     public string? Description { get; init; }
 
     public EnumStatusLostAndFound? Status { get; init; }

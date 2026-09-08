@@ -80,7 +80,6 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
 
     public async Task UpdateAsync(LostAndFoundRecord lostAndFoundRecord)
     {
-        context.LostAndFoundRecords.Update(lostAndFoundRecord);
         await context.SaveChangesAsync();
     }
 }

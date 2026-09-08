@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.Common.Services;
 
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Enums;
+using FateConnect.Api.Modules.Common.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
@@ -18,11 +19,11 @@ public class StorageService(IWebHostEnvironment env) : IStorageService
 
         string uploadsFolder = Path.Combine(webRootPath, UploadsFolderName, containerName);
 
+        string fileExtension = ImageContentTypes.ExtensionFor(file.ContentType);
+        string uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+
         if (!Directory.Exists(uploadsFolder))
             Directory.CreateDirectory(uploadsFolder);
-
-        string fileExtension = GetExtensionFromContentType(file.ContentType);
-        string uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
 
         string physicalFilePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -49,16 +50,5 @@ public class StorageService(IWebHostEnvironment env) : IStorageService
             File.Delete(physicalFilePath);
 
         return Task.CompletedTask;
-    }
-
-    private static string GetExtensionFromContentType(string contentType)
-    {
-        return contentType.ToLowerInvariant() switch
-        {
-            "image/jpeg" or "image/jpg" => ".jpg",
-            "image/png" => ".png",
-            "image/webp" => ".webp",
-            _ => throw new InvalidOperationException("Formato de arquivo não suportado.")
-        };
     }
 }

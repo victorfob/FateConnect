@@ -118,7 +118,7 @@ public class Ride
 
     private static void ValidateDepartureDateTime(DateOnly date, TimeOnly time)
     {
-        DateTime departureUtc = TimeZoneInfo.ConvertTimeToUtc(date.ToDateTime(time), DateTimeUtils.ProductTimeZone);
+        DateTime departureUtc = DateTimeUtils.ToUtcFromProductTimeZone(date, time);
 
         if (departureUtc < DateTime.UtcNow)
             throw new InvalidDepartureScheduleException();

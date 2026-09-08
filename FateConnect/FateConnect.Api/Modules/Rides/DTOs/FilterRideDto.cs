@@ -6,7 +6,7 @@ using FateConnect.Api.Modules.Rides.Enums;
 
 public record FilterRideDto : PagedFilterDto
 {
-    public string? Destination { get; init; }
+    public string? SearchTerm { get; init; }
     public DateOnly? DepartureDate { get; init; }
     public TimeOnly? DepartureTime { get; init; }
 

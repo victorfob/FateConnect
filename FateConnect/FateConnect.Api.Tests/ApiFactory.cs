@@ -140,13 +140,18 @@ public class ApiFactory : WebApplicationFactory<Program>
         return (user.Id, user.FatecEmail);
     }
 
-    public Guid SeedRide(int driverId, DateOnly departureDate, TimeOnly departureTime, string destination = "Sorocaba centro")
+    public Guid SeedRide(
+        int driverId,
+        DateOnly departureDate,
+        TimeOnly departureTime,
+        string destination = "Sorocaba centro",
+        string? description = null)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
         DateOnly acceptedDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
-        Ride ride = new(3, destination, acceptedDate, departureTime, EnumRideType.Solidarity, driverId);
+        Ride ride = new(3, destination, acceptedDate, departureTime, EnumRideType.Solidarity, driverId, description);
 
         context.Rides.Add(ride);
         context.Entry(ride).Property(entity => entity.DepartureDate).CurrentValue = departureDate;

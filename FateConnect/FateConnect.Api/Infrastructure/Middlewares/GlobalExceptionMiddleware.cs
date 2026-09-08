@@ -3,6 +3,7 @@ namespace FateConnect.Api.Infrastructure.Middlewares;
 using System.Net;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Exceptions;
@@ -32,6 +33,7 @@ public partial class GlobalExceptionMiddleware(
 
         switch (exception)
         {
+            case InvalidImageException:
             case LostAndFoundDomainException:
             case RideDomainException:
                 statusCode = HttpStatusCode.BadRequest;
