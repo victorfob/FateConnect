@@ -15,7 +15,7 @@ describe('rideSearchCodec', () => {
       expect(read('pagina=3&destino=Sorocaba&data=2026-09-01&hora=07:30&tipo=solidaria')).toEqual({
         page: 3,
         pageSize: PAGE_SIZE,
-        destination: 'Sorocaba',
+        searchTerm: 'Sorocaba',
         departureDate: '2026-09-01',
         departureTime: '07:30',
         rideType: RideTypeEnum.SOLIDARITY,
@@ -52,7 +52,7 @@ describe('rideSearchCodec', () => {
         page: 2,
         pageSize: PAGE_SIZE,
         rideType: RideTypeEnum.EGALITARIAN,
-        destination: 'Sorocaba',
+        searchTerm: 'Sorocaba',
       });
 
       expect(params).toEqual({ pagina: '2', tipo: 'igualitaria', destino: 'Sorocaba' });
@@ -62,7 +62,7 @@ describe('rideSearchCodec', () => {
       const original = {
         page: 4,
         pageSize: PAGE_SIZE,
-        destination: 'Votorantim',
+        searchTerm: 'Votorantim',
         departureDate: '2026-09-10',
         departureTime: '18:00',
         rideType: RideTypeEnum.SOLIDARITY,

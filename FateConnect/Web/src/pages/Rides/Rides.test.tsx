@@ -195,7 +195,7 @@ describe('Rides', () => {
     await userEvent.type(screen.getByLabelText(FILTER_LABELS.destination), 'Sorocaba');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
-    await waitFor(() => expect(requestUrl?.searchParams.get('destination')).toBe('Sorocaba'));
+    await waitFor(() => expect(requestUrl?.searchParams.get('searchTerm')).toBe('Sorocaba'));
     // O ponto do painel não tem papel de acessibilidade: chega-se a ele pelo título.
     const activeDot = screen
       .getByText(FILTER_PANEL_TITLE)

@@ -17,8 +17,8 @@ function fromParams(params: URLSearchParams): RideFilter {
     pageSize: PAGE_SIZE,
   };
 
-  const destination = readParamValue(params, SearchParamEnum.DESTINATION);
-  if (destination) filter.destination = destination;
+  const searchTerm = readParamValue(params, SearchParamEnum.DESTINATION);
+  if (searchTerm) filter.searchTerm = searchTerm;
 
   const departureDate = readParamValue(params, SearchParamEnum.DEPARTURE_DATE);
   if (departureDate) filter.departureDate = departureDate;
@@ -36,7 +36,7 @@ function toParams(filter: RideFilter): Record<string, string> {
   const params: Record<string, string> = {};
 
   writePageParam(params, filter.page);
-  if (filter.destination) params[SearchParamEnum.DESTINATION] = filter.destination;
+  if (filter.searchTerm) params[SearchParamEnum.DESTINATION] = filter.searchTerm;
   if (filter.departureDate) params[SearchParamEnum.DEPARTURE_DATE] = filter.departureDate;
   if (filter.departureTime) params[SearchParamEnum.DEPARTURE_TIME] = filter.departureTime;
   if (filter.rideType) params[SearchParamEnum.RIDE_TYPE] = rideTypeSlug(filter.rideType);

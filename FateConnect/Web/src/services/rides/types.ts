@@ -35,7 +35,7 @@ export type RideInput = Omit<Ride, 'id' | 'createdAt' | 'driver' | 'isOwner'>;
 
 /** Filtros da listagem, com os mesmos nomes que a API recebe na query. */
 export interface RideFilter extends PageQuery {
-  destination?: string;
+  searchTerm?: string;
   departureDate?: string;
   departureTime?: string;
   rideType?: RideTypeEnum;

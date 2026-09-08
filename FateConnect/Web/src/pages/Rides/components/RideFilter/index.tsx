@@ -12,12 +12,12 @@ const NO_FILTERS = 0;
 
 /** Paginação não conta: o ponto ao lado do título é sobre escolha de busca. */
 function hasAnyFilter({
-  destination,
+  searchTerm,
   departureDate,
   departureTime,
   rideType,
 }: RideFilterValues): boolean {
-  return Boolean(destination || departureDate || departureTime || rideType);
+  return Boolean(searchTerm || departureDate || departureTime || rideType);
 }
 
 type RideFilterProps = Readonly<{
@@ -30,7 +30,7 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
     toDisplayDate(initialFilters.departureDate ?? ''),
   );
   const [departureTime, setDepartureTime] = useState(initialFilters.departureTime ?? '');
-  const [destination, setDestination] = useState(initialFilters.destination ?? '');
+  const [searchTerm, setSearchTerm] = useState(initialFilters.searchTerm ?? '');
   const [rideType, setRideType] = useState<string>(
     initialFilters.rideType ?? C.RideTypeFilterEnum.ALL,
   );
@@ -40,8 +40,8 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
     (event: ChangeEvent<HTMLInputElement>) => setDepartureTime(event.target.value),
     [],
   );
-  const handleDestinationChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => setDestination(event.target.value),
+  const handleSearchTermChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value),
     [],
   );
   const handleRideTypeChange = useCallback(
@@ -54,12 +54,12 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
 
     if (departureDate) filters.departureDate = toApiDateText(departureDate);
     if (departureTime) filters.departureTime = departureTime;
-    if (destination.trim()) filters.destination = destination.trim();
+    if (searchTerm.trim()) filters.searchTerm = searchTerm.trim();
     if (rideType) filters.rideType = rideType as RideTypeEnum;
 
     setIsFiltered(Object.keys(filters).length > NO_FILTERS);
     onApply(filters);
-  }, [departureDate, departureTime, destination, rideType, onApply]);
+  }, [departureDate, departureTime, searchTerm, rideType, onApply]);
 
   return (
     <FilterPanel
@@ -92,8 +92,8 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
           label={C.FILTER_LABELS.destination}
           fullWidth
           placeholder={C.FILTER_PLACEHOLDERS.destination}
-          value={destination}
-          onChange={handleDestinationChange}
+          value={searchTerm}
+          onChange={handleSearchTermChange}
         />
       </FilterPanel.Field>
 
