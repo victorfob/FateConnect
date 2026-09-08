@@ -20,19 +20,17 @@ public partial class LostAndFoundService(
 {
     public async Task<ReadLostAndFoundDto> CreateAsync(CreateLostAndFoundDto dto, int currentUserId)
     {
-        string? imageUrl = dto.Image is not null
-            ? await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound)
-            : null;
-
         var record = new LostAndFoundRecord(
             dto.Name,
             dto.LostAndFoundType,
             dto.Place,
             dto.OcurredOn,
             dto.Description,
-            currentUserId,
-            imageUrl
+            currentUserId
         );
+
+        if (dto.Image is not null)
+            record.AttachImage(await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound));
 
         await repository.AddAsync(record);
 
@@ -86,32 +84,27 @@ public partial class LostAndFoundService(
 
         EnsureRecordIsReportedBy(record, currentUserId);
 
-        string? oldImageUrl = record.ImageUrl;
-        string? newImageUrl = oldImageUrl;
-
-        if (dto.Image is not null)
-        {
-            newImageUrl = await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
-        }
-
         record.UpdateBasicAttributes(
             dto.Name,
             dto.LostAndFoundType,
             dto.Place,
             dto.OcurredOn,
             dto.Description,
-            dto.Status,
-            newImageUrl
+            dto.Status
         );
 
-        await repository.UpdateAsync(record);
+        string? replacedImageUrl = null;
 
-        bool shouldDeleteOldImage = dto.Image is not null && !string.IsNullOrWhiteSpace(oldImageUrl);
-
-        if (shouldDeleteOldImage)
+        if (dto.Image is not null)
         {
-            await storageService.DeleteImageAsync(oldImageUrl!);
+            replacedImageUrl = record.ImageUrl;
+            record.AttachImage(await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound));
         }
+
+        await repository.SaveChangesAsync();
+
+        if (!string.IsNullOrWhiteSpace(replacedImageUrl))
+            await storageService.DeleteImageAsync(replacedImageUrl);
 
         LogRecordUpdated(logger, id);
 
@@ -132,7 +125,7 @@ public partial class LostAndFoundService(
 
         record.MarkAsDeleted(EnumDeletionReason.User);
 
-        await repository.UpdateAsync(record);
+        await repository.SaveChangesAsync();
 
         LogRecordDeleted(logger, id);
 

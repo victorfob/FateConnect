@@ -8,5 +8,5 @@ public interface ILostAndFoundRepository
     Task<(IReadOnlyList<LostAndFoundRecord> Items, int Total)> GetAllAsync(FilterLostAndFoundDto filter, int? currentUserId = null);
     Task<LostAndFoundRecord?> GetByIdAsync(Guid id);
     Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord);
-    Task UpdateAsync(LostAndFoundRecord lostAndFoundRecord);
+    Task SaveChangesAsync();
 }

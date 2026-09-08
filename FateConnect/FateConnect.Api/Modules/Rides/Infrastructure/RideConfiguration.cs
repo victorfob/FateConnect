@@ -26,8 +26,6 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
         builder.Property(r => r.CreatedAt)
               .IsRequired();
 
-        builder.Property(r => r.UpdatedAt);
-
         builder.Property(r => r.RideType)
               .IsRequired();
 

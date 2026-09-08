@@ -33,12 +33,8 @@ public class LostAndFoundRecordConfiguration : IEntityTypeConfiguration<LostAndF
         builder.Property(r => r.Status)
                .IsRequired();
 
-        builder.Property(r => r.DeletionReason);
-
         builder.Property(r => r.CreatedAt)
                .IsRequired();
-
-        builder.Property(r => r.UpdatedAt);
 
         builder.Property(r => r.UserId)
                .IsRequired();

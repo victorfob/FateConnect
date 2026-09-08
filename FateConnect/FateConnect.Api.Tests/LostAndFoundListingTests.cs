@@ -60,35 +60,35 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
     [Theory]
     [InlineData("Cachecol de lã cinza", "cachecol de la")]
     [InlineData("Cachecol de la cinza", "cachecol de lã")]
-    public async Task GetItems_FilteredByName_IgnoresAccentsAndCase(string name, string search)
+    public async Task GetItems_FilteredBySearchTerm_IgnoresAccentsAndCase(string name, string search)
     {
         HttpClient client = _factory.CreateClientForNewUser("Ana Beatriz Nogueira");
         Guid id = await ReportAsync(client, ItemForm(name));
 
-        PagedItems page = await ListAsync(client, $"?Name={Uri.EscapeDataString(search.ToUpperInvariant())}");
+        PagedItems page = await ListAsync(client, $"?SearchTerm={Uri.EscapeDataString(search.ToUpperInvariant())}");
 
         Assert.Contains(page.Items, item => item.Id == id);
     }
 
     [Fact]
-    public async Task GetItems_FilteredByName_AlsoMatchesTheDescription()
+    public async Task GetItems_FilteredBySearchTerm_AlsoMatchesTheDescription()
     {
         HttpClient client = _factory.CreateClientForNewUser("Bruno Carvalho Souza");
         Guid id = await ReportAsync(client, ItemForm("Estojo azul", description: "Tinha um adesivo do grêmio."));
 
-        PagedItems page = await ListAsync(client, "?Name=gremio");
+        PagedItems page = await ListAsync(client, "?SearchTerm=gremio");
 
         Assert.Contains(page.Items, item => item.Id == id);
     }
 
     [Fact]
-    public async Task GetItems_FilteredByName_LeavesOutWhatDoesNotMatch()
+    public async Task GetItems_FilteredBySearchTerm_LeavesOutWhatDoesNotMatch()
     {
         HttpClient client = _factory.CreateClientForNewUser("Carla Menezes Duarte");
         Guid matching = await ReportAsync(client, ItemForm("Caneca de porcelana"));
         Guid other = await ReportAsync(client, ItemForm("Tênis de corrida"));
 
-        PagedItems page = await ListAsync(client, "?Name=caneca");
+        PagedItems page = await ListAsync(client, "?SearchTerm=caneca");
 
         Assert.Contains(page.Items, item => item.Id == matching);
         Assert.DoesNotContain(page.Items, item => item.Id == other);
@@ -101,7 +101,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         Guid lost = await ReportAsync(client, ItemForm("Pulseira dourada Daniela", EnumLostAndFoundType.Lost));
         Guid found = await ReportAsync(client, ItemForm("Pulseira prateada Daniela", EnumLostAndFoundType.Found));
 
-        PagedItems page = await ListAsync(client, "?Name=Daniela&LostAndFoundType=Found");
+        PagedItems page = await ListAsync(client, "?SearchTerm=Daniela&LostAndFoundType=Found");
 
         Assert.Contains(page.Items, item => item.Id == found);
         Assert.DoesNotContain(page.Items, item => item.Id == lost);
@@ -115,7 +115,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         Guid yesterday = await ReportAsync(client, ItemForm("Boné do Eduardo"));
         Guid older = await ReportAsync(client, ItemForm("Cinto do Eduardo", ocurredOn: lastWeek));
 
-        PagedItems page = await ListAsync(client, $"?Name=Eduardo&OcurredOn={lastWeek:yyyy-MM-dd}");
+        PagedItems page = await ListAsync(client, $"?SearchTerm=Eduardo&OcurredOn={lastWeek:yyyy-MM-dd}");
 
         Assert.Contains(page.Items, item => item.Id == older);
         Assert.DoesNotContain(page.Items, item => item.Id == yesterday);
@@ -129,7 +129,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         Guid deleted = await ReportAsync(client, ItemForm("Marcador da Fernanda"));
         await client.DeleteAsync($"/LostAndFound/{deleted}");
 
-        PagedItems page = await ListAsync(client, "?Name=Fernanda&Status=Deleted");
+        PagedItems page = await ListAsync(client, "?SearchTerm=Fernanda&Status=Deleted");
 
         Assert.Contains(page.Items, item => item.Id == deleted);
         Assert.DoesNotContain(page.Items, item => item.Id == open);
@@ -143,7 +143,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         Guid deleted = await ReportAsync(client, ItemForm("Toalha do Gabriel"));
         await client.DeleteAsync($"/LostAndFound/{deleted}");
 
-        PagedItems page = await ListAsync(client, "?Name=Gabriel");
+        PagedItems page = await ListAsync(client, "?SearchTerm=Gabriel");
 
         Assert.Contains(page.Items, item => item.Id == open);
         Assert.Contains(page.Items, item => item.Id == deleted);
@@ -157,7 +157,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         Guid myItem = await ReportAsync(mine, ItemForm("Umbrella compartilhada Helena"));
         Guid theirItem = await ReportAsync(theirs, ItemForm("Umbrella compartilhada Igor"));
 
-        PagedItems page = await ListAsync(mine, "?Name=Umbrella compartilhada&OnlyMyItems=true");
+        PagedItems page = await ListAsync(mine, "?SearchTerm=Umbrella compartilhada&OnlyMyItems=true");
 
         Assert.Contains(page.Items, item => item.Id == myItem);
         Assert.DoesNotContain(page.Items, item => item.Id == theirItem);
@@ -170,7 +170,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         HttpClient theirs = _factory.CreateClientForNewUser("Kleber Antunes Faria");
         Guid theirItem = await ReportAsync(theirs, ItemForm("Estojo compartilhado Kleber"));
 
-        PagedItems page = await ListAsync(mine, "?Name=Estojo compartilhado");
+        PagedItems page = await ListAsync(mine, "?SearchTerm=Estojo compartilhado");
 
         Assert.Contains(page.Items, item => item.Id == theirItem);
         Assert.DoesNotContain(page.Items, item => item.IsOwner);
@@ -184,7 +184,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         await ReportAsync(client, ItemForm("Chaveiro numerado Larissa dois"));
         await ReportAsync(client, ItemForm("Chaveiro numerado Larissa tres"));
 
-        PagedItems page = await ListAsync(client, "?Name=Chaveiro numerado Larissa&PageSize=2");
+        PagedItems page = await ListAsync(client, "?SearchTerm=Chaveiro numerado Larissa&PageSize=2");
 
         Assert.Equal(2, page.Items.Count);
         Assert.Equal(2, page.PageSize);
@@ -200,8 +200,8 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         await ReportAsync(client, ItemForm("Cartão numerado Marcos dois"));
         await ReportAsync(client, ItemForm("Cartão numerado Marcos tres"));
 
-        PagedItems first = await ListAsync(client, "?Name=Cartão numerado Marcos&PageSize=2");
-        PagedItems second = await ListAsync(client, "?Name=Cartão numerado Marcos&PageSize=2&Page=2");
+        PagedItems first = await ListAsync(client, "?SearchTerm=Cartão numerado Marcos&PageSize=2");
+        PagedItems second = await ListAsync(client, "?SearchTerm=Cartão numerado Marcos&PageSize=2&Page=2");
 
         Assert.Single(second.Items);
         Assert.DoesNotContain(second.Items, item => first.Items.Any(previous => previous.Id == item.Id));

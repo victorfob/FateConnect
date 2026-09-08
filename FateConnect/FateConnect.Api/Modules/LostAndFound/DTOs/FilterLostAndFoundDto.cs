@@ -5,7 +5,7 @@ using FateConnect.Api.Modules.LostAndFound.Enums;
 
 public record FilterLostAndFoundDto : PagedFilterDto
 {
-    public string? Name { get; init; }
+    public string? SearchTerm { get; init; }
 
     public DateOnly? OcurredOn { get; init; }
 

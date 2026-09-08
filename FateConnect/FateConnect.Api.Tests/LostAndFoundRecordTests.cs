@@ -39,13 +39,14 @@ public class LostAndFoundRecordTests
             "  Biblioteca do bloco B  ",
             Yesterday,
             "  Ficou na mesa do fundo.  ",
-            ReporterId,
-            "  /uploads/lostandfound/foto.png  ");
+            ReporterId);
+
+        record.AttachImage("  uploads/lostandfound/foto.png  ");
 
         Assert.Equal("Garrafa térmica azul", record.Name);
         Assert.Equal("Biblioteca do bloco B", record.Place);
         Assert.Equal("Ficou na mesa do fundo.", record.Description);
-        Assert.Equal("/uploads/lostandfound/foto.png", record.ImageUrl);
+        Assert.Equal("uploads/lostandfound/foto.png", record.ImageUrl);
     }
 
     [Fact]
@@ -119,8 +120,9 @@ public class LostAndFoundRecordTests
             "Cantina",
             lastWeek,
             "Estava embaixo da mesa.",
-            EnumStatusLostAndFound.Resolved,
-            "/uploads/lostandfound/outra.png");
+            EnumStatusLostAndFound.Resolved);
+
+        record.AttachImage("uploads/lostandfound/outra.png");
 
         Assert.Equal("Guarda-chuva preto", record.Name);
         Assert.Equal(EnumLostAndFoundType.Found, record.LostAndFoundType);
@@ -128,7 +130,7 @@ public class LostAndFoundRecordTests
         Assert.Equal(lastWeek, record.OcurredOn);
         Assert.Equal("Estava embaixo da mesa.", record.Description);
         Assert.Equal(EnumStatusLostAndFound.Resolved, record.Status);
-        Assert.Equal("/uploads/lostandfound/outra.png", record.ImageUrl);
+        Assert.Equal("uploads/lostandfound/outra.png", record.ImageUrl);
         Assert.NotNull(record.UpdatedAt);
     }
 
@@ -137,7 +139,7 @@ public class LostAndFoundRecordTests
     {
         LostAndFoundRecord record = NewRecord();
 
-        record.UpdateBasicAttributes(null, null, null, null, null, null, null);
+        record.UpdateBasicAttributes(null, null, null, null, null, null);
 
         Assert.Equal("Garrafa térmica azul", record.Name);
         Assert.Equal(EnumLostAndFoundType.Lost, record.LostAndFoundType);
@@ -152,7 +154,7 @@ public class LostAndFoundRecordTests
         LostAndFoundRecord record = NewRecord();
 
         Assert.Throws<InvalidLostAndFoundNameException>(
-            () => record.UpdateBasicAttributes("ab", null, null, null, null, null, null));
+            () => record.UpdateBasicAttributes("ab", null, null, null, null, null));
     }
 
     [Fact]
@@ -161,7 +163,7 @@ public class LostAndFoundRecordTests
         LostAndFoundRecord record = NewRecord();
 
         Assert.Throws<InvalidLostAndFoundPlaceException>(
-            () => record.UpdateBasicAttributes(null, null, "ab", null, null, null, null));
+            () => record.UpdateBasicAttributes(null, null, "ab", null, null, null));
     }
 
     [Fact]
@@ -171,7 +173,7 @@ public class LostAndFoundRecordTests
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(2));
 
         Assert.Throws<InvalidOccurrenceDateException>(
-            () => record.UpdateBasicAttributes(null, null, null, tomorrow, null, null, null));
+            () => record.UpdateBasicAttributes(null, null, null, tomorrow, null, null));
     }
 
     [Fact]
@@ -180,7 +182,7 @@ public class LostAndFoundRecordTests
         LostAndFoundRecord record = NewRecord();
 
         Assert.Throws<InvalidLostAndFoundTypeException>(
-            () => record.UpdateBasicAttributes(null, (EnumLostAndFoundType)99, null, null, null, null, null));
+            () => record.UpdateBasicAttributes(null, (EnumLostAndFoundType)99, null, null, null, null));
     }
 
     [Fact]
@@ -189,7 +191,7 @@ public class LostAndFoundRecordTests
         LostAndFoundRecord record = NewRecord();
 
         Assert.Throws<InvalidLostAndFoundStatusException>(
-            () => record.UpdateBasicAttributes(null, null, null, null, null, (EnumStatusLostAndFound)99, null));
+            () => record.UpdateBasicAttributes(null, null, null, null, null, (EnumStatusLostAndFound)99));
     }
 
     [Fact]
@@ -212,7 +214,7 @@ public class LostAndFoundRecordTests
         LostAndFoundRecord record = NewRecord();
         record.MarkAsDeleted(EnumDeletionReason.Inactivity);
 
-        record.UpdateBasicAttributes(null, null, null, null, null, status, null);
+        record.UpdateBasicAttributes(null, null, null, null, null, status);
 
         Assert.Equal(status, record.Status);
         Assert.Null(record.DeletionReason);
@@ -223,7 +225,7 @@ public class LostAndFoundRecordTests
     {
         LostAndFoundRecord record = NewRecord();
 
-        record.UpdateBasicAttributes(null, null, null, null, null, EnumStatusLostAndFound.Deleted, null);
+        record.UpdateBasicAttributes(null, null, null, null, null, EnumStatusLostAndFound.Deleted);
 
         Assert.Equal(EnumStatusLostAndFound.Deleted, record.Status);
         Assert.Equal(EnumDeletionReason.User, record.DeletionReason);

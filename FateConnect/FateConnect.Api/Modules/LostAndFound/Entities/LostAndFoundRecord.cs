@@ -29,8 +29,7 @@ public class LostAndFoundRecord
         string place,
         DateOnly ocurredOn,
         string? description,
-        int userId,
-        string? imageUrl = null)
+        int userId)
     {
         ValidateName(name);
         ValidatePlace(place);
@@ -44,8 +43,7 @@ public class LostAndFoundRecord
         LostAndFoundType = lostAndFoundType;
         Place = place.Trim();
         OcurredOn = ocurredOn;
-        Description = description?.Trim();
-        ImageUrl = imageUrl?.Trim();
+        Description = NormalizeDescription(description);
         Status = EnumStatusLostAndFound.Open;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
@@ -57,8 +55,7 @@ public class LostAndFoundRecord
         string? place,
         DateOnly? ocurredOn,
         string? description,
-        EnumStatusLostAndFound? status,
-        string? imageUrl)
+        EnumStatusLostAndFound? status)
     {
         if (name is not null)
         {
@@ -85,26 +82,18 @@ public class LostAndFoundRecord
         }
 
         if (description is not null)
-        {
-            Description = description.Trim();
-        }
+            Description = NormalizeDescription(description);
 
         if (status.HasValue)
         {
             ValidateStatus(status.Value);
-            Status = status.Value;
-            DeletionReason = status.Value == EnumStatusLostAndFound.Deleted
-                ? EnumDeletionReason.User
-                : null;
-        }
-
-        if (imageUrl is not null)
-        {
-            ImageUrl = imageUrl.Trim();
+            ApplyStatus(status.Value);
         }
 
         UpdatedAt = DateTime.UtcNow;
     }
+
+    public void AttachImage(string imageUrl) => ImageUrl = imageUrl.Trim();
 
     public void MarkAsDeleted(EnumDeletionReason reason)
     {
@@ -114,6 +103,21 @@ public class LostAndFoundRecord
     }
 
     public bool IsReportedBy(int userId) => UserId == userId;
+
+    private void ApplyStatus(EnumStatusLostAndFound status)
+    {
+        if (status == EnumStatusLostAndFound.Deleted)
+        {
+            MarkAsDeleted(EnumDeletionReason.User);
+            return;
+        }
+
+        Status = status;
+        DeletionReason = null;
+    }
+
+    private static string? NormalizeDescription(string? description) =>
+        string.IsNullOrWhiteSpace(description) ? null : description.Trim();
 
     private static void ValidateUser(int userId)
     {

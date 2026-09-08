@@ -18,9 +18,9 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         if (currentUserId.HasValue)
             query = query.Where(r => r.UserId == currentUserId.Value);
 
-        if (!string.IsNullOrWhiteSpace(filter.Name))
+        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            string escapedName = filter.Name
+            string escapedSearchTerm = filter.SearchTerm
                 .Replace(@"\", @"\\")
                 .Replace("%", @"\%")
                 .Replace("_", @"\_");
@@ -28,12 +28,12 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
             query = query.Where(r =>
                 EF.Functions.ILike(
                     EF.Functions.Unaccent(r.Name),
-                    "%" + EF.Functions.Unaccent(escapedName) + "%",
+                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
                     @"\"
                 ) ||
                 EF.Functions.ILike(
                     EF.Functions.Unaccent(r.Description ?? ""),
-                    "%" + EF.Functions.Unaccent(escapedName) + "%",
+                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
                     @"\"
                 )
             );
@@ -78,7 +78,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         return lostAndFoundRecord;
     }
 
-    public async Task UpdateAsync(LostAndFoundRecord lostAndFoundRecord)
+    public async Task SaveChangesAsync()
     {
         await context.SaveChangesAsync();
     }
