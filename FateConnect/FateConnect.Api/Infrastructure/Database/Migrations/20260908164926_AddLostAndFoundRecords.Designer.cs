@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FateConnect.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(FateConnectDbContext))]
-    [Migration("20260907194945_StandardizeAuditDates")]
-    partial class StandardizeAuditDates
+    [Migration("20260908164926_AddLostAndFoundRecords")]
+    partial class AddLostAndFoundRecords
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,8 +35,10 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int?>("DeletionReason")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
@@ -111,9 +113,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.Property<int>("RideType")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -216,7 +215,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("FatecEmail")
                         .IsRequired()
@@ -243,7 +244,10 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 

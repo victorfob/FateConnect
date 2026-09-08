@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FateConnect.Api.Infrastructure.Database.Migrations
 {
-    /// <inheritdoc />
-    public partial class InitialLostAndFoundModule : Migration
+    public partial class AddLostAndFoundRecords : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -20,12 +18,13 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     LostAndFoundType = table.Column<int>(type: "integer", nullable: false),
                     Place = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     OcurredOn = table.Column<DateOnly>(type: "date", nullable: false),
-                    Description = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    Description = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
                     ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    DeletionReason = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -44,7 +43,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 column: "UserId");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

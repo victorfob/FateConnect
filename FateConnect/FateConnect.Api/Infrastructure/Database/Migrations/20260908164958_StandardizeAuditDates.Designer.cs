@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FateConnect.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(FateConnectDbContext))]
-    [Migration("20260907220452_MakeLostAndFoundDescriptionOptional")]
-    partial class MakeLostAndFoundDescriptionOptional
+    [Migration("20260908164958_StandardizeAuditDates")]
+    partial class StandardizeAuditDates
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("DeletionReason")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasMaxLength(300)

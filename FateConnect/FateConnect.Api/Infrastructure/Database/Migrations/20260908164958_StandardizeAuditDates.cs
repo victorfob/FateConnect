@@ -5,16 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FateConnect.Api.Infrastructure.Database.Migrations
 {
-    /// <inheritdoc />
     public partial class StandardizeAuditDates : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "IsActive",
-                table: "LostAndFoundRecords");
-
             migrationBuilder.AlterColumn<DateTime>(
                 name: "UpdatedAt",
                 table: "Users",
@@ -38,24 +32,13 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 table: "Rides",
                 type: "timestamp without time zone",
                 nullable: true);
-
-            migrationBuilder.AddColumn<DateTime>(
-                name: "UpdatedAt",
-                table: "LostAndFoundRecords",
-                type: "timestamp without time zone",
-                nullable: true);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
                 name: "UpdatedAt",
                 table: "Rides");
-
-            migrationBuilder.DropColumn(
-                name: "UpdatedAt",
-                table: "LostAndFoundRecords");
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "UpdatedAt",
@@ -75,13 +58,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 defaultValueSql: "CURRENT_TIMESTAMP",
                 oldClrType: typeof(DateTime),
                 oldType: "timestamp without time zone");
-
-            migrationBuilder.AddColumn<bool>(
-                name: "IsActive",
-                table: "LostAndFoundRecords",
-                type: "boolean",
-                nullable: false,
-                defaultValue: true);
         }
     }
 }
