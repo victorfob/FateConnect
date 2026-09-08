@@ -5,8 +5,9 @@ using FateConnect.Api.Modules.Common.Enums;
 using FateConnect.Api.Modules.Common.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
-public class StorageService(IWebHostEnvironment env) : IStorageService
+public partial class StorageService(IWebHostEnvironment env, ILogger<StorageService> logger) : IStorageService
 {
     public async Task<string> UploadImageAsync(IFormFile file, EnumStorageContainer container)
     {
@@ -40,8 +41,15 @@ public class StorageService(IWebHostEnvironment env) : IStorageService
             UploadsLocation.WebRootOf(env),
             relativePath.Replace('/', Path.DirectorySeparatorChar));
 
-        if (File.Exists(physicalFilePath))
-            File.Delete(physicalFilePath);
+        try
+        {
+            if (File.Exists(physicalFilePath))
+                File.Delete(physicalFilePath);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            LogImageDeletionFailed(logger, filePath, exception);
+        }
 
         return Task.CompletedTask;
     }

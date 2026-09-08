@@ -29,10 +29,15 @@ public partial class LostAndFoundService(
             currentUserId
         );
 
-        if (dto.Image is not null)
-            record.AttachImage(await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound));
+        string? storedImageUrl = null;
 
-        await repository.AddAsync(record);
+        if (dto.Image is not null)
+        {
+            storedImageUrl = await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
+            record.AttachImage(storedImageUrl);
+        }
+
+        await PersistOrDropImageAsync(() => repository.AddAsync(record), storedImageUrl);
 
         LogRecordCreated(logger, record.Id);
 
@@ -94,14 +99,16 @@ public partial class LostAndFoundService(
         );
 
         string? replacedImageUrl = null;
+        string? storedImageUrl = null;
 
         if (dto.Image is not null)
         {
             replacedImageUrl = record.ImageUrl;
-            record.AttachImage(await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound));
+            storedImageUrl = await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
+            record.AttachImage(storedImageUrl);
         }
 
-        await repository.SaveChangesAsync();
+        await PersistOrDropImageAsync(repository.SaveChangesAsync, storedImageUrl);
 
         if (!string.IsNullOrWhiteSpace(replacedImageUrl))
             await storageService.DeleteImageAsync(replacedImageUrl);
@@ -136,6 +143,21 @@ public partial class LostAndFoundService(
         LogRecordDeleted(logger, id);
 
         return true;
+    }
+
+    private async Task PersistOrDropImageAsync(Func<Task> persist, string? imageToDropOnFailure)
+    {
+        try
+        {
+            await persist();
+        }
+        catch
+        {
+            if (!string.IsNullOrWhiteSpace(imageToDropOnFailure))
+                await storageService.DeleteImageAsync(imageToDropOnFailure);
+
+            throw;
+        }
     }
 
     private void EnsureRecordIsReportedBy(LostAndFoundRecord record, int currentUserId)

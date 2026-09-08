@@ -5,9 +5,16 @@ using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Common.Validators;
+using FateConnect.Api.Modules.LostAndFound.DTOs;
+using FateConnect.Api.Modules.LostAndFound.Entities;
+using FateConnect.Api.Modules.LostAndFound.Enums;
+using FateConnect.Api.Modules.LostAndFound.Interfaces;
+using FateConnect.Api.Modules.LostAndFound.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FateConnect.Api.Tests;
 
@@ -38,6 +45,24 @@ public sealed class ImageStorageTests : IDisposable
 
     private static ValidationResult? Validate(IFormFile? image) =>
         new ValidImageAttribute().GetValidationResult(image, new ValidationContext(new object()));
+
+    private static StorageService ServiceOn(string webRoot) =>
+        new(new TemporaryWebRoot(webRoot), NullLogger<StorageService>.Instance);
+
+    private sealed class RefusingRepository : ILostAndFoundRepository
+    {
+        public Task<(IReadOnlyList<LostAndFoundRecord> Items, int Total)> GetAllAsync(
+            FilterLostAndFoundDto filter, int? currentUserId = null) =>
+            throw new NotSupportedException();
+
+        public Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true) =>
+            throw new NotSupportedException();
+
+        public Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord) =>
+            throw new DbUpdateException("o banco recusou o registro");
+
+        public Task SaveChangesAsync() => throw new NotSupportedException();
+    }
 
     public void Dispose()
     {
@@ -109,7 +134,7 @@ public sealed class ImageStorageTests : IDisposable
     [Fact]
     public async Task UploadImage_NamesTheFileByTheContentTypeAndNotByWhatWasSent()
     {
-        StorageService service = new(new TemporaryWebRoot(_webRoot));
+        StorageService service = ServiceOn(_webRoot);
 
         string path = await service.UploadImageAsync(FileOf("image/png", fileName: "payload.html"), EnumStorageContainer.LostAndFound);
 
@@ -121,7 +146,7 @@ public sealed class ImageStorageTests : IDisposable
     [Fact]
     public async Task UploadImage_WithAnUnsupportedContentType_WritesNothing()
     {
-        StorageService service = new(new TemporaryWebRoot(_webRoot));
+        StorageService service = ServiceOn(_webRoot);
 
         await Assert.ThrowsAsync<InvalidImageException>(
             () => service.UploadImageAsync(FileOf("text/html"), EnumStorageContainer.LostAndFound));
@@ -132,7 +157,7 @@ public sealed class ImageStorageTests : IDisposable
     [Fact]
     public async Task DeleteImage_RemovesTheFileItStored()
     {
-        StorageService service = new(new TemporaryWebRoot(_webRoot));
+        StorageService service = ServiceOn(_webRoot);
         string path = await service.UploadImageAsync(FileOf("image/webp"), EnumStorageContainer.LostAndFound);
         string physicalPath = Path.Combine(_webRoot, path.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
 
@@ -146,7 +171,7 @@ public sealed class ImageStorageTests : IDisposable
     [InlineData("   ")]
     public async Task DeleteImage_WithoutAPath_DoesNothing(string path)
     {
-        StorageService service = new(new TemporaryWebRoot(_webRoot));
+        StorageService service = ServiceOn(_webRoot);
 
         await service.DeleteImageAsync(path);
 
@@ -156,10 +181,55 @@ public sealed class ImageStorageTests : IDisposable
     [Fact]
     public async Task DeleteImage_OfAFileThatIsNoLongerThere_DoesNothing()
     {
-        StorageService service = new(new TemporaryWebRoot(_webRoot));
+        StorageService service = ServiceOn(_webRoot);
 
         await service.DeleteImageAsync("uploads/lostandfound/inexistente.png");
 
         Assert.False(Directory.Exists(_webRoot));
+    }
+
+    [Fact]
+    public async Task DeleteImage_TheFileSystemRefuses_KeepsGoingAndLeavesTheFile()
+    {
+        if (OperatingSystem.IsWindows())
+            return;
+
+        StorageService service = ServiceOn(_webRoot);
+        string path = await service.UploadImageAsync(FileOf("image/png"), EnumStorageContainer.LostAndFound);
+        string physicalPath = Path.Combine(_webRoot, path.Replace('/', Path.DirectorySeparatorChar));
+        string folder = Path.GetDirectoryName(physicalPath)!;
+
+        File.SetUnixFileMode(folder, UnixFileMode.UserRead | UnixFileMode.UserExecute);
+
+        try
+        {
+            await service.DeleteImageAsync(path);
+
+            Assert.True(File.Exists(physicalPath));
+        }
+        finally
+        {
+            File.SetUnixFileMode(folder, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        }
+    }
+
+    [Fact]
+    public async Task CreateItem_WhenTheDatabaseRefusesIt_LeavesNoFileBehind()
+    {
+        StorageService storage = ServiceOn(_webRoot);
+        LostAndFoundService service = new(new RefusingRepository(), storage, NullLogger<LostAndFoundService>.Instance);
+
+        CreateLostAndFoundDto dto = new()
+        {
+            Name = "Garrafa térmica azul",
+            LostAndFoundType = EnumLostAndFoundType.Lost,
+            Place = "Biblioteca do bloco B",
+            OcurredOn = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
+            Image = FileOf("image/png"),
+        };
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => service.CreateAsync(dto, 1));
+
+        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "lostandfound")));
     }
 }
