@@ -113,7 +113,7 @@ public sealed class ImageStorageTests : IDisposable
 
         string path = await service.UploadImageAsync(FileOf("image/png", fileName: "payload.html"), EnumStorageContainer.LostAndFound);
 
-        Assert.StartsWith("/uploads/lostandfound/", path, StringComparison.Ordinal);
+        Assert.StartsWith("uploads/lostandfound/", path, StringComparison.Ordinal);
         Assert.EndsWith(".png", path, StringComparison.Ordinal);
         Assert.True(File.Exists(Path.Combine(_webRoot, path.TrimStart('/').Replace('/', Path.DirectorySeparatorChar))));
     }
@@ -158,7 +158,7 @@ public sealed class ImageStorageTests : IDisposable
     {
         StorageService service = new(new TemporaryWebRoot(_webRoot));
 
-        await service.DeleteImageAsync("/uploads/lostandfound/inexistente.png");
+        await service.DeleteImageAsync("uploads/lostandfound/inexistente.png");
 
         Assert.False(Directory.Exists(_webRoot));
     }

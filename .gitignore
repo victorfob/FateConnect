@@ -14,3 +14,7 @@ docker-compose.override.yml
 # projeto, porque a regra é a mesma para todos e projeto novo já nasce coberto.
 [Bb]in/
 [Oo]bj/
+
+# Imagens enviadas pela API. Rodar a API na máquina cria a pasta e grava aqui; em
+# produção o mesmo caminho é um volume do contêiner, não o repositório.
+FateConnect/FateConnect.Api/wwwroot/

@@ -8,22 +8,16 @@ using Microsoft.AspNetCore.Http;
 
 public class StorageService(IWebHostEnvironment env) : IStorageService
 {
-    private const string WebRootFolderName = "wwwroot";
-    private const string UploadsFolderName = "uploads";
-
     public async Task<string> UploadImageAsync(IFormFile file, EnumStorageContainer container)
     {
         string containerName = container.ToString().ToLowerInvariant();
 
-        string webRootPath = env.WebRootPath ?? Path.Combine(env.ContentRootPath, WebRootFolderName);
-
-        string uploadsFolder = Path.Combine(webRootPath, UploadsFolderName, containerName);
+        string uploadsFolder = Path.Combine(UploadsLocation.PhysicalRootOf(env), containerName);
 
         string fileExtension = ImageContentTypes.ExtensionFor(file.ContentType);
         string uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
 
-        if (!Directory.Exists(uploadsFolder))
-            Directory.CreateDirectory(uploadsFolder);
+        Directory.CreateDirectory(uploadsFolder);
 
         string physicalFilePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -32,7 +26,7 @@ public class StorageService(IWebHostEnvironment env) : IStorageService
             await file.CopyToAsync(stream);
         }
 
-        return $"/{UploadsFolderName}/{containerName}/{uniqueFileName}";
+        return $"{UploadsLocation.FolderName}/{containerName}/{uniqueFileName}";
     }
 
     public Task DeleteImageAsync(string filePath)
@@ -42,9 +36,9 @@ public class StorageService(IWebHostEnvironment env) : IStorageService
 
         string relativePath = filePath.TrimStart('/');
 
-        string webRootPath = env.WebRootPath ?? Path.Combine(env.ContentRootPath, WebRootFolderName);
-
-        string physicalFilePath = Path.Combine(webRootPath, relativePath.Replace('/', Path.DirectorySeparatorChar));
+        string physicalFilePath = Path.Combine(
+            UploadsLocation.WebRootOf(env),
+            relativePath.Replace('/', Path.DirectorySeparatorChar));
 
         if (File.Exists(physicalFilePath))
             File.Delete(physicalFilePath);

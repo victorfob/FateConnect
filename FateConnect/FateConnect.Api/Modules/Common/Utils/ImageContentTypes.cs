@@ -18,9 +18,9 @@ public static class ImageContentTypes
 
     public static string ExtensionFor(string contentType)
     {
-        if (!IsSupported(contentType))
+        if (!ExtensionByContentType.TryGetValue(contentType, out string? fileExtension))
             throw new InvalidImageException(UnsupportedMessage);
 
-        return ExtensionByContentType[contentType];
+        return fileExtension;
     }
 }
