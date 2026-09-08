@@ -6,7 +6,7 @@ using FateConnect.Api.Modules.LostAndFound.Entities;
 public interface ILostAndFoundRepository
 {
     Task<(IReadOnlyList<LostAndFoundRecord> Items, int Total)> GetAllAsync(FilterLostAndFoundDto filter, int? currentUserId = null);
-    Task<LostAndFoundRecord?> GetByIdAsync(Guid id);
+    Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true);
     Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord);
     Task SaveChangesAsync();
 }

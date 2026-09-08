@@ -60,11 +60,15 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         return (items, total);
     }
 
-    public async Task<LostAndFoundRecord?> GetByIdAsync(Guid id)
+    public async Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true)
     {
-        return await context.LostAndFoundRecords
-            .Include(r => r.User.Contacts)
-            .FirstOrDefaultAsync(r => r.Id == id);
+        IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
+            .Include(r => r.User.Contacts);
+
+        if (!forChange)
+            query = query.AsNoTracking();
+
+        return await query.FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord)

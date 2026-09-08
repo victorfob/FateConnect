@@ -58,7 +58,7 @@ public partial class LostAndFoundService(
 
     public async Task<ReadLostAndFoundDto?> GetByIdAsync(Guid id, int currentUserId)
     {
-        var record = await repository.GetByIdAsync(id);
+        var record = await repository.GetByIdAsync(id, forChange: false);
 
         if (record is null)
         {
