@@ -7,7 +7,6 @@ import {
   LostItemKindEnum,
   LostItemStatusEnum,
   type LostItem,
-  type LostItemInput,
 } from '@app/services/lostAndFound/types';
 import { fireEvent, render, screen, userEvent, waitFor } from '@app/test/testing-library';
 import { toApiDate } from '@app/utils/apiDate';
@@ -21,7 +20,15 @@ import {
 } from './constants';
 import { LostItemFormDialog, type LostItemFormDialogProps } from '.';
 
-const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/achado';
+const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/lostandfound';
+
+/**
+ * A API recebe `[FromForm]` nos dois verbos de escrita, e ler o corpo como
+ * formulário é o que faz o stub reprovar um JSON — como ela reprovaria.
+ */
+async function fieldsOf(request: Request): Promise<Record<string, FormDataEntryValue>> {
+  return Object.fromEntries(await request.formData());
+}
 
 const PREVIEW_URL = 'blob:https://fateconnect.test/preview';
 
@@ -113,10 +120,10 @@ describe('LostItemFormDialog', () => {
   });
 
   it('should send the whole item on update, so the description survives', async () => {
-    let body: LostItemInput | null = null;
+    let fields: Record<string, FormDataEntryValue> | null = null;
     server.use(
-      http.put(`${LOST_AND_FOUND_URL}/:id`, async ({ request }) => {
-        body = (await request.json()) as LostItemInput;
+      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, async ({ request }) => {
+        fields = await fieldsOf(request);
         return HttpResponse.json({ id: LOST_ITEM.id });
       }),
     );
@@ -126,18 +133,18 @@ describe('LostItemFormDialog', () => {
     await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(body).toEqual({
-      name: LOST_ITEM.name,
-      lostAndFoundType: LOST_ITEM.lostAndFoundType,
-      place: LOST_ITEM.place,
-      ocurredOn: '2026-08-11',
-      description: LOST_ITEM.description,
+    expect(fields).toEqual({
+      Name: LOST_ITEM.name,
+      LostAndFoundType: LOST_ITEM.lostAndFoundType,
+      Place: LOST_ITEM.place,
+      OcurredOn: '2026-08-11',
+      Description: LOST_ITEM.description,
     });
   });
 
   it('should keep the dialog open when the api fails, with what was typed', async () => {
     server.use(
-      http.put(`${LOST_AND_FOUND_URL}/:id`, () => new HttpResponse(null, { status: 500 })),
+      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, () => new HttpResponse(null, { status: 500 })),
     );
     renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
@@ -150,10 +157,10 @@ describe('LostItemFormDialog', () => {
   });
 
   it('should register the item the form describes', async () => {
-    let body: LostItemInput | null = null;
+    let fields: Record<string, FormDataEntryValue> | null = null;
     server.use(
       http.post(LOST_AND_FOUND_URL, async ({ request }) => {
-        body = (await request.json()) as LostItemInput;
+        fields = await fieldsOf(request);
         return HttpResponse.json({ id: 'novo' }, { status: 201 });
       }),
     );
@@ -179,13 +186,31 @@ describe('LostItemFormDialog', () => {
     await userEvent.click(screen.getByRole('button', { name: REGISTER_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(body).toEqual({
-      name: 'Garrafa térmica',
-      lostAndFoundType: LostItemKindEnum.FOUND,
-      place: 'Bloco C',
-      ocurredOn: toApiDate(OCCURRED_AT),
-      description: '',
+    expect(fields).toEqual({
+      Name: 'Garrafa térmica',
+      LostAndFoundType: LostItemKindEnum.FOUND,
+      Place: 'Bloco C',
+      OcurredOn: toApiDate(OCCURRED_AT),
+      Description: '',
     });
+  });
+
+  it('should send the chosen photo in the same request as the item', async () => {
+    let fields: Record<string, FormDataEntryValue> | null = null;
+    server.use(
+      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, async ({ request }) => {
+        fields = await fieldsOf(request);
+        return HttpResponse.json({ id: LOST_ITEM.id });
+      }),
+    );
+    renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+
+    await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
+    await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect((fields!.Image as File).type).toBe('image/png');
   });
 
   it('should show the chosen photo and let the user drop it', async () => {

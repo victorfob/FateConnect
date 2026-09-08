@@ -24,5 +24,6 @@ export function toLostItemInput(values: LostItemFormValues): LostItemInput {
     place: values.place,
     ocurredOn: toApiDateText(values.occurredOn),
     description: values.description,
+    image: values.photo,
   };
 }

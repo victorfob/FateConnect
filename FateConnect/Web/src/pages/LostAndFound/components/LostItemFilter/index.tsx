@@ -16,13 +16,13 @@ const FILTER_COLUMNS = 3;
 
 /** O mural já abre em Aberto, e paginação não é escolha de busca: nenhum dos dois acende o ponto. */
 function isBeyondDefault({
-  name,
-  occurredOn,
-  kind,
-  onlyMine,
+  searchTerm,
+  ocurredOn,
+  lostAndFoundType,
+  onlyMyItems,
   status,
 }: LostItemFilterValues): boolean {
-  if (name || occurredOn || kind || onlyMine) return true;
+  if (searchTerm || ocurredOn || lostAndFoundType || onlyMyItems) return true;
 
   return status !== LostItemStatusEnum.OPEN;
 }
@@ -33,13 +33,13 @@ type LostItemFilterProps = Readonly<{
 }>;
 
 export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps) {
-  const [itemName, setItemName] = useState(initialFilters.name ?? '');
-  const [occurredOn, setOccurredOn] = useState(() =>
-    toDisplayDate(initialFilters.occurredOn ?? ''),
+  const [itemName, setItemName] = useState(initialFilters.searchTerm ?? '');
+  const [occurredOn, setOccurredOn] = useState(() => toDisplayDate(initialFilters.ocurredOn ?? ''));
+  const [kind, setKind] = useState<string>(
+    initialFilters.lostAndFoundType ?? C.LostItemKindFilterEnum.ALL,
   );
-  const [kind, setKind] = useState<string>(initialFilters.kind ?? C.LostItemKindFilterEnum.ALL);
   const [owner, setOwner] = useState<string>(() => {
-    if (initialFilters.onlyMine) return C.LostItemOwnerFilterEnum.MINE;
+    if (initialFilters.onlyMyItems) return C.LostItemOwnerFilterEnum.MINE;
 
     return C.LostItemOwnerFilterEnum.ALL;
   });
@@ -68,10 +68,10 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
   const handleSubmit = useCallback(() => {
     const filters: LostItemFilterValues = {};
 
-    if (itemName.trim()) filters.name = itemName.trim();
-    if (occurredOn) filters.occurredOn = toApiDateText(occurredOn);
-    if (isLostItemKind(kind)) filters.kind = kind;
-    if (owner === C.LostItemOwnerFilterEnum.MINE) filters.onlyMine = true;
+    if (itemName.trim()) filters.searchTerm = itemName.trim();
+    if (occurredOn) filters.ocurredOn = toApiDateText(occurredOn);
+    if (isLostItemKind(kind)) filters.lostAndFoundType = kind;
+    if (owner === C.LostItemOwnerFilterEnum.MINE) filters.onlyMyItems = true;
     if (isLostItemStatus(status)) filters.status = status;
 
     setIsFiltered(isBeyondDefault(filters));

@@ -7,28 +7,28 @@ import {
   type LostItemInput,
 } from './types';
 
-const LOST_AND_FOUND_PATH = '/achado';
+const LOST_AND_FOUND_PATH = '/lostandfound';
 
 const INVALID_LIST_PAYLOAD_MESSAGE =
   'A API de achados e perdidos respondeu algo que não é uma página.';
 
-function toQueryParams(filters: LostItemFilter = {}): Record<string, string> {
-  const params: Record<string, string> = {};
+/** Cadastrar e editar são `multipart`: é o que faz a foto viajar no mesmo pedido. */
+function toFormData(input: LostItemInput): FormData {
+  const body = new FormData();
 
-  if (filters.name) params.Nome = filters.name;
-  if (filters.occurredOn) params.DataOcorrido = filters.occurredOn;
-  if (filters.kind) params.Tipo = filters.kind;
-  if (filters.onlyMine) params.MeusItens = 'true';
-  if (filters.status) params.Situacao = filters.status;
-  if (filters.page) params.Page = String(filters.page);
-  if (filters.pageSize) params.PageSize = String(filters.pageSize);
+  body.append('Name', input.name);
+  body.append('LostAndFoundType', input.lostAndFoundType);
+  body.append('Place', input.place);
+  body.append('OcurredOn', input.ocurredOn);
+  body.append('Description', input.description);
+  if (input.image) body.append('Image', input.image);
 
-  return params;
+  return body;
 }
 
 export async function listLostItems(filters?: LostItemFilter): Promise<PagedResult<LostItem>> {
   const { data } = await apiClient.get<PagedResult<LostItem>>(LOST_AND_FOUND_PATH, {
-    params: toQueryParams(filters),
+    params: filters,
   });
 
   // Sem endereço de API a requisição cai no dev server, que responde HTML com 200.
@@ -38,20 +38,26 @@ export async function listLostItems(filters?: LostItemFilter): Promise<PagedResu
 }
 
 export async function createLostItem(input: LostItemInput): Promise<LostItem> {
-  const { data } = await apiClient.post<LostItem>(LOST_AND_FOUND_PATH, input);
+  const { data } = await apiClient.post<LostItem>(LOST_AND_FOUND_PATH, toFormData(input));
 
   return data;
 }
 
 export async function updateLostItem(itemId: string, input: LostItemInput): Promise<LostItem> {
-  const { data } = await apiClient.put<LostItem>(`${LOST_AND_FOUND_PATH}/${itemId}`, input);
+  const { data } = await apiClient.patch<LostItem>(
+    `${LOST_AND_FOUND_PATH}/${itemId}`,
+    toFormData(input),
+  );
 
   return data;
 }
 
-/** Recurso próprio: um `PUT` exigiria reenviar campos que a ação não toca. */
+/** Sozinha no corpo, a situação muda sem que os outros campos do item sejam tocados. */
 async function changeLostItemStatus(itemId: string, status: LostItemStatusEnum): Promise<void> {
-  await apiClient.patch(`${LOST_AND_FOUND_PATH}/${itemId}/situacao`, { situacao: status });
+  const body = new FormData();
+  body.append('Status', status);
+
+  await apiClient.patch(`${LOST_AND_FOUND_PATH}/${itemId}`, body);
 }
 
 export async function resolveLostItem(itemId: string): Promise<void> {

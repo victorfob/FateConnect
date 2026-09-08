@@ -31,16 +31,17 @@ export type LostItem = {
   createdAt: string;
 };
 
-/** A foto fica de fora: quem devolve a `imageUrl` é o servidor. */
-export type LostItemInput = Pick<
-  LostItem,
-  'name' | 'lostAndFoundType' | 'place' | 'ocurredOn' | 'description'
->;
+export type LostItemInput = Pick<LostItem, 'name' | 'lostAndFoundType' | 'place' | 'ocurredOn'> & {
+  /** String vazia limpa a descrição guardada; omitir o campo a deixaria como está. */
+  description: string;
+  image: File | null;
+};
 
+/** Filtros da listagem, com os mesmos nomes que a API recebe na query. */
 export interface LostItemFilter extends PageQuery {
-  name?: string;
-  occurredOn?: string;
-  kind?: LostItemKindEnum;
-  onlyMine?: boolean;
+  searchTerm?: string;
+  ocurredOn?: string;
+  lostAndFoundType?: LostItemKindEnum;
+  onlyMyItems?: boolean;
   status?: LostItemStatusEnum;
 }

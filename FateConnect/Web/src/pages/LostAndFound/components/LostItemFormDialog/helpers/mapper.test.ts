@@ -45,14 +45,15 @@ describe('toFormValues', () => {
 });
 
 describe('toLostItemInput', () => {
-  it('should carry every field the api owns and leave the photo out', () => {
+  it('should carry every field the api owns, the chosen photo included', () => {
+    const photo = new File(['foto'], 'carteira.png', { type: 'image/png' });
     const values: LostItemFormValues = {
       name: 'Carteira preta',
       kind: LostItemKindEnum.LOST,
       place: 'Biblioteca',
       occurredOn: '11/08/2026',
       description: 'Carteira de couro preta.',
-      photo: new File(['foto'], 'carteira.png', { type: 'image/png' }),
+      photo,
     };
 
     expect(toLostItemInput(values)).toEqual({
@@ -61,6 +62,7 @@ describe('toLostItemInput', () => {
       place: 'Biblioteca',
       ocurredOn: '2026-08-11',
       description: 'Carteira de couro preta.',
+      image: photo,
     });
   });
 });

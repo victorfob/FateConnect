@@ -31,7 +31,7 @@ import { EDIT_MODE, REGISTER_MODE } from './components/LostItemFormDialog/consta
 import * as C from './constants';
 import { LostAndFound } from '.';
 
-const LOST_ITEMS_URL = 'https://api.fateconnect.test/achado';
+const LOST_ITEMS_URL = 'https://api.fateconnect.test/lostandfound';
 
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
@@ -79,20 +79,17 @@ function boardTracking(initial: LostItem) {
   server.use(
     http.get(LOST_ITEMS_URL, ({ request }) => {
       const url = new URL(request.url);
-      const wanted = url.searchParams.get('Situacao');
+      const wanted = url.searchParams.get('status');
       if (wanted && wanted !== current.status) return HttpResponse.json(pagedResponse([], url));
 
       return HttpResponse.json(pagedResponse([current], url));
     }),
-    http.patch<{ itemId: string }, { situacao: LostItemStatusEnum }>(
-      `${LOST_ITEMS_URL}/:itemId/situacao`,
-      async ({ request }) => {
-        const { situacao } = await request.json();
-        current = { ...current, status: situacao, deletionReason: null };
+    http.patch(`${LOST_ITEMS_URL}/:itemId`, async ({ request }) => {
+      const status = (await request.formData()).get('Status') as LostItemStatusEnum;
+      current = { ...current, status, deletionReason: null };
 
-        return new HttpResponse(null, { status: NO_CONTENT });
-      },
-    ),
+      return HttpResponse.json(current);
+    }),
     http.delete(`${LOST_ITEMS_URL}/:itemId`, () => {
       current = {
         ...current,
@@ -149,7 +146,7 @@ describe('LostAndFound', () => {
     renderComponent();
 
     await waitFor(() => expect(received).not.toBeNull());
-    expect(received!.searchParams.get('Situacao')).toBe(LostItemStatusEnum.OPEN);
+    expect(received!.searchParams.get('status')).toBe(LostItemStatusEnum.OPEN);
   });
 
   it('should tell the user when no item matches', async () => {
@@ -181,8 +178,8 @@ describe('LostAndFound', () => {
     await userEvent.type(screen.getByLabelText(FILTER_LABELS.name), 'Carteira');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
-    await waitFor(() => expect(requestUrl!.searchParams.get('Nome')).toBe('Carteira'));
-    expect(requestUrl!.searchParams.get('Situacao')).toBe(LostItemStatusEnum.OPEN);
+    await waitFor(() => expect(requestUrl!.searchParams.get('searchTerm')).toBe('Carteira'));
+    expect(requestUrl!.searchParams.get('status')).toBe(LostItemStatusEnum.OPEN);
     expect(activeFilterDot(FILTER_PANEL_TITLE)).not.toHaveClass('MuiBadge-invisible');
   });
 
@@ -440,10 +437,7 @@ describe('LostAndFound', () => {
   it('should report a failure to conclude the item', async () => {
     listReturning([OWN_OPEN_ITEM]);
     server.use(
-      http.patch(
-        `${LOST_ITEMS_URL}/:itemId/situacao`,
-        () => new HttpResponse(null, { status: 500 }),
-      ),
+      http.patch(`${LOST_ITEMS_URL}/:itemId`, () => new HttpResponse(null, { status: 500 })),
     );
     renderComponent();
     await screen.findByText(LOST_ITEM.name);
@@ -507,7 +501,7 @@ describe('LostAndFound', () => {
 
       renderComponent('?pagina=3');
 
-      await waitFor(() => expect(asked!.searchParams.get('Page')).toBe('3'));
+      await waitFor(() => expect(asked!.searchParams.get('page')).toBe('3'));
     });
 
     it('should show the items the requested page holds, and not the ones before it', async () => {

@@ -25,16 +25,18 @@ function fromParams(params: URLSearchParams): LostItemFilter {
     status: parseLostItemStatus(params.get(SearchParamEnum.STATUS)) ?? DEFAULT_STATUS,
   };
 
-  const name = readParamValue(params, SearchParamEnum.NAME);
-  if (name) filter.name = name;
+  const searchTerm = readParamValue(params, SearchParamEnum.NAME);
+  if (searchTerm) filter.searchTerm = searchTerm;
 
-  const occurredOn = readParamValue(params, SearchParamEnum.OCCURRED_ON);
-  if (occurredOn) filter.occurredOn = occurredOn;
+  const ocurredOn = readParamValue(params, SearchParamEnum.OCCURRED_ON);
+  if (ocurredOn) filter.ocurredOn = ocurredOn;
 
   const kind = parseLostItemKind(params.get(SearchParamEnum.KIND));
-  if (kind) filter.kind = kind;
+  if (kind) filter.lostAndFoundType = kind;
 
-  if (params.get(SearchParamEnum.ONLY_MINE)?.trim().toLowerCase() === MINE) filter.onlyMine = true;
+  if (params.get(SearchParamEnum.ONLY_MINE)?.trim().toLowerCase() === MINE) {
+    filter.onlyMyItems = true;
+  }
 
   return filter;
 }
@@ -43,13 +45,15 @@ function toParams(filter: LostItemFilter): Record<string, string> {
   const params: Record<string, string> = {};
 
   writePageParam(params, filter.page);
-  if (filter.name) params[SearchParamEnum.NAME] = filter.name;
-  if (filter.occurredOn) params[SearchParamEnum.OCCURRED_ON] = filter.occurredOn;
-  if (filter.kind) params[SearchParamEnum.KIND] = lostItemKindSlug(filter.kind);
+  if (filter.searchTerm) params[SearchParamEnum.NAME] = filter.searchTerm;
+  if (filter.ocurredOn) params[SearchParamEnum.OCCURRED_ON] = filter.ocurredOn;
+  if (filter.lostAndFoundType) {
+    params[SearchParamEnum.KIND] = lostItemKindSlug(filter.lostAndFoundType);
+  }
   if (filter.status && filter.status !== DEFAULT_STATUS) {
     params[SearchParamEnum.STATUS] = lostItemStatusSlug(filter.status);
   }
-  if (filter.onlyMine) params[SearchParamEnum.ONLY_MINE] = MINE;
+  if (filter.onlyMyItems) params[SearchParamEnum.ONLY_MINE] = MINE;
 
   return params;
 }

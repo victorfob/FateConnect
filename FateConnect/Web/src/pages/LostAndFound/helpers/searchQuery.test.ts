@@ -17,11 +17,11 @@ describe('lostItemSearchCodec', () => {
       ).toEqual({
         page: 2,
         pageSize: PAGE_SIZE,
-        name: 'Garrafa',
-        occurredOn: '2026-08-01',
-        kind: LostItemKindEnum.LOST,
+        searchTerm: 'Garrafa',
+        ocurredOn: '2026-08-01',
+        lostAndFoundType: LostItemKindEnum.LOST,
         status: LostItemStatusEnum.RESOLVED,
-        onlyMine: true,
+        onlyMyItems: true,
       });
     });
 
@@ -42,12 +42,12 @@ describe('lostItemSearchCodec', () => {
     });
 
     it('should ignore a kind it does not recognise', () => {
-      expect(read('tipo=emprestado').kind).toBeUndefined();
+      expect(read('tipo=emprestado').lostAndFoundType).toBeUndefined();
     });
 
     it('should not care about the case of the words', () => {
       expect(read('tipo=ACHADO&situacao=Excluido')).toMatchObject({
-        kind: LostItemKindEnum.FOUND,
+        lostAndFoundType: LostItemKindEnum.FOUND,
         status: LostItemStatusEnum.DELETED,
       });
     });
@@ -55,7 +55,7 @@ describe('lostItemSearchCodec', () => {
     it.each(['meus=nao', 'meus=', 'meus=talvez'])(
       'should leave "only mine" off when the url says %s',
       (search) => {
-        expect(read(search).onlyMine).toBeUndefined();
+        expect(read(search).onlyMyItems).toBeUndefined();
       },
     );
   });
@@ -75,9 +75,9 @@ describe('lostItemSearchCodec', () => {
       const params = lostItemSearchCodec.toParams({
         page: 3,
         pageSize: PAGE_SIZE,
-        kind: LostItemKindEnum.FOUND,
+        lostAndFoundType: LostItemKindEnum.FOUND,
         status: LostItemStatusEnum.DELETED,
-        onlyMine: true,
+        onlyMyItems: true,
       });
 
       expect(params).toEqual({ pagina: '3', tipo: 'achado', situacao: 'excluido', meus: 'sim' });
@@ -87,11 +87,11 @@ describe('lostItemSearchCodec', () => {
       const original = {
         page: 4,
         pageSize: PAGE_SIZE,
-        name: 'Guarda-chuva azul',
-        occurredOn: '2026-07-15',
-        kind: LostItemKindEnum.LOST,
+        searchTerm: 'Guarda-chuva azul',
+        ocurredOn: '2026-07-15',
+        lostAndFoundType: LostItemKindEnum.LOST,
         status: LostItemStatusEnum.RESOLVED,
-        onlyMine: true,
+        onlyMyItems: true,
       };
 
       const params = new URLSearchParams(lostItemSearchCodec.toParams(original));
