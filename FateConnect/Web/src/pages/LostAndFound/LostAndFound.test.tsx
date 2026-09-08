@@ -41,6 +41,7 @@ const LOST_ITEM: LostItem = {
   ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos e cartões.',
   imageUrl: null,
+  contact: { name: 'Marina Duarte', email: 'marina.duarte@example.com', phone: '(15) 99999-0001' },
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
   isOwner: false,
