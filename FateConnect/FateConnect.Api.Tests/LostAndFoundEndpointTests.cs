@@ -373,6 +373,18 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Assert.Contains("Informe se o item foi perdido ou achado.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
     }
 
+    public async Task DeleteItem_ThatIsAlreadyDeleted_IsNotFound()
+    {
+        (ReadItem item, int reporterId, _) = await ReportItemAsync("Cadeado de bicicleta");
+        HttpClient reporter = _factory.CreateClientFor(reporterId);
+
+        HttpResponseMessage first = await reporter.DeleteAsync($"/LostAndFound/{item.Id}");
+        HttpResponseMessage second = await reporter.DeleteAsync($"/LostAndFound/{item.Id}");
+
+        Assert.Equal(HttpStatusCode.NoContent, first.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, second.StatusCode);
+    }
+
     public async Task ReadItem_CarriesTheCreationInstantAsUtc()
     {
         (ReadItem item, int reporterId, _) = await ReportItemAsync("Cachecol de lã");

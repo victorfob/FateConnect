@@ -146,6 +146,7 @@ public class LostAndFoundRecordTests
         Assert.Equal("Biblioteca do bloco B", record.Place);
         Assert.Equal("Ficou na mesa do fundo.", record.Description);
         Assert.Equal(EnumStatusLostAndFound.Open, record.Status);
+        Assert.Null(record.UpdatedAt);
     }
 
     [Fact]

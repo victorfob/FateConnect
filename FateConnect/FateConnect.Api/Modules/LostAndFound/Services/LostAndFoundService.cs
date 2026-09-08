@@ -123,6 +123,12 @@ public partial class LostAndFoundService(
 
         EnsureRecordIsReportedBy(record, currentUserId);
 
+        if (record.IsDeleted)
+        {
+            LogRecordDeletionFailed(logger, id);
+            return false;
+        }
+
         record.MarkAsDeleted(EnumDeletionReason.User);
 
         await repository.SaveChangesAsync();

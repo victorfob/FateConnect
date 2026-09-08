@@ -57,40 +57,51 @@ public class LostAndFoundRecord
         string? description,
         EnumStatusLostAndFound? status)
     {
+        bool receivedAnyField = false;
+
         if (name is not null)
         {
             ValidateName(name);
             Name = name.Trim();
+            receivedAnyField = true;
         }
 
         if (lostAndFoundType.HasValue)
         {
             ValidateType(lostAndFoundType.Value);
             LostAndFoundType = lostAndFoundType.Value;
+            receivedAnyField = true;
         }
 
         if (place is not null)
         {
             ValidatePlace(place);
             Place = place.Trim();
+            receivedAnyField = true;
         }
 
         if (ocurredOn.HasValue)
         {
             ValidateOcurredOn(ocurredOn.Value);
             OcurredOn = ocurredOn.Value;
+            receivedAnyField = true;
         }
 
         if (description is not null)
+        {
             Description = NormalizeDescription(description);
+            receivedAnyField = true;
+        }
 
         if (status.HasValue)
         {
             ValidateStatus(status.Value);
             ApplyStatus(status.Value);
+            receivedAnyField = true;
         }
 
-        UpdatedAt = DateTime.UtcNow;
+        if (receivedAnyField)
+            UpdatedAt = DateTime.UtcNow;
     }
 
     public void AttachImage(string imageUrl) => ImageUrl = imageUrl.Trim();
@@ -103,6 +114,8 @@ public class LostAndFoundRecord
     }
 
     public bool IsReportedBy(int userId) => UserId == userId;
+
+    public bool IsDeleted => Status == EnumStatusLostAndFound.Deleted;
 
     private void ApplyStatus(EnumStatusLostAndFound status)
     {

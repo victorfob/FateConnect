@@ -26,8 +26,9 @@ public class UserRepository : IUserRepository
     {
         await _context.Users
             .Where(user => user.Id == userId)
-            .ExecuteUpdateAsync(update =>
-                update.SetProperty(user => user.TokenVersion, user => user.TokenVersion + 1));
+            .ExecuteUpdateAsync(update => update
+                .SetProperty(user => user.TokenVersion, user => user.TokenVersion + 1)
+                .SetProperty(user => user.UpdatedAt, DateTime.UtcNow));
     }
 
     public async Task<bool> EmailExistsAsync(string email)
