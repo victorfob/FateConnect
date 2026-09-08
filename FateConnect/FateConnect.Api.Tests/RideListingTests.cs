@@ -192,7 +192,7 @@ public class RideListingTests
     }
 
     [Fact]
-    public async Task GetRides_FilteredByDestination_KeepsOnlyTheRidesThatMatch()
+    public async Task GetRides_FilteredBySearchTerm_KeepsOnlyTheRidesThatMatch()
     {
         using ApiFactory factory = new();
         int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
@@ -200,7 +200,7 @@ public class RideListingTests
         Guid matching = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), "São Paulo centro");
         factory.SeedRide(driverId, tomorrow, new TimeOnly(9, 0), "Campinas");
 
-        PagedRides page = await GetPageAsync(factory, driverId, "?Destination=paulo");
+        PagedRides page = await GetPageAsync(factory, driverId, "?SearchTerm=paulo");
 
         Assert.Equal(1, page.Total);
         Assert.Equal(matching, Assert.Single(page.Items).Id);
@@ -210,16 +210,45 @@ public class RideListingTests
     [InlineData("São Paulo centro", "sao paulo")]
     [InlineData("Sao Paulo centro", "são paulo")]
     [InlineData("São Paulo centro", "SÃO PAULO")]
-    public async Task GetRides_FilteredByDestination_IgnoresAccentsAndCase(string destination, string search)
+    public async Task GetRides_FilteredBySearchTerm_IgnoresAccentsAndCase(string destination, string search)
     {
         using ApiFactory factory = new();
         int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
         Guid expected = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), destination);
 
-        PagedRides page = await GetPageAsync(factory, driverId, $"?Destination={Uri.EscapeDataString(search)}");
+        PagedRides page = await GetPageAsync(factory, driverId, $"?SearchTerm={Uri.EscapeDataString(search)}");
 
         Assert.Equal(expected, Assert.Single(page.Items).Id);
+    }
+
+    [Fact]
+    public async Task GetRides_FilteredBySearchTerm_AlsoMatchesTheDescription()
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        Guid matching = factory.SeedRide(
+            driverId, tomorrow, new TimeOnly(8, 30), "Campinas", "Passa pelo terminal de Sorocaba.");
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(9, 0), "Itu", "Saída pelo portão da frente.");
+
+        PagedRides page = await GetPageAsync(factory, driverId, "?SearchTerm=sorocaba");
+
+        Assert.Equal(1, page.Total);
+        Assert.Equal(matching, Assert.Single(page.Items).Id);
+    }
+
+    [Fact]
+    public async Task GetRides_FilteredBySearchTerm_MatchesEvenWhenTheRideHasNoDescription()
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        Guid matching = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), "Votorantim");
+
+        PagedRides page = await GetPageAsync(factory, driverId, "?SearchTerm=votorantim");
+
+        Assert.Equal(matching, Assert.Single(page.Items).Id);
     }
 
     [Fact]
@@ -233,7 +262,7 @@ public class RideListingTests
         PagedRides page = await GetPageAsync(
             factory,
             driverId,
-            $"?Destination=sorocaba&DepartureDate={tomorrow:yyyy-MM-dd}&DepartureTime=08:30:00&RideType=Solidarity");
+            $"?SearchTerm=sorocaba&DepartureDate={tomorrow:yyyy-MM-dd}&DepartureTime=08:30:00&RideType=Solidarity");
 
         Assert.Equal(expected, Assert.Single(page.Items).Id);
     }

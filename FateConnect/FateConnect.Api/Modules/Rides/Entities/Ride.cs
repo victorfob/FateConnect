@@ -1,20 +1,19 @@
 namespace FateConnect.Api.Modules.Rides.Entities;
 
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Entities;
 
 public class Ride
 {
-    private static readonly TimeZoneInfo ProductTimeZone =
-        TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
-
     public Guid Id { get; private set; }
     public int AvailableSeats { get; private set; }
     public string Destination { get; private set; } = default!;
     public DateOnly DepartureDate { get; private set; }
     public TimeOnly DepartureTime { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
     public EnumRideType RideType { get; private set; }
     public string? Description { get; private set; }
     public bool IsActive { get; private set; }
@@ -45,6 +44,7 @@ public class Ride
         DepartureDate = departureDate;
         DepartureTime = departureTime;
         CreatedAt = DateTime.UtcNow;
+        UpdatedAt = null;
         RideType = rideType;
         Description = description?.Trim();
         IsActive = true;
@@ -76,6 +76,8 @@ public class Ride
 
         if (description is not null)
             Description = description.Trim();
+
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void ChangeDepartureSchedule(DateOnly? departureDate, TimeOnly? departureTime)
@@ -87,11 +89,14 @@ public class Ride
 
         DepartureDate = newDate;
         DepartureTime = newTime;
+
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void Deactivate()
     {
         IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public bool IsDrivenBy(int userId) => DriverId == userId;
@@ -111,12 +116,9 @@ public class Ride
 
     }
 
-    public static DateTime NowInProductTimeZone() =>
-        TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ProductTimeZone);
-
     private static void ValidateDepartureDateTime(DateOnly date, TimeOnly time)
     {
-        DateTime departureUtc = TimeZoneInfo.ConvertTimeToUtc(date.ToDateTime(time), ProductTimeZone);
+        DateTime departureUtc = DateTimeUtils.ToUtcFromProductTimeZone(date, time);
 
         if (departureUtc < DateTime.UtcNow)
             throw new InvalidDepartureScheduleException();

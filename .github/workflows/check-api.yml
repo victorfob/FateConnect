@@ -3,7 +3,11 @@ name: Check API
 # Como no `check-front.yml`, o recorte fica dentro do job: workflow que não
 # dispara deixa o check obrigatório `Pending` para sempre.
 on:
-  pull_request
+  pull_request:
+    # `ready_for_review` é obrigatório junto do recorte de rascunho: sair de
+    # rascunho não emite nenhum dos três tipos padrão, então sem ele um PR que
+    # nasceu rascunho chegaria a "pronto" com o check verde sem ter validado nada.
+    types: [opened, synchronize, reopened, ready_for_review]
 
 # Grupo próprio: compartilhá-lo com o check do front faria um cancelar o outro.
 concurrency:
@@ -30,6 +34,15 @@ jobs:
         run: |
           set -euo pipefail
 
+          # PR em rascunho não valida: quem o abre ainda está escrevendo, e a
+          # validação vem no `ready_for_review`. O recorte fica aqui dentro pelo
+          # mesmo motivo que o de caminho.
+          if [[ "$IS_DRAFT" == 'true' ]]; then
+            echo 'api=false' >> "$GITHUB_OUTPUT"
+            echo 'PR em rascunho — nada a validar ainda.'
+            exit 0
+          fi
+
           changed=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')
 
           # Nenhum `.md` é importado pelo código, então documentação não muda o
@@ -50,6 +63,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          IS_DRAFT: ${{ github.event.pull_request.draft }}
 
       - uses: actions/setup-dotnet@v4
         if: steps.changes.outputs.api == 'true'

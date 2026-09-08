@@ -5,7 +5,11 @@ name: Check front
 # ele `Pending` para sempre, e o PR fica impossível de mergear. Sem filtro de
 # branch de destino pelo mesmo tipo de motivo: PR empilhado precisa ser validado.
 on:
-  pull_request
+  pull_request:
+    # `ready_for_review` é obrigatório junto do recorte de rascunho: sair de
+    # rascunho não emite nenhum dos três tipos padrão, então sem ele um PR que
+    # nasceu rascunho chegaria a "pronto" com o check verde sem ter validado nada.
+    types: [opened, synchronize, reopened, ready_for_review]
 
 # Grupo próprio: compartilhá-lo com o check da API faria um cancelar o outro.
 concurrency:
@@ -38,6 +42,15 @@ jobs:
         run: |
           set -euo pipefail
 
+          # PR em rascunho não valida: quem o abre ainda está escrevendo, e a
+          # validação vem no `ready_for_review`. O recorte fica aqui dentro pelo
+          # mesmo motivo que o de caminho.
+          if [[ "$IS_DRAFT" == 'true' ]]; then
+            echo 'web=false' >> "$GITHUB_OUTPUT"
+            echo 'PR em rascunho — nada a validar ainda.'
+            exit 0
+          fi
+
           changed=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')
 
           # Nenhum `.md` é importado pelo código, então documentação não muda o
@@ -56,6 +69,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          IS_DRAFT: ${{ github.event.pull_request.draft }}
 
       - uses: actions/setup-node@v5
         if: steps.changes.outputs.web == 'true'
