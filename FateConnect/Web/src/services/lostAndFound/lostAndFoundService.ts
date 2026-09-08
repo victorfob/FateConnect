@@ -72,3 +72,13 @@ export async function restoreLostItem(itemId: string): Promise<void> {
 export async function deleteLostItem(itemId: string): Promise<void> {
   await apiClient.delete(`${LOST_AND_FOUND_PATH}/${itemId}`);
 }
+
+/**
+ * A foto responde por endpoint autenticado, então uma `<img>` apontada para o
+ * endereço dela recebe 401: quem a busca é o cliente da API, que leva o token.
+ */
+export async function fetchStoredImage(imageUrl: string): Promise<Blob> {
+  const { data } = await apiClient.get<Blob>(imageUrl, { responseType: 'blob' });
+
+  return data;
+}

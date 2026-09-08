@@ -5,6 +5,7 @@ import { server } from '@app/mocks/server';
 import {
   createLostItem,
   deleteLostItem,
+  fetchStoredImage,
   listLostItems,
   resolveLostItem,
   restoreLostItem,
@@ -226,6 +227,25 @@ describe('lostAndFoundService', () => {
     await restoreLostItem(ITEM_ID);
 
     expect(received).toEqual([{ Status: LostItemStatusEnum.OPEN }]);
+  });
+
+  // A API devolve o endereço da foto relativo e sem barra inicial, então ele tem
+  // de cair sob a base da API — sob o endereço do site, o nginx responde o
+  // index.html do front com 200 e nem 404 aparece no log.
+  it('should fetch the stored image under the api base address', async () => {
+    let requestUrl: string | null = null;
+    server.use(
+      http.get('https://api.fateconnect.test/uploads/lostandfound/:file', ({ request }) => {
+        requestUrl = request.url;
+
+        return new HttpResponse('bytes', { headers: { 'Content-Type': 'image/png' } });
+      }),
+    );
+
+    const image = await fetchStoredImage('uploads/lostandfound/foto.png');
+
+    expect(requestUrl).toBe('https://api.fateconnect.test/uploads/lostandfound/foto.png');
+    expect(image.type).toBe('image/png');
   });
 
   it('should delete the item, leaving the reason to the server', async () => {
