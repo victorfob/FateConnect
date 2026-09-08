@@ -23,12 +23,23 @@ public static class ImageContentTypes
 
     public static bool IsSupported(string contentType) => ExtensionByContentType.ContainsKey(contentType);
 
-    public static bool TryContentTypeOfStoredFile(string fileName, [NotNullWhen(true)] out string? contentType)
+    public static bool TryDescribeStoredFile(
+        string fileName,
+        [NotNullWhen(true)] out string? storedFileName,
+        [NotNullWhen(true)] out string? contentType)
     {
+        storedFileName = null;
         contentType = null;
 
-        return Guid.TryParse(Path.GetFileNameWithoutExtension(fileName), out _)
-            && ContentTypeByExtension.TryGetValue(Path.GetExtension(fileName), out contentType);
+        if (!Guid.TryParse(Path.GetFileNameWithoutExtension(fileName), out Guid identifier))
+            return false;
+
+        if (!ContentTypeByExtension.TryGetValue(Path.GetExtension(fileName), out contentType))
+            return false;
+
+        storedFileName = $"{identifier}{ExtensionByContentType[contentType]}";
+
+        return true;
     }
 
     public static string ExtensionFor(string contentType)

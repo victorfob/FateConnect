@@ -18,13 +18,13 @@ public class UploadsController(IWebHostEnvironment environment) : ControllerBase
             || !Enum.IsDefined(storageContainer))
             return NotFound();
 
-        if (!ImageContentTypes.TryContentTypeOfStoredFile(fileName, out string? contentType))
+        if (!ImageContentTypes.TryDescribeStoredFile(fileName, out string? storedFileName, out string? contentType))
             return NotFound();
 
         string physicalFilePath = Path.Combine(
             UploadsLocation.PhysicalRootOf(environment),
             storageContainer.ToString().ToLowerInvariant(),
-            fileName);
+            storedFileName);
 
         if (!System.IO.File.Exists(physicalFilePath))
             return NotFound();
