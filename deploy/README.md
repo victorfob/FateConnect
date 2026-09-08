@@ -209,22 +209,44 @@ O conteúdo de `~/.ssh/github-actions` (sem o `.pub`) vai no secret
 ### A identidade do servidor
 
 A pipeline não descobre mais a identidade da VPS a cada publicação: ela a lê do
-secret `DEPLOY_KNOWN_HOSTS`. Gere o conteúdo de qualquer máquina que alcance o
-servidor e cole a saída inteira no secret:
+secret `DEPLOY_KNOWN_HOSTS`. Gere o conteúdo **na própria VPS**, lendo as chaves
+na fonte, e cole a saída inteira no secret:
 
 ```bash
-ssh-keyscan -H <endereço da VPS>
+for f in /etc/ssh/ssh_host_*_key.pub; do echo "<endereços> $(cut -d' ' -f1,2 "$f")"; done
 ```
+
+⛔ **Não gere com `ssh-keyscan`.** Ele abre uma conexão por tipo de chave, em
+paralelo, e o `MaxStartups` do sshd descarta conexão nova quando a fila de
+preauth está cheia — o estado normal de uma máquina exposta à internet. Medido
+em 08/09/2026: duas execuções seguidas devolveram conjuntos diferentes, e uma
+devolveu nada. Foi por isso que ele saiu do workflow, e é por isso que não serve
+nem para gerar o secret à mão. Ler `/etc/ssh` não usa rede e traz todas.
+
+**`<endereços>` é uma lista separada por vírgula**, e é o detalhe que faz ou
+quebra: o ssh procura a chave pelo **nome que o cliente digitou**, então a
+entrada precisa citar o mesmo valor que está em `DEPLOY_HOST`. Como o mesmo
+servidor atende por vários nomes — o domínio de cada ambiente, o hostname do
+provedor, o IP —, listar todos dispensa saber qual forma o secret guarda:
+
+```
+dominio-de-um-ambiente,dominio-do-outro,hostname-do-provedor,IP ssh-ed25519 AAAA...
+```
+
+Confira antes de mergear, salvando num arquivo o mesmo texto que foi para o
+secret. O `ssh-keygen` faz a mesma busca que o ssh faria, sem conectar em nada:
+
+```bash
+ssh-keygen -F <endereço> -f <arquivo>
+```
+
+Todo endereço da lista precisa ser encontrado, e um endereço de fora precisa
+**não** ser — senão a linha virou curinga em vez de cobertura.
 
 ⚠️ **Sem esse secret a publicação para no passo da chave**, dizendo o que falta —
 de propósito, porque um `known_hosts` vazio derruba o `rsync` três passos
-adiante, com uma mensagem que não aponta para a causa.
-
-O `ssh-keyscan` saiu do workflow porque ele abre uma conexão por tipo de chave,
-em paralelo, e o `MaxStartups` do sshd descarta conexão nova quando a fila de
-preauth está cheia — que é o estado normal de uma máquina exposta à internet.
-Trocar a chave do servidor (reinstalação, por exemplo) passa a exigir atualizar
-o secret.
+adiante, com uma mensagem que não aponta para a causa. Trocar a chave do
+servidor — numa reinstalação, por exemplo — passa a exigir atualizar o secret.
 
 ## Como o código chega na VPS
 
