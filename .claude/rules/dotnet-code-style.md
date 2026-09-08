@@ -144,9 +144,9 @@ E o `Where` passa a se ler sozinho: `.Where(HasNotDeparted(today, currentTime))`
 
 ✅ **O gate protege isto desde a #237.** A suíte roda contra PostgreSQL de verdade, então predicado que não traduz derruba teste: a mutação para método `bool` fez **20 testes** caírem. Antes, no provedor em memória, as duas formas passavam iguais.
 
-## DTO de query: opcional é nullable, derivado é `[BindNever]`
+## DTO de entrada: opcional é nullable, derivado é `[BindNever]`, vazio não é ausente
 
-Dois apontamentos diferentes que aparecem no mesmo tipo de DTO — o que o controller recebe com `[FromQuery]`.
+Três apontamentos diferentes que aparecem no mesmo tipo de DTO — o que o controller recebe com `[FromQuery]` ou `[FromForm]`.
 
 ⛔ **Tipo-valor cuja ausência é válida precisa ser nullable.** `int Page` num DTO de entrada reprova o build com `S6964`: quem omite o campo recebe o `default` em silêncio. Quando a omissão é intencional — e num filtro paginado ela é, o padrão está no contrato —, `int?` é o que declara isso. `required` também satisfaz o analisador, mas mente: torna o campo obrigatório.
 
@@ -157,3 +157,17 @@ Dois apontamentos diferentes que aparecem no mesmo tipo de DTO — o que o contr
 ```csharp
 string json = await factory.CreateClient().GetStringAsync("/swagger/v1/swagger.json");
 ```
+
+⛔ **String vazia chega como `null`, e aí "limpar o campo" fica indistinguível de "não mexer no campo".** O binder converte string vazia em `null` por padrão, então num DTO de edição parcial o `if (campo is not null)` da entidade engole os dois casos: quem manda `description=""` para apagar o texto recebe **200** e o texto antigo continua gravado. Não há erro em lugar nenhum — a resposta é de sucesso e traz o valor velho.
+
+Medido em 08/09/2026 no #322, e o teste é o que segura: `UpdateItem_WithAnEmptyDescription_IsAccepted` falha sem o atributo e passa com ele.
+
+```csharp
+[DisplayFormat(ConvertEmptyStringToNull = false)]
+[StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
+public string? Description { get; init; }
+```
+
+⚠️ **Só no campo que pode ser esvaziado de propósito.** Em campo obrigatório — nome, local — a conversão é o comportamento certo: ali string vazia não é valor, e deixá-la virar `null` faz a edição parcial ignorá-la em vez de gravar lixo.
+
+⚠️ **O tell é a entidade que decide por `is not null`.** Todo campo opcional de um `PATCH` passa por essa comparação; para cada um, pergunte se existe motivo de alguém querer apagá-lo — se existe, o atributo entra junto.
