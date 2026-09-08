@@ -14,84 +14,105 @@ cd "$(dirname "$0")/.."
 
 BASE="${1:-origin/develop}"
 SOLUTION="FateConnect/FateConnect.Api/FateConnect.Api.sln"
-MINIMO="${MINIMO:-90}"
-saida="$(mktemp -d)"
-trap 'rm -rf "$saida"' EXIT
+MINIMUM="${MINIMUM:-90}"
+output="$(mktemp -d)"
+trap 'rm -rf "$output"' EXIT
 
 echo "==> Rodando a suíte com cobertura"
 dotnet test "$SOLUTION" --nologo \
   --collect:"XPlat Code Coverage;Format=opencover" \
-  --results-directory "$saida" >/dev/null
+  --results-directory "$output" >/dev/null
 
-relatorio="$(find "$saida" -name coverage.opencover.xml | head -1)"
-if [[ -z "$relatorio" ]]; then
+report="$(find "$output" -name coverage.opencover.xml | head -1)"
+if [[ -z "$report" ]]; then
   echo "coverage-changed: a suíte não produziu relatório de cobertura" >&2
   exit 1
 fi
 
-git diff --name-only "$BASE...HEAD" -- '*.cs' > "$saida/alterados.txt"
+git diff --name-only "$BASE...HEAD" -- '*.cs' > "$output/changed.txt"
 
-MINIMO="$MINIMO" python3 - "$relatorio" "$saida/alterados.txt" <<'PY'
+MINIMUM="$MINIMUM" python3 - "$report" "$output/changed.txt" <<'PY'
 import os, re, sys, xml.etree.ElementTree as ET
 
-minimo = int(os.environ["MINIMO"])
-raiz = ET.parse(sys.argv[1]).getroot()
-with open(sys.argv[2]) as f:
-    alterados = {os.path.abspath(linha.strip()) for linha in f if linha.strip()}
+minimum = int(os.environ["MINIMUM"])
+root = ET.parse(sys.argv[1]).getroot()
+with open(sys.argv[2]) as handle:
+    changed = {os.path.abspath(line.strip()) for line in handle if line.strip()}
 
 
-def eh_construtor_de_copia(nome_da_classe, nome_do_metodo):
+def is_synthesized(method):
+    # Membro que o compilador escreve não tem corpo no arquivo, e o relatório o
+    # ancora num vão de um caractere só. Construtor escrito à mão sempre abrange
+    # as chaves do próprio corpo, então nunca cai aqui.
+    points = list(method.iter("SequencePoint"))
+
+    if len(points) != 1:
+        return False
+
+    return int(points[0].get("ec")) - int(points[0].get("sc")) == 1
+
+
+def is_generated_copy_constructor(class_name, method):
     # O compilador gera um construtor de cópia para todo `record`, e só uma
     # expressão `with` o chama. Nada em produção usa `with`, então ele fica
     # eternamente descoberto e derruba DTO de dados puros para 80%: num arquivo
     # de cinco linhas, uma linha que ninguém pode alcançar vale 20%.
-    assinatura = re.search(r"::\.ctor\((.*)\)$", nome_do_metodo)
+    #
+    # As duas condições precisam andar juntas: sem a segunda, um construtor de
+    # cópia escrito à mão também sairia da conta, e é justamente a lógica dele
+    # que o gate existe para cobrar. Medido em 08/09/2026 sobre a suíte inteira,
+    # o par alcança os 8 gerados e nenhum dos 22 escritos à mão.
+    signature = re.search(r"::\.ctor\((.*)\)$", method.findtext("Name") or "")
 
-    if assinatura is None:
+    if signature is None:
         return False
 
-    return re.sub(r"<.*>$", "", assinatura.group(1)) == nome_da_classe
+    if re.sub(r"<.*>$", "", signature.group(1)) != class_name:
+        return False
+
+    return is_synthesized(method)
 
 
-por_arquivo = {}
-for modulo in raiz.iter("Module"):
-    caminhos = {a.get("uid"): a.get("fullPath") for a in modulo.iter("File")}
-    for classe in modulo.iter("Class"):
-        nome_da_classe = classe.findtext("FullName") or ""
-        pontos = [(p, m.find("FileRef"))
-                  for m in classe.iter("Method")
-                  if not eh_construtor_de_copia(nome_da_classe, m.findtext("Name") or "")
-                  for p in m.iter("SequencePoint")]
-        if not pontos:
+by_file = {}
+for module in root.iter("Module"):
+    paths = {entry.get("uid"): entry.get("fullPath") for entry in module.iter("File")}
+    for class_element in module.iter("Class"):
+        class_name = class_element.findtext("FullName") or ""
+        points = [(point, method.find("FileRef"))
+                  for method in class_element.iter("Method")
+                  if not is_generated_copy_constructor(class_name, method)
+                  for point in method.iter("SequencePoint")]
+        if not points:
             continue
-        uid = next((r.get("uid") for _, r in pontos if r is not None), None)
-        caminho = caminhos.get(uid)
+        uid = next((ref.get("uid") for _, ref in points if ref is not None), None)
+        path = paths.get(uid)
         # Migrations e a própria suíte ficam fora, como no `sonar.coverage.exclusions`.
-        if not caminho or caminho not in alterados or "Migrations" in caminho or ".Tests/" in caminho:
+        if not path or path not in changed or "Migrations" in path or ".Tests/" in path:
             continue
-        acumulado = por_arquivo.setdefault(caminho, [0, 0])
-        acumulado[0] += sum(1 for p, _ in pontos if int(p.get("vc")) > 0)
-        acumulado[1] += len(pontos)
+        tally = by_file.setdefault(path, [0, 0])
+        tally[0] += sum(1 for point, _ in points if int(point.get("vc")) > 0)
+        tally[1] += len(points)
 
-if not por_arquivo:
+if not by_file:
     print("    nenhum arquivo de produção da API no diff")
     sys.exit(0)
 
-linhas = sorted((c / t * 100, c, t, p) for p, (c, t) in por_arquivo.items())
-abaixo = [linha for linha in linhas if linha[0] < minimo]
+rows = sorted((covered / total * 100, covered, total, path)
+              for path, (covered, total) in by_file.items())
+below = [row for row in rows if row[0] < minimum]
 
-for pct, cobertas, total, caminho in linhas:
-    nome = caminho.split("FateConnect.Api/")[-1]
-    marca = "  ABAIXO" if pct < minimo else ""
-    print(f"    {nome:56s} {pct:5.1f}%  ({cobertas}/{total}){marca}")
+for percentage, covered, total, path in rows:
+    name = path.split("FateConnect.Api/")[-1]
+    mark = "  ABAIXO" if percentage < minimum else ""
+    print(f"    {name:56s} {percentage:5.1f}%  ({covered}/{total}){mark}")
 
-cobertas = sum(linha[1] for linha in linhas)
-total = sum(linha[2] for linha in linhas)
-print(f"\n    {len(linhas)} arquivos, agregado {cobertas / total * 100:.1f}%")
+covered = sum(row[1] for row in rows)
+total = sum(row[2] for row in rows)
+print(f"\n    {len(rows)} arquivos, agregado {covered / total * 100:.1f}%")
 
-if abaixo:
-    print(f"\ncoverage-changed: {len(abaixo)} arquivo(s) abaixo de {minimo}%.", file=sys.stderr)
+if below:
+    print(f"\ncoverage-changed: {len(below)} arquivo(s) abaixo de {minimum}%.", file=sys.stderr)
     sys.exit(1)
 PY
 
-echo "==> Todos os arquivos tocados atingem ${MINIMO}%."
+echo "==> Todos os arquivos tocados atingem ${MINIMUM}%."
