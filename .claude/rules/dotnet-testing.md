@@ -139,6 +139,26 @@ As três passavam verdes no provedor em memória, que executa LINQ em memória e
 
 ⚠️ **Cada `[InlineData]` de acento precisa provar um lado.** As duas últimas mutações derrubam casos diferentes justamente porque um deles tem acento na coluna e busca sem, e o outro o inverso. Caso que nenhuma mutação derruba é caso que não está provando nada.
 
+## Teste que grava arquivo grava dentro do repositório
+
+⛔ **A raiz de arquivos do host de teste é a pasta do projeto.** O `WebApplicationFactory` deriva `WebRootPath` do `ContentRootPath`, que é `FateConnect.Api/` — então tudo que o código de produção escrever em `wwwroot` durante a suíte cai na árvore versionada, e o teste passa verde sujando o repositório.
+
+Aconteceu em 2026-09-08, ao cobrir o upload de imagem: **9 arquivos** em `wwwroot/uploads/lostandfound/`, dentro do projeto da API — caminho que, por existir só em tempo de execução, o `check-harness-paths.sh` acusaria como órfão se citado por extenso aqui. Nenhum erro, nenhum gate vermelho — apareceu num `git status` rodado por outro motivo.
+
+**A correção é dizer onde:** a `ApiFactory` declara a raiz num temporário e a apaga no `Dispose`.
+
+```csharp
+private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-webroot-{Guid.NewGuid():N}");
+
+protected override void ConfigureWebHost(IWebHostBuilder builder)
+{
+    builder.UseWebRoot(_webRoot);
+```
+
+⚠️ **O `.gitignore` daquela pasta é rede, não a correção.** Ele existe porque rodar a API na máquina cria o mesmo caminho, e ali o arquivo é legítimo — em produção aquele lugar é um volume do contêiner. Ignorar sem isolar deixa a suíte gravando em disco de verdade, só que invisível.
+
+**O que acusa é `git status` depois da suíte**, e vale para qualquer teste que escreva arquivo — não só imagem.
+
 ## Suíte verde não prova que ela pega o defeito
 
 ⛔ **Quebre o código de propósito e confira que a suíte cai.** É a única forma de saber se o teste testa o que o nome dele diz — e o caso clássico é o teste que passa porque o cenário nunca se montou, não porque o código está certo.
