@@ -30,8 +30,6 @@ using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Services;
-using FateConnect.Api.Modules.Common.Utils;
-using Microsoft.Extensions.FileProviders;
 
 public class Program
 {
@@ -192,16 +190,6 @@ public class Program
         app.UseMiddleware<GlobalExceptionMiddleware>();
 
         app.UseCors(corsPolicy);
-
-        string uploadsRoot = UploadsLocation.PhysicalRootOf(app.Environment);
-
-        Directory.CreateDirectory(uploadsRoot);
-
-        app.UseStaticFiles(new StaticFileOptions
-        {
-            FileProvider = new PhysicalFileProvider(uploadsRoot),
-            RequestPath = UploadsLocation.RequestPath,
-        });
 
         app.UseSwagger();
         app.UseSwaggerUI();

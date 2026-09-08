@@ -6,8 +6,6 @@ public static class UploadsLocation
 {
     public const string FolderName = "uploads";
 
-    public static string RequestPath => $"/{FolderName}";
-
     private const string WebRootFolderName = "wwwroot";
 
     public static string WebRootOf(IWebHostEnvironment environment) =>

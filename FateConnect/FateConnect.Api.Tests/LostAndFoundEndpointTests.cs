@@ -339,6 +339,87 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task StoredImage_WithoutAToken_IsUnauthorized()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Joana Peixoto Lima");
+
+        MultipartFormDataContent form = NewItemForm("Guarda-chuva xadrez");
+        form.Add(ImagePayload(0x04), "Image", "foto.png");
+
+        ReadItem item = (await (await reporter.PostAsync("/LostAndFound", form))
+            .Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!;
+
+        HttpResponseMessage anonymous = await _factory.CreateClient().GetAsync($"/{item.ImageUrl}");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await reporter.GetAsync($"/{item.ImageUrl}")).StatusCode);
+    }
+
+    [Theory]
+    [InlineData("segredo.txt")]
+    [InlineData("8a1b0f2e-0000-4000-8000-000000000000.svg")]
+    public async Task StoredImage_OfAFileTheApiDidNotName_IsNotFound(string fileName)
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Kleber Antunes Faria");
+
+        string folder = UploadsFolderForItems();
+        Directory.CreateDirectory(folder);
+        await File.WriteAllTextAsync(Path.Combine(folder, fileName), "conteúdo que ninguém deveria alcançar");
+
+        HttpResponseMessage response = await client.GetAsync($"/uploads/lostandfound/{fileName}");
+
+        Assert.True(File.Exists(Path.Combine(folder, fileName)));
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task StoredImage_OfAFolderThatIsNotAContainer_IsNotFound()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Marcos Teixeira Pinho");
+
+        string folder = Path.Combine(
+            UploadsLocation.PhysicalRootOf(_factory.Services.GetRequiredService<IWebHostEnvironment>()),
+            "outrapasta");
+
+        Directory.CreateDirectory(folder);
+        string fileName = $"{Guid.NewGuid()}.png";
+        await File.WriteAllTextAsync(Path.Combine(folder, fileName), "arquivo fora de um contêiner conhecido");
+
+        HttpResponseMessage response = await client.GetAsync($"/uploads/outrapasta/{fileName}");
+
+        Assert.True(File.Exists(Path.Combine(folder, fileName)));
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task StoredImage_OfAFileThatIsNotThere_IsNotFound()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Larissa Coelho Vieira");
+
+        HttpResponseMessage response = await client.GetAsync(
+            "/uploads/lostandfound/8a1b0f2e-0000-4000-8000-000000000000.png");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task StoredImage_CarriesTheContentTypeOfItsExtensionAndRefusesSniffing()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Lucas Ferraz Bianchi");
+
+        MultipartFormDataContent form = NewItemForm("Boné azul-marinho");
+        form.Add(ImagePayload(0x05), "Image", "payload.html");
+
+        ReadItem item = (await (await client.PostAsync("/LostAndFound", form))
+            .Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!;
+
+        HttpResponseMessage stored = await client.GetAsync($"/{item.ImageUrl}");
+
+        Assert.Equal("image/png", stored.Content.Headers.ContentType?.MediaType);
+        Assert.Equal("nosniff", Assert.Single(stored.Headers.GetValues("X-Content-Type-Options")));
+    }
+
+    [Fact]
     public async Task CreateItem_WithoutTheOccurrenceDate_IsRejected()
     {
         SeededUser reporter = _factory.SeedUser("Carla Menezes Dias");
@@ -356,6 +437,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Assert.Contains("Informe a data do ocorrido.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
     }
 
+    [Fact]
     public async Task CreateItem_WithoutTheType_IsRejected()
     {
         SeededUser reporter = _factory.SeedUser("Diego Prado Ramos");
@@ -373,6 +455,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Assert.Contains("Informe se o item foi perdido ou achado.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
     }
 
+    [Fact]
     public async Task DeleteItem_ThatIsAlreadyDeleted_IsNotFound()
     {
         (ReadItem item, int reporterId, _) = await ReportItemAsync("Cadeado de bicicleta");
@@ -385,6 +468,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Assert.Equal(HttpStatusCode.NotFound, second.StatusCode);
     }
 
+    [Fact]
     public async Task ReadItem_CarriesTheCreationInstantAsUtc()
     {
         (ReadItem item, int reporterId, _) = await ReportItemAsync("Cachecol de lã");
@@ -398,6 +482,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Assert.Matches("\"createdAt\":\"[^\"]+Z\"", onList);
     }
 
+    [Fact]
     public async Task CreateItem_WithAFileThatIsNotAnImage_IsRejected()
     {
         HttpClient client = _factory.CreateClientForNewUser("Fernanda Lopes Teixeira");

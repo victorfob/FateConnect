@@ -25,6 +25,7 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     [Theory]
     [MemberData(nameof(RideRoutes))]
     [MemberData(nameof(LostAndFoundRoutes))]
+    [MemberData(nameof(UploadRoutes))]
     public async Task ProtectedEndpoints_WithoutToken_RespondUnauthorized(string method, string route)
     {
         var request = new HttpRequestMessage(new HttpMethod(method), route);
@@ -43,6 +44,11 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+    public static TheoryData<string, string> UploadRoutes() => new()
+    {
+        { "GET", "/uploads/lostandfound/8a1b0f2e-0000-4000-8000-000000000000.png" }
+    };
 
     public static TheoryData<string, string> LostAndFoundRoutes() => new()
     {
