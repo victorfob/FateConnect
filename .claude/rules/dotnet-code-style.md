@@ -106,14 +106,19 @@ O roteamento do ASP.NET é case-insensitive, então `/users/signup` também reso
 
 ⛔ Cobrado na #172. O repositório precisava de "que horas são no fuso do produto" para descartar carona já partida, e o fuso era um `private static readonly TimeZoneInfo` na entidade `Ride`. Tornei o campo público — a saída de menor esforço, e a pior: o repositório passou a saber que existe um `TimeZoneInfo`, e a conversão ficou em dois lugares que se ignoram, cada um numa direção. A pergunta foi *"pq ProductTimeZone precisou se tornar público?"*.
 
-O que ficou:
+O fuso vive em `FateConnect/FateConnect.Api/Modules/Common/Utils/DateTimeUtils.cs`, `private`, e quem precisa dele pergunta em vez de converter:
 
 ```csharp
 public static DateTime NowInProductTimeZone() =>
     TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ProductTimeZone);
+
+public static DateTime ToUtcFromProductTimeZone(DateOnly date, TimeOnly time) =>
+    TimeZoneInfo.ConvertTimeToUtc(date.ToDateTime(time), ProductTimeZone);
 ```
 
-`TimeZoneInfo` voltou a aparecer só dentro da entidade, e o repositório pergunta as horas em vez do fuso.
+⛔ **A segunda vez foi na #322, e quem a produziu foi a mudança de lugar.** Tirar o fuso da entidade estava certo — três chamadores passaram a existir —, mas no destino o campo nasceu `public` de novo, e a entidade voltou a converter por fora. O que fechou não foi trancar o campo: foi ver que faltava a **segunda** pergunta. `ToUtcFromProductTimeZone` nasceu aí, e a conversão sumiu dos chamadores.
+
+⚠️ **Extrair reabre a decisão de visibilidade, e ninguém a trata como decisão.** O modificador que o símbolo ganha no arquivo novo é escolha de quem extrai, feita no meio de um trabalho que parece mecânico — e o caminho de menor esforço é o mesmo `public` da primeira vez.
 
 **O tell é tornar público um `private` para atender um consumidor.** Antes de mudar o modificador, pergunte o que o consumidor realmente quer saber — quase sempre é uma resposta, não o dado bruto com que ela é calculada.
 
