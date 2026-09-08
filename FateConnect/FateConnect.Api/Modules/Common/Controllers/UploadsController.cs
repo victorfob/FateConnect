@@ -29,7 +29,7 @@ public class UploadsController(IWebHostEnvironment environment) : ControllerBase
         if (!System.IO.File.Exists(physicalFilePath))
             return NotFound();
 
-        Response.Headers["X-Content-Type-Options"] = "nosniff";
+        Response.Headers.XContentTypeOptions = "nosniff";
 
         return PhysicalFile(physicalFilePath, contentType);
     }
