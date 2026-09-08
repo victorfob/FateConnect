@@ -28,6 +28,13 @@ jobs:
       name: ${{ inputs.environment }}
       url: ${{ vars.PUBLIC_URL }}
 
+    env:
+      # O sshd descarta conexão nova quando a fila de preauth está cheia
+      # (`MaxStartups`), e numa máquina exposta à internet ela vive cheia de
+      # tentativa de força bruta. Insistir no connect transforma o descarte em
+      # alguns segundos de atraso em vez de publicação reprovada.
+      SSH_OPTIONS: -i ~/.ssh/deploy_key -o BatchMode=yes -o ConnectTimeout=15 -o ConnectionAttempts=5
+
     steps:
       - uses: actions/checkout@v5
 
@@ -64,15 +71,22 @@ jobs:
       - name: Load the deploy key
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          # Aceita a identidade do servidor na primeira conexão. Para fixá-la,
-          # guarde a saída de `ssh-keyscan` num secret e escreva-a aqui.
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          # A identidade do servidor vem fixada em secret. O `ssh-keyscan` que
+          # ficava aqui abria uma conexão por tipo de chave, em paralelo, e as
+          # três disputavam a fila de preauth justamente antes de o deploy
+          # precisar dela.
+          if [[ -z "$DEPLOY_KNOWN_HOSTS" ]]; then
+            echo "Falta o secret DEPLOY_KNOWN_HOSTS. Gere com: ssh-keyscan -H <host>" >&2
+            exit 1
+          fi
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Send the front to the VPS
         env:
@@ -84,7 +98,7 @@ jobs:
           target="/var/www/fateconnect/${{ inputs.environment }}"
           # --delete: sem ele, arquivo apagado no código segue servido no ar.
           rsync -az --delete \
-            -e "ssh -i ~/.ssh/deploy_key -o BatchMode=yes" \
+            -e "ssh $SSH_OPTIONS" \
             FateConnect/Web/dist/ \
             "$DEPLOY_USER@$DEPLOY_HOST:$target/"
 
@@ -94,7 +108,7 @@ jobs:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          ssh -i ~/.ssh/deploy_key -o BatchMode=yes \
+          ssh $SSH_OPTIONS \
             "$DEPLOY_USER@$DEPLOY_HOST" \
             "cd '$DEPLOY_PATH/deploy' && ./deploy.sh '${{ inputs.environment }}'"
 
@@ -103,7 +117,7 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
-          ssh -i ~/.ssh/deploy_key -o BatchMode=yes \
+          ssh $SSH_OPTIONS \
             "$DEPLOY_USER@$DEPLOY_HOST" \
             "docker ps --filter 'name=fateconnect-${{ inputs.environment }}' --filter 'status=running' --format '{{.Names}}'" \
             > containers.txt

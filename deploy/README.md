@@ -187,6 +187,7 @@ motivo para duplicá-los por ambiente:
 | `DEPLOY_USER` | o usuário do SSH |
 | `DEPLOY_SSH_KEY` | a chave **privada** dedicada à pipeline |
 | `DEPLOY_PATH` | o caminho do clone na VPS |
+| `DEPLOY_KNOWN_HOSTS` | a identidade pública do servidor — veja abaixo |
 | `SENTRY_AUTH_TOKEN` | se usar Sentry |
 
 O `PUBLIC_URL` da variable e o do `.env` na VPS precisam ser o mesmo endereço:
@@ -204,6 +205,26 @@ cat ~/.ssh/github-actions.pub >> ~/.ssh/authorized_keys
 
 O conteúdo de `~/.ssh/github-actions` (sem o `.pub`) vai no secret
 `DEPLOY_SSH_KEY`. Ele nunca deve ser colado em conversa, chamado ou commit.
+
+### A identidade do servidor
+
+A pipeline não descobre mais a identidade da VPS a cada publicação: ela a lê do
+secret `DEPLOY_KNOWN_HOSTS`. Gere o conteúdo de qualquer máquina que alcance o
+servidor e cole a saída inteira no secret:
+
+```bash
+ssh-keyscan -H <endereço da VPS>
+```
+
+⚠️ **Sem esse secret a publicação para no passo da chave**, dizendo o que falta —
+de propósito, porque um `known_hosts` vazio derruba o `rsync` três passos
+adiante, com uma mensagem que não aponta para a causa.
+
+O `ssh-keyscan` saiu do workflow porque ele abre uma conexão por tipo de chave,
+em paralelo, e o `MaxStartups` do sshd descarta conexão nova quando a fila de
+preauth está cheia — que é o estado normal de uma máquina exposta à internet.
+Trocar a chave do servidor (reinstalação, por exemplo) passa a exigir atualizar
+o secret.
 
 ## Como o código chega na VPS
 
