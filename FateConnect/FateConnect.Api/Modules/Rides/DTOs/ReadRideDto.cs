@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Rides.DTOs;
 
+using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.Enums;
 
 public record ReadRideDto(
@@ -11,6 +12,6 @@ public record ReadRideDto(
     DateTime CreatedAt,
     EnumRideType RideType,
     string? Description,
-    RideDriverDto Driver,
+    UserContactDto Driver,
     bool IsOwner
 );

@@ -11,7 +11,7 @@ public class User
     public DateTime BirthDate { get; set; }
     public EnumGender Gender { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
     public EnumProfileType ProfileType { get; set; }
     public int TokenVersion { get; set; }
     public ICollection<Address> Addresses { get; set; } = [];
