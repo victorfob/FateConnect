@@ -339,6 +339,19 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task ReadItem_CarriesTheCreationInstantAsUtc()
+    {
+        (ReadItem item, int reporterId, _) = await ReportItemAsync("Cachecol de lã");
+        HttpClient reporter = _factory.CreateClientFor(reporterId);
+
+        string onRead = await reporter.GetStringAsync($"/LostAndFound/{item.Id}");
+        string onList = await reporter.GetStringAsync("/LostAndFound?SearchTerm=Cachecol");
+
+        Assert.Contains("\"createdAt\":\"", onRead, StringComparison.Ordinal);
+        Assert.Matches("\"createdAt\":\"[^\"]+Z\"", onRead);
+        Assert.Matches("\"createdAt\":\"[^\"]+Z\"", onList);
+    }
+
     public async Task CreateItem_WithAFileThatIsNotAnImage_IsRejected()
     {
         HttpClient client = _factory.CreateClientForNewUser("Fernanda Lopes Teixeira");

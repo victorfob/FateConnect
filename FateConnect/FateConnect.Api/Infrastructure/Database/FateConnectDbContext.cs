@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Infrastructure.Database;
 
+using FateConnect.Api.Infrastructure.Database.Converters;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Users.Entities;
@@ -20,5 +21,11 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
         modelBuilder.HasPostgresExtension("unaccent");
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(FateConnectDbContext).Assembly);
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+        configurationBuilder.Properties<DateTime?>().HaveConversion<NullableUtcDateTimeConverter>();
     }
 }
