@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 
+import { apiClient } from '../httpClient';
 import {
   createLostItem,
   deleteLostItem,
@@ -141,24 +142,25 @@ describe('lostAndFoundService', () => {
     await expect(listLostItems()).rejects.toThrow(/não é uma página/);
   });
 
-  it('should register the item as a form, so the photo travels in the same request', async () => {
+  /**
+   * A foto é o único campo que não atravessa o stub: o `File` do jsdom não passa
+   * na checagem do undici que o interceptador usa para montar a requisição, e no
+   * navegador ela atravessa. O que dá para afirmar aqui é o corpo que o serviço
+   * entrega ao cliente HTTP, que é onde a decisão de mandar a foto acontece.
+   */
+  it('should put the chosen photo in the same body as the item', async () => {
     const photo = new File(['foto'], 'garrafa.png', { type: 'image/png' });
-    let fields: Record<string, FormDataEntryValue> | null = null;
-    server.use(
-      http.post(LOST_AND_FOUND_URL, async ({ request }) => {
-        fields = await fieldsOf(request);
-
-        return HttpResponse.json({ id: 'novo' }, { status: CREATED });
-      }),
-    );
+    const post = vi.spyOn(apiClient, 'post').mockResolvedValue({ data: { id: 'novo' } });
 
     const created = await createLostItem({ ...LOST_ITEM_INPUT, image: photo });
 
-    expect(fields).toMatchObject(SENT_FIELDS);
-    // Quem decide o formato guardado é o content type; o nome do arquivo a API ignora.
-    expect((fields!.Image as File).type).toBe('image/png');
-    expect((fields!.Image as File).size).toBeGreaterThan(0);
+    const [path, body] = post.mock.calls[0]!;
+    expect(path).toBe('/lostandfound');
+    expect(Object.fromEntries(body as FormData)).toMatchObject(SENT_FIELDS);
+    expect((body as FormData).get('Image')).toBe(photo);
     expect(created.id).toBe('novo');
+
+    post.mockRestore();
   });
 
   it('should leave the image field out when no photo was chosen', async () => {

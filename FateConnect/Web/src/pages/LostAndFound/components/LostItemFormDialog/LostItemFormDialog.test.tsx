@@ -3,6 +3,7 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 import { lostItemKindLabel } from '@app/pages/LostAndFound/helpers/lostItemKind';
+import { apiClient } from '@app/services/httpClient';
 import {
   LostItemKindEnum,
   LostItemStatusEnum,
@@ -211,22 +212,22 @@ describe('LostItemFormDialog', () => {
     });
   });
 
+  // A foto observada no corpo entregue ao cliente, e não no stub: o `File` do
+  // jsdom não atravessa o interceptador, e no navegador ele atravessa.
   it('should send the chosen photo in the same request as the item', async () => {
-    let fields: Record<string, FormDataEntryValue> | null = null;
-    server.use(
-      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, async ({ request }) => {
-        fields = await fieldsOf(request);
-        return HttpResponse.json({ id: LOST_ITEM.id });
-      }),
-    );
+    const patch = vi.spyOn(apiClient, 'patch').mockResolvedValue({ data: { id: LOST_ITEM.id } });
+    const photo = photoOf('achado.png', 'image/png');
     renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
 
-    await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
+    await userEvent.upload(photoInput(), photo);
     await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect((fields!.Image as File).type).toBe('image/png');
+    const [, body] = patch.mock.calls[0]!;
+    expect((body as FormData).get('Image')).toBe(photo);
+
+    patch.mockRestore();
   });
 
   it('should show the chosen photo and let the user drop it', async () => {
