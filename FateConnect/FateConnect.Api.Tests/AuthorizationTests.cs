@@ -43,6 +43,36 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    public static TheoryData<string, string> LostAndFoundRoutes() => new()
+    {
+        { "GET", "/LostAndFound" },
+        { "GET", "/LostAndFound/8a1b0f2e-0000-4000-8000-000000000000" },
+        { "POST", "/LostAndFound" },
+        { "PATCH", "/LostAndFound/8a1b0f2e-0000-4000-8000-000000000000" },
+        { "DELETE", "/LostAndFound/8a1b0f2e-0000-4000-8000-000000000000" }
+    };
+
+    [Theory]
+    [MemberData(nameof(LostAndFoundRoutes))]
+    public async Task LostAndFoundEndpoints_WithoutToken_RespondUnauthorized(string method, string route)
+    {
+        var request = new HttpRequestMessage(new HttpMethod(method), route);
+
+        HttpResponseMessage response = await _factory.CreateClient().SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task LostAndFoundEndpoints_WithAValidToken_ReachTheController()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Mariana Alves Rocha");
+
+        HttpResponseMessage response = await client.GetAsync("/LostAndFound");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
     [Theory]
     [InlineData("/auth/login")]
     [InlineData("/Users/signup")]
