@@ -32,6 +32,10 @@ describe('lostItemSearchCodec', () => {
       },
     );
 
+    it('should ask for every status when the url says so, which the default cannot express', () => {
+      expect(read('situacao=todas').status).toBeUndefined();
+    });
+
     it('should fall back to the default status when the url names one it does not know', () => {
       expect(read('situacao=extraviado').status).toBe(DEFAULT_STATUS);
     });
@@ -69,6 +73,13 @@ describe('lostItemSearchCodec', () => {
       });
 
       expect(params).toEqual({});
+    });
+
+    it('should name every status in the url, so it survives a reload', () => {
+      const params = lostItemSearchCodec.toParams({ page: FIRST_PAGE, pageSize: PAGE_SIZE });
+
+      expect(params).toEqual({ situacao: 'todas' });
+      expect(read('situacao=todas').status).toBeUndefined();
     });
 
     it('should write the words the screen shows', () => {

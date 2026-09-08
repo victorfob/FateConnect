@@ -9,6 +9,9 @@ export const DEFAULT_STATUS = LostItemStatusEnum.OPEN;
 
 const MINE = 'sim';
 
+/** A ausência do parâmetro já é o padrão do mural, então pedir todas precisa de palavra própria. */
+const EVERY_STATUS = 'todas';
+
 enum SearchParamEnum {
   NAME = 'nome',
   OCCURRED_ON = 'data',
@@ -17,13 +20,24 @@ enum SearchParamEnum {
   ONLY_MINE = 'meus',
 }
 
+/** Filtro sem situação é o pedido por todas elas, que é como a API as devolve. */
+function readStatus(params: URLSearchParams): LostItemStatusEnum | undefined {
+  const raw = params.get(SearchParamEnum.STATUS)?.trim().toLowerCase();
+
+  if (raw === EVERY_STATUS) return undefined;
+
+  // O mural abre em Aberto, então a ausência do parâmetro é essa escolha.
+  return parseLostItemStatus(raw) ?? DEFAULT_STATUS;
+}
+
 function fromParams(params: URLSearchParams): LostItemFilter {
   const filter: LostItemFilter = {
     page: readPageParam(params),
     pageSize: PAGE_SIZE,
-    // O mural abre em Aberto, então a ausência do parâmetro é essa escolha.
-    status: parseLostItemStatus(params.get(SearchParamEnum.STATUS)) ?? DEFAULT_STATUS,
   };
+
+  const status = readStatus(params);
+  if (status) filter.status = status;
 
   const searchTerm = readParamValue(params, SearchParamEnum.NAME);
   if (searchTerm) filter.searchTerm = searchTerm;
@@ -50,7 +64,8 @@ function toParams(filter: LostItemFilter): Record<string, string> {
   if (filter.lostAndFoundType) {
     params[SearchParamEnum.KIND] = lostItemKindSlug(filter.lostAndFoundType);
   }
-  if (filter.status && filter.status !== DEFAULT_STATUS) {
+  if (!filter.status) params[SearchParamEnum.STATUS] = EVERY_STATUS;
+  else if (filter.status !== DEFAULT_STATUS) {
     params[SearchParamEnum.STATUS] = lostItemStatusSlug(filter.status);
   }
   if (filter.onlyMyItems) params[SearchParamEnum.ONLY_MINE] = MINE;

@@ -60,6 +60,8 @@ const NO_CONTENT = 204;
 
 const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', deleted: 'Excluído' };
 
+const STATUS_FILTER_ALL_LABEL = 'Todas';
+
 const RESOLVE_LABEL = { lost: 'Marcar como encontrado', found: 'Marcar como devolvido' };
 
 const DELETION_NOTE = {
@@ -147,6 +149,20 @@ describe('LostAndFound', () => {
 
     await waitFor(() => expect(received).not.toBeNull());
     expect(received!.searchParams.get('status')).toBe(LostItemStatusEnum.OPEN);
+  });
+
+  it('should ask the api without a status when every status is wanted', async () => {
+    let requestUrl: URL | null = null;
+    listReturning([LOST_ITEM], (url) => {
+      requestUrl = url;
+    });
+    renderComponent();
+    await screen.findByText(LOST_ITEM.name);
+
+    await filterByStatus(STATUS_FILTER_ALL_LABEL);
+
+    await waitFor(() => expect(requestUrl!.searchParams.has('status')).toBe(false));
+    expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
   });
 
   it('should tell the user when no item matches', async () => {

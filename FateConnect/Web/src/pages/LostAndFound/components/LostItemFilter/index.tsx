@@ -43,7 +43,9 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
 
     return C.LostItemOwnerFilterEnum.ALL;
   });
-  const [status, setStatus] = useState<string>(initialFilters.status ?? LostItemStatusEnum.OPEN);
+  const [status, setStatus] = useState<string>(
+    initialFilters.status ?? C.LostItemStatusFilterEnum.ALL,
+  );
   const [isFiltered, setIsFiltered] = useState(() => isBeyondDefault(initialFilters));
   // Item achado ou perdido só pode ter ocorrido até hoje.
   const today = useMemo(() => new Date(), []);
