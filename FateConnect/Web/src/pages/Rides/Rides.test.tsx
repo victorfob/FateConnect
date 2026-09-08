@@ -3,7 +3,8 @@ import { http, HttpResponse } from 'msw';
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
-import { RideTypeEnum, type Ride, type RideDriver } from '@app/services/rides/types';
+import { RideTypeEnum, type Ride } from '@app/services/rides/types';
+import type { UserContact } from '@app/services/types';
 import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
@@ -24,7 +25,7 @@ const SECOND_PAGE_LABEL = 'Ir para a página 2';
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
 const RETRY_WINDOW_MS = 5000;
 
-const DRIVER: RideDriver = {
+const DRIVER: UserContact = {
   name: 'Ana Ofertante',
   email: 'ana@example.com',
   phone: '(15) 90000-0000',
