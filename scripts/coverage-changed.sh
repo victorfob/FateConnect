@@ -32,18 +32,36 @@ fi
 git diff --name-only "$BASE...HEAD" -- '*.cs' > "$saida/alterados.txt"
 
 MINIMO="$MINIMO" python3 - "$relatorio" "$saida/alterados.txt" <<'PY'
-import os, sys, xml.etree.ElementTree as ET
+import os, re, sys, xml.etree.ElementTree as ET
 
 minimo = int(os.environ["MINIMO"])
 raiz = ET.parse(sys.argv[1]).getroot()
 with open(sys.argv[2]) as f:
     alterados = {os.path.abspath(linha.strip()) for linha in f if linha.strip()}
 
+
+def eh_construtor_de_copia(nome_da_classe, nome_do_metodo):
+    # O compilador gera um construtor de cópia para todo `record`, e só uma
+    # expressão `with` o chama. Nada em produção usa `with`, então ele fica
+    # eternamente descoberto e derruba DTO de dados puros para 80%: num arquivo
+    # de cinco linhas, uma linha que ninguém pode alcançar vale 20%.
+    assinatura = re.search(r"::\.ctor\((.*)\)$", nome_do_metodo)
+
+    if assinatura is None:
+        return False
+
+    return re.sub(r"<.*>$", "", assinatura.group(1)) == nome_da_classe
+
+
 por_arquivo = {}
 for modulo in raiz.iter("Module"):
     caminhos = {a.get("uid"): a.get("fullPath") for a in modulo.iter("File")}
     for classe in modulo.iter("Class"):
-        pontos = [(p, m.find("FileRef")) for m in classe.iter("Method") for p in m.iter("SequencePoint")]
+        nome_da_classe = classe.findtext("FullName") or ""
+        pontos = [(p, m.find("FileRef"))
+                  for m in classe.iter("Method")
+                  if not eh_construtor_de_copia(nome_da_classe, m.findtext("Name") or "")
+                  for p in m.iter("SequencePoint")]
         if not pontos:
             continue
         uid = next((r.get("uid") for _, r in pontos if r is not None), None)
