@@ -12,7 +12,7 @@ describe('rideSearchCodec', () => {
     });
 
     it('should read every filter the url carries', () => {
-      expect(read('pagina=3&destino=Sorocaba&data=2026-09-01&hora=07:30&tipo=solidaria')).toEqual({
+      expect(read('pagina=3&busca=Sorocaba&data=2026-09-01&hora=07:30&tipo=solidaria')).toEqual({
         page: 3,
         pageSize: PAGE_SIZE,
         searchTerm: 'Sorocaba',
@@ -38,7 +38,7 @@ describe('rideSearchCodec', () => {
     });
 
     it('should drop filters that carry only blank space', () => {
-      expect(read('destino=%20%20&hora=%20')).toEqual({ page: FIRST_PAGE, pageSize: PAGE_SIZE });
+      expect(read('busca=%20%20&hora=%20')).toEqual({ page: FIRST_PAGE, pageSize: PAGE_SIZE });
     });
   });
 
@@ -55,7 +55,7 @@ describe('rideSearchCodec', () => {
         searchTerm: 'Sorocaba',
       });
 
-      expect(params).toEqual({ pagina: '2', tipo: 'igualitaria', destino: 'Sorocaba' });
+      expect(params).toEqual({ pagina: '2', tipo: 'igualitaria', busca: 'Sorocaba' });
     });
 
     it('should survive a round trip through the url', () => {

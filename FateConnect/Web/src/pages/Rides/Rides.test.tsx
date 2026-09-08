@@ -192,7 +192,7 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
-    await userEvent.type(screen.getByLabelText(FILTER_LABELS.destination), 'Sorocaba');
+    await userEvent.type(screen.getByLabelText(FILTER_LABELS.searchTerm), 'Sorocaba');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
     await waitFor(() => expect(requestUrl?.searchParams.get('searchTerm')).toBe('Sorocaba'));
@@ -388,7 +388,7 @@ describe('Rides', () => {
     it('should open with the fields already filled from the url', async () => {
       listReturning([RIDE]);
 
-      renderComponent('?destino=Sorocaba&hora=07:30&tipo=solidaria');
+      renderComponent('?busca=Sorocaba&hora=07:30&tipo=solidaria');
 
       expect(await screen.findByDisplayValue('Sorocaba')).toBeInTheDocument();
       expect(screen.getByDisplayValue('07:30')).toBeInTheDocument();
@@ -427,10 +427,10 @@ describe('Rides', () => {
       listReturning(manyRides(30));
       const router = renderComponent('?pagina=3');
 
-      await userEvent.type(await screen.findByLabelText(FILTER_LABELS.destination), 'Votorantim');
+      await userEvent.type(await screen.findByLabelText(FILTER_LABELS.searchTerm), 'Votorantim');
       await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
-      await waitFor(() => expect(router.state.location.search).toBe('?destino=Votorantim'));
+      await waitFor(() => expect(router.state.location.search).toBe('?busca=Votorantim'));
     });
 
     it('should fall back to the last page when the url asks beyond it', async () => {

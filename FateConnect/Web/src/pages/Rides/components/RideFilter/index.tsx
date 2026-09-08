@@ -89,9 +89,9 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
 
       <FilterPanel.Field>
         <Input
-          label={C.FILTER_LABELS.destination}
+          label={C.FILTER_LABELS.searchTerm}
           fullWidth
-          placeholder={C.FILTER_PLACEHOLDERS.destination}
+          placeholder={C.FILTER_PLACEHOLDERS.searchTerm}
           value={searchTerm}
           onChange={handleSearchTermChange}
         />

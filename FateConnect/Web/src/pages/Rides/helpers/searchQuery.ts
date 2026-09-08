@@ -5,7 +5,7 @@ import { PAGE_SIZE, readPageParam, readParamValue, writePageParam } from '@app/u
 import { parseRideType, rideTypeSlug } from './rideType';
 
 enum SearchParamEnum {
-  DESTINATION = 'destino',
+  SEARCH_TERM = 'busca',
   DEPARTURE_DATE = 'data',
   DEPARTURE_TIME = 'hora',
   RIDE_TYPE = 'tipo',
@@ -17,7 +17,7 @@ function fromParams(params: URLSearchParams): RideFilter {
     pageSize: PAGE_SIZE,
   };
 
-  const searchTerm = readParamValue(params, SearchParamEnum.DESTINATION);
+  const searchTerm = readParamValue(params, SearchParamEnum.SEARCH_TERM);
   if (searchTerm) filter.searchTerm = searchTerm;
 
   const departureDate = readParamValue(params, SearchParamEnum.DEPARTURE_DATE);
@@ -36,7 +36,7 @@ function toParams(filter: RideFilter): Record<string, string> {
   const params: Record<string, string> = {};
 
   writePageParam(params, filter.page);
-  if (filter.searchTerm) params[SearchParamEnum.DESTINATION] = filter.searchTerm;
+  if (filter.searchTerm) params[SearchParamEnum.SEARCH_TERM] = filter.searchTerm;
   if (filter.departureDate) params[SearchParamEnum.DEPARTURE_DATE] = filter.departureDate;
   if (filter.departureTime) params[SearchParamEnum.DEPARTURE_TIME] = filter.departureTime;
   if (filter.rideType) params[SearchParamEnum.RIDE_TYPE] = rideTypeSlug(filter.rideType);
