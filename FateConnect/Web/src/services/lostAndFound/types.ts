@@ -20,21 +20,21 @@ export enum DeletionReasonEnum {
 export type LostItem = {
   id: string;
   name: string;
-  type: LostItemKindEnum;
+  lostAndFoundType: LostItemKindEnum;
   place: string;
-  occurredOn: string;
+  ocurredOn: string;
   description: string | null;
-  photoUrl: string | null;
+  imageUrl: string | null;
   status: LostItemStatusEnum;
   deletionReason: DeletionReasonEnum | null;
-  isMine: boolean;
+  isOwner: boolean;
   createdAt: string;
 };
 
-/** A foto fica de fora: quem devolve a `photoUrl` é o servidor. */
+/** A foto fica de fora: quem devolve a `imageUrl` é o servidor. */
 export type LostItemInput = Pick<
   LostItem,
-  'name' | 'type' | 'place' | 'occurredOn' | 'description'
+  'name' | 'lostAndFoundType' | 'place' | 'ocurredOn' | 'description'
 >;
 
 export interface LostItemFilter extends PageQuery {

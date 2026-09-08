@@ -14,9 +14,9 @@ import { LostItemKindEnum, LostItemStatusEnum, type LostItemInput } from './type
 
 const LOST_ITEM_INPUT: LostItemInput = {
   name: 'Garrafa térmica',
-  type: LostItemKindEnum.FOUND,
+  lostAndFoundType: LostItemKindEnum.FOUND,
   place: 'Biblioteca',
-  occurredOn: '2026-08-20',
+  ocurredOn: '2026-08-20',
   description: 'Garrafa azul, com adesivos na tampa.',
 };
 

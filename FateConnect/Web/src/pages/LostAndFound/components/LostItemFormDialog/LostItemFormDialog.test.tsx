@@ -32,14 +32,14 @@ const TYPED_DATE = format(OCCURRED_AT, 'ddMMyyyy');
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
   name: 'Carteira preta',
-  type: LostItemKindEnum.LOST,
+  lostAndFoundType: LostItemKindEnum.LOST,
   place: 'Biblioteca',
-  occurredOn: '2026-08-11T00:00:00',
+  ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos.',
-  photoUrl: null,
+  imageUrl: null,
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
-  isMine: true,
+  isOwner: true,
   createdAt: '2026-08-12T00:00:00',
 };
 
@@ -128,9 +128,9 @@ describe('LostItemFormDialog', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
       name: LOST_ITEM.name,
-      type: LOST_ITEM.type,
+      lostAndFoundType: LOST_ITEM.lostAndFoundType,
       place: LOST_ITEM.place,
-      occurredOn: '2026-08-11',
+      ocurredOn: '2026-08-11',
       description: LOST_ITEM.description,
     });
   });
@@ -181,9 +181,9 @@ describe('LostItemFormDialog', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
       name: 'Garrafa térmica',
-      type: LostItemKindEnum.FOUND,
+      lostAndFoundType: LostItemKindEnum.FOUND,
       place: 'Bloco C',
-      occurredOn: toApiDate(OCCURRED_AT),
+      ocurredOn: toApiDate(OCCURRED_AT),
       description: '',
     });
   });

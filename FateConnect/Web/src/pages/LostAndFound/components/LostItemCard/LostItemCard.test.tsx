@@ -14,14 +14,14 @@ import { LostItemCard } from '.';
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
   name: 'Carteira preta',
-  type: LostItemKindEnum.LOST,
+  lostAndFoundType: LostItemKindEnum.LOST,
   place: 'Biblioteca',
-  occurredOn: '2026-08-11T00:00:00',
+  ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos e cartões.',
-  photoUrl: null,
+  imageUrl: null,
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
-  isMine: false,
+  isOwner: false,
   createdAt: '2026-08-12T00:00:00',
 };
 
@@ -34,7 +34,7 @@ const DELETION_NOTE = {
 
 const DELETED_ITEM: LostItem = {
   ...LOST_ITEM,
-  isMine: true,
+  isOwner: true,
   status: LostItemStatusEnum.DELETED,
   deletionReason: DeletionReasonEnum.USER,
 };
@@ -89,7 +89,7 @@ describe('LostItemCard', () => {
   });
 
   it('should not offer contact on the item registered by the logged user', () => {
-    renderComponent({ ...LOST_ITEM, isMine: true });
+    renderComponent({ ...LOST_ITEM, isOwner: true });
 
     expect(screen.queryByRole('button', { name: CONTACT_LABEL })).not.toBeInTheDocument();
   });

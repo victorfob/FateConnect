@@ -36,14 +36,14 @@ const LOST_ITEMS_URL = 'https://api.fateconnect.test/achado';
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
   name: 'Carteira preta',
-  type: LostItemKindEnum.LOST,
+  lostAndFoundType: LostItemKindEnum.LOST,
   place: 'Biblioteca',
-  occurredOn: '2026-08-11T00:00:00',
+  ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos e cartões.',
-  photoUrl: null,
+  imageUrl: null,
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
-  isMine: false,
+  isOwner: false,
   createdAt: '2026-08-12T00:00:00',
 };
 
@@ -67,7 +67,7 @@ const DELETION_NOTE = {
   inactivity: 'Excluído automaticamente por inatividade.',
 };
 
-const OWN_OPEN_ITEM: LostItem = { ...LOST_ITEM, isMine: true };
+const OWN_OPEN_ITEM: LostItem = { ...LOST_ITEM, isOwner: true };
 
 /**
  * Mural que guarda o que as ações mudaram e respeita o filtro de situação, como
@@ -196,7 +196,7 @@ describe('LostAndFound', () => {
   });
 
   it('should mark only the item that belongs to the user', async () => {
-    listReturning([{ ...LOST_ITEM, isMine: true }]);
+    listReturning([{ ...LOST_ITEM, isOwner: true }]);
 
     renderComponent();
 
@@ -231,7 +231,10 @@ describe('LostAndFound', () => {
   });
 
   it('should tell lost from found by the icon on the card', async () => {
-    listReturning([LOST_ITEM, { ...LOST_ITEM, id: 'outro', type: LostItemKindEnum.FOUND }]);
+    listReturning([
+      LOST_ITEM,
+      { ...LOST_ITEM, id: 'outro', lostAndFoundType: LostItemKindEnum.FOUND },
+    ]);
 
     renderComponent();
 
@@ -377,7 +380,10 @@ describe('LostAndFound', () => {
   });
 
   it('should name the ending after the kind of the item', async () => {
-    listReturning([OWN_OPEN_ITEM, { ...OWN_OPEN_ITEM, id: 'outro', type: LostItemKindEnum.FOUND }]);
+    listReturning([
+      OWN_OPEN_ITEM,
+      { ...OWN_OPEN_ITEM, id: 'outro', lostAndFoundType: LostItemKindEnum.FOUND },
+    ]);
 
     renderComponent();
 

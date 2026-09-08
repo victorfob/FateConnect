@@ -10,14 +10,14 @@ import { toFormValues, toLostItemInput } from './mapper';
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
   name: 'Carteira preta',
-  type: LostItemKindEnum.LOST,
+  lostAndFoundType: LostItemKindEnum.LOST,
   place: 'Biblioteca',
-  occurredOn: '2026-08-11T00:00:00',
+  ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta.',
-  photoUrl: 'https://fotos.fateconnect.test/carteira.png',
+  imageUrl: 'https://fotos.fateconnect.test/carteira.png',
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
-  isMine: true,
+  isOwner: true,
   createdAt: '2026-08-12T00:00:00',
 };
 
@@ -57,9 +57,9 @@ describe('toLostItemInput', () => {
 
     expect(toLostItemInput(values)).toEqual({
       name: 'Carteira preta',
-      type: LostItemKindEnum.LOST,
+      lostAndFoundType: LostItemKindEnum.LOST,
       place: 'Biblioteca',
-      occurredOn: '2026-08-11',
+      ocurredOn: '2026-08-11',
       description: 'Carteira de couro preta.',
     });
   });
