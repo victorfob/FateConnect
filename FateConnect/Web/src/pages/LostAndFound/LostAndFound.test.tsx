@@ -192,7 +192,7 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
-    await userEvent.type(screen.getByLabelText(FILTER_LABELS.name), 'Carteira');
+    await userEvent.type(screen.getByLabelText(FILTER_LABELS.searchTerm), 'Carteira');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
     await waitFor(() => expect(requestUrl!.searchParams.get('searchTerm')).toBe('Carteira'));
@@ -505,7 +505,7 @@ describe('LostAndFound', () => {
     it('should open with the fields already filled from the url', async () => {
       listReturning([LOST_ITEM]);
 
-      renderComponent('?nome=Garrafa&tipo=perdido');
+      renderComponent('?busca=Garrafa&tipo=perdido');
 
       expect(await screen.findByDisplayValue('Garrafa')).toBeInTheDocument();
     });
@@ -543,10 +543,10 @@ describe('LostAndFound', () => {
       listReturning(manyItems(30));
       const router = renderComponent('?pagina=3');
 
-      await userEvent.type(await screen.findByLabelText(FILTER_LABELS.name), 'Mochila');
+      await userEvent.type(await screen.findByLabelText(FILTER_LABELS.searchTerm), 'Mochila');
       await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
-      await waitFor(() => expect(router.state.location.search).toBe('?nome=Mochila'));
+      await waitFor(() => expect(router.state.location.search).toBe('?busca=Mochila'));
     });
 
     it('should fall back to the last page when the url asks beyond it', async () => {

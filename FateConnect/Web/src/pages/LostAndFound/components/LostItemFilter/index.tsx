@@ -90,9 +90,9 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
     >
       <FilterPanel.Field>
         <Input
-          label={C.FILTER_LABELS.name}
+          label={C.FILTER_LABELS.searchTerm}
           fullWidth
-          placeholder={C.FILTER_PLACEHOLDERS.name}
+          placeholder={C.FILTER_PLACEHOLDERS.searchTerm}
           value={itemName}
           onChange={handleNameChange}
         />

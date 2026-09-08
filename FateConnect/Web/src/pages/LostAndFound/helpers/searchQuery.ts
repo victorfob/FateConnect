@@ -13,7 +13,7 @@ const MINE = 'sim';
 const EVERY_STATUS = 'todas';
 
 enum SearchParamEnum {
-  NAME = 'nome',
+  SEARCH_TERM = 'busca',
   OCCURRED_ON = 'data',
   KIND = 'tipo',
   STATUS = 'situacao',
@@ -39,7 +39,7 @@ function fromParams(params: URLSearchParams): LostItemFilter {
   const status = readStatus(params);
   if (status) filter.status = status;
 
-  const searchTerm = readParamValue(params, SearchParamEnum.NAME);
+  const searchTerm = readParamValue(params, SearchParamEnum.SEARCH_TERM);
   if (searchTerm) filter.searchTerm = searchTerm;
 
   const ocurredOn = readParamValue(params, SearchParamEnum.OCCURRED_ON);
@@ -59,7 +59,7 @@ function toParams(filter: LostItemFilter): Record<string, string> {
   const params: Record<string, string> = {};
 
   writePageParam(params, filter.page);
-  if (filter.searchTerm) params[SearchParamEnum.NAME] = filter.searchTerm;
+  if (filter.searchTerm) params[SearchParamEnum.SEARCH_TERM] = filter.searchTerm;
   if (filter.ocurredOn) params[SearchParamEnum.OCCURRED_ON] = filter.ocurredOn;
   if (filter.lostAndFoundType) {
     params[SearchParamEnum.KIND] = lostItemKindSlug(filter.lostAndFoundType);

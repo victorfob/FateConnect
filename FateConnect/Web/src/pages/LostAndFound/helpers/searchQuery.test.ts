@@ -13,7 +13,7 @@ describe('lostItemSearchCodec', () => {
 
     it('should read every filter the url carries', () => {
       expect(
-        read('pagina=2&nome=Garrafa&data=2026-08-01&tipo=perdido&situacao=resolvido&meus=sim'),
+        read('pagina=2&busca=Garrafa&data=2026-08-01&tipo=perdido&situacao=resolvido&meus=sim'),
       ).toEqual({
         page: 2,
         pageSize: PAGE_SIZE,
