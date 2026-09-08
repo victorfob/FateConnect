@@ -31,6 +31,8 @@ async function fieldsOf(request: Request): Promise<Record<string, FormDataEntryV
 }
 
 const PREVIEW_URL = 'blob:https://fateconnect.test/preview';
+/** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
+const PNG_BYTES = '\x89PNG\r\n\x1a\n';
 
 const OCCURRED_AT = new Date(2026, 7, 11);
 /** O seletor do MUI recebe a data seção a seção, na ordem de pt-BR. */
@@ -50,6 +52,19 @@ const LOST_ITEM: LostItem = {
   isOwner: true,
   createdAt: '2026-08-12T00:00:00',
 };
+
+const STORED_PHOTO_PATH = 'uploads/lostandfound/6f0b8e3a-1c2d-4e5f-8a9b-0c1d2e3f4a5b.png';
+
+const ITEM_WITH_PHOTO: LostItem = { ...LOST_ITEM, imageUrl: STORED_PHOTO_PATH };
+
+function storedPhotoServing() {
+  server.use(
+    http.get(
+      `https://api.fateconnect.test/${STORED_PHOTO_PATH}`,
+      () => new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': 'image/png' } }),
+    ),
+  );
+}
 
 const onClose = vi.fn();
 
@@ -230,6 +245,32 @@ describe('LostItemFormDialog', () => {
       expect(screen.queryByRole('img', { name: PHOTO_ACTIONS.previewAlt })).not.toBeInTheDocument(),
     );
     expect(screen.getByRole('button', { name: PHOTO_ACTIONS.pick })).toBeInTheDocument();
+  });
+
+  it('should bring the stored photo into the form when the item already has one', async () => {
+    storedPhotoServing();
+    renderComponent({ ...DEFAULT_PROPS, item: ITEM_WITH_PHOTO });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+
+    expect(await screen.findByRole('img', { name: PHOTO_ACTIONS.storedAlt })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_ACTIONS.replace })).toBeInTheDocument();
+    // A API não apaga a foto guardada, só a troca: oferecer remover seria mentira.
+    expect(screen.queryByRole('button', { name: PHOTO_ACTIONS.remove })).not.toBeInTheDocument();
+  });
+
+  it('should put the stored photo back when the newly chosen one is dropped', async () => {
+    storedPhotoServing();
+    renderComponent({ ...DEFAULT_PROPS, item: ITEM_WITH_PHOTO });
+    await screen.findByRole('img', { name: PHOTO_ACTIONS.storedAlt });
+
+    await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
+
+    expect(await screen.findByRole('img', { name: PHOTO_ACTIONS.previewAlt })).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: PHOTO_ACTIONS.storedAlt })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_ACTIONS.remove }));
+
+    expect(await screen.findByRole('img', { name: PHOTO_ACTIONS.storedAlt })).toBeInTheDocument();
   });
 
   it('should refuse a photo in a format the server will not take', async () => {
