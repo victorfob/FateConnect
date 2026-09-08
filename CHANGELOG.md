@@ -14,6 +14,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Amplia a busca de caronas, que passa a casar também a descrição da carona e não só o destino; o campo de busca do site deixa de filtrar até o ajuste do front sair, e volta a filtrar com ele (#322) [Backend]
 
+### Fixed
+
+- Corrige o instante de criação nas respostas da API, que vinha sem a marca de fuso horário quando lido do banco: um cliente que o interpretasse leria o horário como local, três horas adiantado (#322) [Backend]
+
 ## [0.8.0] - 2026-09-05
 
 ### Added
