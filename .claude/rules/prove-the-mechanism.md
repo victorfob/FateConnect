@@ -44,7 +44,9 @@ O que respondeu foi ler a **cascata**, não o pixel: percorrer `document.styleSh
 
 A quarta linha custou uma segunda rodada de review. Em 04/09/2026 a varredura devolveu 11 achados, eu corrigi os 11 e declarei o PR limpo; faltavam dois — as asserções do teste que guardava a copy, escritas como regex. Eles só apareceram porque a suíte ficou **vermelha** depois da correção.
 
-⚠️ **Texto de código mora em quatro formas: string, template, regex e comentário.** Instrumento que lê três responde com a mesma confiança sobre as três, e o silêncio sobre a quarta se lê como ausência.
+⚠️ **Texto de código mora em cinco formas: string, template, regex, comentário — e bloco de código, onde não há crase nenhuma.** Instrumento que lê quatro responde com a mesma confiança sobre as quatro, e o silêncio sobre a quinta se lê como ausência.
+
+A quinta forma apareceu em 09/09/2026, ao levar para o inglês os nomes da API que seis issues abertas citavam. Meu buscador procurava token entre crases e devolveu seis issues; a #162 tinha **treze** nomes em português fora de crase — num bloco `csharp`, num bloco de JSON e num diagrama de setas. Quem os achou não foi o buscador: foi a guarda que reclama de sobra depois da substituição.
 
 Em 02/09/2026 entrou um quarto, de outra natureza: o predicado que é verdadeiro **por vacuidade**. Esperando o CI de um PR com `until gh pr checks <n> --json name,bucket | jq -e 'all(.bucket != "pending")'`, o laço saiu na primeira olhada e eu anunciei quatro checks verdes — havia **um** registrado, e `all()` sobre lista de um elemento é verdadeiro. Os outros três nem existiam, incluindo o único que importava naquele PR. A âncora que faltava é de cardinalidade:
 
@@ -95,6 +97,10 @@ Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase`
 **A guarda é aritmética, não cuidado:** conte as entradas do bloco de entrada, conte as que você atribuiu, e **aborte** quando os dois números não baterem. Uma linha de `assert` teria transformado uma perda silenciosa numa parada barulhenta.
 
 ⚠️ **O sinal é a saída vazia onde deveria haver enumeração.** "0 arquivos alterados", "nenhuma seção", "nada a fazer" — num passo que existe justamente para alterar algo, isso não é sucesso, é o instrumento dizendo que não entendeu a entrada.
+
+⛔ **Tabela de substituição confere também que cada regra dela disparou.** Regra que nunca casa não faz nada e não reclama: o arquivo sai plausível, com um trecho intacto no meio do que você acha que traduziu.
+
+Na mesma tradução de 09/09/2026, a reescrita de uma frase inteira da #193 nunca casou — as trocas de token que rodaram antes já tinham mudado `Operador` para `Operator` **dentro dela**, então o texto que eu procurava já não existia. Quem parou foi o `assert` de que toda entrada casou ao menos uma vez. **Reescrita de frase vai antes das trocas de token**, e entre as trocas a ordem é do mais longo para o mais curto: sem isso `AgenteUsuario` vira `AgenteUser`.
 
 ## O alcance de uma mudança de token se mede no consumidor renderizado
 
