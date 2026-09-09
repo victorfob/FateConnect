@@ -11,9 +11,10 @@ import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
 import {
+  FILTER_CLEAR_LABEL,
   FILTER_LABELS,
-  FILTER_PANEL_TITLE,
   FILTER_SUBMIT_LABEL,
+  FILTER_TITLE,
 } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
 import * as C from './constants';
@@ -59,6 +60,28 @@ function manyRides(total: number): Ride[] {
 
 function listReturning(rides: Ride[], onRequest?: (url: URL) => void) {
   server.use(pagedListHandler(RIDES_URL, rides, onRequest));
+}
+
+/** O ponto não tem papel de acessibilidade: chega-se a ele pelo gatilho que ele marca. */
+async function activeFilterDot() {
+  // Modal aberto deixa o resto da página `aria-hidden`: o gatilho só volta a ser
+  // alcançável por papel depois que o diálogo sai de cena.
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+  return screen
+    .getByRole('button', { name: FILTER_TITLE })
+    .closest('.MuiBadge-root')
+    ?.querySelector('.MuiBadge-badge');
+}
+
+/** Os campos moram no diálogo: tocá-los pede abri-lo primeiro. */
+async function openFilters() {
+  // Modal aberto deixa o resto da página `aria-hidden`: o gatilho só volta a ser
+  // alcançável por papel depois que o diálogo sai de cena.
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+  await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE }));
+  await screen.findByRole('dialog');
 }
 
 function renderComponent(search = '') {
@@ -193,16 +216,32 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
+    await openFilters();
     await userEvent.type(screen.getByLabelText(FILTER_LABELS.searchTerm), 'Sorocaba');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
     await waitFor(() => expect(requestUrl?.searchParams.get('searchTerm')).toBe('Sorocaba'));
-    // O ponto do painel não tem papel de acessibilidade: chega-se a ele pelo título.
-    const activeDot = screen
-      .getByText(FILTER_PANEL_TITLE)
-      .closest('.MuiBadge-root')
-      ?.querySelector('.MuiBadge-badge');
-    expect(activeDot).not.toHaveClass('MuiBadge-invisible');
+    expect(await activeFilterDot()).not.toHaveClass('MuiBadge-invisible');
+  });
+
+  it('should drop every filter when the search is cleared', async () => {
+    let requestUrl: URL | undefined;
+    listReturning([], (url) => {
+      requestUrl = url;
+    });
+    renderComponent();
+    await screen.findByText(C.EMPTY_LIST_MESSAGE);
+
+    await openFilters();
+    await userEvent.type(screen.getByLabelText(FILTER_LABELS.searchTerm), 'Sorocaba');
+    await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
+    await waitFor(() => expect(requestUrl?.searchParams.get('searchTerm')).toBe('Sorocaba'));
+
+    await openFilters();
+    await userEvent.click(screen.getByRole('button', { name: FILTER_CLEAR_LABEL }));
+
+    await waitFor(() => expect(requestUrl?.searchParams.has('searchTerm')).toBe(false));
+    expect(await activeFilterDot()).toHaveClass('MuiBadge-invisible');
   });
 
   it('should ask for confirmation before deleting and keep the ride when it is refused', async () => {
@@ -391,6 +430,8 @@ describe('Rides', () => {
 
       renderComponent('?busca=Sorocaba&hora=07:30&tipo=solidaria');
 
+      await openFilters();
+
       expect(await screen.findByDisplayValue('Sorocaba')).toBeInTheDocument();
       expect(screen.getByDisplayValue('07:30')).toBeInTheDocument();
     });
@@ -428,6 +469,7 @@ describe('Rides', () => {
       listReturning(manyRides(30));
       const router = renderComponent('?pagina=3');
 
+      await openFilters();
       await userEvent.type(await screen.findByLabelText(FILTER_LABELS.searchTerm), 'Votorantim');
       await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 

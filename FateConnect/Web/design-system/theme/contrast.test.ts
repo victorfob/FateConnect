@@ -122,6 +122,7 @@ function boundPairs(theme: Theme): Par[] {
 
   return [
     ['content on the app chrome', palette.chrome.contrastText, palette.chrome.main],
+    ['content on the primary colour', palette.primary.contrastText, palette.primary.main],
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
     ...tones.map((tone): Par => [
       `a ${tone} tag`,

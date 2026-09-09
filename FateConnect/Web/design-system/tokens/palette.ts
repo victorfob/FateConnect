@@ -123,7 +123,8 @@ export const colorVariants = {
  * que o papel dela exige, não por uma regra fixa de dessaturação.
  */
 export const darkColorTokens = {
-  primary: '#68828E',
+  /** Fundo do botão neutro: escuro o bastante para o texto branco, que aqui é regra. */
+  primary: '#566C76',
   /** Fundo de botão: escuro o bastante para o texto branco, que aqui é regra. */
   secondary: '#CF2E2E',
   /**

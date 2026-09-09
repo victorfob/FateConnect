@@ -1,5 +1,4 @@
 import type { ElementType, ReactNode } from 'react';
-import Typography from '@mui/material/Typography';
 
 import * as S from './styles';
 
@@ -18,11 +17,11 @@ export type PageShellBackProps = Readonly<{
 
 export function PageShellBack({ label, icon, ...rest }: PageShellBackProps) {
   return (
-    <S.BackAction {...rest}>
+    <S.BackAction {...rest} aria-label={label}>
       {icon}
-      <Typography variant="subtitleBold" color="inherit">
+      <S.BackLabel variant="subtitleBold" color="inherit">
         {label}
-      </Typography>
+      </S.BackLabel>
     </S.BackAction>
   );
 }
