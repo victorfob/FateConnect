@@ -4,9 +4,6 @@
  * A aplicação importa daqui, nunca de `@mui/material` — é o que permite
  * envolver, substituir ou restringir um componente sem varrer o app inteiro.
  */
-export { default as Accordion } from '@mui/material/Accordion';
-export { default as AccordionDetails } from '@mui/material/AccordionDetails';
-export { default as AccordionSummary } from '@mui/material/AccordionSummary';
 export { default as AppBar } from '@mui/material/AppBar';
 export { default as Box } from '@mui/material/Box';
 export { default as Button } from '@mui/material/Button';

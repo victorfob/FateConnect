@@ -86,7 +86,7 @@ export const darkPalette: PaletteOptions = {
   mode: 'dark',
   primary: {
     main: darkColorTokens.primary,
-    contrastText: darkColorTokens.surface,
+    contrastText: colorTokens.surfaceWhite,
   },
   secondary: {
     main: darkColorTokens.secondary,

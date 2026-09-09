@@ -71,6 +71,7 @@ export function Rides() {
   return (
     <PageShell
       title={C.RIDES_TITLE}
+      titleAction={<RideFilter initialFilters={filters} onApply={applyFilters} />}
       action={
         <PageShell.Back
           label={C.BACK_LABEL}
@@ -95,8 +96,6 @@ export function Rides() {
         </>
       }
     >
-      <RideFilter initialFilters={filters} onApply={applyFilters} />
-
       <CardsList
         isLoading={isLoading}
         isEmpty={rides.length === NO_ITEMS}

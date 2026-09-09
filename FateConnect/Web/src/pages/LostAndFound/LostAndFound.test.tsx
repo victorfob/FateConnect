@@ -1,3 +1,4 @@
+import { DATE_PICKER_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
@@ -26,9 +27,10 @@ import {
   RESTORE_LABEL,
 } from './components/LostItemCard/LostItemStatusAction/constants';
 import {
+  FILTER_CLEAR_LABEL,
   FILTER_LABELS,
-  FILTER_PANEL_TITLE,
   FILTER_SUBMIT_LABEL,
+  FILTER_TITLE,
 } from './components/LostItemFilter/constants';
 import { EDIT_MODE, REGISTER_MODE } from './components/LostItemFormDialog/constants';
 import * as C from './constants';
@@ -51,9 +53,26 @@ const LOST_ITEM: LostItem = {
   createdAt: '2026-08-12T00:00:00',
 };
 
-/** O ponto do painel não tem papel de acessibilidade: chega-se a ele pelo título. */
-function activeFilterDot(title: string) {
-  return screen.getByText(title).closest('.MuiBadge-root')?.querySelector('.MuiBadge-badge');
+/** O ponto não tem papel de acessibilidade: chega-se a ele pelo gatilho que ele marca. */
+async function activeFilterDot() {
+  // Modal aberto deixa o resto da página `aria-hidden`: o gatilho só volta a ser
+  // alcançável por papel depois que o diálogo sai de cena.
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+  return screen
+    .getByRole('button', { name: FILTER_TITLE })
+    .closest('.MuiBadge-root')
+    ?.querySelector('.MuiBadge-badge');
+}
+
+/** Os campos moram no diálogo: tocá-los pede abri-lo primeiro. */
+async function openFilters() {
+  // Modal aberto deixa o resto da página `aria-hidden`: o gatilho só volta a ser
+  // alcançável por papel depois que o diálogo sai de cena.
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+  await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE }));
+  await screen.findByRole('dialog');
 }
 
 function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
@@ -118,11 +137,13 @@ async function confirmAction(actionLabel: string, confirmLabel: string) {
 }
 
 async function filterByStatus(optionLabel: string) {
+  await openFilters();
   await userEvent.click(screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.status) }));
   await userEvent.click(
     within(screen.getByRole('listbox')).getByRole('option', { name: optionLabel }),
   );
   await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 }
 
 function renderComponent(search = '') {
@@ -193,12 +214,13 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
+    await openFilters();
     await userEvent.type(screen.getByLabelText(FILTER_LABELS.searchTerm), 'Carteira');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
     await waitFor(() => expect(requestUrl!.searchParams.get('searchTerm')).toBe('Carteira'));
     expect(requestUrl!.searchParams.get('status')).toBe(LostItemStatusEnum.OPEN);
-    expect(activeFilterDot(FILTER_PANEL_TITLE)).not.toHaveClass('MuiBadge-invisible');
+    expect(await activeFilterDot()).not.toHaveClass('MuiBadge-invisible');
   });
 
   it('should leave the filter unmarked while only the open items are asked for', async () => {
@@ -207,7 +229,29 @@ describe('LostAndFound', () => {
     renderComponent();
 
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
-    expect(activeFilterDot(FILTER_PANEL_TITLE)).toHaveClass('MuiBadge-invisible');
+    expect(await activeFilterDot()).toHaveClass('MuiBadge-invisible');
+  });
+
+  it('should hand the board back to the open items when the filter is cleared', async () => {
+    let requestUrl: URL | null = null;
+    listReturning([], (url) => {
+      requestUrl = url;
+    });
+    renderComponent();
+    await screen.findByText(C.EMPTY_LIST_MESSAGE);
+
+    await openFilters();
+    await userEvent.type(screen.getByLabelText(FILTER_LABELS.searchTerm), 'Carteira');
+    await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
+    await waitFor(() => expect(requestUrl!.searchParams.get('searchTerm')).toBe('Carteira'));
+
+    await openFilters();
+    await userEvent.click(screen.getByRole('button', { name: FILTER_CLEAR_LABEL }));
+
+    // O mural abre em Aberto, então limpar devolve a situação a ela — e o ponto apaga.
+    await waitFor(() => expect(requestUrl!.searchParams.has('searchTerm')).toBe(false));
+    expect(requestUrl!.searchParams.get('status')).toBe(LostItemStatusEnum.OPEN);
+    expect(await activeFilterDot()).toHaveClass('MuiBadge-invisible');
   });
 
   it('should mark only the item that belongs to the user', async () => {
@@ -236,7 +280,8 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Abrir calendário' }));
+    await openFilters();
+    await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
 
     const calendar = within(await screen.findByRole('grid'));
     expect(calendar.getByRole('gridcell', { name: '10' })).toBeEnabled();
@@ -571,6 +616,9 @@ describe('LostAndFound', () => {
       listReturning([LOST_ITEM]);
 
       renderComponent('?busca=Garrafa&tipo=perdido');
+      await screen.findByText(LOST_ITEM.name);
+
+      await openFilters();
 
       expect(await screen.findByDisplayValue('Garrafa')).toBeInTheDocument();
     });
@@ -608,6 +656,7 @@ describe('LostAndFound', () => {
       listReturning(manyItems(30));
       const router = renderComponent('?pagina=3');
 
+      await openFilters();
       await userEvent.type(await screen.findByLabelText(FILTER_LABELS.searchTerm), 'Mochila');
       await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 

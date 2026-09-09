@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
-import { FilterPanel, Input } from '@design-system';
+import { FilterDialog, Input } from '@design-system';
 
 import { isLostItemKind } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import { isLostItemStatus } from '@app/pages/LostAndFound/helpers/lostItemStatus';
@@ -10,9 +10,6 @@ import {
 import { toApiDateText, toDisplayDate } from '@app/utils/apiDate';
 
 import * as C from './constants';
-
-/** Células por linha no desktop: cinco campos e o botão quebram em duas. */
-const FILTER_COLUMNS = 3;
 
 /** O mural já abre em Aberto, e paginação não é escolha de busca: nenhum dos dois acende o ponto. */
 function isBeyondDefault({
@@ -67,6 +64,20 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
     [],
   );
 
+  /**
+   * O mural abre em Aberto, então limpar devolve a situação a ela — e não a
+   * Todas, que é escolha de quem filtra e mantém o ponto aceso.
+   */
+  const handleClear = useCallback(() => {
+    setItemName('');
+    setOccurredOn('');
+    setKind(C.LostItemKindFilterEnum.ALL);
+    setOwner(C.LostItemOwnerFilterEnum.ALL);
+    setStatus(LostItemStatusEnum.OPEN);
+    setIsFiltered(false);
+    onApply({ status: LostItemStatusEnum.OPEN });
+  }, [onApply]);
+
   const handleSubmit = useCallback(() => {
     const filters: LostItemFilterValues = {};
 
@@ -81,14 +92,16 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
   }, [itemName, occurredOn, kind, owner, status, onApply]);
 
   return (
-    <FilterPanel
-      title={C.FILTER_PANEL_TITLE}
+    <FilterDialog
+      triggerLabel={C.FILTER_TITLE}
+      title={C.FILTER_TITLE}
       submitLabel={C.FILTER_SUBMIT_LABEL}
-      columns={FILTER_COLUMNS}
+      clearLabel={C.FILTER_CLEAR_LABEL}
       active={isFiltered}
       onSubmit={handleSubmit}
+      onClear={handleClear}
     >
-      <FilterPanel.Field>
+      <FilterDialog.Field>
         <Input
           label={C.FILTER_LABELS.searchTerm}
           fullWidth
@@ -96,43 +109,43 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
           value={itemName}
           onChange={handleNameChange}
         />
-      </FilterPanel.Field>
+      </FilterDialog.Field>
 
-      <FilterPanel.Field>
+      <FilterDialog.Field>
         <Input.Date
           label={C.FILTER_LABELS.occurredOn}
           value={occurredOn}
           onChange={setOccurredOn}
           maxDate={today}
         />
-      </FilterPanel.Field>
+      </FilterDialog.Field>
 
-      <FilterPanel.Field>
+      <FilterDialog.Field>
         <Input.Select
           label={C.FILTER_LABELS.kind}
           options={C.LOST_ITEM_KIND_FILTER_OPTIONS}
           value={kind}
           onChange={handleKindChange}
         />
-      </FilterPanel.Field>
+      </FilterDialog.Field>
 
-      <FilterPanel.Field>
+      <FilterDialog.Field>
         <Input.Select
           label={C.FILTER_LABELS.owner}
           options={C.LOST_ITEM_OWNER_FILTER_OPTIONS}
           value={owner}
           onChange={handleOwnerChange}
         />
-      </FilterPanel.Field>
+      </FilterDialog.Field>
 
-      <FilterPanel.Field>
+      <FilterDialog.Field>
         <Input.Select
           label={C.FILTER_LABELS.status}
           options={C.LOST_ITEM_STATUS_FILTER_OPTIONS}
           value={status}
           onChange={handleStatusChange}
         />
-      </FilterPanel.Field>
-    </FilterPanel>
+      </FilterDialog.Field>
+    </FilterDialog>
   );
 }

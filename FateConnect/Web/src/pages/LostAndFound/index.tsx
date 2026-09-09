@@ -49,6 +49,7 @@ export function LostAndFound() {
   return (
     <PageShell
       title={C.LOST_AND_FOUND_TITLE}
+      titleAction={<LostItemFilter initialFilters={filters} onApply={applyFilters} />}
       action={
         <PageShell.Back
           label={C.BACK_LABEL}
@@ -73,8 +74,6 @@ export function LostAndFound() {
         </>
       }
     >
-      <LostItemFilter initialFilters={filters} onApply={applyFilters} />
-
       <CardsList
         isLoading={isLoading}
         isEmpty={items.length === NO_ITEMS}

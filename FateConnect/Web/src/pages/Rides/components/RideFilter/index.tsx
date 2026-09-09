@@ -1,13 +1,11 @@
 import { useCallback, useState, type ChangeEvent } from 'react';
-import { FilterPanel, Input } from '@design-system';
+import { FilterDialog, Input } from '@design-system';
 
 import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
 import { toApiDateText, toDisplayDate } from '@app/utils/apiDate';
 
 import * as C from './constants';
 
-/** Células por linha no desktop: quatro campos e o botão cabem em uma. */
-const FILTER_COLUMNS = 5;
 const NO_FILTERS = 0;
 
 /** Paginação não conta: o ponto ao lado do título é sobre escolha de busca. */
@@ -49,6 +47,16 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
     [],
   );
 
+  /** A busca abre sem filtro nenhum, então limpar é devolver os campos ao vazio. */
+  const handleClear = useCallback(() => {
+    setDepartureDate('');
+    setDepartureTime('');
+    setSearchTerm('');
+    setRideType(C.RideTypeFilterEnum.ALL);
+    setIsFiltered(false);
+    onApply({});
+  }, [onApply]);
+
   const handleSubmit = useCallback(() => {
     const filters: RideFilterValues = {};
 
@@ -62,22 +70,24 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
   }, [departureDate, departureTime, searchTerm, rideType, onApply]);
 
   return (
-    <FilterPanel
-      title={C.FILTER_PANEL_TITLE}
+    <FilterDialog
+      triggerLabel={C.FILTER_TITLE}
+      title={C.FILTER_TITLE}
       submitLabel={C.FILTER_SUBMIT_LABEL}
-      columns={FILTER_COLUMNS}
+      clearLabel={C.FILTER_CLEAR_LABEL}
       active={isFiltered}
       onSubmit={handleSubmit}
+      onClear={handleClear}
     >
-      <FilterPanel.Field>
+      <FilterDialog.Field>
         <Input.Date
           label={C.FILTER_LABELS.departureDate}
           value={departureDate}
           onChange={setDepartureDate}
         />
-      </FilterPanel.Field>
+      </FilterDialog.Field>
 
-      <FilterPanel.Field>
+      <FilterDialog.Field>
         <Input
           label={C.FILTER_LABELS.departureTime}
           type="time"
@@ -85,9 +95,9 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
           value={departureTime}
           onChange={handleTimeChange}
         />
-      </FilterPanel.Field>
+      </FilterDialog.Field>
 
-      <FilterPanel.Field>
+      <FilterDialog.Field>
         <Input
           label={C.FILTER_LABELS.searchTerm}
           fullWidth
@@ -95,9 +105,9 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
           value={searchTerm}
           onChange={handleSearchTermChange}
         />
-      </FilterPanel.Field>
+      </FilterDialog.Field>
 
-      <FilterPanel.Field>
+      <FilterDialog.Field>
         <Input.Select
           label={C.FILTER_LABELS.rideType}
           helpText={C.RIDE_TYPE_HELP}
@@ -105,7 +115,7 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
           value={rideType}
           onChange={handleRideTypeChange}
         />
-      </FilterPanel.Field>
-    </FilterPanel>
+      </FilterDialog.Field>
+    </FilterDialog>
   );
 }
