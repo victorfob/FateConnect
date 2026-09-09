@@ -8,6 +8,8 @@ export type PageShellProps = Readonly<{
   title: string;
   /** Ação do canto do cabeçalho — normalmente `PageShell.Back`. */
   action?: ReactNode;
+  /** Ação encostada no título, para o que fala sobre a tela e não sai dela. */
+  titleAction?: ReactNode;
   /** Abas da tela, montadas com `PageShell.Tab`; a barra é desenhada aqui. */
   tabs?: ReactNode;
   children: ReactNode;
@@ -18,11 +20,14 @@ export type PageShellProps = Readonly<{
  * só, e quem precisa dele monta os slots — foi o que evitou a segunda cópia
  * quando achados e perdidos pediu o mesmo cabeçalho de caronas.
  */
-function PageShell({ title, action, tabs, children }: PageShellProps) {
+function PageShell({ title, action, titleAction, tabs, children }: PageShellProps) {
   return (
     <S.PageRoot>
       <S.PageHeaderRow>
-        <S.PageTitleText variant="h1">{title}</S.PageTitleText>
+        <S.TitleGroup>
+          <S.PageTitleText variant="h1">{title}</S.PageTitleText>
+          {titleAction}
+        </S.TitleGroup>
         {action}
       </S.PageHeaderRow>
 

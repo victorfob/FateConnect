@@ -3,11 +3,11 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 import { lostItemKindLabel } from '@app/pages/LostAndFound/helpers/lostItemKind';
+import { apiClient } from '@app/services/httpClient';
 import {
   LostItemKindEnum,
   LostItemStatusEnum,
   type LostItem,
-  type LostItemInput,
 } from '@app/services/lostAndFound/types';
 import { fireEvent, render, screen, userEvent, waitFor } from '@app/test/testing-library';
 import { toApiDate } from '@app/utils/apiDate';
@@ -21,9 +21,19 @@ import {
 } from './constants';
 import { LostItemFormDialog, type LostItemFormDialogProps } from '.';
 
-const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/achado';
+const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/lostandfound';
+
+/**
+ * A API recebe `[FromForm]` nos dois verbos de escrita, e ler o corpo como
+ * formulário é o que faz o stub reprovar um JSON — como ela reprovaria.
+ */
+async function fieldsOf(request: Request): Promise<Record<string, FormDataEntryValue>> {
+  return Object.fromEntries(await request.formData());
+}
 
 const PREVIEW_URL = 'blob:https://fateconnect.test/preview';
+/** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
+const PNG_BYTES = '\x89PNG\r\n\x1a\n';
 
 const OCCURRED_AT = new Date(2026, 7, 11);
 /** O seletor do MUI recebe a data seção a seção, na ordem de pt-BR. */
@@ -32,16 +42,30 @@ const TYPED_DATE = format(OCCURRED_AT, 'ddMMyyyy');
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
   name: 'Carteira preta',
-  type: LostItemKindEnum.LOST,
+  lostAndFoundType: LostItemKindEnum.LOST,
   place: 'Biblioteca',
-  occurredOn: '2026-08-11T00:00:00',
+  ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos.',
-  photoUrl: null,
+  imageUrl: null,
+  contact: { name: 'Marina Duarte', email: 'marina.duarte@example.com', phone: '(15) 99999-0001' },
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
-  isMine: true,
+  isOwner: true,
   createdAt: '2026-08-12T00:00:00',
 };
+
+const STORED_PHOTO_PATH = 'uploads/lostandfound/6f0b8e3a-1c2d-4e5f-8a9b-0c1d2e3f4a5b.png';
+
+const ITEM_WITH_PHOTO: LostItem = { ...LOST_ITEM, imageUrl: STORED_PHOTO_PATH };
+
+function storedPhotoServing() {
+  server.use(
+    http.get(
+      `https://api.fateconnect.test/${STORED_PHOTO_PATH}`,
+      () => new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': 'image/png' } }),
+    ),
+  );
+}
 
 const onClose = vi.fn();
 
@@ -113,10 +137,10 @@ describe('LostItemFormDialog', () => {
   });
 
   it('should send the whole item on update, so the description survives', async () => {
-    let body: LostItemInput | null = null;
+    let fields: Record<string, FormDataEntryValue> | null = null;
     server.use(
-      http.put(`${LOST_AND_FOUND_URL}/:id`, async ({ request }) => {
-        body = (await request.json()) as LostItemInput;
+      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, async ({ request }) => {
+        fields = await fieldsOf(request);
         return HttpResponse.json({ id: LOST_ITEM.id });
       }),
     );
@@ -126,18 +150,18 @@ describe('LostItemFormDialog', () => {
     await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(body).toEqual({
-      name: LOST_ITEM.name,
-      type: LOST_ITEM.type,
-      place: LOST_ITEM.place,
-      occurredOn: '2026-08-11',
-      description: LOST_ITEM.description,
+    expect(fields).toEqual({
+      Name: LOST_ITEM.name,
+      LostAndFoundType: LOST_ITEM.lostAndFoundType,
+      Place: LOST_ITEM.place,
+      OcurredOn: '2026-08-11',
+      Description: LOST_ITEM.description,
     });
   });
 
   it('should keep the dialog open when the api fails, with what was typed', async () => {
     server.use(
-      http.put(`${LOST_AND_FOUND_URL}/:id`, () => new HttpResponse(null, { status: 500 })),
+      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, () => new HttpResponse(null, { status: 500 })),
     );
     renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
@@ -150,10 +174,10 @@ describe('LostItemFormDialog', () => {
   });
 
   it('should register the item the form describes', async () => {
-    let body: LostItemInput | null = null;
+    let fields: Record<string, FormDataEntryValue> | null = null;
     server.use(
       http.post(LOST_AND_FOUND_URL, async ({ request }) => {
-        body = (await request.json()) as LostItemInput;
+        fields = await fieldsOf(request);
         return HttpResponse.json({ id: 'novo' }, { status: 201 });
       }),
     );
@@ -179,13 +203,31 @@ describe('LostItemFormDialog', () => {
     await userEvent.click(screen.getByRole('button', { name: REGISTER_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(body).toEqual({
-      name: 'Garrafa térmica',
-      type: LostItemKindEnum.FOUND,
-      place: 'Bloco C',
-      occurredOn: toApiDate(OCCURRED_AT),
-      description: '',
+    expect(fields).toEqual({
+      Name: 'Garrafa térmica',
+      LostAndFoundType: LostItemKindEnum.FOUND,
+      Place: 'Bloco C',
+      OcurredOn: toApiDate(OCCURRED_AT),
+      Description: '',
     });
+  });
+
+  // A foto observada no corpo entregue ao cliente, e não no stub: o `File` do
+  // jsdom não atravessa o interceptador, e no navegador ele atravessa.
+  it('should send the chosen photo in the same request as the item', async () => {
+    const patch = vi.spyOn(apiClient, 'patch').mockResolvedValue({ data: { id: LOST_ITEM.id } });
+    const photo = photoOf('achado.png', 'image/png');
+    renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+
+    await userEvent.upload(photoInput(), photo);
+    await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    const [, body] = patch.mock.calls[0]!;
+    expect((body as FormData).get('Image')).toBe(photo);
+
+    patch.mockRestore();
   });
 
   it('should show the chosen photo and let the user drop it', async () => {
@@ -204,6 +246,32 @@ describe('LostItemFormDialog', () => {
       expect(screen.queryByRole('img', { name: PHOTO_ACTIONS.previewAlt })).not.toBeInTheDocument(),
     );
     expect(screen.getByRole('button', { name: PHOTO_ACTIONS.pick })).toBeInTheDocument();
+  });
+
+  it('should bring the stored photo into the form when the item already has one', async () => {
+    storedPhotoServing();
+    renderComponent({ ...DEFAULT_PROPS, item: ITEM_WITH_PHOTO });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+
+    expect(await screen.findByRole('img', { name: PHOTO_ACTIONS.storedAlt })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_ACTIONS.replace })).toBeInTheDocument();
+    // A API não apaga a foto guardada, só a troca: oferecer remover seria mentira.
+    expect(screen.queryByRole('button', { name: PHOTO_ACTIONS.remove })).not.toBeInTheDocument();
+  });
+
+  it('should put the stored photo back when the newly chosen one is dropped', async () => {
+    storedPhotoServing();
+    renderComponent({ ...DEFAULT_PROPS, item: ITEM_WITH_PHOTO });
+    await screen.findByRole('img', { name: PHOTO_ACTIONS.storedAlt });
+
+    await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
+
+    expect(await screen.findByRole('img', { name: PHOTO_ACTIONS.previewAlt })).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: PHOTO_ACTIONS.storedAlt })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_ACTIONS.remove }));
+
+    expect(await screen.findByRole('img', { name: PHOTO_ACTIONS.storedAlt })).toBeInTheDocument();
   });
 
   it('should refuse a photo in a format the server will not take', async () => {

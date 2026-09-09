@@ -80,7 +80,7 @@ public class UserService : IUserService
             Password = hashedPassword,
             ProfileType = EnumProfileType.Operator,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
+            UpdatedAt = null,
             Addresses = mappedAddresses,
             Contacts = mappedContacts
         };
@@ -93,7 +93,7 @@ public class UserService : IUserService
         if (dtos is null or { Count: 0 })
             return [];
 
-        List<Address> addresses = dtos.Select(dto => new Address
+        List<Address> addresses = [.. dtos.Select(dto => new Address
         {
             ZipCode = dto.ZipCode,
             Street = dto.Street,
@@ -101,7 +101,7 @@ public class UserService : IUserService
             Complement = dto.Complement,
             City = dto.City,
             State = dto.State
-        }).ToList();
+        })];
 
         return addresses;
     }
@@ -111,11 +111,11 @@ public class UserService : IUserService
         if (dtos is null or { Count: 0 })
             return [];
 
-        List<Contact> contacts = dtos.Select(dto => new Contact
+        List<Contact> contacts = [.. dtos.Select(dto => new Contact
         {
             Phone = dto.Phone,
             ContactEmail = dto.ContactEmail
-        }).ToList();
+        })];
 
         return contacts;
     }

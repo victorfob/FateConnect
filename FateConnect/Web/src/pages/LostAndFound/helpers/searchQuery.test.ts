@@ -13,15 +13,15 @@ describe('lostItemSearchCodec', () => {
 
     it('should read every filter the url carries', () => {
       expect(
-        read('pagina=2&nome=Garrafa&data=2026-08-01&tipo=perdido&situacao=resolvido&meus=sim'),
+        read('pagina=2&busca=Garrafa&data=2026-08-01&tipo=perdido&situacao=resolvido&meus=sim'),
       ).toEqual({
         page: 2,
         pageSize: PAGE_SIZE,
-        name: 'Garrafa',
-        occurredOn: '2026-08-01',
-        kind: LostItemKindEnum.LOST,
+        searchTerm: 'Garrafa',
+        ocurredOn: '2026-08-01',
+        lostAndFoundType: LostItemKindEnum.LOST,
         status: LostItemStatusEnum.RESOLVED,
-        onlyMine: true,
+        onlyMyItems: true,
       });
     });
 
@@ -31,6 +31,10 @@ describe('lostItemSearchCodec', () => {
         expect(read(search).page).toBe(FIRST_PAGE);
       },
     );
+
+    it('should ask for every status when the url says so, which the default cannot express', () => {
+      expect(read('situacao=todas').status).toBeUndefined();
+    });
 
     it('should fall back to the default status when the url names one it does not know', () => {
       expect(read('situacao=extraviado').status).toBe(DEFAULT_STATUS);
@@ -42,12 +46,12 @@ describe('lostItemSearchCodec', () => {
     });
 
     it('should ignore a kind it does not recognise', () => {
-      expect(read('tipo=emprestado').kind).toBeUndefined();
+      expect(read('tipo=emprestado').lostAndFoundType).toBeUndefined();
     });
 
     it('should not care about the case of the words', () => {
       expect(read('tipo=ACHADO&situacao=Excluido')).toMatchObject({
-        kind: LostItemKindEnum.FOUND,
+        lostAndFoundType: LostItemKindEnum.FOUND,
         status: LostItemStatusEnum.DELETED,
       });
     });
@@ -55,7 +59,7 @@ describe('lostItemSearchCodec', () => {
     it.each(['meus=nao', 'meus=', 'meus=talvez'])(
       'should leave "only mine" off when the url says %s',
       (search) => {
-        expect(read(search).onlyMine).toBeUndefined();
+        expect(read(search).onlyMyItems).toBeUndefined();
       },
     );
   });
@@ -71,13 +75,20 @@ describe('lostItemSearchCodec', () => {
       expect(params).toEqual({});
     });
 
+    it('should name every status in the url, so it survives a reload', () => {
+      const params = lostItemSearchCodec.toParams({ page: FIRST_PAGE, pageSize: PAGE_SIZE });
+
+      expect(params).toEqual({ situacao: 'todas' });
+      expect(read('situacao=todas').status).toBeUndefined();
+    });
+
     it('should write the words the screen shows', () => {
       const params = lostItemSearchCodec.toParams({
         page: 3,
         pageSize: PAGE_SIZE,
-        kind: LostItemKindEnum.FOUND,
+        lostAndFoundType: LostItemKindEnum.FOUND,
         status: LostItemStatusEnum.DELETED,
-        onlyMine: true,
+        onlyMyItems: true,
       });
 
       expect(params).toEqual({ pagina: '3', tipo: 'achado', situacao: 'excluido', meus: 'sim' });
@@ -87,11 +98,11 @@ describe('lostItemSearchCodec', () => {
       const original = {
         page: 4,
         pageSize: PAGE_SIZE,
-        name: 'Guarda-chuva azul',
-        occurredOn: '2026-07-15',
-        kind: LostItemKindEnum.LOST,
+        searchTerm: 'Guarda-chuva azul',
+        ocurredOn: '2026-07-15',
+        lostAndFoundType: LostItemKindEnum.LOST,
         status: LostItemStatusEnum.RESOLVED,
-        onlyMine: true,
+        onlyMyItems: true,
       };
 
       const params = new URLSearchParams(lostItemSearchCodec.toParams(original));

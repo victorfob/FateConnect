@@ -24,6 +24,12 @@ Solução proposta: o que fazer.
 
 ⛔ **Um problema por comentário.** Dois threads sobre linhas vizinhas é ruído; se dois apontamentos têm a **mesma correção**, são um comentário só — foi o caso do `[Range]` duplicado e do `[Required]` inútil, que estavam no mesmo bloco de anotações e terminavam na mesma frase: enxugar o DTO.
 
+## Preview antes de publicar, um de cada vez
+
+⛔ **Nenhum comentário vai para o PR sem o texto ter sido mostrado e confirmado.** Um por vez: preview, confirmação, publicação, próximo — nunca uma leva inteira de uma vez.
+
+Pedido pelo Victor nas duas vezes em que esta skill foi invocada: *"só poste depois que confirmar explicitamente, quero ver o preview antes de confirmar"* e *"me mostrar o preview antes de cada um, quero confirmar um por vez"*. O motivo aparece na prática — comentário publicado é instrução endereçada a quem vai corrigir, e retirar um que já foi lido custa mais que mostrá-lo antes. Na rodada do #322, **dois** dos onze mudaram de conteúdo no preview e um terceiro deixou de existir.
+
 ## Onde ancorar
 
 ```bash
@@ -86,6 +92,26 @@ O `global.json` fecha essa porta: ele fixa a banda `8.0.x`, e numa máquina com 
 O tempo verbal denuncia: *"vai ficar"*, *"responderia"*, *"em banco novo"*. Troque por passado medido.
 
 **Errou depois de publicar?** Edite o comentário para o texto correto e sem meta-narrativa — o histórico de edição do GitHub já registra. A explicação do erro vai para o usuário, não para o thread do autor.
+
+## O certo mora no consumidor e no módulo irmão
+
+⛔ **Todo apontamento que diz "o certo seria X" pede dois arquivos abertos antes do texto: o consumidor e o módulo irmão.** A definição do comportamento correto quase nunca está no arquivo revisado.
+
+- **O consumidor** — o serviço, o codec, o schema e o **teste** do outro lado que exercitam aquele campo.
+- **O módulo irmão** — o mesmo campo no módulo que já existe, que quase sempre já decidiu.
+
+⛔ Aconteceu duas vezes no #322, com dois comentários já redigidos:
+
+| O que eu ia publicar | O que a leitura mostrou |
+| --- | --- |
+| "a listagem sem `status` traz os excluídos — deveria excluí-los" | o filtro do front tem uma opção "Todas" que omite o parâmetro de propósito: omitir **significa** todas as situações. Eu ia pedir para quebrar código que funciona |
+| "descrição obrigatória diverge do front; é decisão de produto" | em caronas o mesmo campo é `string?` sem validação na entidade — não havia decisão a tomar |
+
+⚠️ **Ler os dois não decide quem cede, e consumidor mergeado não é fonte de verdade.** A leitura estabelece **que** a divergência existe e o que cada lado faz hoje; qual lado se move é a pergunta seguinte, e o apontamento legítimo às vezes é *"o front vai ter que mudar"*. Divergência de contrato, quem se adequa é o consumidor; rigidez desnecessária de quem serve, corrige-se na origem — senão todo cliente futuro paga o mesmo imposto. O comentário diz qual dos dois e por quê.
+
+⚠️ **O tell é a frase de escape:** *"alinhar com o front"*, *"é decisão de produto"*, *"depende do contrato"*. Sem arquivo e linha ao lado, cada uma significa que você ainda não leu onde o certo está escrito.
+
+**E a leitura rende achado que você não tinha:** a mesma passada pelo front encontrou um campo que o cartão renderiza e a API não devolve.
 
 ## Fechamento da rodada
 

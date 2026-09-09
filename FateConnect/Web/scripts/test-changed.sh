@@ -51,6 +51,10 @@ for path in "$@"; do
   fi
 done
 
+# Toda corrida diz em qual Node mediu: suíte verde na versão errada é verde de
+# outro mundo, e sem esta linha não há como saber qual foi depois do fato.
+echo "test-changed: Node $(node -v)"
+
 if [ "$run_everything" -eq 1 ]; then
   echo "test-changed: mudança fora de src/ e design-system/ ou remoção de arquivo — suíte completa."
   exec npx --no-install vitest run

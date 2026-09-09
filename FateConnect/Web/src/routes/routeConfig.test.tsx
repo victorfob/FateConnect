@@ -34,7 +34,7 @@ describe('routeConfig', () => {
   beforeEach(() => {
     server.use(
       http.get('https://api.fateconnect.test/rides', () => HttpResponse.json([])),
-      http.get('https://api.fateconnect.test/achado', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/lostandfound', () => HttpResponse.json([])),
     );
   });
 

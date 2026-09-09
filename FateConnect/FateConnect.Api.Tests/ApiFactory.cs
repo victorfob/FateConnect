@@ -25,8 +25,12 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     private readonly string _databaseName = $"fateconnect-tests-{Guid.NewGuid()}";
 
+    private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-webroot-{Guid.NewGuid():N}");
+
     public ApiFactory()
     {
+        Directory.CreateDirectory(_webRoot);
+
         Environment.SetEnvironmentVariable("JWT_SECRET", FakeSecret);
         Environment.SetEnvironmentVariable("JWT_ISSUER", "FateConnectTest");
         Environment.SetEnvironmentVariable("JWT_AUDIENCE", "FateConnectTestWeb");
@@ -34,6 +38,8 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseWebRoot(_webRoot);
+
         builder.ConfigureServices(services =>
         {
             ServiceDescriptor registration = services.Single(
@@ -43,6 +49,14 @@ public class ApiFactory : WebApplicationFactory<Program>
             services.AddDbContext<FateConnectDbContext>(
                 options => options.UseNpgsql(TestDatabase.ConnectionStringFor(_databaseName)));
         });
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+
+        if (disposing && Directory.Exists(_webRoot))
+            Directory.Delete(_webRoot, recursive: true);
     }
 
     public static string IssueToken(int userId = 1, int tokenVersion = 0)
@@ -140,13 +154,18 @@ public class ApiFactory : WebApplicationFactory<Program>
         return (user.Id, user.FatecEmail);
     }
 
-    public Guid SeedRide(int driverId, DateOnly departureDate, TimeOnly departureTime, string destination = "Sorocaba centro")
+    public Guid SeedRide(
+        int driverId,
+        DateOnly departureDate,
+        TimeOnly departureTime,
+        string destination = "Sorocaba centro",
+        string? description = null)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
         DateOnly acceptedDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
-        Ride ride = new(3, destination, acceptedDate, departureTime, EnumRideType.Solidarity, driverId);
+        Ride ride = new(3, destination, acceptedDate, departureTime, EnumRideType.Solidarity, driverId, description);
 
         context.Rides.Add(ride);
         context.Entry(ride).Property(entity => entity.DepartureDate).CurrentValue = departureDate;

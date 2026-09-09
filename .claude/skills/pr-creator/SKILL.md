@@ -57,11 +57,28 @@ Do not add assumptions not present in the diff.
 1. Push branch if needed:
    - `git push -u origin $(git branch --show-current)` (first push)
    - `git push` (updates)
-2. Create PR with GitHub CLI (preferred):
+2. **Atualizando a descrição de um PR já aberto**, monte o corpo novo a partir do publicado, nunca do rascunho local:
+
+   ```bash
+   gh pr view <n> --json body -q .body > /tmp/corpo.md   # e edite ESTE arquivo
+   ```
+
+   ⛔ O `--body-file` **substitui o corpo inteiro**, e o que ele escreveu depois de eu abrir o PR — evidências, capturas — desaparece sem aviso. Partir do publicado funde sozinho; detectar "ele já mexeu?" depende de eu lembrar, e em 09/09/2026 eu não lembrei **duas vezes seguidas** no #336: as cinco capturas dele foram apagadas, e quem viu foi ele. ⚠️ A primeira edição foi segura porque ele ainda não tinha posto nada — e foi essa suposição que eu levei para a segunda. Entre duas edições minhas cabe uma dele, justamente enquanto ele testa o que eu pedi.
+
+   Apagou mesmo assim? O histórico guarda cada versão **inteira**:
+
+   ```bash
+   gh api graphql -f query='{repository(owner:"<dono>",name:"<repo>"){pullRequest(number:<n>){
+     userContentEdits(last:10){nodes{editedAt editor{login} diff}}}}}'
+   ```
+
+   O campo `diff` devolve o corpo completo, não um diff, e a ordem veio do mais novo para o mais antigo. ⛔ Recuperar é **comparar linha a linha** o corpo dele contra o atual e listar as ausentes — não colar de volta o que eu lembro que havia. No #336 saíram seis linhas, não cinco.
+
+3. Create PR with GitHub CLI (preferred):
    - `gh pr create --base <target-branch> --title "<title>" --body "<body>" --assignee @me`
    - **`--assignee @me` is mandatory** — every PR opened through this skill is assigned to the authenticated user, so it shows up in their "Assigned to you" list. Use `@me` rather than a hardcoded username so the skill stays correct for whoever runs it.
    - If the PR already exists without an assignee, fix it with `gh pr edit <n> --add-assignee @me`.
-3. If GitHub CLI is unavailable, stop and tell the user — do not invent another path.
+4. If GitHub CLI is unavailable, stop and tell the user — do not invent another path.
 
 ## Validation checklist
 

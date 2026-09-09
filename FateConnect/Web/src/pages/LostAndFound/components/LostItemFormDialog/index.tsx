@@ -72,7 +72,7 @@ export function LostItemFormDialog({ open, onClose, item }: LostItemFormDialogPr
       <FormProvider {...form}>
         <S.LostItemForm component="form" onSubmit={handleSubmit} noValidate>
           <Dialog.Body>
-            <LostItemFormFields />
+            <LostItemFormFields storedImageUrl={item?.imageUrl ?? null} />
           </Dialog.Body>
 
           <Dialog.Footer>

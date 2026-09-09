@@ -49,4 +49,14 @@ describe('ContactDetails', () => {
     expect(phoneLink).toHaveAttribute('target', '_blank');
     expect(phoneLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
+
+  it('should center the name and shrink it instead of the contact channels', () => {
+    renderComponent({ ...DEFAULT_PROPS, name: 'Mariana Aparecida de Souza Nogueira' });
+
+    const identity = screen.getByText('Mariana Aparecida de Souza Nogueira').parentElement;
+    const channels = screen.getByRole('link', { name: DEFAULT_PROPS.phone }).parentElement;
+
+    expect(getComputedStyle(identity as HTMLElement).textAlign).toBe('center');
+    expect(getComputedStyle(channels as HTMLElement).flexShrink).toBe('0');
+  });
 });
