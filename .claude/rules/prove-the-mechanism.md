@@ -96,6 +96,16 @@ Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase`
 
 ⚠️ **O sinal é a saída vazia onde deveria haver enumeração.** "0 arquivos alterados", "nenhuma seção", "nada a fazer" — num passo que existe justamente para alterar algo, isso não é sucesso, é o instrumento dizendo que não entendeu a entrada.
 
+## O alcance de uma mudança de token se mede no consumidor renderizado
+
+⛔ **Antes de afirmar o que uma troca de cor ou de token vai atingir, não basta achar quem lê a chave: confira se aquele caminho chega à tela.** O `grep` responde quem **referencia**; ele não responde quem **renderiza**.
+
+Aconteceu em 09/09/2026, ao escolher o tom do botão neutro no tema escuro. Apresentei uma tabela afirmando que escurecer `palette.primary` degradaria o logotipo, com o contraste medido em cada candidato — e o número condenava três dos quatro tons. Estava errada duas vezes: o símbolo da marca tem dois tons e o que aparece no cromo pinta com `currentColor`, não com a chave; e o tom que **lê** a chave não tem consumidor nenhum na aplicação, só três linhas de teste.
+
+Quem derrubou a tabela foi a pergunta *"não entendi pq o logotipo muda"*. Sem ela, a cor teria sido escolhida contra uma restrição que não existe.
+
+**O tell é a medição que restringe demais.** Quando a conta elimina quase todas as opções, confira a premissa antes de aceitar o resultado: é mais provável que o alcance esteja errado do que a janela ser tão estreita.
+
 ## O artefato publicado não é o que você quis escrever
 
 ⛔ **Antes de afirmar o que um PR, uma issue ou um comentário seu diz, releia o publicado.** A lembrança guarda a **decisão** de registrar algo, e ela se lê exatamente igual a ter registrado — não há sensação diferente entre as duas.
