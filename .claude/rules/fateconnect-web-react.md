@@ -69,6 +69,7 @@ Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/b
 ## Dados
 
 - `axios` com baseURL de `import.meta.env.VITE_*`. **Nenhuma URL de API literal em arquivo versionado.**
+- **Caminho de rota da API em minúsculo**, mesmo quando o controlador é `PascalCase`: `/rides` e `/lostandfound`, nunca `/Rides` nem `/LostAndFound`. O roteamento do ASP.NET não olha caixa, então as duas grafias casam — e copiar a do `[Route("[controller]")]` espalha duas escritas para a mesma rota, que é o que se evita.
 - Interceptor de request injeta o token; interceptor de response centraliza o tratamento de erro.
 - Requisição em componente via `@tanstack/react-query` — não `useEffect` + `setState` na mão. Erro de rede vira notificação ao usuário, não só log.
 

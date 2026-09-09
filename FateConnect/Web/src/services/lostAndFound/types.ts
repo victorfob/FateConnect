@@ -1,4 +1,4 @@
-import type { PageQuery } from '../types';
+import type { PageQuery, UserContact } from '../types';
 
 /** Valores canônicos alinhados à serialização do backend. */
 export enum LostItemKindEnum {
@@ -17,9 +17,6 @@ export enum DeletionReasonEnum {
   INACTIVITY = 'Inactivity',
 }
 
-/** Quem cadastrou o item, com o que o cartão precisa para chamar a pessoa. */
-export type LostItemContact = { name: string; email: string; phone: string };
-
 export type LostItem = {
   id: string;
   name: string;
@@ -28,7 +25,7 @@ export type LostItem = {
   ocurredOn: string;
   description: string | null;
   imageUrl: string | null;
-  contact: LostItemContact;
+  contact: UserContact;
   status: LostItemStatusEnum;
   deletionReason: DeletionReasonEnum | null;
   isOwner: boolean;

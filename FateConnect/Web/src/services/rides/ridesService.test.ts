@@ -40,13 +40,13 @@ describe('ridesService', () => {
     );
 
     await listRides({
-      destination: 'Sorocaba',
+      searchTerm: 'Sorocaba',
       departureDate: '2026-08-20',
       departureTime: '07:30',
       rideType: RideTypeEnum.EGALITARIAN,
     });
 
-    expect(received!.get('destination')).toBe('Sorocaba');
+    expect(received!.get('searchTerm')).toBe('Sorocaba');
     expect(received!.get('departureDate')).toBe('2026-08-20');
     expect(received!.get('departureTime')).toBe('07:30');
     expect(received!.get('rideType')).toBe(RideTypeEnum.EGALITARIAN);
@@ -76,9 +76,9 @@ describe('ridesService', () => {
       }),
     );
 
-    await listRides({ destination: 'Sorocaba' });
+    await listRides({ searchTerm: 'Sorocaba' });
 
-    expect([...received!.keys()]).toEqual(['destination']);
+    expect([...received!.keys()]).toEqual(['searchTerm']);
   });
 
   it('should list rides without filters', async () => {

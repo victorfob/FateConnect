@@ -3,7 +3,8 @@ import { http, HttpResponse } from 'msw';
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
-import { RideTypeEnum, type Ride, type RideDriver } from '@app/services/rides/types';
+import { RideTypeEnum, type Ride } from '@app/services/rides/types';
+import type { UserContact } from '@app/services/types';
 import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
@@ -24,7 +25,7 @@ const SECOND_PAGE_LABEL = 'Ir para a página 2';
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
 const RETRY_WINDOW_MS = 5000;
 
-const DRIVER: RideDriver = {
+const DRIVER: UserContact = {
   name: 'Ana Ofertante',
   email: 'ana@example.com',
   phone: '(15) 90000-0000',
@@ -192,10 +193,10 @@ describe('Rides', () => {
     renderComponent();
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
-    await userEvent.type(screen.getByLabelText(FILTER_LABELS.destination), 'Sorocaba');
+    await userEvent.type(screen.getByLabelText(FILTER_LABELS.searchTerm), 'Sorocaba');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
-    await waitFor(() => expect(requestUrl?.searchParams.get('destination')).toBe('Sorocaba'));
+    await waitFor(() => expect(requestUrl?.searchParams.get('searchTerm')).toBe('Sorocaba'));
     // O ponto do painel não tem papel de acessibilidade: chega-se a ele pelo título.
     const activeDot = screen
       .getByText(FILTER_PANEL_TITLE)
@@ -388,7 +389,7 @@ describe('Rides', () => {
     it('should open with the fields already filled from the url', async () => {
       listReturning([RIDE]);
 
-      renderComponent('?destino=Sorocaba&hora=07:30&tipo=solidaria');
+      renderComponent('?busca=Sorocaba&hora=07:30&tipo=solidaria');
 
       expect(await screen.findByDisplayValue('Sorocaba')).toBeInTheDocument();
       expect(screen.getByDisplayValue('07:30')).toBeInTheDocument();
@@ -427,10 +428,10 @@ describe('Rides', () => {
       listReturning(manyRides(30));
       const router = renderComponent('?pagina=3');
 
-      await userEvent.type(await screen.findByLabelText(FILTER_LABELS.destination), 'Votorantim');
+      await userEvent.type(await screen.findByLabelText(FILTER_LABELS.searchTerm), 'Votorantim');
       await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
-      await waitFor(() => expect(router.state.location.search).toBe('?destino=Votorantim'));
+      await waitFor(() => expect(router.state.location.search).toBe('?busca=Votorantim'));
     });
 
     it('should fall back to the last page when the url asks beyond it', async () => {

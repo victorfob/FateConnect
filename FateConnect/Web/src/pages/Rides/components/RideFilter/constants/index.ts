@@ -6,11 +6,14 @@ export const FILTER_SUBMIT_LABEL = 'Filtrar';
 export const FILTER_LABELS = {
   departureDate: 'Data',
   departureTime: 'Hora',
-  destination: 'Destino',
+  searchTerm: 'Destino ou descrição',
   rideType: 'Tipo',
 };
 
-export const FILTER_PLACEHOLDERS = { destination: 'Insira o destino', rideType: 'Selecione...' };
+export const FILTER_PLACEHOLDERS = {
+  searchTerm: 'Insira o destino ou parte da descrição',
+  rideType: 'Selecione...',
+};
 
 export const TIME_PICKER_LABEL = 'Abrir seletor de horário';
 
