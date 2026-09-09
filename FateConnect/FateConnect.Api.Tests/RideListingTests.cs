@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -34,6 +35,11 @@ public class RideListingTests
             .GetFromJsonAsync<PagedRides>($"/Rides{query}", JsonOptions);
 
         return page!;
+    }
+
+    private static async Task<HttpResponseMessage> RequestPageAsync(ApiFactory factory, int userId, string query)
+    {
+        return await factory.CreateClientFor(userId).GetAsync($"/Rides{query}");
     }
 
     [Fact]
@@ -184,7 +190,8 @@ public class RideListingTests
         int driverId = SeedRides(factory, 23);
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
 
-        PagedRides page = await GetPageAsync(factory, driverId, $"?DepartureDate={tomorrow:yyyy-MM-dd}");
+        PagedRides page = await GetPageAsync(
+            factory, driverId, $"?DateFrom={tomorrow:yyyy-MM-dd}&DateTo={tomorrow:yyyy-MM-dd}");
 
         Assert.Equal(1, page.Total);
         Assert.Equal(1, page.TotalPages);
@@ -262,8 +269,92 @@ public class RideListingTests
         PagedRides page = await GetPageAsync(
             factory,
             driverId,
-            $"?SearchTerm=sorocaba&DepartureDate={tomorrow:yyyy-MM-dd}&DepartureTime=08:30:00&RideType=Solidarity");
+            $"?SearchTerm=sorocaba&DateFrom={tomorrow:yyyy-MM-dd}&DateTo={tomorrow:yyyy-MM-dd}"
+                + "&DepartureTime=08:30:00&RideType=Solidarity");
 
         Assert.Equal(expected, Assert.Single(page.Items).Id);
+    }
+
+    [Fact]
+    public async Task GetRides_FilteredByAClosedDateRange_KeepsBothEndsOfTheRange()
+    {
+        using ApiFactory factory = new();
+        int driverId = SeedRides(factory, 3);
+        DateOnly firstDay = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        DateOnly secondDay = firstDay.AddDays(1);
+
+        PagedRides page = await GetPageAsync(
+            factory, driverId, $"?DateFrom={firstDay:yyyy-MM-dd}&DateTo={secondDay:yyyy-MM-dd}");
+
+        Assert.Equal(2, page.Total);
+    }
+
+    [Fact]
+    public async Task GetRides_FilteredByOnlyTheStartDate_KeepsThatDayAlone()
+    {
+        using ApiFactory factory = new();
+        int driverId = SeedRides(factory, 3);
+        DateOnly thirdDay = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(3));
+
+        PagedRides page = await GetPageAsync(factory, driverId, $"?DateFrom={thirdDay:yyyy-MM-dd}");
+
+        Assert.Equal(1, page.Total);
+    }
+
+    [Fact]
+    public async Task GetRides_FilteredByOnlyTheEndDate_KeepsThatDayAlone()
+    {
+        using ApiFactory factory = new();
+        int driverId = SeedRides(factory, 3);
+        DateOnly thirdDay = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(3));
+
+        PagedRides page = await GetPageAsync(factory, driverId, $"?DateTo={thirdDay:yyyy-MM-dd}");
+
+        Assert.Equal(1, page.Total);
+    }
+
+    [Fact]
+    public async Task GetRides_WithoutAnyDate_KeepsEveryRide()
+    {
+        using ApiFactory factory = new();
+        int driverId = SeedRides(factory, 3);
+
+        PagedRides page = await GetPageAsync(factory, driverId);
+
+        Assert.Equal(3, page.Total);
+    }
+
+    [Fact]
+    public async Task GetRides_WithTheEndDateBeforeTheStartDate_IsRejected()
+    {
+        using ApiFactory factory = new();
+        int driverId = SeedRides(factory, 3);
+        DateOnly firstDay = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        DateOnly secondDay = firstDay.AddDays(1);
+
+        HttpResponseMessage response = await RequestPageAsync(
+            factory, driverId, $"?DateFrom={secondDay:yyyy-MM-dd}&DateTo={firstDay:yyyy-MM-dd}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains(
+            "anterior à data inicial",
+            await response.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task GetRides_FilteredByARangeStartingInThePast_DoesNotBringDepartedRides()
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        factory.SeedRide(driverId, lastWeek, new TimeOnly(8, 30));
+        Guid upcoming = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30));
+
+        PagedRides page = await GetPageAsync(
+            factory, driverId, $"?DateFrom={lastWeek:yyyy-MM-dd}&DateTo={tomorrow:yyyy-MM-dd}");
+
+        Assert.Equal(upcoming, Assert.Single(page.Items).Id);
     }
 }
