@@ -22,8 +22,11 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
             .Where(r => r.IsActive)
             .Where(HasNotDeparted(today, currentTime));
 
-        if (filter.DepartureDate.HasValue)
-            query = query.Where(r => r.DepartureDate == filter.DepartureDate.Value);
+        DateOnly? rangeStart = filter.EffectiveDateFrom;
+        DateOnly? rangeEnd = filter.EffectiveDateTo;
+
+        if (rangeStart.HasValue && rangeEnd.HasValue)
+            query = query.Where(DepartsWithin(rangeStart.Value, rangeEnd.Value));
 
         if (filter.DepartureTime.HasValue)
             query = query.Where(r => r.DepartureTime == filter.DepartureTime.Value);
@@ -63,6 +66,9 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
 
         return (items, total);
     }
+
+    private static Expression<Func<Ride, bool>> DepartsWithin(DateOnly rangeStart, DateOnly rangeEnd) =>
+        ride => ride.DepartureDate >= rangeStart && ride.DepartureDate <= rangeEnd;
 
     private static Expression<Func<Ride, bool>> HasNotDeparted(DateOnly today, TimeOnly currentTime) =>
         ride => ride.DepartureDate > today

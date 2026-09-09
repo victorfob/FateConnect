@@ -6,6 +6,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Passa a filtrar as duas listas por intervalo de datas em vez de uma data exata: as duas pontas trazem o período fechado, uma ponta sozinha traz aquele dia inteiro, e intervalo invertido é recusado com erro; na consulta, `departureDate` e `ocurredOn` dão lugar a `dateFrom` e `dateTo` (#342) [Backend]
+
 ## [0.9.0] - 2026-09-09
 
 ### Added
