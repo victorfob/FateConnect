@@ -28,3 +28,19 @@ if (!Element.prototype.scrollIntoView) {
 
 // jsdom não implementa scrollTo; o ScrollRestoration do roteador o chama a cada navegação.
 window.scrollTo = () => {};
+
+// jsdom não implementa `Blob.stream`, e o interceptador do msw o chama para
+// montar a resposta de quem pede `responseType: 'blob'`. Sem isto, buscar a foto
+// de um item explode no teste e funciona no navegador.
+if (!Blob.prototype.stream) {
+  Blob.prototype.stream = function stream(this: Blob) {
+    const content = this.arrayBuffer();
+
+    return new ReadableStream<Uint8Array<ArrayBuffer>>({
+      async start(controller) {
+        controller.enqueue(new Uint8Array(await content));
+        controller.close();
+      },
+    });
+  };
+}

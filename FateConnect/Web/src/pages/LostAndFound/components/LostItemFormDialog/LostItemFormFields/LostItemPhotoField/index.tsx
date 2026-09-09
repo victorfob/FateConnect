@@ -8,10 +8,13 @@ import type {
   LostItemFormInput,
   LostItemFormValues,
 } from '@app/pages/LostAndFound/components/LostItemFormDialog/schema';
+import { useStoredImage } from '@app/pages/LostAndFound/hooks/useStoredImage';
 
 import * as S from './styles';
 
-export function LostItemPhotoField() {
+export type LostItemPhotoFieldProps = Readonly<{ storedImageUrl: string | null }>;
+
+export function LostItemPhotoField({ storedImageUrl }: LostItemPhotoFieldProps) {
   const {
     control,
     setValue,
@@ -20,17 +23,27 @@ export function LostItemPhotoField() {
   const photo = useWatch({ control, name: 'photo' });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const previewUrl = useMemo(() => {
+  const chosenPhotoUrl = useMemo(() => {
     if (!photo) return null;
 
     return URL.createObjectURL(photo);
   }, [photo]);
 
   useEffect(() => {
-    if (!previewUrl) return;
+    if (!chosenPhotoUrl) return;
 
-    return () => URL.revokeObjectURL(previewUrl);
-  }, [previewUrl]);
+    return () => URL.revokeObjectURL(chosenPhotoUrl);
+  }, [chosenPhotoUrl]);
+
+  const storedPhotoUrl = useStoredImage(storedImageUrl);
+
+  // A escolha de agora cobre a foto guardada; desfeita, a guardada volta a aparecer.
+  const preview = useMemo(() => {
+    if (chosenPhotoUrl) return { src: chosenPhotoUrl, alt: C.PHOTO_ACTIONS.previewAlt };
+    if (storedPhotoUrl) return { src: storedPhotoUrl, alt: C.PHOTO_ACTIONS.storedAlt };
+
+    return null;
+  }, [chosenPhotoUrl, storedPhotoUrl]);
 
   const handlePick = useCallback(() => fileInputRef.current?.click(), []);
 
@@ -50,10 +63,10 @@ export function LostItemPhotoField() {
   );
 
   const pickLabel = useMemo(() => {
-    if (photo) return C.PHOTO_ACTIONS.replace;
+    if (preview) return C.PHOTO_ACTIONS.replace;
 
     return C.PHOTO_ACTIONS.pick;
-  }, [photo]);
+  }, [preview]);
 
   const errorMessage = errors.photo?.message;
 
@@ -62,9 +75,7 @@ export function LostItemPhotoField() {
       <Typography variant="caption">{C.LOST_ITEM_FORM_LABELS.photo}</Typography>
 
       <S.PhotoRow>
-        {previewUrl && (
-          <S.PhotoPreview component="img" src={previewUrl} alt={C.PHOTO_ACTIONS.previewAlt} />
-        )}
+        {preview && <S.PhotoPreview component="img" src={preview.src} alt={preview.alt} />}
 
         <S.PhotoActions>
           <S.PhotoActionButton variant="outlined" onClick={handlePick} disabled={disabled}>
@@ -74,6 +85,7 @@ export function LostItemPhotoField() {
             </Typography>
           </S.PhotoActionButton>
 
+          {/* Só a escolha de agora se desfaz: a foto guardada a API não apaga, só troca. */}
           {photo && (
             <S.PhotoRemoveButton variant="outlined" onClick={handleRemove} disabled={disabled}>
               <DeleteIcon fontSize="small" />

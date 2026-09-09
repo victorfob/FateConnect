@@ -2,9 +2,11 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 
+import { apiClient } from '../httpClient';
 import {
   createLostItem,
   deleteLostItem,
+  fetchStoredImage,
   listLostItems,
   resolveLostItem,
   restoreLostItem,
@@ -12,37 +14,39 @@ import {
 } from './lostAndFoundService';
 import { LostItemKindEnum, LostItemStatusEnum, type LostItemInput } from './types';
 
-const LOST_ITEM_INPUT: LostItemInput = {
-  name: 'Garrafa térmica',
-  type: LostItemKindEnum.FOUND,
-  place: 'Biblioteca',
-  occurredOn: '2026-08-20',
-  description: 'Garrafa azul, com adesivos na tampa.',
-};
+const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/lostandfound';
+const ITEM_ID = 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14';
 
-const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/achado';
 const FIRST_PAGE = 1;
 const PAGE_SIZE = 10;
 const SINGLE_PAGE = 1;
-const ITEM_ID = 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14';
 
 const NO_CONTENT = 204;
+const CREATED = 201;
 
-type StatusRequest = { itemId: string; situacao: string };
+const LOST_ITEM_INPUT: LostItemInput = {
+  name: 'Garrafa térmica',
+  lostAndFoundType: LostItemKindEnum.FOUND,
+  place: 'Biblioteca',
+  ocurredOn: '2026-08-20',
+  description: 'Garrafa azul, com adesivos na tampa.',
+  image: null,
+};
 
-/** Guarda o que chegou no recurso de situação, para o caso conferir depois. */
-function statusEndpointRecording(received: StatusRequest[]) {
-  server.use(
-    http.patch<{ itemId: string }, { situacao: string }>(
-      `${LOST_AND_FOUND_URL}/:itemId/situacao`,
-      async ({ request, params }) => {
-        const { situacao } = await request.json();
-        received.push({ itemId: params.itemId, situacao });
+const SENT_FIELDS = {
+  Name: 'Garrafa térmica',
+  LostAndFoundType: LostItemKindEnum.FOUND,
+  Place: 'Biblioteca',
+  OcurredOn: '2026-08-20',
+  Description: 'Garrafa azul, com adesivos na tampa.',
+};
 
-        return new HttpResponse(null, { status: NO_CONTENT });
-      },
-    ),
-  );
+/**
+ * A API recebe `[FromForm]` nos dois verbos de escrita, e ler o corpo como
+ * formulário é o que faz o stub reprovar um JSON — como ela reprovaria.
+ */
+async function fieldsOf(request: Request): Promise<Record<string, FormDataEntryValue>> {
+  return Object.fromEntries(await request.formData());
 }
 
 function pageOf(items: unknown[]) {
@@ -55,43 +59,67 @@ function pageOf(items: unknown[]) {
   };
 }
 
+function listingRecording(received: { params?: URLSearchParams }) {
+  server.use(
+    http.get(LOST_AND_FOUND_URL, ({ request }) => {
+      received.params = new URL(request.url).searchParams;
+
+      return HttpResponse.json(pageOf([]));
+    }),
+  );
+}
+
+/** Guarda o que chegou no recurso do item, para o caso conferir depois. */
+function itemEndpointRecording(received: Record<string, FormDataEntryValue>[]) {
+  server.use(
+    http.patch(`${LOST_AND_FOUND_URL}/:itemId`, async ({ request }) => {
+      received.push(await fieldsOf(request));
+
+      return HttpResponse.json({ id: ITEM_ID });
+    }),
+  );
+}
+
 describe('lostAndFoundService', () => {
-  it('should translate the front filters into the api query parameters', async () => {
-    let received: URLSearchParams | null = null;
-    server.use(
-      http.get(LOST_AND_FOUND_URL, ({ request }) => {
-        received = new URL(request.url).searchParams;
-        return HttpResponse.json(pageOf([]));
-      }),
-    );
+  it('should ask the listing by the names the api takes', async () => {
+    const received: { params?: URLSearchParams } = {};
+    listingRecording(received);
 
     await listLostItems({
-      name: 'Garrafa térmica',
-      occurredOn: '2026-08-20',
-      kind: LostItemKindEnum.FOUND,
-      onlyMine: true,
+      searchTerm: 'Garrafa térmica',
+      ocurredOn: '2026-08-20',
+      lostAndFoundType: LostItemKindEnum.FOUND,
+      onlyMyItems: true,
       status: LostItemStatusEnum.OPEN,
     });
 
-    expect(received!.get('Nome')).toBe('Garrafa térmica');
-    expect(received!.get('DataOcorrido')).toBe('2026-08-20');
-    expect(received!.get('Tipo')).toBe(LostItemKindEnum.FOUND);
-    expect(received!.get('MeusItens')).toBe('true');
-    expect(received!.get('Situacao')).toBe(LostItemStatusEnum.OPEN);
+    expect(Object.fromEntries(received.params!)).toEqual({
+      searchTerm: 'Garrafa térmica',
+      ocurredOn: '2026-08-20',
+      lostAndFoundType: LostItemKindEnum.FOUND,
+      onlyMyItems: 'true',
+      status: LostItemStatusEnum.OPEN,
+    });
   });
 
-  it('should omit parameters that were not filled in, including the unchecked mine flag', async () => {
-    let received: URLSearchParams | null = null;
-    server.use(
-      http.get(LOST_AND_FOUND_URL, ({ request }) => {
-        received = new URL(request.url).searchParams;
-        return HttpResponse.json(pageOf([]));
-      }),
-    );
+  it('should leave out of the query what the filter did not fill in', async () => {
+    const received: { params?: URLSearchParams } = {};
+    listingRecording(received);
 
-    await listLostItems({ name: 'Garrafa térmica', onlyMine: false });
+    await listLostItems({ searchTerm: 'Garrafa térmica' });
 
-    expect([...received!.keys()]).toEqual(['Nome']);
+    expect([...received.params!.keys()]).toEqual(['searchTerm']);
+  });
+
+  // Omitir a situação é como a opção "Todas" pede todas elas, inclusive as excluídas.
+  it('should ask without a status when no status was chosen', async () => {
+    const received: { params?: URLSearchParams } = {};
+    listingRecording(received);
+
+    await listLostItems({ page: 2, pageSize: PAGE_SIZE });
+
+    expect(received.params!.has('status')).toBe(false);
+    expect(received.params!.get('page')).toBe('2');
   });
 
   it('should list items without filters', async () => {
@@ -106,22 +134,120 @@ describe('lostAndFoundService', () => {
     expect(page.items).toHaveLength(1);
   });
 
-  it('should conclude the item through the status resource', async () => {
-    const received: StatusRequest[] = [];
-    statusEndpointRecording(received);
+  it('should fail when the response is not a list', async () => {
+    server.use(
+      http.get(LOST_AND_FOUND_URL, () => HttpResponse.text('<!doctype html><html></html>')),
+    );
+
+    await expect(listLostItems()).rejects.toThrow(/não é uma página/);
+  });
+
+  /**
+   * A foto é o único campo que não atravessa o stub: o `File` do jsdom não passa
+   * na checagem do undici que o interceptador usa para montar a requisição, e no
+   * navegador ela atravessa. O que dá para afirmar aqui é o corpo que o serviço
+   * entrega ao cliente HTTP, que é onde a decisão de mandar a foto acontece.
+   */
+  it('should put the chosen photo in the same body as the item', async () => {
+    const photo = new File(['foto'], 'garrafa.png', { type: 'image/png' });
+    const post = vi.spyOn(apiClient, 'post').mockResolvedValue({ data: { id: 'novo' } });
+
+    const created = await createLostItem({ ...LOST_ITEM_INPUT, image: photo });
+
+    const [path, body] = post.mock.calls[0]!;
+    expect(path).toBe('/lostandfound');
+    expect(Object.fromEntries(body as FormData)).toMatchObject(SENT_FIELDS);
+    expect((body as FormData).get('Image')).toBe(photo);
+    expect(created.id).toBe('novo');
+
+    post.mockRestore();
+  });
+
+  it('should leave the image field out when no photo was chosen', async () => {
+    let fields: Record<string, FormDataEntryValue> | null = null;
+    server.use(
+      http.post(LOST_AND_FOUND_URL, async ({ request }) => {
+        fields = await fieldsOf(request);
+
+        return HttpResponse.json({ id: 'novo' }, { status: CREATED });
+      }),
+    );
+
+    await createLostItem(LOST_ITEM_INPUT);
+
+    expect(fields).toEqual(SENT_FIELDS);
+  });
+
+  it('should patch the item under its own id on update', async () => {
+    let requestUrl: string | null = null;
+    let fields: Record<string, FormDataEntryValue> | null = null;
+    server.use(
+      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, async ({ request }) => {
+        requestUrl = request.url;
+        fields = await fieldsOf(request);
+
+        return HttpResponse.json({ id: ITEM_ID });
+      }),
+    );
+
+    const updated = await updateLostItem(ITEM_ID, LOST_ITEM_INPUT);
+
+    expect(requestUrl).toBe(`${LOST_AND_FOUND_URL}/${ITEM_ID}`);
+    expect(fields).toEqual(SENT_FIELDS);
+    expect(updated.id).toBe(ITEM_ID);
+  });
+
+  // A API só limpa a descrição quando o campo chega vazio; omiti-lo a deixaria como está.
+  it('should send the description even when it is empty, which is what clears it', async () => {
+    let fields: Record<string, FormDataEntryValue> | null = null;
+    server.use(
+      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, async ({ request }) => {
+        fields = await fieldsOf(request);
+
+        return HttpResponse.json({ id: ITEM_ID });
+      }),
+    );
+
+    await updateLostItem(ITEM_ID, { ...LOST_ITEM_INPUT, description: '' });
+
+    expect(fields!.Description).toBe('');
+  });
+
+  it('should conclude the item without touching any other field', async () => {
+    const received: Record<string, FormDataEntryValue>[] = [];
+    itemEndpointRecording(received);
 
     await resolveLostItem(ITEM_ID);
 
-    expect(received).toEqual([{ itemId: ITEM_ID, situacao: LostItemStatusEnum.RESOLVED }]);
+    expect(received).toEqual([{ Status: LostItemStatusEnum.RESOLVED }]);
   });
 
-  it('should restore the item through the status resource', async () => {
-    const received: StatusRequest[] = [];
-    statusEndpointRecording(received);
+  it('should restore the item without touching any other field', async () => {
+    const received: Record<string, FormDataEntryValue>[] = [];
+    itemEndpointRecording(received);
 
     await restoreLostItem(ITEM_ID);
 
-    expect(received).toEqual([{ itemId: ITEM_ID, situacao: LostItemStatusEnum.OPEN }]);
+    expect(received).toEqual([{ Status: LostItemStatusEnum.OPEN }]);
+  });
+
+  // A API devolve o endereço da foto relativo e sem barra inicial, então ele tem
+  // de cair sob a base da API — sob o endereço do site, o nginx responde o
+  // index.html do front com 200 e nem 404 aparece no log.
+  it('should fetch the stored image under the api base address', async () => {
+    let requestUrl: string | null = null;
+    server.use(
+      http.get('https://api.fateconnect.test/uploads/lostandfound/:file', ({ request }) => {
+        requestUrl = request.url;
+
+        return new HttpResponse('bytes', { headers: { 'Content-Type': 'image/png' } });
+      }),
+    );
+
+    const image = await fetchStoredImage('uploads/lostandfound/foto.png');
+
+    expect(requestUrl).toBe('https://api.fateconnect.test/uploads/lostandfound/foto.png');
+    expect(image.type).toBe('image/png');
   });
 
   it('should delete the item, leaving the reason to the server', async () => {
@@ -137,44 +263,5 @@ describe('lostAndFoundService', () => {
     await deleteLostItem(ITEM_ID);
 
     expect(deleted).toEqual([ITEM_ID]);
-  });
-
-  it('should fail when the response is not a list', async () => {
-    server.use(
-      http.get(LOST_AND_FOUND_URL, () => HttpResponse.text('<!doctype html><html></html>')),
-    );
-
-    await expect(listLostItems()).rejects.toThrow(/não é uma página/);
-  });
-
-  it('should post the item on creation and return what the api answered', async () => {
-    let body: LostItemInput | null = null;
-    server.use(
-      http.post(LOST_AND_FOUND_URL, async ({ request }) => {
-        body = (await request.json()) as LostItemInput;
-        return HttpResponse.json({ id: 'novo', ...LOST_ITEM_INPUT }, { status: 201 });
-      }),
-    );
-
-    const created = await createLostItem(LOST_ITEM_INPUT);
-
-    expect(body).toEqual(LOST_ITEM_INPUT);
-    expect(created.id).toBe('novo');
-  });
-
-  it('should put the item under its own id on update', async () => {
-    const itemId = 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14';
-    let requestUrl: string | null = null;
-    server.use(
-      http.put(`${LOST_AND_FOUND_URL}/:id`, ({ request }) => {
-        requestUrl = request.url;
-        return HttpResponse.json({ id: itemId, ...LOST_ITEM_INPUT });
-      }),
-    );
-
-    const updated = await updateLostItem(itemId, LOST_ITEM_INPUT);
-
-    expect(requestUrl).toBe(`${LOST_AND_FOUND_URL}/${itemId}`);
-    expect(updated.id).toBe(itemId);
   });
 });

@@ -17,30 +17,35 @@ export enum DeletionReasonEnum {
   INACTIVITY = 'Inactivity',
 }
 
+/** Quem cadastrou o item, com o que o cartão precisa para chamar a pessoa. */
+export type LostItemContact = { name: string; email: string; phone: string };
+
 export type LostItem = {
   id: string;
   name: string;
-  type: LostItemKindEnum;
+  lostAndFoundType: LostItemKindEnum;
   place: string;
-  occurredOn: string;
+  ocurredOn: string;
   description: string | null;
-  photoUrl: string | null;
+  imageUrl: string | null;
+  contact: LostItemContact;
   status: LostItemStatusEnum;
   deletionReason: DeletionReasonEnum | null;
-  isMine: boolean;
+  isOwner: boolean;
   createdAt: string;
 };
 
-/** A foto fica de fora: quem devolve a `photoUrl` é o servidor. */
-export type LostItemInput = Pick<
-  LostItem,
-  'name' | 'type' | 'place' | 'occurredOn' | 'description'
->;
+export type LostItemInput = Pick<LostItem, 'name' | 'lostAndFoundType' | 'place' | 'ocurredOn'> & {
+  /** String vazia limpa a descrição guardada; omitir o campo a deixaria como está. */
+  description: string;
+  image: File | null;
+};
 
+/** Filtros da listagem, com os mesmos nomes que a API recebe na query. */
 export interface LostItemFilter extends PageQuery {
-  name?: string;
-  occurredOn?: string;
-  kind?: LostItemKindEnum;
-  onlyMine?: boolean;
+  searchTerm?: string;
+  ocurredOn?: string;
+  lostAndFoundType?: LostItemKindEnum;
+  onlyMyItems?: boolean;
   status?: LostItemStatusEnum;
 }
