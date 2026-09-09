@@ -17,7 +17,7 @@ export function LostItemOwnerActions({ item, onEdit, onDelete }: LostItemOwnerAc
   const handleEdit = useCallback(() => onEdit?.(item), [onEdit, item]);
   const handleDelete = useCallback(() => onDelete(item), [onDelete, item]);
 
-  if (!item.isMine) return null;
+  if (!item.isOwner) return null;
 
   // Vale para resolvido, para excluído e para o que a API venha a inventar.
   if (item.status !== LostItemStatusEnum.OPEN) return null;

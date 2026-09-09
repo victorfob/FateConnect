@@ -33,9 +33,9 @@ export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: L
 
   return (
     <ListCard
-      own={item.isMine}
+      own={item.isOwner}
       ownLabel={C.OWN_ITEM_LABEL}
-      media={<LostItemPhoto url={item.photoUrl} itemName={item.name} />}
+      media={<LostItemPhoto url={item.imageUrl} itemName={item.name} />}
     >
       <ListCard.Header>
         <Typography variant="subtitleBold">{item.name}</Typography>
@@ -58,14 +58,14 @@ export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: L
         <ListCard.InfoItem>
           <CalendarTodayIcon />
           <Typography variant="caption" color="inherit">
-            {format(parseISO(item.occurredOn), DATE_FORMAT)}
+            {format(parseISO(item.ocurredOn), DATE_FORMAT)}
           </Typography>
         </ListCard.InfoItem>
 
         <ListCard.InfoItem>
-          <LostItemKindIcon kind={item.type} />
+          <LostItemKindIcon kind={item.lostAndFoundType} />
           <Typography variant="caption" color="inherit">
-            {lostItemKindLabel(item.type)}
+            {lostItemKindLabel(item.lostAndFoundType)}
           </Typography>
         </ListCard.InfoItem>
       </ListCard.InfoRow>

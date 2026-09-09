@@ -1,31 +1,44 @@
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
-import { LOST_ITEM_OWNER } from '@app/pages/LostAndFound/helpers/lostItemOwner';
 import {
   DeletionReasonEnum,
   LostItemKindEnum,
   LostItemStatusEnum,
   type LostItem,
+  type LostItemContact,
 } from '@app/services/lostAndFound/types';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
 
 import { RESTORE_LABEL } from './LostItemStatusAction/constants';
 import { LostItemCard } from '.';
 
+const CONTACT: LostItemContact = {
+  name: 'Marina Duarte',
+  email: 'marina.duarte@example.com',
+  phone: '(15) 99999-0001',
+};
+
+const OTHER_CONTACT: LostItemContact = {
+  name: 'Rafael Nunes',
+  email: 'rafael.nunes@example.com',
+  phone: '(15) 99999-0002',
+};
+
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
   name: 'Carteira preta',
-  type: LostItemKindEnum.LOST,
+  lostAndFoundType: LostItemKindEnum.LOST,
   place: 'Biblioteca',
-  occurredOn: '2026-08-11T00:00:00',
+  ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos e cartões.',
-  photoUrl: null,
+  imageUrl: null,
+  contact: CONTACT,
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
-  isMine: false,
+  isOwner: false,
   createdAt: '2026-08-12T00:00:00',
 };
 
-const COPY_EMAIL_LABEL = `Copiar ${LOST_ITEM_OWNER.email}`;
+const COPY_EMAIL_LABEL = `Copiar ${CONTACT.email}`;
 
 const DELETION_NOTE = {
   manual: 'Excluído manualmente.',
@@ -34,7 +47,7 @@ const DELETION_NOTE = {
 
 const DELETED_ITEM: LostItem = {
   ...LOST_ITEM,
-  isMine: true,
+  isOwner: true,
   status: LostItemStatusEnum.DELETED,
   deletionReason: DeletionReasonEnum.USER,
 };
@@ -83,13 +96,22 @@ describe('LostItemCard', () => {
 
     const dialog = await openContact();
 
-    expect(dialog.getByText(LOST_ITEM_OWNER.name)).toBeInTheDocument();
+    expect(dialog.getByText(CONTACT.name)).toBeInTheDocument();
     expect(dialog.getByRole('button', { name: COPY_EMAIL_LABEL })).toBeInTheDocument();
-    expect(dialog.getByRole('link', { name: LOST_ITEM_OWNER.phone })).toBeInTheDocument();
+    expect(dialog.getByRole('link', { name: CONTACT.phone })).toBeInTheDocument();
+  });
+
+  it('should take the contact from the item, not from a fixed one', async () => {
+    renderComponent({ ...LOST_ITEM, contact: OTHER_CONTACT });
+
+    const dialog = await openContact();
+
+    expect(dialog.getByText(OTHER_CONTACT.name)).toBeInTheDocument();
+    expect(dialog.queryByText(CONTACT.name)).not.toBeInTheDocument();
   });
 
   it('should not offer contact on the item registered by the logged user', () => {
-    renderComponent({ ...LOST_ITEM, isMine: true });
+    renderComponent({ ...LOST_ITEM, isOwner: true });
 
     expect(screen.queryByRole('button', { name: CONTACT_LABEL })).not.toBeInTheDocument();
   });
@@ -99,7 +121,7 @@ describe('LostItemCard', () => {
 
     const dialog = await openContact();
 
-    expect(dialog.getByText(LOST_ITEM_OWNER.name)).toBeInTheDocument();
+    expect(dialog.getByText(CONTACT.name)).toBeInTheDocument();
   });
 
   it('should open the conversation already mentioning the item', async () => {
@@ -107,7 +129,7 @@ describe('LostItemCard', () => {
 
     const dialog = await openContact();
 
-    expect(dialog.getByRole('link', { name: LOST_ITEM_OWNER.phone })).toHaveAttribute(
+    expect(dialog.getByRole('link', { name: CONTACT.phone })).toHaveAttribute(
       'href',
       expect.stringContaining(encodeURIComponent(LOST_ITEM.name)),
     );
@@ -120,7 +142,7 @@ describe('LostItemCard', () => {
     await userEvent.click(dialog.getByRole('button', { name: COPY_EMAIL_LABEL }));
 
     expect(await screen.findByText(CONTACT_DIALOG.emailCopied)).toBeInTheDocument();
-    expect(clipboardWrite).toHaveBeenCalledWith(LOST_ITEM_OWNER.email);
+    expect(clipboardWrite).toHaveBeenCalledWith(CONTACT.email);
   });
 
   it('should report a refused copy instead of claiming success', async () => {

@@ -7,7 +7,9 @@ import * as C from '../constants';
 import { LostItemPhotoField } from './LostItemPhotoField';
 import * as S from './styles';
 
-export function LostItemFormFields() {
+export type LostItemFormFieldsProps = Readonly<{ storedImageUrl: string | null }>;
+
+export function LostItemFormFields({ storedImageUrl }: LostItemFormFieldsProps) {
   const {
     control,
     register,
@@ -80,7 +82,7 @@ export function LostItemFormFields() {
       </S.WideCell>
 
       <S.WideCell>
-        <LostItemPhotoField />
+        <LostItemPhotoField storedImageUrl={storedImageUrl} />
       </S.WideCell>
     </S.FieldsGrid>
   );

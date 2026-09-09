@@ -7,14 +7,14 @@ export const FILTER_PANEL_TITLE = 'Filtros';
 export const FILTER_SUBMIT_LABEL = 'Filtrar';
 
 export const FILTER_LABELS = {
-  name: 'Nome',
+  searchTerm: 'Nome ou descrição',
   occurredOn: 'Data do ocorrido',
   kind: 'Tipo',
   owner: 'Quem cadastrou',
   status: 'Situação',
 };
 
-export const FILTER_PLACEHOLDERS = { name: 'Insira o nome do item' };
+export const FILTER_PLACEHOLDERS = { searchTerm: 'Insira o nome ou parte da descrição' };
 
 /** `ALL` é sentinela do formulário: não vai para a requisição. */
 export enum LostItemKindFilterEnum {
