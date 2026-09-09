@@ -6,6 +6,7 @@ import { useNotification } from '@app/hooks/useNotification';
 import type { UserContact } from '@app/services/types';
 import { copyToClipboard } from '@app/utils/clipboard';
 import { getInitials } from '@app/utils/initials';
+import { maskPhone } from '@app/utils/masks/phoneMask';
 import { whatsappConversationUrl } from '@app/utils/whatsapp';
 
 import { ContactDetails } from './ContactDetails';
@@ -32,6 +33,9 @@ export function ContactButton({ contact, message }: ContactButtonProps) {
   }, [contact.email, notifyError, notifySuccess]);
 
   const initials = useMemo(() => getInitials(contact.name), [contact.name]);
+  // A máscara é só de exibição: o endereço da conversa recebe o número como a
+  // API o devolve, porque é o mesmo valor em dois papéis diferentes.
+  const displayPhone = useMemo(() => maskPhone(contact.phone), [contact.phone]);
   const phoneHref = useMemo(
     () => whatsappConversationUrl(contact.phone, message),
     [contact.phone, message],
@@ -49,7 +53,7 @@ export function ContactButton({ contact, message }: ContactButtonProps) {
             name={contact.name}
             initials={initials}
             email={contact.email}
-            phone={contact.phone}
+            phone={displayPhone}
             phoneHref={phoneHref}
             onCopyEmail={handleCopyEmail}
           />
