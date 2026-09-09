@@ -23,6 +23,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o instante de criação nas respostas da API, que vinha sem a marca de fuso horário quando lido do banco: um cliente que o interpretasse leria o horário como local, três horas adiantado (#322) [Backend]
 - Corrige o contato do cartão de achados e perdidos, que mostrava sempre a mesma pessoa fictícia em vez de quem cadastrou o item (#328) [Frontend]
 - Corrige a opção Todas do filtro de situação em achados e perdidos, que voltava para Aberto sem avisar em vez de mostrar as situações todas (#328) [Frontend]
+- Corrige a apresentação do diálogo de contato: o nome centraliza também quando quebra em mais de uma linha, o e-mail deixa de quebrar no desktop, e o telefone passa a aparecer com máscara em vez de dígitos corridos (#335) [Frontend]
 
 ## [0.8.0] - 2026-09-05
 
