@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-09
+
 ### Added
 
 - Adiciona a API de achados e perdidos: cadastrar, editar, excluir e listar item, com foto opcional e filtro por nome, tipo, situação, data do ocorrido e autoria; o item excluído guarda o motivo, manual ou por inatividade, que é o que a tela usa para escrever a nota do cartão (#322) [Backend]
