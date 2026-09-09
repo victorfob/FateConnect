@@ -55,7 +55,13 @@ describe('PageShell', () => {
       action: <PageShell.Back label={BACK_LABEL} icon={<span />} component="a" href="/menu" />,
     });
 
-    expect(screen.getByRole('link', { name: BACK_LABEL })).toHaveAttribute('href', '/menu');
+    const back = screen.getByRole('link', { name: BACK_LABEL });
+
+    expect(back).toHaveAttribute('href', '/menu');
+    // No estreito o rótulo sai de vista e é o `aria-label` que nomeia a ação. A
+    // media query não roda no jsdom, então o texto continua aqui e a consulta
+    // por papel passaria sem ele — o atributo é o que resta para guardar.
+    expect(back).toHaveAttribute('aria-label', BACK_LABEL);
   });
 
   it('should keep the title action beside the title, not in the corner', () => {
