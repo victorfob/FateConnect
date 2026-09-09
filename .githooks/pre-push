@@ -12,6 +12,9 @@ ROOT="$(git rev-parse --show-toplevel)"
 WEB="$ROOT/FateConnect/Web"
 API_SOLUTION="$ROOT/FateConnect/FateConnect.Api/FateConnect.Api.sln"
 
+# shellcheck source=lib/project-node.sh
+. "$ROOT/.githooks/lib/project-node.sh"
+
 # Ref vazia (branch sendo deletada) vem como SHA de zeros.
 EMPTY_SHA="$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')"
 
@@ -50,6 +53,10 @@ if grep -q '^FateConnect/Web/' "$changed"; then
     echo "pre-push: dependências de FateConnect/Web ausentes — rode 'yarn' nessa pasta" >&2
     exit 1
   fi
+
+  # O script chama `npx`, que roda no Node do shell: sem esta linha o gate mede
+  # outra versão da que o CI usa, e responde verde.
+  use_project_node "$WEB"
 
   grep '^FateConnect/Web/' "$changed" | tr '\n' '\0' | xargs -0 "$WEB/scripts/test-changed.sh"
   tested=1
