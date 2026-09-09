@@ -1,13 +1,10 @@
-import type { PageQuery } from '../types';
+import type { PageQuery, UserContact } from '../types';
 
 /** Valores canônicos alinhados à serialização do backend. */
 export enum RideTypeEnum {
   SOLIDARITY = 'Solidarity',
   EGALITARIAN = 'Egalitarian',
 }
-
-/** Quem ofertou a carona, com o que o cartão precisa para chamar a pessoa. */
-export type RideDriver = { name: string; email: string; phone: string };
 
 /** Entidade como a API devolve. O id é o `Guid` do backend. */
 export type Ride = {
@@ -19,7 +16,7 @@ export type Ride = {
   createdAt: string;
   rideType: RideTypeEnum;
   description: string | null;
-  driver: RideDriver;
+  driver: UserContact;
   /**
    * Vem calculado pela API para quem perguntou. O front não teria como inferir:
    * o login guarda o nome, não o id de quem ofertou.
@@ -35,7 +32,7 @@ export type RideInput = Omit<Ride, 'id' | 'createdAt' | 'driver' | 'isOwner'>;
 
 /** Filtros da listagem, com os mesmos nomes que a API recebe na query. */
 export interface RideFilter extends PageQuery {
-  destination?: string;
+  searchTerm?: string;
   departureDate?: string;
   departureTime?: string;
   rideType?: RideTypeEnum;

@@ -64,6 +64,14 @@ O mesmo objeto ou estado se chama igual em **toda** a tela — etiqueta, botão,
 
 ⛔ Aconteceu em achados e perdidos: etiqueta "Concluído", diálogo "Confirmar Conclusão", botão "Concluir" e aviso "Item resolvido" — dois nomes para um estado. Ficou **Resolvido** em todos, inclusive no valor que o contrato serializa.
 
+### O rótulo do campo de busca nomeia tudo o que ele alcança
+
+⛔ **Busca que casa mais de um campo diz isso no rótulo.** O rótulo é o que o leitor de tela anuncia como nome do campo, e placeholder some ao digitar — precisão que mora só no placeholder é precisão que some.
+
+Os dois filtros da aplicação buscam em **dois** campos cada um, e por isso se chamam `Destino ou descrição` em caronas e `Nome ou descrição` em achados e perdidos. Antes diziam `Destino` e `Nome`, e prometiam menos do que a busca entrega. O endereço acompanha o rótulo: `?busca=` nos dois.
+
+⚠️ O `Destino` do formulário de **ofertar** carona não é este campo e não muda — ali é o destino de verdade, digitado por quem oferta. Renomear os dois de uma vez quebra o formulário.
+
 ### O valor que o contrato serializa não é o rótulo
 
 ⛔ **Antes de escrever um valor de enum em texto que alguém lê — copy, URL, corpo de issue —, confira o mapa de rótulo.** Os dois nem sempre coincidem: `Solidarity` aparece na tela como **Solidária**, e `Egalitarian` como **Igualitária** — o valor é inglês, o rótulo é português com acento. O mapa mora ao lado da tela, em `src/pages/Rides/helpers/rideType.ts`.

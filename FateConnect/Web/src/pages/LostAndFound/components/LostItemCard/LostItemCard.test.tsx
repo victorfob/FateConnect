@@ -4,20 +4,20 @@ import {
   LostItemKindEnum,
   LostItemStatusEnum,
   type LostItem,
-  type LostItemContact,
 } from '@app/services/lostAndFound/types';
+import type { UserContact } from '@app/services/types';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
 
 import { RESTORE_LABEL } from './LostItemStatusAction/constants';
 import { LostItemCard } from '.';
 
-const CONTACT: LostItemContact = {
+const CONTACT: UserContact = {
   name: 'Marina Duarte',
   email: 'marina.duarte@example.com',
   phone: '(15) 99999-0001',
 };
 
-const OTHER_CONTACT: LostItemContact = {
+const OTHER_CONTACT: UserContact = {
   name: 'Rafael Nunes',
   email: 'rafael.nunes@example.com',
   phone: '(15) 99999-0002',

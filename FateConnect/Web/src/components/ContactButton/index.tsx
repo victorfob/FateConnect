@@ -3,6 +3,7 @@ import { Dialog, IconButton } from '@design-system';
 import { ContactPageIcon } from '@design-system/icons';
 
 import { useNotification } from '@app/hooks/useNotification';
+import type { UserContact } from '@app/services/types';
 import { copyToClipboard } from '@app/utils/clipboard';
 import { getInitials } from '@app/utils/initials';
 import { whatsappConversationUrl } from '@app/utils/whatsapp';
@@ -10,9 +11,7 @@ import { whatsappConversationUrl } from '@app/utils/whatsapp';
 import { ContactDetails } from './ContactDetails';
 import * as C from './constants';
 
-type Contact = Readonly<{ name: string; email: string; phone: string }>;
-
-type ContactButtonProps = Readonly<{ contact: Contact; message: string }>;
+type ContactButtonProps = Readonly<{ contact: UserContact; message: string }>;
 
 export function ContactButton({ contact, message }: ContactButtonProps) {
   const [showingContact, setShowingContact] = useState(false);
