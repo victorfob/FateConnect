@@ -198,6 +198,24 @@ Quatro vezes na árvore da #207:
 
 **O gatilho é o merge, não o fim da árvore.** Ao fechar uma sub-issue, abra as irmãs abertas e procure: escopo que outro PR já entregou, símbolo que deixou de existir, e decisão que mudou. Item entregue vira `[x]` com a nota de onde saiu; item morto sai.
 
+### O raio de um rename é o quadro, não a árvore
+
+⛔ **Rename de módulo, entidade ou método envelhece toda issue aberta que o cite, não só as irmãs da mesma árvore.** O gatilho acima é o merge de uma sub-issue; este é outro, e mais largo: o merge que **renomeia** algo.
+
+Em 09/09/2026, muito depois de a API passar para o inglês, seis issues abertas ainda falavam português — #108, #110, #114, #162, #164 e #193 —, e nenhuma delas era irmã de outra. Metade era nome morto, de quem daria `grep` e não acharia. A outra metade era pior: a #162 e a #164 mandavam **criar** entidade nova em português, contra a convenção que a #207 havia fixado para a API inteira. Texto velho engana quem lê; instrução velha faz nascer código errado.
+
+A conferência é mecânica, e são dois instrumentos, porque nenhum alcança o do outro — caminho e símbolo se citam de formas diferentes:
+
+```bash
+gh issue view <n> --json body -q .body                # o corpo publicado, um por issue aberta
+git ls-tree -r --name-only origin/develop             # todo caminho citado tem de casar
+git grep -q -w -- "<Símbolo>" origin/develop          # todo símbolo citado tem de existir
+```
+
+⚠️ **Derive o prefixo dos caminhos da própria árvore, não de uma lista sua.** A minha, escrita à mão, não tinha `FateConnect/Web/src/pages/`, e três caminhos vivos foram reportados como órfãos.
+
+⚠️ **Símbolo ausente não é defeito por si:** issue não implementada cita de propósito o que ainda vai nascer. O que se procura é o nome que **existia e mudou** — e a diferença se lê no que a issue promete, não no resultado do `grep`.
+
 ## 8. Fechar o pai é manual, e ninguém avisa
 
 ⛔ **Nada fecha sozinho aqui.** Duas mecânicas somadas deixam a árvore aberta com tudo entregue:
