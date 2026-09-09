@@ -45,7 +45,7 @@ export const Container = styled(PolymorphicStack)({ flexDirection: 'row' });
 
 O `styled` do Emotion resolve as props do `Box` e do `Stack` pela última assinatura de chamada deles, onde `component` não aparece — e a prop some da tipagem. Os dois alvos pré-tipados declaram o que já é verdade. Alvo que **não** vai receber `component` continua sendo o cru: anotar tudo era o vício antigo, e 79 das 113 anotações nunca recebiam a prop.
 
-⛔ **Não estenda a lista de alvos pré-tipados para componente que não aceita `component`.** Foi medido: `AccordionDetails` é função simples, sem a prop, e o repo faz `styled(AccordionDetails)`. Prometê-la ali compila, mas em runtime o `component` chega ao DOM como atributo cru e a semântica se perde calada. Por isso a injeção **não** vive no `styled` — se vivesse, valeria para todo alvo.
+⛔ **Não estenda a lista de alvos pré-tipados para componente que não aceita `component`.** Foi medido: `AccordionDetails` é função simples, sem a prop. Prometê-la ali compila, mas em runtime o `component` chega ao DOM como atributo cru e a semântica se perde calada. Por isso a injeção **não** vive no `styled` — se vivesse, valeria para todo alvo.
 
 ⚠️ **Outro componente do MUI que aceita `component` cai na mesma armadilha.** `styled(Divider)` também perde a prop na tipagem, e a saída **não** é criar um terceiro alvo pré-tipado: é declará-la no genérico com o valor que você usa — `styled(Divider)<{ component?: 'li' }>`, que dentro de uma lista é o que mantém o HTML válido.
 
@@ -162,6 +162,16 @@ Medido de três jeitos na #291, e os dois primeiros levaram a conclusões errada
 ⚠️ **O sinal é o número que não se move.** `padding` acrescentado a um elemento para afastá-lo do vizinho **não altera** a distância entre as caixas — só `margin` alteraria. Se a medida é a mesma depois de uma correção que você sabe que aplicou, o instrumento está medindo a caixa.
 
 ⚠️ **Quem reclama é sempre a pessoa que olha a tela**, porque o número mente com confiança: eu tinha `32px` de um lado e `32px` do outro, e mesmo assim estava torto. Ao receber "não está alinhado" sobre algo que você mediu, desconfie do **que** foi medido antes de duvidar do relato.
+
+## Rótulo de campo sobe acima da caixa, e ancestral com `overflow` o recorta
+
+⛔ **O rótulo encolhido do campo do MUI é posicionado 9px ACIMA da caixa do campo** — `translate(14px, -9px)` —, e ancestral com `overflow` diferente de `visible` corta esses 9px sem nada acusar. Campo na primeira linha de um contêiner que rola sai com o rótulo cortado ao meio.
+
+Medido em 09/09/2026, ao levar os filtros para dentro do diálogo: o miolo do diálogo tem `overflow-y: auto` e recuo zero no topo, e o rótulo do primeiro campo ficava 9px acima dele.
+
+**A saída é folga no topo da grade de campos, por token:** `padding-top` de `sm` cobre os 9px e sobra 3px. ⚠️ **Antes de inventar a correção, meça o vizinho que não sofre do problema** — o diálogo de formulário já tinha esse recuo, e foi ele que deu o valor.
+
+⚠️ **Não aparece em teste algum**: no jsdom a geometria é toda zero, então o rótulo nunca sobe e nada é cortado. Quem responde é medir na aplicação o retângulo do rótulo contra o do contêiner que rola.
 
 ## A cor se julga ao lado do vizinho, não sozinha no fundo
 
