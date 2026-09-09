@@ -17,6 +17,12 @@ server {
     error_log  /var/log/nginx/fateconnect-__ENVIRONMENT__.error.log;
 
     location /api/ {
+        # A foto de um item pode ter 5 MB, o limite que o ValidImageAttribute
+        # cobra, e o padrão do nginx é 1 MB: sem esta linha o 413 sai daqui e a
+        # API nunca chega a explicar o tamanho a quem enviou. A folga é do
+        # envelope multipart, que soma os campos e as fronteiras ao arquivo.
+        client_max_body_size 6m;
+
         proxy_pass http://127.0.0.1:__API_PORT__/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

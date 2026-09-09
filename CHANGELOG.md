@@ -6,6 +6,30 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-09
+
+### Added
+
+- Adiciona a API de achados e perdidos: cadastrar, editar, excluir e listar item, com foto opcional e filtro por nome, tipo, situação, data do ocorrido e autoria; o item excluído guarda o motivo, manual ou por inatividade, que é o que a tela usa para escrever a nota do cartão (#322) [Backend]
+
+### Changed
+
+- Amplia a busca de caronas, que passa a casar também a descrição da carona e não só o destino (#322) [Backend]
+- Passa a guardar os itens do mural de achados e perdidos: cadastro, edição, foto, conclusão, exclusão e restauração chegam ao servidor, e o item continua lá depois de recarregar a página — antes nada do que a tela fazia era gravado (#328) [Frontend]
+- Passa a buscar item de achados e perdidos por nome ou descrição, com o campo do filtro dizendo isso; o endereço da busca vai de `?nome=` para `?busca=`, e link salvo com o antigo abre a lista sem filtro (#328) [Frontend]
+- Passa a buscar carona por destino ou descrição, com o campo do filtro dizendo isso; o endereço da busca vai de `?destino=` para `?busca=`, e link salvo com o antigo abre a lista sem filtro (#329) [Frontend]
+- Passa a dizer na confirmação o que resolver um item de achados e perdidos significa: quem cadastrou um perdido marca como encontrado e quem cadastrou um achado marca como devolvido — antes os dois casos diziam só resolver; a situação do item continua se chamando Resolvido (#333) [Frontend]
+- Passa a abrir os filtros das duas listas num diálogo, atrás de um botão ao lado do título da página, em vez do painel que ficava aberto ocupando o topo: os campos são os mesmos e na mesma ordem, o aviso de filtro valendo acompanha o botão, filtrar fecha o diálogo, e um botão de limpar — que não existia — devolve a lista ao padrão da tela (#336) [Frontend]
+- Passa a mostrar só o ícone no botão de voltar das telas internas quando a tela é estreita: com o texto ao lado a linha do cabeçalho não cabia, e o título mais longo quebrava em duas linhas. O nome do botão continua sendo anunciado por leitor de tela (#336) [Frontend]
+
+### Fixed
+
+- Corrige o instante de criação nas respostas da API, que vinha sem a marca de fuso horário quando lido do banco: um cliente que o interpretasse leria o horário como local, três horas adiantado (#322) [Backend]
+- Corrige o contato do cartão de achados e perdidos, que mostrava sempre a mesma pessoa fictícia em vez de quem cadastrou o item (#328) [Frontend]
+- Corrige a opção Todas do filtro de situação em achados e perdidos, que voltava para Aberto sem avisar em vez de mostrar as situações todas (#328) [Frontend]
+- Corrige a apresentação do diálogo de contato: o nome centraliza também quando quebra em mais de uma linha, o e-mail deixa de quebrar no desktop, e o telefone passa a aparecer com máscara em vez de dígitos corridos (#335) [Frontend]
+- Corrige o botão neutro dos diálogos no tema escuro, que era o único do produto com texto escuro: o texto passa a ser branco como nos demais, sobre um fundo um tom mais escuro para ele se manter legível (#336) [Frontend]
+
 ## [0.8.0] - 2026-09-05
 
 ### Added

@@ -8,9 +8,9 @@ export function toFormValues(item: LostItem | undefined): LostItemFormInput {
 
   return {
     name: item.name,
-    kind: item.type,
+    kind: item.lostAndFoundType,
     place: item.place,
-    occurredOn: toDisplayDate(item.occurredOn),
+    occurredOn: toDisplayDate(item.ocurredOn),
     description: item.description ?? '',
     // O campo só lida com arquivo escolhido agora, não com a URL guardada.
     photo: null,
@@ -20,9 +20,10 @@ export function toFormValues(item: LostItem | undefined): LostItemFormInput {
 export function toLostItemInput(values: LostItemFormValues): LostItemInput {
   return {
     name: values.name,
-    type: values.kind,
+    lostAndFoundType: values.kind,
     place: values.place,
-    occurredOn: toApiDateText(values.occurredOn),
+    ocurredOn: toApiDateText(values.occurredOn),
     description: values.description,
+    image: values.photo,
   };
 }

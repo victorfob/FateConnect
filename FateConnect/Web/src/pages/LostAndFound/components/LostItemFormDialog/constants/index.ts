@@ -66,6 +66,7 @@ export const PHOTO_ACTIONS = {
   replace: 'Trocar foto',
   remove: 'Remover foto',
   previewAlt: 'Prévia da foto escolhida',
+  storedAlt: 'Foto do item',
 };
 
 export const PHOTO_HINT = `JPG, PNG ou WebP, até ${LOST_ITEM_LIMITS.maxPhotoMegabytes} MB.`;

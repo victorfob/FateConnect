@@ -18,7 +18,7 @@ export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemSta
   const handleResolve = useCallback(() => onResolve(item), [onResolve, item]);
   const handleRestore = useCallback(() => onRestore(item), [onRestore, item]);
 
-  if (!item.isMine) return null;
+  if (!item.isOwner) return null;
 
   if (item.status === LostItemStatusEnum.DELETED) {
     return (
@@ -33,13 +33,16 @@ export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemSta
 
   if (item.status !== LostItemStatusEnum.OPEN) return null;
 
+  const resolveLabel = C.lostItemResolveLabel(item.lostAndFoundType);
+
   return (
     <S.ActionRow>
       <LostItemConfirmAction
-        label={C.lostItemResolveLabel(item.type)}
+        label={resolveLabel}
         icon={<CheckCircleIcon fontSize="small" />}
-        dialogTitle={C.RESOLVE_DIALOG.title}
+        dialogTitle={resolveLabel}
         messagePrefix={C.RESOLVE_DIALOG.messagePrefix}
+        messageSuffix={C.lostItemResolveSuffix(item.lostAndFoundType)}
         itemName={item.name}
         confirmLabel={C.RESOLVE_DIALOG.confirmLabel}
         onConfirm={handleResolve}

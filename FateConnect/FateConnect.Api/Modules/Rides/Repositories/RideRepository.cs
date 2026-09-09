@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.Rides.Repositories;
 
 using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Interfaces;
@@ -11,7 +12,7 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
 {
     public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter)
     {
-        DateTime nowInProductTimeZone = Ride.NowInProductTimeZone();
+        DateTime nowInProductTimeZone = DateTimeUtils.NowInProductTimeZone();
         DateOnly today = DateOnly.FromDateTime(nowInProductTimeZone);
         TimeOnly currentTime = TimeOnly.FromDateTime(nowInProductTimeZone);
 
@@ -27,9 +28,9 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
         if (filter.DepartureTime.HasValue)
             query = query.Where(r => r.DepartureTime == filter.DepartureTime.Value);
 
-        if (!string.IsNullOrWhiteSpace(filter.Destination))
+        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            string escapedDestination = filter.Destination
+            string escapedSearchTerm = filter.SearchTerm
                 .Replace(@"\", @"\\")
                 .Replace("%", @"\%")
                 .Replace("_", @"\_");
@@ -37,7 +38,12 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
             query = query.Where(r =>
                 EF.Functions.ILike(
                     EF.Functions.Unaccent(r.Destination),
-                    "%" + EF.Functions.Unaccent(escapedDestination) + "%",
+                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
+                    @"\"
+                ) ||
+                EF.Functions.ILike(
+                    EF.Functions.Unaccent(r.Description ?? ""),
+                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
                     @"\"
                 ));
         }

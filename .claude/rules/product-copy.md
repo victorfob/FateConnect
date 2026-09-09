@@ -62,7 +62,23 @@ Mesma régua para "por favor", "aguarde um momento" e "parabéns".
 
 O mesmo objeto ou estado se chama igual em **toda** a tela — etiqueta, botão, título de diálogo e aviso. Varra o artefato inteiro antes de fechar, não elemento a elemento.
 
-⛔ Aconteceu em achados e perdidos: etiqueta "Concluído", diálogo "Confirmar Conclusão", botão "Concluir" e aviso "Item resolvido" — dois nomes para um estado. Ficou **Resolvido** em todos, inclusive no valor que o contrato serializa.
+⛔ Aconteceu em achados e perdidos: etiqueta "Concluído", diálogo "Confirmar Conclusão", botão "Concluir" e aviso "Item resolvido" — dois nomes para um estado. O **estado** ficou `Resolvido` na etiqueta, na opção do filtro, no aviso e no valor que o contrato serializa.
+
+### O estado tem um nome; a ação de chegar nele fala por tipo
+
+⚠️ **A regra acima é do estado, não da ação.** Resolver um item de achados e perdidos significa coisas diferentes conforme quem o cadastrou: quem perdeu e recuperou marca como **encontrado**, quem achou e entregou marca como **devolvido**. O botão do cartão, o título do diálogo e a mensagem falam por tipo; a etiqueta, o filtro e o aviso continuam `Resolvido`.
+
+⛔ **O que fecha essa porta é o filtro, não preferência.** O campo `Situação` do painel não tem item, logo não tem tipo — ali `Resolvido` é a única palavra possível, e levar `Encontrado`/`Devolvido` para o estado deixaria o filtro sem nome para o que o cartão nomeia. O aviso de sucesso cai no mesmo teste por outro motivo: `Item encontrado.` colidiria com o estado vazio da própria tela, que diz `Nenhum item encontrado.`
+
+⚠️ **O tell de que a distinção vazou para o lugar errado** é um rótulo de estado que só se consegue escrever tendo um item na mão.
+
+### O rótulo do campo de busca nomeia tudo o que ele alcança
+
+⛔ **Busca que casa mais de um campo diz isso no rótulo.** O rótulo é o que o leitor de tela anuncia como nome do campo, e placeholder some ao digitar — precisão que mora só no placeholder é precisão que some.
+
+Os dois filtros da aplicação buscam em **dois** campos cada um, e por isso se chamam `Destino ou descrição` em caronas e `Nome ou descrição` em achados e perdidos. Antes diziam `Destino` e `Nome`, e prometiam menos do que a busca entrega. O endereço acompanha o rótulo: `?busca=` nos dois.
+
+⚠️ O `Destino` do formulário de **ofertar** carona não é este campo e não muda — ali é o destino de verdade, digitado por quem oferta. Renomear os dois de uma vez quebra o formulário.
 
 ### O valor que o contrato serializa não é o rótulo
 
@@ -87,7 +103,20 @@ Diz o que aconteceu e o que fazer: `Erro ao carregar os itens. Tente novamente.`
 
 - Imperativo, **verbo primeiro**, até três palavras: "Marcar como encontrado", "Salvar alterações".
 - Sem ponto final, sem emoji, sem caixa alta.
-- **O verbo do botão é o verbo do título** do diálogo que ele confirma. Ícone, quando houver, à esquerda.
+- **Título e botão de um diálogo dividem o nome da ação e a moldura da confirmação**, um em cada slot — ver a seção abaixo. Nunca palavras sem relação entre os dois. Ícone, quando houver, à esquerda.
+
+### O nome da ação aparece uma vez no diálogo, não duas
+
+O par `Cancelar` / botão de confirmar distribui **duas** coisas entre o título e o botão: o nome da ação e a moldura que diz que aquilo é uma confirmação. Cada slot leva uma.
+
+| Título | Botão | Por quê |
+| --- | --- | --- |
+| `Confirmar exclusão` | `Excluir` | a moldura está no título, então o botão nomeia a ação |
+| `Marcar como encontrado` | `Confirmar` | a ação já está no título, em negrito, então o botão fecha o ato |
+
+⛔ **Não ponha a ação nos dois.** `Marcar como encontrado` no título e no botão faz o botão soar como eco do título em vez de resolução — e, medido, um rótulo de três palavras estoura o rodapé.
+
+⚠️ **`Cancelar` / `Confirmar` só vale quando o título diz o que vai acontecer.** Título que apenas emoldura (`Confirmar alteração`) com botão `Confirmar` deixa a pessoa confirmando sem nada nomear a ação: aí o botão volta a levar o verbo.
 
 ## Caixa: sentence case
 
@@ -162,6 +191,19 @@ Medido com a aplicação de pé a 409px:
 O candidato mais longo, `Vespertino (12:00 - 17:59)`, ocupa 183,5px em Inter 16px: cabe nos dois. A largura **deixou de decidir** o nome, e a escolha voltou a ser por precisão — que é o critério certo. Sem a medição eu teria descartado ou aceitado um nome pelo motivo errado.
 
 **Como medir:** largura útil pelo `getBoundingClientRect` do campo menos o `padding` computado; largura do texto com `measureText` num `canvas` usando a fonte real, depois de `document.fonts.ready`. Meça no **mais apertado** dos contêineres que vão receber o texto.
+
+### As larguras do diálogo, medidas
+
+O diálogo é o contêiner mais apertado do produto, e cada região dele tem uma sobra diferente. Medido a 409px em 09/09/2026, ao nomear a confirmação de resolver item:
+
+| Região | Largura útil |
+| --- | --- |
+| Corpo e par de ações do rodapé | **281px** |
+| Linha do título | **242px** |
+
+O papel mede 345px — 409 menos os 32px de margem que o MUI aplica de cada lado —, menos 32px de recuo da superfície de cada lado. Na linha do título ainda saem o vão de 12px e o botão de fechar de 40px, que só existe abaixo do breakpoint de mobile, devolvendo os 13px do recuo negativo dele.
+
+⚠️ **Estourar não corta o texto: cresce na vertical, e cada região cresce diferente.** O rodapé tem `flexWrap`, então duas ações que não caibam empilham e ele vai de 36px para **80px** — `Cancelar` mais um rótulo de três palavras já passa disso. O título apenas quebra em duas linhas, que é barato. Foi essa assimetria que decidiu a copy da confirmação de resolver: o título ficou com a frase inteira (`Marcar como encontrado`, 291px, duas linhas) e o botão de confirmar ficou curto (`Confirmar`, 106px, mantendo o par em 214px numa linha).
 
 ## Idioma
 
