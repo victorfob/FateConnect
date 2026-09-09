@@ -12,6 +12,8 @@ type LostItemConfirmActionProps = Readonly<{
   iconOnly?: boolean;
   dialogTitle: string;
   messagePrefix: string;
+  /** Fecha a frase depois do nome do item, para quem precisa dizer mais que o `?`. */
+  messageSuffix?: string;
   itemName: string;
   confirmLabel: string;
   onConfirm: VoidFunction;
@@ -23,6 +25,7 @@ export function LostItemConfirmAction({
   iconOnly,
   dialogTitle,
   messagePrefix,
+  messageSuffix = CONFIRMATION.messageSuffix,
   itemName,
   confirmLabel,
   onConfirm,
@@ -45,7 +48,7 @@ export function LostItemConfirmAction({
           <S.ConfirmationMessage variant="subtitle">
             {messagePrefix}
             <strong>{itemName}</strong>
-            {CONFIRMATION.messageSuffix}
+            {messageSuffix}
           </S.ConfirmationMessage>
         </Dialog.Body>
 
