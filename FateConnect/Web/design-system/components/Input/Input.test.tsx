@@ -12,6 +12,11 @@ import {
 import { themeModeStorage } from '@ds-root/ThemeProvider/storage/themeModeStorage';
 
 import {
+  CLEAR_DATE_RANGE_LABEL,
+  END_DATE_HINT,
+  START_DATE_HINT,
+} from './components/DateRangeField/constants';
+import {
   DATE_PICKER_LABEL,
   DATE_TIME_PICKER_LABEL,
   HELP_TRIGGER_LABEL_PREFIX,
@@ -230,6 +235,151 @@ describe('Input.Date', () => {
     );
 
     await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
+  });
+});
+
+const PERIOD_START = '22/05/2026';
+const PERIOD = '22/05/2026 - 25/05/2026';
+const TAB_STOPS_TO_THE_DAY = 4;
+
+function DateRangeHarness({ initialValue }: Readonly<{ initialValue: string }>) {
+  const [period, setPeriod] = useState(initialValue);
+
+  return <Input.DateRange label="Período" value={period} onChange={setPeriod} />;
+}
+
+const renderRange = (initialValue = '') => render(<DateRangeHarness initialValue={initialValue} />);
+
+const rangeField = () => screen.getByRole('textbox', { name: /Período/ });
+
+const openRangePicker = () =>
+  userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
+
+const pickDay = async (day: string) =>
+  userEvent.click(within(await screen.findByRole('grid')).getByRole('gridcell', { name: day }));
+
+describe('Input.DateRange', () => {
+  it('should close the range on the second day picked', async () => {
+    renderRange(PERIOD_START);
+    await openRangePicker();
+
+    await pickDay('25');
+
+    expect(rangeField()).toHaveValue(PERIOD);
+    await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
+  });
+
+  it('should offer a single month, since two would not fit the dialog that holds it', async () => {
+    renderRange(PERIOD_START);
+
+    await openRangePicker();
+
+    expect(await screen.findAllByRole('grid')).toHaveLength(1);
+  });
+
+  it('should take the same day at both ends as a range of one day', async () => {
+    renderRange(PERIOD_START);
+    await openRangePicker();
+
+    await pickDay('22');
+
+    expect(rangeField()).toHaveValue('22/05/2026 - 22/05/2026');
+    await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
+  });
+
+  // O campo é consultado antes de abrir: o painel é um modal, e enquanto ele
+  // está aberto o MUI marca o resto da página como `aria-hidden`.
+  it('should start the selection over when the day picked falls before the start', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
+
+    await pickDay('21');
+
+    expect(field).toHaveValue('21/05/2026');
+    expect(await screen.findByRole('grid')).toBeInTheDocument();
+  });
+
+  it('should start a new range once the current one is closed', async () => {
+    renderRange(PERIOD);
+    const field = rangeField();
+    await openRangePicker();
+
+    await pickDay('10');
+
+    expect(field).toHaveValue('10/05/2026');
+  });
+
+  it('should say which end is being picked', async () => {
+    renderRange(PERIOD_START);
+
+    await openRangePicker();
+
+    expect(await screen.findByRole('status')).toHaveTextContent(END_DATE_HINT);
+  });
+
+  it('should ask for the start again once the range is closed', async () => {
+    renderRange(PERIOD);
+
+    await openRangePicker();
+
+    expect(await screen.findByRole('status')).toHaveTextContent(START_DATE_HINT);
+  });
+
+  it('should mask what is typed and stop at the second year', async () => {
+    renderRange();
+
+    await userEvent.type(rangeField(), '220520262505202699');
+
+    expect(rangeField()).toHaveValue(PERIOD);
+  });
+
+  it('should empty the field when the range is cleared', async () => {
+    renderRange(PERIOD);
+
+    await userEvent.click(screen.getByRole('button', { name: CLEAR_DATE_RANGE_LABEL }));
+
+    expect(rangeField()).toHaveValue('');
+  });
+
+  it('should keep the clear button away while there is nothing to clear', () => {
+    renderRange();
+
+    expect(screen.queryByRole('button', { name: CLEAR_DATE_RANGE_LABEL })).not.toBeInTheDocument();
+  });
+
+  // O painel abre com o foco no papel, que começa pela dica do passo; as três
+  // paradas antes do dia são os controles de mês e de ano do cabeçalho.
+  it('should let the keyboard alone close the range', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    screen.getByRole('button', { name: DATE_PICKER_LABEL }).focus();
+    await userEvent.keyboard('{Enter}');
+    await screen.findByRole('grid');
+
+    for (let stop = 0; stop < TAB_STOPS_TO_THE_DAY; stop++) await userEvent.tab();
+    expect(screen.getByRole('gridcell', { name: '22' })).toHaveFocus();
+
+    await userEvent.keyboard('{ArrowRight}{Enter}');
+
+    expect(field).toHaveValue('22/05/2026 - 23/05/2026');
+  });
+
+  it('should not offer a day after the max date', async () => {
+    render(
+      <Input.DateRange
+        label="Período"
+        value={PERIOD_START}
+        maxDate={new Date(2026, 4, 25)}
+        onChange={vi.fn()}
+      />,
+    );
+
+    await openRangePicker();
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '25' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '26' })).toBeDisabled();
   });
 });
 
