@@ -1,7 +1,8 @@
 import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
 
-export const FILTER_PANEL_TITLE = 'Filtros';
+export const FILTER_TITLE = 'Filtros';
 export const FILTER_SUBMIT_LABEL = 'Filtrar';
+export const FILTER_CLEAR_LABEL = 'Limpar';
 
 export const FILTER_LABELS = {
   departureDate: 'Data',
