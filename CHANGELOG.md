@@ -16,6 +16,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a guardar os itens do mural de achados e perdidos: cadastro, edição, foto, conclusão, exclusão e restauração chegam ao servidor, e o item continua lá depois de recarregar a página — antes nada do que a tela fazia era gravado (#328) [Frontend]
 - Passa a buscar item de achados e perdidos por nome ou descrição, com o campo do filtro dizendo isso; o endereço da busca vai de `?nome=` para `?busca=`, e link salvo com o antigo abre a lista sem filtro (#328) [Frontend]
 - Passa a buscar carona por destino ou descrição, com o campo do filtro dizendo isso; o endereço da busca vai de `?destino=` para `?busca=`, e link salvo com o antigo abre a lista sem filtro (#329) [Frontend]
+- Passa a dizer na confirmação o que resolver um item de achados e perdidos significa: quem cadastrou um perdido marca como encontrado e quem cadastrou um achado marca como devolvido — antes os dois casos diziam só resolver; a situação do item continua se chamando Resolvido (#333) [Frontend]
 
 ### Fixed
 
