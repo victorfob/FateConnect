@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@ds-root/styled';
 import { radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
-const { md, lg, xxl, giant } = spacingScale;
+const { xs, md, lg, xxl, giant } = spacingScale;
 
 export const PageRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
@@ -21,6 +21,15 @@ export const PageHeaderRow = styled(Stack)({
   alignItems: 'center',
   justifyContent: 'space-between',
 });
+
+/** O título e o que fala sobre a tela andam juntos; o canto continua da ação. */
+export const TitleGroup = styled(Stack)(({ theme }) => ({
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.space(xs),
+  // O título é quem cede quando a linha aperta: o alvo de toque não encolhe.
+  minWidth: 0,
+}));
 
 export const PageTitleText = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.primary,

@@ -58,11 +58,30 @@ describe('PageShell', () => {
     expect(screen.getByRole('link', { name: BACK_LABEL })).toHaveAttribute('href', '/menu');
   });
 
+  it('should keep the title action beside the title, not in the corner', () => {
+    const TITLE_ACTION_LABEL = 'Filtros';
+    renderComponent({
+      ...DEFAULT_PROPS,
+      action: <PageShell.Back label={BACK_LABEL} icon={<span />} component="a" href="/menu" />,
+      titleAction: <button type="button">{TITLE_ACTION_LABEL}</button>,
+    });
+
+    const heading = screen.getByRole('heading', { name: TITLE });
+    const action = screen.getByRole('button', { name: TITLE_ACTION_LABEL });
+
+    // O canto do cabeçalho é do voltar: a ação do título divide o grupo com ele.
+    expect(action.parentElement).toBe(heading.parentElement);
+    expect(screen.getByRole('link', { name: BACK_LABEL }).parentElement).not.toBe(
+      heading.parentElement,
+    );
+  });
+
   it('should render without the optional slots', () => {
     renderComponent({ title: TITLE, children: <p>{CONTENT}</p> });
 
     expect(screen.getByRole('heading', { name: TITLE })).toBeInTheDocument();
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: BACK_LABEL })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });
