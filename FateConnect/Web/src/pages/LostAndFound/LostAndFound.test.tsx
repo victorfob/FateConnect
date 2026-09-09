@@ -19,7 +19,10 @@ import {
 } from './components/LostItemCard/LostItemActions/constants';
 import { CONFIRMATION } from './components/LostItemCard/LostItemConfirmAction/constants';
 import {
+  lostItemResolveLabel,
+  lostItemResolveSuffix,
   RESOLVE_DIALOG,
+  RESOLVE_LABEL,
   RESTORE_LABEL,
 } from './components/LostItemCard/LostItemStatusAction/constants';
 import {
@@ -62,8 +65,6 @@ const NO_CONTENT = 204;
 const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', deleted: 'Excluído' };
 
 const STATUS_FILTER_ALL_LABEL = 'Todas';
-
-const RESOLVE_LABEL = { lost: 'Marcar como encontrado', found: 'Marcar como devolvido' };
 
 const DELETION_NOTE = {
   owner: 'Excluído manualmente.',
@@ -329,7 +330,7 @@ describe('LostAndFound', () => {
 
     await filterByStatus(STATUS_TAG_LABEL.open);
     await screen.findByText(LOST_ITEM.name);
-    await confirmAction(RESOLVE_LABEL.lost, RESOLVE_DIALOG.confirmLabel);
+    await confirmAction(RESOLVE_LABEL[LostItemKindEnum.LOST], RESOLVE_DIALOG.confirmLabel);
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.resolveSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
@@ -338,6 +339,62 @@ describe('LostAndFound', () => {
 
     expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
     expect(card().getAllByText(STATUS_TAG_LABEL.resolved)).toHaveLength(1);
+  });
+
+  it('should name the found outcome in the dialog of a lost item', async () => {
+    listReturning([OWN_OPEN_ITEM]);
+    renderComponent();
+    await screen.findByText(LOST_ITEM.name);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: RESOLVE_LABEL[LostItemKindEnum.LOST] }),
+    );
+
+    const dialog = await screen.findByRole('dialog', {
+      name: RESOLVE_LABEL[LostItemKindEnum.LOST],
+    });
+
+    expect(within(dialog).getByText(LOST_ITEM.name).parentElement).toHaveTextContent(
+      `${RESOLVE_DIALOG.messagePrefix}${LOST_ITEM.name}${lostItemResolveSuffix(LostItemKindEnum.LOST)}`,
+    );
+    expect(
+      within(dialog).getByRole('button', { name: RESOLVE_DIALOG.confirmLabel }),
+    ).toBeInTheDocument();
+  });
+
+  it('should name the returned outcome in the dialog of a found item', async () => {
+    const foundItem: LostItem = { ...OWN_OPEN_ITEM, lostAndFoundType: LostItemKindEnum.FOUND };
+    listReturning([foundItem]);
+    renderComponent();
+    await screen.findByText(foundItem.name);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: RESOLVE_LABEL[LostItemKindEnum.FOUND] }),
+    );
+
+    const dialog = await screen.findByRole('dialog', {
+      name: RESOLVE_LABEL[LostItemKindEnum.FOUND],
+    });
+
+    expect(within(dialog).getByText(foundItem.name).parentElement).toHaveTextContent(
+      `${RESOLVE_DIALOG.messagePrefix}${foundItem.name}${lostItemResolveSuffix(LostItemKindEnum.FOUND)}`,
+    );
+  });
+
+  it('should fall back to the status wording when the api sends an unknown kind', async () => {
+    const unknownKind = 'Sonda' as unknown as LostItemKindEnum;
+    const item: LostItem = { ...OWN_OPEN_ITEM, lostAndFoundType: unknownKind };
+    listReturning([item]);
+    renderComponent();
+    await screen.findByText(item.name);
+
+    await userEvent.click(screen.getByRole('button', { name: lostItemResolveLabel(unknownKind) }));
+
+    const dialog = await screen.findByRole('dialog', { name: lostItemResolveLabel(unknownKind) });
+
+    expect(within(dialog).getByText(item.name).parentElement).toHaveTextContent(
+      `${RESOLVE_DIALOG.messagePrefix}${item.name}${lostItemResolveSuffix(unknownKind)}`,
+    );
   });
 
   it('should keep the owner actions off the card of someone else', async () => {
@@ -352,7 +409,9 @@ describe('LostAndFound', () => {
     expect(
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: RESOLVE_LABEL.lost })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: RESOLVE_LABEL[LostItemKindEnum.LOST] }),
+    ).not.toBeInTheDocument();
   });
 
   it('should leave a concluded item without any action of its own', async () => {
@@ -367,7 +426,9 @@ describe('LostAndFound', () => {
     expect(
       screen.queryByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: RESOLVE_LABEL.lost })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: RESOLVE_LABEL[LostItemKindEnum.LOST] }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: RESTORE_LABEL })).not.toBeInTheDocument();
   });
 
@@ -402,8 +463,12 @@ describe('LostAndFound', () => {
     renderComponent();
 
     await screen.findAllByText(LOST_ITEM.name);
-    expect(screen.getByRole('button', { name: RESOLVE_LABEL.lost })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: RESOLVE_LABEL.found })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: RESOLVE_LABEL[LostItemKindEnum.LOST] }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: RESOLVE_LABEL[LostItemKindEnum.FOUND] }),
+    ).toBeInTheDocument();
   });
 
   // A palavra destrutiva e a de dispensar dividem a mesma caixa: o que separa uma
@@ -459,7 +524,7 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(LOST_ITEM.name);
 
-    await confirmAction(RESOLVE_LABEL.lost, RESOLVE_DIALOG.confirmLabel);
+    await confirmAction(RESOLVE_LABEL[LostItemKindEnum.LOST], RESOLVE_DIALOG.confirmLabel);
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.resolveFailed)).toBeInTheDocument();
   });

@@ -33,13 +33,16 @@ export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemSta
 
   if (item.status !== LostItemStatusEnum.OPEN) return null;
 
+  const resolveLabel = C.lostItemResolveLabel(item.lostAndFoundType);
+
   return (
     <S.ActionRow>
       <LostItemConfirmAction
-        label={C.lostItemResolveLabel(item.lostAndFoundType)}
+        label={resolveLabel}
         icon={<CheckCircleIcon fontSize="small" />}
-        dialogTitle={C.RESOLVE_DIALOG.title}
+        dialogTitle={resolveLabel}
         messagePrefix={C.RESOLVE_DIALOG.messagePrefix}
+        messageSuffix={C.lostItemResolveSuffix(item.lostAndFoundType)}
         itemName={item.name}
         confirmLabel={C.RESOLVE_DIALOG.confirmLabel}
         onConfirm={handleResolve}
