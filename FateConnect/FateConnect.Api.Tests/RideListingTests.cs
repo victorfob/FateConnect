@@ -168,6 +168,65 @@ public class RideListingTests
         Assert.Equal(upcoming, Assert.Single(page.Items).Id);
     }
 
+    [Fact]
+    public async Task GetRides_WithOnlyMine_LeavesOutTheRidesOfOtherPeople()
+    {
+        using ApiFactory factory = new();
+        int mineId = factory.SeedUser("Helena Souza Braga").Id;
+        int theirsId = factory.SeedUser("Igor Fontenele Alves").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        Guid myRide = factory.SeedRide(mineId, tomorrow, new TimeOnly(8, 30), "Sorocaba centro");
+        factory.SeedRide(theirsId, tomorrow, new TimeOnly(9, 30), "Campinas centro");
+
+        PagedRides page = await GetPageAsync(factory, mineId, "?OnlyMine=true");
+
+        Assert.Equal(1, page.Total);
+        Assert.Equal(myRide, Assert.Single(page.Items).Id);
+    }
+
+    [Fact]
+    public async Task GetRides_WithoutOnlyMine_KeepsTheRidesOfEveryone()
+    {
+        using ApiFactory factory = new();
+        int mineId = factory.SeedUser("Joana Ribeiro Castro").Id;
+        int theirsId = factory.SeedUser("Kleber Antunes Faria").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        factory.SeedRide(mineId, tomorrow, new TimeOnly(8, 30), "Sorocaba centro");
+        factory.SeedRide(theirsId, tomorrow, new TimeOnly(9, 30), "Campinas centro");
+
+        PagedRides page = await GetPageAsync(factory, mineId, "?OnlyMine=false");
+
+        Assert.Equal(2, page.Total);
+    }
+
+    [Fact]
+    public async Task GetRides_WithOnlyMine_StillLeavesOutWhatAlreadyDeparted()
+    {
+        using ApiFactory factory = new();
+        int mineId = factory.SeedUser("Larissa Prado Bittencourt").Id;
+        DateOnly yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        factory.SeedRide(mineId, yesterday, new TimeOnly(8, 30), "Carona vencida");
+        Guid upcoming = factory.SeedRide(mineId, tomorrow, new TimeOnly(8, 30), "Carona futura");
+
+        PagedRides page = await GetPageAsync(factory, mineId, "?OnlyMine=true");
+
+        Assert.Equal(1, page.Total);
+        Assert.Equal(upcoming, Assert.Single(page.Items).Id);
+    }
+
+    [Fact]
+    public async Task GetRides_WithSomeoneElsesIdInPlaceOfTheFlag_IsRefused()
+    {
+        using ApiFactory factory = new();
+        int mineId = factory.SeedUser("Marcelo Tavares Pinho").Id;
+        int theirsId = factory.SeedUser("Natália Coelho Vidal").Id;
+
+        HttpResponseMessage response = await RequestPageAsync(factory, mineId, $"?OnlyMine={theirsId}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     [Theory]
     [InlineData("Morning")]
     [InlineData("Afternoon")]

@@ -5,7 +5,7 @@ using FateConnect.Api.Modules.Rides.Entities;
 
 public interface IRideRepository
 {
-    Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter);
+    Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter, int? currentUserId = null);
     Task<Ride?> GetByIdAsync(Guid id);
     Task<Ride> AddAsync(Ride ride);
     Task UpdateAsync(Ride ride);

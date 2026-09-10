@@ -151,21 +151,21 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task GetItems_WithOnlyMyItems_LeavesOutWhatOtherPeopleReported()
+    public async Task GetItems_WithOnlyMine_LeavesOutWhatOtherPeopleReported()
     {
         HttpClient mine = _factory.CreateClientForNewUser("Helena Souza Braga");
         HttpClient theirs = _factory.CreateClientForNewUser("Igor Fontenele Alves");
         Guid myItem = await ReportAsync(mine, ItemForm("Umbrella compartilhada Helena"));
         Guid theirItem = await ReportAsync(theirs, ItemForm("Umbrella compartilhada Igor"));
 
-        PagedItems page = await ListAsync(mine, "?SearchTerm=Umbrella compartilhada&OnlyMyItems=true");
+        PagedItems page = await ListAsync(mine, "?SearchTerm=Umbrella compartilhada&OnlyMine=true");
 
         Assert.Contains(page.Items, item => item.Id == myItem);
         Assert.DoesNotContain(page.Items, item => item.Id == theirItem);
     }
 
     [Fact]
-    public async Task GetItems_WithoutOnlyMyItems_ReturnsWhatOtherPeopleReported()
+    public async Task GetItems_WithoutOnlyMine_ReturnsWhatOtherPeopleReported()
     {
         HttpClient mine = _factory.CreateClientForNewUser("Joana Ribeiro Castro");
         HttpClient theirs = _factory.CreateClientForNewUser("Kleber Antunes Faria");
