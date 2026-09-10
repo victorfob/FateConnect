@@ -1,6 +1,7 @@
 import type { SelectOption } from '@design-system';
 import { AddIcon, SaveIcon } from '@design-system/icons';
 
+import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { seatsLabel } from '@app/pages/Rides/constants';
 import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
 
@@ -48,13 +49,12 @@ export const RIDE_FORM_LABELS = {
 
 export const RIDE_FORM_PLACEHOLDERS = {
   destination: 'Insira o destino',
-  select: 'Selecione...',
   description: 'Conte como será a carona',
 };
 
 export const DESCRIPTION_ROWS = 3;
 
-const EMPTY_CHOICE: SelectOption = { value: '', label: RIDE_FORM_PLACEHOLDERS.select };
+const EMPTY_CHOICE: SelectOption = { value: '', label: SELECT_PLACEHOLDER };
 
 /** As escolhas do campo, já com a opção vazia na frente. */
 export const RIDE_TYPE_SELECT_OPTIONS: readonly SelectOption[] = [
