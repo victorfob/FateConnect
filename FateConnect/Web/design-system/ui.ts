@@ -28,6 +28,3 @@ export type { BoxProps } from '@mui/material/Box';
 export type { ButtonProps } from '@mui/material/Button';
 export type { ListItemTextProps } from '@mui/material/ListItemText';
 export type { TypographyProps } from '@mui/material/Typography';
-
-/** Calendário avulso; o do campo de data mora dentro do `Input`. */
-export { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
