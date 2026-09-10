@@ -6,6 +6,13 @@ export enum RideTypeEnum {
   EGALITARIAN = 'Egalitarian',
 }
 
+/** Faixas de partida que a API resolve; a noite atravessa a meia-noite. */
+export enum RideShiftEnum {
+  MORNING = 'Morning',
+  AFTERNOON = 'Afternoon',
+  NIGHT = 'Night',
+}
+
 /** Entidade como a API devolve. O id é o `Guid` do backend. */
 export type Ride = {
   id: string;
@@ -33,7 +40,11 @@ export type RideInput = Omit<Ride, 'id' | 'createdAt' | 'driver' | 'isOwner'>;
 /** Filtros da listagem, com os mesmos nomes que a API recebe na query. */
 export interface RideFilter extends PageQuery {
   searchTerm?: string;
-  departureDate?: string;
-  departureTime?: string;
+  /** Uma ponta só filtra o dia inteiro dela; sem nenhuma, a data sai da consulta. */
+  dateFrom?: string;
+  dateTo?: string;
+  departureShift?: RideShiftEnum;
   rideType?: RideTypeEnum;
+  /** Só as que a pessoa ofertou; o id de quem pergunta viaja fora da query. */
+  onlyMine?: boolean;
 }

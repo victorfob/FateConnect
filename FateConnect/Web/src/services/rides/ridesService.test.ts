@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 
 import { createRide, deleteRide, listRides, updateRide } from './ridesService';
-import { RideTypeEnum, type RideInput } from './types';
+import { RideShiftEnum, RideTypeEnum, type RideInput } from './types';
 
 const RIDES_URL = 'https://api.fateconnect.test/rides';
 const FIRST_PAGE = 1;
@@ -41,15 +41,21 @@ describe('ridesService', () => {
 
     await listRides({
       searchTerm: 'Sorocaba',
-      departureDate: '2026-08-20',
-      departureTime: '07:30',
+      dateFrom: '2026-08-20',
+      dateTo: '2026-08-24',
+      departureShift: RideShiftEnum.MORNING,
       rideType: RideTypeEnum.EGALITARIAN,
+      onlyMine: true,
     });
 
-    expect(received!.get('searchTerm')).toBe('Sorocaba');
-    expect(received!.get('departureDate')).toBe('2026-08-20');
-    expect(received!.get('departureTime')).toBe('07:30');
-    expect(received!.get('rideType')).toBe(RideTypeEnum.EGALITARIAN);
+    expect(Object.fromEntries(received!)).toEqual({
+      searchTerm: 'Sorocaba',
+      dateFrom: '2026-08-20',
+      dateTo: '2026-08-24',
+      departureShift: RideShiftEnum.MORNING,
+      rideType: RideTypeEnum.EGALITARIAN,
+      onlyMine: 'true',
+    });
   });
 
   it('should send the page and the page size the caller asked for', async () => {
