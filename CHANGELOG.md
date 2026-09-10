@@ -10,6 +10,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Passa a filtrar as duas listas por intervalo de datas em vez de uma data exata: as duas pontas trazem o período fechado, uma ponta sozinha traz aquele dia inteiro, e intervalo invertido é recusado com erro; na consulta, `departureDate` e `ocurredOn` dão lugar a `dateFrom` e `dateTo` (#342) [Backend]
 - Passa a mostrar menos páginas na paginação das duas listas quando a tela é estreita: a fileira não cabia e quebrava em duas linhas, então fica a página atual entre a primeira e a última. As setas continuam andando de uma em uma, e no desktop os números vizinhos seguem visíveis (#345) [Frontend]
+- Passa a filtrar caronas por turno em vez de hora exata, que exigia hora em ponto: `Morning` cobre 04:00–11:59, `Afternoon` 12:00–17:59 e `Night` 18:00–03:59, atravessando a meia-noite; na consulta, `departureTime` dá lugar a `departureShift` (#347) [Backend]
 
 ### Fixed
 
