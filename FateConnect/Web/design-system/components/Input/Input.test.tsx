@@ -12,10 +12,9 @@ import {
 import { themeModeStorage } from '@ds-root/ThemeProvider/storage/themeModeStorage';
 
 import {
-  CLEAR_DATE_RANGE_LABEL,
-  END_DATE_HINT,
+  APPLY_LABEL,
+  CLEAR_LABEL,
   INVERTED_RANGE_MESSAGE,
-  START_DATE_HINT,
 } from './components/DateRangeField/constants';
 import {
   DATE_PICKER_LABEL,
@@ -265,11 +264,13 @@ const pickDay = async (day: string) =>
 describe('Input.DateRange', () => {
   it('should close the range on the second day picked', async () => {
     renderRange(PERIOD_START);
+    const field = rangeField();
     await openRangePicker();
 
     await pickDay('25');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
 
-    expect(rangeField()).toHaveValue(PERIOD);
+    expect(field).toHaveValue(PERIOD);
     await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
   });
 
@@ -281,13 +282,30 @@ describe('Input.DateRange', () => {
     expect(await screen.findAllByRole('grid')).toHaveLength(1);
   });
 
+  // As duas pontas são escolha, a faixa entre elas é desenho — e quem ouve a
+  // tela precisa da diferença. O `aria-selected` da biblioteca conhece só o
+  // início, que é o único dia que ela recebe como valor.
+  it('should announce both ends of the range as chosen, and no day between them', async () => {
+    renderRange(PERIOD);
+
+    await openRangePicker();
+
+    const month = within(await screen.findByRole('grid'));
+
+    expect(month.getByRole('gridcell', { name: '22', selected: true })).toBeInTheDocument();
+    expect(month.getByRole('gridcell', { name: '25', selected: true })).toBeInTheDocument();
+    expect(month.getByRole('gridcell', { name: '23', selected: false })).toBeInTheDocument();
+  });
+
   it('should take the same day at both ends as a range of one day', async () => {
     renderRange(PERIOD_START);
+    const field = rangeField();
     await openRangePicker();
 
     await pickDay('22');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
 
-    expect(rangeField()).toHaveValue('22/05/2026 - 22/05/2026');
+    expect(field).toHaveValue('22/05/2026 - 22/05/2026');
     await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
   });
 
@@ -299,9 +317,10 @@ describe('Input.DateRange', () => {
     await openRangePicker();
 
     await pickDay('21');
+    expect(await screen.findByRole('grid')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
 
     expect(field).toHaveValue('21/05/2026');
-    expect(await screen.findByRole('grid')).toBeInTheDocument();
   });
 
   it('should start a new range once the current one is closed', async () => {
@@ -310,24 +329,9 @@ describe('Input.DateRange', () => {
     await openRangePicker();
 
     await pickDay('10');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
 
     expect(field).toHaveValue('10/05/2026');
-  });
-
-  it('should say which end is being picked', async () => {
-    renderRange(PERIOD_START);
-
-    await openRangePicker();
-
-    expect(await screen.findByRole('status')).toHaveTextContent(END_DATE_HINT);
-  });
-
-  it('should ask for the start again once the range is closed', async () => {
-    renderRange(PERIOD);
-
-    await openRangePicker();
-
-    expect(await screen.findByRole('status')).toHaveTextContent(START_DATE_HINT);
   });
 
   it('should mask what is typed and stop at the second year', async () => {
@@ -338,18 +342,49 @@ describe('Input.DateRange', () => {
     expect(rangeField()).toHaveValue(PERIOD);
   });
 
-  it('should empty the field when the range is cleared', async () => {
+  it('should empty the field from the picker footer', async () => {
     renderRange(PERIOD);
+    const field = rangeField();
+    await openRangePicker();
 
-    await userEvent.click(screen.getByRole('button', { name: CLEAR_DATE_RANGE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: CLEAR_LABEL }));
 
-    expect(rangeField()).toHaveValue('');
+    expect(field).toHaveValue('');
+    await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
   });
 
-  it('should keep the clear button away while there is nothing to clear', () => {
-    renderRange();
+  it('should hold the days picked until they are applied', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
 
-    expect(screen.queryByRole('button', { name: CLEAR_DATE_RANGE_LABEL })).not.toBeInTheDocument();
+    await pickDay('25');
+
+    expect(field).toHaveValue(PERIOD_START);
+    expect(await screen.findByRole('grid')).toBeInTheDocument();
+  });
+
+  it('should commit the range picked when it is applied', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
+
+    await pickDay('25');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
+
+    expect(field).toHaveValue(PERIOD);
+    await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
+  });
+
+  it('should keep the field untouched when the picker is dismissed without applying', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
+    await pickDay('25');
+
+    await userEvent.keyboard('{Escape}');
+
+    expect(field).toHaveValue(PERIOD_START);
   });
 
   // O painel abre com o foco no papel, que começa pela dica do passo; as três
@@ -365,6 +400,7 @@ describe('Input.DateRange', () => {
     expect(screen.getByRole('gridcell', { name: '22' })).toHaveFocus();
 
     await userEvent.keyboard('{ArrowRight}{Enter}');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
 
     expect(field).toHaveValue('22/05/2026 - 23/05/2026');
   });

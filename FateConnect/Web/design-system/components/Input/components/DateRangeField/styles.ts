@@ -1,12 +1,14 @@
-import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 
 import { styled } from '@ds-root/styled';
 import { spacingScale } from '@ds-root/tokens';
 
-const { none, sm } = spacingScale;
+const { none, sm, md } = spacingScale;
 
-/** O calendário abaixo traz o próprio recuo; a dica precisa do dela. */
-export const PickerStepHint = styled(Typography)(({ theme }) => ({
-  padding: theme.space(sm, sm, none),
-  color: theme.palette.text.secondary,
+/** As ações do período, no pé do popover — o toque fora é alvo estreito no celular. */
+export const PickerFooter = styled(Stack)(({ theme }) => ({
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  gap: theme.space(sm),
+  padding: theme.space(none, md, md),
 }));

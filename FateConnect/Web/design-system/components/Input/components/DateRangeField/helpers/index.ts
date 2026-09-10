@@ -1,4 +1,4 @@
-import { isBefore, startOfDay } from 'date-fns';
+import { isBefore, isSameDay, isWithinInterval, startOfDay } from 'date-fns';
 
 import {
   formatDate,
@@ -8,7 +8,7 @@ import {
 import { onlyDigits } from '@ds-root/utils/text';
 
 import { RANGE_SEPARATOR } from '../constants';
-import type { PartialDateRange, ReadDateRange } from '../types';
+import type { DayBandShape, PartialDateRange, ReadDateRange } from '../types';
 
 const TEXT_START = 0;
 const MAX_RANGE_DIGITS = 16;
@@ -59,4 +59,23 @@ export function parseRangeSoFar(value: string): PartialDateRange {
 /** Separa o texto que se contradiz do que só está incompleto — só o primeiro é erro. */
 export function isInvertedRange(value: string): boolean {
   return readRange(value).isInverted;
+}
+
+/**
+ * Onde a faixa começa, continua e termina. Intervalo aberto não pinta nada: a
+ * faixa existe para exibir período escolhido, não escolha pela metade.
+ */
+export function dayBandShape(day: Date, range: PartialDateRange): DayBandShape {
+  const { start, end } = range;
+  if (!start || !end) return 'outside';
+
+  const isStart = isSameDay(day, start);
+  const isEnd = isSameDay(day, end);
+
+  if (isStart && isEnd) return 'only';
+  if (isStart) return 'start';
+  if (isEnd) return 'end';
+  if (isWithinInterval(day, { start, end })) return 'inside';
+
+  return 'outside';
 }

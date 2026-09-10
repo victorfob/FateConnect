@@ -1,4 +1,11 @@
-import { formatDateRange, isDayBefore, isInvertedRange, maskDateRange, parseRangeSoFar } from '.';
+import {
+  dayBandShape,
+  formatDateRange,
+  isDayBefore,
+  isInvertedRange,
+  maskDateRange,
+  parseRangeSoFar,
+} from '.';
 
 const RANGE_START = new Date(2026, 4, 22);
 const RANGE_END = new Date(2026, 4, 25);
@@ -78,5 +85,28 @@ describe('isInvertedRange', () => {
     ['', false],
   ])('should answer %s with %s', (value, expected) => {
     expect(isInvertedRange(value)).toBe(expected);
+  });
+});
+
+describe('dayBandShape', () => {
+  const CLOSED = { start: RANGE_START, end: RANGE_END };
+
+  it.each([
+    [21, 'outside'],
+    [22, 'start'],
+    [23, 'inside'],
+    [24, 'inside'],
+    [25, 'end'],
+    [26, 'outside'],
+  ])('should shape day %s as %s', (dayOfMonth, expected) => {
+    expect(dayBandShape(new Date(2026, 4, dayOfMonth), CLOSED)).toBe(expected);
+  });
+
+  it('should paint nothing while the range has no end', () => {
+    expect(dayBandShape(RANGE_START, { start: RANGE_START, end: null })).toBe('outside');
+  });
+
+  it('should paint a lone square when both ends fall on the same day', () => {
+    expect(dayBandShape(RANGE_START, { start: RANGE_START, end: RANGE_START })).toBe('only');
   });
 });
