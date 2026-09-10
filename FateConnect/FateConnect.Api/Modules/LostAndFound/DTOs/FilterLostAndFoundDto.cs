@@ -11,5 +11,5 @@ public record FilterLostAndFoundDto : DateRangeFilterDto
 
     public EnumStatusLostAndFound? Status { get; init; }
 
-    public bool? OnlyMyItems { get; init; }
+    public bool? OnlyMine { get; init; }
 }

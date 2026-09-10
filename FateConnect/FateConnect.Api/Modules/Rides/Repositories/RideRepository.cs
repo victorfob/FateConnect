@@ -15,7 +15,7 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
     private static readonly TimeOnly AfternoonStart = new(12, 0);
     private static readonly TimeOnly NightStart = new(18, 0);
 
-    public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter)
+    public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter, int? currentUserId = null)
     {
         DateTime nowInProductTimeZone = DateTimeUtils.NowInProductTimeZone();
         DateOnly today = DateOnly.FromDateTime(nowInProductTimeZone);
@@ -26,6 +26,9 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
             .Include(r => r.Driver.Contacts)
             .Where(r => r.IsActive)
             .Where(HasNotDeparted(today, currentTime));
+
+        if (currentUserId.HasValue)
+            query = query.Where(IsOfferedBy(currentUserId.Value));
 
         DateOnly? rangeStart = filter.EffectiveDateFrom;
         DateOnly? rangeEnd = filter.EffectiveDateTo;
@@ -71,6 +74,9 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
 
         return (items, total);
     }
+
+    private static Expression<Func<Ride, bool>> IsOfferedBy(int driverId) =>
+        ride => ride.DriverId == driverId;
 
     private static Expression<Func<Ride, bool>> DepartsWithin(DateOnly rangeStart, DateOnly rangeEnd) =>
         ride => ride.DepartureDate >= rangeStart && ride.DepartureDate <= rangeEnd;
