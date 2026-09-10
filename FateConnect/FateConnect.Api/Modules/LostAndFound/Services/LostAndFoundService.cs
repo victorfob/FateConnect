@@ -46,7 +46,7 @@ public partial class LostAndFoundService(
 
     public async Task<PagedResultDto<ReadLostAndFoundDto>> GetAllAsync(FilterLostAndFoundDto filter, int currentUserId)
     {
-        int? userIdToFilter = filter.OnlyMyItems == true ? currentUserId : null;
+        int? userIdToFilter = filter.OnlyMine == true ? currentUserId : null;
 
         (IReadOnlyList<LostAndFoundRecord> records, int total) = await repository.GetAllAsync(filter, userIdToFilter);
 
