@@ -123,6 +123,16 @@ Quem derrubou a tabela foi a pergunta *"não entendi pq o logotipo muda"*. Sem e
 
 **O tell é a medição que restringe demais.** Quando a conta elimina quase todas as opções, confira a premissa antes de aceitar o resultado: é mais provável que o alcance esteja errado do que a janela ser tão estreita.
 
+## O relato dele contra a sua medição: suspeite do recorte
+
+⛔ **Quando o que ele vê rodando contradiz o que você mediu, o errado é quase sempre o recorte da medição — não o relato.** Ele está olhando o produto inteiro; você está olhando um arquivo.
+
+Aconteceu em 10/09/2026. Eu medi que o `httpClient` do front descarta o corpo da resposta de erro — verdade, nenhum arquivo lê `error` — e afirmei que **a tela** mostra sempre a frase genérica. O Victor testou o cadastro, viu `Este e-mail já está em uso…` e perguntou *"tem certeza que o usuário vê essa mensagem genérica na tela?"*. Não tinha: três telas e nove requisições escrevem a copy delas, escolhida por `status` ou por `field`. A minha medição estava certa sobre o interceptor e eu a estendi para a camada de cima.
+
+**O tell é o sujeito da afirmação ser mais largo que o arquivo aberto** — eu disse "a tela mostra" tendo lido o interceptor. Antes de responder que o relato está errado, liste o que ainda está **entre** a sua medição e o que ele vê, e abra cada um.
+
+⚠️ **A versão específica disto já estava escrita em `web-styling.md`**, para alinhamento — *"ao receber 'não está alinhado' sobre algo que você mediu, desconfie do que foi medido antes de duvidar do relato"*. Ela vale para qualquer medição, não só geometria, e é por isso que subiu para cá: aquela rule carrega só em arquivo do front.
+
 ## O artefato publicado não é o que você quis escrever
 
 ⛔ **Antes de afirmar o que um PR, uma issue ou um comentário seu diz, releia o publicado.** A lembrança guarda a **decisão** de registrar algo, e ela se lê exatamente igual a ter registrado — não há sensação diferente entre as duas.
