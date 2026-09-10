@@ -87,6 +87,8 @@ O segundo é o pior: eu ia relatar que os arquivos de API haviam desaparecido e 
 
 ⚠️ **`| head` num `grep` de investigação é o pior dos três**, porque some com a evidência sem avisar e a saída parece completa. Em busca que vai sustentar conclusão, conte antes (`grep -c`) ou não trunque.
 
+⛔ **E não é só busca: truncar a saída de um comando que pode falhar apaga o motivo da falha.** Em 10/09/2026 um `git push | tail -2` deixou na tela `failed to push some refs` sem a linha que dizia por quê; empurrei de novo, funcionou, e o motivo da primeira reprovação está perdido para sempre. **Comando que pode falhar vai sem filtro, ou com a saída inteira num arquivo** — o `tail` entra depois, sobre o arquivo, que continua ali para reler.
+
 ⛔ **Regra nova se prova nas duas formas.** O controle positivo de uma regra de lint não é só "reprova o que deve" — é também "aceita o que deve". Ao estender a de tag crua, rodei um arquivo com `<div>` **e** `<strong>` no mesmo JSX: o primeiro reprova, o segundo passa. Sem a segunda metade eu teria proibido ênfase de texto sem perceber.
 
 ⛔ **Correção com duas pontas se confere nas duas, enumerando.** Consertei a página 4 e entreguei; a 9 tinha o defeito espelhado e quem viu foi o Victor. O que resolveu foi listar **todos** os estados de 1 a 12 numa tabela e olhar a coluna inteira — as duas faixas usavam medidas diferentes, e isso só aparece lado a lado.

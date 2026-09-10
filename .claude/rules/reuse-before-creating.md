@@ -39,6 +39,12 @@ O que fechou a conversa foi a tabela que eu devia ter apresentado antes:
 
 **O sinal de risco é você já ter medido que a biblioteca não resolve.** É exatamente aí que a reescrita parece inevitável — e é aí que o caminho barato precisa ser dito em voz alta, com o custo, para o outro lado escolher.
 
+⛔ **E a tabela acima estava incompleta: faltava a linha que ganhou.** Em 10/09/2026 a mesma fileira voltou a quebrar, e a saída foi **pedir menos páginas ao próprio componente** — `siblingCount={0}` abaixo do limite de desktop, o padrão acima. Zero linhas nossas, sem tocar no alvo de toque, e as 15 linhas de janela mais o arquivo de rótulos de acessibilidade saíram: o locale que o tema já aplica entrega as mesmas cinco strings que aquele arquivo duplicava.
+
+**Antes de reescrever, leia as props do componente.** A biblioteca costuma já parametrizar exatamente o que você está prestes a recomputar — e ali a prop existia desde o começo. Apresentar duas opções não cumpre esta regra se a terceira, mais barata que as duas, é uma linha da documentação que ninguém abriu.
+
+⚠️ **O tell é a sua tabela de custos só ter caminhos que passam por código seu.** Se nenhuma linha dela é "configurar o que já existe", falta procurar.
+
 ## Antes de afrouxar uma regra do projeto, procure a ferramenta padrão
 
 ⛔ **Código que não passa numa regra daqui é sinal de que falta uma ferramenta, não de que a regra está larga demais.** Editar a regra é o caminho mais curto e o mais caro: ela deixa de valer para todo mundo, para sempre, por causa de um caso.
