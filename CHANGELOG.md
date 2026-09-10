@@ -9,6 +9,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Adiciona o filtro por autoria na lista de caronas, por `onlyMine`, que traz só as caronas que a pessoa ofertou; sem o campo a lista segue trazendo as de todo mundo, e carona já partida continua de fora nos dois casos (#348) [Backend]
+- Adiciona o filtro por autoria na busca de caronas, com a escolha entre todas as caronas e só as que a pessoa ofertou; sem escolher, a lista segue trazendo as de todo mundo (#350) [Frontend]
 
 ### Changed
 
@@ -16,6 +17,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a mostrar menos páginas na paginação das duas listas quando a tela é estreita: a fileira não cabia e quebrava em duas linhas, então fica a página atual entre a primeira e a última. As setas continuam andando de uma em uma, e no desktop os números vizinhos seguem visíveis (#345) [Frontend]
 - Passa a filtrar caronas por turno em vez de hora exata, que exigia hora em ponto: `Morning` cobre 04:00–11:59, `Afternoon` 12:00–17:59 e `Night` 18:00–03:59, atravessando a meia-noite; na consulta, `departureTime` dá lugar a `departureShift` (#347) [Backend]
 - Passa a chamar o filtro por autoria de `onlyMine` também em achados e perdidos, onde ele era `onlyMyItems`; o comportamento de lá é o mesmo, e a consulta com o nome antigo deixa de filtrar (#348) [Backend]
+- Passa a filtrar as duas buscas por período em vez de data exata, e as caronas por turno em vez de hora exata: o período aceita as duas pontas ou só a inicial, que busca aquele dia inteiro, e o turno traz manhã, tarde e noite com a faixa de horas no rótulo. As escolhas continuam no endereço, então o link restaura a busca; link antigo abre a lista sem os filtros que saíram (#350) [Frontend]
 
 ### Fixed
 
