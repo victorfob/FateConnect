@@ -14,7 +14,8 @@ const EVERY_STATUS = 'todas';
 
 enum SearchParamEnum {
   SEARCH_TERM = 'busca',
-  OCCURRED_ON = 'data',
+  DATE_FROM = 'de',
+  DATE_TO = 'ate',
   KIND = 'tipo',
   STATUS = 'situacao',
   ONLY_MINE = 'meus',
@@ -42,15 +43,16 @@ function fromParams(params: URLSearchParams): LostItemFilter {
   const searchTerm = readParamValue(params, SearchParamEnum.SEARCH_TERM);
   if (searchTerm) filter.searchTerm = searchTerm;
 
-  const ocurredOn = readParamValue(params, SearchParamEnum.OCCURRED_ON);
-  if (ocurredOn) filter.ocurredOn = ocurredOn;
+  const dateFrom = readParamValue(params, SearchParamEnum.DATE_FROM);
+  if (dateFrom) filter.dateFrom = dateFrom;
+
+  const dateTo = readParamValue(params, SearchParamEnum.DATE_TO);
+  if (dateTo) filter.dateTo = dateTo;
 
   const kind = parseLostItemKind(params.get(SearchParamEnum.KIND));
   if (kind) filter.lostAndFoundType = kind;
 
-  if (params.get(SearchParamEnum.ONLY_MINE)?.trim().toLowerCase() === MINE) {
-    filter.onlyMyItems = true;
-  }
+  if (params.get(SearchParamEnum.ONLY_MINE)?.trim().toLowerCase() === MINE) filter.onlyMine = true;
 
   return filter;
 }
@@ -60,7 +62,8 @@ function toParams(filter: LostItemFilter): Record<string, string> {
 
   writePageParam(params, filter.page);
   if (filter.searchTerm) params[SearchParamEnum.SEARCH_TERM] = filter.searchTerm;
-  if (filter.ocurredOn) params[SearchParamEnum.OCCURRED_ON] = filter.ocurredOn;
+  if (filter.dateFrom) params[SearchParamEnum.DATE_FROM] = filter.dateFrom;
+  if (filter.dateTo) params[SearchParamEnum.DATE_TO] = filter.dateTo;
   if (filter.lostAndFoundType) {
     params[SearchParamEnum.KIND] = lostItemKindSlug(filter.lostAndFoundType);
   }
@@ -68,7 +71,7 @@ function toParams(filter: LostItemFilter): Record<string, string> {
   else if (filter.status !== DEFAULT_STATUS) {
     params[SearchParamEnum.STATUS] = lostItemStatusSlug(filter.status);
   }
-  if (filter.onlyMyItems) params[SearchParamEnum.ONLY_MINE] = MINE;
+  if (filter.onlyMine) params[SearchParamEnum.ONLY_MINE] = MINE;
 
   return params;
 }

@@ -41,8 +41,10 @@ export type LostItemInput = Pick<LostItem, 'name' | 'lostAndFoundType' | 'place'
 /** Filtros da listagem, com os mesmos nomes que a API recebe na query. */
 export interface LostItemFilter extends PageQuery {
   searchTerm?: string;
-  ocurredOn?: string;
+  /** Uma ponta só filtra o dia inteiro dela; sem nenhuma, a data sai da consulta. */
+  dateFrom?: string;
+  dateTo?: string;
   lostAndFoundType?: LostItemKindEnum;
-  onlyMyItems?: boolean;
+  onlyMine?: boolean;
   status?: LostItemStatusEnum;
 }
