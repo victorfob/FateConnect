@@ -9,6 +9,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - Passa a filtrar as duas listas por intervalo de datas em vez de uma data exata: as duas pontas trazem o período fechado, uma ponta sozinha traz aquele dia inteiro, e intervalo invertido é recusado com erro; na consulta, `departureDate` e `ocurredOn` dão lugar a `dateFrom` e `dateTo` (#342) [Backend]
+- Passa a mostrar menos páginas na paginação das duas listas quando a tela é estreita: a fileira não cabia e quebrava em duas linhas, então fica a página atual entre a primeira e a última. As setas continuam andando de uma em uma, e no desktop os números vizinhos seguem visíveis (#345) [Frontend]
+
+### Fixed
+
+- Corrige o vão abaixo dos cartões do menu nas telas estreitas, menor que o que separa um cartão do outro (#345) [Frontend]
 
 ## [0.9.0] - 2026-09-09
 
