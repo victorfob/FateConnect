@@ -44,13 +44,26 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 
 A API fala **inglês inteira** — caminho, query, corpo e resposta. Não há tradução na borda: o tipo do front vai direto na chamada.
 
-- **Caronas.** Caminho `/Rides`, query (`destination`, `departureDate`, `departureTime`, `rideType`) e propriedades do JSON com os mesmos nomes. Valores do enum: `Solidarity` | `Egalitarian`.
+- **Caronas.** Caminho `/Rides`. Valores do enum de tipo: `Solidarity` | `Egalitarian`; do enum de turno: `Morning` | `Afternoon` | `Night`.
+- **Achados e perdidos.** Caminho `/LostAndFound`. O campo de autoria se chama `OnlyMine` **nos dois módulos**.
 - **Cadastro.** `POST /Users/signup` com `fullName`, `fatecEmail`, `password`, `birthDate`, `gender`, `addresses` (`zipCode`, `street`, `streetNumber`, `complement`, `city`, `state`) e `contacts` (`phone`, `contactEmail`). Resposta: `{ token }` — o cadastro já autentica. Valores de gênero: `Male` | `Female` | `Other`.
 - **Login.** `POST /Auth/login` com `{ fatecEmail, password }`, resposta `{ token }`.
 - **Sessão.** `GET /Auth/session`, autenticada, responde `204` enquanto o token vale e `401` quando não vale mais. É quem diz se a sessão continua de pé — o front não julga validade por conta própria, e não lê o `exp` do token.
 - **O nome de quem está logado sai do token**, na claim `unique_name`, e não de nenhuma resposta. Cadastro e login devolvem o mesmo `TokenResponseDto`.
-- **Erro.** Qualquer status de erro devolve `{ "error": "..." }`, com a mensagem em pt-BR. O corpo sai do `ErrorResponseDto`, o mesmo tipo que o `ProducesResponseType` anuncia — documentação e resposta não conseguem divergir.
+- **Erro.** São **duas** formas, e o que as separa é quem recusou:
+  - o que a **aplicação** lança sai como `{ "error": "..." }`, do `ErrorResponseDto`, com a mensagem em pt-BR — é o que o `GlobalExceptionMiddleware` devolve, e é o mesmo tipo que o `ProducesResponseType` anuncia, então documentação e resposta não conseguem divergir;
+  - o que a **validação de modelo ou o binder** recusa sai como `ProblemDetails`, com os campos aninhados: `{"title":"One or more validation errors occurred.","status":400,"errors":{"<Campo>":["..."]}}`. O `Program.cs` não configura `InvalidModelStateResponseFactory`, então quem responde é o padrão do ASP.NET.
+
+  Medido em 10/09/2026 em quatro casos — enum fora do conjunto, enum com nome inexistente, booleano recebendo número, e o `IValidatableObject` do período invertido: os quatro devolveram `ProblemDetails`, com controle positivo no mesmo lote (valor de enum válido responde `200`).
+
+  ⛔ **O que o front lê do corpo é o `field`, nunca a mensagem.** Nenhum arquivo de `src/` lê `error`: o interceptor descarta a mensagem da API e **cada tela escreve a copy dela**, escolhida por `status` ou por `field` — é por isso que o conflito de cadastro aparece como `Este e-mail já está em uso…` e não como o texto que a API mandou. Ao escrever mensagem de erro na API, saiba que ela documenta o contrato e **não** é o que a pessoa lê.
+
+  ⚠️ **E a diferença que a segunda forma faz é no `field`, não no texto:** o `ProblemDetails` não traz `field` no topo — o nome do campo é chave dentro de `errors` —, então recusa de validação **não consegue apontar o campo** como o conflito de cadastro aponta.
 - **Erro que aponta um campo** acrescenta `field`, com o nome que a **requisição** usa: `fatecEmail`, `phone` ou `contactEmail`. Hoje só o conflito de cadastro o manda, e é ele que permite ao formulário marcar o campo certo em vez de casar substring da mensagem. Erro sem campo associado devolve só `error`, e o front trata a ausência como o caso genérico.
+
+⛔ **Não enumere aqui os parâmetros de filtro.** Esta seção os listava e drifou três vezes em uma semana: `destination` já era `SearchTerm`, `departureDate` saiu com o filtro de período, `departureTime` saiu com o de turno. Enumerar num lugar que ninguém revisita produz uma lista que mente com confiança. Eles se leem na fonte — o DTO de filtro de cada módulo, mais o `DateRangeFilterDto` e o `PagedFilterDto` que os dois herdam — e, no ar, no documento do Swagger de cada ambiente.
+
+⚠️ **A query e o JSON de resposta não têm os mesmos nomes**, e já tiveram. Hoje a query de caronas filtra por `DateFrom`, `DateTo` e `DepartureShift`, enquanto o JSON devolve `DepartureDate` e `DepartureTime` — dos dois lados só `RideType` coincide. Não presuma simetria entre o que se filtra e o que se recebe.
 
 ⚠️ **A API publica com a inicial maiúscula e o front chama minúsculo.** `[Route("[controller]")]` gera `/Rides`, `/Users` e `/Auth`, que é o que o Swagger mostra; os serviços do front padronizam `/rides`, `/users/signup` e `/auth`, porque o roteamento do ASP.NET é case-insensitive. Não "corrija" nenhum dos dois lados — a divergência é deliberada.
 
