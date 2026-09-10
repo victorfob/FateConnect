@@ -1,9 +1,10 @@
+import type { SelectOption } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
-import { RideTypeEnum, type Ride } from '@app/services/rides/types';
+import { RideShiftEnum, RideTypeEnum, type Ride } from '@app/services/rides/types';
 import type { UserContact } from '@app/services/types';
 import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
@@ -15,6 +16,10 @@ import {
   FILTER_LABELS,
   FILTER_SUBMIT_LABEL,
   FILTER_TITLE,
+  RIDE_OWNER_FILTER_OPTIONS,
+  RIDE_SHIFT_FILTER_OPTIONS,
+  RIDE_TYPE_FILTER_OPTIONS,
+  RideOwnerFilterEnum,
 } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
 import * as C from './constants';
@@ -83,6 +88,19 @@ async function openFilters() {
   await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE }));
   await screen.findByRole('dialog');
 }
+
+/** O rótulo sai da opção, não do texto: copy muda e o literal não muda junto. */
+const optionLabel = (options: readonly SelectOption[], value: string) =>
+  options.find((option) => option.value === value)!.label;
+
+async function pickOption(fieldLabel: string, chosenLabel: string) {
+  await userEvent.click(screen.getByRole('combobox', { name: new RegExp(fieldLabel) }));
+  await userEvent.click(
+    within(screen.getByRole('listbox')).getByRole('option', { name: chosenLabel }),
+  );
+}
+
+const periodField = () => screen.getByRole('textbox', { name: new RegExp(FILTER_LABELS.period) });
 
 function renderComponent(search = '') {
   return renderAtRoute(RoutePathEnum.RIDES, <Rides />, search);
@@ -222,6 +240,43 @@ describe('Rides', () => {
 
     await waitFor(() => expect(requestUrl?.searchParams.get('searchTerm')).toBe('Sorocaba'));
     expect(await activeFilterDot()).not.toHaveClass('MuiBadge-invisible');
+  });
+
+  it('should build the request from every field the filter offers', async () => {
+    let requestUrl: URL | undefined;
+    listReturning([], (url) => {
+      requestUrl = url;
+    });
+    renderComponent();
+    await screen.findByText(C.EMPTY_LIST_MESSAGE);
+
+    await openFilters();
+    await userEvent.type(periodField(), '2205202625052026');
+    await userEvent.type(screen.getByLabelText(FILTER_LABELS.searchTerm), 'Sorocaba');
+    await pickOption(
+      FILTER_LABELS.departureShift,
+      optionLabel(RIDE_SHIFT_FILTER_OPTIONS, RideShiftEnum.MORNING),
+    );
+    await pickOption(
+      FILTER_LABELS.rideType,
+      optionLabel(RIDE_TYPE_FILTER_OPTIONS, RideTypeEnum.EGALITARIAN),
+    );
+    await pickOption(
+      FILTER_LABELS.owner,
+      optionLabel(RIDE_OWNER_FILTER_OPTIONS, RideOwnerFilterEnum.MINE),
+    );
+    await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
+
+    await waitFor(() =>
+      expect(Object.fromEntries(requestUrl!.searchParams)).toMatchObject({
+        searchTerm: 'Sorocaba',
+        dateFrom: '2026-05-22',
+        dateTo: '2026-05-25',
+        departureShift: RideShiftEnum.MORNING,
+        rideType: RideTypeEnum.EGALITARIAN,
+        onlyMine: 'true',
+      }),
+    );
   });
 
   it('should drop every filter when the search is cleared', async () => {
@@ -426,15 +481,48 @@ describe('Rides', () => {
 
   describe('paginação e busca na URL', () => {
     it('should open with the fields already filled from the url', async () => {
-      listReturning([RIDE]);
+      let asked: URL | null = null;
+      listReturning([RIDE], (url) => {
+        asked = url;
+      });
 
-      renderComponent('?busca=Sorocaba&hora=07:30&tipo=solidaria');
+      renderComponent('?busca=Sorocaba&de=2026-09-01&ate=2026-09-05&turno=noite&meus=sim');
+
+      await waitFor(() =>
+        expect(Object.fromEntries(asked!.searchParams)).toMatchObject({
+          searchTerm: 'Sorocaba',
+          dateFrom: '2026-09-01',
+          dateTo: '2026-09-05',
+          departureShift: RideShiftEnum.NIGHT,
+          onlyMine: 'true',
+        }),
+      );
 
       await openFilters();
 
       expect(await screen.findByDisplayValue('Sorocaba')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('07:30')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('01/09/2026 - 05/09/2026')).toBeInTheDocument();
+      expect(
+        screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.departureShift) }),
+      ).toHaveTextContent(optionLabel(RIDE_SHIFT_FILTER_OPTIONS, RideShiftEnum.NIGHT));
+      expect(
+        screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.owner) }),
+      ).toHaveTextContent(optionLabel(RIDE_OWNER_FILTER_OPTIONS, RideOwnerFilterEnum.MINE));
     });
+
+    // O ponto ao lado do título precisa acompanhar os campos novos: sem isso a
+    // lista abre filtrada e nada avisa quem chegou pelo link.
+    it.each(['?de=2026-09-01', '?ate=2026-09-05', '?turno=noite', '?meus=sim'])(
+      'should mark the filter as active when the url carries only %s',
+      async (search) => {
+        listReturning([RIDE]);
+
+        renderComponent(search);
+        await screen.findByText(RIDE.destination);
+
+        expect(await activeFilterDot()).not.toHaveClass('MuiBadge-invisible');
+      },
+    );
 
     it('should ask the api for the page the url names', async () => {
       let asked: URL | null = null;

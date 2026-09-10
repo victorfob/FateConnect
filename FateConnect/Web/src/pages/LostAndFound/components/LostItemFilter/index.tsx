@@ -7,19 +7,20 @@ import {
   LostItemStatusEnum,
   type LostItemFilter as LostItemFilterValues,
 } from '@app/services/lostAndFound/types';
-import { toApiDateText, toDisplayDate } from '@app/utils/apiDate';
+import { toApiDateRange, toDisplayDateRange } from '@app/utils/apiDate';
 
 import * as C from './constants';
 
 /** O mural já abre em Aberto, e paginação não é escolha de busca: nenhum dos dois acende o ponto. */
 function isBeyondDefault({
   searchTerm,
-  ocurredOn,
+  dateFrom,
+  dateTo,
   lostAndFoundType,
-  onlyMyItems,
+  onlyMine,
   status,
 }: LostItemFilterValues): boolean {
-  if (searchTerm || ocurredOn || lostAndFoundType || onlyMyItems) return true;
+  if (searchTerm || dateFrom || dateTo || lostAndFoundType || onlyMine) return true;
 
   return status !== LostItemStatusEnum.OPEN;
 }
@@ -31,12 +32,14 @@ type LostItemFilterProps = Readonly<{
 
 export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps) {
   const [itemName, setItemName] = useState(initialFilters.searchTerm ?? '');
-  const [occurredOn, setOccurredOn] = useState(() => toDisplayDate(initialFilters.ocurredOn ?? ''));
+  const [period, setPeriod] = useState(() =>
+    toDisplayDateRange(initialFilters.dateFrom, initialFilters.dateTo),
+  );
   const [kind, setKind] = useState<string>(
     initialFilters.lostAndFoundType ?? C.LostItemKindFilterEnum.ALL,
   );
   const [owner, setOwner] = useState<string>(() => {
-    if (initialFilters.onlyMyItems) return C.LostItemOwnerFilterEnum.MINE;
+    if (initialFilters.onlyMine) return C.LostItemOwnerFilterEnum.MINE;
 
     return C.LostItemOwnerFilterEnum.ALL;
   });
@@ -70,7 +73,7 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
    */
   const handleClear = useCallback(() => {
     setItemName('');
-    setOccurredOn('');
+    setPeriod('');
     setKind(C.LostItemKindFilterEnum.ALL);
     setOwner(C.LostItemOwnerFilterEnum.ALL);
     setStatus(LostItemStatusEnum.OPEN);
@@ -80,16 +83,18 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
 
   const handleSubmit = useCallback(() => {
     const filters: LostItemFilterValues = {};
+    const { dateFrom, dateTo } = toApiDateRange(period);
 
     if (itemName.trim()) filters.searchTerm = itemName.trim();
-    if (occurredOn) filters.ocurredOn = toApiDateText(occurredOn);
+    if (dateFrom) filters.dateFrom = dateFrom;
+    if (dateTo) filters.dateTo = dateTo;
     if (isLostItemKind(kind)) filters.lostAndFoundType = kind;
-    if (owner === C.LostItemOwnerFilterEnum.MINE) filters.onlyMyItems = true;
+    if (owner === C.LostItemOwnerFilterEnum.MINE) filters.onlyMine = true;
     if (isLostItemStatus(status)) filters.status = status;
 
     setIsFiltered(isBeyondDefault(filters));
     onApply(filters);
-  }, [itemName, occurredOn, kind, owner, status, onApply]);
+  }, [itemName, period, kind, owner, status, onApply]);
 
   return (
     <FilterDialog
@@ -112,10 +117,10 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
       </FilterDialog.Field>
 
       <FilterDialog.Field>
-        <Input.Date
-          label={C.FILTER_LABELS.occurredOn}
-          value={occurredOn}
-          onChange={setOccurredOn}
+        <Input.DateRange
+          label={C.FILTER_LABELS.period}
+          value={period}
+          onChange={setPeriod}
           maxDate={today}
         />
       </FilterDialog.Field>

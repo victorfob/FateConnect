@@ -1,4 +1,4 @@
-import { DATE_PICKER_LABEL } from '@design-system';
+import { DATE_PICKER_LABEL, type SelectOption } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
@@ -31,6 +31,9 @@ import {
   FILTER_LABELS,
   FILTER_SUBMIT_LABEL,
   FILTER_TITLE,
+  LOST_ITEM_KIND_FILTER_OPTIONS,
+  LOST_ITEM_OWNER_FILTER_OPTIONS,
+  LostItemOwnerFilterEnum,
 } from './components/LostItemFilter/constants';
 import { EDIT_MODE, REGISTER_MODE } from './components/LostItemFormDialog/constants';
 import * as C from './constants';
@@ -85,6 +88,12 @@ const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', deleted: 'Excl
 
 const STATUS_FILTER_ALL_LABEL = 'Todas';
 
+/** O rótulo sai da opção, não do texto: copy muda e o literal não muda junto. */
+const optionLabel = (options: readonly SelectOption[], value: string) =>
+  options.find((option) => option.value === value)!.label;
+
+const OWNER_MINE_LABEL = optionLabel(LOST_ITEM_OWNER_FILTER_OPTIONS, LostItemOwnerFilterEnum.MINE);
+
 const DELETION_NOTE = {
   owner: 'Excluído manualmente.',
   inactivity: 'Excluído automaticamente por inatividade.',
@@ -136,12 +145,18 @@ async function confirmAction(actionLabel: string, confirmLabel: string) {
   );
 }
 
-async function filterByStatus(optionLabel: string) {
-  await openFilters();
-  await userEvent.click(screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.status) }));
+async function pickOption(fieldLabel: string, chosenLabel: string) {
+  await userEvent.click(screen.getByRole('combobox', { name: new RegExp(fieldLabel) }));
   await userEvent.click(
-    within(screen.getByRole('listbox')).getByRole('option', { name: optionLabel }),
+    within(screen.getByRole('listbox')).getByRole('option', { name: chosenLabel }),
   );
+}
+
+const periodField = () => screen.getByRole('textbox', { name: new RegExp(FILTER_LABELS.period) });
+
+async function filterByStatus(chosenLabel: string) {
+  await openFilters();
+  await pickOption(FILTER_LABELS.status, chosenLabel);
   await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 }
@@ -221,6 +236,33 @@ describe('LostAndFound', () => {
     await waitFor(() => expect(requestUrl!.searchParams.get('searchTerm')).toBe('Carteira'));
     expect(requestUrl!.searchParams.get('status')).toBe(LostItemStatusEnum.OPEN);
     expect(await activeFilterDot()).not.toHaveClass('MuiBadge-invisible');
+  });
+
+  it('should build the request from every field the filter offers', async () => {
+    let requestUrl: URL | null = null;
+    listReturning([], (url) => {
+      requestUrl = url;
+    });
+    renderComponent();
+    await screen.findByText(C.EMPTY_LIST_MESSAGE);
+
+    await openFilters();
+    await userEvent.type(periodField(), '0108202605082026');
+    await pickOption(
+      FILTER_LABELS.kind,
+      optionLabel(LOST_ITEM_KIND_FILTER_OPTIONS, LostItemKindEnum.LOST),
+    );
+    await pickOption(FILTER_LABELS.owner, OWNER_MINE_LABEL);
+    await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
+
+    await waitFor(() =>
+      expect(Object.fromEntries(requestUrl!.searchParams)).toMatchObject({
+        dateFrom: '2026-08-01',
+        dateTo: '2026-08-05',
+        lostAndFoundType: LostItemKindEnum.LOST,
+        onlyMine: 'true',
+      }),
+    );
   });
 
   it('should leave the filter unmarked while only the open items are asked for', async () => {
@@ -613,15 +655,44 @@ describe('LostAndFound', () => {
     }
 
     it('should open with the fields already filled from the url', async () => {
-      listReturning([LOST_ITEM]);
+      let asked: URL | null = null;
+      listReturning([LOST_ITEM], (url) => {
+        asked = url;
+      });
 
-      renderComponent('?busca=Garrafa&tipo=perdido');
+      renderComponent('?busca=Garrafa&tipo=perdido&de=2026-08-01&ate=2026-08-05&meus=sim');
       await screen.findByText(LOST_ITEM.name);
+
+      await waitFor(() =>
+        expect(Object.fromEntries(asked!.searchParams)).toMatchObject({
+          searchTerm: 'Garrafa',
+          dateFrom: '2026-08-01',
+          dateTo: '2026-08-05',
+          onlyMine: 'true',
+        }),
+      );
 
       await openFilters();
 
       expect(await screen.findByDisplayValue('Garrafa')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('01/08/2026 - 05/08/2026')).toBeInTheDocument();
+      expect(
+        screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.owner) }),
+      ).toHaveTextContent(OWNER_MINE_LABEL);
     });
+
+    // O ponto ao lado do título precisa acompanhar o período e a autoria.
+    it.each(['?de=2026-08-01', '?ate=2026-08-05', '?meus=sim'])(
+      'should mark the filter as active when the url carries only %s',
+      async (search) => {
+        listReturning([LOST_ITEM]);
+
+        renderComponent(search);
+        await screen.findByText(LOST_ITEM.name);
+
+        expect(await activeFilterDot()).not.toHaveClass('MuiBadge-invisible');
+      },
+    );
 
     it('should ask the api for the page the url names', async () => {
       let asked: URL | null = null;

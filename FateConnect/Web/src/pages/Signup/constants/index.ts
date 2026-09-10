@@ -27,8 +27,6 @@ export const FIELD_PLACEHOLDERS = {
   phone: '(00) 00000-0000',
 };
 
-export const SELECT_PLACEHOLDER = 'Selecione...';
-
 export const SUBMIT_LABEL = 'Criar conta';
 export const LOGIN_PROMPT = 'Já tem conta?';
 export const LOGIN_LINK_LABEL = 'Entrar';

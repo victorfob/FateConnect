@@ -1,6 +1,6 @@
 import type { SelectOption } from '@design-system';
 
-import { SELECT_PLACEHOLDER } from '@app/pages/Signup/constants';
+import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 
 export const ZIP_LOOKUP_LABEL = 'Consultando CEP';
 

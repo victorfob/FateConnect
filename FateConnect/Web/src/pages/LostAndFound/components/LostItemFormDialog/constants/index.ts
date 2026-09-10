@@ -1,6 +1,7 @@
 import type { SelectOption } from '@design-system';
 import { AddIcon, SaveIcon } from '@design-system/icons';
 
+import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { LOST_ITEM_KIND_OPTIONS } from '@app/pages/LostAndFound/helpers/lostItemKind';
 
 import type { LostItemFormMode } from '../@types';
@@ -55,7 +56,6 @@ export const LOST_ITEM_FORM_LABELS = {
 export const LOST_ITEM_FORM_PLACEHOLDERS = {
   name: 'Insira o nome do item',
   place: 'Onde o item foi achado ou perdido',
-  select: 'Selecione...',
   description: 'Descreva o item com detalhes',
 };
 
@@ -71,7 +71,7 @@ export const PHOTO_ACTIONS = {
 
 export const PHOTO_HINT = `JPG, PNG ou WebP, até ${LOST_ITEM_LIMITS.maxPhotoMegabytes} MB.`;
 
-const EMPTY_CHOICE: SelectOption = { value: '', label: LOST_ITEM_FORM_PLACEHOLDERS.select };
+const EMPTY_CHOICE: SelectOption = { value: '', label: SELECT_PLACEHOLDER };
 
 export const LOST_ITEM_KIND_SELECT_OPTIONS: readonly SelectOption[] = [
   EMPTY_CHOICE,
