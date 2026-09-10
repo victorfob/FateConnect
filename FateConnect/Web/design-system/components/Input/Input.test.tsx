@@ -12,6 +12,11 @@ import {
 import { themeModeStorage } from '@ds-root/ThemeProvider/storage/themeModeStorage';
 
 import {
+  APPLY_LABEL,
+  CLEAR_LABEL,
+  INVERTED_RANGE_MESSAGE,
+} from './components/DateRangeField/constants';
+import {
   DATE_PICKER_LABEL,
   DATE_TIME_PICKER_LABEL,
   HELP_TRIGGER_LABEL_PREFIX,
@@ -233,6 +238,191 @@ describe('Input.Date', () => {
   });
 });
 
+const PERIOD_START = '22/05/2026';
+const PERIOD = '22/05/2026 - 25/05/2026';
+const TAB_STOPS_TO_THE_DAY = 4;
+const BACKWARDS_PERIOD = '22/05/2026 - 21/05/2026';
+const SINGLE_DAY_PERIOD = '22/05/2026 - 22/05/2026';
+const CONSUMER_ERROR = 'Informe o período';
+
+function DateRangeHarness({ initialValue }: Readonly<{ initialValue: string }>) {
+  const [period, setPeriod] = useState(initialValue);
+
+  return <Input.DateRange label="Período" value={period} onChange={setPeriod} />;
+}
+
+const renderRange = (initialValue = '') => render(<DateRangeHarness initialValue={initialValue} />);
+
+const rangeField = () => screen.getByRole('textbox', { name: /Período/ });
+
+const openRangePicker = () =>
+  userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
+
+const pickDay = async (day: string) =>
+  userEvent.click(within(await screen.findByRole('grid')).getByRole('gridcell', { name: day }));
+
+describe('Input.DateRange', () => {
+  it('should close the range on the second day picked', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
+
+    await pickDay('25');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
+
+    expect(field).toHaveValue(PERIOD);
+    await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
+  });
+
+  it('should offer a single month, since two would not fit the dialog that holds it', async () => {
+    renderRange(PERIOD_START);
+
+    await openRangePicker();
+
+    expect(await screen.findAllByRole('grid')).toHaveLength(1);
+  });
+
+  // As duas pontas são escolha, a faixa entre elas é desenho — e quem ouve a
+  // tela precisa da diferença. O `aria-selected` da biblioteca conhece só o
+  // início, que é o único dia que ela recebe como valor.
+  it('should announce both ends of the range as chosen, and no day between them', async () => {
+    renderRange(PERIOD);
+
+    await openRangePicker();
+
+    const month = within(await screen.findByRole('grid'));
+
+    expect(month.getByRole('gridcell', { name: '22', selected: true })).toBeInTheDocument();
+    expect(month.getByRole('gridcell', { name: '25', selected: true })).toBeInTheDocument();
+    expect(month.getByRole('gridcell', { name: '23', selected: false })).toBeInTheDocument();
+  });
+
+  it('should take the same day at both ends as a range of one day', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
+
+    await pickDay('22');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
+
+    expect(field).toHaveValue('22/05/2026 - 22/05/2026');
+    await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
+  });
+
+  // O campo é consultado antes de abrir: o painel é um modal, e enquanto ele
+  // está aberto o MUI marca o resto da página como `aria-hidden`.
+  it('should start the selection over when the day picked falls before the start', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
+
+    await pickDay('21');
+    expect(await screen.findByRole('grid')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
+
+    expect(field).toHaveValue('21/05/2026');
+  });
+
+  it('should start a new range once the current one is closed', async () => {
+    renderRange(PERIOD);
+    const field = rangeField();
+    await openRangePicker();
+
+    await pickDay('10');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
+
+    expect(field).toHaveValue('10/05/2026');
+  });
+
+  it('should mask what is typed and stop at the second year', async () => {
+    renderRange();
+
+    await userEvent.type(rangeField(), '220520262505202699');
+
+    expect(rangeField()).toHaveValue(PERIOD);
+  });
+
+  it('should empty the field from the picker footer', async () => {
+    renderRange(PERIOD);
+    const field = rangeField();
+    await openRangePicker();
+
+    await userEvent.click(screen.getByRole('button', { name: CLEAR_LABEL }));
+
+    expect(field).toHaveValue('');
+    await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
+  });
+
+  it('should hold the days picked until they are applied', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
+
+    await pickDay('25');
+
+    expect(field).toHaveValue(PERIOD_START);
+    expect(await screen.findByRole('grid')).toBeInTheDocument();
+  });
+
+  it('should commit the range picked when it is applied', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
+
+    await pickDay('25');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
+
+    expect(field).toHaveValue(PERIOD);
+    await waitFor(() => expect(screen.queryByRole('grid')).not.toBeInTheDocument());
+  });
+
+  it('should keep the field untouched when the picker is dismissed without applying', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    await openRangePicker();
+    await pickDay('25');
+
+    await userEvent.keyboard('{Escape}');
+
+    expect(field).toHaveValue(PERIOD_START);
+  });
+
+  // O painel abre com o foco no papel, que começa pela dica do passo; as três
+  // paradas antes do dia são os controles de mês e de ano do cabeçalho.
+  it('should let the keyboard alone close the range', async () => {
+    renderRange(PERIOD_START);
+    const field = rangeField();
+    screen.getByRole('button', { name: DATE_PICKER_LABEL }).focus();
+    await userEvent.keyboard('{Enter}');
+    await screen.findByRole('grid');
+
+    for (let stop = 0; stop < TAB_STOPS_TO_THE_DAY; stop++) await userEvent.tab();
+    expect(screen.getByRole('gridcell', { name: '22' })).toHaveFocus();
+
+    await userEvent.keyboard('{ArrowRight}{Enter}');
+    await userEvent.click(screen.getByRole('button', { name: APPLY_LABEL }));
+
+    expect(field).toHaveValue('22/05/2026 - 23/05/2026');
+  });
+
+  it('should not offer a day after the max date', async () => {
+    render(
+      <Input.DateRange
+        label="Período"
+        value={PERIOD_START}
+        maxDate={new Date(2026, 4, 25)}
+        onChange={vi.fn()}
+      />,
+    );
+
+    await openRangePicker();
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '25' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '26' })).toBeDisabled();
+  });
+});
+
 const DEPARTURE = '22/05/2026 18:30';
 const DEPARTURE_HOUR = '18:30';
 /** Dia antes do mês: o adaptador crava a ordem inversa em qualquer idioma. */
@@ -438,5 +628,42 @@ describe('Input.DateTime in the dark theme', () => {
 
     expect(getComputedStyle(dayTab as HTMLElement).color).toBe(readingColour);
     expect(getComputedStyle(day as HTMLElement).color).toBe(readingColour);
+  });
+
+  it('should report the range typed backwards', () => {
+    renderRange(BACKWARDS_PERIOD);
+
+    expect(rangeField()).toHaveAccessibleDescription(INVERTED_RANGE_MESSAGE);
+  });
+
+  it('should describe nothing when the range typed is not backwards', () => {
+    renderRange(PERIOD);
+
+    expect(rangeField()).toHaveAccessibleDescription('');
+  });
+
+  it('should describe nothing while the range is still missing its end', () => {
+    renderRange(PERIOD_START);
+
+    expect(rangeField()).toHaveAccessibleDescription('');
+  });
+
+  it('should take the same day typed at both ends as a valid range', () => {
+    renderRange(SINGLE_DAY_PERIOD);
+
+    expect(rangeField()).toHaveAccessibleDescription('');
+  });
+
+  it('should keep the message of whoever consumes the field over its own', () => {
+    render(
+      <Input.DateRange
+        label="Período"
+        value={BACKWARDS_PERIOD}
+        error={CONSUMER_ERROR}
+        onChange={vi.fn()}
+      />,
+    );
+
+    expect(rangeField()).toHaveAccessibleDescription(CONSUMER_ERROR);
   });
 });

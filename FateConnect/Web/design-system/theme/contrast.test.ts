@@ -105,6 +105,17 @@ function floatingSurfaceNonText(theme: Theme): Par[] {
   ];
 }
 
+/**
+ * A faixa do período no calendário não entra em `surfaces` pela mesma razão da
+ * superfície flutuante: ela carrega **só** o número do dia. Medir `brandText` e
+ * o vermelho de erro contra ela reprovaria cor que nunca pousa ali.
+ */
+function dateRangeBandText(theme: Theme): Par[] {
+  const { palette } = theme;
+
+  return [['a day number on the range band', palette.text.primary, palette.dateRangeBand]];
+}
+
 function against(theme: Theme, colours: (theme: Theme) => [string, string][]): Par[] {
   return colours(theme).flatMap(([content, foreground]) =>
     surfaces(theme).map(([surface, background]): Par => [
@@ -123,6 +134,7 @@ function boundPairs(theme: Theme): Par[] {
   return [
     ['content on the app chrome', palette.chrome.contrastText, palette.chrome.main],
     ['content on the primary colour', palette.primary.contrastText, palette.primary.main],
+    ...dateRangeBandText(theme),
     ['content on the secondary colour', palette.secondary.contrastText, palette.secondary.main],
     ...tones.map((tone): Par => [
       `a ${tone} tag`,

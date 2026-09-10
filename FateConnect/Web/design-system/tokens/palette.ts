@@ -78,6 +78,7 @@ export const colorTokens = {
    */
   inputAutofill: '#E8F0FE',
   switchTrack: '#848C92',
+  dateRangeBand: '#E2E3E5',
 
   /** Divisor sobre superfície neutra. */
   divider: '#D9D9D9',
@@ -186,6 +187,7 @@ export const darkColorTokens = {
    */
   inputAutofill: '#2A2A2A',
   switchTrack: '#818181',
+  dateRangeBand: '#2C2C2C',
 
   onSurfaceHigh: 'rgba(255, 255, 255, 0.87)',
   onSurfaceMedium: 'rgba(255, 255, 255, 0.60)',
