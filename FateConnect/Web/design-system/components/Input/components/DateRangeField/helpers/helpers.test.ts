@@ -1,4 +1,4 @@
-import { formatDateRange, isDayBefore, maskDateRange, parseRangeSoFar } from '.';
+import { formatDateRange, isDayBefore, isInvertedRange, maskDateRange, parseRangeSoFar } from '.';
 
 const RANGE_START = new Date(2026, 4, 22);
 const RANGE_END = new Date(2026, 4, 25);
@@ -65,5 +65,18 @@ describe('parseRangeSoFar', () => {
   it('should read nothing while the start does not close a date', () => {
     expect(parseRangeSoFar('')).toEqual({ start: null, end: null });
     expect(parseRangeSoFar('32/05/2026 - 25/05/2026')).toEqual({ start: null, end: null });
+  });
+});
+
+describe('isInvertedRange', () => {
+  it.each([
+    ['22/05/2026 - 21/05/2026', true],
+    ['22/05/2026 - 25/05/2026', false],
+    ['22/05/2026 - 22/05/2026', false],
+    ['22/05/2026', false],
+    ['22/05/2026 - 2', false],
+    ['', false],
+  ])('should answer %s with %s', (value, expected) => {
+    expect(isInvertedRange(value)).toBe(expected);
   });
 });

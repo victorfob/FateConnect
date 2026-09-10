@@ -14,6 +14,7 @@ import { themeModeStorage } from '@ds-root/ThemeProvider/storage/themeModeStorag
 import {
   CLEAR_DATE_RANGE_LABEL,
   END_DATE_HINT,
+  INVERTED_RANGE_MESSAGE,
   START_DATE_HINT,
 } from './components/DateRangeField/constants';
 import {
@@ -241,6 +242,9 @@ describe('Input.Date', () => {
 const PERIOD_START = '22/05/2026';
 const PERIOD = '22/05/2026 - 25/05/2026';
 const TAB_STOPS_TO_THE_DAY = 4;
+const BACKWARDS_PERIOD = '22/05/2026 - 21/05/2026';
+const SINGLE_DAY_PERIOD = '22/05/2026 - 22/05/2026';
+const CONSUMER_ERROR = 'Informe o período';
 
 function DateRangeHarness({ initialValue }: Readonly<{ initialValue: string }>) {
   const [period, setPeriod] = useState(initialValue);
@@ -588,5 +592,42 @@ describe('Input.DateTime in the dark theme', () => {
 
     expect(getComputedStyle(dayTab as HTMLElement).color).toBe(readingColour);
     expect(getComputedStyle(day as HTMLElement).color).toBe(readingColour);
+  });
+
+  it('should report the range typed backwards', () => {
+    renderRange(BACKWARDS_PERIOD);
+
+    expect(rangeField()).toHaveAccessibleDescription(INVERTED_RANGE_MESSAGE);
+  });
+
+  it('should describe nothing when the range typed is not backwards', () => {
+    renderRange(PERIOD);
+
+    expect(rangeField()).toHaveAccessibleDescription('');
+  });
+
+  it('should describe nothing while the range is still missing its end', () => {
+    renderRange(PERIOD_START);
+
+    expect(rangeField()).toHaveAccessibleDescription('');
+  });
+
+  it('should take the same day typed at both ends as a valid range', () => {
+    renderRange(SINGLE_DAY_PERIOD);
+
+    expect(rangeField()).toHaveAccessibleDescription('');
+  });
+
+  it('should keep the message of whoever consumes the field over its own', () => {
+    render(
+      <Input.DateRange
+        label="Período"
+        value={BACKWARDS_PERIOD}
+        error={CONSUMER_ERROR}
+        onChange={vi.fn()}
+      />,
+    );
+
+    expect(rangeField()).toHaveAccessibleDescription(CONSUMER_ERROR);
   });
 });

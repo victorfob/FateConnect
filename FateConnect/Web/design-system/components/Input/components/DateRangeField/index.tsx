@@ -10,7 +10,13 @@ import { DATE_PICKER_LABEL } from '../../constants';
 import { useMaskedPicker } from '../../hooks/useMaskedPicker';
 import { InputField } from '../../InputField';
 import { formatDate } from '../DateField/helpers';
-import { formatDateRange, isDayBefore, maskDateRange, parseRangeSoFar } from './helpers';
+import {
+  formatDateRange,
+  isDayBefore,
+  isInvertedRange,
+  maskDateRange,
+  parseRangeSoFar,
+} from './helpers';
 import * as C from './constants';
 import * as S from './styles';
 
@@ -50,6 +56,15 @@ export function DateRangeField({
   const range = useMemo(() => parseRangeSoFar(value), [value]);
   const isAwaitingEnd = Boolean(range.start) && !range.end;
 
+  // A mensagem do consumidor ganha: a prop é dele, e a nossa existe para o
+  // silêncio em que o texto se contradiz e nada explica por quê.
+  const fieldError = useMemo(() => {
+    if (error) return error;
+    if (isInvertedRange(value)) return C.INVERTED_RANGE_MESSAGE;
+
+    return undefined;
+  }, [error, value]);
+
   /**
    * Dia anterior ao início recomeça a escolha, senão um início errado não teria
    * correção; intervalo já fechado recomeça pela mesma razão. O mesmo dia duas
@@ -84,7 +99,7 @@ export function DateRangeField({
         onBlur={onBlur}
         required={required}
         disabled={disabled}
-        error={error}
+        error={fieldError}
         fullWidth
         type="text"
         inputMode="numeric"

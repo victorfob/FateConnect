@@ -8,7 +8,7 @@ import {
 import { onlyDigits } from '@ds-root/utils/text';
 
 import { RANGE_SEPARATOR } from '../constants';
-import type { PartialDateRange } from '../types';
+import type { PartialDateRange, ReadDateRange } from '../types';
 
 const TEXT_START = 0;
 const MAX_RANGE_DIGITS = 16;
@@ -32,19 +32,31 @@ export function formatDateRange(start: Date, end: Date): string {
   return `${formatDate(start)}${RANGE_SEPARATOR}${formatDate(end)}`;
 }
 
+function readRange(value: string): ReadDateRange {
+  const [startText = '', endText = ''] = value.split(RANGE_SEPARATOR);
+
+  const start = parseDate(startText);
+  const end = parseDate(endText);
+
+  if (!start || !end) return { start, end: null, isInverted: false };
+
+  return { start, end, isInverted: isDayBefore(end, start) };
+}
+
 /**
  * O que o calendário consegue mostrar do que já foi digitado: o início sozinho
  * enquanto o fim não fecha intervalo, e os dois quando fecha. Fim anterior ao
  * início não fecha nada, então o campo continua esperando um fim.
  */
 export function parseRangeSoFar(value: string): PartialDateRange {
-  const [startText = '', endText = ''] = value.split(RANGE_SEPARATOR);
+  const { start, end, isInverted } = readRange(value);
 
-  const start = parseDate(startText);
-  if (!start) return { start: null, end: null };
-
-  const end = parseDate(endText);
-  if (!end || isDayBefore(end, start)) return { start, end: null };
+  if (isInverted) return { start, end: null };
 
   return { start, end };
+}
+
+/** Separa o texto que se contradiz do que só está incompleto — só o primeiro é erro. */
+export function isInvertedRange(value: string): boolean {
+  return readRange(value).isInverted;
 }
