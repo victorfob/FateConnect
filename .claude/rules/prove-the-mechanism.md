@@ -72,6 +72,10 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 
 ⚠️ **O tell é a contagem discordar da listagem**: `N matches` com nada embaixo. Vale para qualquer comando que passe por filtro — quando a saída vai sustentar conclusão, confira que o que foi contado é o que foi mostrado.
 
+⛔ **E o mesmo envelope infla: ele acrescenta linha, e o `wc -l` conta o enfeite.** Em 10/09/2026, conferindo o que ia num commit, `git diff --cached --name-only | wc -l` respondeu **14** para **11** arquivos preparados — a diferença era cabeçalho e rodapé impressos pelo filtro. Quem discriminou foi a listagem ao lado, com os 11 caminhos certos; a contagem sozinha teria me mandado caçar três arquivos que não existiam.
+
+⚠️ **Contagem que vai conferir alguma coisa se lê na saída crua** — `rtk proxy <comando>` — ou se conta na listagem. Engolir e inflar são o mesmo defeito: medir através de algo que reescreve a saída.
+
 ⛔ **E o complemento de "passou" não é "falhou".** No mesmo `gh pr checks`, tratar `bucket != "pass"` como falha reporta vermelho onde há `pending`: em 02/09/2026 anunciei um check falhando no #287 quando o front ainda estava `IN_PROGRESS`, porque a cascata da pilha havia reiniciado o CI. Estado de terceira via — `pending`, `skipping`, `neutral` — se nomeia, não se deduz por exclusão.
 
 ⛔ **`performance.getEntriesByType('resource')` não enxerga requisição que falha na conexão.** Em 04/09/2026, provando que um formulário deixara de chamar a API, ele devolveu **zero** nos dois casos — no que não devia chamar e no que devia. O zero era do instrumento. Quem responde é o log de rede do navegador (`read_network_requests`), que registra a tentativa com o motivo da falha; e o par positivo — o caso que **deve** disparar a requisição — é o que separa "não chamou" de "não medi".
