@@ -87,17 +87,19 @@ describe('lostAndFoundService', () => {
 
     await listLostItems({
       searchTerm: 'Garrafa térmica',
-      ocurredOn: '2026-08-20',
+      dateFrom: '2026-08-20',
+      dateTo: '2026-08-24',
       lostAndFoundType: LostItemKindEnum.FOUND,
-      onlyMyItems: true,
+      onlyMine: true,
       status: LostItemStatusEnum.OPEN,
     });
 
     expect(Object.fromEntries(received.params!)).toEqual({
       searchTerm: 'Garrafa térmica',
-      ocurredOn: '2026-08-20',
+      dateFrom: '2026-08-20',
+      dateTo: '2026-08-24',
       lostAndFoundType: LostItemKindEnum.FOUND,
-      onlyMyItems: 'true',
+      onlyMine: 'true',
       status: LostItemStatusEnum.OPEN,
     });
   });

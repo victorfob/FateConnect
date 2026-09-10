@@ -1,21 +1,23 @@
 import { useCallback, useState, type ChangeEvent } from 'react';
 import { FilterDialog, Input } from '@design-system';
 
-import type { RideFilter as RideFilterValues, RideTypeEnum } from '@app/services/rides/types';
-import { toApiDateText, toDisplayDate } from '@app/utils/apiDate';
+import { isRideShift } from '@app/pages/Rides/helpers/rideShift';
+import { isRideType } from '@app/pages/Rides/helpers/rideType';
+import type { RideFilter as RideFilterValues } from '@app/services/rides/types';
+import { toApiDateRange, toDisplayDateRange } from '@app/utils/apiDate';
 
 import * as C from './constants';
-
-const NO_FILTERS = 0;
 
 /** Paginação não conta: o ponto ao lado do título é sobre escolha de busca. */
 function hasAnyFilter({
   searchTerm,
-  departureDate,
-  departureTime,
+  dateFrom,
+  dateTo,
+  departureShift,
   rideType,
+  onlyMine,
 }: RideFilterValues): boolean {
-  return Boolean(searchTerm || departureDate || departureTime || rideType);
+  return Boolean(searchTerm || dateFrom || dateTo || departureShift || rideType || onlyMine);
 }
 
 type RideFilterProps = Readonly<{
@@ -24,18 +26,25 @@ type RideFilterProps = Readonly<{
 }>;
 
 export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
-  const [departureDate, setDepartureDate] = useState(() =>
-    toDisplayDate(initialFilters.departureDate ?? ''),
+  const [period, setPeriod] = useState(() =>
+    toDisplayDateRange(initialFilters.dateFrom, initialFilters.dateTo),
   );
-  const [departureTime, setDepartureTime] = useState(initialFilters.departureTime ?? '');
+  const [departureShift, setDepartureShift] = useState<string>(
+    initialFilters.departureShift ?? C.RideShiftFilterEnum.ALL,
+  );
   const [searchTerm, setSearchTerm] = useState(initialFilters.searchTerm ?? '');
   const [rideType, setRideType] = useState<string>(
     initialFilters.rideType ?? C.RideTypeFilterEnum.ALL,
   );
+  const [owner, setOwner] = useState<string>(() => {
+    if (initialFilters.onlyMine) return C.RideOwnerFilterEnum.MINE;
+
+    return C.RideOwnerFilterEnum.ALL;
+  });
   const [isFiltered, setIsFiltered] = useState(() => hasAnyFilter(initialFilters));
 
-  const handleTimeChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => setDepartureTime(event.target.value),
+  const handleShiftChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => setDepartureShift(event.target.value),
     [],
   );
   const handleSearchTermChange = useCallback(
@@ -46,28 +55,36 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
     (event: ChangeEvent<HTMLInputElement>) => setRideType(event.target.value),
     [],
   );
+  const handleOwnerChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => setOwner(event.target.value),
+    [],
+  );
 
   /** A busca abre sem filtro nenhum, então limpar é devolver os campos ao vazio. */
   const handleClear = useCallback(() => {
-    setDepartureDate('');
-    setDepartureTime('');
+    setPeriod('');
+    setDepartureShift(C.RideShiftFilterEnum.ALL);
     setSearchTerm('');
     setRideType(C.RideTypeFilterEnum.ALL);
+    setOwner(C.RideOwnerFilterEnum.ALL);
     setIsFiltered(false);
     onApply({});
   }, [onApply]);
 
   const handleSubmit = useCallback(() => {
     const filters: RideFilterValues = {};
+    const { dateFrom, dateTo } = toApiDateRange(period);
 
-    if (departureDate) filters.departureDate = toApiDateText(departureDate);
-    if (departureTime) filters.departureTime = departureTime;
+    if (dateFrom) filters.dateFrom = dateFrom;
+    if (dateTo) filters.dateTo = dateTo;
+    if (isRideShift(departureShift)) filters.departureShift = departureShift;
     if (searchTerm.trim()) filters.searchTerm = searchTerm.trim();
-    if (rideType) filters.rideType = rideType as RideTypeEnum;
+    if (isRideType(rideType)) filters.rideType = rideType;
+    if (owner === C.RideOwnerFilterEnum.MINE) filters.onlyMine = true;
 
-    setIsFiltered(Object.keys(filters).length > NO_FILTERS);
+    setIsFiltered(hasAnyFilter(filters));
     onApply(filters);
-  }, [departureDate, departureTime, searchTerm, rideType, onApply]);
+  }, [period, departureShift, searchTerm, rideType, owner, onApply]);
 
   return (
     <FilterDialog
@@ -80,20 +97,15 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
       onClear={handleClear}
     >
       <FilterDialog.Field>
-        <Input.Date
-          label={C.FILTER_LABELS.departureDate}
-          value={departureDate}
-          onChange={setDepartureDate}
-        />
+        <Input.DateRange label={C.FILTER_LABELS.period} value={period} onChange={setPeriod} />
       </FilterDialog.Field>
 
       <FilterDialog.Field>
-        <Input
-          label={C.FILTER_LABELS.departureTime}
-          type="time"
-          fullWidth
-          value={departureTime}
-          onChange={handleTimeChange}
+        <Input.Select
+          label={C.FILTER_LABELS.departureShift}
+          options={C.RIDE_SHIFT_FILTER_OPTIONS}
+          value={departureShift}
+          onChange={handleShiftChange}
         />
       </FilterDialog.Field>
 
@@ -114,6 +126,15 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
           options={C.RIDE_TYPE_FILTER_OPTIONS}
           value={rideType}
           onChange={handleRideTypeChange}
+        />
+      </FilterDialog.Field>
+
+      <FilterDialog.Field>
+        <Input.Select
+          label={C.FILTER_LABELS.owner}
+          options={C.RIDE_OWNER_FILTER_OPTIONS}
+          value={owner}
+          onChange={handleOwnerChange}
         />
       </FilterDialog.Field>
     </FilterDialog>

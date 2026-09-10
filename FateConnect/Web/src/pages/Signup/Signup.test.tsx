@@ -4,6 +4,7 @@ import { http, HttpResponse } from 'msw';
 
 import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
 import { PRIVACY_URL, TERMS_URL } from '@app/constants/legalDocuments';
+import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
@@ -283,7 +284,7 @@ describe('Signup', () => {
     await userEvent.click(screen.getByRole('combobox', { name: /Gênero/ }));
 
     const options = within(screen.getByRole('listbox')).getAllByRole('option');
-    expect(options[0]).toHaveTextContent(C.SELECT_PLACEHOLDER);
+    expect(options[0]).toHaveTextContent(SELECT_PLACEHOLDER);
   });
 
   it('should create the account and send the user into the app already signed in', async () => {

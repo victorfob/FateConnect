@@ -9,7 +9,7 @@ export const FILTER_CLEAR_LABEL = 'Limpar';
 
 export const FILTER_LABELS = {
   searchTerm: 'Nome ou descrição',
-  occurredOn: 'Data do ocorrido',
+  period: 'Período',
   kind: 'Tipo',
   owner: 'Quem cadastrou',
   status: 'Situação',
@@ -22,7 +22,7 @@ export enum LostItemKindFilterEnum {
   ALL = '',
 }
 
-/** Dono não é campo da entidade: só `MINE` vira `onlyMine` na requisição. */
+/** Quem cadastrou não é campo da entidade: só `MINE` vira `onlyMine` na requisição. */
 export enum LostItemOwnerFilterEnum {
   ALL = '',
   MINE = 'mine',
