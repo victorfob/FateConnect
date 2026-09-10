@@ -213,7 +213,11 @@ Medido em 04/09/2026, no menu da conta: o ícone tinha `width: 20px` no computad
 const escala = el.getBoundingClientRect().width / el.offsetWidth;   // 1 = sem redução
 ```
 
+⛔ **O fator é local, então medi-lo no lugar errado devolve `1` e a contaminação passa.** Em 10/09/2026 a razão no `body` deu **1** enquanto a fileira do calendário dava **0,75** — e `0,75` é exatamente o `scale` inicial da transição de entrada do popover do MUI, que com o painel oculto **não avança**, porque a página não compõe quadros. Meça a razão no **próprio** elemento que você está medindo, nunca num ancestral; ou meça só por `offset*`, que nenhuma transformação alcança.
+
 ⚠️ **E o painel oculto mede zero.** Escondido, `window.innerWidth` responde `0`, e toda geometria tirada dali é lixo — inclusive a posição de um popover, que aparece ancorado no canto errado sem nada acusar. Leia a largura junto de cada medição, como já se faz com a porta: `{ porta: location.port, largura: window.innerWidth }`.
+
+⚠️ **Mas painel oculto não condena a medição: emular um viewport devolve layout real.** `resize_window` com largura e altura explícitas força as métricas do dispositivo, e a partir dali `window.innerWidth` responde o valor pedido e a geometria volta a valer. Medido em 10/09/2026 com o painel oculto: `innerWidth` **409**, célula do calendário **40px**, dia **36px**, vão entre células **0px**. Antes de descartar uma medição por causa do painel, force o viewport — e devolva-o com o preset `desktop` ao terminar.
 
 ## Editar arquivo servido por HMR e medir sem navegar mede o estado anterior
 

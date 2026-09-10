@@ -76,6 +76,15 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 
 ⛔ **`performance.getEntriesByType('resource')` não enxerga requisição que falha na conexão.** Em 04/09/2026, provando que um formulário deixara de chamar a API, ele devolveu **zero** nos dois casos — no que não devia chamar e no que devia. O zero era do instrumento. Quem responde é o log de rede do navegador (`read_network_requests`), que registra a tentativa com o motivo da falha; e o par positivo — o caso que **deve** disparar a requisição — é o que separa "não chamou" de "não medi".
 
+⛔ **`grep` casa caixa e acento literalmente, e o zero se lê como ausência.** Duas medições minhas quase viraram relatório errado por isso, e as duas eram sobre **rename**:
+
+| Busca | Respondeu | O real |
+| --- | --- | --- |
+| `per[ií]odo` no corpo de uma issue, locale C | **0** | **4** — o `í` são dois bytes, e a expressão de colchete não o alcança |
+| `onlyMyItems` na base | **13 em 5 arquivos** | **18 em 8** — a API escreve `OnlyMyItems` |
+
+O segundo é o pior: eu ia relatar que os arquivos de API haviam desaparecido e que alguém já tinha feito o rename. **Busca que vai sustentar conclusão sobre presença ou contagem roda com `-i` e com `LC_ALL=pt_BR.UTF-8`**, e o controle é procurar um trecho que você sabe que existe — não aparecendo, o instrumento está cego, e não o repositório vazio.
+
 ⚠️ **`| head` num `grep` de investigação é o pior dos três**, porque some com a evidência sem avisar e a saída parece completa. Em busca que vai sustentar conclusão, conte antes (`grep -c`) ou não trunque.
 
 ⛔ **Regra nova se prova nas duas formas.** O controle positivo de uma regra de lint não é só "reprova o que deve" — é também "aceita o que deve". Ao estender a de tag crua, rodei um arquivo com `<div>` **e** `<strong>` no mesmo JSX: o primeiro reprova, o segundo passa. Sem a segunda metade eu teria proibido ênfase de texto sem perceber.
