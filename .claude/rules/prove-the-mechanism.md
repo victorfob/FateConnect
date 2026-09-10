@@ -80,6 +80,17 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 
 ⛔ **`performance.getEntriesByType('resource')` não enxerga requisição que falha na conexão.** Em 04/09/2026, provando que um formulário deixara de chamar a API, ele devolveu **zero** nos dois casos — no que não devia chamar e no que devia. O zero era do instrumento. Quem responde é o log de rede do navegador (`read_network_requests`), que registra a tentativa com o motivo da falha; e o par positivo — o caso que **deve** disparar a requisição — é o que separa "não chamou" de "não medi".
 
+⛔ **E há a busca que só alcança o que tem nome de símbolo.** Um pedido entregue deixa rastro em **dois** lugares independentes — o código e o rastreador —, e o `grep` só responde bem quando existe um identificador a procurar.
+
+Em 10/09/2026 varri dezesseis pedidos antigos "por código, não de memória" e declarei seis em aberto. **Quatro tinham issue própria, fechada e entregue.** Os quatro eram os **visuais** — largura de cartão, altura de ícone, recuo de rodapé, alinhamento de diálogo —, e nenhum deles tem símbolo: recuo não se procura por nome.
+
+⚠️ **O tell é o pedido descrever geometria ou aparência.** Aí a pergunta muda de lugar:
+
+```bash
+gh issue list --state all --limit 300 --json number,title,state \
+  --jq '.[] | select(.title | test("<termo do pedido>"; "i")) | "#\(.number) [\(.state)] \(.title)"'
+```
+
 ⛔ **`grep` casa caixa e acento literalmente, e o zero se lê como ausência.** Duas medições minhas quase viraram relatório errado por isso, e as duas eram sobre **rename**:
 
 | Busca | Respondeu | O real |
