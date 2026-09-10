@@ -159,6 +159,21 @@ Três partes: **status** ("Nenhum item encontrado"), **o que apareceria ali**, e
 | Veja, ver | Confira, Consulte | |
 | Clique aqui | o verbo do destino | Âncora tem que dizer para onde vai |
 
+## Pontuação: sem travessão
+
+⛔ **Nada de `—` em copy de produto.** Ele pede uma pausa longa que a frase curta não precisa, e quem lê por leitor de tela não o ouve como pausa nenhuma. Onde ele apareceria cabe uma de três saídas: ponto final, dois pontos, ou nenhuma pontuação porque a frase encurtou.
+
+| ❌ | ✅ |
+| --- | --- |
+| `Cadastre o item — ele aparece na lista` | `Cadastre o item. Ele aparece na lista.` |
+| `Nenhum resultado — ajuste os filtros` | `Nenhum resultado. Ajuste os filtros.` |
+
+Decidido em 10/09/2026, ao revisar os documentos legais: eram **15** travessões neles e **2** na copy do produto — o estado vazio de caronas e o conflito de e-mail já cadastrado. A limpeza mede o que existe; sem esta linha, a copy seguinte nasce com um.
+
+⚠️ **O traço que marca ausência de valor não é pontuação, e fica.** `pages/Rides/helpers/rideType.ts` e `pages/LostAndFound/helpers/lostItemStatus.ts` declaram `UNKNOWN_LABEL = '—'` para a célula sem conteúdo. Ali ele é símbolo, e trocá-lo mudaria o que a tela mostra.
+
+⚠️ **A régua é da copy, não dos nossos documentos.** Rule, skill, issue, corpo de PR e comentário seguem usando travessão à vontade — este arquivo tem dezenas. O alvo é o texto que a pessoa lê dentro do produto, mais os dois documentos legais, que são texto de produto por outro nome.
+
 ## Neutro e acessível
 
 - Linguagem neutra de gênero: "a pessoa responsável", não "o responsável". Nunca `x` ou `@`.
