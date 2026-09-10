@@ -70,6 +70,29 @@ process.env.TZ = PRODUCT_TIME_ZONE;
 
 ⚠️ **O sinal é o controle passar quando você esperava que falhasse.** Antes de concluir que o código sob mutação é desnecessário, pergunte se o cenário chega a alcançá-lo.
 
+## O jsdom não tem `matchMedia`, e a decisão por largura responde estreito
+
+⛔ **Componente que decide em JS pela largura — `useMediaQuery` — só exercita o ramo estreito na suíte, e não é o tamanho da janela que decide isso.** O `window.matchMedia` **não existe** no jsdom, então o hook não tem a quem perguntar e responde `false`. Medido em 10/09/2026: `typeof window.matchMedia` é `undefined` enquanto o `innerWidth` do ambiente é **1024** — largura de desktop com resposta de celular.
+
+O ramo largo se cobre forjando a resposta, e o stub precisa dos **três métodos de escuta**: o hook assina a mudança da consulta, e sem eles o render estoura com `mediaQueryList.addEventListener is not a function` (medido na mesma rodada).
+
+```ts
+function stubDesktopViewport() {
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: true,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}
+```
+
+⚠️ **`vi.unstubAllGlobals()` no `afterEach`, sempre em par.** Global forjado que sobrevive ao caso contamina o seguinte, que passa a medir desktop sem ter pedido.
+
+⛔ **O risco é o silêncio, não o erro.** Sem o stub, o caso do ramo largo **não falha**: ele passa medindo o ramo estreito, com o nome dizendo outra coisa — é a asserção que concorda com o ambiente errado. O par é o que separa os dois, e o exemplo na base é [`design-system/components/Pagination/Pagination.test.tsx`](FateConnect/Web/design-system/components/Pagination/Pagination.test.tsx), onde um caso mede o estreito sem stub e o outro o largo com ele.
+
 ## O nome no `getByRole` sai da constante, nunca do texto
 
 ⛔ **Nunca escreva o rótulo literal — nem string, nem regex — para achar um controle.** Importe a constante que o componente usa. Copy muda, e o literal não muda junto: ou o teste quebra, ou — pior — passa a casar **outro** controle.
