@@ -11,8 +11,8 @@ export type DescriptionHighlight = { label: string; Icon: SvgIconComponent };
 export const DESCRIPTION_HIGHLIGHTS: DescriptionHighlight[] = [
   { label: 'Caronas seguras', Icon: DirectionsCarIcon },
   { label: 'Achados & Perdidos', Icon: SearchIcon },
-  { label: 'Portal de denúncias', Icon: SecurityIcon },
   { label: 'Comunidade verificada', Icon: GroupsIcon },
+  { label: 'Portal de denúncias', Icon: SecurityIcon },
 ];
 
 export const HIGHLIGHT_LIST_LABEL = 'Destaques do FateConnect';
