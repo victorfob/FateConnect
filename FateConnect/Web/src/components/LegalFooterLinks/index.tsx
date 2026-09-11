@@ -1,4 +1,4 @@
-import { Typography } from '@design-system';
+import { Typography, UnderlinedLink } from '@design-system';
 
 import * as C from './constants';
 import * as S from './styles';
@@ -8,11 +8,11 @@ export function LegalFooterLinks() {
   return (
     <S.LinksRow>
       {C.LEGAL_FOOTER_LINKS.map(({ label, url }) => (
-        <S.DocumentLink key={url} component="a" href={url} target="_blank" rel="noreferrer">
+        <UnderlinedLink key={url} href={url} opensInNewTab>
           <Typography variant="caption" color="inherit">
             {label}
           </Typography>
-        </S.DocumentLink>
+        </UnderlinedLink>
       ))}
     </S.LinksRow>
   );

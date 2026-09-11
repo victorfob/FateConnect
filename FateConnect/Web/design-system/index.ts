@@ -37,6 +37,8 @@ export { PageShell } from './components/PageShell';
 export type { PageShellProps } from './components/PageShell';
 export { Pagination } from './components/Pagination';
 export type { PaginationProps } from './components/Pagination';
+export { UnderlinedLink } from './components/UnderlinedLink';
+export type { UnderlinedLinkProps } from './components/UnderlinedLink';
 export { StatusTag } from './components/StatusTag';
 export type { StatusTagProps } from './components/StatusTag';
 export type { StatusTagTone } from './theme/types';
