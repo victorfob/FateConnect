@@ -5,12 +5,17 @@ using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
+using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Rides.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 public class RideRepository(FateConnectDbContext context) : IRideRepository
 {
-    public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter)
+    private static readonly TimeOnly MorningStart = new(4, 0);
+    private static readonly TimeOnly AfternoonStart = new(12, 0);
+    private static readonly TimeOnly NightStart = new(18, 0);
+
+    public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter, int? currentUserId = null)
     {
         DateTime nowInProductTimeZone = DateTimeUtils.NowInProductTimeZone();
         DateOnly today = DateOnly.FromDateTime(nowInProductTimeZone);
@@ -22,14 +27,17 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
             .Where(r => r.IsActive)
             .Where(HasNotDeparted(today, currentTime));
 
+        if (currentUserId.HasValue)
+            query = query.Where(IsOfferedBy(currentUserId.Value));
+
         DateOnly? rangeStart = filter.EffectiveDateFrom;
         DateOnly? rangeEnd = filter.EffectiveDateTo;
 
         if (rangeStart.HasValue && rangeEnd.HasValue)
             query = query.Where(DepartsWithin(rangeStart.Value, rangeEnd.Value));
 
-        if (filter.DepartureTime.HasValue)
-            query = query.Where(r => r.DepartureTime == filter.DepartureTime.Value);
+        if (filter.DepartureShift.HasValue)
+            query = query.Where(DepartsInShift(filter.DepartureShift.Value));
 
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
@@ -64,8 +72,24 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
         return (items, total);
     }
 
+    private static Expression<Func<Ride, bool>> IsOfferedBy(int driverId) =>
+        ride => ride.DriverId == driverId;
+
     private static Expression<Func<Ride, bool>> DepartsWithin(DateOnly rangeStart, DateOnly rangeEnd) =>
         ride => ride.DepartureDate >= rangeStart && ride.DepartureDate <= rangeEnd;
+
+    private static Expression<Func<Ride, bool>> DepartsInShift(EnumRideShift shift) => shift switch
+    {
+        EnumRideShift.Morning => DepartsBetween(MorningStart, AfternoonStart),
+        EnumRideShift.Afternoon => DepartsBetween(AfternoonStart, NightStart),
+        _ => DepartsAcrossMidnight(NightStart, MorningStart)
+    };
+
+    private static Expression<Func<Ride, bool>> DepartsBetween(TimeOnly shiftStart, TimeOnly nextShiftStart) =>
+        ride => ride.DepartureTime >= shiftStart && ride.DepartureTime < nextShiftStart;
+
+    private static Expression<Func<Ride, bool>> DepartsAcrossMidnight(TimeOnly shiftStart, TimeOnly shiftEnd) =>
+        ride => ride.DepartureTime >= shiftStart || ride.DepartureTime < shiftEnd;
 
     private static Expression<Func<Ride, bool>> HasNotDeparted(DateOnly today, TimeOnly currentTime) =>
         ride => ride.DepartureDate > today

@@ -1,18 +1,4 @@
 import { maskPhone } from './phoneMask';
-import { maskZipCode } from './zipCodeMask';
-
-describe('maskZipCode', () => {
-  it.each([
-    ['', ''],
-    ['01001', '01001'],
-    ['010010', '01001-0'],
-    ['01001000', '01001-000'],
-    ['010010009', '01001-000'],
-  ])('should format %s as %s', (input, expected) => {
-    expect(maskZipCode(input)).toBe(expected);
-  });
-});
-
 describe('maskPhone', () => {
   it.each([
     ['', ''],

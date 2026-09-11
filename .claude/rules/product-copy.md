@@ -159,6 +159,21 @@ Três partes: **status** ("Nenhum item encontrado"), **o que apareceria ali**, e
 | Veja, ver | Confira, Consulte | |
 | Clique aqui | o verbo do destino | Âncora tem que dizer para onde vai |
 
+## Pontuação: sem travessão
+
+⛔ **Nada de `—` em copy de produto.** Ele pede uma pausa longa que a frase curta não precisa, e quem lê por leitor de tela não o ouve como pausa nenhuma. Onde ele apareceria cabe uma de três saídas: ponto final, dois pontos, ou nenhuma pontuação porque a frase encurtou.
+
+| ❌ | ✅ |
+| --- | --- |
+| `Cadastre o item — ele aparece na lista` | `Cadastre o item. Ele aparece na lista.` |
+| `Nenhum resultado — ajuste os filtros` | `Nenhum resultado. Ajuste os filtros.` |
+
+Decidido em 10/09/2026, ao revisar os documentos legais: eram **15** travessões neles e **2** na copy do produto — o estado vazio de caronas e o conflito de e-mail já cadastrado. A limpeza mede o que existe; sem esta linha, a copy seguinte nasce com um.
+
+⚠️ **O traço que marca ausência de valor não é pontuação, e fica.** `pages/Rides/helpers/rideType.ts` e `pages/LostAndFound/helpers/lostItemStatus.ts` declaram `UNKNOWN_LABEL = '—'` para a célula sem conteúdo. Ali ele é símbolo, e trocá-lo mudaria o que a tela mostra.
+
+⚠️ **A régua é da copy, não dos nossos documentos.** Rule, skill, issue, corpo de PR e comentário seguem usando travessão à vontade — este arquivo tem dezenas. O alvo é o texto que a pessoa lê dentro do produto, mais os dois documentos legais, que são texto de produto por outro nome.
+
 ## Neutro e acessível
 
 - Linguagem neutra de gênero: "a pessoa responsável", não "o responsável". Nunca `x` ou `@`.
@@ -191,6 +206,19 @@ Medido com a aplicação de pé a 409px:
 O candidato mais longo, `Vespertino (12:00 - 17:59)`, ocupa 183,5px em Inter 16px: cabe nos dois. A largura **deixou de decidir** o nome, e a escolha voltou a ser por precisão — que é o critério certo. Sem a medição eu teria descartado ou aceitado um nome pelo motivo errado.
 
 **Como medir:** largura útil pelo `getBoundingClientRect` do campo menos o `padding` computado; largura do texto com `measureText` num `canvas` usando a fonte real, depois de `document.fonts.ready`. Meça no **mais apertado** dos contêineres que vão receber o texto.
+
+### As larguras do texto de ajuda de campo, medidas
+
+Mensagem de validação sai como `helperText` abaixo do campo, e ali a sobra é menor que a do corpo do diálogo. Medido a 409px em 11/09/2026, ao separar a recusa do e-mail institucional em duas frases:
+
+| Onde | Campo | Sobra para o texto |
+| --- | --- | --- |
+| Formulário de cadastro | 275,3px | **243,3px** |
+| Cartão de login da landing | 312,0px | **280,0px** |
+
+⚠️ **Estourar aqui é barato:** o `helperText` cresce **21px por linha** e empurra o resto do formulário para baixo. É o oposto do rodapé de diálogo, onde duas ações que não cabem saltam de 36px para 80px.
+
+⛔ **Aqui a largura saiu da decisão pelo motivo oposto ao do caso acima.** Lá o candidato mais longo cabia; aqui **nenhuma** candidata cabe — 291,5px, 324,0px e 372,4px contra 243,3px de sobra, e a frase que já estava em produção também não cabe (336,7px). Nos dois a conclusão é a mesma e a leitura é diferente: **meça para saber se a largura decide**. Ela decide quando separa as opções, e é indiferente tanto quando todas cabem quanto quando nenhuma cabe.
 
 ### As larguras do diálogo, medidas
 

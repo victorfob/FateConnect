@@ -50,6 +50,16 @@ Aconteceu em 04/09/2026, na #309. A regra de partida futura do formulário de ca
 
 **Restaure a árvore ao fim de cada mutação** e confirme com `git status` que nada sobrou.
 
+⛔ **E `git checkout --` restaura para o HEAD, não para o seu estado.** Em arquivo que a sua branch já alterou, ele apaga a **sua** mudança junto com a mutação — e o sintoma é o oposto de um erro: a árvore fica limpa, que é exatamente o que você foi conferir.
+
+Aconteceu em 11/09/2026. Mutei a ordem de uma constante que eu mesmo tinha acabado de reordenar, restaurei com `git checkout --`, e a reordenação sumiu com a mutação. O `git status` respondeu que o arquivo não tinha modificação nenhuma, e isso se lê como sucesso.
+
+**A conferência não é "a árvore está limpa", é "a minha mudança continua lá".** Em arquivo que a branch toca, `git status` limpo é o alarme — leia o trecho mutado antes de seguir.
+
+⛔ **Mutação que não compila por motivo incidental não é resultado — ela não foi testada.** O `tsc` reprovando parece invariante garantido pelo compilador, e às vezes é; mas `TS6133 — declaração sem uso` só diz que a sua mutação deixou um import órfão. São coisas opostas com a mesma cara.
+
+Aconteceu em 10/09/2026, na rodada da faixa de período: três mutações voltaram como "`tsc` reprovou" e eu ia relatar três invariantes do compilador. **Leia o código do erro.** `TS6133` manda refazer a mutação removendo o órfão junto; erro de tipo de verdade — `end` como `Date | null` onde a comparação pede `Date` — é resultado, e aí não falta teste. Refeitas, duas morreram e uma sobreviveu.
+
 ## O fuso do processo vem fixado, e a linha de comando não o vence
 
 ⛔ **`vitest.setup.ts` executa `process.env.TZ = 'America/Sao_Paulo'` para toda a suíte.** Rodar `TZ=UTC npx vitest` **não muda nada**: o setup roda depois e sobrescreve.
@@ -65,6 +75,29 @@ process.env.TZ = PRODUCT_TIME_ZONE;
 ```
 
 ⚠️ **O sinal é o controle passar quando você esperava que falhasse.** Antes de concluir que o código sob mutação é desnecessário, pergunte se o cenário chega a alcançá-lo.
+
+## O jsdom não tem `matchMedia`, e a decisão por largura responde estreito
+
+⛔ **Componente que decide em JS pela largura — `useMediaQuery` — só exercita o ramo estreito na suíte, e não é o tamanho da janela que decide isso.** O `window.matchMedia` **não existe** no jsdom, então o hook não tem a quem perguntar e responde `false`. Medido em 10/09/2026: `typeof window.matchMedia` é `undefined` enquanto o `innerWidth` do ambiente é **1024** — largura de desktop com resposta de celular.
+
+O ramo largo se cobre forjando a resposta, e o stub precisa dos **três métodos de escuta**: o hook assina a mudança da consulta, e sem eles o render estoura com `mediaQueryList.addEventListener is not a function` (medido na mesma rodada).
+
+```ts
+function stubDesktopViewport() {
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: true,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}
+```
+
+⚠️ **`vi.unstubAllGlobals()` no `afterEach`, sempre em par.** Global forjado que sobrevive ao caso contamina o seguinte, que passa a medir desktop sem ter pedido.
+
+⛔ **O risco é o silêncio, não o erro.** Sem o stub, o caso do ramo largo **não falha**: ele passa medindo o ramo estreito, com o nome dizendo outra coisa — é a asserção que concorda com o ambiente errado. O par é o que separa os dois, e o exemplo na base é [`design-system/components/Pagination/Pagination.test.tsx`](FateConnect/Web/design-system/components/Pagination/Pagination.test.tsx), onde um caso mede o estreito sem stub e o outro o largo com ele.
 
 ## O nome no `getByRole` sai da constante, nunca do texto
 

@@ -1,13 +1,13 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo, type ChangeEvent } from 'react';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { PAGINATION_LABEL, paginationItemLabel } from './constants';
-import { pageRun, type PageSlot } from './pageRun';
 import * as S from './styles';
 
 const SINGLE_PAGE = 1;
-const FIRST_PAGE = 1;
-const PREVIOUS_STEP = 1;
-const NEXT_STEP = 1;
+/** No estreito a fileira não cabe com vizinhos: sobram as pontas e a atual. */
+const NO_SIBLINGS = 0;
+const DEFAULT_SIBLINGS = 1;
 
 export type PaginationProps = Readonly<{
   /** Total de páginas. Com uma só o controle não se desenha. */
@@ -17,59 +17,29 @@ export type PaginationProps = Readonly<{
   onChange: (page: number) => void;
 }>;
 
-function slotKey(slot: PageSlot, index: number): string {
-  if (typeof slot === 'number') return `page-${slot}`;
-
-  return `${slot}-${index}`;
-}
-
 export function Pagination({ count, page, onChange }: PaginationProps) {
-  const goToPrevious = useCallback(() => onChange(page - PREVIOUS_STEP), [onChange, page]);
-  const goToNext = useCallback(() => onChange(page + NEXT_STEP), [onChange, page]);
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+
+  const siblingCount = useMemo(() => {
+    if (isDesktop) return DEFAULT_SIBLINGS;
+
+    return NO_SIBLINGS;
+  }, [isDesktop]);
+
+  const handleChange = useCallback(
+    (_event: ChangeEvent<unknown>, nextPage: number) => onChange(nextPage),
+    [onChange],
+  );
 
   if (count <= SINGLE_PAGE) return null;
 
   return (
-    <S.PaginationNav component="nav" aria-label={PAGINATION_LABEL}>
-      <S.PaginationList component="ul">
-        <S.PaginationSlot component="li">
-          <S.PaginationEntry
-            type="previous"
-            disabled={page <= FIRST_PAGE}
-            onClick={goToPrevious}
-            aria-label={paginationItemLabel({ type: 'previous' })}
-          />
-        </S.PaginationSlot>
-
-        {pageRun(count, page).map((slot, index) => (
-          <S.PaginationSlot component="li" key={slotKey(slot, index)}>
-            {typeof slot === 'number' ? (
-              <S.PaginationEntry
-                type="page"
-                page={slot}
-                selected={slot === page}
-                onClick={() => onChange(slot)}
-                aria-label={paginationItemLabel({
-                  type: 'page',
-                  page: slot,
-                  selected: slot === page,
-                })}
-              />
-            ) : (
-              <S.PaginationEntry type={slot} />
-            )}
-          </S.PaginationSlot>
-        ))}
-
-        <S.PaginationSlot component="li">
-          <S.PaginationEntry
-            type="next"
-            disabled={page >= count}
-            onClick={goToNext}
-            aria-label={paginationItemLabel({ type: 'next' })}
-          />
-        </S.PaginationSlot>
-      </S.PaginationList>
-    </S.PaginationNav>
+    <S.PaginationRoot
+      count={count}
+      page={page}
+      onChange={handleChange}
+      siblingCount={siblingCount}
+    />
   );
 }

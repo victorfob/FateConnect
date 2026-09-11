@@ -6,9 +6,34 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Adiciona a ação às linhas de contato do rodapé, que eram texto para copiar à mão: o e-mail abre o aplicativo de e-mail, o telefone abre o discador e o endereço abre o mapa em nova guia; o ícone entra na área clicável junto do texto, e cada link diz a ação ao leitor de tela (#372) [Frontend]
+- Adiciona o filtro por autoria na lista de caronas, por `onlyMine`, que traz só as caronas que a pessoa ofertou; sem o campo a lista segue trazendo as de todo mundo, e carona já partida continua de fora nos dois casos (#348) [Backend]
+- Adiciona o filtro por autoria na busca de caronas, com a escolha entre todas as caronas e só as que a pessoa ofertou; sem escolher, a lista segue trazendo as de todo mundo (#350) [Frontend]
+
 ### Changed
 
+- Reescreve a descrição da comunidade verificada na landing, que listava os dois domínios de e-mail aceitos e passa a chamar para criar a conta com o e-mail institucional; os domínios seguem ditos no campo de e-mail do cadastro e do login (#370) [Frontend]
 - Passa a filtrar as duas listas por intervalo de datas em vez de uma data exata: as duas pontas trazem o período fechado, uma ponta sozinha traz aquele dia inteiro, e intervalo invertido é recusado com erro; na consulta, `departureDate` e `ocurredOn` dão lugar a `dateFrom` e `dateTo` (#342) [Backend]
+- Passa a mostrar menos páginas na paginação das duas listas quando a tela é estreita: a fileira não cabia e quebrava em duas linhas, então fica a página atual entre a primeira e a última. As setas continuam andando de uma em uma, e no desktop os números vizinhos seguem visíveis (#345) [Frontend]
+- Passa a filtrar caronas por turno em vez de hora exata, que exigia hora em ponto: `Morning` cobre 04:00–11:59, `Afternoon` 12:00–17:59 e `Night` 18:00–03:59, atravessando a meia-noite; na consulta, `departureTime` dá lugar a `departureShift` (#347) [Backend]
+- Passa a chamar o filtro por autoria de `onlyMine` também em achados e perdidos, onde ele era `onlyMyItems`; o comportamento de lá é o mesmo, e a consulta com o nome antigo deixa de filtrar (#348) [Backend]
+- Passa a filtrar as duas buscas por período em vez de data exata, e as caronas por turno em vez de hora exata: o período aceita as duas pontas ou só a inicial, que busca aquele dia inteiro, e o turno traz manhã, tarde e noite com a faixa de horas no rótulo. As escolhas continuam no endereço, então o link restaura a busca; link antigo abre a lista sem os filtros que saíram (#350) [Frontend]
+
+### Fixed
+
+- Corrige o sublinhado dos links de documentos no rodapé do celular, que media a largura da linha em vez da largura do texto (#372) [Frontend]
+- Corrige os destaques do topo da landing: os quatro rótulos quebravam em duas linhas, e a ordem e o texto deles divergiam dos cards de serviço logo abaixo (#370) [Frontend]
+- Corrige o cabeçalho numa faixa estreita de larguras de desktop, em que a barra de navegação quebrava em duas linhas e dobrava de altura: o menu recolhido passa a valer até a largura em que a barra cabe (#370) [Frontend]
+- Corrige o vão abaixo dos cartões do menu nas telas estreitas, menor que o que separa um cartão do outro (#345) [Frontend]
+- Corrige a política de privacidade, que listava o apelido entre os dados coletados no cadastro depois de o campo ter sido removido (#367) [Frontend]
+- Corrige a recusa do e-mail institucional, que falava do domínio mesmo quando ele estava certo e o problema era o trecho antes do @; cada um dos dois passa a ter a sua mensagem, e o conjunto de endereços aceitos continua o mesmo (#368) [Frontend] [Backend]
+
+### Removed
+
+- Remove o endereço do cadastro: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A tabela é apagada, então o endereço de quem já se cadastrou se perde (#365) [Backend]
+- Remove o endereço do formulário de cadastro, com a busca automática por CEP que o preenchia; a política de privacidade deixa de declarar a coleta do endereço e o envio do CEP a serviço externo, em nova versão do documento (#367) [Frontend]
 
 ## [0.9.0] - 2026-09-09
 

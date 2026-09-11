@@ -40,6 +40,7 @@ O que respondeu foi ler a **cascata**, não o pixel: percorrer `document.styleSh
 | `grep ... \| head` procurando quem mexia no scroll | as 10 primeiras linhas | na 11ª — e eu **descartei a hipótese certa** por causa disso |
 | a regra `no-restricted-syntax` de tag crua | chamadas de `styled('nav')` | no JSX: três `<li>` passaram no código novo |
 | a correção da fileira de paginação | a ponta inicial, onde a página 4 quebrava | na ponta final, onde a 9 quebrava igual |
+| a medição de layout numa largura só | 1440px, onde a coluna está no teto de 600px | entre 933 e 1056px, onde ela divide a linha com o cartão de login |
 | a varredura que comparava **toda string** do diff | `'…'`, `"…"` e `` `…` `` | num **regex literal**: `/nome deve ter ao menos/i` |
 
 A quarta linha custou uma segunda rodada de review. Em 04/09/2026 a varredura devolveu 11 achados, eu corrigi os 11 e declarei o PR limpo; faltavam dois — as asserções do teste que guardava a copy, escritas como regex. Eles só apareceram porque a suíte ficou **vermelha** depois da correção.
@@ -72,11 +73,37 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 
 ⚠️ **O tell é a contagem discordar da listagem**: `N matches` com nada embaixo. Vale para qualquer comando que passe por filtro — quando a saída vai sustentar conclusão, confira que o que foi contado é o que foi mostrado.
 
+⛔ **E o mesmo envelope infla: ele acrescenta linha, e o `wc -l` conta o enfeite.** Em 10/09/2026, conferindo o que ia num commit, `git diff --cached --name-only | wc -l` respondeu **14** para **11** arquivos preparados — a diferença era cabeçalho e rodapé impressos pelo filtro. Quem discriminou foi a listagem ao lado, com os 11 caminhos certos; a contagem sozinha teria me mandado caçar três arquivos que não existiam.
+
+⚠️ **Contagem que vai conferir alguma coisa se lê na saída crua** — `rtk proxy <comando>` — ou se conta na listagem. Engolir e inflar são o mesmo defeito: medir através de algo que reescreve a saída.
+
 ⛔ **E o complemento de "passou" não é "falhou".** No mesmo `gh pr checks`, tratar `bucket != "pass"` como falha reporta vermelho onde há `pending`: em 02/09/2026 anunciei um check falhando no #287 quando o front ainda estava `IN_PROGRESS`, porque a cascata da pilha havia reiniciado o CI. Estado de terceira via — `pending`, `skipping`, `neutral` — se nomeia, não se deduz por exclusão.
 
 ⛔ **`performance.getEntriesByType('resource')` não enxerga requisição que falha na conexão.** Em 04/09/2026, provando que um formulário deixara de chamar a API, ele devolveu **zero** nos dois casos — no que não devia chamar e no que devia. O zero era do instrumento. Quem responde é o log de rede do navegador (`read_network_requests`), que registra a tentativa com o motivo da falha; e o par positivo — o caso que **deve** disparar a requisição — é o que separa "não chamou" de "não medi".
 
+⛔ **E há a busca que só alcança o que tem nome de símbolo.** Um pedido entregue deixa rastro em **dois** lugares independentes — o código e o rastreador —, e o `grep` só responde bem quando existe um identificador a procurar.
+
+Em 10/09/2026 varri dezesseis pedidos antigos "por código, não de memória" e declarei seis em aberto. **Quatro tinham issue própria, fechada e entregue.** Os quatro eram os **visuais** — largura de cartão, altura de ícone, recuo de rodapé, alinhamento de diálogo —, e nenhum deles tem símbolo: recuo não se procura por nome.
+
+⚠️ **O tell é o pedido descrever geometria ou aparência.** Aí a pergunta muda de lugar:
+
+```bash
+gh issue list --state all --limit 300 --json number,title,state \
+  --jq '.[] | select(.title | test("<termo do pedido>"; "i")) | "#\(.number) [\(.state)] \(.title)"'
+```
+
+⛔ **`grep` casa caixa e acento literalmente, e o zero se lê como ausência.** Duas medições minhas quase viraram relatório errado por isso, e as duas eram sobre **rename**:
+
+| Busca | Respondeu | O real |
+| --- | --- | --- |
+| `per[ií]odo` no corpo de uma issue, locale C | **0** | **4** — o `í` são dois bytes, e a expressão de colchete não o alcança |
+| `onlyMyItems` na base | **13 em 5 arquivos** | **18 em 8** — a API escreve `OnlyMyItems` |
+
+O segundo é o pior: eu ia relatar que os arquivos de API haviam desaparecido e que alguém já tinha feito o rename. **Busca que vai sustentar conclusão sobre presença ou contagem roda com `-i` e com `LC_ALL=pt_BR.UTF-8`**, e o controle é procurar um trecho que você sabe que existe — não aparecendo, o instrumento está cego, e não o repositório vazio.
+
 ⚠️ **`| head` num `grep` de investigação é o pior dos três**, porque some com a evidência sem avisar e a saída parece completa. Em busca que vai sustentar conclusão, conte antes (`grep -c`) ou não trunque.
+
+⛔ **E não é só busca: truncar a saída de um comando que pode falhar apaga o motivo da falha.** Em 10/09/2026 um `git push | tail -2` deixou na tela `failed to push some refs` sem a linha que dizia por quê; empurrei de novo, funcionou, e o motivo da primeira reprovação está perdido para sempre. **Comando que pode falhar vai sem filtro, ou com a saída inteira num arquivo** — o `tail` entra depois, sobre o arquivo, que continua ali para reler.
 
 ⛔ **Regra nova se prova nas duas formas.** O controle positivo de uma regra de lint não é só "reprova o que deve" — é também "aceita o que deve". Ao estender a de tag crua, rodei um arquivo com `<div>` **e** `<strong>` no mesmo JSX: o primeiro reprova, o segundo passa. Sem a segunda metade eu teria proibido ênfase de texto sem perceber.
 
@@ -85,6 +112,24 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 ⛔ **Zero de comando composto não vale sem saber onde ele rodou.** Um `cd` que falha em `cd X && grep ...` deixa o `grep` rodar no diretório anterior, e o zero se lê como "não existe". Em 04/09/2026 afirmei que o projeto não tinha regra de autofill nenhuma; tinha zero **naquele** diretório, que não era o do front. `pwd` entra na mesma saída sempre que o zero vai sustentar conclusão.
 
 ⛔ **Antes de atribuir um artefato à sua mudança, remova a mudança.** Correlação não é autoria. No mesmo dia vi seletores quebrados aparecerem junto da minha regra de CSS e disse ao Victor que eram meus; removendo a regra e recarregando frio, os nove continuavam lá — eram do MUI. O tell é a frase *"isso apareceu depois que eu mexi"*.
+
+### Largura é dimensão de varredura, não um ponto
+
+⛔ **Layout responsivo se mede na faixa em que ele muda de forma, e o defeito mora entre os pontos que você escolheu.** Medir "no desktop" é medir um pixel de uma faixa de mil, e o verde dali não fala pelos outros novecentos.
+
+Três vezes em 11/09/2026, na mesma rodada:
+
+| O que eu media | Onde o defeito estava |
+| --- | --- |
+| a fileira de destaques a 1440px, com a coluna nos 600px do teto | a 982px, onde a coluna tem **351px** porque divide a linha com o cartão de login |
+| a correção que apliquei, de novo a 1440px | na faixa 933–1056px, que a própria correção reintroduziu |
+| nada: o cabeçalho vinha quebrado da branch anterior | entre 933 e 980px, onde a gaveta já tinha sumido e a nav ainda não cabia |
+
+Nas três quem viu foi o Victor, olhando a tela.
+
+**Os pontos que a faixa exige:** cada limite declarado e **um pixel de cada lado dele** — é ali que os dois estados se encostam e o buraco aparece —, mais a largura em que cada contêiner elástico para de crescer.
+
+⚠️ **Elemento que divide a linha com outro não tem a largura da janela.** A coluna da landing vai de 314px a 600px enquanto a janela vai de 937 a 1920, e é a **dela** que decide a quebra. Meça a largura do contêiner junto da janela, sempre — como já se faz com a porta.
 
 ### Pior que alcançar metade: destruir a outra
 
@@ -111,6 +156,16 @@ Aconteceu em 09/09/2026, ao escolher o tom do botão neutro no tema escuro. Apre
 Quem derrubou a tabela foi a pergunta *"não entendi pq o logotipo muda"*. Sem ela, a cor teria sido escolhida contra uma restrição que não existe.
 
 **O tell é a medição que restringe demais.** Quando a conta elimina quase todas as opções, confira a premissa antes de aceitar o resultado: é mais provável que o alcance esteja errado do que a janela ser tão estreita.
+
+## O relato dele contra a sua medição: suspeite do recorte
+
+⛔ **Quando o que ele vê rodando contradiz o que você mediu, o errado é quase sempre o recorte da medição — não o relato.** Ele está olhando o produto inteiro; você está olhando um arquivo.
+
+Aconteceu em 10/09/2026. Eu medi que o `httpClient` do front descarta o corpo da resposta de erro — verdade, nenhum arquivo lê `error` — e afirmei que **a tela** mostra sempre a frase genérica. O Victor testou o cadastro, viu `Este e-mail já está em uso…` e perguntou *"tem certeza que o usuário vê essa mensagem genérica na tela?"*. Não tinha: três telas e nove requisições escrevem a copy delas, escolhida por `status` ou por `field`. A minha medição estava certa sobre o interceptor e eu a estendi para a camada de cima.
+
+**O tell é o sujeito da afirmação ser mais largo que o arquivo aberto** — eu disse "a tela mostra" tendo lido o interceptor. Antes de responder que o relato está errado, liste o que ainda está **entre** a sua medição e o que ele vê, e abra cada um.
+
+⚠️ **A versão específica disto já estava escrita em `web-styling.md`**, para alinhamento — *"ao receber 'não está alinhado' sobre algo que você mediu, desconfie do que foi medido antes de duvidar do relato"*. Ela vale para qualquer medição, não só geometria, e é por isso que subiu para cá: aquela rule carrega só em arquivo do front.
 
 ## O artefato publicado não é o que você quis escrever
 

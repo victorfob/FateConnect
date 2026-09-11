@@ -13,15 +13,33 @@ describe('lostItemSearchCodec', () => {
 
     it('should read every filter the url carries', () => {
       expect(
-        read('pagina=2&busca=Garrafa&data=2026-08-01&tipo=perdido&situacao=resolvido&meus=sim'),
+        read(
+          'pagina=2&busca=Garrafa&de=2026-08-01&ate=2026-08-05&tipo=perdido&situacao=resolvido&meus=sim',
+        ),
       ).toEqual({
         page: 2,
         pageSize: PAGE_SIZE,
         searchTerm: 'Garrafa',
-        ocurredOn: '2026-08-01',
+        dateFrom: '2026-08-01',
+        dateTo: '2026-08-05',
         lostAndFoundType: LostItemKindEnum.LOST,
         status: LostItemStatusEnum.RESOLVED,
-        onlyMyItems: true,
+        onlyMine: true,
+      });
+    });
+
+    it('should take one end of the period without the other', () => {
+      expect(read('de=2026-08-01')).toMatchObject({ dateFrom: '2026-08-01' });
+      expect(read('ate=2026-08-05')).toMatchObject({ dateTo: '2026-08-05' });
+    });
+
+    // O período substituiu a data fixa: link antigo salvo deixa de restaurar, e
+    // o que ele carrega não pode quebrar a tela.
+    it('should ignore the parameter the filter no longer knows', () => {
+      expect(read('data=2026-08-01')).toEqual({
+        page: FIRST_PAGE,
+        pageSize: PAGE_SIZE,
+        status: DEFAULT_STATUS,
       });
     });
 
@@ -59,7 +77,7 @@ describe('lostItemSearchCodec', () => {
     it.each(['meus=nao', 'meus=', 'meus=talvez'])(
       'should leave "only mine" off when the url says %s',
       (search) => {
-        expect(read(search).onlyMyItems).toBeUndefined();
+        expect(read(search).onlyMine).toBeUndefined();
       },
     );
   });
@@ -88,7 +106,7 @@ describe('lostItemSearchCodec', () => {
         pageSize: PAGE_SIZE,
         lostAndFoundType: LostItemKindEnum.FOUND,
         status: LostItemStatusEnum.DELETED,
-        onlyMyItems: true,
+        onlyMine: true,
       });
 
       expect(params).toEqual({ pagina: '3', tipo: 'achado', situacao: 'excluido', meus: 'sim' });
@@ -99,10 +117,11 @@ describe('lostItemSearchCodec', () => {
         page: 4,
         pageSize: PAGE_SIZE,
         searchTerm: 'Guarda-chuva azul',
-        ocurredOn: '2026-07-15',
+        dateFrom: '2026-07-15',
+        dateTo: '2026-07-20',
         lostAndFoundType: LostItemKindEnum.LOST,
         status: LostItemStatusEnum.RESOLVED,
-        onlyMyItems: true,
+        onlyMine: true,
       };
 
       const params = new URLSearchParams(lostItemSearchCodec.toParams(original));

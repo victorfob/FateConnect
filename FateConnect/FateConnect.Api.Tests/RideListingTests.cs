@@ -28,6 +28,18 @@ public class RideListingTests
         return driverId;
     }
 
+    private static int SeedOneRidePerShift(ApiFactory factory)
+    {
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(5, 0), "Praça da Sé");
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(13, 0), "Avenida Paulista");
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(23, 0), "Terminal Bandeira");
+
+        return driverId;
+    }
+
     private static async Task<PagedRides> GetPageAsync(ApiFactory factory, int userId, string query = "")
     {
         PagedRides? page = await factory
@@ -157,17 +169,126 @@ public class RideListingTests
     }
 
     [Fact]
-    public async Task GetRides_FilteredByDepartureTime_KeepsOnlyTheRidesThatLeaveAtThatHour()
+    public async Task GetRides_WithOnlyMine_LeavesOutTheRidesOfOtherPeople()
+    {
+        using ApiFactory factory = new();
+        int mineId = factory.SeedUser("Helena Souza Braga").Id;
+        int theirsId = factory.SeedUser("Igor Fontenele Alves").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        Guid myRide = factory.SeedRide(mineId, tomorrow, new TimeOnly(8, 30), "Sorocaba centro");
+        factory.SeedRide(theirsId, tomorrow, new TimeOnly(9, 30), "Campinas centro");
+
+        PagedRides page = await GetPageAsync(factory, mineId, "?OnlyMine=true");
+
+        Assert.Equal(1, page.Total);
+        Assert.Equal(myRide, Assert.Single(page.Items).Id);
+    }
+
+    [Fact]
+    public async Task GetRides_WithoutOnlyMine_KeepsTheRidesOfEveryone()
+    {
+        using ApiFactory factory = new();
+        int mineId = factory.SeedUser("Joana Ribeiro Castro").Id;
+        int theirsId = factory.SeedUser("Kleber Antunes Faria").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        factory.SeedRide(mineId, tomorrow, new TimeOnly(8, 30), "Sorocaba centro");
+        factory.SeedRide(theirsId, tomorrow, new TimeOnly(9, 30), "Campinas centro");
+
+        PagedRides page = await GetPageAsync(factory, mineId, "?OnlyMine=false");
+
+        Assert.Equal(2, page.Total);
+    }
+
+    [Fact]
+    public async Task GetRides_WithOnlyMine_StillLeavesOutWhatAlreadyDeparted()
+    {
+        using ApiFactory factory = new();
+        int mineId = factory.SeedUser("Larissa Prado Bittencourt").Id;
+        DateOnly yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        factory.SeedRide(mineId, yesterday, new TimeOnly(8, 30), "Carona vencida");
+        Guid upcoming = factory.SeedRide(mineId, tomorrow, new TimeOnly(8, 30), "Carona futura");
+
+        PagedRides page = await GetPageAsync(factory, mineId, "?OnlyMine=true");
+
+        Assert.Equal(1, page.Total);
+        Assert.Equal(upcoming, Assert.Single(page.Items).Id);
+    }
+
+    [Fact]
+    public async Task GetRides_WithSomeoneElsesIdInPlaceOfTheFlag_IsRefused()
+    {
+        using ApiFactory factory = new();
+        int mineId = factory.SeedUser("Marcelo Tavares Pinho").Id;
+        int theirsId = factory.SeedUser("Natália Coelho Vidal").Id;
+
+        HttpResponseMessage response = await RequestPageAsync(factory, mineId, $"?OnlyMine={theirsId}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("Morning")]
+    [InlineData("Afternoon")]
+    [InlineData("Night")]
+    public async Task GetRides_FilteredByShift_KeepsOnlyTheRideThatDepartsInIt(string shift)
+    {
+        using ApiFactory factory = new();
+        int driverId = SeedOneRidePerShift(factory);
+
+        PagedRides page = await GetPageAsync(factory, driverId, $"?DepartureShift={shift}");
+
+        Assert.Equal(1, page.Total);
+    }
+
+    [Fact]
+    public async Task GetRides_WithoutAShift_KeepsTheRidesOfEveryShift()
+    {
+        using ApiFactory factory = new();
+        int driverId = SeedOneRidePerShift(factory);
+
+        PagedRides page = await GetPageAsync(factory, driverId);
+
+        Assert.Equal(3, page.Total);
+    }
+
+    [Theory]
+    [InlineData(4, 0, "Morning", "Night")]
+    [InlineData(11, 59, "Morning", "Afternoon")]
+    [InlineData(12, 0, "Afternoon", "Morning")]
+    [InlineData(17, 59, "Afternoon", "Night")]
+    [InlineData(18, 0, "Night", "Afternoon")]
+    [InlineData(3, 59, "Night", "Morning")]
+    public async Task GetRides_FilteredByShift_PutsTheEdgeOfTheRangeInOneShiftOnly(
+        int hour,
+        int minute,
+        string ownShift,
+        string neighbourShift)
     {
         using ApiFactory factory = new();
         int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
-        factory.SeedRide(driverId, tomorrow, new TimeOnly(7, 0));
-        factory.SeedRide(driverId, tomorrow, new TimeOnly(22, 0));
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(hour, minute), "Avenida Paulista");
 
-        PagedRides page = await GetPageAsync(factory, driverId, "?DepartureTime=07:00:00");
+        PagedRides own = await GetPageAsync(factory, driverId, $"?DepartureShift={ownShift}");
+        PagedRides neighbour = await GetPageAsync(factory, driverId, $"?DepartureShift={neighbourShift}");
 
-        Assert.Equal(1, page.Total);
+        Assert.Equal(1, own.Total);
+        Assert.Equal(0, neighbour.Total);
+    }
+
+    [Fact]
+    public async Task GetRides_FilteredByTheNightShift_KeepsBothSidesOfMidnight()
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(23, 30), "Terminal Bandeira");
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(1, 0), "Estação da Luz");
+
+        PagedRides page = await GetPageAsync(factory, driverId, "?DepartureShift=Night");
+
+        Assert.Equal(2, page.Total);
     }
 
     [Fact]

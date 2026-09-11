@@ -14,6 +14,8 @@ Vale a partir da tela de cadastro (#54), primeira a ter schema de validação.
 - Verificar o **contrato**, não a biblioteca: para cada campo, um caso válido e os casos inválidos que a regra de negócio prevê.
 - Usar `schema.safeParse(entrada)` e asserir `success`; em falha, asserir o **caminho** do erro (`issues[0].path`), não a mensagem exata — mensagem é copy e muda.
 
+  ⚠️ **Exceção: quando a mensagem **é** o comportamento sob teste.** Campo com duas regras e duas mensagens precisa afirmar **qual** delas saiu — senão o teste passa com as duas trocadas, que era justamente o defeito. Aí se afirma caminho **e** mensagem, sempre pela **constante** que o schema usa, nunca pelo literal. Nasceu na #354, na recusa do e-mail institucional.
+
 ## Casos obrigatórios por campo
 
 - Valor válido no limite (menor e maior aceitos, quando houver limite).
