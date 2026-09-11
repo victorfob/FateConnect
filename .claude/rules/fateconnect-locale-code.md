@@ -2,6 +2,7 @@
 description: pt-BR para UI, URLs e mensagem ao usuário; inglês para código, estrutura e contrato da API — absoluto dos dois lados; domínio Ride e o prefixo Enum do C#
 paths:
   - "FateConnect/**"
+  - ".github/**"
 ---
 
 # FateConnect — idioma da interface vs idioma do código
@@ -23,6 +24,16 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 - **`id` e seletor** usados só pelo código (não copy): inglês.
 - **Tokens** do design system: inglês (`primary`, `surfaceWhite`, `textMuted`).
 - **Teste:** `describe` e `it` em inglês, no padrão `should <fazer algo>`. O código dentro do teste também é inglês. Copy de produto em asserção continua em pt-BR, porque é o texto real da tela.
+
+## Esteira: nome em inglês, comentário em pt-BR
+
+⛔ **Nome de job e de step em workflow é inglês** — é a mesma regra do identificador de código, e vale porque o nome aparece como check no PR, ao lado dos que o GitHub gera.
+
+⛔ Aconteceu em 11/09/2026, no `check-front.yml`: escrevi um step `Frentes anteriores` e o Victor cobrou — *"lembra que é pra ser feito tudo em inglês"*. A medição mostrou o tamanho do desvio: **26 nomes de step em todos os workflows, e o meu era o único em português**.
+
+⚠️ **E aqui o `paths` desta rule era o defeito real.** Ele cobria só `FateConnect/**`, então editar `.github/` não carregava nada sobre idioma — a regra existia e não me alcançava. Por isso a entrada de `.github/**` acima.
+
+**Comentário e mensagem de `echo` continuam em pt-BR**, como nos sete workflows. Medido na mesma rodada: os sete têm comentário em português, e o `echo` que fala com quem lê o log também. Não "corrija" isso para inglês — o que é inglês é o **nome**.
 
 ## Back-end .NET
 
