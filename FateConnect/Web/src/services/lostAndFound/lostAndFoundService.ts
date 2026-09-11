@@ -68,7 +68,7 @@ export async function restoreLostItem(itemId: string): Promise<void> {
   await changeLostItemStatus(itemId, LostItemStatusEnum.OPEN);
 }
 
-/** Exclusão lógica: o servidor marca Excluído e registra o motivo. */
+/** Exclusão lógica: o servidor marca `Deleted` e registra o motivo. */
 export async function deleteLostItem(itemId: string): Promise<void> {
   await apiClient.delete(`${LOST_AND_FOUND_PATH}/${itemId}`);
 }

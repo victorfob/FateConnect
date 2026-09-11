@@ -9,11 +9,11 @@ export function photoAlt(itemName: string): string {
 
 /** O advérbio é quem separa o par: sem ele, "por" seria agente num e causa no outro. */
 const DELETION_NOTE: Readonly<Record<DeletionReasonEnum, string>> = {
-  [DeletionReasonEnum.USER]: 'Excluído manualmente.',
-  [DeletionReasonEnum.INACTIVITY]: 'Excluído automaticamente por inatividade.',
+  [DeletionReasonEnum.USER]: 'Arquivado manualmente.',
+  [DeletionReasonEnum.INACTIVITY]: 'Arquivado automaticamente por inatividade.',
 };
 
-/** Sem motivo não há nota: a etiqueta do cartão já diz que o item foi excluído. */
+/** Sem motivo não há nota: a etiqueta do cartão já diz que o item foi arquivado. */
 export function deletionNote(reason: DeletionReasonEnum | null): string | null {
   if (reason === null) return null;
 

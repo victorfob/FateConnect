@@ -41,8 +41,8 @@ const LOST_ITEM: LostItem = {
 const COPY_EMAIL_LABEL = `Copiar ${CONTACT.email}`;
 
 const DELETION_NOTE = {
-  manual: 'Excluído manualmente.',
-  inactivity: 'Excluído automaticamente por inatividade.',
+  manual: 'Arquivado manualmente.',
+  inactivity: 'Arquivado automaticamente por inatividade.',
 };
 
 const DELETED_ITEM: LostItem = {

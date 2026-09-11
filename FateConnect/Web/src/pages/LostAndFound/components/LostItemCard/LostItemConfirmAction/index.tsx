@@ -2,14 +2,11 @@ import { useCallback, useState, type ReactNode } from 'react';
 import { Button, Dialog } from '@design-system';
 
 import { CONFIRMATION } from './constants';
-import { LostItemConfirmTrigger } from './LostItemConfirmTrigger';
 import * as S from './styles';
 
 type LostItemConfirmActionProps = Readonly<{
   label: string;
   icon: ReactNode;
-  /** Sem rótulo à mostra: o nome do botão fica no tooltip. */
-  iconOnly?: boolean;
   dialogTitle: string;
   messagePrefix: string;
   /** Fecha a frase depois do nome do item, para quem precisa dizer mais que o `?`. */
@@ -22,7 +19,6 @@ type LostItemConfirmActionProps = Readonly<{
 export function LostItemConfirmAction({
   label,
   icon,
-  iconOnly,
   dialogTitle,
   messagePrefix,
   messageSuffix = CONFIRMATION.messageSuffix,
@@ -41,7 +37,10 @@ export function LostItemConfirmAction({
 
   return (
     <>
-      <LostItemConfirmTrigger label={label} icon={icon} iconOnly={iconOnly} onClick={handleAsk} />
+      <Button type="button" variant="soft" onClick={handleAsk}>
+        {icon}
+        {label}
+      </Button>
 
       <Dialog open={confirming} onClose={handleDismiss} title={dialogTitle}>
         <Dialog.Body>
