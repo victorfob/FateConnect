@@ -33,7 +33,7 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 
 ⚠️ **E aqui o `paths` desta rule era o defeito real.** Ele cobria só `FateConnect/**`, então editar `.github/` não carregava nada sobre idioma — a regra existia e não me alcançava. Por isso a entrada de `.github/**` acima.
 
-**Comentário e mensagem de `echo` continuam em pt-BR**, como nos sete workflows. Medido na mesma rodada: os sete têm comentário em português, e o `echo` que fala com quem lê o log também. Não "corrija" isso para inglês — o que é inglês é o **nome**.
+**Comentário e mensagem de `echo` continuam em pt-BR** — *"echo é um comentário"*, como o Victor resolveu em 11/09/2026, então ele segue a regra do comentário e não a do identificador. Medido na mesma rodada: os sete workflows escrevem os dois em português. Não "corrija" isso para inglês — o que é inglês é o **nome**.
 
 ## Back-end .NET
 

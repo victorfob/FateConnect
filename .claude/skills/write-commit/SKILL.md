@@ -17,6 +17,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/). Message in 
 | `feat`     | New feature                                                   |
 | `fix`      | Bug fix                                                       |
 | `chore`    | Changes that do not affect production code (scripts, configs) |
+| `ci`       | Pipeline and workflow under `.github/`                        |
 | `refactor` | Code changes that do not alter external behavior              |
 | `test`     | Adding or updating tests                                      |
 | `docs`     | Documentation changes                                         |
@@ -26,6 +27,8 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/). Message in 
 
 - `prefix: message`
 - Imperative, lowercase after the colon. Do not add the issue code (e.g. Github Issue ID) in the message; it is already in the branch name.
+
+⚠️ **`ci` e `chore` se confundem, e o corte é o arquivo:** mexeu em `.github/`, é `ci`; qualquer outro script ou configuração é `chore`. A distinção existe porque a esteira é o que decide se um PR pode ser mergeado — quem lê o histórico procurando "por que o CI mudou" não deveria ter de garimpar entre `chore`.
 
 ### Examples
 
