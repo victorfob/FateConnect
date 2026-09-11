@@ -105,6 +105,10 @@ O segundo é o pior: eu ia relatar que os arquivos de API haviam desaparecido e 
 
 ⛔ **E não é só busca: truncar a saída de um comando que pode falhar apaga o motivo da falha.** Em 10/09/2026 um `git push | tail -2` deixou na tela `failed to push some refs` sem a linha que dizia por quê; empurrei de novo, funcionou, e o motivo da primeira reprovação está perdido para sempre. **Comando que pode falhar vai sem filtro, ou com a saída inteira num arquivo** — o `tail` entra depois, sobre o arquivo, que continua ali para reler.
 
+⛔ **Mutação que não alterou o arquivo não matou nada — e se apresenta como acerto.** Ao provar um verificador, confira que cada mutante **difere** do original antes de ler o veredito: `cmp -s` resolve. Em 11/09/2026 três mutações minhas usaram `sed` com expressão inválida; ele falhou, o arquivo saiu vazio, o verificador reprovou por isso, e eu contabilizei três mortes que nunca aconteceram. A saída do `sed` estava na tela e eu li o resultado do verificador em vez dela.
+
+⚠️ **O sintoma é o mutante morrer rápido demais ou todos morrerem de primeira.** Verificador que reprova o arquivo vazio reprova qualquer erro de escrita do mutante, então o kill não diz nada sobre o invariante que você quis testar.
+
 ⛔ **Regra nova se prova nas duas formas.** O controle positivo de uma regra de lint não é só "reprova o que deve" — é também "aceita o que deve". Ao estender a de tag crua, rodei um arquivo com `<div>` **e** `<strong>` no mesmo JSX: o primeiro reprova, o segundo passa. Sem a segunda metade eu teria proibido ênfase de texto sem perceber.
 
 ⛔ **Correção com duas pontas se confere nas duas, enumerando.** Consertei a página 4 e entreguei; a 9 tinha o defeito espelhado e quem viu foi o Victor. O que resolveu foi listar **todos** os estados de 1 a 12 numa tabela e olhar a coluna inteira — as duas faixas usavam medidas diferentes, e isso só aparece lado a lado.
@@ -112,6 +116,19 @@ O segundo é o pior: eu ia relatar que os arquivos de API haviam desaparecido e 
 ⛔ **Zero de comando composto não vale sem saber onde ele rodou.** Um `cd` que falha em `cd X && grep ...` deixa o `grep` rodar no diretório anterior, e o zero se lê como "não existe". Em 04/09/2026 afirmei que o projeto não tinha regra de autofill nenhuma; tinha zero **naquele** diretório, que não era o do front. `pwd` entra na mesma saída sempre que o zero vai sustentar conclusão.
 
 ⛔ **Antes de atribuir um artefato à sua mudança, remova a mudança.** Correlação não é autoria. No mesmo dia vi seletores quebrados aparecerem junto da minha regra de CSS e disse ao Victor que eram meus; removendo a regra e recarregando frio, os nove continuavam lá — eram do MUI. O tell é a frase *"isso apareceu depois que eu mexi"*.
+
+### A prova local cobre a ferramenta, não o trajeto
+
+⛔ **Provar que a ferramenta faz o que promete não prova que o dado chega ao passo seguinte.** Entre um passo e outro há transporte — artefato, volume, rede, disco —, e ele não existe na sua máquina: você o pula sem perceber, porque localmente os dois passos compartilham o mesmo diretório.
+
+⛔ Aconteceu em 11/09/2026, ao fatiar a suíte de testes no CI. Provei o Vitest inteiro na máquina: dois shards, relatório `blob`, fusão, cobertura idêntica à corrida cheia, inventário de testes do Sonar. Os **dois** defeitos que apareceram estavam fora disso:
+
+| O que quebrou | Por que a prova local não alcançava |
+| --- | --- |
+| passo rodando antes do `checkout` herdava um diretório que ainda não existia | localmente o diretório sempre existe |
+| o upload de artefato ignora arquivo oculto, e o relatório mora em `.vitest-reports` | localmente ninguém sobe artefato: o passo seguinte lê o mesmo disco |
+
+**O tell é a sua prova e o seu alvo rodarem no mesmo processo ou no mesmo diretório**, quando em produção eles são dois. Antes de declarar provado, pergunte por onde o dado **viaja** entre um e outro — e conte o que chegou do outro lado, não o que saiu deste.
 
 ### Largura é dimensão de varredura, não um ponto
 
@@ -131,6 +148,10 @@ Nas três quem viu foi o Victor, olhando a tela.
 
 ⚠️ **Elemento que divide a linha com outro não tem a largura da janela.** A coluna da landing vai de 314px a 600px enquanto a janela vai de 937 a 1920, e é a **dela** que decide a quebra. Meça a largura do contêiner junto da janela, sempre — como já se faz com a porta.
 
+⛔ **E o eixo esquecido nem sempre é espacial: pode ser o tempo desde que o artefato nasceu.** Em 11/09/2026, medindo se um `Cache-Control` novo mudava alguma coisa, o navegador respondeu **zero requisição** tanto com ele quanto sem — e o controle contra produção é que denunciou o empate. O que faltava segurar era a **idade do arquivo**: sem `Cache-Control`, o navegador arbitra a validade em ~10% da idade, então recém-publicado ele revalida tudo e dias depois não revalida nada. A mesma configuração responde diferente conforme o dia em que se mede.
+
+O A/B só discriminou depois de `touch` nos arquivos e duas portas, com cache separado: **7 revalidações contra 0**. Antes disso, os dois lados diziam a mesma coisa e a conclusão seria "não muda nada".
+
 ### Pior que alcançar metade: destruir a outra
 
 ⛔ **Instrumento que transforma texto precisa contar o que consumiu contra o que emitiu.** O que só mede erra devolvendo um número torto; o que reescreve erra **apagando** — e o arquivo salvo não denuncia o que sumiu.
@@ -142,6 +163,10 @@ Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase`
 **A guarda é aritmética, não cuidado:** conte as entradas do bloco de entrada, conte as que você atribuiu, e **aborte** quando os dois números não baterem. Uma linha de `assert` teria transformado uma perda silenciosa numa parada barulhenta.
 
 ⚠️ **O sinal é a saída vazia onde deveria haver enumeração.** "0 arquivos alterados", "nenhuma seção", "nada a fazer" — num passo que existe justamente para alterar algo, isso não é sucesso, é o instrumento dizendo que não entendeu a entrada.
+
+⛔ **Na esteira isso tem nome e padrão: o passo que não achou nada avisa e segue verde.** O `actions/upload-artifact` nasce com `if-no-files-found: warn`, então um caminho errado sobe **zero arquivo** e o job fica verde; quem quebra é o passo que ia consumir o artefato, num job adiante, longe da causa. Em 11/09/2026 gastei um ciclo inteiro de CI nisso — o diretório era `.vitest-reports`, e o upload ignora arquivo oculto por padrão.
+
+**Passo que transporta exige as duas guardas:** `if-no-files-found: error` de um lado, e do outro **contar o que chegou** antes de usar — um relatório por shard, conferido, separa "a suíte reprovou" de "os relatórios não chegaram".
 
 ⛔ **Tabela de substituição confere também que cada regra dela disparou.** Regra que nunca casa não faz nada e não reclama: o arquivo sai plausível, com um trecho intacto no meio do que você acha que traduziu.
 
