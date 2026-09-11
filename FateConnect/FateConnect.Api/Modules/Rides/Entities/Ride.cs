@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Rides.Entities;
 
+using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Rides.Exceptions;
@@ -104,7 +105,7 @@ public class Ride
     private static void ValidateDriver(int driverId)
     {
         if (driverId < 1)
-            throw new InvalidRideDriverException();
+            throw new InvalidUserIdentifierException();
     }
 
     private static void ValidateRideType(EnumRideType rideType)
