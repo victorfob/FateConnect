@@ -40,6 +40,7 @@ O que respondeu foi ler a **cascata**, não o pixel: percorrer `document.styleSh
 | `grep ... \| head` procurando quem mexia no scroll | as 10 primeiras linhas | na 11ª — e eu **descartei a hipótese certa** por causa disso |
 | a regra `no-restricted-syntax` de tag crua | chamadas de `styled('nav')` | no JSX: três `<li>` passaram no código novo |
 | a correção da fileira de paginação | a ponta inicial, onde a página 4 quebrava | na ponta final, onde a 9 quebrava igual |
+| a medição de layout numa largura só | 1440px, onde a coluna está no teto de 600px | entre 933 e 1056px, onde ela divide a linha com o cartão de login |
 | a varredura que comparava **toda string** do diff | `'…'`, `"…"` e `` `…` `` | num **regex literal**: `/nome deve ter ao menos/i` |
 
 A quarta linha custou uma segunda rodada de review. Em 04/09/2026 a varredura devolveu 11 achados, eu corrigi os 11 e declarei o PR limpo; faltavam dois — as asserções do teste que guardava a copy, escritas como regex. Eles só apareceram porque a suíte ficou **vermelha** depois da correção.
@@ -111,6 +112,24 @@ O segundo é o pior: eu ia relatar que os arquivos de API haviam desaparecido e 
 ⛔ **Zero de comando composto não vale sem saber onde ele rodou.** Um `cd` que falha em `cd X && grep ...` deixa o `grep` rodar no diretório anterior, e o zero se lê como "não existe". Em 04/09/2026 afirmei que o projeto não tinha regra de autofill nenhuma; tinha zero **naquele** diretório, que não era o do front. `pwd` entra na mesma saída sempre que o zero vai sustentar conclusão.
 
 ⛔ **Antes de atribuir um artefato à sua mudança, remova a mudança.** Correlação não é autoria. No mesmo dia vi seletores quebrados aparecerem junto da minha regra de CSS e disse ao Victor que eram meus; removendo a regra e recarregando frio, os nove continuavam lá — eram do MUI. O tell é a frase *"isso apareceu depois que eu mexi"*.
+
+### Largura é dimensão de varredura, não um ponto
+
+⛔ **Layout responsivo se mede na faixa em que ele muda de forma, e o defeito mora entre os pontos que você escolheu.** Medir "no desktop" é medir um pixel de uma faixa de mil, e o verde dali não fala pelos outros novecentos.
+
+Três vezes em 11/09/2026, na mesma rodada:
+
+| O que eu media | Onde o defeito estava |
+| --- | --- |
+| a fileira de destaques a 1440px, com a coluna nos 600px do teto | a 982px, onde a coluna tem **351px** porque divide a linha com o cartão de login |
+| a correção que apliquei, de novo a 1440px | na faixa 933–1056px, que a própria correção reintroduziu |
+| nada: o cabeçalho vinha quebrado da branch anterior | entre 933 e 980px, onde a gaveta já tinha sumido e a nav ainda não cabia |
+
+Nas três quem viu foi o Victor, olhando a tela.
+
+**Os pontos que a faixa exige:** cada limite declarado e **um pixel de cada lado dele** — é ali que os dois estados se encostam e o buraco aparece —, mais a largura em que cada contêiner elástico para de crescer.
+
+⚠️ **Elemento que divide a linha com outro não tem a largura da janela.** A coluna da landing vai de 314px a 600px enquanto a janela vai de 937 a 1920, e é a **dela** que decide a quebra. Meça a largura do contêiner junto da janela, sempre — como já se faz com a porta.
 
 ### Pior que alcançar metade: destruir a outra
 

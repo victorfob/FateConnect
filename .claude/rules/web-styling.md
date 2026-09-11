@@ -129,6 +129,12 @@ O `md` está sobrescrito em **769px**, e é o único que mexemos: `Toolbar` e `D
 
 Para decidir em JS, `useMediaQuery(theme.breakpoints.up('md'))` — não meça `window.innerWidth`.
 
+⛔ **Antes de mover o limite, esgote o que não o move.** Ele é uma constante do tema: mudá-lo desloca a fronteira mobile/desktop de **toda** tela que consulta `up('md')` ou `down('md')`, não só a que te trouxe até aqui.
+
+Em 11/09/2026 a barra do cabeçalho quebrava em duas linhas numa faixa de ~47px e eu fui direto ao limite, que precisaria subir 12px. A correção do Victor foi *"diminuir o vão primeiro e aumentar a faixa pro resultado após a diminuição"*: dois vãos de 24px para 16px tiraram 32px da conta, e o limite subiu **4px**.
+
+**A ordem é encolher o conteúdo, remedir, e só então mover o limite para o que sobrou.** O limite é medido no cabeçalho — ver `design-system/tokens/breakpoints.ts` —, então mexer no que mora nele obriga a remedir de qualquer forma.
+
 ### 4. CSS puro / classe solta
 
 ```tsx

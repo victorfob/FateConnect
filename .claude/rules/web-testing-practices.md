@@ -50,6 +50,12 @@ Aconteceu em 04/09/2026, na #309. A regra de partida futura do formulário de ca
 
 **Restaure a árvore ao fim de cada mutação** e confirme com `git status` que nada sobrou.
 
+⛔ **E `git checkout --` restaura para o HEAD, não para o seu estado.** Em arquivo que a sua branch já alterou, ele apaga a **sua** mudança junto com a mutação — e o sintoma é o oposto de um erro: a árvore fica limpa, que é exatamente o que você foi conferir.
+
+Aconteceu em 11/09/2026. Mutei a ordem de uma constante que eu mesmo tinha acabado de reordenar, restaurei com `git checkout --`, e a reordenação sumiu com a mutação. O `git status` respondeu que o arquivo não tinha modificação nenhuma, e isso se lê como sucesso.
+
+**A conferência não é "a árvore está limpa", é "a minha mudança continua lá".** Em arquivo que a branch toca, `git status` limpo é o alarme — leia o trecho mutado antes de seguir.
+
 ⛔ **Mutação que não compila por motivo incidental não é resultado — ela não foi testada.** O `tsc` reprovando parece invariante garantido pelo compilador, e às vezes é; mas `TS6133 — declaração sem uso` só diz que a sua mutação deixou um import órfão. São coisas opostas com a mesma cara.
 
 Aconteceu em 10/09/2026, na rodada da faixa de período: três mutações voltaram como "`tsc` reprovou" e eu ia relatar três invariantes do compilador. **Leia o código do erro.** `TS6133` manda refazer a mutação removendo o órfão junto; erro de tipo de verdade — `end` como `Date | null` onde a comparação pede `Date` — é resultado, e aí não falta teste. Refeitas, duas morreram e uma sobreviveu.
