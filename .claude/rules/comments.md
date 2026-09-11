@@ -47,11 +47,17 @@ Sai, sempre:
 - Parágrafo de contexto que pertence ao corpo do PR ou à issue — por que a API ainda não guarda o arquivo, o que a #106 vai implementar.
 - Comentário que repete a constante declarada logo acima.
 
+⛔ **E essa lista vale também para o que já está escrito.** Ao editar um trecho, passe os comentários **vizinhos** pelo mesmo teste e apague os que só repetem o código — editar é o único momento em que alguém relê aquilo. Varredura dedicada é cara e acontece uma vez por ano; limpeza de passagem é grátis e contínua.
+
+⚠️ **Não é licença para alargar o diff.** Sai o comentário que está **no trecho que o PR já toca**, pela mesma regra de boy-scout que vale para padrão legado: não incluir mais, e corrigir o que passou pela sua mão.
+
 ## Forma: JSDoc acima de declaração, `//` dentro de corpo
 
 O comentário que passou no teste acima ainda escolhe a forma errada. Acima de uma **declaração** — `const`, `function`, `type`, `enum`, componente `styled` — é `/** … */`, como `OWN_ITEM_LABEL`, `ErrorScreen` e `CardRoot` estão escritos. **Dentro** de um corpo — propriedade de objeto, ramo de `if`, passo de um teste — é `//`.
 
 ⛔ Cobrado no PR #141: `// Instrumentado para a transação…` acima do `const router`, no `main.tsx`. *"Deveria ser jsDoc"*. O mesmo comentário, com o mesmo texto, estava certo — errada estava a forma.
+
+**E o topo do arquivo não é um terceiro caso.** Medido nesta base: **26 dos 398** arquivos do front começam com comentário, e em todos ele está **colado na primeira declaração** — o barrel, o enum de rotas, o bloco de tokens. Banner que descreve *o arquivo* em vez de uma declaração não existe aqui e não é para nascer: ele é, estruturalmente, o que a seção **Comentário órfão** descreve — JSDoc seguido de linha em branco.
 
 ## Comentário que descreve o vizinho envelhece com ele
 
