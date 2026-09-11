@@ -24,7 +24,6 @@ public class SignupTests : IClassFixture<ApiFactory>
         fullName = "Mariana Alves Rocha",
         birthDate = birthDate ?? "2000-01-01T00:00:00Z",
         gender = "Male",
-        addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
         contacts = contacts,
     };
 
@@ -97,14 +96,13 @@ public class SignupTests : IClassFixture<ApiFactory>
             fullName = "Mariana Alves Rocha",
             birthDate = "2000-01-01T00:00:00Z",
             gender = "Male",
-            addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, r.StatusCode);
     }
 
     [Fact]
-    public async Task Signup_WithTheRemovedNicknameField_IsAccepted()
+    public async Task Signup_WithAPayloadFromTheOlderContract_IsAccepted()
     {
         HttpResponseMessage r = await _factory.CreateClient().PostAsJsonAsync("/Users/signup", new
         {
@@ -184,7 +182,6 @@ public class SignupTests : IClassFixture<ApiFactory>
             fullName = "Mariana Alves Rocha",
             birthDate = "2000-01-01T00:00:00Z",
             gender = "Male",
-            addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
             contacts = new[] { new { phone, contactEmail } },
         };
 
