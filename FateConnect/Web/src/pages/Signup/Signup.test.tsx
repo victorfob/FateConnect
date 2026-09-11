@@ -2,7 +2,10 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { DATE_PICKER_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
-import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
+import {
+  FATEC_EMAIL_DOMAIN_MESSAGE,
+  FATEC_EMAIL_LOCAL_PART_MESSAGE,
+} from '@app/constants/fatecEmail';
 import { PRIVACY_URL, TERMS_URL } from '@app/constants/legalDocuments';
 import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { server } from '@app/mocks/server';
@@ -93,7 +96,7 @@ describe('Signup', () => {
 
     await submit();
 
-    expect(await screen.findByText(FATEC_EMAIL_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(FATEC_EMAIL_DOMAIN_MESSAGE)).toBeInTheDocument();
     expect(screen.getByText(SIGNUP_MESSAGES.passwordTooShort)).toBeInTheDocument();
   });
 
@@ -105,7 +108,17 @@ describe('Signup', () => {
 
     await submit();
 
-    expect(await screen.findByText(FATEC_EMAIL_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(FATEC_EMAIL_DOMAIN_MESSAGE)).toBeInTheDocument();
+  });
+
+  // O domínio estava certo: quem reprova é o acento, e a mensagem precisa dizer isso.
+  it('should name what comes before the at sign when the email carries an accent', async () => {
+    renderSignup();
+    await userEvent.type(screen.getByLabelText(/E-mail Fatec/), 'josé_silva@aluno.cps.sp.gov.br');
+
+    await submit();
+
+    expect(await screen.findByText(FATEC_EMAIL_LOCAL_PART_MESSAGE)).toBeInTheDocument();
   });
 
   it('should reject a phone number outside ten or eleven digits', async () => {

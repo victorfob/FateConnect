@@ -1,6 +1,11 @@
 import { z } from 'zod';
 
-import { FATEC_EMAIL_MESSAGE, FATEC_EMAIL_PATTERN } from '@app/constants/fatecEmail';
+import {
+  FATEC_EMAIL_DOMAIN_MESSAGE,
+  FATEC_EMAIL_DOMAIN_PATTERN,
+  FATEC_EMAIL_LOCAL_PART_MESSAGE,
+  FATEC_EMAIL_LOCAL_PART_PATTERN,
+} from '@app/constants/fatecEmail';
 
 const REQUIRED_MIN_LENGTH = 1;
 
@@ -13,7 +18,8 @@ export const loginSchema = z.object({
   email: z
     .string()
     .min(REQUIRED_MIN_LENGTH, LOGIN_MESSAGES.emailRequired)
-    .regex(FATEC_EMAIL_PATTERN, FATEC_EMAIL_MESSAGE),
+    .regex(FATEC_EMAIL_DOMAIN_PATTERN, FATEC_EMAIL_DOMAIN_MESSAGE)
+    .regex(FATEC_EMAIL_LOCAL_PART_PATTERN, FATEC_EMAIL_LOCAL_PART_MESSAGE),
   password: z.string().min(REQUIRED_MIN_LENGTH, LOGIN_MESSAGES.passwordRequired),
 });
 
