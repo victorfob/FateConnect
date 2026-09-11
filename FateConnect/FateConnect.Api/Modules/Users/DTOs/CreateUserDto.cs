@@ -37,10 +37,6 @@ public class CreateUserDto
     required public EnumGender Gender { get; set; }
 
     [Required]
-    required public List<CreateAddressDto> Addresses { get; set; } =
-    [];
-
-    [Required]
     [MinLength(1, ErrorMessage = "Informe ao menos um contato")]
     required public List<CreateContactDto> Contacts { get; set; } =
     [];
