@@ -1,7 +1,5 @@
-import Button from '@mui/material/Button';
 import type { Theme } from '@mui/material/styles';
 
-import { styled } from '@ds-root/styled';
 import type { NotificationVariant } from '@ds-root/theme/types';
 import { spacingScale, typographyTokens } from '@ds-root/tokens';
 
@@ -18,10 +16,6 @@ const MESSAGE_PADDING_Y_PX = 14;
  * linhas quando não cabe e a ação fica sempre no mesmo ponto.
  */
 const BOX_WIDTH_PX = 378;
-/** Caixa do botão de ação no produto, herdada do botão do Material. */
-const DISMISS_MIN_WIDTH_PX = 64;
-const DISMISS_HEIGHT_PX = 36;
-
 /**
  * O notistack marca o conteúdo com `notistack-MuiContent-<variante>`, e é por
  * essa classe que a cor do produto entra: a prop `classes` do provider só
@@ -71,12 +65,3 @@ export function notificationStyles(theme: Theme) {
     ...Object.fromEntries(perVariant),
   };
 }
-
-export const DismissButton = styled(Button)(({ theme }) => ({
-  ...typographyTokens.button,
-  lineHeight: 'normal',
-  minWidth: `${DISMISS_MIN_WIDTH_PX}px`,
-  height: `${DISMISS_HEIGHT_PX}px`,
-  padding: theme.space(none, xs),
-  color: 'inherit',
-}));

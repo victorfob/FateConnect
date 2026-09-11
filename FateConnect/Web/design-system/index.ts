@@ -32,6 +32,10 @@ export type { CardsListProps } from './components/CardsList';
 export { ListCard } from './components/ListCard';
 export type { ListCardProps } from './components/ListCard';
 export { NotificationProvider } from './components/NotificationProvider';
+export {
+  NotificationActions,
+  type NotificationAction,
+} from './components/NotificationProvider/NotificationActions';
 export { PageMessage } from './components/PageMessage';
 export type { PageMessageProps } from './components/PageMessage';
 export { PageShell } from './components/PageShell';
