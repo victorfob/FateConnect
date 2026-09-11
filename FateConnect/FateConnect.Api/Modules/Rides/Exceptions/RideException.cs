@@ -14,8 +14,5 @@ public class InvalidDestinationException()
 public class InvalidRideTypeException()
     : RideDomainException("Tipo de carona inválido.");
 
-public class InvalidRideDriverException()
-    : RideDomainException("Não foi possível identificar quem está ofertando a carona. Entre novamente.");
-
 public class RideNotDrivenByUserException()
     : Exception("Esta carona foi ofertada por outra pessoa. Só quem ofertou pode alterá-la.");

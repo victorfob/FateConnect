@@ -1,3 +1,4 @@
+using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
@@ -99,7 +100,7 @@ public class LostAndFoundRecordTests
     [Fact]
     public void Constructor_WithoutAnIdentifiedReporter_IsRejected()
     {
-        Assert.Throws<InvalidReporterException>(() => new LostAndFoundRecord(
+        Assert.Throws<InvalidUserIdentifierException>(() => new LostAndFoundRecord(
             "Garrafa térmica azul",
             EnumLostAndFoundType.Lost,
             "Biblioteca do bloco B",

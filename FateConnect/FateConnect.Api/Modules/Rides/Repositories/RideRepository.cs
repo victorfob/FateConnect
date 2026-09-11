@@ -41,10 +41,7 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
 
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            string escapedSearchTerm = filter.SearchTerm
-                .Replace(@"\", @"\\")
-                .Replace("%", @"\%")
-                .Replace("_", @"\_");
+            string escapedSearchTerm = filter.SearchTerm.SanitizeSearchTerm();
 
             query = query.Where(r =>
                 EF.Functions.ILike(
