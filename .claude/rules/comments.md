@@ -1,5 +1,5 @@
 ---
-description: Quando comentar — zero no back-end .NET, e no front só o estritamente essencial, cujo teste é impedir uma mudança errada
+description: Quando comentar — zero no back-end .NET; fora dele, renomear, extrair e simplificar antes de escrever, e o teste é impedir uma mudança errada
 ---
 
 # Comentário
@@ -22,9 +22,21 @@ Aconteceu nesta mesma rodada: apagado o XML doc do `TimeOnlyJsonConverter`, a `w
 
 ⚠️ **A regra é do código, não do repositório.** YAML de workflow, script de shell, Markdown e o front seguem pela seção abaixo — lá o comentário existe, só é raro.
 
-⛔ **Comentário só quando for estritamente essencial:** trecho não óbvio, que não se explica sozinho. **Se o código precisa ser explicado, o problema é o código** — renomeie, extraia, simplifique, e o comentário deixa de ser necessário.
+## Fora do C#: reescrever vem antes de comentar
 
-**O teste, antes de escrever qualquer um:** este comentário impede alguém de fazer uma mudança errada? Se sim, fica. Se ele só conta o que o código já diz, sai.
+⛔ **Comentário é sinal de que o código não se explicou sozinho.** A primeira reação a *"isso aqui merece um comentário"* é reescrever o trecho até ele não merecer mais.
+
+⛔ **Antes de escrever qualquer um, tentar nesta ordem:**
+
+1. **renomear** — variável, função ou tipo que revele a intenção;
+2. **extrair** — uma função nomeada no lugar do bloco que você ia comentar;
+3. **simplificar** — reduzir aninhamento, early return, condição composta virando função com nome.
+
+Só o que sobrevive às três chega a ser candidato.
+
+**E o candidato ainda passa por um teste:** este comentário impede alguém de fazer uma mudança errada? Se sim, fica. Se ele só conta o que o código já diz, sai.
+
+⚠️ **A escada vem antes do teste porque o teste sozinho é permissivo.** Acabado de escrever, quase todo comentário parece impedir alguma mudança errada — quem o escreveu ainda tem na cabeça o contexto que o justifica. As três tentativas reduzem o volume porque removem a pergunta em vez de respondê-la.
 
 Fica: `Concluido` viaja sem acento **porque o backend serializa assim** (sem isso alguém "corrige" o typo). O `Array.isArray` **porque sem endereço de API o dev server responde HTML com 200** (sem isso alguém apaga a guarda como código morto).
 
