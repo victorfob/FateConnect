@@ -175,4 +175,12 @@ public string? Description { get; init; }
 
 ⚠️ **Só no campo que pode ser esvaziado de propósito.** Em campo obrigatório — nome, local — a conversão é o comportamento certo: ali string vazia não é valor, e deixá-la virar `null` faz a edição parcial ignorá-la em vez de gravar lixo.
 
+### Atributo de validação: dois limites que só aparecem ao compilar
+
+⛔ **`[RegularExpression]` casa a string INTEIRA, não um trecho.** O atributo roda `Regex.Match` e depois exige `Index == 0 && Length == value.Length`, então um padrão pensado para conferir só o fim — `@(aluno\.)?cps\.sp\.gov\.br$` — reprova tudo. Ancore os dois lados: `^.*@(aluno\.)?cps\.sp\.gov\.br$`.
+
+⛔ **E ele não empilha:** `AllowMultiple = false`. Duas expressões na mesma propriedade não compilam — `CS0579: Duplicate 'RegularExpression' attribute`. Precisando de **duas checagens com mensagens diferentes** no mesmo campo, a saída é um `ValidationAttribute` próprio em `Infrastructure/Validation/`, na forma do `MinimumAgeAttribute`: cada `if` devolve o seu `ValidationResult`, e a **ordem dos `if` decide qual mensagem sai**.
+
+Medido em 11/09/2026, na #354, ao separar a recusa do e-mail institucional em formato e domínio. ⚠️ A ordem é comportamento, não detalhe: invertê-la faz `nao-e-email` ouvir a mensagem da parte local. Ela se trava com teste.
+
 ⚠️ **O tell é a entidade que decide por `is not null`.** Todo campo opcional de um `PATCH` passa por essa comparação; para cada um, pergunte se existe motivo de alguém querer apagá-lo — se existe, o atributo entra junto.
