@@ -51,6 +51,27 @@ Sai, sempre:
 
 ⚠️ **Não é licença para alargar o diff.** Sai o comentário que está **no trecho que o PR já toca**, pela mesma regra de boy-scout que vale para padrão legado: não incluir mais, e corrigir o que passou pela sua mão.
 
+### Teto: três linhas de texto
+
+⛔ **Comentário tem até três linhas — e conta-se o texto, não o arquivo.** Um `/** … */` gasta duas linhas só com os delimitadores, então medir linha de arquivo vira um teto de **uma** linha sem ninguém perceber. Foi o erro que quase matou esta seção: a primeira medição disse que o teto condenava 33% da base, e ela contava delimitador.
+
+**O estado do front hoje, 572 blocos em código de produção:**
+
+| Linhas de texto | Blocos | Acumulado |
+| --- | --- | --- |
+| 1 | 297 | 51% |
+| 2 | 130 | 74% |
+| 3 | 94 | **91%** |
+| 4 ou mais | 51 | 100% |
+
+⚠️ **O teto é barato porque 91% já o cumprem.** Ele não corta o que existe — impede o comentário longo de nascer.
+
+⛔ **Estourou? A saída não é apagar, é mudar de lugar.** Volte à escada acima; o que ainda não couber é explicação que pertence ao **corpo do PR, à issue ou a uma rule** — onde alguém a relê quando o código mudar. O comentário fica com a **decisão**, não com a derivação dela.
+
+O caso que prova: `design-system/tokens/breakpoints.ts` carrega **14 linhas** derivando o limite a partir das larguras medidas do cabeçalho. Ninguém revisita aquilo ao mexer no tema, e nada avisa quando um dos números muda.
+
+⚠️ **Os 51 de hoje saem por boy-scout**, conforme alguém passe por eles. Não se abre varredura para isto.
+
 ## Forma: JSDoc acima de declaração, `//` dentro de corpo
 
 O comentário que passou no teste acima ainda escolhe a forma errada. Acima de uma **declaração** — `const`, `function`, `type`, `enum`, componente `styled` — é `/** … */`, como `OWN_ITEM_LABEL`, `ErrorScreen` e `CardRoot` estão escritos. **Dentro** de um corpo — propriedade de objeto, ramo de `if`, passo de um teste — é `//`.
