@@ -54,7 +54,6 @@ Serve para conferir rápido se algo que você acrescentou já está coberto:
 - **IP e identificação do navegador** no registro do aceite;
 - **Sentry** com replay de sessão — 10% das sessões e 100% das que dão erro, com texto mascarado e mídia bloqueada, sem dado de usuário e sem corpo de requisição;
 - **`localStorage`** com token, nome e preferência de tema;
-- **consulta de CEP** enviando o CEP a serviço externo;
 - o que fica visível para outros usuários, prazos de guarda, e os direitos do Art. 18 da LGPD.
 
 ⚠️ **O texto não passou por revisão jurídica.** Ele é verdadeiro sobre o que o código faz — que é o que dá para garantir daqui —, e continua pendente de revisão por quem tenha competência para isso.
