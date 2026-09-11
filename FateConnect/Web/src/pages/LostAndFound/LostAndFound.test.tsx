@@ -81,7 +81,7 @@ function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
 
 const NO_CONTENT = 204;
 
-const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', deleted: 'Excluído' };
+const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', deleted: 'Arquivado' };
 
 const STATUS_FILTER_ALL_LABEL = 'Todas';
 
@@ -92,8 +92,8 @@ const optionLabel = (options: readonly SelectOption[], value: string) =>
 const OWNER_MINE_LABEL = optionLabel(LOST_ITEM_OWNER_FILTER_OPTIONS, LostItemOwnerFilterEnum.MINE);
 
 const DELETION_NOTE = {
-  owner: 'Excluído manualmente.',
-  inactivity: 'Excluído automaticamente por inatividade.',
+  owner: 'Arquivado manualmente.',
+  inactivity: 'Arquivado automaticamente por inatividade.',
 };
 
 const OWN_OPEN_ITEM: LostItem = { ...LOST_ITEM, isOwner: true };

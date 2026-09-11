@@ -5,20 +5,20 @@ import { LostItemStatusEnum } from '@app/services/lostAndFound/types';
 const STATUS_LABEL: Readonly<Record<LostItemStatusEnum, string>> = {
   [LostItemStatusEnum.OPEN]: 'Aberto',
   [LostItemStatusEnum.RESOLVED]: 'Resolvido',
-  [LostItemStatusEnum.DELETED]: 'Excluído',
+  [LostItemStatusEnum.DELETED]: 'Arquivado',
 };
 
 /** O que vai para a URL: o rótulo sem acento, porque a barra de endereço se lê. */
 const STATUS_SLUG: Readonly<Record<LostItemStatusEnum, string>> = {
   [LostItemStatusEnum.OPEN]: 'aberto',
   [LostItemStatusEnum.RESOLVED]: 'resolvido',
-  [LostItemStatusEnum.DELETED]: 'excluido',
+  [LostItemStatusEnum.DELETED]: 'arquivado',
 };
 
 const STATUS_TONE: Readonly<Record<LostItemStatusEnum, StatusTagTone>> = {
   [LostItemStatusEnum.OPEN]: 'warning',
   [LostItemStatusEnum.RESOLVED]: 'success',
-  [LostItemStatusEnum.DELETED]: 'danger',
+  [LostItemStatusEnum.DELETED]: 'neutral',
 };
 
 const STATUS_VALUES: ReadonlySet<string> = new Set(Object.values(LostItemStatusEnum));
