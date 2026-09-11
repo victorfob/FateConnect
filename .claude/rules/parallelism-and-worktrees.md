@@ -88,12 +88,8 @@ Aconteceu em 03/09/2026: eu media a #292 na 5173 enquanto o agente da #293 media
 
 E `lsof -nP -iTCP -sTCP:LISTEN | grep 517` diz quantos servidores existem. Mais de um ⇒ nenhuma medição vale sem dizer de qual porta veio.
 
-## Fatiação do agente: cada commit precisa compilar sozinho
+## Confira o corte do agente, não só o conteúdo
 
-⛔ **Confira o corte, não só o conteúdo.** O agente agrupa por assunto e esquece a ordem de dependência, e nenhum gate pega: eles rodam sempre na ponta da branch, nunca em cada commit.
+⛔ **O agente agrupa por assunto e esquece a ordem de dependência**, e nenhum gate pega: eles rodam na ponta da branch, nunca em cada commit. Foi assim na #171, com o barrel exportando um componente cuja pasta só chegava no commit seguinte.
 
-Na mesma #171, o commit da paginação já trazia o barrel **inteiro**, exportando um componente cuja pasta só chegava no commit seguinte — `tsc` reprovaria naquele ponto do histórico. Cada commit passou a levar apenas a sua própria linha no barrel.
-
-```bash
-git ls-tree -r --name-only <commit> -- <caminho que o barrel exporta>   # vazio = o commit aponta para o vazio
-```
+⚠️ **Isto não é defeito de agente.** A instrução de conferir — o tell, por que `git ls-tree` não basta, e como provar — vive na skill `write-commit`, porque vale para todo commit fatiado, inclusive os meus: em 11/09/2026 cometi a mesma coisa cortando à mão. Aqui fica só o lembrete de que a entrega do agente também passa por ela.
