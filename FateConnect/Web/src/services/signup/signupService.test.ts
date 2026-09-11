@@ -14,7 +14,6 @@ const PAYLOAD: SignupRequest = {
   fullName: 'Fulano de Tal',
   birthDate: '2000-01-01T00:00:00Z',
   gender: 'Female',
-  addresses: [],
   contacts: [],
 };
 

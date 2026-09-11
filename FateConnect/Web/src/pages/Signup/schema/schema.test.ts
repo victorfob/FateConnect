@@ -6,8 +6,7 @@ const ONE_DAY_MS = 86_400_000;
 const ONE_CHARACTER = 1;
 
 /** Os campos de texto que a API corta por comprimento. */
-type TextField =
-  'fullName' | 'fatecEmail' | 'street' | 'streetNumber' | 'complement' | 'city' | 'contactEmail';
+type TextField = 'fullName' | 'fatecEmail' | 'contactEmail';
 
 function textOfLength(total: number, suffix: string): string {
   return 'a'.repeat(total - suffix.length) + suffix;
@@ -20,11 +19,6 @@ const VALID: SignupFormValues = {
   birthDate: '22/05/1999',
   gender: GenderValueEnum.FEMALE,
   password: 'segredo123',
-  zipCode: '18000-000',
-  state: 'SP',
-  city: 'Sorocaba',
-  street: 'Rua das Flores',
-  streetNumber: '100',
   phone: '(11) 91234-5678',
   contactEmail: 'maria@exemplo.com',
   acceptTerms: true,
@@ -45,8 +39,8 @@ describe('signupSchema', () => {
     expect(parse().success).toBe(true);
   });
 
-  it('should accept the form without the optional fields', () => {
-    const result = parse({ complement: '', acceptMarketing: false });
+  it('should accept the form without the optional field', () => {
+    const result = parse({ acceptMarketing: false });
 
     expect(result.success).toBe(true);
   });
@@ -115,10 +109,6 @@ describe('signupSchema', () => {
   const MAX_LENGTHS: [TextField, number, string][] = [
     ['fullName', 200, ''],
     ['fatecEmail', 150, '@aluno.cps.sp.gov.br'],
-    ['street', 200, ''],
-    ['streetNumber', 20, ''],
-    ['complement', 100, ''],
-    ['city', 100, ''],
     ['contactEmail', 150, '@exemplo.com'],
   ];
 
