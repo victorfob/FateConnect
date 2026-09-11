@@ -16,9 +16,10 @@ server {
     access_log /var/log/nginx/fateconnect-__ENVIRONMENT__.access.log;
     error_log  /var/log/nginx/fateconnect-__ENVIRONMENT__.error.log;
 
-    # A lista embutida do nginx cobre só text/html. ⛔ Este servidor mapeia .js
-    # para application/javascript, e não para o text/javascript que o nginx
-    # passou a usar: sem os dois nomes, o bundle volta a sair cru sem erro nenhum.
+    # O build escreve um .gz ao lado de cada estático, e é esse arquivo pronto que
+    # o gzip_static serve; o gzip cobre o que não tiver par. ⛔ Este servidor
+    # mapeia .js para application/javascript — sem esse tipo, o bundle sai cru.
+    gzip_static on;
     gzip on;
     gzip_types application/javascript text/javascript text/css application/json image/svg+xml;
     gzip_min_length 1024;
