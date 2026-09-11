@@ -19,7 +19,6 @@ if [[ "$(id -u)" -ne 0 ]]; then
 fi
 
 TARGET_USER="${SUDO_USER:-$(logname 2>/dev/null || echo root)}"
-PG_CONF=/etc/postgresql/17/main/postgresql.conf
 PG_HBA=/etc/postgresql/17/main/pg_hba.conf
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
@@ -54,13 +53,12 @@ ufw default allow outgoing >/dev/null
 ufw allow 22/tcp    comment 'SSH'      >/dev/null
 ufw allow 80/tcp    comment 'HTTP'     >/dev/null
 ufw allow 443/tcp   comment 'HTTPS'    >/dev/null
-ufw allow 10000/tcp comment 'Webmin'   >/dev/null
 # Os contêineres alcançam o banco pelo gateway do Docker, e essa conexão entra
 # pela interface docker0 — ou seja, é "incoming" e cai no deny padrão. Liberar
 # a faixa privada do Docker é o que a autoriza sem abrir a porta para fora.
 ufw allow from 172.16.0.0/12 to any port 5432 proto tcp comment 'Postgres para contêineres' >/dev/null
 ufw --force enable >/dev/null
-echo "    liberadas 22, 80, 443 e 10000; a 5432 só para os contêineres"
+echo "    liberadas 22, 80 e 443; a 5432 só para os contêineres"
 
 echo "==> 4/5 Acesso dos contêineres ao Postgres"
 cp -a "$PG_HBA" "$PG_HBA.bak-$TIMESTAMP"
