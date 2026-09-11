@@ -52,6 +52,11 @@ export const LogoSlot = styled(PolymorphicBox)(({ theme }) => ({
   '& a:hover': { opacity: 0.8 },
 }));
 
+/**
+ * ⛔ Acrescentar item aqui obriga a remedir o `DESKTOP_MIN_WIDTH_PX`: ele é a
+ * largura em que esta fileira ainda cabe numa linha, e nada acusa quando ela
+ * cresce — o defeito nasce entre o limite antigo e o ponto onde ela deixou de caber.
+ */
 export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
