@@ -26,7 +26,7 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 
 ## Back-end .NET
 
-**Inglês absoluto, como no front:** identificador, namespace, nome de pasta e nome de arquivo. Módulos são `Auth`, `Common`, `Denunciations`, `LostAndFound`, `Rides` e `Users`; as tabelas são `Users`, `Addresses`, `Contacts` e `Rides`.
+**Inglês absoluto, como no front:** identificador, namespace, nome de pasta e nome de arquivo. Módulos são `Auth`, `Common`, `Denunciations`, `LostAndFound`, `Rides` e `Users`; o nome de cada tabela vem do `DbSet` que a declara no `FateConnectDbContext`, em PascalCase e no plural.
 
 - **Enum leva o prefixo `Enum`** — `EnumRideType`, `EnumGender`, `EnumProfileType` —, enquanto no front a regra é o sufixo (`RideTypeEnum`, `RoutePathEnum`). A divergência não é descuido e **não se corrige**: a análise da Microsoft reprova o sufixo pela **CA1711**, e com o `TreatWarningsAsErrors` do `.csproj` isso é erro de compilação, não preferência. Medido em 2026-08-28: um `public enum SondaEnum` derruba o build com `error CA1711: Rename type name SondaEnum so that it does not end in 'Enum'`.
 - **A rota do controller vem de `[Route("[controller]")]`**, nunca de string literal — daí `/Rides`, `/Users`, `/Auth`, com a inicial maiúscula do nome da classe. O roteamento do ASP.NET é case-insensitive, então minúsculo também resolve; o que muda é o que o Swagger mostra.
@@ -46,7 +46,7 @@ A API fala **inglês inteira** — caminho, query, corpo e resposta. Não há tr
 
 - **Caronas.** Caminho `/Rides`. Valores do enum de tipo: `Solidarity` | `Egalitarian`; do enum de turno: `Morning` | `Afternoon` | `Night`.
 - **Achados e perdidos.** Caminho `/LostAndFound`. O campo de autoria se chama `OnlyMine` **nos dois módulos**.
-- **Cadastro.** `POST /Users/signup` com `fullName`, `fatecEmail`, `password`, `birthDate`, `gender`, `addresses` (`zipCode`, `street`, `streetNumber`, `complement`, `city`, `state`) e `contacts` (`phone`, `contactEmail`). Resposta: `{ token }` — o cadastro já autentica. Valores de gênero: `Male` | `Female` | `Other`.
+- **Cadastro.** `POST /Users/signup` com `fullName`, `fatecEmail`, `password`, `birthDate`, `gender` e `contacts` (`phone`, `contactEmail`). Resposta: `{ token }` — o cadastro já autentica. Valores de gênero: `Male` | `Female` | `Other`.
 - **Login.** `POST /Auth/login` com `{ fatecEmail, password }`, resposta `{ token }`.
 - **Sessão.** `GET /Auth/session`, autenticada, responde `204` enquanto o token vale e `401` quando não vale mais. É quem diz se a sessão continua de pé — o front não julga validade por conta própria, e não lê o `exp` do token.
 - **O nome de quem está logado sai do token**, na claim `unique_name`, e não de nenhuma resposta. Cadastro e login devolvem o mesmo `TokenResponseDto`.
