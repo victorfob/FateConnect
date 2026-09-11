@@ -1,3 +1,8 @@
+import {
+  FATEC_EMAIL_DOMAIN_MESSAGE,
+  FATEC_EMAIL_LOCAL_PART_MESSAGE,
+} from '@app/constants/fatecEmail';
+
 import { GenderValueEnum } from '../@types';
 import { formatBirthDate, latestBirthDate } from '../helpers/birthDate';
 import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from '.';
@@ -34,6 +39,12 @@ function firstIssuePath(result: ReturnType<typeof parse>) {
   return result.error.issues[0]?.path;
 }
 
+function firstIssueMessage(result: ReturnType<typeof parse>) {
+  if (result.success) return undefined;
+
+  return result.error.issues[0]?.message;
+}
+
 describe('signupSchema', () => {
   it('should accept a complete form', () => {
     expect(parse().success).toBe(true);
@@ -60,10 +71,31 @@ describe('signupSchema', () => {
     expect(firstIssuePath(result)).toEqual([field]);
   });
 
-  it('should reject an email without a domain', () => {
-    const result = parse({ fatecEmail: 'maria@' });
+  it('should accept an institutional email with the characters the api allows', () => {
+    expect(parse({ fatecEmail: 'jose_silva@aluno.cps.sp.gov.br' }).success).toBe(true);
+    expect(parse({ fatecEmail: 'a+b%c-d@cps.sp.gov.br' }).success).toBe(true);
+  });
+
+  it.each([
+    ['an email without a domain', 'maria@'],
+    ['an email outside the institutional domain', 'joao.silva@gmail.com'],
+    ['something that is not an email', 'nao-e-email'],
+  ])('should name the domain when rejecting %s', (_, fatecEmail) => {
+    const result = parse({ fatecEmail });
 
     expect(firstIssuePath(result)).toEqual(['fatecEmail']);
+    expect(firstIssueMessage(result)).toBe(FATEC_EMAIL_DOMAIN_MESSAGE);
+  });
+
+  it.each([
+    ['an accent', 'josé_silva@aluno.cps.sp.gov.br'],
+    ['a space', 'ze chicrete@cps.sp.gov.br'],
+    ['nothing at all', '@cps.sp.gov.br'],
+  ])('should name what comes before the at sign when it carries %s', (_, fatecEmail) => {
+    const result = parse({ fatecEmail });
+
+    expect(firstIssuePath(result)).toEqual(['fatecEmail']);
+    expect(firstIssueMessage(result)).toBe(FATEC_EMAIL_LOCAL_PART_MESSAGE);
   });
 
   it('should reject a password below eight characters', () => {

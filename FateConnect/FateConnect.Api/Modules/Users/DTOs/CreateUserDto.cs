@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.Validation;
-using FateConnect.Api.Modules.Common.Constants;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
 
@@ -11,7 +10,7 @@ public class CreateUserDto
 {
     [Required(ErrorMessage = "Informe o e-mail")]
     [EmailAddress(ErrorMessage = "E-mail inválido")]
-    [RegularExpression(RegexConstants.FatecEmailPattern, ErrorMessage = RegexConstants.FatecEmailErrorMessage)]
+    [FatecEmail]
     [MaxLength(150)]
     [DefaultValue("joao.silva999@aluno.cps.sp.gov.br")]
     public string FatecEmail { get; set; } = string.Empty;
