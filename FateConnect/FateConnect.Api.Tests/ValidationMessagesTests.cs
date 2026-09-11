@@ -34,7 +34,6 @@ public class ValidationMessagesTests
             FullName = "Mariana Alves Rocha",
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             Gender = (EnumGender)99,
-            Addresses = [],
             Contacts = [],
         });
 
@@ -51,7 +50,6 @@ public class ValidationMessagesTests
             FullName = "Mariana Alves Rocha",
             BirthDate = DateTime.UtcNow.Date.AddYears(-10),
             Gender = EnumGender.Female,
-            Addresses = [],
             Contacts = [],
         });
 
