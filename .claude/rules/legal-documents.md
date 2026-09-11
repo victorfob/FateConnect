@@ -38,6 +38,14 @@ Conta como fluxo novo, e portanto obriga a releitura:
 
 Ao mudar o texto: edite o HTML, suba a data nos dois lugares (no `<header>` e no rodapé do HTML, e na constante), e rode `build-pdfs.sh`.
 
+⚠️ **E suba a data só do documento que mudou.** Mexendo na política, `PRIVACY_VERSION` sobe e `TERMS_VERSION` fica — versão que anda sem o texto ter andado faz o aceite apontar para uma revisão que não existiu.
+
+⚠️ **O `build-pdfs.sh` gera os dois PDFs, inclusive o do documento que você não tocou.** O carimbo de geração muda, então o `git status` acusa os dois e o diff carrega um binário sem uma linha de conteúdo diferente. Devolva o que não mudou antes de commitar — medido em 11/09/2026, ao corrigir só a política:
+
+```bash
+git checkout -- FateConnect/Web/public/termos.pdf
+```
+
 ## O que os documentos hoje declaram
 
 Serve para conferir rápido se algo que você acrescentou já está coberto:
@@ -46,7 +54,6 @@ Serve para conferir rápido se algo que você acrescentou já está coberto:
 - **IP e identificação do navegador** no registro do aceite;
 - **Sentry** com replay de sessão — 10% das sessões e 100% das que dão erro, com texto mascarado e mídia bloqueada, sem dado de usuário e sem corpo de requisição;
 - **`localStorage`** com token, nome e preferência de tema;
-- **consulta de CEP** enviando o CEP a serviço externo;
 - o que fica visível para outros usuários, prazos de guarda, e os direitos do Art. 18 da LGPD.
 
 ⚠️ **O texto não passou por revisão jurídica.** Ele é verdadeiro sobre o que o código faz — que é o que dá para garantir daqui —, e continua pendente de revisão por quem tenha competência para isso.
