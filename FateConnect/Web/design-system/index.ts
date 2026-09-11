@@ -15,6 +15,7 @@ export type { AnchoredPopoverProps } from './components/AnchoredPopover';
 export { Header } from './components/Header';
 export { HEADER_HEIGHT_PX } from './components/Header/styles';
 export { Footer } from './components/Footer';
+export type { FooterContact } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
 export { InitialsAvatar } from './components/InitialsAvatar';
 export { Dialog } from './components/Dialog';
