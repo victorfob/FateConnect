@@ -207,6 +207,19 @@ O candidato mais longo, `Vespertino (12:00 - 17:59)`, ocupa 183,5px em Inter 16p
 
 **Como medir:** largura útil pelo `getBoundingClientRect` do campo menos o `padding` computado; largura do texto com `measureText` num `canvas` usando a fonte real, depois de `document.fonts.ready`. Meça no **mais apertado** dos contêineres que vão receber o texto.
 
+### As larguras do texto de ajuda de campo, medidas
+
+Mensagem de validação sai como `helperText` abaixo do campo, e ali a sobra é menor que a do corpo do diálogo. Medido a 409px em 11/09/2026, ao separar a recusa do e-mail institucional em duas frases:
+
+| Onde | Campo | Sobra para o texto |
+| --- | --- | --- |
+| Formulário de cadastro | 275,3px | **243,3px** |
+| Cartão de login da landing | 312,0px | **280,0px** |
+
+⚠️ **Estourar aqui é barato:** o `helperText` cresce **21px por linha** e empurra o resto do formulário para baixo. É o oposto do rodapé de diálogo, onde duas ações que não cabem saltam de 36px para 80px.
+
+⛔ **Aqui a largura saiu da decisão pelo motivo oposto ao do caso acima.** Lá o candidato mais longo cabia; aqui **nenhuma** candidata cabe — 291,5px, 324,0px e 372,4px contra 243,3px de sobra, e a frase que já estava em produção também não cabe (336,7px). Nos dois a conclusão é a mesma e a leitura é diferente: **meça para saber se a largura decide**. Ela decide quando separa as opções, e é indiferente tanto quando todas cabem quanto quando nenhuma cabe.
+
 ### As larguras do diálogo, medidas
 
 O diálogo é o contêiner mais apertado do produto, e cada região dele tem uma sobra diferente. Medido a 409px em 09/09/2026, ao nomear a confirmação de resolver item:
