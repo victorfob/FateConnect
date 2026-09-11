@@ -22,6 +22,12 @@ Estudante da faculdade, no celular ou no laptop, geralmente com pressa e no meio
    - **Precisão:** o texto promete o que a tela entrega? Desconfie de "automático" onde a ação é manual.
    - **Paralelismo:** itens de lista e de menu na mesma forma gramatical.
    - **Só ouvido:** quem usa leitor de tela entende onde está e o que vem depois?
+
+   ⛔ **A varredura de naming cobre também a palavra que a SUA sugestão introduz.** Os itens acima perguntam se o artefato se contradiz; nenhum deles pega o termo novo que você trouxe de fora e que o produto já batizou em outro lugar.
+
+   Aconteceu em 11/09/2026, na #357: propus `Cadastre-se` para um card da landing, e o produto chama essa ação de `Criar conta` em **quatro** lugares — o link do cartão de login, o título do passo de *Como funciona*, o título da tela de cadastro e o botão que a envia. Quem viu foi o Victor, e pelo sintoma, não pela regra: a mesma palavra abrindo dois cards vizinhos.
+
+   **Antes de propor um verbo, procure no código a ação que ele nomeia.** `grep` pelo verbo e pelos sinônimos dele; achando outro nome já em uso, o seu não entra.
 4. **Entregue em tabela Atual × Sugerido × Por quê**, com a justificativa em uma linha citando a regra aplicada. Havendo mais de uma opção defensável, mostre o trade-off em vez de escolher sozinho.
 
    ⛔ **Medir as candidatas não substitui oferecê-las — e quanto mais medição, maior o risco.** O atalho não vem da preguiça: vem do trabalho bem feito. Com a régua lida, as vizinhas conferidas e as larguras medidas no campo real, a escolha parece decidida pelos números, e a tabela parece cerimônia sobre um resultado que já se impôs.
