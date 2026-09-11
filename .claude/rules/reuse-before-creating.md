@@ -55,6 +55,16 @@ O que fechou a conversa foi a tabela que eu devia ter apresentado antes:
 
 ⚠️ **Vale mesmo com a exceção bem medida.** A minha estava: recorte mínimo, controle positivo nas duas formas, comentário explicando. Continuava sendo a regra cedendo ao meu caso, quando existia caso nenhum a abrir.
 
+## O precedente do vizinho vale até onde o contexto dele vale
+
+⛔ **Reaproveitar o código do vizinho traz junto as decisões dele, e algumas foram tomadas para um contexto que o seu caso não tem.** Copiar o comportamento inteiro é o gesto certo para o mecanismo e o errado para o que o mecanismo assume.
+
+⛔ Aconteceu em 11/09/2026, na #358. As linhas de contato do rodapé viraram links, e o vizinho — os links de documentos legais no **mesmo rodapé** — já resolvia "link no cromo". Reaproveitei o estilo, o que era certo, e junto a decisão de o link envolver **só o texto**. O vizinho não tem ícone; a linha de contato tem, e ali o ícone ficou fora da área clicável. A correção do Victor foi *"acho que o ícone pode estar dentro da área clicável tbm, assim a gente aumenta a acessibilidade"*.
+
+**O tell é o seu caso ter um elemento que o vizinho não tem.** Antes de herdar o recorte dele, liste o que existe dos dois lados: o que só existe no seu não foi considerado quando aquela decisão foi tomada.
+
+⚠️ **Reaproveitar continua certo** — o que não se herda é a escolha que dependia da ausência. E a diferença costuma reaparecer no estilo: ali o sublinhado teve de sair da âncora e ir para o texto, senão correria por baixo do ícone.
+
 ## Encontrou duplicação: propor e perguntar
 
 Vale também para duplicação **fora da tarefa**. Se eu vi, eu proponho na hora, sem esperar ser cobrado — a sugestão é obrigação, não favor. Trazer três coisas: o que está repetido, o que fica no lugar dos dois, e **onde** passa a morar. E **esperar o sim**.
