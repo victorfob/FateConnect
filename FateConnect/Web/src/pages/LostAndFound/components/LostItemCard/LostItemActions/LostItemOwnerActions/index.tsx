@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { IconButton } from '@design-system';
 import { DeleteIcon, EditIcon } from '@design-system/icons';
 
-import { LostItemConfirmAction } from '@app/pages/LostAndFound/components/LostItemCard/LostItemConfirmAction';
 import { LostItemStatusEnum, type LostItem } from '@app/services/lostAndFound/types';
 
 import * as C from '../constants';
@@ -28,16 +27,9 @@ export function LostItemOwnerActions({ item, onEdit, onDelete }: LostItemOwnerAc
         <EditIcon />
       </IconButton>
 
-      <LostItemConfirmAction
-        label={C.LOST_ITEM_ACTION_LABELS.delete}
-        icon={<DeleteIcon />}
-        iconOnly
-        dialogTitle={C.DELETE_DIALOG.title}
-        messagePrefix={C.DELETE_DIALOG.messagePrefix}
-        itemName={item.name}
-        confirmLabel={C.DELETE_DIALOG.confirmLabel}
-        onConfirm={handleDelete}
-      />
+      <IconButton type="button" label={C.LOST_ITEM_ACTION_LABELS.delete} onClick={handleDelete}>
+        <DeleteIcon />
+      </IconButton>
     </>
   );
 }
