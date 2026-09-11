@@ -23,6 +23,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Corrige o vão abaixo dos cartões do menu nas telas estreitas, menor que o que separa um cartão do outro (#345) [Frontend]
 - Corrige a política de privacidade, que listava o apelido entre os dados coletados no cadastro depois de o campo ter sido removido (#367) [Frontend]
+- Corrige a recusa do e-mail institucional, que falava do domínio mesmo quando ele estava certo e o problema era o trecho antes do @; cada um dos dois passa a ter a sua mensagem, e o conjunto de endereços aceitos continua o mesmo (#368) [Frontend] [Backend]
 
 ### Removed
 

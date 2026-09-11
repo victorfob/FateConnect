@@ -1,7 +1,10 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
-import { FATEC_EMAIL_MESSAGE } from '@app/constants/fatecEmail';
+import {
+  FATEC_EMAIL_DOMAIN_MESSAGE,
+  FATEC_EMAIL_LOCAL_PART_MESSAGE,
+} from '@app/constants/fatecEmail';
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
@@ -40,13 +43,22 @@ describe('LandingLoginCard', () => {
     expect(screen.getByText(LOGIN_MESSAGES.passwordRequired)).toBeInTheDocument();
   });
 
-  it('should reject a malformed email', async () => {
+  it('should reject a malformed email naming the domain', async () => {
     renderCard();
     await preencher('nao-e-email', 'segredo123');
 
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
-    expect(await screen.findByText(FATEC_EMAIL_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(FATEC_EMAIL_DOMAIN_MESSAGE)).toBeInTheDocument();
+  });
+
+  it('should name what comes before the at sign when the email carries an accent', async () => {
+    renderCard();
+    await preencher('josé_silva@aluno.cps.sp.gov.br', 'segredo123');
+
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+
+    expect(await screen.findByText(FATEC_EMAIL_LOCAL_PART_MESSAGE)).toBeInTheDocument();
   });
 
   it('should toggle the password visibility', async () => {
