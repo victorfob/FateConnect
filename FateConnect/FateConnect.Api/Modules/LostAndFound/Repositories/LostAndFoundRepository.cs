@@ -2,9 +2,9 @@ namespace FateConnect.Api.Modules.LostAndFound.Repositories;
 
 using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
-using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,10 +21,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
 
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            string escapedSearchTerm = filter.SearchTerm
-                .Replace(@"\", @"\\")
-                .Replace("%", @"\%")
-                .Replace("_", @"\_");
+            string escapedSearchTerm = filter.SearchTerm.SanitizeSearchTerm();
 
             query = query.Where(r =>
                 EF.Functions.ILike(
