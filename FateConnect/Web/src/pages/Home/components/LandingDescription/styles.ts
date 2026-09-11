@@ -7,11 +7,11 @@ import {
   styled,
 } from '@design-system';
 
-const { sm, md, lg } = spacingScale;
+const { xs, md, lg } = spacingScale;
 
 const MAX_WIDTH_PX = 600;
 const TITLE_MAX_WIDTH_PX = 500;
-const HIGHLIGHT_MAX_WIDTH_PX = 120;
+const HIGHLIGHTS_PER_ROW = 2;
 
 export const DescriptionRoot = styled(Stack)(({ theme }) => ({
   flex: 1,
@@ -50,8 +50,13 @@ export const HighlightList = styled(PolymorphicStack)(({ theme }) => ({
 export const HighlightItem = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
-  gap: theme.space(sm),
-  maxWidth: `${HIGHLIGHT_MAX_WIDTH_PX}px`,
+  justifyContent: 'center',
+  gap: theme.space(xs),
+  flexBasis: `calc(100% / ${HIGHLIGHTS_PER_ROW} - ${theme.space(md)} / ${HIGHLIGHTS_PER_ROW})`,
+  flexGrow: 0,
+  // A coluna divide a linha com o cartão de login e encolhe; sem isto, na faixa
+  // estreita a metade fica menor que o rótulo e ele volta a quebrar em duas linhas.
+  minWidth: 'max-content',
   color: theme.palette.text.primary,
   textAlign: 'center',
 

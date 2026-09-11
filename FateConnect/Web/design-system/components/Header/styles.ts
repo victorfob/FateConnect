@@ -5,7 +5,7 @@ import { PolymorphicBox, PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { shadowTokens, spacingScale } from '@ds-root/tokens';
 
-const { none, xxs, xs, lg, giant } = spacingScale;
+const { none, xxs, xs, md, lg, giant } = spacingScale;
 
 /** Altura do topo; a casca reserva esse espaço porque o header é fixo. */
 export const HEADER_HEIGHT_PX = 64;
@@ -56,7 +56,7 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'center',
-  gap: theme.space(xs, lg),
+  gap: theme.space(xs, md),
   // Empurra navegação e ações para a direita, mantendo só a marca à esquerda.
   // Sem isso, o `space-between` distribui os três blocos e centraliza a navegação.
   marginLeft: 'auto',
@@ -94,7 +94,7 @@ export const ActionsSlot = styled(PolymorphicStack)(({ theme }) => ({
   // Separa uma ação da outra. Com um filho só isso não aparecia, e duas
   // ações adjacentes ficavam encostadas.
   gap: theme.space(xs),
-  marginLeft: theme.space(lg),
+  marginLeft: theme.space(md),
 }));
 
 /**

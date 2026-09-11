@@ -6,6 +6,7 @@ import { render, screen, within } from '@app/test/testing-library';
 import {
   DESCRIPTION_HIGHLIGHTS,
   DESCRIPTION_TITLE,
+  HIGHLIGHT_LIST_LABEL,
 } from './components/LandingDescription/constants';
 import { HOW_IT_WORKS_STEPS, HOW_IT_WORKS_TITLE } from './components/LandingHowItWorks/constants';
 import { SERVICE_CARDS, SERVICES_TITLE } from './components/LandingServices/constants';
@@ -24,11 +25,25 @@ describe('Home', () => {
 
     expect(screen.getByRole('heading', { name: DESCRIPTION_TITLE })).toBeInTheDocument();
 
-    // Alguns rótulos de destaque repetem o título de um card de serviço.
-    const destaques = within(screen.getByRole('list', { name: 'Destaques do FateConnect' }));
+    // Cada rótulo de destaque repete o título de um card de serviço.
+    const highlights = within(screen.getByRole('list', { name: HIGHLIGHT_LIST_LABEL }));
     DESCRIPTION_HIGHLIGHTS.forEach(({ label }) => {
-      expect(destaques.getByText(label)).toBeInTheDocument();
+      expect(highlights.getByText(label)).toBeInTheDocument();
     });
+  });
+
+  it('should name and order the highlights after the service cards', () => {
+    renderHome();
+
+    expect(DESCRIPTION_HIGHLIGHTS).toEqual(
+      SERVICE_CARDS.map(({ title, Icon }) => ({ label: title, Icon })),
+    );
+
+    const highlights = screen.getByRole('list', { name: HIGHLIGHT_LIST_LABEL });
+    const renderedLabels = within(highlights)
+      .getAllByRole('listitem')
+      .map((item) => item.textContent);
+    expect(renderedLabels).toEqual(DESCRIPTION_HIGHLIGHTS.map(({ label }) => label));
   });
 
   it('should render every service card', () => {
