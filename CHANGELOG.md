@@ -22,10 +22,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 
 - Corrige o vão abaixo dos cartões do menu nas telas estreitas, menor que o que separa um cartão do outro (#345) [Frontend]
+- Corrige a política de privacidade, que listava o apelido entre os dados coletados no cadastro depois de o campo ter sido removido (#367) [Frontend]
 
 ### Removed
 
 - Remove o endereço do cadastro: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A tabela é apagada, então o endereço de quem já se cadastrou se perde (#365) [Backend]
+- Remove o endereço do formulário de cadastro, com a busca automática por CEP que o preenchia; a política de privacidade deixa de declarar a coleta do endereço e o envio do CEP a serviço externo, em nova versão do documento (#367) [Frontend]
 
 ## [0.9.0] - 2026-09-09
 

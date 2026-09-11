@@ -12,16 +12,12 @@ import { render, screen, userEvent, waitFor, within } from '@app/test/testing-li
 
 import { SignupConflictFieldEnum } from './@types';
 import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
-import { maxLengthMessage, SIGNUP_MESSAGES } from './schema';
+import { SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/users/signup';
 const SIGNUP_TOKEN = 'token-do-cadastro';
-const ZIP_URL = 'https://viacep.com.br/ws/:zipCode/json/';
-/** O que o `CreateAddressDto` aceita no complemento. */
-const COMPLEMENT_MAX_LENGTH = 100;
-const ONE_CHARACTER = 1;
 
 const VALID_SIGNUP = {
   fullName: 'Maria Silva',
@@ -47,18 +43,6 @@ function renderSignup() {
 }
 
 async function fillRequiredFields() {
-  // O endereço é obrigatório, e quem o preenche é a busca por CEP.
-  server.use(
-    http.get(ZIP_URL, () =>
-      HttpResponse.json({
-        cep: '18000-000',
-        logradouro: 'Rua das Flores',
-        localidade: 'Sorocaba',
-        uf: 'SP',
-      }),
-    ),
-  );
-
   await userEvent.type(screen.getByLabelText(/Nome completo/), VALID_SIGNUP.fullName);
   await userEvent.type(screen.getByLabelText(/E-mail Fatec/), VALID_SIGNUP.fatecEmail);
   await userEvent.type(screen.getByLabelText(/Data de nascimento/), VALID_SIGNUP.birthDate);
@@ -66,10 +50,6 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText(/Telefone/), VALID_SIGNUP.phone);
   await userEvent.type(screen.getByLabelText(/E-mail para contato/), VALID_SIGNUP.contactEmail);
   await selectOption(C.FIELD_LABELS.gender, 'Feminino');
-
-  await userEvent.type(screen.getByLabelText(/CEP/), '18000000');
-  await screen.findByDisplayValue('Rua das Flores');
-  await userEvent.type(screen.getByLabelText(/Número/), '100');
 
   await userEvent.click(screen.getByRole('checkbox', { name: /Termos de uso/ }));
 }
@@ -126,18 +106,6 @@ describe('Signup', () => {
     await submit();
 
     expect(await screen.findByText(FATEC_EMAIL_MESSAGE)).toBeInTheDocument();
-  });
-
-  // O complemento é o único campo opcional com limite de comprimento: o schema
-  // recusa, e sem a prop de erro no campo a mensagem não chega à tela.
-  it('should show the length message on the optional complement', async () => {
-    renderSignup();
-    await userEvent.click(screen.getByLabelText(C.FIELD_LABELS.complement));
-    await userEvent.paste('a'.repeat(COMPLEMENT_MAX_LENGTH + ONE_CHARACTER));
-
-    await submit();
-
-    expect(await screen.findByText(maxLengthMessage(COMPLEMENT_MAX_LENGTH))).toBeInTheDocument();
   });
 
   it('should reject a phone number outside ten or eleven digits', async () => {
@@ -203,49 +171,6 @@ describe('Signup', () => {
 
     expect(password).toHaveAttribute('type', 'text');
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
-  });
-
-  it('should fill the address from the zip code', async () => {
-    server.use(
-      http.get(ZIP_URL, () =>
-        HttpResponse.json({
-          cep: '01001-000',
-          logradouro: 'Praça da Sé',
-          localidade: 'São Paulo',
-          uf: 'SP',
-        }),
-      ),
-    );
-    renderSignup();
-
-    await userEvent.type(screen.getByLabelText(/CEP/), '01001000');
-
-    expect(await screen.findByDisplayValue('Praça da Sé')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('São Paulo')).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: /Estado/ })).toHaveTextContent('São Paulo');
-    expect(labelOf(screen.getByLabelText(/Logradouro/))).toHaveAttribute('data-shrink', 'true');
-  });
-
-  it('should warn and clear the address when the zip code does not exist', async () => {
-    server.use(http.get(ZIP_URL, () => HttpResponse.json({ erro: 'true' })));
-    renderSignup();
-
-    await userEvent.type(screen.getByLabelText(/CEP/), '00000000');
-
-    expect(await screen.findByText(C.ZIP_LOOKUP_MESSAGES.notFound)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Cidade/)).toHaveValue('');
-  });
-
-  it('should warn when both zip code providers fail', async () => {
-    server.use(
-      http.get(ZIP_URL, () => HttpResponse.error()),
-      http.get('https://opencep.com/v1/:zipCode.json', () => HttpResponse.error()),
-    );
-    renderSignup();
-
-    await userEvent.type(screen.getByLabelText(/CEP/), '01001000');
-
-    expect(await screen.findByText(C.ZIP_LOOKUP_MESSAGES.failed)).toBeInTheDocument();
   });
 
   it('should open each legal document in a new tab, so the form survives', () => {
@@ -320,16 +245,6 @@ describe('Signup', () => {
       password: VALID_SIGNUP.password,
       gender: 'Female',
       birthDate: '1999-05-22T00:00:00Z',
-      addresses: [
-        {
-          zipCode: '18000-000',
-          street: 'Rua das Flores',
-          streetNumber: '100',
-          complement: '',
-          city: 'Sorocaba',
-          state: 'SP',
-        },
-      ],
       contacts: [{ phone: '11912345678', contactEmail: VALID_SIGNUP.contactEmail }],
     });
   });

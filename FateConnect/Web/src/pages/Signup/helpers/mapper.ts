@@ -20,16 +20,6 @@ export function toSignupRequest(values: SignupFormValues): SignupRequest {
     password: values.password,
     birthDate: toApiBirthDateOrEmpty(values.birthDate),
     gender: values.gender,
-    addresses: [
-      {
-        zipCode: values.zipCode,
-        street: values.street,
-        streetNumber: values.streetNumber,
-        complement: values.complement,
-        city: values.city,
-        state: values.state,
-      },
-    ],
     contacts: [
       {
         phone: onlyDigits(values.phone),
