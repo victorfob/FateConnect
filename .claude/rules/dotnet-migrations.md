@@ -53,7 +53,11 @@ Reescrever o `Up()` à mão não mexe no `.Designer.cs` nem no `FateConnectDbCon
 dotnet ef migrations add _Drift && grep "migrationBuilder\." Infrastructure/Database/Migrations/*_Drift.cs
 ```
 
-Saída vazia é o que se espera. Apague a `_Drift` depois — `dotnet ef migrations remove` nem sempre apaga o arquivo, então confira com `git status`.
+Saída vazia é o que se espera. **Apague os dois arquivos da sonda à mão** — o `.cs` e o `.Designer.cs` — e confira com `git status`.
+
+⛔ **`dotnet ef migrations remove` não apaga a sonda neste repositório.** Ele reconstrói o projeto antes de remover, e a sonda não compila: o analisador reprova o nome com sublinhado (`S101`) e o **método vazio** (`S1186`), e o `TreatWarningsAsErrors` do `.csproj` transforma os dois em erro.
+
+⚠️ **Renomear a sonda não resolve, e isso foi medido com controle** em 11/09/2026: com `DriftProbe` o `S101` some, o `S1186` fica sozinho, e o `remove` reprova igual. Migration de sonda é vazia por definição, e é o vazio que o analisador recusa.
 
 ⚠️ **Migration gerada na base errada mente sem avisar.** Se a branch rebaseou, o `.Designer.cs` pode ser anterior à migration que entrou na base — ele compila, passa nos testes, e só o teste de drift acusa.
 
