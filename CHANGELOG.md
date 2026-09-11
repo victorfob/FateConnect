@@ -8,6 +8,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona a ação às linhas de contato do rodapé, que eram texto para copiar à mão: o e-mail abre o aplicativo de e-mail, o telefone abre o discador e o endereço abre o mapa em nova guia; o ícone entra na área clicável junto do texto, e cada link diz a ação ao leitor de tela (#372) [Frontend]
 - Adiciona o filtro por autoria na lista de caronas, por `onlyMine`, que traz só as caronas que a pessoa ofertou; sem o campo a lista segue trazendo as de todo mundo, e carona já partida continua de fora nos dois casos (#348) [Backend]
 - Adiciona o filtro por autoria na busca de caronas, com a escolha entre todas as caronas e só as que a pessoa ofertou; sem escolher, a lista segue trazendo as de todo mundo (#350) [Frontend]
 
@@ -22,6 +23,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Corrige o sublinhado dos links de documentos no rodapé do celular, que media a largura da linha em vez da largura do texto (#372) [Frontend]
 - Corrige os destaques do topo da landing: os quatro rótulos quebravam em duas linhas, e a ordem e o texto deles divergiam dos cards de serviço logo abaixo (#370) [Frontend]
 - Corrige o cabeçalho numa faixa estreita de larguras de desktop, em que a barra de navegação quebrava em duas linhas e dobrava de altura: o menu recolhido passa a valer até a largura em que a barra cabe (#370) [Frontend]
 - Corrige o vão abaixo dos cartões do menu nas telas estreitas, menor que o que separa um cartão do outro (#345) [Frontend]
