@@ -13,6 +13,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Reescreve a descrição da comunidade verificada na landing, que listava os dois domínios de e-mail aceitos e passa a chamar para criar a conta com o e-mail institucional; os domínios seguem ditos no campo de e-mail do cadastro e do login (#370) [Frontend]
 - Passa a filtrar as duas listas por intervalo de datas em vez de uma data exata: as duas pontas trazem o período fechado, uma ponta sozinha traz aquele dia inteiro, e intervalo invertido é recusado com erro; na consulta, `departureDate` e `ocurredOn` dão lugar a `dateFrom` e `dateTo` (#342) [Backend]
 - Passa a mostrar menos páginas na paginação das duas listas quando a tela é estreita: a fileira não cabia e quebrava em duas linhas, então fica a página atual entre a primeira e a última. As setas continuam andando de uma em uma, e no desktop os números vizinhos seguem visíveis (#345) [Frontend]
 - Passa a filtrar caronas por turno em vez de hora exata, que exigia hora em ponto: `Morning` cobre 04:00–11:59, `Afternoon` 12:00–17:59 e `Night` 18:00–03:59, atravessando a meia-noite; na consulta, `departureTime` dá lugar a `departureShift` (#347) [Backend]
@@ -21,6 +22,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Corrige os destaques do topo da landing: os quatro rótulos quebravam em duas linhas, e a ordem e o texto deles divergiam dos cards de serviço logo abaixo (#370) [Frontend]
+- Corrige o cabeçalho numa faixa estreita de larguras de desktop, em que a barra de navegação quebrava em duas linhas e dobrava de altura: o menu recolhido passa a valer até a largura em que a barra cabe (#370) [Frontend]
 - Corrige o vão abaixo dos cartões do menu nas telas estreitas, menor que o que separa um cartão do outro (#345) [Frontend]
 - Corrige a política de privacidade, que listava o apelido entre os dados coletados no cadastro depois de o campo ter sido removido (#367) [Frontend]
 - Corrige a recusa do e-mail institucional, que falava do domínio mesmo quando ele estava certo e o problema era o trecho antes do @; cada um dos dois passa a ter a sua mensagem, e o conjunto de endereços aceitos continua o mesmo (#368) [Frontend] [Backend]

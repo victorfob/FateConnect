@@ -31,7 +31,7 @@ function Dialog({ open, onClose, title, children }: DialogProps) {
     // `fullWidth` faz o papel ocupar a largura disponível até o teto, em vez de
     // acompanhar o conteúdo — sem ele cada diálogo abre com uma largura, porque
     // o formulário de dentro é quem decidia. O teto é o `sm` do MUI (600px), que
-    // não sobrescrevemos; `maxWidth="md"` aqui significaria 933px.
+    // não sobrescrevemos; o `md` é o nosso limite de desktop, largo demais aqui.
     <MuiDialog open={open} onClose={onClose} aria-labelledby={titleId} fullWidth maxWidth="sm">
       <S.DialogSurface>
         <S.TitleRow>
