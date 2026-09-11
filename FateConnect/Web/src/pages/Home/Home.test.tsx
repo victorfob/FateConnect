@@ -25,18 +25,18 @@ describe('Home', () => {
 
     expect(screen.getByRole('heading', { name: DESCRIPTION_TITLE })).toBeInTheDocument();
 
-    // Alguns rótulos de destaque repetem o título de um card de serviço.
+    // Cada rótulo de destaque repete o título de um card de serviço.
     const highlights = within(screen.getByRole('list', { name: HIGHLIGHT_LIST_LABEL }));
     DESCRIPTION_HIGHLIGHTS.forEach(({ label }) => {
       expect(highlights.getByText(label)).toBeInTheDocument();
     });
   });
 
-  it('should keep the highlights in the same order as the service cards', () => {
+  it('should name and order the highlights after the service cards', () => {
     renderHome();
 
-    expect(DESCRIPTION_HIGHLIGHTS.map(({ Icon }) => Icon)).toEqual(
-      SERVICE_CARDS.map(({ Icon }) => Icon),
+    expect(DESCRIPTION_HIGHLIGHTS).toEqual(
+      SERVICE_CARDS.map(({ title, Icon }) => ({ label: title, Icon })),
     );
 
     const highlights = screen.getByRole('list', { name: HIGHLIGHT_LIST_LABEL });

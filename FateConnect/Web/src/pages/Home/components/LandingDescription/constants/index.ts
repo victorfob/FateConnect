@@ -9,7 +9,7 @@ import {
 export type DescriptionHighlight = { label: string; Icon: SvgIconComponent };
 
 export const DESCRIPTION_HIGHLIGHTS: DescriptionHighlight[] = [
-  { label: 'Caronas seguras', Icon: DirectionsCarIcon },
+  { label: 'Caronas universitárias', Icon: DirectionsCarIcon },
   { label: 'Achados & Perdidos', Icon: SearchIcon },
   { label: 'Comunidade verificada', Icon: GroupsIcon },
   { label: 'Portal de denúncias', Icon: SecurityIcon },
