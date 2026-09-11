@@ -1,9 +1,10 @@
 name: Check front
 
-# O recorte é feito DENTRO do job, e não em `paths` no gatilho, porque este é um
-# check obrigatório: workflow que não dispara não deixa o check ausente — deixa
-# ele `Pending` para sempre, e o PR fica impossível de mergear. Sem filtro de
-# branch de destino pelo mesmo tipo de motivo: PR empilhado precisa ser validado.
+# O recorte é feito DENTRO dos jobs, e não em `paths` no gatilho, porque este é
+# um check obrigatório: workflow que não dispara não deixa o check ausente —
+# deixa ele `Pending` para sempre, e o PR fica impossível de mergear. Sem filtro
+# de branch de destino pelo mesmo tipo de motivo: PR empilhado precisa ser
+# validado.
 on:
   pull_request:
     # `ready_for_review` é obrigatório junto do recorte de rascunho: sair de
@@ -21,18 +22,13 @@ permissions:
   pull-requests: read
 
 jobs:
-  web:
-    name: React front (Web)
+  changes:
+    name: Changed paths
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: FateConnect/Web
+    outputs:
+      web: ${{ steps.changes.outputs.web }}
     steps:
       - uses: actions/checkout@v5
-        with:
-          # Clone completo por causa do Sonar: sem histórico ele perde a noção
-          # de código novo, que é o que o quality gate mede.
-          fetch-depth: 0
 
       # É a API de arquivos, paginada, e não `gh pr diff`: aquele recusa PR com
       # mais de 300 arquivos (HTTP 406), e a release que trocou o front inteiro
@@ -71,48 +67,190 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           IS_DRAFT: ${{ github.event.pull_request.draft }}
 
+  # Os limites de cobertura são globais, então nenhum shard pode cobrá-los: um
+  # sozinho mede 80% porque rodou metade dos testes. Eles são zerados aqui e
+  # aplicados uma vez só, sobre a suíte inteira, no job de fusão.
+  shard:
+    name: Tests ${{ matrix.index }} of 2
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FateConnect/Web
+    strategy:
+      # Sem isto, um shard vermelho cancela o outro e o relatório sai pela
+      # metade, escondendo falhas que a pessoa teria de descobrir num segundo push.
+      fail-fast: false
+      matrix:
+        index: [1, 2]
+    steps:
+      - uses: actions/checkout@v5
+
       - uses: actions/setup-node@v5
-        if: steps.changes.outputs.web == 'true'
         with:
           node-version-file: FateConnect/Web/.nvmrc
-          cache: yarn
-          cache-dependency-path: FateConnect/Web/yarn.lock
+
+      # O pacote comprime de 565 MB para 81 MB e descomprime em 1s, contra 33s
+      # de `yarn install` a frio. O prefixo solto deixa a árvore anterior ser
+      # restaurada quando o lockfile muda, e aí o yarn reconcilia só a diferença.
+      - uses: actions/cache@v4
+        with:
+          path: FateConnect/Web/node_modules
+          key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
+          restore-keys: node-modules-
 
       # Instalar dependência não deve executar código: sem `--ignore-scripts` o
       # `postinstall` de qualquer pacote da árvore roda com os segredos do job
       # ao alcance.
       - name: Install dependencies
-        if: steps.changes.outputs.web == 'true'
+        run: yarn install --frozen-lockfile --ignore-scripts
+
+      - name: Tests
+        run: |
+          yarn vitest run --coverage --reporter=blob \
+            --shard=${{ matrix.index }}/2 \
+            --coverage.thresholds.lines=0 \
+            --coverage.thresholds.functions=0 \
+            --coverage.thresholds.branches=0 \
+            --coverage.thresholds.statements=0
+
+      # ⛔ `.vitest-reports` começa com ponto, e o upload ignora arquivo oculto
+      # por padrão: sem a primeira linha ele sobe zero arquivo, e sem a segunda
+      # avisa e segue verde — o job de fusão é que quebra, longe da causa.
+      - name: Upload the shard report
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-${{ matrix.index }}
+          path: FateConnect/Web/.vitest-reports
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+  # Job à parte para correr ao lado dos shards: nada aqui depende dos testes.
+  quality:
+    name: Types, lint and build
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FateConnect/Web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: FateConnect/Web/.nvmrc
+
+      - uses: actions/cache@v4
+        with:
+          path: FateConnect/Web/node_modules
+          key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
+          restore-keys: node-modules-
+
+      - name: Install dependencies
         run: yarn install --frozen-lockfile --ignore-scripts
 
       - name: Types
-        if: steps.changes.outputs.web == 'true'
         run: yarn typecheck
 
       - name: Lint
-        if: steps.changes.outputs.web == 'true'
         run: yarn lint
 
-      # Suíte inteira: os limites de cobertura são globais, então medi-los sobre
-      # um recorte reprovaria código saudável. Quem roda só o que mudou é o hook
-      # de pre-push, onde o objetivo é velocidade.
-      - name: Tests and coverage
-        if: steps.changes.outputs.web == 'true'
-        run: yarn test:ci
-
       - name: Build
-        if: steps.changes.outputs.web == 'true'
         run: yarn build
+
+  # ⛔ O nome deste job é contrato: é ele que as rulesets da `develop` e da `main`
+  # exigem. Ele roda SEMPRE — são os passos que se guardam —, porque job pulado
+  # não reporta, e um check obrigatório que não reporta fica `Pending` para
+  # sempre. Renomeá-lo trava o merge de todo PR até alguém editar as rulesets.
+  web:
+    name: React front (Web)
+    needs: [changes, shard, quality]
+    if: always()
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FateConnect/Web
+    steps:
+      # Roda antes do checkout, então não pode herdar o `working-directory` do
+      # job: o bash não inicia num diretório que ainda não existe, e o passo
+      # falha sem sequer executar o script.
+      - name: Check the previous jobs
+        working-directory: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          if [[ '${{ needs.changes.result }}' != 'success' ]]; then
+            echo 'A detecção de caminhos não concluiu.' >&2
+            exit 1
+          fi
+          if [[ '${{ needs.changes.outputs.web }}' != 'true' ]]; then
+            echo 'Nada em FateConnect/Web — nada a validar aqui.'
+            exit 0
+          fi
+          for resultado in '${{ needs.shard.result }}' '${{ needs.quality.result }}'; do
+            if [[ "$resultado" != 'success' ]]; then
+              echo "Uma frente reprovou ($resultado); veja o job dela." >&2
+              exit 1
+            fi
+          done
+
+      - uses: actions/checkout@v5
+        if: needs.changes.outputs.web == 'true'
+        with:
+          # Clone completo por causa do Sonar: sem histórico ele perde a noção
+          # de código novo, que é o que o quality gate mede.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        if: needs.changes.outputs.web == 'true'
+        with:
+          node-version-file: FateConnect/Web/.nvmrc
+
+      - uses: actions/cache@v4
+        if: needs.changes.outputs.web == 'true'
+        with:
+          path: FateConnect/Web/node_modules
+          key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
+          restore-keys: node-modules-
+
+      - name: Install dependencies
+        if: needs.changes.outputs.web == 'true'
+        run: yarn install --frozen-lockfile --ignore-scripts
+
+      - name: Download the shard reports
+        if: needs.changes.outputs.web == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: blob-*
+          merge-multiple: true
+          path: FateConnect/Web/.vitest-reports
+
+      # Sem re-executar nada: a fusão reconstitui a cobertura da suíte inteira a
+      # partir dos relatórios dos shards, e é aqui que os limites globais valem.
+      # Produz também o lcov e o inventário de testes que o Sonar lê.
+      - name: Merge coverage and enforce the thresholds
+        if: needs.changes.outputs.web == 'true'
+        run: |
+          set -euo pipefail
+          # Um blob por shard: conferir a contagem antes de fundir separa
+          # "a suíte reprovou" de "os relatórios não chegaram".
+          encontrados=$(ls .vitest-reports/*.json 2>/dev/null | wc -l)
+          if [[ "$encontrados" -ne 2 ]]; then
+            echo "Esperava 2 relatórios de shard, encontrei $encontrados." >&2
+            exit 1
+          fi
+          yarn vitest run --merge-reports --coverage
 
       # Passo deste job, e não um job à parte, porque é este o check que a
       # ruleset exige: Sonar reprovado tem que impedir o merge sem depender de
       # alguém marcar um segundo check como obrigatório.
       #
-      # Vem depois dos testes porque consome o lcov que eles produzem. Quem faz
-      # este passo reprovar é o `sonar.qualitygate.wait` do
+      # Quem faz este passo reprovar é o `sonar.qualitygate.wait` do
       # `sonar-project.properties`; sem ele o scan publica e sai verde.
       - name: Sonar
-        if: steps.changes.outputs.web == 'true'
+        if: needs.changes.outputs.web == 'true'
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
         with:
           projectBaseDir: FateConnect/Web
