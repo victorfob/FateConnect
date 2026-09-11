@@ -70,8 +70,10 @@ jobs:
   # Os limites de cobertura são globais, então nenhum shard pode cobrá-los: um
   # sozinho mede 80% porque rodou metade dos testes. Eles são zerados aqui e
   # aplicados uma vez só, sobre a suíte inteira, no job de fusão.
-  shard:
-    name: Tests ${{ matrix.index }} of 2
+  # ⛔ Sem `name:` de propósito, então o id vira o nome exibido e o GitHub anexa o
+  # valor da matriz. Nome explícito com `${{ }}` não é interpolado quando a matriz
+  # não materializa, e o check de um PR sem front sai com a expressão crua.
+  Tests:
     needs: changes
     if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
@@ -167,7 +169,7 @@ jobs:
   # sempre. Renomeá-lo trava o merge de todo PR até alguém editar as rulesets.
   web:
     name: React front (Web)
-    needs: [changes, shard, quality]
+    needs: [changes, Tests, quality]
     if: always()
     runs-on: ubuntu-latest
     defaults:
@@ -189,7 +191,7 @@ jobs:
             echo 'Nada em FateConnect/Web — nada a validar aqui.'
             exit 0
           fi
-          for resultado in '${{ needs.shard.result }}' '${{ needs.quality.result }}'; do
+          for resultado in '${{ needs.Tests.result }}' '${{ needs.quality.result }}'; do
             if [[ "$resultado" != 'success' ]]; then
               echo "Uma frente reprovou ($resultado); veja o job dela." >&2
               exit 1
