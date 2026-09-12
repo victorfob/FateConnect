@@ -31,6 +31,14 @@ O que respondeu foi ler a **cascata**, não o pixel: percorrer `document.styleSh
 
 ⚠️ **Relatar isso como "medi o preenchimento automático" seria falso.** O que se mediu foi qual regra vence; que a regra vencedora pinta o que promete continua por conferir. Diga a frase que descreve o instrumento, não a que descreve o que você queria saber.
 
+⛔ **Controle positivo em outro alvo não limpa o alvo que interessa.** Ele responde se o **instrumento** funciona; não responde se o caminho até **este** alvo é limpo. E ele engana justamente por parecer rigor — você rodou um controle, então se sente coberto.
+
+Aconteceu em 12/09/2026, conferindo se o `http2 on;` recém-instalado tinha pegado. Daqui a resposta foi `HTTP/1.1` em todos os caminhos, e eu ia relatar que a diretiva não funcionava. O controle que rodei — três sites conhecidos negociando `h2` desta mesma máquina — provava só que **aqueles** hosts não eram rebaixados. Medida de dentro do próprio servidor, a mesma rota respondeu `ALPN: server accepted h2`.
+
+**O controle que vale é da própria conexão que você está medindo**, e ali ele vinha de graça no mesmo comando: o emissor do certificado. Diferente do esperado ⇒ há intermediário terminando a conexão, e tudo que ela diz sobre **transporte** — versão de protocolo, cifra, tamanho comprimido — é do intermediário. Status e corpo atravessam intactos, e foi por isso que os 404 e os `Content-Type` da mesma medição estavam todos certos.
+
+⚠️ **O tell é o número contrariar uma configuração que você acabou de provar noutra bancada.** A diretiva estava provada num nginx da mesma versão em contêiner; quando o ambiente real discordou, a hipótese barata era o instrumento, não a configuração.
+
 ## O instrumento que alcança metade
 
 ⛔ **Sonda, regra e correção nascem cobrindo uma forma, e a resposta está na outra.** Não basta que o instrumento funcione: ele precisa alcançar **onde o problema mora**. Três vezes na #242, cada uma de um jeito:

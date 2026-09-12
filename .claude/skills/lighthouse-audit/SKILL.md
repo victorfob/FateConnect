@@ -90,6 +90,16 @@ ls -l /var/www/fateconnect/<ambiente>/assets/<arquivo>.js.gz
 curl -sI -H 'Accept-Encoding: gzip' <ambiente>/assets/<arquivo>.js | grep -i content-length
 ```
 
+⛔ **E a versão do protocolo que o relatório mostra pode não ser a do servidor.** Havendo terminação de TLS no caminho, o navegador negocia com o intermediário, e a coluna `Protocol` descreve **aquela** conexão — o painel de rede inteiro, junto.
+
+Medido em 12/09/2026: a auditoria de homologação listou `http/1.1` em **todas** as requisições enquanto o servidor aceitava `h2`. O que discrimina vem de graça na mesma conexão:
+
+```bash
+curl -sv -o /dev/null https://<ambiente>/ 2>&1 | grep -iE "issuer:|ALPN"
+```
+
+Emissor diferente do certificado real do site ⇒ o transporte do relatório é do intermediário, e **o item de HTTP moderno não vira issue**. Como o servidor de fato responde se mede de dentro do host, com `--resolve` para o loopback.
+
 Batendo no byte, os tamanhos valem. Registre isso no relatório — e registre junto a **latência medida** (`ping`) e o `benchmarkIndex` que o próprio Lighthouse reporta, porque são eles que dizem a que máquina e a que rede aquele número pertence.
 
 ## 4. Tela autenticada: o usuário loga, você nunca
@@ -158,6 +168,8 @@ Foto que o front baixa com token e converte em `blob:` aparece com `transferSize
 
 - **Decisão deliberada nossa.** O Lighthouse pede compressão na resposta da API; ela sai crua de propósito, porque o `location /api/` declara `gzip off` por causa do BREACH. Abrir issue para isso é pedir para desfazer uma decisão de segurança.
 - **Apontamento de peso zero.** Parte dos itens de acessibilidade é informativa e não move a nota — `label-content-name-mismatch` é um. Vale citar no relatório, não abrir issue.
+
+⛔ **Homologação reprova `is-crawlable` de propósito, e isso derruba a categoria inteira.** Desde a #384 o `robots.txt` de lá responde `Disallow: /`, porque a verificação do domínio no Search Console cobre o subdomínio. Medido em 12/09/2026: o SEO de homologação foi a **58** por dois achados, e este era um deles. Não abra issue, e não "conserte" — a comparação de SEO entre ambientes só vale descontando este item.
 
 **Registre os dois no relatório, nomeados**, com a frase que impede alguém de "consertar" depois.
 
