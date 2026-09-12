@@ -1,9 +1,10 @@
 ---
 name: lighthouse-audit
 description: >-
-  Audita o site publicado com o Lighthouse — as quatro categorias, em desktop e celular, nas telas
-  públicas e nas autenticadas — e transforma os apontamentos em issues. Use quando o usuário pedir
-  para auditar, medir ou rodar o Lighthouse, checar desempenho, acessibilidade, SEO ou boas práticas
+  Audita o site publicado com o Lighthouse — todas as categorias que a versão instalada oferecer, em
+  desktop e celular, nas telas públicas e nas autenticadas — e transforma os apontamentos em issues.
+  Use quando o usuário pedir para auditar, medir ou rodar o Lighthouse, checar desempenho,
+  acessibilidade, SEO, boas práticas ou navegação agêntica
   do site no ar, ou refazer a linha de base depois de a aplicação ganhar telas. Cobre a matriz de
   medição, como medir tela logada sem digitar senha, e o que **não** vira issue.
 ---
@@ -46,6 +47,33 @@ lighthouse "<url>" [--preset=desktop] \
 Sem `--preset` o Lighthouse já mede celular. Uma execução leva ~14 s.
 
 ⛔ **Não relate uma execução só.** Uma rodada isolada vira baseline falsa — já aconteceu noutra frente deste repo, com um número de CI que se mostrou 45% otimista na medição seguinte. Três execuções custam 42 s e mostram a dispersão.
+
+### ⛔ Instale a versão mais recente, nunca um major
+
+```bash
+npm i lighthouse            # e não lighthouse@<major>
+lighthouse --version        # anote no relatório
+```
+
+⛔ Aconteceu na primeira rodada, a da #361: instalei `lighthouse@12` e recebi a **12.8.2** com a **13.4.1** publicada. As quatro notas batiam nas duas versões, então nada acusou — o que ficou invisível foi uma **categoria inteira**, `agentic-browsing`, que só existe a partir da 13 e onde o site marcava 67.
+
+⚠️ **A lista de categorias não é fechada.** Quem descobriu o buraco foi o Victor, abrindo o PageSpeed Insights — que roda sempre a versão hospedada — e vendo uma categoria que nenhum relatório meu tinha. **Confira o conjunto de categorias do relatório contra o que o PageSpeed mostra**, em vez de supor que são quatro.
+
+### ⛔ Auditoria migra entre versões, e uma delas perde o nome
+
+Comparando a mesma página na 12.8.2 e na 13.4.1, **cinco** auditorias foram reestruturadas. Quatro só mudaram de nome, virando *insights*:
+
+| Antes | Depois |
+| --- | --- |
+| `uses-long-cache-ttl` | `cache-insight` |
+| `uses-http2` | `modern-http-insight` |
+| `legacy-javascript` | `legacy-javascript-insight` |
+
+**A quinta não tem sucessor:** `uses-text-compression` deixou de existir, e na 13 nenhuma auditoria nomeia a compressão dos estáticos. A que sobrou perto disso, `document-latency-insight`, olha só o documento e **passa**, porque o HTML já vai comprimido.
+
+⛔ **O efeito é uma regressão invisível ao contrário:** com 1 MB de JavaScript cru no ar, a versão nova simplesmente não menciona compressão. Quem comparar rodadas pelo **id** da auditoria lê isso como "resolvido".
+
+**Compare o achado, não o id** — e, ao reauditar, liste os ids que sumiram desde a rodada anterior e vá procurar onde cada um foi parar. Sumiço sem sucessor é o caso perigoso, porque ele se parece com sucesso.
 
 ### Escolha as telas pelo que elas acrescentam
 
