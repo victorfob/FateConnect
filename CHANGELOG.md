@@ -8,6 +8,24 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Módulo de Denúncias (Denunciations): Implementação completa do domínio seguindo princípios de Clean Architecture e DDD.
+- DenunciationsController: Novos endpoints RESTful com controle de acesso rigoroso "Secure by Default":
+    - POST /denunciations: Criação de denúncias, aceitando multipart/form-data para envio de imagens (acesso liberado para perfil Operator ou superior).
+    - GET /denunciations: Listagem paginada e filtrada (acesso exclusivo para Administrator).
+    - GET /denunciations/{id}: Consulta de detalhes da denúncia (acesso exclusivo para Administrator).
+    - PATCH /denunciations/{id}/status: Atualização pontual do status da denúncia (acesso exclusivo para Administrator).
+- DenunciationService & IDenunciationRepository: Implementação da camada de serviço com herança da BaseFileService para garantir o upload de imagens atrelado a transações, com rollback automático em caso de falha de persistência no banco.
+- Data Transfer Objects (DTOs): Criação dos contratos de dados, incluindo CreateDenunciationDto, ReadDenunciationDto, UpdateDenunciationStatusDto e DenunciationFilterDto.
+- Segurança Baseada em Perfil: Criação do atributo customizado [AuthorizeProfile] no módulo de Auth (Attributes/AuthorizeProfileAttribute.cs), permitindo controle de acesso hierárquico e tipado utilizando o EnumProfileType.
+- Infraestrutura de Banco de Dados: Configuração do mapeamento do EF Core e criação da migration referente ao novo módulo de denúncias.
+
+### Changed
+
+- Refatoração do UploadsController: Reestruturação do código para otimizar a legibilidade, clareza e fluidez dos endpoints de gerenciamento de arquivos.
+- Aplicação do Princípio DRY (Don't Repeat Yourself): Limpeza estrutural de classes para eliminação de código duplicado. Lógicas repetidas foram centralizadas em classes abstratas (como a nova BaseFileService para uploads e rollbacks) e classes de erro foram generalizadas, aumentando o reaproveitamento e facilitando a manutenção global.
+
+### Added
+
 - Adiciona a ação às linhas de contato do rodapé, que eram texto para copiar à mão: o e-mail abre o aplicativo de e-mail, o telefone abre o discador e o endereço abre o mapa em nova guia; o ícone entra na área clicável junto do texto, e cada link diz a ação ao leitor de tela (#372) [Frontend]
 - Adiciona o filtro por autoria na lista de caronas, por `onlyMine`, que traz só as caronas que a pessoa ofertou; sem o campo a lista segue trazendo as de todo mundo, e carona já partida continua de fora nos dois casos (#348) [Backend]
 - Adiciona o filtro por autoria na busca de caronas, com a escolha entre todas as caronas e só as que a pessoa ofertou; sem escolher, a lista segue trazendo as de todo mundo (#350) [Frontend]
