@@ -13,7 +13,7 @@ public record CreateDenunciationDto
     [StringLength(500, MinimumLength = 10, ErrorMessage = "A descrição deve ter entre 10 e 500 caracteres.")]
     public required string Description { get; init; }
 
-    public bool IsAnonymous { get; init; }
+    public required bool IsAnonymous { get; init; }
 
     [ValidImage]
     public IFormFile? Image { get; init; }
