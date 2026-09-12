@@ -1,5 +1,6 @@
 import { Outlet, ScrollRestoration } from 'react-router';
 
+import { PageMetadata } from '@app/components/PageMetadata';
 import { useHashScroll } from '@app/hooks/useHashScroll';
 import { SessionProvider } from '@app/providers/SessionProvider';
 
@@ -12,6 +13,7 @@ export function RootLayout() {
 
   return (
     <>
+      <PageMetadata />
       <ScrollRestoration />
       <SessionProvider>
         <Outlet />

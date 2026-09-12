@@ -77,8 +77,11 @@ const styleConventions = [
     // três `<li>` escritos direto no JSX da paginação — quem viu foi o Victor.
     // Ênfase de texto fica de fora: `<strong>` no meio de uma frase é marcação
     // semântica, não contêiner, e embrulhá-la num `styled` piora o que se lê.
+    // `title`, `meta` e `link` também: o React 19 as hasteia para o `<head>`,
+    // onde não há caixa para estilizar — e renderizá-las é o mecanismo dele,
+    // não uma alternativa a `styled`.
     selector:
-      'JSXOpeningElement > JSXIdentifier[name=/^[a-z]/]:not([name=/^(strong|em|b|i|u|s|small|sub|sup|abbr|code|kbd|mark|br|wbr)$/])',
+      'JSXOpeningElement > JSXIdentifier[name=/^[a-z]/]:not([name=/^(strong|em|b|i|u|s|small|sub|sup|abbr|code|kbd|mark|br|wbr|title|meta|link)$/])',
     message:
       'Sem tag HTML crua no JSX: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
   },
