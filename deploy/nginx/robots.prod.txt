@@ -1,0 +1,6 @@
+# Produção: liberado. O conteúdo é por ambiente e mora fora da raiz do front,
+# porque o rsync --delete da publicação apaga o que estiver lá dentro.
+User-agent: *
+Allow: /
+
+Sitemap: https://__DOMAIN__/sitemap.xml

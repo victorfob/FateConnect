@@ -38,7 +38,12 @@ while IFS=: read -r arquivo linha citado; do
   echo "  $arquivo:$linha  →  $citado"
   encontrados=$((encontrados + 1))
 done < <(
-  grep -rnoE --include="*.md" "($raizes)/[A-Za-z0-9_./-]+" .claude/ | sed -E 's/[.,;:)]+$//' | sort -u
+  # ⛔ `worktrees/` fora da varredura: lá dentro mora uma cópia do repositório
+  # noutra branch, e o que ela cita é problema daquela branch. A lista de
+  # `ignorados` acima não resolve isto — ela diz quais caminhos CITADOS podem
+  # faltar, e não onde parar de procurar.
+  grep -rnoE --include="*.md" --exclude-dir="worktrees" "($raizes)/[A-Za-z0-9_./-]+" .claude/ |
+    sed -E 's/[.,;:)]+$//' | sort -u
 )
 
 rm -f "$conhecidos"
