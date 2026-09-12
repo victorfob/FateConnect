@@ -53,6 +53,21 @@ gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
 - Editar: `PATCH .../pulls/comments/<id>`. Apagar: `DELETE` no mesmo caminho.
 - ⛔ **O `POST` falhou com erro de rede? Conte os comentários antes de repetir.** Esta rede derruba escrita no GitHub mantendo a leitura boa, e o `EOF` aparece tanto quando o comentário não entrou quanto quando ele entrou e a resposta se perdeu. Repetir às cegas publica dois threads idênticos no PR de outra pessoa. Aconteceu duas vezes em 12/09/2026: `gh api .../pulls/<n>/comments --jq length` respondeu o número exato de antes, e aí a repetição foi segura.
 
+⛔ **Bloco `suggestion` substitui exatamente as linhas ancoradas, e a faixa se decide na CRIAÇÃO.** O `PATCH` de um comentário de review aceita só o `body` — não há como alargar o intervalo depois. Comentário nascido de linha única fica preso a uma linha para sempre.
+
+Faixa se pede com `start_line` e `start_side` junto do `line`:
+
+```bash
+gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
+  -f commit_id="$(gh pr view <n> --json headRefOid --jq .headRefOid)" \
+  -f path="<caminho>" -F start_line=61 -F line=62 \
+  -f side="RIGHT" -f start_side="RIGHT" -f body='...'
+```
+
+⚠️ **Então decida a faixa antes de publicar, mesmo quando ainda não vai sugerir.** Em 12/09/2026 os dois comentários que mereciam bloco tinham nascido de linha única, e a saída foi apagar e repostar — barato porque nenhum tinha resposta, e impossível se tivesse.
+
+⛔ **E a faixa cobre da primeira à última linha que o conserto toca, não a que ilustra o argumento.** A correção do `Update()` parecia ser uma linha; eram três — a chamada, a linha em branco e o `SaveChangesAsync` que a sugestão absorve. Substituir só as duas primeiras teria **duplicado** a chamada, com um clique.
+
 ⛔ **Quando o problema é ausência, não há âncora.** Arquivo que o PR *não* tocou não está no diff. Aí o apontamento não é comentário: vira issue, ou não é levantado. **Decida com o usuário** — foi assim que o contrato do front virou uma issue em vez de um thread.
 
 ## O que a redação precisa carregar
@@ -108,6 +123,14 @@ error S8969: Remove this null-forgiving operator; the compiler already
 **A bancada:** worktree no head do PR (`git fetch origin pull/<n>/head`), **build de linha de base primeiro** — sem ele, uma falha depois não distingue a sua sugestão de algo que já estava quebrado —, aplicar, confirmar com `cmp -s` que o arquivo de fato mudou, e construir. O corpo do comentário sai do arquivo que passou no build, não do que você digitou no rascunho.
 
 ⚠️ **Diga em que ambiente compilou**, como o resto desta skill exige: aqui é o SDK que o `global.json` fixa, e `dotnet --version` responde `8.0.4xx`.
+
+### Compilar não cobre o que quebra na borda
+
+⛔ **Sugestão pode compilar e estourar no driver.** A `suggestion` do fuso trocava a construção de um `DateTime` gravado em Postgres, e o Npgsql recusa `Kind` incompatível com o tipo da coluna — a coluna era `timestamp without time zone`, que reprova `Kind=Utc`.
+
+**O que liberou não foi o build: foi comparar as duas formas na dimensão que o driver olha.** `ToDateTime(..., DateTimeKind.Utc)` e `ConvertTimeToUtc(...)` devolvem os dois `Kind=Utc` — idêntico ao que já grava hoje, logo sem risco novo. Se diferissem, o build continuaria verde e a gravação quebraria em produção.
+
+⚠️ **A pergunta é sempre a mesma:** o valor que a minha sugestão produz difere do atual em algo que outra camada inspeciona? Tipo, `Kind`, encoding, precisão, nulidade. Compilar responde pela sintaxe; isso responde pela borda.
 
 ## Meça antes de afirmar
 

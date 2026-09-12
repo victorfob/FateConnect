@@ -60,6 +60,34 @@ Mais `FateConnect/Web/scripts/test-changed.sh`, cujo `case` decide entre testes 
 
 Não estão em risco o gatilho do CI (`^FateConnect/Web/`) nem os `paths:` das rules (`FateConnect/Web/**`) — o que quebra é sempre o recorte escrito um nível mais fundo. Ancorado no PR #143, que tirou o design system de `src`.
 
+## Medir o pacote: o build local mede outro mundo
+
+⛔ **Sem `VITE_SENTRY_DSN` no ambiente, o build poda o SDK de observabilidade inteiro.** O `initSentry` abre com `if (!dsn) return`, o Vite inlina a variável ausente como `undefined`, o resto do corpo vira código morto e o rolldown o remove. Medido em 12/09/2026 com A/B na mesma sessão: **16,60 kB** sem a variável contra **286,24 kB** com ela — e os ambientes servem 279,9 kB.
+
+**Toda medição de tamanho de pacote roda com as variáveis do ambiente de verdade**, nem que seja um valor de fachada. O controle é comparar com o que está publicado: `ls -l` dos `assets/*.js` na máquina contra a saída do build.
+
+⚠️ **O mesmo vale para qualquer `if (!variável) return`** no caminho de um pacote pesado — o padrão não é do Sentry, é do Vite inlinar `import.meta.env` e o bundler podar o que ficou inalcançável.
+
+### `import()` que reentra num módulo já estático não separa nada
+
+⛔ **Import dinâmico de um módulo que o código também importa estaticamente não cria pedaço nenhum** — ele resolve para a mesma instância, e o bundler funde tudo de volta. `await import('@sentry/react')` dentro de um carregador cujo arquivo vizinho já faz `import { getClient } from '@sentry/react'` devolveu **286,56 kB** num pedaço só, sem pedaço assíncrono.
+
+**O alvo do `import()` tem de ser um módulo nosso alcançável só por ele**, que por sua vez importa o que é pesado. É por isso que existe `observability/sessionReplay.ts` — o comentário dele registra a medição.
+
+### A ordem dos grupos do `codeSplitting` decide se a economia existe
+
+⛔ **Grupo declarado antes rouba os módulos compartilhados, e o pedaço que devia ser assíncrono passa a ser alcançado estaticamente.** Com o grupo do replay **antes** do `sentry`, 68 módulos de `@sentry/core` caíram no pedaço do replay, o `index` passou a importar duas ligações de lá, e o `import()` não tirou um byte da carga inicial.
+
+Invertendo — `sentry` primeiro com `(?!replay)` no teste, depois o grupo do replay — o núcleo fica onde deve e o pedaço do replay vira assíncrono: **54,85 kB** na carga inicial contra 93,77 kB.
+
+⚠️ **A conferência não é o tamanho do pedaço, é quem está no `index.html`.** Pedaço separado e ainda assim pré-carregado não economiza nada:
+
+```bash
+grep -oE 'href="/assets/[^"]*\.js"' dist/index.html
+```
+
+⛔ **E procurar o pedaço ausente nessa lista responde zero por vacuidade** quando ele não foi criado. Confira as duas coisas: que o pedaço **existe** na saída do build, e que **não** está no `index.html`.
+
 ## Rotas
 
 Os caminhos são em **pt-BR** — `/inicio`, `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas`, com `/` → `/inicio` e curinga → `/inicio`. Trocar um segmento quebra link salvo; só com decisão de produto.
