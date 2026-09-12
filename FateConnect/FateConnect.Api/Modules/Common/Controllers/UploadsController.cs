@@ -14,23 +14,25 @@ public class UploadsController(IWebHostEnvironment environment) : ControllerBase
     [HttpGet("{container}/{fileName}")]
     public ActionResult GetStoredImage(string container, string fileName)
     {
-        if (!Enum.TryParse(container, ignoreCase: true, out EnumStorageContainer storageContainer)
-            || !Enum.IsDefined(storageContainer))
+        bool isValidContainer = Enum.TryParse(container, ignoreCase: true, out EnumStorageContainer storageContainer) && Enum.IsDefined(storageContainer);
+
+        if (!isValidContainer)
             return NotFound();
 
-        if (!ImageContentTypes.TryDescribeStoredFile(fileName, out string? storedFileName, out string? contentType))
+        bool isKnownImageFormat = ImageContentTypes.TryDescribeStoredFile(fileName, out string? storedFileName, out string? contentType);
+
+        if (!isKnownImageFormat)
             return NotFound();
 
-        string physicalFilePath = Path.Combine(
-            UploadsLocation.PhysicalRootOf(environment),
-            storageContainer.ToString().ToLowerInvariant(),
-            storedFileName);
+        string physicalFilePath = Path.Combine(UploadsLocation.PhysicalRootOf(environment), storageContainer.ToString().ToLowerInvariant(), storedFileName!);
 
-        if (!System.IO.File.Exists(physicalFilePath))
+        bool imageExistsOnDisk = System.IO.File.Exists(physicalFilePath);
+
+        if (!imageExistsOnDisk)
             return NotFound();
 
         Response.Headers.XContentTypeOptions = "nosniff";
 
-        return PhysicalFile(physicalFilePath, contentType);
+        return PhysicalFile(physicalFilePath, contentType!);
     }
 }

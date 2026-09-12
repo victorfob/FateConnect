@@ -30,6 +30,9 @@ using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Services;
+using FateConnect.Api.Modules.Denunciations.Interfaces;
+using FateConnect.Api.Modules.Denunciations.Services;
+using FateConnect.Api.Modules.Denunciations.Infrastructure;
 
 public class Program
 {
@@ -89,6 +92,9 @@ public class Program
         builder.Services.AddScoped<ILostAndFoundService, LostAndFoundService>();
 
         builder.Services.AddScoped<IStorageService, StorageService>();
+
+        builder.Services.AddScoped<IDenunciationRepository, DenunciationRepository>();
+        builder.Services.AddScoped<IDenunciationService, DenunciationService>();
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>

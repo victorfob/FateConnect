@@ -6,17 +6,17 @@ using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
-using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Enums;
 using Microsoft.Extensions.Logging;
 using FateConnect.Api.Modules.Users.Extensions;
+using FateConnect.Api.Modules.Common.Services;
 
 public partial class LostAndFoundService(
     ILostAndFoundRepository repository,
     IStorageService storageService,
     ILogger<LostAndFoundService> logger
-) : ILostAndFoundService
+) : BaseFileService(storageService), ILostAndFoundService
 {
     public async Task<ReadLostAndFoundDto> CreateAsync(CreateLostAndFoundDto dto, int currentUserId)
     {
@@ -33,7 +33,7 @@ public partial class LostAndFoundService(
 
         if (dto.Image is not null)
         {
-            storedImageUrl = await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
+            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
             record.AttachImage(storedImageUrl);
         }
 
@@ -104,14 +104,14 @@ public partial class LostAndFoundService(
         if (dto.Image is not null)
         {
             replacedImageUrl = record.ImageUrl;
-            storedImageUrl = await storageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
+            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
             record.AttachImage(storedImageUrl);
         }
 
         await PersistOrDropImageAsync(repository.SaveChangesAsync, storedImageUrl);
 
         if (!string.IsNullOrWhiteSpace(replacedImageUrl))
-            await storageService.DeleteImageAsync(replacedImageUrl);
+            await StorageService.DeleteImageAsync(replacedImageUrl);
 
         LogRecordUpdated(logger, id);
 
@@ -143,21 +143,6 @@ public partial class LostAndFoundService(
         LogRecordDeleted(logger, id);
 
         return true;
-    }
-
-    private async Task PersistOrDropImageAsync(Func<Task> persist, string? imageToDropOnFailure)
-    {
-        try
-        {
-            await persist();
-        }
-        catch
-        {
-            if (!string.IsNullOrWhiteSpace(imageToDropOnFailure))
-                await storageService.DeleteImageAsync(imageToDropOnFailure);
-
-            throw;
-        }
     }
 
     private void EnsureRecordIsReportedBy(LostAndFoundRecord record, int currentUserId)
