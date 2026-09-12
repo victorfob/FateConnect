@@ -37,15 +37,6 @@ export function useLostItemTransitions(): LostItemTransitions {
     meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.resolveFailed },
   });
 
-  const { mutate: deleteItem, isPending: isDeleting } = useMutation({
-    mutationFn: (item: LostItem) => deleteLostItem(item.id),
-    onSuccess: async () => {
-      notifySuccess(C.LOST_ITEM_LIST_MESSAGES.deleteSucceeded);
-      await invalidateList();
-    },
-    meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.deleteFailed },
-  });
-
   const { mutate: restoreItem, isPending: isRestoring } = useMutation({
     mutationFn: (item: LostItem) => restoreLostItem(item.id),
     onSuccess: async () => {
@@ -53,6 +44,19 @@ export function useLostItemTransitions(): LostItemTransitions {
       await invalidateList();
     },
     meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.restoreFailed },
+  });
+
+  // Declarada depois do restaurar porque o aviso dela o oferece como desfazer.
+  const { mutate: deleteItem, isPending: isDeleting } = useMutation({
+    mutationFn: (item: LostItem) => deleteLostItem(item.id),
+    onSuccess: async (_data, item) => {
+      notifySuccess(C.LOST_ITEM_LIST_MESSAGES.deleteSucceeded, {
+        autoHideMs: C.UNDO_NOTICE_MS,
+        action: { label: C.UNDO_LABEL, onClick: () => restoreItem(item) },
+      });
+      await invalidateList();
+    },
+    meta: { errorMessage: C.LOST_ITEM_LIST_MESSAGES.deleteFailed },
   });
 
   return {

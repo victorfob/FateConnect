@@ -11,7 +11,7 @@ describe('lostItemStatusLabel', () => {
   it('should give each situation the word the screen shows', () => {
     expect(lostItemStatusLabel(LostItemStatusEnum.RESOLVED)).toBe('Resolvido');
     expect(lostItemStatusLabel(LostItemStatusEnum.OPEN)).toBe('Aberto');
-    expect(lostItemStatusLabel(LostItemStatusEnum.DELETED)).toBe('Excluído');
+    expect(lostItemStatusLabel(LostItemStatusEnum.DELETED)).toBe('Arquivado');
   });
 
   it('should fall back to the raw value when the status is unknown', () => {
@@ -29,7 +29,7 @@ describe('lostItemStatusTone', () => {
   it('should give each situation its own colour', () => {
     expect(lostItemStatusTone(LostItemStatusEnum.OPEN)).toBe('warning');
     expect(lostItemStatusTone(LostItemStatusEnum.RESOLVED)).toBe('success');
-    expect(lostItemStatusTone(LostItemStatusEnum.DELETED)).toBe('danger');
+    expect(lostItemStatusTone(LostItemStatusEnum.DELETED)).toBe('neutral');
   });
 
   it('should leave the unknown status without a box', () => {
@@ -42,13 +42,13 @@ describe('lostItemStatusSlug', () => {
   it('should write the word of the screen in the url, never the one of the contract', () => {
     expect(lostItemStatusSlug(LostItemStatusEnum.OPEN)).toBe('aberto');
     expect(lostItemStatusSlug(LostItemStatusEnum.RESOLVED)).toBe('resolvido');
-    expect(lostItemStatusSlug(LostItemStatusEnum.DELETED)).toBe('excluido');
+    expect(lostItemStatusSlug(LostItemStatusEnum.DELETED)).toBe('arquivado');
   });
 });
 
 describe('parseLostItemStatus', () => {
   it('should read back the slug it writes, whatever the case', () => {
-    expect(parseLostItemStatus('excluido')).toBe(LostItemStatusEnum.DELETED);
+    expect(parseLostItemStatus('arquivado')).toBe(LostItemStatusEnum.DELETED);
     expect(parseLostItemStatus(' Aberto ')).toBe(LostItemStatusEnum.OPEN);
   });
 
@@ -57,7 +57,7 @@ describe('parseLostItemStatus', () => {
   });
 
   it('should give nothing back when the url says nothing it knows', () => {
-    expect(parseLostItemStatus('arquivado')).toBeNull();
+    expect(parseLostItemStatus('sumido')).toBeNull();
     expect(parseLostItemStatus(undefined)).toBeNull();
   });
 });

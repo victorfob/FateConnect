@@ -1,6 +1,10 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
+import { gzipSync } from 'node:zlib';
+import type { Plugin } from 'vite';
 import svgr from 'vite-plugin-svgr';
 import { defineConfig } from 'vitest/config';
 
@@ -15,6 +19,51 @@ import { defineConfig } from 'vitest/config';
  * build local e o de PR sem tentar subir nada.
  */
 const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
+
+/**
+ * Espelha o `gzip_types` de `deploy/nginx/site.conf.template`. ⛔ Sem o `.html`:
+ * só o índice não leva hash, e um `.gz` de uma publicação anterior apontaria
+ * para pacotes que já saíram — ele o nginx comprime na hora.
+ */
+const PRECOMPRESSIBLE_FILE = /\.(?:css|js|json|svg)$/;
+
+/** Espelha o `gzip_min_length` do nginx, para os dois decidirem pelo mesmo corte. */
+const MIN_BYTES_TO_PRECOMPRESS = 1024;
+
+/**
+ * Escreve um `.gz` ao lado de cada estático, que é o que o `gzip_static` do
+ * nginx serve sem gastar CPU por pedido. Nível 9 porque isto roda uma vez por
+ * build, e não a cada visita.
+ */
+function precompressForNginx(): Plugin {
+  let outputDirectory = '';
+
+  return {
+    name: 'fateconnect:precompress-for-nginx',
+    apply: 'build',
+    configResolved(config) {
+      outputDirectory = resolve(config.root, config.build.outDir);
+    },
+    // `closeBundle` e não `writeBundle`: o que o build copia de `public/` não
+    // passa pelo bundle, e é ali que moram o ícone e os documentos legais.
+    closeBundle() {
+      for (const entry of readdirSync(outputDirectory, { recursive: true, withFileTypes: true })) {
+        if (!entry.isFile()) continue;
+        if (!PRECOMPRESSIBLE_FILE.test(entry.name)) continue;
+
+        const path = join(entry.parentPath, entry.name);
+        const raw = readFileSync(path);
+        if (raw.byteLength < MIN_BYTES_TO_PRECOMPRESS) continue;
+
+        // O `gzip_static` não compara tamanhos: havendo `.gz`, ele serve o `.gz`.
+        const compressed = gzipSync(raw, { level: 9 });
+        if (compressed.byteLength >= raw.byteLength) continue;
+
+        writeFileSync(`${path}.gz`, compressed);
+      }
+    },
+  };
+}
 
 export default defineConfig({
   plugins: [
@@ -38,6 +87,7 @@ export default defineConfig({
       // O mapa sobe para o Sentry e sai do `dist`: ninguém serve source map.
       sourcemaps: { filesToDeleteAfterUpload: ['dist/**/*.map'] },
     }),
+    precompressForNginx(),
   ],
   build: {
     // `hidden` gera o mapa sem o comentário `sourceMappingURL`, então o

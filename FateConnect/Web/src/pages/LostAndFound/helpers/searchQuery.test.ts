@@ -68,7 +68,7 @@ describe('lostItemSearchCodec', () => {
     });
 
     it('should not care about the case of the words', () => {
-      expect(read('tipo=ACHADO&situacao=Excluido')).toMatchObject({
+      expect(read('tipo=ACHADO&situacao=Arquivado')).toMatchObject({
         lostAndFoundType: LostItemKindEnum.FOUND,
         status: LostItemStatusEnum.DELETED,
       });
@@ -109,7 +109,7 @@ describe('lostItemSearchCodec', () => {
         onlyMine: true,
       });
 
-      expect(params).toEqual({ pagina: '3', tipo: 'achado', situacao: 'excluido', meus: 'sim' });
+      expect(params).toEqual({ pagina: '3', tipo: 'achado', situacao: 'arquivado', meus: 'sim' });
     });
 
     it('should survive a round trip through the url', () => {
