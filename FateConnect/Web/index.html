@@ -9,7 +9,15 @@
     <!-- Quem entende SVG prefere este, e é ele que clareia a roda quando a aba
          é escura — o `.ico` é um raster só e não acompanha o esquema. -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <title>FateConnect</title>
+    <!-- Título padrão, para a primeira passada do rastreador: cada rota declara
+         o seu em `routes/pageMetadata.ts`, e o React 19 insere o dela ANTES
+         deste, que é o que faz a da rota valer. Um teste reprova se este texto
+         deixar de ser o da landing.
+         ⛔ E não há `meta description` aqui de propósito. Medido no navegador:
+         o React insere `<meta>` no FIM do `<head>`, não no começo como faz com
+         o `<title>` — então uma description estática ficaria à frente da que a
+         rota declara e venceria, servindo o texto da landing em `/cadastro`. -->
+    <title>FateConnect | Caronas e achados e perdidos da Fatec</title>
   </head>
   <body>
     <div id="root"></div>
