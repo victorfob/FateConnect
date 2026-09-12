@@ -25,6 +25,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a servir os arquivos estáticos comprimidos e com cache longo: o JavaScript da primeira visita cai de 1,4 MB para 434 KB, e nas visitas seguintes deixa de ser pedido ao servidor, em vez das sete revalidações de hoje. O índice continua sem cache, então a publicação nova segue sendo vista na hora (#377) [Frontend]
 - Passa a dar um título próprio a cada tela: antes as nove mostravam `FateConnect` na aba do navegador e no histórico, e quem usa leitor de tela não ouvia a troca ao navegar (#392) [Frontend]
 - Passa a servir o site por HTTP/2, em vez de HTTP/1.1, e a responder 404 no endereço com extensão que não existe: hoje qualquer endereço devolve 200 com a página inicial, inclusive os arquivos que um buscador procura por convenção. Endereço sem extensão continua abrindo a página inicial, como as rotas do app exigem (#394) [Frontend]
+- Passa a carregar a gravação de sessão depois que a página inicial termina de pintar, em vez de junto com ela: a primeira visita baixa 39 KB comprimidos a menos. O que é gravado não muda, e o monitoramento de erros e de navegação continua ativo desde o primeiro byte (#397) [Frontend]
 
 ### Fixed
 

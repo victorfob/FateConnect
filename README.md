@@ -62,6 +62,7 @@ A validação consulta as tags no **remoto**. Consultar localmente aprovaria qua
 | `check-api.yml`   | todo PR                                       | valida a API: compilação, testes e Sonar                                    |
 | `check-version.yml` | PR para a `main`                            | reprova quando a versão da raiz já tem tag                                  |
 | `deploy.yml`      | push na `develop`                             | publica em homologação                                                      |
+| `warm-front-cache.yml` | push na `develop`                        | grava na branch o cache de dependências que os checks de PR leem             |
 | `release.yml`     | push na `main`                                | cria a tag, publica em produção e devolve a `main` para a `develop`         |
 | `sonar-main.yml`  | push na `main`                                | analisa a `main` dos dois projetos, linha de base do código novo de cada PR |
 | `publish.yml`     | chamado pelos dois de publicação              | constrói o front e sobe um ambiente — os passos que homologação e produção compartilham |

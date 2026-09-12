@@ -5,7 +5,9 @@ import {
   useLocation,
   useNavigationType,
 } from 'react-router';
-import { init, reactRouterBrowserTracingIntegration, replayIntegration } from '@sentry/react';
+import { init, reactRouterBrowserTracingIntegration } from '@sentry/react';
+
+import { scheduleSessionReplay } from './loadSessionReplay';
 
 const TRACES_SAMPLE_RATE = 1;
 const REPLAY_SESSION_SAMPLE_RATE = 0.1;
@@ -37,7 +39,6 @@ export function initSentry(): void {
         createRoutesFromChildren,
         matchRoutes,
       }),
-      replayIntegration({ maskAllText: true, blockAllMedia: true }),
     ],
     tracesSampleRate: TRACES_SAMPLE_RATE,
     tracePropagationTargets: tracePropagationTargets(),
@@ -49,4 +50,6 @@ export function initSentry(): void {
     // `enableLogs` vem `true` do SDK; o repo não tem console em produção.
     enableLogs: false,
   });
+
+  scheduleSessionReplay();
 }
