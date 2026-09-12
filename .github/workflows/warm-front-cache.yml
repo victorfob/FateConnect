@@ -1,0 +1,46 @@
+name: Warm front cache
+
+# ⛔ Escrita de cache num run de `pull_request` fica presa em
+# `refs/pull/N/merge`, e um PR não lê o do outro. Como os checks só disparam em
+# `pull_request`, nenhum `node-modules-*` chegava a existir numa branch — e a
+# primeira execução de todo PR instalava a frio, ~50s no caminho crítico.
+# Este job é quem grava na `develop`, que é o escopo que os PRs enxergam.
+on:
+  push:
+    branches: [develop]
+
+# Sem cancelamento: um merge que cancela o aquecimento do anterior deixa o cache
+# sem gravar, que é justamente o que este workflow existe para impedir.
+concurrency:
+  group: warm-front-cache
+
+permissions:
+  contents: read
+
+jobs:
+  warm:
+    name: Warm front cache
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FateConnect/Web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: FateConnect/Web/.nvmrc
+
+      # A chave e o prefixo são os mesmos do `check-front.yml`: chave diferente
+      # aqui grava um cache que os PRs não acham, e o workflow inteiro vira ruído.
+      - uses: actions/cache@v4
+        with:
+          path: FateConnect/Web/node_modules
+          key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
+          restore-keys: node-modules-
+
+      # Instalar dependência não deve executar código: sem `--ignore-scripts` o
+      # `postinstall` de qualquer pacote da árvore roda com os segredos do job
+      # ao alcance.
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-scripts
