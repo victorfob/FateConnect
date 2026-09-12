@@ -47,6 +47,50 @@ Hoje vale para o **Portal de denúncias**, na milestone 14/09. Entrando o módul
 
 Fundamentando a seção: [Concise, SCANNABLE, and Objective](https://www.nngroup.com/articles/concise-scannable-and-objective-how-to-write-for-the-web/) e [How Users Read on the Web](https://www.nngroup.com/articles/how-users-read-on-the-web/), Nielsen Norman Group.
 
+## Título de documento e resumo de busca
+
+Terceiro registro, e o único que é lido **fora** da tela: a aba do navegador, o histórico, o anúncio do leitor de tela ao navegar, e o resultado de busca. O texto mora em [`FateConnect/Web/src/routes/pageMetadata.ts`](FateConnect/Web/src/routes/pageMetadata.ts), uma entrada por rota.
+
+⛔ **Título distinto por rota, sem exceção.** É o que o guia do Google pede — *"É importante ter um texto distinto que descreva o conteúdo da página no elemento `<title>` para cada página do seu site"* — e título repetido é um dos motivos pelos quais ele **reescreve** o seu, junto com *"texto longo que varia apenas por uma informação"*.
+
+⚠️ **E não é só busca.** A WCAG 2.4.2 pede que a página seja titulada, e num SPA o título não muda sozinho: quem usa leitor de tela depende da troca para saber que mudou de tela. **Rota interna, que robô nenhum alcança, precisa de título pelo mesmo motivo.**
+
+**O padrão é `<Tela> | FateConnect`**, e só a landing inverte, com a marca à frente. O guia admite a marca no início ou no fim, separada por delimitador — hífen, dois-pontos ou barra vertical.
+
+⛔ **A palavra que distingue vem primeiro.** A aba mostra bem menos que o resultado de busca, então marca à frente numa tela interna gasta o espaço visível com o nome que quem está logado já sabe.
+
+### O título não é o cabeçalho visível da tela
+
+⛔ **Reaproveitar a constante do `<h1>` parece automático e falha em três formas.** Medido nas nove rotas ao escrever esta seção:
+
+| O que o cabeçalho dizia | Por que não serve como título |
+| --- | --- |
+| uma chamada de marketing de 56 caracteres | come o corte do resultado e não traz o nome do site |
+| uma saudação (`Boas-vindas ao FateConnect`) | não é o nome de um lugar, e é o que a aba mostra |
+| o mesmo texto em três rotas de marcador | três URLs com título idêntico, que é o defeito que a regra existe para evitar |
+
+⛔ **O título nomeia o destino, não o estado da tela.** Rota cujo conteúdo ainda é um marcador leva o nome do que ela vai ser — `Meu perfil`, e não `Ainda não disponível`. O estado a pessoa lê no cabeçalho; repeti-lo no título diz duas vezes o que a tela diz uma, como na seção de nota ao lado de etiqueta.
+
+⚠️ **E o nome vem do glossário, não da sua cabeça.** O produto já batiza cada tela em algum lugar — a navegação, a gaveta, o menu da conta. `Meu perfil` está escrito em dois deles; `Perfil` não existe.
+
+### Resumo só onde a busca alcança
+
+⚠️ **`meta description` é para rota pública.** Rota atrás do guard não é rastreada, e resumo ali é texto sem leitor. Hoje são duas: a landing e o cadastro.
+
+**A descrição é a alternativa ao trecho que o buscador monta sozinho** raspando a página. Ela segue a régua da landing acima — específica, sem hipérbole, sobrevivendo à pergunta *"como assim?"*.
+
+### As medidas
+
+| | Corte |
+| --- | --- |
+| Título, no resultado de busca | por volta de **60** caracteres |
+| Título, na aba | bem menos — conte com 20 a 30 |
+| Resumo, no resultado | por volta de **160** caracteres |
+
+⚠️ **Não há limite técnico**, e o guia diz isso; o que existe é truncamento. Medir o candidato antes de propô-lo é o mesmo cuidado da seção de largura, mais abaixo.
+
+Fundamentando a seção: [Controle os links de título nos resultados da Pesquisa](https://developers.google.com/search/docs/appearance/title-link?hl=pt_BR), Google.
+
 ## Aviso de sucesso nomeia o que aconteceu
 
 ⛔ **Sem "com sucesso".** O aviso já **é** a confirmação. Particípio e ponto final:
