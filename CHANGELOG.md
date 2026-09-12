@@ -11,6 +11,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a ação às linhas de contato do rodapé, que eram texto para copiar à mão: o e-mail abre o aplicativo de e-mail, o telefone abre o discador e o endereço abre o mapa em nova guia; o ícone entra na área clicável junto do texto, e cada link diz a ação ao leitor de tela (#372) [Frontend]
 - Adiciona o filtro por autoria na lista de caronas, por `onlyMine`, que traz só as caronas que a pessoa ofertou; sem o campo a lista segue trazendo as de todo mundo, e carona já partida continua de fora nos dois casos (#348) [Backend]
 - Adiciona o filtro por autoria na busca de caronas, com a escolha entre todas as caronas e só as que a pessoa ofertou; sem escolher, a lista segue trazendo as de todo mundo (#350) [Frontend]
+- Adiciona o resumo que a landing e o cadastro mostram no resultado de busca, que até agora o Google montava raspando texto da própria página, e o endereço canônico da landing, que junta a raiz e `/inicio` num só (#392) [Frontend]
 
 ### Changed
 
@@ -21,6 +22,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a chamar o filtro por autoria de `onlyMine` também em achados e perdidos, onde ele era `onlyMyItems`; o comportamento de lá é o mesmo, e a consulta com o nome antigo deixa de filtrar (#348) [Backend]
 - Passa a filtrar as duas buscas por período em vez de data exata, e as caronas por turno em vez de hora exata: o período aceita as duas pontas ou só a inicial, que busca aquele dia inteiro, e o turno traz manhã, tarde e noite com a faixa de horas no rótulo. As escolhas continuam no endereço, então o link restaura a busca; link antigo abre a lista sem os filtros que saíram (#350) [Frontend]
 - Passa a servir os arquivos estáticos comprimidos e com cache longo: o JavaScript da primeira visita cai de 1,4 MB para 434 KB, e nas visitas seguintes deixa de ser pedido ao servidor, em vez das sete revalidações de hoje. O índice continua sem cache, então a publicação nova segue sendo vista na hora (#377) [Frontend]
+- Passa a dar um título próprio a cada tela: antes as nove mostravam `FateConnect` na aba do navegador e no histórico, e quem usa leitor de tela não ouvia a troca ao navegar (#392) [Frontend]
 
 ### Fixed
 
