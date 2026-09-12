@@ -70,6 +70,11 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
     position: 'relative',
     fontSize: NAV_FONT_SIZE,
     fontWeight: NAV_FONT_WEIGHT,
+  },
+  // ⛔ O preenchido fica de fora, como no realce de hover acima: ele traz o
+  // próprio fundo, e o branco a 90% do cromo sobre o vermelho de botão dá 4,41.
+  // O `secondary.contrastText` que ele recebe sozinho é branco puro, a 5,14.
+  '& .MuiButton-root:not(.MuiButton-contained)': {
     color: theme.palette.chrome.contrastText,
   },
   // A marca da tela atual pende do atributo que o leitor de tela já lê, e não de
