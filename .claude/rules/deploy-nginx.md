@@ -30,6 +30,19 @@ docker run -d --name prova -p 8091:8091 \
 
 ⚠️ **O `nginx -t` só responde sobre sintaxe.** Ele aprova uma configuração que serve a coisa errada — o que discrimina é o `curl` em cada caminho, lendo status, `Content-Type` e os cabeçalhos que você espera.
 
+## Depois de instalar, o transporte se confere de dentro
+
+⛔ **Medição feita de fora atravessa tudo que estiver no caminho, e o que ela descreve pode ser o caminho, não o servidor.** Vale para o que é negociado na conexão — versão do protocolo, TLS, tamanho comprimido.
+
+```bash
+ssh <host> 'curl -sk --http2 -o /dev/null -D - \
+  --resolve <dominio>:443:127.0.0.1 https://<dominio>/'
+```
+
+Medido em 12/09/2026, logo depois de instalar o `http2 on;` em homologação: de fora a mesma rota respondeu `HTTP/1.1` e de dentro `ALPN: server accepted h2`. A diretiva estava certa; a leitura é que não era do servidor.
+
+⚠️ **Status, corpo e `Content-Type` atravessam intactos** — esses se conferem de qualquer lugar. É só o transporte que precisa do loopback.
+
 ## ⛔ Regex vence prefixo, e o prefixo perde calado
 
 ⛔ **Ao acrescentar um `location ~`, todo `location /prefixo/` do arquivo passa a correr risco.** A ordem do nginx é: `=` exato, depois `^~`, depois **regex**, e só então o prefixo mais longo. Um prefixo simples perde para qualquer regex que case o mesmo caminho.

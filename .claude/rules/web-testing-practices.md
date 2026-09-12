@@ -42,6 +42,21 @@ O import saía de graça em 48 arquivos e ninguém percebia porque o teste passa
 - Não testar detalhe de implementação: nada de asserção sobre estado interno, nome de classe CSS ou ordem de chamada de hook.
 - Não duplicar no teste a lógica que ele verifica — valor esperado é literal, não recalculado.
 
+## A asserção que compara o valor com a própria fonte dele
+
+⛔ **Afirmar que a saída é igual à constante de onde ela veio não testa nada.** Os dois lados do `expect` lêem o mesmo lugar, então o caso passa para qualquer valor — inclusive um que o consumidor recusa.
+
+Aconteceu em 12/09/2026. O `<link rel="canonical">` saía relativo, e o teste dizia `expect(...getAttribute('href')).toBe(RoutePathEnum.LANDING)` — exatamente a constante que o componente escrevia. Verde, e cego: o Lighthouse reprova canonical relativa com nota zero, e nada na suíte sabia disso. Quem viu foi o Victor, auditando o site publicado.
+
+**A saída é afirmar o que o consumidor exige, não o que você escreveu.** Ali a propriedade era resolver sem base:
+
+```ts
+expect(() => new URL(href)).not.toThrow();
+expect(href.startsWith('/')).toBe(false);
+```
+
+⚠️ **O tell é o valor esperado ser um símbolo que a implementação também importa.** Literal no teste já ajuda — é o que a linha "valor esperado é literal, não recalculado" acima pede —, mas nem o literal responde quando a pergunta é sobre o **formato** que alguém de fora vai ler. Aí a asserção descreve a propriedade, não o valor.
+
 ## Suíte verde não prova que ela pega o defeito
 
 ⛔ **Quebre o código de propósito e confira que o teste cai.** É a única forma de saber se ele testa o que o nome dele diz — e o caso clássico aqui não é o teste frouxo, é o teste que **alimenta o formato errado**.
