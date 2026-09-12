@@ -16,11 +16,21 @@ export function PageMetadata() {
     return PAGE_METADATA[RoutePathEnum.LANDING];
   }, [pathname]);
 
+  /**
+   * ⛔ Absoluta: o Lighthouse reprova canonical relativa com nota zero, e o guia
+   * do Google pede o endereço inteiro. A origem vem do ambiente que serve a
+   * página, e não do repositório.
+   */
+  const canonicalUrl = useMemo(() => {
+    if (!metadata.canonical) return undefined;
+    return `${window.location.origin}${metadata.canonical}`;
+  }, [metadata.canonical]);
+
   return (
     <>
       <title>{metadata.title}</title>
       {metadata.description && <meta name="description" content={metadata.description} />}
-      {metadata.canonical && <link rel="canonical" href={metadata.canonical} />}
+      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     </>
   );
 }

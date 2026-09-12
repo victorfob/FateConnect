@@ -20,8 +20,8 @@ const LANDING_METADATA: PageMetadata = {
   title: `${SITE_NAME}${TITLE_SEPARATOR}Caronas e achados e perdidos da Fatec`,
   description:
     'Caronas entre quem estuda na Fatec Sorocaba e um mural de achados e perdidos. Ofereça uma vaga no seu trajeto ou encontre quem faz o mesmo caminho.',
-  // Relativa de propósito: o endereço de cada ambiente fica fora do repositório,
-  // e a raiz serve este mesmo documento sem redirecionar no servidor.
+  // Caminho, não endereço: quem monta a URL absoluta é o PageMetadata, com a
+  // origem do ambiente. A raiz serve este mesmo documento sem redirecionar.
   canonical: RoutePathEnum.LANDING,
 };
 
