@@ -50,6 +50,21 @@ sed -e "s|__DOMAIN__|$DOMAIN|g" \
     nginx/site.conf.template > "$CONF"
 ln -sf "$CONF" "/etc/nginx/sites-enabled/fateconnect-$ENVIRONMENT"
 
+# O que o robô lê fica fora da raiz do front: lá o `rsync --delete` da
+# publicação apagaria. Só produção tem sitemap — em homologação o arquivo não
+# existe, e é a ausência dele que devolve 404.
+ROBOT_DIR="/etc/nginx/fateconnect-$ENVIRONMENT"
+echo "==> Arquivos de robô: $ROBOT_DIR"
+mkdir -p "$ROBOT_DIR"
+sed "s|__DOMAIN__|$DOMAIN|g" "nginx/robots.$ENVIRONMENT.txt" > "$ROBOT_DIR/robots.txt"
+
+SITEMAP_SRC="nginx/sitemap.$ENVIRONMENT.xml"
+if [[ -f "$SITEMAP_SRC" ]]; then
+  sed "s|__DOMAIN__|$DOMAIN|g" "$SITEMAP_SRC" > "$ROBOT_DIR/sitemap.xml"
+else
+  rm -f "$ROBOT_DIR/sitemap.xml"
+fi
+
 echo "==> Conferindo a configuração antes de recarregar"
 nginx -t
 systemctl reload nginx

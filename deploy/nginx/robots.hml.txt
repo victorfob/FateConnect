@@ -1,0 +1,4 @@
+# Homologação não é para ser indexada, e a propriedade do Search Console é de
+# domínio — ela cobre este subdomínio sem ninguém ter pedido.
+User-agent: *
+Disallow: /
