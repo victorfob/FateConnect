@@ -56,7 +56,7 @@ describe('PageMetadata', () => {
     expect(described).toEqual([RoutePathEnum.LANDING, RoutePathEnum.SIGNUP]);
   });
 
-  it('should point the canonical at the landing, relative to the environment', () => {
+  it('should store the canonical as a path, leaving the origin to the environment', () => {
     expect(PAGE_METADATA[RoutePathEnum.LANDING].canonical).toBe(RoutePathEnum.LANDING);
   });
 
@@ -79,8 +79,23 @@ describe('PageMetadata', () => {
       ),
     );
     expect(document.head.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
-      RoutePathEnum.LANDING,
+      `${window.location.origin}${RoutePathEnum.LANDING}`,
     );
+  });
+
+  // O Lighthouse reprova canonical relativa com nota zero, e foi assim que ela
+  // saiu: afirmar a origem montada repetiria a implementação, então o que se
+  // afirma aqui é que o endereço se resolve sozinho, sem base.
+  it('should render a canonical that is absolute on its own', async () => {
+    renderAt(RoutePathEnum.LANDING);
+
+    await waitFor(() =>
+      expect(document.head.querySelector('link[rel="canonical"]')).not.toBeNull(),
+    );
+    const href = document.head.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? '';
+
+    expect(() => new URL(href)).not.toThrow();
+    expect(href.startsWith('/')).toBe(false);
   });
 
   // A rota interna não é alcançada por robô: descrição ali seria texto sem leitor.
