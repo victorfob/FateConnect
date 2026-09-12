@@ -1,10 +1,10 @@
 ---
 name: write-review-comment
 description: >-
-  Escreve comentário de review em PR deste repositório — formato Problema/Solução proposta, ancorado
-  na linha exata. Use quando o usuário pedir para comentar, revisar ou apontar problemas no PR de
-  outra pessoa, ou para levar achados de um code review para o PR. Para responder comentários que
-  outros escreveram, use `resolve-pr-comments`.
+  Escreve comentário de review em PR deste repositório, ancorado na linha exata — defeito no formato
+  Problema/Solução proposta, e o que não está errado como sugestão. Use quando o usuário pedir para
+  comentar, revisar ou apontar problemas no PR de outra pessoa, ou para levar achados de um code
+  review para o PR. Para responder comentários que outros escreveram, use `resolve-pr-comments`.
 ---
 
 # Escrever comentário de review
@@ -24,6 +24,16 @@ Solução proposta: o que fazer.
 
 ⛔ **Um problema por comentário.** Dois threads sobre linhas vizinhas é ruído; se dois apontamentos têm a **mesma correção**, são um comentário só — foi o caso do `[Range]` duplicado e do `[Required]` inútil, que estavam no mesmo bloco de anotações e terminavam na mesma frase: enxugar o DTO.
 
+### A palavra `Problema` promete gravidade — o que não é defeito usa outro registro
+
+⛔ **Só é `Problema:` o que está errado: defeito, contrato quebrado, código morto, incoerência dentro do PR.** O resto — ganho de desempenho, privacidade por desenho, nome que lê melhor, campo que falta no contrato — abre com `**Sugestão:**` e fecha dizendo que a escolha é de quem escreveu.
+
+⛔ Cobrado em 12/09/2026, na rodada do PR #391. Eu tinha redigido como `Problema:` uma refatoração que trocava garantia do compilador por dois `!` — real, mas sem nada quebrado hoje. A correção do Victor foi *"se esse não é um problema use um template de sugestão, colocar como problema faz parecer q é algo crítico"*.
+
+**O custo de errar o registro não é de estilo.** Quem recebe doze threads abertos por `Problema:` não consegue separar o que derruba a aplicação do que melhora uma linha, e passa a ler todos com o mesmo peso — ou a descontar todos pelo mesmo fator.
+
+**O teste:** alguma coisa está errada **hoje**, com o código como está? Não estando, é sugestão.
+
 ## Preview antes de publicar, um de cada vez
 
 ⛔ **Nenhum comentário vai para o PR sem o texto ter sido mostrado e confirmado.** Um por vez: preview, confirmação, publicação, próximo — nunca uma leva inteira de uma vez.
@@ -41,6 +51,7 @@ gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
 - ⛔ **A linha precisa estar dentro de uma seção do diff**, senão a API responde 422. Confira antes mapeando as seções — o `Program.cs` tinha um vão de duas linhas exatamente onde eu queria comentar.
 - **Problema num arquivo apagado: `side: LEFT`, no arquivo antigo.** É a melhor âncora para comportamento removido: o thread nasce em cima do código que some, e não numa linha vizinha parecida. Ancore na **declaração** — a classe, o método —, nunca na chave de fechamento.
 - Editar: `PATCH .../pulls/comments/<id>`. Apagar: `DELETE` no mesmo caminho.
+- ⛔ **O `POST` falhou com erro de rede? Conte os comentários antes de repetir.** Esta rede derruba escrita no GitHub mantendo a leitura boa, e o `EOF` aparece tanto quando o comentário não entrou quanto quando ele entrou e a resposta se perdeu. Repetir às cegas publica dois threads idênticos no PR de outra pessoa. Aconteceu duas vezes em 12/09/2026: `gh api .../pulls/<n>/comments --jq length` respondeu o número exato de antes, e aí a repetição foi segura.
 
 ⛔ **Quando o problema é ausência, não há âncora.** Arquivo que o PR *não* tocou não está no diff. Aí o apontamento não é comentário: vira issue, ou não é levantado. **Decida com o usuário** — foi assim que o contrato do front virou uma issue em vez de um thread.
 
@@ -78,6 +89,25 @@ Aconteceu **três vezes no mesmo PR**, o #186, sempre pelo mesmo gesto meu:
 ⛔ **Sugestão de forma para código de consulta se mede antes de sair, não depois.** Na mesma rodada eu pedi escape de `%` e `_` no filtro por destino; o escape saiu correto, mas a edição trocou concatenação por interpolação — e dentro de uma árvore de expressão `$"%{x}%"` compila para `string.Format`, que o EF Core **não traduz**. Toda busca por destino passou a responder 500, pior que o defeito que eu tinha apontado.
 
 **O que a medição precisa ser:** chamar o método real do commit, não reconstruir a consulta numa sonda. O controle que provou foi chamar `GetAllAsync` duas vezes — sem `Destination` a query chega a abrir conexão, com `Destination` estoura na tradução. Reconstruir teria medido o meu código, não o dele.
+
+### Bloco `suggestion` é aplicado em um clique — compile antes de publicar
+
+⛔ **O que vai dentro de um bloco ` ```suggestion ` entra na branch exatamente como está escrito, sem ninguém reler.** Sugestão que não compila é defeito entregue por quem revisa, e chega lá com a autoridade de quem apontou o problema.
+
+⛔ Aconteceu em 12/09/2026, no PR #391, e só não foi publicada porque o Victor cobrou antes: *"pra sugestões verifique se o código roda ou se não está sugerindo algo quebrado"*. Eu ia sugerir devolver uma chamada para dentro do `if`, restaurando o `[NotNullWhen(true)]` e dispensando um `!`. Medido, o bloco reprovava o build:
+
+```
+error S8969: Remove this null-forgiving operator; the compiler already
+             knows this expression is not null here.
+```
+
+⚠️ **A correção parcial é que quebra.** Eram **dois** `!`, e removendo só o que estava no meu recorte, o outro passa a ser redundante — e redundante é **erro** aqui, porque o `.csproj` liga `TreatWarningsAsErrors`. O bloco tinha de cobrir da primeira à última linha afetada, não só o trecho que ilustra o argumento.
+
+⚠️ E o erro era a prova do argumento: o compilador só reclama do segundo `!` porque voltou a saber que a expressão não é nula.
+
+**A bancada:** worktree no head do PR (`git fetch origin pull/<n>/head`), **build de linha de base primeiro** — sem ele, uma falha depois não distingue a sua sugestão de algo que já estava quebrado —, aplicar, confirmar com `cmp -s` que o arquivo de fato mudou, e construir. O corpo do comentário sai do arquivo que passou no build, não do que você digitou no rascunho.
+
+⚠️ **Diga em que ambiente compilou**, como o resto desta skill exige: aqui é o SDK que o `global.json` fixa, e `dotnet --version` responde `8.0.4xx`.
 
 ## Meça antes de afirmar
 
