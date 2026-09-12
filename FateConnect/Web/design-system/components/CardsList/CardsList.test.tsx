@@ -6,8 +6,11 @@ const EMPTY_MESSAGE = 'Nenhum item por aqui.';
 const CARD_TEXT = 'Cartão semeado';
 const PAGINATION_LABEL = 'paginação';
 
+const SKELETON_COUNT = 10;
+
 const DEFAULT_PROPS: CardsListProps = {
   isLoading: false,
+  skeletonCount: SKELETON_COUNT,
   isEmpty: false,
   emptyMessage: EMPTY_MESSAGE,
   pagination: <nav aria-label={PAGINATION_LABEL} />,
@@ -23,6 +26,12 @@ describe('CardsList', () => {
     expect(screen.getByText(CARD_TEXT)).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: PAGINATION_LABEL })).toBeInTheDocument();
     expect(screen.queryByText(EMPTY_MESSAGE)).not.toBeInTheDocument();
+  });
+
+  it('should reserve one ghost per card of the page while loading', () => {
+    renderComponent({ ...DEFAULT_PROPS, isLoading: true });
+
+    expect(screen.getAllByRole('article')).toHaveLength(SKELETON_COUNT);
   });
 
   it('should hold the place of the cards while loading, without the pagination', () => {
