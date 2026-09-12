@@ -99,6 +99,20 @@ function stubDesktopViewport() {
 
 ⛔ **O risco é o silêncio, não o erro.** Sem o stub, o caso do ramo largo **não falha**: ele passa medindo o ramo estreito, com o nome dizendo outra coisa — é a asserção que concorda com o ambiente errado. O par é o que separa os dois, e o exemplo na base é [`design-system/components/Pagination/Pagination.test.tsx`](FateConnect/Web/design-system/components/Pagination/Pagination.test.tsx), onde um caso mede o estreito sem stub e o outro o largo com ele.
 
+## O jsdom não carrega o `index.html`, então o `<head>` do teste está vazio
+
+⛔ **A suíte monta o documento do zero: o que está escrito no `index.html` não existe ali.** Tudo o que a página real já traz no `<head>` — título, metadado, ícone — some do teste, e uma asserção sobre o `<head>` mede um documento em que só o seu componente escreveu.
+
+⛔ Aconteceu em 12/09/2026, na #386. Cada rota passou a declarar o seu `<title>` e a sua `meta description`, e o `index.html` mantinha um par padrão. O teste lia a **primeira** `meta[name=description]` do `<head>` e passava. No navegador havia **duas**, e o React as ordena diferente: ele insere `<title>` no começo do `<head>` e `<meta>` no fim — então a estática ficava **à frente** da que a rota declarava, e `/cadastro` servia o resumo da landing. A suíte inteira verde.
+
+**Quando a asserção depende do que o `index.html` traz, o teste tem de ler o arquivo:**
+
+```ts
+readFileSync(resolve(import.meta.dirname, '<caminho até>/index.html'), 'utf8');
+```
+
+⚠️ **O sintoma é a asserção que pega "o primeiro" de algo** — `querySelector` sem índice, `[0]`, `find`. No teste existe um só e a escolha não aparece; no navegador existem dois e ela decide o resultado. Conte antes de ler: `querySelectorAll(...).length` diz se havia escolha a fazer.
+
 ## O nome no `getByRole` sai da constante, nunca do texto
 
 ⛔ **Nunca escreva o rótulo literal — nem string, nem regex — para achar um controle.** Importe a constante que o componente usa. Copy muda, e o literal não muda junto: ou o teste quebra, ou — pior — passa a casar **outro** controle.
