@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-09-13
+
 ### Added
 
 - Adiciona a ação às linhas de contato do rodapé, que eram texto para copiar à mão: o e-mail abre o aplicativo de e-mail, o telefone abre o discador e o endereço abre o mapa em nova guia; o ícone entra na área clicável junto do texto, e cada link diz a ação ao leitor de tela (#372) [Frontend]
@@ -26,6 +28,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a dar um título próprio a cada tela: antes as nove mostravam `FateConnect` na aba do navegador e no histórico, e quem usa leitor de tela não ouvia a troca ao navegar (#392) [Frontend]
 - Passa a servir o site por HTTP/2, em vez de HTTP/1.1, e a responder 404 no endereço com extensão que não existe: hoje qualquer endereço devolve 200 com a página inicial, inclusive os arquivos que um buscador procura por convenção. Endereço sem extensão continua abrindo a página inicial, como as rotas do app exigem (#394) [Frontend]
 - Passa a carregar a gravação de sessão depois que a página inicial termina de pintar, em vez de junto com ela: a primeira visita baixa 39 KB comprimidos a menos. O que é gravado não muda, e o monitoramento de erros e de navegação continua ativo desde o primeiro byte (#397) [Frontend]
+- Renomeia para `Arquivar` a ação de achados e perdidos que se chamava `Excluir`, e que prometia destruir um item que continua visível para todo mundo — um anúncio arquivado ainda serve a quem procura e fala com quem o cadastrou; a etiqueta, a nota do cartão e o aviso acompanham. A confirmação deixa de existir e o aviso passa a oferecer desfazer por cinco segundos, porque o mural abre em `Aberto` e o item sai da vista no mesmo instante; resolver um item continua pedindo confirmação, que é onde não há volta pela tela (#380) [Frontend]
 
 ### Fixed
 
@@ -36,7 +39,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige a política de privacidade, que listava o apelido entre os dados coletados no cadastro depois de o campo ter sido removido (#367) [Frontend]
 - Corrige a recusa do e-mail institucional, que falava do domínio mesmo quando ele estava certo e o problema era o trecho antes do @; cada um dos dois passa a ter a sua mensagem, e o conjunto de endereços aceitos continua o mesmo (#368) [Frontend] [Backend]
 - Corrige o contraste do botão de destaque do topo, abaixo do mínimo de legibilidade nos dois temas: o texto dele vinha do branco translúcido do cabeçalho, que não foi feito para pousar sobre o vermelho do próprio botão, e passa a ser o branco puro dos demais botões preenchidos. Só aparecia no desktop, onde essa fileira de navegação existe (#398) [Frontend]
-- Corrige o salto de layout nas listas de caronas e de achados e perdidos, em que a página pulava no momento em que os cartões chegavam: o carregamento reservava espaço para três cartões e a lista traz dez. Só acontecia na área logada, porque na página inicial o conteúdo já nasce alto (#?) [Frontend]
+- Corrige o salto de layout nas listas de caronas e de achados e perdidos, em que a página pulava no momento em que os cartões chegavam: o carregamento reservava espaço para três cartões e a lista traz dez. Só acontecia na área logada, porque na página inicial o conteúdo já nasce alto (#399) [Frontend]
 
 ### Removed
 
