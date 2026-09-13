@@ -5,7 +5,7 @@ import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { spacingScale } from '@ds-root/tokens';
 
-const { xs, md, lg, giant } = spacingScale;
+const { md, lg, giant } = spacingScale;
 
 export const FooterRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
@@ -35,12 +35,6 @@ export const ContactsContainer = styled(Stack)(({ theme }) => ({
   width: '100%',
 
   [theme.breakpoints.down('md')]: { alignItems: 'center', textAlign: 'center' },
-}));
-
-export const ContactItem = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: theme.space(xs),
 }));
 
 export const FooterDivider = styled(Box)(({ theme }) => ({

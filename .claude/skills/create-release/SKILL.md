@@ -37,6 +37,18 @@ Leia a seção `## [Unreleased]` inteira. Ela é a release: se estiver vazia, n�
 
 ⚠️ **Olhe o que vai ao ar, não só o que mudou.** Funcionalidade entregue no front contra API que não existe vai para produção quebrada. Isso não impede a release, mas o usuário precisa saber antes, não depois.
 
+⛔ **E o inverso quebra igual, sem deixar rastro no changelog: API que troca um contrato à frente do front que o consome.** Parâmetro de query que nenhum DTO liga o ASP.NET **descarta sem erro** — o filtro deixa de filtrar, a resposta continua `200`, e nada acusa. Não há entrada de changelog para procurar, porque a ponta de API entrou como funcionalidade própria e a tela que a consome é outra issue.
+
+**A conferência é o documento do Swagger de cada ambiente**, que é o que diz o que subiu — status code não serve, porque o piso de autorização responde `401` até para rota inexistente:
+
+```bash
+BASE=$(gh api /repos/<dono>/<repo>/environments/<ambiente>/variables \
+  --jq '.variables[] | select(.name=="PUBLIC_URL") | .value')
+curl -s "$BASE/api/swagger/v1/swagger.json" | jq '.paths["/Rides"].get.parameters[].name'
+```
+
+Divergindo entre os ambientes, a release tem **ordem**: ou as duas pontas entram juntas, ou a do front vai primeiro. Medido em 10/09/2026 — homologação publicava `DateFrom`/`DateTo` enquanto o front ainda mandava `departureDate`, e o filtro de data das duas listas estava morto lá; produção seguia consistente **só** porque tinha ficado na versão anterior da API.
+
 ## 2. Escolher a versão
 
 Em `0.x`, funcionalidade nova é **minor** — `0.2.0 → 0.3.0`. Só correção é **patch**.

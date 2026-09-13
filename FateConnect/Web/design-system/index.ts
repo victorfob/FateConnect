@@ -15,6 +15,7 @@ export type { AnchoredPopoverProps } from './components/AnchoredPopover';
 export { Header } from './components/Header';
 export { HEADER_HEIGHT_PX } from './components/Header/styles';
 export { Footer } from './components/Footer';
+export type { FooterContact } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
 export { InitialsAvatar } from './components/InitialsAvatar';
 export { Dialog } from './components/Dialog';
@@ -31,12 +32,18 @@ export type { CardsListProps } from './components/CardsList';
 export { ListCard } from './components/ListCard';
 export type { ListCardProps } from './components/ListCard';
 export { NotificationProvider } from './components/NotificationProvider';
+export {
+  NotificationActions,
+  type NotificationAction,
+} from './components/NotificationProvider/NotificationActions';
 export { PageMessage } from './components/PageMessage';
 export type { PageMessageProps } from './components/PageMessage';
 export { PageShell } from './components/PageShell';
 export type { PageShellProps } from './components/PageShell';
 export { Pagination } from './components/Pagination';
 export type { PaginationProps } from './components/Pagination';
+export { UnderlinedLink } from './components/UnderlinedLink';
+export type { UnderlinedLinkProps } from './components/UnderlinedLink';
 export { StatusTag } from './components/StatusTag';
 export type { StatusTagProps } from './components/StatusTag';
 export type { StatusTagTone } from './theme/types';

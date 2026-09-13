@@ -45,6 +45,16 @@ Na dúvida, a pergunta é: *o comportamento mudou?* — não *o usuário percebe
 
 Reescrever algo por dentro sem mudar o que o usuário vê é `Changed`, não `Added`: para quem usa, nada foi adicionado.
 
+### A entrada irmã já respondeu o que cabe na frase
+
+⛔ **Antes de escrever, procure no `CHANGELOG.md` uma mudança da mesma natureza.** A tabela acima diz qual **seção**; a entrada anterior diz o que cabe **dentro da frase**, e é aí que se erra.
+
+```bash
+grep -n -i "<o conceito, ou a natureza da mudança>" CHANGELOG.md
+```
+
+Aconteceu em 11/09/2026, ao registrar a remoção do endereço do cadastro. Eu ia deixar de fora duas coisas por classificá-las como acessórias — que a requisição com o campo antigo continua sendo aceita, e que o dado já gravado se perde. A entrada da remoção do **apelido**, mudança da mesma natureza, traz as duas na mesma linha: são elas que dizem a quem lê a release se algo quebra e o que se perde ao subir.
+
 ## 4. Escrever
 
 Uma entrada principal, imperativo, linha curta, terminando no número do PR e no lado que mudou — `[Frontend]` ou `[Backend]`:

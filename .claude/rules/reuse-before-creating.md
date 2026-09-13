@@ -39,6 +39,12 @@ O que fechou a conversa foi a tabela que eu devia ter apresentado antes:
 
 **O sinal de risco é você já ter medido que a biblioteca não resolve.** É exatamente aí que a reescrita parece inevitável — e é aí que o caminho barato precisa ser dito em voz alta, com o custo, para o outro lado escolher.
 
+⛔ **E a tabela acima estava incompleta: faltava a linha que ganhou.** Em 10/09/2026 a mesma fileira voltou a quebrar, e a saída foi **pedir menos páginas ao próprio componente** — `siblingCount={0}` abaixo do limite de desktop, o padrão acima. Zero linhas nossas, sem tocar no alvo de toque, e as 15 linhas de janela mais o arquivo de rótulos de acessibilidade saíram: o locale que o tema já aplica entrega as mesmas cinco strings que aquele arquivo duplicava.
+
+**Antes de reescrever, leia as props do componente.** A biblioteca costuma já parametrizar exatamente o que você está prestes a recomputar — e ali a prop existia desde o começo. Apresentar duas opções não cumpre esta regra se a terceira, mais barata que as duas, é uma linha da documentação que ninguém abriu.
+
+⚠️ **O tell é a sua tabela de custos só ter caminhos que passam por código seu.** Se nenhuma linha dela é "configurar o que já existe", falta procurar.
+
 ## Antes de afrouxar uma regra do projeto, procure a ferramenta padrão
 
 ⛔ **Código que não passa numa regra daqui é sinal de que falta uma ferramenta, não de que a regra está larga demais.** Editar a regra é o caminho mais curto e o mais caro: ela deixa de valer para todo mundo, para sempre, por causa de um caso.
@@ -48,6 +54,16 @@ O que fechou a conversa foi a tabela que eu devia ter apresentado antes:
 **O gesto que denuncia:** você está editando configuração de lint no meio de uma tarefa que não é de lint. Antes de salvar, pergunte qual é o jeito padrão do ecossistema de fazer aquilo — a resposta costuma ser um plugin de uma linha.
 
 ⚠️ **Vale mesmo com a exceção bem medida.** A minha estava: recorte mínimo, controle positivo nas duas formas, comentário explicando. Continuava sendo a regra cedendo ao meu caso, quando existia caso nenhum a abrir.
+
+## O precedente do vizinho vale até onde o contexto dele vale
+
+⛔ **Reaproveitar o código do vizinho traz junto as decisões dele, e algumas foram tomadas para um contexto que o seu caso não tem.** Copiar o comportamento inteiro é o gesto certo para o mecanismo e o errado para o que o mecanismo assume.
+
+⛔ Aconteceu em 11/09/2026, na #358. As linhas de contato do rodapé viraram links, e o vizinho — os links de documentos legais no **mesmo rodapé** — já resolvia "link no cromo". Reaproveitei o estilo, o que era certo, e junto a decisão de o link envolver **só o texto**. O vizinho não tem ícone; a linha de contato tem, e ali o ícone ficou fora da área clicável. A correção do Victor foi *"acho que o ícone pode estar dentro da área clicável tbm, assim a gente aumenta a acessibilidade"*.
+
+**O tell é o seu caso ter um elemento que o vizinho não tem.** Antes de herdar o recorte dele, liste o que existe dos dois lados: o que só existe no seu não foi considerado quando aquela decisão foi tomada.
+
+⚠️ **Reaproveitar continua certo** — o que não se herda é a escolha que dependia da ausência. E a diferença costuma reaparecer no estilo: ali o sublinhado teve de sair da âncora e ir para o texto, senão correria por baixo do ícone.
 
 ## Encontrou duplicação: propor e perguntar
 

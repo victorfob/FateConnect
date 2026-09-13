@@ -4,12 +4,15 @@ using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.Enums;
 
-public record FilterRideDto : PagedFilterDto
+public record FilterRideDto : DateRangeFilterDto
 {
     public string? SearchTerm { get; init; }
-    public DateOnly? DepartureDate { get; init; }
-    public TimeOnly? DepartureTime { get; init; }
+
+    [EnumDataType(typeof(EnumRideShift), ErrorMessage = "Turno inválido")]
+    public EnumRideShift? DepartureShift { get; init; }
 
     [EnumDataType(typeof(EnumRideType), ErrorMessage = "Tipo de carona inválido")]
     public EnumRideType? RideType { get; init; }
+
+    public bool? OnlyMine { get; init; }
 }

@@ -68,6 +68,16 @@ Na #227 o inventário foi a espinha: **295 strings visíveis em 51 arquivos**. E
 
 Blocos de **no máximo quatro perguntas** via `AskUserQuestion` — quatro é o teto do formulário, não uma preferência. Repetir blocos até fechar.
 
+### A estrutura aprovada não dispensa a sabatina
+
+⛔ **O usuário aprovar quantas issues nascem e como elas se penduram não responde o que vai dentro de cada uma.** Estrutura é uma decisão; alcance, contrato e invariante são outras — e ter a primeira na mão dá a sensação de que o que sobrou é redigir.
+
+⛔ Aconteceu em 12/09/2026, ao abrir as filhas da auditoria do Lighthouse. A lista e o desenho "pai com duas filhas" já estavam aprovados, e eu fui direto escrever os corpos; o Victor teve de lembrar da skill. A sabatina que veio depois mudou duas coisas **já escritas**: o alcance da miniatura de foto, e — pela resposta em texto livre — a correção das fotos de homologação, que deixou de ser conveniência e virou **pré-condição** do contrato, porque sem ela o campo chega nulo numa tela que não tem caminho de volta.
+
+⚠️ E a leitura do passo 1 foi o que salvou o corpo de uma issue inteira: `gh issue list --state all --search` achou a **#160**, fechada, que já havia decidido e medido aquela cor. O defeito não era a decisão faltando — era uma sobrescrita de CSS passando por cima dela. Procurar issue fechada não serve só para achar duplicata: serve para achar a decisão que o código deixou de cumprir.
+
+**O tell é você já saber quantas issues vai abrir e ainda não saber o que decide o corpo de nenhuma.**
+
 Cada pergunta tem:
 
 - **Opção A** — a recomendação, ancorada em código que você leu, com `caminho/arquivo.tsx:linha`

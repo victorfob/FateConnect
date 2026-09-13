@@ -6,6 +6,7 @@ vi.mock('@sentry/react', () => ({
   init: vi.fn(),
   reactRouterBrowserTracingIntegration: vi.fn(),
   replayIntegration: vi.fn(),
+  getClient: vi.fn(),
 }));
 
 const mockInit = init as Mock;

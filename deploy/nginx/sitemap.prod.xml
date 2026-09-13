@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Só as duas rotas fora do guard. As outras exigem sessão e o robô não as
+     alcança. Sem changefreq nem priority, que o Google ignora, e sem lastmod,
+     que mentiria assim que ninguém o atualizasse. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://__DOMAIN__/inicio</loc></url>
+  <url><loc>https://__DOMAIN__/cadastro</loc></url>
+</urlset>

@@ -1,4 +1,4 @@
-import { DATE_PICKER_LABEL } from '@design-system';
+import { DATE_PICKER_LABEL, type SelectOption } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
@@ -14,10 +14,7 @@ import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
 import { OWN_ITEM_LABEL } from './components/LostItemCard/constants';
-import {
-  DELETE_DIALOG,
-  LOST_ITEM_ACTION_LABELS,
-} from './components/LostItemCard/LostItemActions/constants';
+import { LOST_ITEM_ACTION_LABELS } from './components/LostItemCard/LostItemActions/constants';
 import { CONFIRMATION } from './components/LostItemCard/LostItemConfirmAction/constants';
 import {
   lostItemResolveLabel,
@@ -31,6 +28,9 @@ import {
   FILTER_LABELS,
   FILTER_SUBMIT_LABEL,
   FILTER_TITLE,
+  LOST_ITEM_KIND_FILTER_OPTIONS,
+  LOST_ITEM_OWNER_FILTER_OPTIONS,
+  LostItemOwnerFilterEnum,
 } from './components/LostItemFilter/constants';
 import { EDIT_MODE, REGISTER_MODE } from './components/LostItemFormDialog/constants';
 import * as C from './constants';
@@ -81,13 +81,19 @@ function listReturning(items: LostItem[], onRequest?: (url: URL) => void) {
 
 const NO_CONTENT = 204;
 
-const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', deleted: 'Excluído' };
+const STATUS_TAG_LABEL = { open: 'Aberto', resolved: 'Resolvido', deleted: 'Arquivado' };
 
 const STATUS_FILTER_ALL_LABEL = 'Todas';
 
+/** O rótulo sai da opção, não do texto: copy muda e o literal não muda junto. */
+const optionLabel = (options: readonly SelectOption[], value: string) =>
+  options.find((option) => option.value === value)!.label;
+
+const OWNER_MINE_LABEL = optionLabel(LOST_ITEM_OWNER_FILTER_OPTIONS, LostItemOwnerFilterEnum.MINE);
+
 const DELETION_NOTE = {
-  owner: 'Excluído manualmente.',
-  inactivity: 'Excluído automaticamente por inatividade.',
+  owner: 'Arquivado manualmente.',
+  inactivity: 'Arquivado automaticamente por inatividade.',
 };
 
 const OWN_OPEN_ITEM: LostItem = { ...LOST_ITEM, isOwner: true };
@@ -136,12 +142,18 @@ async function confirmAction(actionLabel: string, confirmLabel: string) {
   );
 }
 
-async function filterByStatus(optionLabel: string) {
-  await openFilters();
-  await userEvent.click(screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.status) }));
+async function pickOption(fieldLabel: string, chosenLabel: string) {
+  await userEvent.click(screen.getByRole('combobox', { name: new RegExp(fieldLabel) }));
   await userEvent.click(
-    within(screen.getByRole('listbox')).getByRole('option', { name: optionLabel }),
+    within(screen.getByRole('listbox')).getByRole('option', { name: chosenLabel }),
   );
+}
+
+const periodField = () => screen.getByRole('textbox', { name: new RegExp(FILTER_LABELS.period) });
+
+async function filterByStatus(chosenLabel: string) {
+  await openFilters();
+  await pickOption(FILTER_LABELS.status, chosenLabel);
   await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 }
@@ -221,6 +233,33 @@ describe('LostAndFound', () => {
     await waitFor(() => expect(requestUrl!.searchParams.get('searchTerm')).toBe('Carteira'));
     expect(requestUrl!.searchParams.get('status')).toBe(LostItemStatusEnum.OPEN);
     expect(await activeFilterDot()).not.toHaveClass('MuiBadge-invisible');
+  });
+
+  it('should build the request from every field the filter offers', async () => {
+    let requestUrl: URL | null = null;
+    listReturning([], (url) => {
+      requestUrl = url;
+    });
+    renderComponent();
+    await screen.findByText(C.EMPTY_LIST_MESSAGE);
+
+    await openFilters();
+    await userEvent.type(periodField(), '0108202605082026');
+    await pickOption(
+      FILTER_LABELS.kind,
+      optionLabel(LOST_ITEM_KIND_FILTER_OPTIONS, LostItemKindEnum.LOST),
+    );
+    await pickOption(FILTER_LABELS.owner, OWNER_MINE_LABEL);
+    await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
+
+    await waitFor(() =>
+      expect(Object.fromEntries(requestUrl!.searchParams)).toMatchObject({
+        dateFrom: '2026-08-01',
+        dateTo: '2026-08-05',
+        lostAndFoundType: LostItemKindEnum.LOST,
+        onlyMine: 'true',
+      }),
+    );
   });
 
   it('should leave the filter unmarked while only the open items are asked for', async () => {
@@ -357,7 +396,7 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(LOST_ITEM.name);
 
-    await confirmAction(LOST_ITEM_ACTION_LABELS.delete, DELETE_DIALOG.confirmLabel);
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.deleteSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
@@ -384,6 +423,33 @@ describe('LostAndFound', () => {
 
     expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
     expect(card().getAllByText(STATUS_TAG_LABEL.resolved)).toHaveLength(1);
+  });
+
+  it('should archive the item on the click, without asking first', async () => {
+    boardTracking(OWN_OPEN_ITEM);
+    renderComponent();
+    await screen.findByText(LOST_ITEM.name);
+
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
+
+    // O resolver logo abaixo continua abrindo diálogo, então esta consulta acha
+    // alguma coisa nesta tela — a ausência aqui é do porteiro que saiu.
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.deleteSucceeded)).toBeInTheDocument();
+  });
+
+  it('should offer undo in the notice and put the item back in the open list', async () => {
+    boardTracking(OWN_OPEN_ITEM);
+    renderComponent();
+    await screen.findByText(LOST_ITEM.name);
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
+    await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.deleteSucceeded);
+
+    await userEvent.click(screen.getByRole('button', { name: C.UNDO_LABEL }));
+
+    expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.restoreSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
+    expect(card().getAllByText(STATUS_TAG_LABEL.open)).toHaveLength(1);
   });
 
   it('should name the found outcome in the dialog of a lost item', async () => {
@@ -518,17 +584,21 @@ describe('LostAndFound', () => {
 
   // A palavra destrutiva e a de dispensar dividem a mesma caixa: o que separa uma
   // da outra é só o texto, então ele é o que o caso afirma.
-  it('should put the destructive word apart from the dismissing one in the dialog', async () => {
+  it('should put the confirming word apart from the dismissing one in the dialog', async () => {
     listReturning([OWN_OPEN_ITEM]);
     renderComponent();
     await screen.findByText(LOST_ITEM.name);
 
-    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
+    await userEvent.click(
+      screen.getByRole('button', { name: RESOLVE_LABEL[LostItemKindEnum.LOST] }),
+    );
 
     const dialog = within(await screen.findByRole('dialog'));
-    expect(dialog.getByRole('heading', { name: 'Confirmar exclusão' })).toBeInTheDocument();
-    expect(dialog.getByRole('button', { name: 'Excluir' })).toBeInTheDocument();
-    expect(dialog.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument();
+    expect(
+      dialog.getByRole('heading', { name: RESOLVE_LABEL[LostItemKindEnum.LOST] }),
+    ).toBeInTheDocument();
+    expect(dialog.getByRole('button', { name: RESOLVE_DIALOG.confirmLabel })).toBeInTheDocument();
+    expect(dialog.getByRole('button', { name: CONFIRMATION.dismissLabel })).toBeInTheDocument();
   });
 
   it('should keep the item as it is while the confirmation is not given', async () => {
@@ -536,7 +606,9 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(LOST_ITEM.name);
 
-    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
+    await userEvent.click(
+      screen.getByRole('button', { name: RESOLVE_LABEL[LostItemKindEnum.LOST] }),
+    );
     const dialog = within(await screen.findByRole('dialog'));
     await userEvent.click(dialog.getByRole('button', { name: CONFIRMATION.dismissLabel }));
 
@@ -582,7 +654,7 @@ describe('LostAndFound', () => {
     renderComponent();
     await screen.findByText(LOST_ITEM.name);
 
-    await confirmAction(LOST_ITEM_ACTION_LABELS.delete, DELETE_DIALOG.confirmLabel);
+    await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.deleteFailed)).toBeInTheDocument();
   });
@@ -613,15 +685,44 @@ describe('LostAndFound', () => {
     }
 
     it('should open with the fields already filled from the url', async () => {
-      listReturning([LOST_ITEM]);
+      let asked: URL | null = null;
+      listReturning([LOST_ITEM], (url) => {
+        asked = url;
+      });
 
-      renderComponent('?busca=Garrafa&tipo=perdido');
+      renderComponent('?busca=Garrafa&tipo=perdido&de=2026-08-01&ate=2026-08-05&meus=sim');
       await screen.findByText(LOST_ITEM.name);
+
+      await waitFor(() =>
+        expect(Object.fromEntries(asked!.searchParams)).toMatchObject({
+          searchTerm: 'Garrafa',
+          dateFrom: '2026-08-01',
+          dateTo: '2026-08-05',
+          onlyMine: 'true',
+        }),
+      );
 
       await openFilters();
 
       expect(await screen.findByDisplayValue('Garrafa')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('01/08/2026 - 05/08/2026')).toBeInTheDocument();
+      expect(
+        screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.owner) }),
+      ).toHaveTextContent(OWNER_MINE_LABEL);
     });
+
+    // O ponto ao lado do título precisa acompanhar o período e a autoria.
+    it.each(['?de=2026-08-01', '?ate=2026-08-05', '?meus=sim'])(
+      'should mark the filter as active when the url carries only %s',
+      async (search) => {
+        listReturning([LOST_ITEM]);
+
+        renderComponent(search);
+        await screen.findByText(LOST_ITEM.name);
+
+        expect(await activeFilterDot()).not.toHaveClass('MuiBadge-invisible');
+      },
+    );
 
     it('should ask the api for the page the url names', async () => {
       let asked: URL | null = null;

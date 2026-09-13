@@ -1,4 +1,4 @@
-import { RideTypeEnum } from '@app/services/rides/types';
+import { RideShiftEnum, RideTypeEnum } from '@app/services/rides/types';
 import { FIRST_PAGE, PAGE_SIZE } from '@app/utils/searchParams';
 
 import { rideSearchCodec } from './searchQuery';
@@ -12,14 +12,25 @@ describe('rideSearchCodec', () => {
     });
 
     it('should read every filter the url carries', () => {
-      expect(read('pagina=3&busca=Sorocaba&data=2026-09-01&hora=07:30&tipo=solidaria')).toEqual({
+      expect(
+        read(
+          'pagina=3&busca=Sorocaba&de=2026-09-01&ate=2026-09-05&turno=manha&tipo=solidaria&meus=sim',
+        ),
+      ).toEqual({
         page: 3,
         pageSize: PAGE_SIZE,
         searchTerm: 'Sorocaba',
-        departureDate: '2026-09-01',
-        departureTime: '07:30',
+        dateFrom: '2026-09-01',
+        dateTo: '2026-09-05',
+        departureShift: RideShiftEnum.MORNING,
         rideType: RideTypeEnum.SOLIDARITY,
+        onlyMine: true,
       });
+    });
+
+    it('should take one end of the period without the other', () => {
+      expect(read('de=2026-09-01')).toMatchObject({ dateFrom: '2026-09-01' });
+      expect(read('ate=2026-09-05')).toMatchObject({ dateTo: '2026-09-05' });
     });
 
     it.each(['pagina=0', 'pagina=-4', 'pagina=abc', 'pagina='])(
@@ -33,12 +44,35 @@ describe('rideSearchCodec', () => {
       expect(read('tipo=voadora').rideType).toBeUndefined();
     });
 
-    it('should not care about the case of the ride type', () => {
-      expect(read('tipo=SOLIDARIA').rideType).toBe(RideTypeEnum.SOLIDARITY);
+    it('should ignore a shift it does not recognise instead of breaking', () => {
+      expect(read('turno=madrugada').departureShift).toBeUndefined();
     });
 
+    it('should not care about the case of the words', () => {
+      expect(read('tipo=SOLIDARIA&turno=Noite')).toMatchObject({
+        rideType: RideTypeEnum.SOLIDARITY,
+        departureShift: RideShiftEnum.NIGHT,
+      });
+    });
+
+    it.each(['meus=nao', 'meus=', 'meus=talvez'])(
+      'should leave "only mine" off when the url says %s',
+      (search) => {
+        expect(read(search).onlyMine).toBeUndefined();
+      },
+    );
+
     it('should drop filters that carry only blank space', () => {
-      expect(read('busca=%20%20&hora=%20')).toEqual({ page: FIRST_PAGE, pageSize: PAGE_SIZE });
+      expect(read('busca=%20%20&de=%20')).toEqual({ page: FIRST_PAGE, pageSize: PAGE_SIZE });
+    });
+
+    // O período substituiu a data fixa e o turno substituiu a hora: link antigo
+    // salvo deixa de restaurar, e o que ele carrega não pode quebrar a tela.
+    it('should ignore the parameters the filter no longer knows', () => {
+      expect(read('data=2026-09-01&hora=07:30')).toEqual({
+        page: FIRST_PAGE,
+        pageSize: PAGE_SIZE,
+      });
     });
   });
 
@@ -47,15 +81,23 @@ describe('rideSearchCodec', () => {
       expect(rideSearchCodec.toParams({ page: FIRST_PAGE, pageSize: PAGE_SIZE })).toEqual({});
     });
 
-    it('should write the ride type in the words the screen shows', () => {
+    it('should write the words the screen shows', () => {
       const params = rideSearchCodec.toParams({
         page: 2,
         pageSize: PAGE_SIZE,
         rideType: RideTypeEnum.EGALITARIAN,
+        departureShift: RideShiftEnum.AFTERNOON,
         searchTerm: 'Sorocaba',
+        onlyMine: true,
       });
 
-      expect(params).toEqual({ pagina: '2', tipo: 'igualitaria', busca: 'Sorocaba' });
+      expect(params).toEqual({
+        pagina: '2',
+        tipo: 'igualitaria',
+        turno: 'tarde',
+        busca: 'Sorocaba',
+        meus: 'sim',
+      });
     });
 
     it('should survive a round trip through the url', () => {
@@ -63,9 +105,11 @@ describe('rideSearchCodec', () => {
         page: 4,
         pageSize: PAGE_SIZE,
         searchTerm: 'Votorantim',
-        departureDate: '2026-09-10',
-        departureTime: '18:00',
+        dateFrom: '2026-09-10',
+        dateTo: '2026-09-12',
+        departureShift: RideShiftEnum.NIGHT,
         rideType: RideTypeEnum.SOLIDARITY,
+        onlyMine: true,
       };
 
       const params = new URLSearchParams(rideSearchCodec.toParams(original));

@@ -121,54 +121,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("Rides");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Address", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Complement")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("StreetNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ZipCode")
-                        .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("character varying(9)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Addresses");
-                });
-
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Contact", b =>
                 {
                     b.Property<int>("Id")
@@ -271,17 +223,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Navigation("Driver");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Address", b =>
-                {
-                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
-                        .WithMany("Addresses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Contact", b =>
                 {
                     b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
@@ -295,8 +236,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.User", b =>
                 {
-                    b.Navigation("Addresses");
-
                     b.Navigation("Contacts");
                 });
 #pragma warning restore 612, 618

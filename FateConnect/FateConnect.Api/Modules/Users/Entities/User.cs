@@ -14,6 +14,5 @@ public class User
     public DateTime? UpdatedAt { get; set; }
     public EnumProfileType ProfileType { get; set; }
     public int TokenVersion { get; set; }
-    public ICollection<Address> Addresses { get; set; } = [];
     public ICollection<Contact> Contacts { get; set; } = [];
 }

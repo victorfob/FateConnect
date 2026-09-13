@@ -7,6 +7,12 @@ import * as S from './styles';
 
 export type CardsListProps = Readonly<{
   isLoading: boolean;
+  /**
+   * ⛔ Quantos cartões o esqueleto desenha. Reservando menos do que a página
+   * traz, o conteúdo cresce depois da primeira pintura e empurra o rodapé —
+   * deslocamento de layout. Quem sabe o tamanho da página é quem consulta.
+   */
+  skeletonCount: number;
   isEmpty: boolean;
   emptyMessage: string;
   pagination?: ReactNode;
@@ -15,6 +21,7 @@ export type CardsListProps = Readonly<{
 
 export function CardsList({
   isLoading,
+  skeletonCount,
   isEmpty,
   emptyMessage,
   pagination,
@@ -23,7 +30,7 @@ export function CardsList({
   if (isLoading)
     return (
       <S.CardsColumn>
-        <ListCardSkeleton />
+        <ListCardSkeleton count={skeletonCount} />
       </S.CardsColumn>
     );
 

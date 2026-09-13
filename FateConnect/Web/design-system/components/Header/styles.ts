@@ -5,7 +5,7 @@ import { PolymorphicBox, PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { shadowTokens, spacingScale } from '@ds-root/tokens';
 
-const { none, xxs, xs, lg, giant } = spacingScale;
+const { none, xxs, xs, md, lg, giant } = spacingScale;
 
 /** Altura do topo; a casca reserva esse espaço porque o header é fixo. */
 export const HEADER_HEIGHT_PX = 64;
@@ -52,11 +52,16 @@ export const LogoSlot = styled(PolymorphicBox)(({ theme }) => ({
   '& a:hover': { opacity: 0.8 },
 }));
 
+/**
+ * ⛔ Acrescentar item aqui obriga a remedir o `DESKTOP_MIN_WIDTH_PX`: ele é a
+ * largura em que esta fileira ainda cabe numa linha, e nada acusa quando ela
+ * cresce — o defeito nasce entre o limite antigo e o ponto onde ela deixou de caber.
+ */
 export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'center',
-  gap: theme.space(xs, lg),
+  gap: theme.space(xs, md),
   // Empurra navegação e ações para a direita, mantendo só a marca à esquerda.
   // Sem isso, o `space-between` distribui os três blocos e centraliza a navegação.
   marginLeft: 'auto',
@@ -65,6 +70,11 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
     position: 'relative',
     fontSize: NAV_FONT_SIZE,
     fontWeight: NAV_FONT_WEIGHT,
+  },
+  // ⛔ O preenchido fica de fora, como no realce de hover acima: ele traz o
+  // próprio fundo, e o branco a 90% do cromo sobre o vermelho de botão dá 4,41.
+  // O `secondary.contrastText` que ele recebe sozinho é branco puro, a 5,14.
+  '& .MuiButton-root:not(.MuiButton-contained)': {
     color: theme.palette.chrome.contrastText,
   },
   // A marca da tela atual pende do atributo que o leitor de tela já lê, e não de
@@ -94,7 +104,7 @@ export const ActionsSlot = styled(PolymorphicStack)(({ theme }) => ({
   // Separa uma ação da outra. Com um filho só isso não aparecia, e duas
   // ações adjacentes ficavam encostadas.
   gap: theme.space(xs),
-  marginLeft: theme.space(lg),
+  marginLeft: theme.space(md),
 }));
 
 /**

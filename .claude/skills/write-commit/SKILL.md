@@ -17,6 +17,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/). Message in 
 | `feat`     | New feature                                                   |
 | `fix`      | Bug fix                                                       |
 | `chore`    | Changes that do not affect production code (scripts, configs) |
+| `ci`       | Pipeline and workflow under `.github/`                        |
 | `refactor` | Code changes that do not alter external behavior              |
 | `test`     | Adding or updating tests                                      |
 | `docs`     | Documentation changes                                         |
@@ -26,6 +27,8 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/). Message in 
 
 - `prefix: message`
 - Imperative, lowercase after the colon. Do not add the issue code (e.g. Github Issue ID) in the message; it is already in the branch name.
+
+⚠️ **`ci` e `chore` se confundem, e o corte é o arquivo:** mexeu em `.github/`, é `ci`; qualquer outro script ou configuração é `chore`. A distinção existe porque a esteira é o que decide se um PR pode ser mergeado — quem lê o histórico procurando "por que o CI mudou" não deveria ter de garimpar entre `chore`.
 
 ### Examples
 
@@ -78,6 +81,25 @@ Sinal de divisão excessiva: dois commits seguidos tocando **o mesmo arquivo** p
 Aconteceu em 04/09/2026, na #296. A branch tinha 7 commits e eu propus 8 — um por bloco antigo, mais o novo. O Victor perguntou *"não tem como reduzir a quantidade de commits?"*, e a releitura mostrou que **quatro** contavam o mesmo assunto: expor o `ListItem`, montar as seções, criar o `Sair` e ligar tudo na casca não se revertem um sem o outro. Viraram um, e a branch fechou em 4.
 
 **O sinal é a contagem não cair.** Reescrita que sai com tantos commits quantos entraram não reagrupou nada — só renomeou.
+
+### Cada commit precisa compilar sozinho
+
+⛔ **Nenhum gate confere isto: ESLint, `tsc` e a suíte rodam sempre na ponta da branch, nunca em cada commit.** Agrupar por assunto é certo e esquece a ordem de dependência — o assunto "promover o componente" e o assunto "usar o componente" não nascem na mesma hora.
+
+**O tell é um arquivo de índice.** Barrel, `index.ts`, arquivo de rotas, registro de módulo: eles reúnem o que está espalhado, então são o primeiro lugar onde um commit passa a citar o que só chega no seguinte.
+
+Aconteceu duas vezes com a mesma forma. Na #171, o commit da paginação levava o barrel exportando um componente cuja pasta só chegava depois. Em 11/09/2026, na #358, o commit que promovia o link levava `export type { FooterContact }` enquanto o tipo só nascia no commit seguinte.
+
+⚠️ **`git ls-tree` responde por arquivo, e o segundo caso passa por ele.** O `Footer/index.tsx` **existia** naquele commit; faltava o tipo dentro dele. Para símbolo não há atalho — o que responde é compilar:
+
+```bash
+git worktree add --detach /tmp/checa <commit>
+ln -s "$PWD/<app>/node_modules" /tmp/checa/<app>/node_modules
+cd /tmp/checa/<app> && ./node_modules/.bin/tsc --noEmit
+git worktree remove --force /tmp/checa
+```
+
+**Rode isso nos commits que mexem em índice**, não em todos. Achando erro, a correção é mover a linha do índice para o commit que traz o símbolo — não reordenar os commits.
 
 ### Quando as mudanças se sobrepõem nos mesmos arquivos
 

@@ -41,6 +41,7 @@ declare module '@mui/material/styles' {
     surfaceFloating: string;
     skeleton: string;
     switchTrack: string;
+    dateRangeBand: string;
     statusTag: Record<StatusTagTone, SurfacePair>;
     notification: Record<NotificationVariant, SurfacePair>;
   }
@@ -53,6 +54,7 @@ declare module '@mui/material/styles' {
     surfaceFloating: string;
     skeleton: string;
     switchTrack: string;
+    dateRangeBand: string;
     statusTag: Record<StatusTagTone, SurfacePair>;
     notification: Record<NotificationVariant, SurfacePair>;
   }

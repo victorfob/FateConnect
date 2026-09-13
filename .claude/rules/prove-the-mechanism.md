@@ -31,6 +31,14 @@ O que respondeu foi ler a **cascata**, não o pixel: percorrer `document.styleSh
 
 ⚠️ **Relatar isso como "medi o preenchimento automático" seria falso.** O que se mediu foi qual regra vence; que a regra vencedora pinta o que promete continua por conferir. Diga a frase que descreve o instrumento, não a que descreve o que você queria saber.
 
+⛔ **Controle positivo em outro alvo não limpa o alvo que interessa.** Ele responde se o **instrumento** funciona; não responde se o caminho até **este** alvo é limpo. E ele engana justamente por parecer rigor — você rodou um controle, então se sente coberto.
+
+Aconteceu em 12/09/2026, conferindo se o `http2 on;` recém-instalado tinha pegado. Daqui a resposta foi `HTTP/1.1` em todos os caminhos, e eu ia relatar que a diretiva não funcionava. O controle que rodei — três sites conhecidos negociando `h2` desta mesma máquina — provava só que **aqueles** hosts não eram rebaixados. Medida de dentro do próprio servidor, a mesma rota respondeu `ALPN: server accepted h2`.
+
+**O controle que vale é da própria conexão que você está medindo**, e ali ele vinha de graça no mesmo comando: o emissor do certificado. Diferente do esperado ⇒ há intermediário terminando a conexão, e tudo que ela diz sobre **transporte** — versão de protocolo, cifra, tamanho comprimido — é do intermediário. Status e corpo atravessam intactos, e foi por isso que os 404 e os `Content-Type` da mesma medição estavam todos certos.
+
+⚠️ **O tell é o número contrariar uma configuração que você acabou de provar noutra bancada.** A diretiva estava provada num nginx da mesma versão em contêiner; quando o ambiente real discordou, a hipótese barata era o instrumento, não a configuração.
+
 ## O instrumento que alcança metade
 
 ⛔ **Sonda, regra e correção nascem cobrindo uma forma, e a resposta está na outra.** Não basta que o instrumento funcione: ele precisa alcançar **onde o problema mora**. Três vezes na #242, cada uma de um jeito:
@@ -40,6 +48,7 @@ O que respondeu foi ler a **cascata**, não o pixel: percorrer `document.styleSh
 | `grep ... \| head` procurando quem mexia no scroll | as 10 primeiras linhas | na 11ª — e eu **descartei a hipótese certa** por causa disso |
 | a regra `no-restricted-syntax` de tag crua | chamadas de `styled('nav')` | no JSX: três `<li>` passaram no código novo |
 | a correção da fileira de paginação | a ponta inicial, onde a página 4 quebrava | na ponta final, onde a 9 quebrava igual |
+| a medição de layout numa largura só | 1440px, onde a coluna está no teto de 600px | entre 933 e 1056px, onde ela divide a linha com o cartão de login |
 | a varredura que comparava **toda string** do diff | `'…'`, `"…"` e `` `…` `` | num **regex literal**: `/nome deve ter ao menos/i` |
 
 A quarta linha custou uma segunda rodada de review. Em 04/09/2026 a varredura devolveu 11 achados, eu corrigi os 11 e declarei o PR limpo; faltavam dois — as asserções do teste que guardava a copy, escritas como regex. Eles só apareceram porque a suíte ficou **vermelha** depois da correção.
@@ -72,11 +81,41 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 
 ⚠️ **O tell é a contagem discordar da listagem**: `N matches` com nada embaixo. Vale para qualquer comando que passe por filtro — quando a saída vai sustentar conclusão, confira que o que foi contado é o que foi mostrado.
 
+⛔ **E o mesmo envelope infla: ele acrescenta linha, e o `wc -l` conta o enfeite.** Em 10/09/2026, conferindo o que ia num commit, `git diff --cached --name-only | wc -l` respondeu **14** para **11** arquivos preparados — a diferença era cabeçalho e rodapé impressos pelo filtro. Quem discriminou foi a listagem ao lado, com os 11 caminhos certos; a contagem sozinha teria me mandado caçar três arquivos que não existiam.
+
+⚠️ **Contagem que vai conferir alguma coisa se lê na saída crua** — `rtk proxy <comando>` — ou se conta na listagem. Engolir e inflar são o mesmo defeito: medir através de algo que reescreve a saída.
+
 ⛔ **E o complemento de "passou" não é "falhou".** No mesmo `gh pr checks`, tratar `bucket != "pass"` como falha reporta vermelho onde há `pending`: em 02/09/2026 anunciei um check falhando no #287 quando o front ainda estava `IN_PROGRESS`, porque a cascata da pilha havia reiniciado o CI. Estado de terceira via — `pending`, `skipping`, `neutral` — se nomeia, não se deduz por exclusão.
 
 ⛔ **`performance.getEntriesByType('resource')` não enxerga requisição que falha na conexão.** Em 04/09/2026, provando que um formulário deixara de chamar a API, ele devolveu **zero** nos dois casos — no que não devia chamar e no que devia. O zero era do instrumento. Quem responde é o log de rede do navegador (`read_network_requests`), que registra a tentativa com o motivo da falha; e o par positivo — o caso que **deve** disparar a requisição — é o que separa "não chamou" de "não medi".
 
+⛔ **E há a busca que só alcança o que tem nome de símbolo.** Um pedido entregue deixa rastro em **dois** lugares independentes — o código e o rastreador —, e o `grep` só responde bem quando existe um identificador a procurar.
+
+Em 10/09/2026 varri dezesseis pedidos antigos "por código, não de memória" e declarei seis em aberto. **Quatro tinham issue própria, fechada e entregue.** Os quatro eram os **visuais** — largura de cartão, altura de ícone, recuo de rodapé, alinhamento de diálogo —, e nenhum deles tem símbolo: recuo não se procura por nome.
+
+⚠️ **O tell é o pedido descrever geometria ou aparência.** Aí a pergunta muda de lugar:
+
+```bash
+gh issue list --state all --limit 300 --json number,title,state \
+  --jq '.[] | select(.title | test("<termo do pedido>"; "i")) | "#\(.number) [\(.state)] \(.title)"'
+```
+
+⛔ **`grep` casa caixa e acento literalmente, e o zero se lê como ausência.** Duas medições minhas quase viraram relatório errado por isso, e as duas eram sobre **rename**:
+
+| Busca | Respondeu | O real |
+| --- | --- | --- |
+| `per[ií]odo` no corpo de uma issue, locale C | **0** | **4** — o `í` são dois bytes, e a expressão de colchete não o alcança |
+| `onlyMyItems` na base | **13 em 5 arquivos** | **18 em 8** — a API escreve `OnlyMyItems` |
+
+O segundo é o pior: eu ia relatar que os arquivos de API haviam desaparecido e que alguém já tinha feito o rename. **Busca que vai sustentar conclusão sobre presença ou contagem roda com `-i` e com `LC_ALL=pt_BR.UTF-8`**, e o controle é procurar um trecho que você sabe que existe — não aparecendo, o instrumento está cego, e não o repositório vazio.
+
 ⚠️ **`| head` num `grep` de investigação é o pior dos três**, porque some com a evidência sem avisar e a saída parece completa. Em busca que vai sustentar conclusão, conte antes (`grep -c`) ou não trunque.
+
+⛔ **E não é só busca: truncar a saída de um comando que pode falhar apaga o motivo da falha.** Em 10/09/2026 um `git push | tail -2` deixou na tela `failed to push some refs` sem a linha que dizia por quê; empurrei de novo, funcionou, e o motivo da primeira reprovação está perdido para sempre. **Comando que pode falhar vai sem filtro, ou com a saída inteira num arquivo** — o `tail` entra depois, sobre o arquivo, que continua ali para reler.
+
+⛔ **Mutação que não alterou o arquivo não matou nada — e se apresenta como acerto.** Ao provar um verificador, confira que cada mutante **difere** do original antes de ler o veredito: `cmp -s` resolve. Em 11/09/2026 três mutações minhas usaram `sed` com expressão inválida; ele falhou, o arquivo saiu vazio, o verificador reprovou por isso, e eu contabilizei três mortes que nunca aconteceram. A saída do `sed` estava na tela e eu li o resultado do verificador em vez dela.
+
+⚠️ **O sintoma é o mutante morrer rápido demais ou todos morrerem de primeira.** Verificador que reprova o arquivo vazio reprova qualquer erro de escrita do mutante, então o kill não diz nada sobre o invariante que você quis testar.
 
 ⛔ **Regra nova se prova nas duas formas.** O controle positivo de uma regra de lint não é só "reprova o que deve" — é também "aceita o que deve". Ao estender a de tag crua, rodei um arquivo com `<div>` **e** `<strong>` no mesmo JSX: o primeiro reprova, o segundo passa. Sem a segunda metade eu teria proibido ênfase de texto sem perceber.
 
@@ -85,6 +124,41 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 ⛔ **Zero de comando composto não vale sem saber onde ele rodou.** Um `cd` que falha em `cd X && grep ...` deixa o `grep` rodar no diretório anterior, e o zero se lê como "não existe". Em 04/09/2026 afirmei que o projeto não tinha regra de autofill nenhuma; tinha zero **naquele** diretório, que não era o do front. `pwd` entra na mesma saída sempre que o zero vai sustentar conclusão.
 
 ⛔ **Antes de atribuir um artefato à sua mudança, remova a mudança.** Correlação não é autoria. No mesmo dia vi seletores quebrados aparecerem junto da minha regra de CSS e disse ao Victor que eram meus; removendo a regra e recarregando frio, os nove continuavam lá — eram do MUI. O tell é a frase *"isso apareceu depois que eu mexi"*.
+
+### A prova local cobre a ferramenta, não o trajeto
+
+⛔ **Provar que a ferramenta faz o que promete não prova que o dado chega ao passo seguinte.** Entre um passo e outro há transporte — artefato, volume, rede, disco —, e ele não existe na sua máquina: você o pula sem perceber, porque localmente os dois passos compartilham o mesmo diretório.
+
+⛔ Aconteceu em 11/09/2026, ao fatiar a suíte de testes no CI. Provei o Vitest inteiro na máquina: dois shards, relatório `blob`, fusão, cobertura idêntica à corrida cheia, inventário de testes do Sonar. Os **dois** defeitos que apareceram estavam fora disso:
+
+| O que quebrou | Por que a prova local não alcançava |
+| --- | --- |
+| passo rodando antes do `checkout` herdava um diretório que ainda não existia | localmente o diretório sempre existe |
+| o upload de artefato ignora arquivo oculto, e o relatório mora em `.vitest-reports` | localmente ninguém sobe artefato: o passo seguinte lê o mesmo disco |
+
+**O tell é a sua prova e o seu alvo rodarem no mesmo processo ou no mesmo diretório**, quando em produção eles são dois. Antes de declarar provado, pergunte por onde o dado **viaja** entre um e outro — e conte o que chegou do outro lado, não o que saiu deste.
+
+### Largura é dimensão de varredura, não um ponto
+
+⛔ **Layout responsivo se mede na faixa em que ele muda de forma, e o defeito mora entre os pontos que você escolheu.** Medir "no desktop" é medir um pixel de uma faixa de mil, e o verde dali não fala pelos outros novecentos.
+
+Três vezes em 11/09/2026, na mesma rodada:
+
+| O que eu media | Onde o defeito estava |
+| --- | --- |
+| a fileira de destaques a 1440px, com a coluna nos 600px do teto | a 982px, onde a coluna tem **351px** porque divide a linha com o cartão de login |
+| a correção que apliquei, de novo a 1440px | na faixa 933–1056px, que a própria correção reintroduziu |
+| nada: o cabeçalho vinha quebrado da branch anterior | entre 933 e 980px, onde a gaveta já tinha sumido e a nav ainda não cabia |
+
+Nas três quem viu foi o Victor, olhando a tela.
+
+**Os pontos que a faixa exige:** cada limite declarado e **um pixel de cada lado dele** — é ali que os dois estados se encostam e o buraco aparece —, mais a largura em que cada contêiner elástico para de crescer.
+
+⚠️ **Elemento que divide a linha com outro não tem a largura da janela.** A coluna da landing vai de 314px a 600px enquanto a janela vai de 937 a 1920, e é a **dela** que decide a quebra. Meça a largura do contêiner junto da janela, sempre — como já se faz com a porta.
+
+⛔ **E o eixo esquecido nem sempre é espacial: pode ser o tempo desde que o artefato nasceu.** Em 11/09/2026, medindo se um `Cache-Control` novo mudava alguma coisa, o navegador respondeu **zero requisição** tanto com ele quanto sem — e o controle contra produção é que denunciou o empate. O que faltava segurar era a **idade do arquivo**: sem `Cache-Control`, o navegador arbitra a validade em ~10% da idade, então recém-publicado ele revalida tudo e dias depois não revalida nada. A mesma configuração responde diferente conforme o dia em que se mede.
+
+O A/B só discriminou depois de `touch` nos arquivos e duas portas, com cache separado: **7 revalidações contra 0**. Antes disso, os dois lados diziam a mesma coisa e a conclusão seria "não muda nada".
 
 ### Pior que alcançar metade: destruir a outra
 
@@ -97,6 +171,10 @@ Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase`
 **A guarda é aritmética, não cuidado:** conte as entradas do bloco de entrada, conte as que você atribuiu, e **aborte** quando os dois números não baterem. Uma linha de `assert` teria transformado uma perda silenciosa numa parada barulhenta.
 
 ⚠️ **O sinal é a saída vazia onde deveria haver enumeração.** "0 arquivos alterados", "nenhuma seção", "nada a fazer" — num passo que existe justamente para alterar algo, isso não é sucesso, é o instrumento dizendo que não entendeu a entrada.
+
+⛔ **Na esteira isso tem nome e padrão: o passo que não achou nada avisa e segue verde.** O `actions/upload-artifact` nasce com `if-no-files-found: warn`, então um caminho errado sobe **zero arquivo** e o job fica verde; quem quebra é o passo que ia consumir o artefato, num job adiante, longe da causa. Em 11/09/2026 gastei um ciclo inteiro de CI nisso — o diretório era `.vitest-reports`, e o upload ignora arquivo oculto por padrão.
+
+**Passo que transporta exige as duas guardas:** `if-no-files-found: error` de um lado, e do outro **contar o que chegou** antes de usar — um relatório por shard, conferido, separa "a suíte reprovou" de "os relatórios não chegaram".
 
 ⛔ **Tabela de substituição confere também que cada regra dela disparou.** Regra que nunca casa não faz nada e não reclama: o arquivo sai plausível, com um trecho intacto no meio do que você acha que traduziu.
 
@@ -111,6 +189,16 @@ Aconteceu em 09/09/2026, ao escolher o tom do botão neutro no tema escuro. Apre
 Quem derrubou a tabela foi a pergunta *"não entendi pq o logotipo muda"*. Sem ela, a cor teria sido escolhida contra uma restrição que não existe.
 
 **O tell é a medição que restringe demais.** Quando a conta elimina quase todas as opções, confira a premissa antes de aceitar o resultado: é mais provável que o alcance esteja errado do que a janela ser tão estreita.
+
+## O relato dele contra a sua medição: suspeite do recorte
+
+⛔ **Quando o que ele vê rodando contradiz o que você mediu, o errado é quase sempre o recorte da medição — não o relato.** Ele está olhando o produto inteiro; você está olhando um arquivo.
+
+Aconteceu em 10/09/2026. Eu medi que o `httpClient` do front descarta o corpo da resposta de erro — verdade, nenhum arquivo lê `error` — e afirmei que **a tela** mostra sempre a frase genérica. O Victor testou o cadastro, viu `Este e-mail já está em uso…` e perguntou *"tem certeza que o usuário vê essa mensagem genérica na tela?"*. Não tinha: três telas e nove requisições escrevem a copy delas, escolhida por `status` ou por `field`. A minha medição estava certa sobre o interceptor e eu a estendi para a camada de cima.
+
+**O tell é o sujeito da afirmação ser mais largo que o arquivo aberto** — eu disse "a tela mostra" tendo lido o interceptor. Antes de responder que o relato está errado, liste o que ainda está **entre** a sua medição e o que ele vê, e abra cada um.
+
+⚠️ **A versão específica disto já estava escrita em `web-styling.md`**, para alinhamento — *"ao receber 'não está alinhado' sobre algo que você mediu, desconfie do que foi medido antes de duvidar do relato"*. Ela vale para qualquer medição, não só geometria, e é por isso que subiu para cá: aquela rule carrega só em arquivo do front.
 
 ## O artefato publicado não é o que você quis escrever
 

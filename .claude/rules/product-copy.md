@@ -47,6 +47,50 @@ Hoje vale para o **Portal de denúncias**, na milestone 14/09. Entrando o módul
 
 Fundamentando a seção: [Concise, SCANNABLE, and Objective](https://www.nngroup.com/articles/concise-scannable-and-objective-how-to-write-for-the-web/) e [How Users Read on the Web](https://www.nngroup.com/articles/how-users-read-on-the-web/), Nielsen Norman Group.
 
+## Título de documento e resumo de busca
+
+Terceiro registro, e o único que é lido **fora** da tela: a aba do navegador, o histórico, o anúncio do leitor de tela ao navegar, e o resultado de busca. O texto mora em [`FateConnect/Web/src/routes/pageMetadata.ts`](FateConnect/Web/src/routes/pageMetadata.ts), uma entrada por rota.
+
+⛔ **Título distinto por rota, sem exceção.** É o que o guia do Google pede — *"É importante ter um texto distinto que descreva o conteúdo da página no elemento `<title>` para cada página do seu site"* — e título repetido é um dos motivos pelos quais ele **reescreve** o seu, junto com *"texto longo que varia apenas por uma informação"*.
+
+⚠️ **E não é só busca.** A WCAG 2.4.2 pede que a página seja titulada, e num SPA o título não muda sozinho: quem usa leitor de tela depende da troca para saber que mudou de tela. **Rota interna, que robô nenhum alcança, precisa de título pelo mesmo motivo.**
+
+**O padrão é `<Tela> | FateConnect`**, e só a landing inverte, com a marca à frente. O guia admite a marca no início ou no fim, separada por delimitador — hífen, dois-pontos ou barra vertical.
+
+⛔ **A palavra que distingue vem primeiro.** A aba mostra bem menos que o resultado de busca, então marca à frente numa tela interna gasta o espaço visível com o nome que quem está logado já sabe.
+
+### O título não é o cabeçalho visível da tela
+
+⛔ **Reaproveitar a constante do `<h1>` parece automático e falha em três formas.** Medido nas nove rotas ao escrever esta seção:
+
+| O que o cabeçalho dizia | Por que não serve como título |
+| --- | --- |
+| uma chamada de marketing de 56 caracteres | come o corte do resultado e não traz o nome do site |
+| uma saudação (`Boas-vindas ao FateConnect`) | não é o nome de um lugar, e é o que a aba mostra |
+| o mesmo texto em três rotas de marcador | três URLs com título idêntico, que é o defeito que a regra existe para evitar |
+
+⛔ **O título nomeia o destino, não o estado da tela.** Rota cujo conteúdo ainda é um marcador leva o nome do que ela vai ser — `Meu perfil`, e não `Ainda não disponível`. O estado a pessoa lê no cabeçalho; repeti-lo no título diz duas vezes o que a tela diz uma, como na seção de nota ao lado de etiqueta.
+
+⚠️ **E o nome vem do glossário, não da sua cabeça.** O produto já batiza cada tela em algum lugar — a navegação, a gaveta, o menu da conta. `Meu perfil` está escrito em dois deles; `Perfil` não existe.
+
+### Resumo só onde a busca alcança
+
+⚠️ **`meta description` é para rota pública.** Rota atrás do guard não é rastreada, e resumo ali é texto sem leitor. Hoje são duas: a landing e o cadastro.
+
+**A descrição é a alternativa ao trecho que o buscador monta sozinho** raspando a página. Ela segue a régua da landing acima — específica, sem hipérbole, sobrevivendo à pergunta *"como assim?"*.
+
+### As medidas
+
+| | Corte |
+| --- | --- |
+| Título, no resultado de busca | por volta de **60** caracteres |
+| Título, na aba | bem menos — conte com 20 a 30 |
+| Resumo, no resultado | por volta de **160** caracteres |
+
+⚠️ **Não há limite técnico**, e o guia diz isso; o que existe é truncamento. Medir o candidato antes de propô-lo é o mesmo cuidado da seção de largura, mais abaixo.
+
+Fundamentando a seção: [Controle os links de título nos resultados da Pesquisa](https://developers.google.com/search/docs/appearance/title-link?hl=pt_BR), Google.
+
 ## Aviso de sucesso nomeia o que aconteceu
 
 ⛔ **Sem "com sucesso".** O aviso já **é** a confirmação. Particípio e ponto final:
@@ -159,6 +203,21 @@ Três partes: **status** ("Nenhum item encontrado"), **o que apareceria ali**, e
 | Veja, ver | Confira, Consulte | |
 | Clique aqui | o verbo do destino | Âncora tem que dizer para onde vai |
 
+## Pontuação: sem travessão
+
+⛔ **Nada de `—` em copy de produto.** Ele pede uma pausa longa que a frase curta não precisa, e quem lê por leitor de tela não o ouve como pausa nenhuma. Onde ele apareceria cabe uma de três saídas: ponto final, dois pontos, ou nenhuma pontuação porque a frase encurtou.
+
+| ❌ | ✅ |
+| --- | --- |
+| `Cadastre o item — ele aparece na lista` | `Cadastre o item. Ele aparece na lista.` |
+| `Nenhum resultado — ajuste os filtros` | `Nenhum resultado. Ajuste os filtros.` |
+
+Decidido em 10/09/2026, ao revisar os documentos legais: eram **15** travessões neles e **2** na copy do produto — o estado vazio de caronas e o conflito de e-mail já cadastrado. A limpeza mede o que existe; sem esta linha, a copy seguinte nasce com um.
+
+⚠️ **O traço que marca ausência de valor não é pontuação, e fica.** `pages/Rides/helpers/rideType.ts` e `pages/LostAndFound/helpers/lostItemStatus.ts` declaram `UNKNOWN_LABEL = '—'` para a célula sem conteúdo. Ali ele é símbolo, e trocá-lo mudaria o que a tela mostra.
+
+⚠️ **A régua é da copy, não dos nossos documentos.** Rule, skill, issue, corpo de PR e comentário seguem usando travessão à vontade — este arquivo tem dezenas. O alvo é o texto que a pessoa lê dentro do produto, mais os dois documentos legais, que são texto de produto por outro nome.
+
 ## Neutro e acessível
 
 - Linguagem neutra de gênero: "a pessoa responsável", não "o responsável". Nunca `x` ou `@`.
@@ -191,6 +250,19 @@ Medido com a aplicação de pé a 409px:
 O candidato mais longo, `Vespertino (12:00 - 17:59)`, ocupa 183,5px em Inter 16px: cabe nos dois. A largura **deixou de decidir** o nome, e a escolha voltou a ser por precisão — que é o critério certo. Sem a medição eu teria descartado ou aceitado um nome pelo motivo errado.
 
 **Como medir:** largura útil pelo `getBoundingClientRect` do campo menos o `padding` computado; largura do texto com `measureText` num `canvas` usando a fonte real, depois de `document.fonts.ready`. Meça no **mais apertado** dos contêineres que vão receber o texto.
+
+### As larguras do texto de ajuda de campo, medidas
+
+Mensagem de validação sai como `helperText` abaixo do campo, e ali a sobra é menor que a do corpo do diálogo. Medido a 409px em 11/09/2026, ao separar a recusa do e-mail institucional em duas frases:
+
+| Onde | Campo | Sobra para o texto |
+| --- | --- | --- |
+| Formulário de cadastro | 275,3px | **243,3px** |
+| Cartão de login da landing | 312,0px | **280,0px** |
+
+⚠️ **Estourar aqui é barato:** o `helperText` cresce **21px por linha** e empurra o resto do formulário para baixo. É o oposto do rodapé de diálogo, onde duas ações que não cabem saltam de 36px para 80px.
+
+⛔ **Aqui a largura saiu da decisão pelo motivo oposto ao do caso acima.** Lá o candidato mais longo cabia; aqui **nenhuma** candidata cabe — 291,5px, 324,0px e 372,4px contra 243,3px de sobra, e a frase que já estava em produção também não cabe (336,7px). Nos dois a conclusão é a mesma e a leitura é diferente: **meça para saber se a largura decide**. Ela decide quando separa as opções, e é indiferente tanto quando todas cabem quanto quando nenhuma cabe.
 
 ### As larguras do diálogo, medidas
 

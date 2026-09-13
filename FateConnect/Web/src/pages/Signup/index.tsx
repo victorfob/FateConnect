@@ -11,7 +11,6 @@ import { ApiError } from '@app/services/httpClient';
 import { signup } from '@app/services/signup/signupService';
 
 import { AccountSection } from './components/AccountSection';
-import { AddressSection } from './components/AddressSection';
 import { ConsentSection } from './components/ConsentSection';
 import { ContactSection } from './components/ContactSection';
 import { conflictFieldOf } from './helpers/conflictField';
@@ -90,12 +89,6 @@ export function Signup() {
           <S.SignupForm component="form" onSubmit={handleSubmit} noValidate>
             <S.FieldGrid>
               <AccountSection />
-            </S.FieldGrid>
-
-            <S.SectionDivider />
-            <S.SectionTitle variant="subtitleBold">{C.ADDRESS_SECTION_TITLE}</S.SectionTitle>
-            <S.FieldGrid>
-              <AddressSection />
             </S.FieldGrid>
 
             <S.SectionDivider />

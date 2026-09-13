@@ -42,6 +42,21 @@ O import saía de graça em 48 arquivos e ninguém percebia porque o teste passa
 - Não testar detalhe de implementação: nada de asserção sobre estado interno, nome de classe CSS ou ordem de chamada de hook.
 - Não duplicar no teste a lógica que ele verifica — valor esperado é literal, não recalculado.
 
+## A asserção que compara o valor com a própria fonte dele
+
+⛔ **Afirmar que a saída é igual à constante de onde ela veio não testa nada.** Os dois lados do `expect` lêem o mesmo lugar, então o caso passa para qualquer valor — inclusive um que o consumidor recusa.
+
+Aconteceu em 12/09/2026. O `<link rel="canonical">` saía relativo, e o teste dizia `expect(...getAttribute('href')).toBe(RoutePathEnum.LANDING)` — exatamente a constante que o componente escrevia. Verde, e cego: o Lighthouse reprova canonical relativa com nota zero, e nada na suíte sabia disso. Quem viu foi o Victor, auditando o site publicado.
+
+**A saída é afirmar o que o consumidor exige, não o que você escreveu.** Ali a propriedade era resolver sem base:
+
+```ts
+expect(() => new URL(href)).not.toThrow();
+expect(href.startsWith('/')).toBe(false);
+```
+
+⚠️ **O tell é o valor esperado ser um símbolo que a implementação também importa.** Literal no teste já ajuda — é o que a linha "valor esperado é literal, não recalculado" acima pede —, mas nem o literal responde quando a pergunta é sobre o **formato** que alguém de fora vai ler. Aí a asserção descreve a propriedade, não o valor.
+
 ## Suíte verde não prova que ela pega o defeito
 
 ⛔ **Quebre o código de propósito e confira que o teste cai.** É a única forma de saber se ele testa o que o nome dele diz — e o caso clássico aqui não é o teste frouxo, é o teste que **alimenta o formato errado**.
@@ -49,6 +64,16 @@ O import saía de graça em 48 arquivos e ninguém percebia porque o teste passa
 Aconteceu em 04/09/2026, na #309. A regra de partida futura do formulário de carona nunca disparava: o campo guarda `22/05/2026` e ela lia com `parseISO`, que só entende ISO. O teste passava verde porque montava a entrada com o formato da **API** — ele passaria igual com a regra apagada. Quatro mutações fecharam a rodada, cada uma derrubando o teste escrito para ela: voltar o `parseISO`, tirar a conversão de fuso, tirar um `.max()` do schema e tirar a prop de erro de um campo.
 
 **Restaure a árvore ao fim de cada mutação** e confirme com `git status` que nada sobrou.
+
+⛔ **E `git checkout --` restaura para o HEAD, não para o seu estado.** Em arquivo que a sua branch já alterou, ele apaga a **sua** mudança junto com a mutação — e o sintoma é o oposto de um erro: a árvore fica limpa, que é exatamente o que você foi conferir.
+
+Aconteceu em 11/09/2026. Mutei a ordem de uma constante que eu mesmo tinha acabado de reordenar, restaurei com `git checkout --`, e a reordenação sumiu com a mutação. O `git status` respondeu que o arquivo não tinha modificação nenhuma, e isso se lê como sucesso.
+
+**A conferência não é "a árvore está limpa", é "a minha mudança continua lá".** Em arquivo que a branch toca, `git status` limpo é o alarme — leia o trecho mutado antes de seguir.
+
+⛔ **Mutação que não compila por motivo incidental não é resultado — ela não foi testada.** O `tsc` reprovando parece invariante garantido pelo compilador, e às vezes é; mas `TS6133 — declaração sem uso` só diz que a sua mutação deixou um import órfão. São coisas opostas com a mesma cara.
+
+Aconteceu em 10/09/2026, na rodada da faixa de período: três mutações voltaram como "`tsc` reprovou" e eu ia relatar três invariantes do compilador. **Leia o código do erro.** `TS6133` manda refazer a mutação removendo o órfão junto; erro de tipo de verdade — `end` como `Date | null` onde a comparação pede `Date` — é resultado, e aí não falta teste. Refeitas, duas morreram e uma sobreviveu.
 
 ## O fuso do processo vem fixado, e a linha de comando não o vence
 
@@ -65,6 +90,43 @@ process.env.TZ = PRODUCT_TIME_ZONE;
 ```
 
 ⚠️ **O sinal é o controle passar quando você esperava que falhasse.** Antes de concluir que o código sob mutação é desnecessário, pergunte se o cenário chega a alcançá-lo.
+
+## O jsdom não tem `matchMedia`, e a decisão por largura responde estreito
+
+⛔ **Componente que decide em JS pela largura — `useMediaQuery` — só exercita o ramo estreito na suíte, e não é o tamanho da janela que decide isso.** O `window.matchMedia` **não existe** no jsdom, então o hook não tem a quem perguntar e responde `false`. Medido em 10/09/2026: `typeof window.matchMedia` é `undefined` enquanto o `innerWidth` do ambiente é **1024** — largura de desktop com resposta de celular.
+
+O ramo largo se cobre forjando a resposta, e o stub precisa dos **três métodos de escuta**: o hook assina a mudança da consulta, e sem eles o render estoura com `mediaQueryList.addEventListener is not a function` (medido na mesma rodada).
+
+```ts
+function stubDesktopViewport() {
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: true,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}
+```
+
+⚠️ **`vi.unstubAllGlobals()` no `afterEach`, sempre em par.** Global forjado que sobrevive ao caso contamina o seguinte, que passa a medir desktop sem ter pedido.
+
+⛔ **O risco é o silêncio, não o erro.** Sem o stub, o caso do ramo largo **não falha**: ele passa medindo o ramo estreito, com o nome dizendo outra coisa — é a asserção que concorda com o ambiente errado. O par é o que separa os dois, e o exemplo na base é [`design-system/components/Pagination/Pagination.test.tsx`](FateConnect/Web/design-system/components/Pagination/Pagination.test.tsx), onde um caso mede o estreito sem stub e o outro o largo com ele.
+
+## O jsdom não carrega o `index.html`, então o `<head>` do teste está vazio
+
+⛔ **A suíte monta o documento do zero: o que está escrito no `index.html` não existe ali.** Tudo o que a página real já traz no `<head>` — título, metadado, ícone — some do teste, e uma asserção sobre o `<head>` mede um documento em que só o seu componente escreveu.
+
+⛔ Aconteceu em 12/09/2026, na #386. Cada rota passou a declarar o seu `<title>` e a sua `meta description`, e o `index.html` mantinha um par padrão. O teste lia a **primeira** `meta[name=description]` do `<head>` e passava. No navegador havia **duas**, e o React as ordena diferente: ele insere `<title>` no começo do `<head>` e `<meta>` no fim — então a estática ficava **à frente** da que a rota declarava, e `/cadastro` servia o resumo da landing. A suíte inteira verde.
+
+**Quando a asserção depende do que o `index.html` traz, o teste tem de ler o arquivo:**
+
+```ts
+readFileSync(resolve(import.meta.dirname, '<caminho até>/index.html'), 'utf8');
+```
+
+⚠️ **O sintoma é a asserção que pega "o primeiro" de algo** — `querySelector` sem índice, `[0]`, `find`. No teste existe um só e a escolha não aparece; no navegador existem dois e ela decide o resultado. Conte antes de ler: `querySelectorAll(...).length` diz se havia escolha a fazer.
 
 ## O nome no `getByRole` sai da constante, nunca do texto
 
