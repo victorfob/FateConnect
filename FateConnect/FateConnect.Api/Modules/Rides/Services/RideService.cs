@@ -35,7 +35,9 @@ public partial class RideService(
 
     public async Task<PagedResultDto<ReadRideDto>> GetAllAsync(FilterRideDto filter, int currentUserId)
     {
-        (IReadOnlyList<Ride> rides, int total) = await repository.GetAllAsync(filter);
+        int? userIdToFilter = filter.OnlyMine == true ? currentUserId : null;
+
+        (IReadOnlyList<Ride> rides, int total) = await repository.GetAllAsync(filter, userIdToFilter);
 
         LogRidesRetrieved(logger, rides.Count);
 

@@ -29,7 +29,9 @@ export const MenuRoot = styled(Stack)(({ theme }) => ({
   gap: theme.space(md),
   padding: theme.space(xxl, giant),
 
-  [theme.breakpoints.down('md')]: { padding: theme.space(lg) },
+  // Empilhado, o vão depois do último cartão é o mesmo que separa um cartão do
+  // outro; com o recuo lateral ele ficava menor que o ritmo da própria coluna.
+  [theme.breakpoints.down('md')]: { padding: theme.space(lg, lg, xl) },
 }));
 
 export const MenuIntro = styled(Stack)(({ theme }) => ({

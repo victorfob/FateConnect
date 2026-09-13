@@ -1,6 +1,7 @@
 import type { Theme as AppTheme } from '@mui/material/styles';
 
 export { css, keyframes } from '@emotion/react';
+export type { CSSObject } from '@emotion/react';
 export { default as styled } from '@emotion/styled';
 export { darken, lighten, alpha } from '@mui/material/styles';
 

@@ -23,3 +23,13 @@ description: Escolha que você tomou no lugar do Victor se anuncia na mensagem e
 **E a saída certa não era nenhuma das duas que eu tinha na mão.** Contada a medição, a decisão dele continuou de pé e quem mudou foi o mecanismo: o token passou a avisar quem o observa, e o guard voltou a redirecionar sozinho. Escondendo a medição eu teria entregue o contorno — e a issue seguinte, que também tem um `Sair`, herdaria o mesmo buraco.
 
 **O tell é estar escrevendo código que existe para compensar um fato que você ainda não contou.**
+
+### Contar a medição não autoriza redesenhar o pedido
+
+⛔ **Derrubada a premissa, o escopo continua sendo dele.** Contar e **já entregar outra correção** cumpre metade da regra: a medição chegou, mas a escolha do que fazer com ela foi tomada sem ele — e como ela vem anunciada, parece acordada.
+
+⛔ Aconteceu em 10/09/2026, no recuo dos cartões do menu. O pedido era *"arrumar o padding inferior pra ficar equalizado com o padding lateral"*. Eu medi que não dava: o inferior era o número **fixo** (24px, o recuo declarado) e o lateral variava de 10px a 234px, porque o cartão estava preso na largura mínima e centrado. Contei isso — e no mesmo turno entreguei o cartão preenchendo a largura, que equaliza no outro sentido. A devolução foi *"não quero que o card ocupe a largura inteira, eu falei pra vc arrumar o padding e não mexer no card"*, e a saída que ele queria era a terceira: subir o inferior para o valor do **gap entre os cartões**, uma linha, sem tocar no cartão.
+
+**A saída é medir, contar, e aplicar a correção que caiba no escopo pedido** — ou nenhuma, quando não couber. Alvo que a premissa dele nomeia e a medição derruba tem outros candidatos, e escolher entre eles é dele.
+
+⚠️ **Este é o irmão do caso acima e engana mais, porque a regra parece cumprida.** Lá o pecado é o silêncio; aqui, tudo foi dito e o diff mesmo assim passou do que foi pedido. O tell é o seu diff tocar arquivo que o pedido não nomeia.

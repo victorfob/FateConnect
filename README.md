@@ -62,6 +62,7 @@ A validação consulta as tags no **remoto**. Consultar localmente aprovaria qua
 | `check-api.yml`   | todo PR                                       | valida a API: compilação, testes e Sonar                                    |
 | `check-version.yml` | PR para a `main`                            | reprova quando a versão da raiz já tem tag                                  |
 | `deploy.yml`      | push na `develop`                             | publica em homologação                                                      |
+| `warm-front-cache.yml` | push na `develop`                        | grava na branch o cache de dependências que os checks de PR leem             |
 | `release.yml`     | push na `main`                                | cria a tag, publica em produção e devolve a `main` para a `develop`         |
 | `sonar-main.yml`  | push na `main`                                | analisa a `main` dos dois projetos, linha de base do código novo de cada PR |
 | `publish.yml`     | chamado pelos dois de publicação              | constrói o front e sobe um ambiente — os passos que homologação e produção compartilham |
@@ -92,7 +93,7 @@ A pasta **`.claude/`** guarda o contexto que um agente de código carrega ao tra
 | `rules/*.md`        | Padrão que vale para uma área do código                               | com `paths:`, ao abrir um arquivo que casa; sem `paths:`, sempre       |
 | `skills/*/SKILL.md` | Procedimento sob demanda, com passos                                  | quando a tarefa casa com a `description`, ou pelo nome (`/pr-creator`) |
 
-As skills de hoje: **`spec-issue`** (especificar uma issue e dividir em sub-issues), **`pr-creator`** (abrir e atualizar PR), **`resolve-pr-comments`** (triar e responder review), **`write-review-comment`** (comentar o PR de outra pessoa), **`write-commit`** (mensagem de commit e agrupamento em commits), **`changelog-writer`** (entrada do `CHANGELOG.md`), **`create-release`** (cortar uma versão e publicar), **`ux-writing`** (texto de interface) e **`fateconnect-create-component`** (criar componente no front).
+As skills de hoje: **`spec-issue`** (especificar uma issue e dividir em sub-issues), **`pr-creator`** (abrir e atualizar PR), **`resolve-pr-comments`** (triar e responder review), **`write-review-comment`** (comentar o PR de outra pessoa), **`write-commit`** (mensagem de commit e agrupamento em commits), **`changelog-writer`** (entrada do `CHANGELOG.md`), **`create-release`** (cortar uma versão e publicar), **`lighthouse-audit`** (auditar o site publicado e abrir as issues), **`ux-writing`** (texto de interface) e **`fateconnect-create-component`** (criar componente no front).
 
 ### Como mexer nela
 

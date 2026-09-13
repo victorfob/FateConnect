@@ -115,7 +115,8 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         Guid yesterday = await ReportAsync(client, ItemForm("Boné do Eduardo"));
         Guid older = await ReportAsync(client, ItemForm("Cinto do Eduardo", ocurredOn: lastWeek));
 
-        PagedItems page = await ListAsync(client, $"?SearchTerm=Eduardo&OcurredOn={lastWeek:yyyy-MM-dd}");
+        PagedItems page = await ListAsync(
+            client, $"?SearchTerm=Eduardo&DateFrom={lastWeek:yyyy-MM-dd}&DateTo={lastWeek:yyyy-MM-dd}");
 
         Assert.Contains(page.Items, item => item.Id == older);
         Assert.DoesNotContain(page.Items, item => item.Id == yesterday);
@@ -150,21 +151,21 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task GetItems_WithOnlyMyItems_LeavesOutWhatOtherPeopleReported()
+    public async Task GetItems_WithOnlyMine_LeavesOutWhatOtherPeopleReported()
     {
         HttpClient mine = _factory.CreateClientForNewUser("Helena Souza Braga");
         HttpClient theirs = _factory.CreateClientForNewUser("Igor Fontenele Alves");
         Guid myItem = await ReportAsync(mine, ItemForm("Umbrella compartilhada Helena"));
         Guid theirItem = await ReportAsync(theirs, ItemForm("Umbrella compartilhada Igor"));
 
-        PagedItems page = await ListAsync(mine, "?SearchTerm=Umbrella compartilhada&OnlyMyItems=true");
+        PagedItems page = await ListAsync(mine, "?SearchTerm=Umbrella compartilhada&OnlyMine=true");
 
         Assert.Contains(page.Items, item => item.Id == myItem);
         Assert.DoesNotContain(page.Items, item => item.Id == theirItem);
     }
 
     [Fact]
-    public async Task GetItems_WithoutOnlyMyItems_ReturnsWhatOtherPeopleReported()
+    public async Task GetItems_WithoutOnlyMine_ReturnsWhatOtherPeopleReported()
     {
         HttpClient mine = _factory.CreateClientForNewUser("Joana Ribeiro Castro");
         HttpClient theirs = _factory.CreateClientForNewUser("Kleber Antunes Faria");
@@ -205,5 +206,69 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
 
         Assert.Single(second.Items);
         Assert.DoesNotContain(second.Items, item => first.Items.Any(previous => previous.Id == item.Id));
+    }
+
+    [Fact]
+    public async Task GetItems_FilteredByAClosedDateRange_KeepsBothEndsOfTheRange()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Camila Duarte Prado");
+        DateOnly threeDaysAgo = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-3));
+        DateOnly twoDaysAgo = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
+        DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
+        Guid inside = await ReportAsync(client, ItemForm("Guarda-chuva da Camila", ocurredOn: threeDaysAgo));
+        Guid alsoInside = await ReportAsync(client, ItemForm("Caderno da Camila", ocurredOn: twoDaysAgo));
+        Guid outside = await ReportAsync(client, ItemForm("Chaveiro da Camila", ocurredOn: lastWeek));
+
+        PagedItems page = await ListAsync(
+            client, $"?SearchTerm=Camila&DateFrom={threeDaysAgo:yyyy-MM-dd}&DateTo={twoDaysAgo:yyyy-MM-dd}");
+
+        Assert.Contains(page.Items, item => item.Id == inside);
+        Assert.Contains(page.Items, item => item.Id == alsoInside);
+        Assert.DoesNotContain(page.Items, item => item.Id == outside);
+    }
+
+    [Fact]
+    public async Task GetItems_FilteredByOnlyTheEndDate_KeepsThatDayAlone()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Rafael Antunes Vieira");
+        DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
+        Guid yesterday = await ReportAsync(client, ItemForm("Mochila do Rafael"));
+        Guid older = await ReportAsync(client, ItemForm("Fone do Rafael", ocurredOn: lastWeek));
+
+        PagedItems page = await ListAsync(client, $"?SearchTerm=Rafael&DateTo={lastWeek:yyyy-MM-dd}");
+
+        Assert.Contains(page.Items, item => item.Id == older);
+        Assert.DoesNotContain(page.Items, item => item.Id == yesterday);
+    }
+
+    [Fact]
+    public async Task GetItems_WithoutAnyDate_KeepsEveryItem()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Larissa Moreira Pinto");
+        DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
+        Guid yesterday = await ReportAsync(client, ItemForm("Cachecol da Larissa"));
+        Guid older = await ReportAsync(client, ItemForm("Luva da Larissa", ocurredOn: lastWeek));
+
+        PagedItems page = await ListAsync(client, "?SearchTerm=Larissa");
+
+        Assert.Contains(page.Items, item => item.Id == yesterday);
+        Assert.Contains(page.Items, item => item.Id == older);
+    }
+
+    [Fact]
+    public async Task GetItems_WithTheEndDateBeforeTheStartDate_IsRejected()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Thiago Barros Mendes");
+        DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
+        DateOnly yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+
+        HttpResponseMessage response = await client.GetAsync(
+            $"/LostAndFound?DateFrom={yesterday:yyyy-MM-dd}&DateTo={lastWeek:yyyy-MM-dd}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains(
+            "anterior à data inicial",
+            await response.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
     }
 }

@@ -1,17 +1,11 @@
 import { useCallback, type ReactNode } from 'react';
 import GlobalStyles from '@mui/material/GlobalStyles';
-import { closeSnackbar, SnackbarProvider } from 'notistack';
+import { SnackbarProvider } from 'notistack';
 
+import { NotificationActions } from './NotificationActions';
 import * as S from './styles';
 
 const MAX_STACKED = 3;
-
-/**
- * O produto rotula a ação de dispensar com "OK" na maioria das chamadas — as
- * duas exceções usam "Fechar" para o mesmo tipo de evento, então o rótulo aqui
- * é único.
- */
-const DISMISS_LABEL = 'OK';
 
 /** O produto não desenha ícone no aviso; a biblioteca desenha um por variante. */
 const NO_ICON: Record<string, ReactNode> = {
@@ -29,9 +23,7 @@ const NO_ICON: Record<string, ReactNode> = {
  */
 export function NotificationProvider({ children }: Readonly<{ children: ReactNode }>) {
   const renderDismiss = useCallback(
-    (key: string | number) => (
-      <S.DismissButton onClick={() => closeSnackbar(key)}>{DISMISS_LABEL}</S.DismissButton>
-    ),
+    (key: string | number) => <NotificationActions notificationKey={key} />,
     [],
   );
 

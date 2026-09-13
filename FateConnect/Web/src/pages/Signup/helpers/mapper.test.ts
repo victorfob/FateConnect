@@ -9,12 +9,6 @@ const FILLED: SignupFormValues = {
   password: 'segredo123',
   birthDate: '22/05/1999',
   gender: GenderValueEnum.FEMALE,
-  zipCode: '18000-000',
-  street: 'Rua das Flores',
-  streetNumber: '100',
-  complement: 'Apto 12',
-  city: 'Sorocaba',
-  state: 'SP',
   phone: '(15) 99999-9999',
   contactEmail: 'maria@exemplo.com',
   acceptTerms: true,
@@ -30,11 +24,10 @@ describe('toSignupRequest', () => {
     expect(request.gender).toBe(GenderValueEnum.FEMALE);
   });
 
-  // A API documenta o CEP com o hífen e o telefone só com dígitos.
-  it('should keep the zip code masked and send the phone as digits', () => {
+  // A API recebe o telefone só com dígitos.
+  it('should send the phone as digits', () => {
     const request = toSignupRequest(FILLED);
 
-    expect(request.addresses[0]?.zipCode).toBe('18000-000');
     expect(request.contacts[0]?.phone).toBe('15999999999');
   });
 

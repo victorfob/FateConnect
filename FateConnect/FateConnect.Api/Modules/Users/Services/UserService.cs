@@ -68,7 +68,6 @@ public class UserService : IUserService
     {
         string hashedPassword = HashPassword(dto.Password);
 
-        List<Address> mappedAddresses = BuildAddresses(dto.Addresses);
         List<Contact> mappedContacts = BuildContacts(dto.Contacts);
 
         User user = new User
@@ -81,29 +80,10 @@ public class UserService : IUserService
             ProfileType = EnumProfileType.Operator,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = null,
-            Addresses = mappedAddresses,
             Contacts = mappedContacts
         };
 
         return user;
-    }
-
-    private static List<Address> BuildAddresses(List<CreateAddressDto>? dtos)
-    {
-        if (dtos is null or { Count: 0 })
-            return [];
-
-        List<Address> addresses = [.. dtos.Select(dto => new Address
-        {
-            ZipCode = dto.ZipCode,
-            Street = dto.Street,
-            StreetNumber = dto.StreetNumber,
-            Complement = dto.Complement,
-            City = dto.City,
-            State = dto.State
-        })];
-
-        return addresses;
     }
 
     private static List<Contact> BuildContacts(List<CreateContactDto>? dtos)

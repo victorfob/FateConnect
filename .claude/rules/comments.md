@@ -1,5 +1,5 @@
 ---
-description: Quando comentar — zero no back-end .NET, e no front só o estritamente essencial, cujo teste é impedir uma mudança errada
+description: Quando comentar — zero no back-end .NET; fora dele, renomear, extrair e simplificar antes de escrever, e o teste é impedir uma mudança errada
 ---
 
 # Comentário
@@ -22,9 +22,21 @@ Aconteceu nesta mesma rodada: apagado o XML doc do `TimeOnlyJsonConverter`, a `w
 
 ⚠️ **A regra é do código, não do repositório.** YAML de workflow, script de shell, Markdown e o front seguem pela seção abaixo — lá o comentário existe, só é raro.
 
-⛔ **Comentário só quando for estritamente essencial:** trecho não óbvio, que não se explica sozinho. **Se o código precisa ser explicado, o problema é o código** — renomeie, extraia, simplifique, e o comentário deixa de ser necessário.
+## Fora do C#: reescrever vem antes de comentar
 
-**O teste, antes de escrever qualquer um:** este comentário impede alguém de fazer uma mudança errada? Se sim, fica. Se ele só conta o que o código já diz, sai.
+⛔ **Comentário é sinal de que o código não se explicou sozinho.** A primeira reação a *"isso aqui merece um comentário"* é reescrever o trecho até ele não merecer mais.
+
+⛔ **Antes de escrever qualquer um, tentar nesta ordem:**
+
+1. **renomear** — variável, função ou tipo que revele a intenção;
+2. **extrair** — uma função nomeada no lugar do bloco que você ia comentar;
+3. **simplificar** — reduzir aninhamento, early return, condição composta virando função com nome.
+
+Só o que sobrevive às três chega a ser candidato.
+
+**E o candidato ainda passa por um teste:** este comentário impede alguém de fazer uma mudança errada? Se sim, fica. Se ele só conta o que o código já diz, sai.
+
+⚠️ **A escada vem antes do teste porque o teste sozinho é permissivo.** Acabado de escrever, quase todo comentário parece impedir alguma mudança errada — quem o escreveu ainda tem na cabeça o contexto que o justifica. As três tentativas reduzem o volume porque removem a pergunta em vez de respondê-la.
 
 Fica: `Concluido` viaja sem acento **porque o backend serializa assim** (sem isso alguém "corrige" o typo). O `Array.isArray` **porque sem endereço de API o dev server responde HTML com 200** (sem isso alguém apaga a guarda como código morto).
 
@@ -35,11 +47,38 @@ Sai, sempre:
 - Parágrafo de contexto que pertence ao corpo do PR ou à issue — por que a API ainda não guarda o arquivo, o que a #106 vai implementar.
 - Comentário que repete a constante declarada logo acima.
 
+⛔ **E essa lista vale também para o que já está escrito.** Ao editar um trecho, passe os comentários **vizinhos** pelo mesmo teste e apague os que só repetem o código — editar é o único momento em que alguém relê aquilo. Varredura dedicada é cara e acontece uma vez por ano; limpeza de passagem é grátis e contínua.
+
+⚠️ **Não é licença para alargar o diff.** Sai o comentário que está **no trecho que o PR já toca**, pela mesma regra de boy-scout que vale para padrão legado: não incluir mais, e corrigir o que passou pela sua mão.
+
+### Teto: três linhas de texto
+
+⛔ **Comentário tem até três linhas — e conta-se o texto, não o arquivo.** Um `/** … */` gasta duas linhas só com os delimitadores, então medir linha de arquivo vira um teto de **uma** linha sem ninguém perceber. Foi o erro que quase matou esta seção: a primeira medição disse que o teto condenava 33% da base, e ela contava delimitador.
+
+**O estado do front hoje, 572 blocos em código de produção:**
+
+| Linhas de texto | Blocos | Acumulado |
+| --- | --- | --- |
+| 1 | 297 | 51% |
+| 2 | 130 | 74% |
+| 3 | 94 | **91%** |
+| 4 ou mais | 51 | 100% |
+
+⚠️ **O teto é barato porque 91% já o cumprem.** Ele não corta o que existe — impede o comentário longo de nascer.
+
+⛔ **Estourou? A saída não é apagar, é mudar de lugar.** Volte à escada acima; o que ainda não couber é explicação que pertence ao **corpo do PR, à issue ou a uma rule** — onde alguém a relê quando o código mudar. O comentário fica com a **decisão**, não com a derivação dela.
+
+O caso que prova: `design-system/tokens/breakpoints.ts` carrega **14 linhas** derivando o limite a partir das larguras medidas do cabeçalho. Ninguém revisita aquilo ao mexer no tema, e nada avisa quando um dos números muda.
+
+⚠️ **Os 51 de hoje saem por boy-scout**, conforme alguém passe por eles. Não se abre varredura para isto.
+
 ## Forma: JSDoc acima de declaração, `//` dentro de corpo
 
 O comentário que passou no teste acima ainda escolhe a forma errada. Acima de uma **declaração** — `const`, `function`, `type`, `enum`, componente `styled` — é `/** … */`, como `OWN_ITEM_LABEL`, `ErrorScreen` e `CardRoot` estão escritos. **Dentro** de um corpo — propriedade de objeto, ramo de `if`, passo de um teste — é `//`.
 
 ⛔ Cobrado no PR #141: `// Instrumentado para a transação…` acima do `const router`, no `main.tsx`. *"Deveria ser jsDoc"*. O mesmo comentário, com o mesmo texto, estava certo — errada estava a forma.
+
+**E o topo do arquivo não é um terceiro caso.** Medido nesta base: **26 dos 398** arquivos do front começam com comentário, e em todos ele está **colado na primeira declaração** — o barrel, o enum de rotas, o bloco de tokens. Banner que descreve *o arquivo* em vez de uma declaração não existe aqui e não é para nascer: ele é, estruturalmente, o que a seção **Comentário órfão** descreve — JSDoc seguido de linha em branco.
 
 ## Comentário que descreve o vizinho envelhece com ele
 

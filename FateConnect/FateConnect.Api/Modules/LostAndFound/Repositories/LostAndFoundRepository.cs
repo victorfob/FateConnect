@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.LostAndFound.Repositories;
 
+using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
@@ -45,8 +46,11 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         if (filter.Status.HasValue)
             query = query.Where(r => r.Status == filter.Status.Value);
 
-        if (filter.OcurredOn.HasValue)
-            query = query.Where(r => r.OcurredOn == filter.OcurredOn.Value);
+        DateOnly? rangeStart = filter.EffectiveDateFrom;
+        DateOnly? rangeEnd = filter.EffectiveDateTo;
+
+        if (rangeStart.HasValue && rangeEnd.HasValue)
+            query = query.Where(OccurredWithin(rangeStart.Value, rangeEnd.Value));
 
         int total = await query.CountAsync();
 
@@ -59,6 +63,9 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
 
         return (items, total);
     }
+
+    private static Expression<Func<LostAndFoundRecord, bool>> OccurredWithin(DateOnly rangeStart, DateOnly rangeEnd) =>
+        record => record.OcurredOn >= rangeStart && record.OcurredOn <= rangeEnd;
 
     public async Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true)
     {

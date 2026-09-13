@@ -1,12 +1,15 @@
 import { ListCard } from '@ds-root/components/ListCard';
 
-import { GHOST_CARD_KEYS } from './constants';
 import * as S from './styles';
 
-export function ListCardSkeleton() {
+type ListCardSkeletonProps = Readonly<{ count: number }>;
+
+export function ListCardSkeleton({ count }: ListCardSkeletonProps) {
+  const ghostKeys = Array.from({ length: count }, (_, index) => index);
+
   return (
     <S.SkeletonList role="status" aria-busy>
-      {GHOST_CARD_KEYS.map((key) => (
+      {ghostKeys.map((key) => (
         <ListCard key={key}>
           <ListCard.Header>
             <S.GhostTitle />

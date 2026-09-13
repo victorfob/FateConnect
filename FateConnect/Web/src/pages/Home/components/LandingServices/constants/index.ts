@@ -26,7 +26,7 @@ export const SERVICE_CARDS: ServiceCard[] = [
   {
     title: 'Comunidade verificada',
     description:
-      'Só entra quem tem e-mail @aluno.cps.sp.gov.br ou @cps.sp.gov.br: do outro lado há sempre alguém da Fatec.',
+      'Crie sua conta com o e-mail institucional da Fatec e converse sempre com alguém do campus.',
     Icon: GroupsIcon,
   },
   {

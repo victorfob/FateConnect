@@ -7,6 +7,7 @@ import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import { RoutePathEnum } from '@app/routes/paths';
 import { listLostItems } from '@app/services/lostAndFound/lostAndFoundService';
 import type { LostItem } from '@app/services/lostAndFound/types';
+import { PAGE_SIZE } from '@app/utils/searchParams';
 
 import { LostItemCard } from './components/LostItemCard';
 import { LostItemFilter } from './components/LostItemFilter';
@@ -76,6 +77,7 @@ export function LostAndFound() {
     >
       <CardsList
         isLoading={isLoading}
+        skeletonCount={PAGE_SIZE}
         isEmpty={items.length === NO_ITEMS}
         emptyMessage={C.EMPTY_LIST_MESSAGE}
         pagination={<Pagination count={totalPages} page={currentPage} onChange={changePage} />}
