@@ -71,3 +71,21 @@ Medido em 12/09/2026 na configuração instalada: o plugin do nginx tira o `list
 ⛔ **`rsync --delete` apaga o que estiver dentro da raiz** a cada publicação. Arquivo servido pelo nginx que não vem do build — `robots.txt`, `sitemap.xml` — fica fora dela, e o `install-site.sh` o instala por ambiente.
 
 ⚠️ **A diferença entre ambientes sai da presença do arquivo, não de um condicional.** O template é um só: ele aponta o caminho, e o ambiente que não tem aquele arquivo responde 404 sozinho.
+
+## O `install-site.sh` roda por `sudo`, nunca de dentro de um shell de root
+
+⛔ **Ele decide a posse da pasta do front por `SUDO_USER`**, e essa variável não existe num shell de root:
+
+```bash
+chown -R "${SUDO_USER:-root}":"${SUDO_USER:-root}" /var/www/fateconnect
+```
+
+Aberto por `sudo su`, o `:-root` vence e a pasta fica `root:root`. O script termina verde, o nginx recarrega, o site funciona — e a **próxima publicação falha**, porque o `rsync` da esteira entra como o usuário comum e não consegue mais escrever ali. A causa fica um deploy atrás do sintoma.
+
+⚠️ **O `~` denuncia antes:** dentro do shell de root ele aponta para `/root`, e o clone mora no home do usuário do deploy. `cd ~/...` respondendo `No such file or directory` é o aviso de que a sessão é a errada — sair dela, e não corrigir o caminho.
+
+A conferência depois de rodar, que custa uma linha:
+
+```bash
+ls -ld /var/www/fateconnect /var/www/fateconnect/<ambiente>   # dono = o usuário do deploy
+```
