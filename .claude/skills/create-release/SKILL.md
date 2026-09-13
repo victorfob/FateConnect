@@ -35,6 +35,30 @@ grep -c '^- ' CHANGELOG.md                            # entradas acumuladas
 
 Leia a seção `## [Unreleased]` inteira. Ela é a release: se estiver vazia, não há release, por mais commits que existam — refactor e ajuste de CI não entram no changelog e não justificam versão.
 
+### ⛔ O `Unreleased` se confere contra os PRs mergeados, um a um
+
+⛔ **Entrada que falta não deixa buraco visível** — a seção parece completa, porque ninguém sabe de cor quantas linhas ela deveria ter. O instrumento é cruzar a lista de PRs desde a última tag contra o arquivo:
+
+```bash
+for n in $(git log <última-tag>..origin/develop --oneline | grep -oE '\(#[0-9]+\)$' | tr -d '(#)' | sort -n); do
+  grep -q "(#$n)" CHANGELOG.md && echo "#$n ok" || echo "#$n SEM entrada"
+done
+```
+
+⚠️ **Isto roda no passo 1, e não no corte, porque uma entrada que falta pode mudar a versão:** um `Added` esquecido transforma um *patch* em *minor*.
+
+Para cada `SEM entrada`, leia o título do PR. **Ausência legítima:** `docs`, `ci`, `chore`, refactor sem efeito externo, e componente de design system **sem consumidor** — o efeito visível dele sai no PR que o consome. **Ausência que é defeito:** qualquer `feat` ou `fix` de comportamento.
+
+⛔ **E procure o `(#?)` no arquivo.** O placeholder só vira número por `--amend` quando o PR abre, e o PR que esqueceu não avisa:
+
+```bash
+grep -n '(#?)' CHANGELOG.md   # tem que responder vazio
+```
+
+Medido em 13/09/2026, cortando a 0.10.0: de **39** PRs, 24 sem entrada — 22 legítimos, e **dois defeitos**. Um `(#?)` nunca trocado, e um `feat` que renomeava uma ação inteira da tela, que teria ido a produção sem registro nenhum. Nenhum dos dois aparece sem a varredura.
+
+⚠️ **A busca que confere isso precisa de controle positivo.** Procurar o conceito e achar zero se lê como "não está registrado"; procure junto um termo que você sabe que existe no arquivo, e só confie no zero se o controle achar.
+
 ⚠️ **Olhe o que vai ao ar, não só o que mudou.** Funcionalidade entregue no front contra API que não existe vai para produção quebrada. Isso não impede a release, mas o usuário precisa saber antes, não depois.
 
 ⛔ **E o inverso quebra igual, sem deixar rastro no changelog: API que troca um contrato à frente do front que o consome.** Parâmetro de query que nenhum DTO liga o ASP.NET **descarta sem erro** — o filtro deixa de filtrar, a resposta continua `200`, e nada acusa. Não há entrada de changelog para procurar, porque a ponta de API entrou como funcionalidade própria e a tela que a consome é outra issue.

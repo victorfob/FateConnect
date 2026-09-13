@@ -116,6 +116,21 @@ O mesmo objeto ou estado se chama igual em **toda** a tela — etiqueta, botão,
 
 ⚠️ **O tell de que a distinção vazou para o lugar errado** é um rótulo de estado que só se consegue escrever tendo um item na mão.
 
+### O verbo da ação nomeia o resultado, não o gesto
+
+⛔ **Antes de nomear uma ação destrutiva, pergunte o que sobra depois dela.** O verbo promete um resultado; se o registro continua lá, a promessa é falsa — e ela contamina a etiqueta, a nota e o aviso junto.
+
+Duas trocas neste repo, pelo mesmo diagnóstico:
+
+| Era | Virou | Porque o antigo descrevia o gesto |
+| --- | --- | --- |
+| `Cancelar` | `Excluir` | prometia desistir da operação, não destruir o registro |
+| `Excluir` | `Arquivar` | prometia destruir um item que **continua visível para todo mundo** |
+
+⛔ **Por isso achados e perdidos diz `Arquivar` e caronas diz `Excluir`, e isso NÃO é inconsistência a corrigir.** A diferença é reversibilidade: o item arquivado segue no mural e tem `Desfazer` no aviso; a carona não volta — e é ela que **mantém o diálogo de confirmação**, porque ali não há caminho de volta pela tela. Levantei a divergência ao cortar a 0.10.0 e a decisão do Victor foi essa.
+
+⚠️ **A confirmação segue a mesma régua.** Ação reversível pela própria tela troca o diálogo por um `Desfazer` no aviso; ação sem volta mantém o porteiro. O diálogo não é enfeite de gravidade — é a única saída quando não há outra.
+
 ### O rótulo do campo de busca nomeia tudo o que ele alcança
 
 ⛔ **Busca que casa mais de um campo diz isso no rótulo.** O rótulo é o que o leitor de tela anuncia como nome do campo, e placeholder some ao digitar — precisão que mora só no placeholder é precisão que some.

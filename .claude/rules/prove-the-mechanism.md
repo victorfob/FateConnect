@@ -180,6 +180,28 @@ Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase`
 
 Na mesma tradução de 09/09/2026, a reescrita de uma frase inteira da #193 nunca casou — as trocas de token que rodaram antes já tinham mudado `Operador` para `Operator` **dentro dela**, então o texto que eu procurava já não existia. Quem parou foi o `assert` de que toda entrada casou ao menos uma vez. **Reescrita de frase vai antes das trocas de token**, e entre as trocas a ordem é do mais longo para o mais curto: sem isso `AgenteUsuario` vira `AgenteUser`.
 
+## O número que eu prometo se deriva rodando, não contando
+
+⛔ **Valor esperado que vai junto de um comando para outra pessoa rodar se obtém executando aquele comando exato.** Contar de cabeça o que ele *deveria* achar transforma a conferência em ruído: quem roda recebe um número diferente e não sabe se o defeito é do ambiente ou do seu palpite.
+
+Aconteceu em 13/09/2026, entregando `grep -cE 'http2 on;|gzip_static on;|immutable'` com "tem que responder 3" — as três diretivas que eu tinha na cabeça. Respondeu **4**: o **comentário** acima de `http2 on;` cita a própria diretiva que documenta. O Victor teve que perguntar se estava errado.
+
+⚠️ **O tell é montar o comando a partir de uma busca anterior com padrão diferente.** O padrão mudou, o número não foi refeito. Comando novo ⇒ rodar antes de prometer a saída — e, quando a contagem for sustentar conclusão, listar **quais** linhas casaram (`grep -n`), porque a listagem denuncia o casamento que você não previu.
+
+## O comando de conferência tem referência própria, e pode não ser a sua
+
+⛔ **Provar contenção contra uma referência não autoriza um comando que mede contra outra.** Os dois números estão certos e respondem perguntas diferentes — e o segundo parece contradizer o primeiro.
+
+Na mesma rodada: provei `git rev-list --count origin/main..release/0.10.0` = **0** e mandei `git branch -d`. Ele recusou com *"not fully merged"*, porque **o `-d` mede contra a branch em que você está** — a `develop`, que ainda não tinha recebido o back-merge. Nada estava perdido; a recusa era sobre outra coisa.
+
+**O teste que responde a pergunta certa é explícito na referência:**
+
+```bash
+git merge-base --is-ancestor <branch> origin/main   # exit 0 = está toda lá
+```
+
+⚠️ Provado assim, o `-D` é seguro — e a prova vai dita junto, senão forçar parece atalho.
+
 ## O alcance de uma mudança de token se mede no consumidor renderizado
 
 ⛔ **Antes de afirmar o que uma troca de cor ou de token vai atingir, não basta achar quem lê a chave: confira se aquele caminho chega à tela.** O `grep` responde quem **referencia**; ele não responde quem **renderiza**.
