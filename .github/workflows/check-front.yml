@@ -19,12 +19,16 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   changes:
     name: Changed paths
     runs-on: ubuntu-latest
+    # ⛔ O bloco do job SUBSTITUI o do workflow, então o `contents` volta
+    # aqui: sem ele o checkout deste job perde o acesso ao repositório.
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       web: ${{ steps.changes.outputs.web }}
     steps:
