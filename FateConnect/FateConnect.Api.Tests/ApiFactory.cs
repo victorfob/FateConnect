@@ -6,6 +6,9 @@ using System.Text;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
+using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.Denunciations.Entities;
+using FateConnect.Api.Modules.Denunciations.Enums;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.Entities;
@@ -179,6 +182,28 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.SaveChanges();
 
         return ride.Id;
+    }
+
+    public Guid SeedDenunciation(
+        int reporterId,
+        string description,
+        DateOnly reportedOn,
+        EnumDenunciationCategory category = EnumDenunciationCategory.ImproperCharging,
+        EnumDenunciationStatus status = EnumDenunciationStatus.Open,
+        bool isAnonymous = false)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        Denunciation denunciation = new(category, description, reporterId, isAnonymous);
+
+        context.Denunciations.Add(denunciation);
+        context.Entry(denunciation).Property(entity => entity.CreatedAt).CurrentValue =
+            DateTimeUtils.ToUtcFromProductTimeZone(reportedOn, new TimeOnly(10, 0));
+        context.Entry(denunciation).Property(entity => entity.Status).CurrentValue = status;
+        context.SaveChanges();
+
+        return denunciation.Id;
     }
 
     public HttpClient CreateClientFor(

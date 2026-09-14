@@ -32,6 +32,7 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         EnumDenunciationCategory Category,
         string Description,
         string? ImageUrl,
+        bool HasImage,
         EnumDenunciationStatus Status,
         Contact? User,
         bool IsAnonymous,
@@ -42,6 +43,8 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         int Page,
         int PageSize,
         int Total);
+
+    private static readonly DateOnly SeededDay = new(2026, 3, 15);
 
     private static string UniqueSubject() => $"protocolo{Guid.NewGuid():N}";
 
@@ -62,6 +65,25 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         payload.Headers.ContentType = new MediaTypeHeaderValue("image/png");
 
         return payload;
+    }
+
+    private static MultipartFormDataContent FormWithImage()
+    {
+        MultipartFormDataContent form = NewDenunciationForm();
+        form.Add(ImagePayload(0x11), "Image", "foto.png");
+
+        return form;
+    }
+
+    private async Task<string> ImageOfANewDenunciationSeenBy(HttpClient moderation, string reporterName)
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser(reporterName);
+        ReadDenunciation created = await ReportedBy(reporter, FormWithImage());
+
+        ReadDenunciation reviewed = (await moderation
+            .GetFromJsonAsync<ReadDenunciation>($"/Denunciations/{created.Id}", JsonOptions))!;
+
+        return reviewed.ImageUrl!;
     }
 
     private static async Task<ReadDenunciation> ReportedBy(HttpClient reporter, MultipartFormDataContent form)
@@ -98,22 +120,50 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task CreateDenunciation_WithAnImage_DoesNotHandTheReporterAnAddressOnlyModerationOpens()
+    public async Task CreateDenunciation_WithAnImage_ConfirmsTheAttachmentWithoutTheStoredAddress()
     {
         HttpClient reporter = _factory.CreateClientForNewUser("Larissa Coelho Vieira");
+
+        ReadDenunciation created = await ReportedBy(reporter, FormWithImage());
+
+        Assert.True(created.HasImage);
+        Assert.Null(created.ImageUrl);
+    }
+
+    [Fact]
+    public async Task CreateDenunciation_WithoutAnImage_SaysSoInTheSameField()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Murilo Fontenele Braga");
+
+        ReadDenunciation created = await ReportedBy(reporter, NewDenunciationForm());
+
+        Assert.False(created.HasImage);
+        Assert.Null(created.ImageUrl);
+    }
+
+    [Fact]
+    public async Task StoredDenunciationImage_AskedByModeration_IsServed()
+    {
         HttpClient moderation = _factory.CreateClientForNewAdministrator("Kleber Antunes Faria");
+        string storedImage = await ImageOfANewDenunciationSeenBy(moderation, "Vitória Salgueiro Pena");
 
-        MultipartFormDataContent form = NewDenunciationForm();
-        form.Add(ImagePayload(0x11), "Image", "foto.png");
+        HttpResponseMessage response = await moderation.GetAsync($"/{storedImage}");
 
-        ReadDenunciation created = await ReportedBy(reporter, form);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task StoredDenunciationImage_AskedByWhoReportedIt_IsForbidden()
+    {
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Núbia Carvalhaes Lott");
+        HttpClient reporter = _factory.CreateClientForNewUser("Emerson Padilha Goulart");
+        ReadDenunciation created = await ReportedBy(reporter, FormWithImage());
         ReadDenunciation reviewed = (await moderation
             .GetFromJsonAsync<ReadDenunciation>($"/Denunciations/{created.Id}", JsonOptions))!;
 
-        Assert.Null(created.ImageUrl);
-        Assert.NotNull(reviewed.ImageUrl);
-        Assert.Equal(HttpStatusCode.OK, (await moderation.GetAsync($"/{reviewed.ImageUrl}")).StatusCode);
-        Assert.Equal(HttpStatusCode.Forbidden, (await reporter.GetAsync($"/{reviewed.ImageUrl}")).StatusCode);
+        HttpResponseMessage response = await reporter.GetAsync($"/{reviewed.ImageUrl}");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]
@@ -227,6 +277,67 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task ListDenunciations_FilteredBySituation_LeavesTheOtherSituationsOut()
+    {
+        SeededUser reporter = _factory.SeedUser("Cristiane Valadão Pires");
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Anderson Quirino Mota");
+        string subject = UniqueSubject();
+
+        _factory.SeedDenunciation(reporter.Id, $"{ValidDescription} {subject}", SeededDay);
+        _factory.SeedDenunciation(
+            reporter.Id, $"{ValidDescription} {subject}", SeededDay, status: EnumDenunciationStatus.InReview);
+
+        PagedDenunciations open = (await moderation.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}&status={EnumDenunciationStatus.Open}", JsonOptions))!;
+        PagedDenunciations inReview = (await moderation.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}&status={EnumDenunciationStatus.InReview}", JsonOptions))!;
+
+        Assert.Equal(EnumDenunciationStatus.Open, Assert.Single(open.Items).Status);
+        Assert.Equal(EnumDenunciationStatus.InReview, Assert.Single(inReview.Items).Status);
+    }
+
+    [Fact]
+    public async Task ListDenunciations_FilteredByOnlyTheStartingDate_CoversThatWholeDay()
+    {
+        SeededUser reporter = _factory.SeedUser("Heloísa Sampaio Trindade");
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Ubirajara Neves Fontes");
+        string subject = UniqueSubject();
+
+        _factory.SeedDenunciation(reporter.Id, $"{ValidDescription} {subject}", SeededDay);
+
+        PagedDenunciations sameDay = (await moderation.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}&dateFrom={Iso(SeededDay)}", JsonOptions))!;
+        PagedDenunciations nextDay = (await moderation.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}&dateFrom={Iso(SeededDay.AddDays(1))}", JsonOptions))!;
+
+        Assert.Equal(1, sameDay.Total);
+        Assert.Equal(0, nextDay.Total);
+    }
+
+    [Fact]
+    public async Task ListDenunciations_WithMoreThanOnePage_CutsTheNewestFirst()
+    {
+        SeededUser reporter = _factory.SeedUser("Fabrício Andrade Bulhões");
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Marcela Tenório Bastos");
+        string subject = UniqueSubject();
+
+        _factory.SeedDenunciation(reporter.Id, $"{ValidDescription} {subject} antiga", SeededDay);
+        _factory.SeedDenunciation(reporter.Id, $"{ValidDescription} {subject} intermediária", SeededDay.AddDays(1));
+        _factory.SeedDenunciation(reporter.Id, $"{ValidDescription} {subject} recente", SeededDay.AddDays(2));
+
+        PagedDenunciations firstPage = (await moderation.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}&page=1&pageSize=2", JsonOptions))!;
+        PagedDenunciations secondPage = (await moderation.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}&page=2&pageSize=2", JsonOptions))!;
+
+        Assert.Equal(3, firstPage.Total);
+        Assert.Equal(2, firstPage.Items.Count);
+        Assert.EndsWith("recente", firstPage.Items[0].Description, StringComparison.Ordinal);
+        Assert.EndsWith("intermediária", firstPage.Items[1].Description, StringComparison.Ordinal);
+        Assert.EndsWith("antiga", Assert.Single(secondPage.Items).Description, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ListDenunciations_FilteredByTheDayItWasReported_KeepsTheReportOfToday()
     {
         HttpClient reporter = _factory.CreateClientForNewUser("Paulo Sérgio Ramalho");
@@ -281,24 +392,20 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task UpdateStatus_AsAdministrator_WalksTheReportThroughTheReview()
+    public async Task UpdateStatus_ResolvingAReportUnderReview_PersistsTheNewSituation()
     {
-        HttpClient reporter = _factory.CreateClientForNewUser("Gustavo Amaral Peçanha");
+        SeededUser reporter = _factory.SeedUser("Gustavo Amaral Peçanha");
         HttpClient moderation = _factory.CreateClientForNewAdministrator("Beatriz Nogueira Camargo");
+        Guid underReview = _factory.SeedDenunciation(
+            reporter.Id, ValidDescription, SeededDay, status: EnumDenunciationStatus.InReview);
 
-        ReadDenunciation created = await ReportedBy(reporter, NewDenunciationForm());
-        await moderation.PatchAsJsonAsync(
-            $"/Denunciations/{created.Id}/status", new { status = nameof(EnumDenunciationStatus.InReview) });
         HttpResponseMessage resolution = await moderation.PatchAsJsonAsync(
-            $"/Denunciations/{created.Id}/status", new { status = nameof(EnumDenunciationStatus.Resolved) });
+            $"/Denunciations/{underReview}/status", new { status = nameof(EnumDenunciationStatus.Resolved) });
 
-        ReadDenunciation resolved = (await resolution.Content
-            .ReadFromJsonAsync<ReadDenunciation>(JsonOptions))!;
         ReadDenunciation reread = (await moderation
-            .GetFromJsonAsync<ReadDenunciation>($"/Denunciations/{created.Id}", JsonOptions))!;
+            .GetFromJsonAsync<ReadDenunciation>($"/Denunciations/{underReview}", JsonOptions))!;
 
         Assert.Equal(HttpStatusCode.OK, resolution.StatusCode);
-        Assert.Equal(EnumDenunciationStatus.Resolved, resolved.Status);
         Assert.Equal(EnumDenunciationStatus.Resolved, reread.Status);
     }
 

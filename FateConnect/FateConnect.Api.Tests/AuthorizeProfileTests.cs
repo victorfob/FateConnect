@@ -39,6 +39,8 @@ public class AuthorizeProfileTests
     {
         EnumProfileType[] declaredProfiles = Enum.GetValues<EnumProfileType>();
 
-        Assert.All(declaredProfiles, profile => Assert.NotNull(new AuthorizeProfileAttribute(profile).Roles));
+        Assert.All(
+            declaredProfiles,
+            profile => Assert.False(string.IsNullOrWhiteSpace(new AuthorizeProfileAttribute(profile).Roles)));
     }
 }
