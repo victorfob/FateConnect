@@ -9,6 +9,7 @@ import type { UserContact } from '@app/services/types';
 import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
+import { PAGE_SIZE } from '@app/utils/searchParams';
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
 import {
@@ -123,6 +124,22 @@ describe('Rides', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
+  });
+
+  /**
+   * ⛔ Reservar menos do que a página traz faz o conteúdo crescer depois da
+   * primeira pintura, e o rodapé desce com ele — foi o defeito da #385. O que
+   * se afirma aqui é a ligação entre a reserva e o tamanho da página.
+   */
+  it('should reserve one ghost card for each ride the page will show', async () => {
+    // Resposta que nunca chega: prende a tela no estado de carregamento.
+    server.use(http.get(RIDES_URL, () => new Promise(() => undefined)));
+
+    renderComponent();
+
+    const esqueleto = await screen.findByRole('status');
+
+    expect(within(esqueleto).getAllByRole('article')).toHaveLength(PAGE_SIZE);
   });
 
   it('should render the title and the way back to the menu', () => {

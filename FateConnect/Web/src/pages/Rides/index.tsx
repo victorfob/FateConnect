@@ -9,6 +9,7 @@ import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import { RoutePathEnum } from '@app/routes/paths';
 import { deleteRide, listRides } from '@app/services/rides/ridesService';
 import type { Ride } from '@app/services/rides/types';
+import { PAGE_SIZE } from '@app/utils/searchParams';
 
 import { RideCard } from './components/RideCard';
 import { RideFilter } from './components/RideFilter';
@@ -98,6 +99,7 @@ export function Rides() {
     >
       <CardsList
         isLoading={isLoading}
+        skeletonCount={PAGE_SIZE}
         isEmpty={rides.length === NO_ITEMS}
         emptyMessage={C.EMPTY_LIST_MESSAGE}
         pagination={<Pagination count={totalPages} page={currentPage} onChange={changePage} />}

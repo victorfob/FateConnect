@@ -42,6 +42,21 @@ O import saía de graça em 48 arquivos e ninguém percebia porque o teste passa
 - Não testar detalhe de implementação: nada de asserção sobre estado interno, nome de classe CSS ou ordem de chamada de hook.
 - Não duplicar no teste a lógica que ele verifica — valor esperado é literal, não recalculado.
 
+## A asserção que compara o valor com a própria fonte dele
+
+⛔ **Afirmar que a saída é igual à constante de onde ela veio não testa nada.** Os dois lados do `expect` lêem o mesmo lugar, então o caso passa para qualquer valor — inclusive um que o consumidor recusa.
+
+Aconteceu em 12/09/2026. O `<link rel="canonical">` saía relativo, e o teste dizia `expect(...getAttribute('href')).toBe(RoutePathEnum.LANDING)` — exatamente a constante que o componente escrevia. Verde, e cego: o Lighthouse reprova canonical relativa com nota zero, e nada na suíte sabia disso. Quem viu foi o Victor, auditando o site publicado.
+
+**A saída é afirmar o que o consumidor exige, não o que você escreveu.** Ali a propriedade era resolver sem base:
+
+```ts
+expect(() => new URL(href)).not.toThrow();
+expect(href.startsWith('/')).toBe(false);
+```
+
+⚠️ **O tell é o valor esperado ser um símbolo que a implementação também importa.** Literal no teste já ajuda — é o que a linha "valor esperado é literal, não recalculado" acima pede —, mas nem o literal responde quando a pergunta é sobre o **formato** que alguém de fora vai ler. Aí a asserção descreve a propriedade, não o valor.
+
 ## Suíte verde não prova que ela pega o defeito
 
 ⛔ **Quebre o código de propósito e confira que o teste cai.** É a única forma de saber se ele testa o que o nome dele diz — e o caso clássico aqui não é o teste frouxo, é o teste que **alimenta o formato errado**.
@@ -98,6 +113,20 @@ function stubDesktopViewport() {
 ⚠️ **`vi.unstubAllGlobals()` no `afterEach`, sempre em par.** Global forjado que sobrevive ao caso contamina o seguinte, que passa a medir desktop sem ter pedido.
 
 ⛔ **O risco é o silêncio, não o erro.** Sem o stub, o caso do ramo largo **não falha**: ele passa medindo o ramo estreito, com o nome dizendo outra coisa — é a asserção que concorda com o ambiente errado. O par é o que separa os dois, e o exemplo na base é [`design-system/components/Pagination/Pagination.test.tsx`](FateConnect/Web/design-system/components/Pagination/Pagination.test.tsx), onde um caso mede o estreito sem stub e o outro o largo com ele.
+
+## O jsdom não carrega o `index.html`, então o `<head>` do teste está vazio
+
+⛔ **A suíte monta o documento do zero: o que está escrito no `index.html` não existe ali.** Tudo o que a página real já traz no `<head>` — título, metadado, ícone — some do teste, e uma asserção sobre o `<head>` mede um documento em que só o seu componente escreveu.
+
+⛔ Aconteceu em 12/09/2026, na #386. Cada rota passou a declarar o seu `<title>` e a sua `meta description`, e o `index.html` mantinha um par padrão. O teste lia a **primeira** `meta[name=description]` do `<head>` e passava. No navegador havia **duas**, e o React as ordena diferente: ele insere `<title>` no começo do `<head>` e `<meta>` no fim — então a estática ficava **à frente** da que a rota declarava, e `/cadastro` servia o resumo da landing. A suíte inteira verde.
+
+**Quando a asserção depende do que o `index.html` traz, o teste tem de ler o arquivo:**
+
+```ts
+readFileSync(resolve(import.meta.dirname, '<caminho até>/index.html'), 'utf8');
+```
+
+⚠️ **O sintoma é a asserção que pega "o primeiro" de algo** — `querySelector` sem índice, `[0]`, `find`. No teste existe um só e a escolha não aparece; no navegador existem dois e ela decide o resultado. Conte antes de ler: `querySelectorAll(...).length` diz se havia escolha a fazer.
 
 ## O nome no `getByRole` sai da constante, nunca do texto
 

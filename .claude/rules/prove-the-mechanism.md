@@ -31,6 +31,14 @@ O que respondeu foi ler a **cascata**, não o pixel: percorrer `document.styleSh
 
 ⚠️ **Relatar isso como "medi o preenchimento automático" seria falso.** O que se mediu foi qual regra vence; que a regra vencedora pinta o que promete continua por conferir. Diga a frase que descreve o instrumento, não a que descreve o que você queria saber.
 
+⛔ **Controle positivo em outro alvo não limpa o alvo que interessa.** Ele responde se o **instrumento** funciona; não responde se o caminho até **este** alvo é limpo. E ele engana justamente por parecer rigor — você rodou um controle, então se sente coberto.
+
+Aconteceu em 12/09/2026, conferindo se o `http2 on;` recém-instalado tinha pegado. Daqui a resposta foi `HTTP/1.1` em todos os caminhos, e eu ia relatar que a diretiva não funcionava. O controle que rodei — três sites conhecidos negociando `h2` desta mesma máquina — provava só que **aqueles** hosts não eram rebaixados. Medida de dentro do próprio servidor, a mesma rota respondeu `ALPN: server accepted h2`.
+
+**O controle que vale é da própria conexão que você está medindo**, e ali ele vinha de graça no mesmo comando: o emissor do certificado. Diferente do esperado ⇒ há intermediário terminando a conexão, e tudo que ela diz sobre **transporte** — versão de protocolo, cifra, tamanho comprimido — é do intermediário. Status e corpo atravessam intactos, e foi por isso que os 404 e os `Content-Type` da mesma medição estavam todos certos.
+
+⚠️ **O tell é o número contrariar uma configuração que você acabou de provar noutra bancada.** A diretiva estava provada num nginx da mesma versão em contêiner; quando o ambiente real discordou, a hipótese barata era o instrumento, não a configuração.
+
 ## O instrumento que alcança metade
 
 ⛔ **Sonda, regra e correção nascem cobrindo uma forma, e a resposta está na outra.** Não basta que o instrumento funcione: ele precisa alcançar **onde o problema mora**. Três vezes na #242, cada uma de um jeito:
@@ -171,6 +179,28 @@ Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase`
 ⛔ **Tabela de substituição confere também que cada regra dela disparou.** Regra que nunca casa não faz nada e não reclama: o arquivo sai plausível, com um trecho intacto no meio do que você acha que traduziu.
 
 Na mesma tradução de 09/09/2026, a reescrita de uma frase inteira da #193 nunca casou — as trocas de token que rodaram antes já tinham mudado `Operador` para `Operator` **dentro dela**, então o texto que eu procurava já não existia. Quem parou foi o `assert` de que toda entrada casou ao menos uma vez. **Reescrita de frase vai antes das trocas de token**, e entre as trocas a ordem é do mais longo para o mais curto: sem isso `AgenteUsuario` vira `AgenteUser`.
+
+## O número que eu prometo se deriva rodando, não contando
+
+⛔ **Valor esperado que vai junto de um comando para outra pessoa rodar se obtém executando aquele comando exato.** Contar de cabeça o que ele *deveria* achar transforma a conferência em ruído: quem roda recebe um número diferente e não sabe se o defeito é do ambiente ou do seu palpite.
+
+Aconteceu em 13/09/2026, entregando `grep -cE 'http2 on;|gzip_static on;|immutable'` com "tem que responder 3" — as três diretivas que eu tinha na cabeça. Respondeu **4**: o **comentário** acima de `http2 on;` cita a própria diretiva que documenta. O Victor teve que perguntar se estava errado.
+
+⚠️ **O tell é montar o comando a partir de uma busca anterior com padrão diferente.** O padrão mudou, o número não foi refeito. Comando novo ⇒ rodar antes de prometer a saída — e, quando a contagem for sustentar conclusão, listar **quais** linhas casaram (`grep -n`), porque a listagem denuncia o casamento que você não previu.
+
+## O comando de conferência tem referência própria, e pode não ser a sua
+
+⛔ **Provar contenção contra uma referência não autoriza um comando que mede contra outra.** Os dois números estão certos e respondem perguntas diferentes — e o segundo parece contradizer o primeiro.
+
+Na mesma rodada: provei `git rev-list --count origin/main..release/0.10.0` = **0** e mandei `git branch -d`. Ele recusou com *"not fully merged"*, porque **o `-d` mede contra a branch em que você está** — a `develop`, que ainda não tinha recebido o back-merge. Nada estava perdido; a recusa era sobre outra coisa.
+
+**O teste que responde a pergunta certa é explícito na referência:**
+
+```bash
+git merge-base --is-ancestor <branch> origin/main   # exit 0 = está toda lá
+```
+
+⚠️ Provado assim, o `-D` é seguro — e a prova vai dita junto, senão forçar parece atalho.
 
 ## O alcance de uma mudança de token se mede no consumidor renderizado
 

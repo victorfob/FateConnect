@@ -10,6 +10,12 @@ server {
     listen [::]:80;
     server_name __DOMAIN__;
 
+    # O certbot acrescenta o 443 e o TLS a ESTE bloco, em vez de criar outro, e
+    # a renovação não o reescreve — por isso a diretiva mora aqui e sobrevive.
+    # ⛔ É `http2 on;`, e não `listen ... http2`, que está descontinuado desde a
+    # 1.25.1; o host roda a 1.26.
+    http2 on;
+
     root /var/www/fateconnect/__ENVIRONMENT__;
     index index.html;
 
@@ -25,7 +31,10 @@ server {
     gzip_min_length 1024;
     gzip_vary on;
 
-    location /api/ {
+    # ⛔ `^~` para vencer a regex de extensão mais abaixo: no nginx, regex ganha
+    # de prefixo simples, e sem isto uma chamada com ponto no caminho deixaria
+    # de ser encaminhada à API.
+    location ^~ /api/ {
         # A foto de um item pode ter 5 MB, o limite que o ValidImageAttribute
         # cobra, e o padrão do nginx é 1 MB: sem esta linha o 413 sai daqui e a
         # API nunca chega a explicar o tamanho a quem enviou. A folga é do
@@ -43,6 +52,27 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # O que o robô lê é por ambiente, e mora FORA da raiz do front: o
+    # `rsync --delete` da publicação apaga o que estiver lá dentro. Em
+    # homologação o sitemap não existe, e a ausência do arquivo é o que devolve
+    # 404 — não há condicional no template.
+    location = /robots.txt {
+        alias /etc/nginx/fateconnect-__ENVIRONMENT__/robots.txt;
+    }
+
+    location = /sitemap.xml {
+        alias /etc/nginx/fateconnect-__ENVIRONMENT__/sitemap.xml;
+    }
+
+    # Caminho com extensão que não corresponde a arquivo responde 404, em vez do
+    # index. Sem isto TODA URL responde 200 com a página, inclusive as que um
+    # robô procura por convenção — e a lista delas cresce sozinha: robots.txt,
+    # sitemap.xml e llms.txt já apareceram. ⛔ Nenhuma rota do produto tem ponto,
+    # e é isso que torna a regra segura; conferir antes de criar rota com ponto.
+    location ~ \.[A-Za-z0-9]+$ {
+        try_files $uri =404;
+    }
+
     # O React Router resolve as rotas no navegador: qualquer caminho que não
     # seja arquivo precisa devolver o index, senão recarregar a página dá 404.
     location / {
@@ -52,7 +82,9 @@ server {
     # Cada arquivo aqui leva o hash do conteúdo no nome, então publicar gera
     # outro nome e guardar para sempre nunca serve versão velha. ⛔ Não estenda
     # à raiz: lá os PDFs legais são substituídos mantendo o mesmo nome.
-    location /assets/ {
+    # ⛔ `^~` pelo mesmo motivo do /api/: sem ele todo .js cairia na regex de
+    # extensão e perderia este cabeçalho, sem nada acusar.
+    location ^~ /assets/ {
         add_header Cache-Control "public, max-age=31536000, immutable";
     }
 

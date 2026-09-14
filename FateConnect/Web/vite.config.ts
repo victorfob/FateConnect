@@ -108,7 +108,11 @@ export default defineConfig({
             { name: 'mui-icons', test: /node_modules\/@mui\/icons-material\// },
             { name: 'mui', test: /node_modules\/@mui\// },
             { name: 'emotion', test: /node_modules\/@emotion\// },
-            { name: 'sentry', test: /node_modules\/@sentry(-internal)?\// },
+            // ⛔ O `sentry` vem ANTES e exclui o replay: sem isso o núcleo do SDK
+            // cai no pedaço do replay, o pedaço passa a ser alcançado
+            // estaticamente e o `import()` não tira um byte da carga inicial.
+            { name: 'sentry', test: /node_modules\/@sentry(-internal)?\/(?!replay)/ },
+            { name: 'sentry-replay', test: /node_modules\/@sentry\/replay(-canvas)?\// },
             { name: 'vendor', test: /node_modules\// },
           ],
         },
