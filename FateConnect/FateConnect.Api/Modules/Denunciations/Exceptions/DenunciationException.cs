@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.Denunciations.Exceptions;
 
 using System;
+using FateConnect.Api.Modules.Denunciations.Enums;
 
 public abstract class DenunciationDomainException(string message) : Exception(message);
 
@@ -12,3 +13,11 @@ public class InvalidDenunciationCategoryException()
 
 public class InvalidDenunciationStatusException()
     : DenunciationDomainException("O status informado para a denúncia é inválido.");
+
+public class InvalidDenunciationStatusTransitionException(EnumDenunciationStatus currentStatus, EnumDenunciationStatus newStatus)
+    : DenunciationDomainException(
+        currentStatus == newStatus
+            ? $"A denúncia já se encontra no status '{currentStatus}'."
+            : $"Transição inválida: não é possível alterar o status de '{currentStatus}' para '{newStatus}'.")
+{
+}

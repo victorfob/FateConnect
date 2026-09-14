@@ -44,6 +44,7 @@ public class Denunciation
     public void UpdateStatus(EnumDenunciationStatus newStatus)
     {
         ValidateStatus(newStatus);
+        ValidateTransition(Status, newStatus);
 
         Status = newStatus;
         UpdatedAt = DateTime.UtcNow;
@@ -52,6 +53,21 @@ public class Denunciation
     public void AttachImage(string imageUrl) => ImageUrl = imageUrl.Trim();
 
     public bool IsReportedBy(int userId) => UserId == userId;
+
+    private static void ValidateTransition(EnumDenunciationStatus currentStatus, EnumDenunciationStatus newStatus)
+    {
+        bool isValidTransition = (currentStatus, newStatus) switch
+        {
+            (EnumDenunciationStatus.Open, EnumDenunciationStatus.InReview) => true,
+            (EnumDenunciationStatus.InReview, EnumDenunciationStatus.Resolved) => true,
+            (EnumDenunciationStatus.InReview, EnumDenunciationStatus.Dismissed) => true,
+
+            _ => false
+        };
+
+        if (!isValidTransition)
+            throw new InvalidDenunciationStatusTransitionException(currentStatus, newStatus);
+    }
 
     private static void ValidateDescription(string? description)
     {
