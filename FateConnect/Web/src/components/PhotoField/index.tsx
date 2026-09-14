@@ -1,33 +1,48 @@
 import { useCallback, useEffect, useMemo, useRef, type ChangeEvent } from 'react';
 import { HiddenField, Typography } from '@design-system';
 import { DeleteIcon, ImageIcon } from '@design-system/icons';
-import { useFormContext, useWatch } from 'react-hook-form';
-
-import * as C from '@app/pages/LostAndFound/components/LostItemFormDialog/constants';
-import type {
-  LostItemFormInput,
-  LostItemFormValues,
-} from '@app/pages/LostAndFound/components/LostItemFormDialog/schema';
-import { useStoredImage } from '@app/pages/LostAndFound/hooks/useStoredImage';
 
 import * as S from './styles';
 
-export type LostItemPhotoFieldProps = Readonly<{ storedImageUrl: string | null }>;
+export type PhotoFieldLabels = Readonly<{
+  field: string;
+  hint: string;
+  pick: string;
+  replace: string;
+  remove: string;
+  previewAlt: string;
+}>;
 
-export function LostItemPhotoField({ storedImageUrl }: LostItemPhotoFieldProps) {
-  const {
-    control,
-    setValue,
-    formState: { errors, disabled },
-  } = useFormContext<LostItemFormInput, unknown, LostItemFormValues>();
-  const photo = useWatch({ control, name: 'photo' });
+export type PhotoFieldPreview = Readonly<{ src: string; alt: string }>;
+
+export type PhotoFieldProps = Readonly<{
+  labels: PhotoFieldLabels;
+  /** Filtra o seletor do sistema; quem valida o formato é o schema de quem usa. */
+  accept: string;
+  value: File | null;
+  onChange: (photo: File | null) => void;
+  /** O que o registro já guarda; a escolha de agora o cobre. */
+  storedPreview?: PhotoFieldPreview | null;
+  error?: string;
+  disabled?: boolean;
+}>;
+
+export function PhotoField({
+  labels,
+  accept,
+  value,
+  onChange,
+  storedPreview = null,
+  error,
+  disabled = false,
+}: PhotoFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const chosenPhotoUrl = useMemo(() => {
-    if (!photo) return null;
+    if (!value) return null;
 
-    return URL.createObjectURL(photo);
-  }, [photo]);
+    return URL.createObjectURL(value);
+  }, [value]);
 
   useEffect(() => {
     if (!chosenPhotoUrl) return;
@@ -35,44 +50,36 @@ export function LostItemPhotoField({ storedImageUrl }: LostItemPhotoFieldProps) 
     return () => URL.revokeObjectURL(chosenPhotoUrl);
   }, [chosenPhotoUrl]);
 
-  const storedPhotoUrl = useStoredImage(storedImageUrl);
-
   // A escolha de agora cobre a foto guardada; desfeita, a guardada volta a aparecer.
   const preview = useMemo(() => {
-    if (chosenPhotoUrl) return { src: chosenPhotoUrl, alt: C.PHOTO_ACTIONS.previewAlt };
-    if (storedPhotoUrl) return { src: storedPhotoUrl, alt: C.PHOTO_ACTIONS.storedAlt };
+    if (chosenPhotoUrl) return { src: chosenPhotoUrl, alt: labels.previewAlt };
 
-    return null;
-  }, [chosenPhotoUrl, storedPhotoUrl]);
+    return storedPreview;
+  }, [chosenPhotoUrl, labels.previewAlt, storedPreview]);
 
   const handlePick = useCallback(() => fileInputRef.current?.click(), []);
 
   const handleFileChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const [chosen] = event.target.files ?? [];
-      setValue('photo', chosen ?? null, { shouldValidate: true });
+      onChange(chosen ?? null);
       // Zerar o campo deixa o mesmo arquivo, escolhido de novo, disparar a troca.
       event.target.value = '';
     },
-    [setValue],
+    [onChange],
   );
 
-  const handleRemove = useCallback(
-    () => setValue('photo', null, { shouldValidate: true }),
-    [setValue],
-  );
+  const handleRemove = useCallback(() => onChange(null), [onChange]);
 
   const pickLabel = useMemo(() => {
-    if (preview) return C.PHOTO_ACTIONS.replace;
+    if (preview) return labels.replace;
 
-    return C.PHOTO_ACTIONS.pick;
-  }, [preview]);
-
-  const errorMessage = errors.photo?.message;
+    return labels.pick;
+  }, [preview, labels.pick, labels.replace]);
 
   return (
     <S.PhotoField>
-      <Typography variant="caption">{C.LOST_ITEM_FORM_LABELS.photo}</Typography>
+      <Typography variant="caption">{labels.field}</Typography>
 
       <S.PhotoRow>
         {preview && <S.PhotoPreview component="img" src={preview.src} alt={preview.alt} />}
@@ -85,29 +92,29 @@ export function LostItemPhotoField({ storedImageUrl }: LostItemPhotoFieldProps) 
             </Typography>
           </S.PhotoActionButton>
 
-          {/* Só a escolha de agora se desfaz: a foto guardada a API não apaga, só troca. */}
-          {photo && (
+          {/* Só a escolha de agora se desfaz: o que já está guardado se troca, não se apaga. */}
+          {value && (
             <S.PhotoRemoveButton variant="outlined" onClick={handleRemove} disabled={disabled}>
               <DeleteIcon fontSize="small" />
               <Typography variant="caption" color="inherit">
-                {C.PHOTO_ACTIONS.remove}
+                {labels.remove}
               </Typography>
             </S.PhotoRemoveButton>
           )}
         </S.PhotoActions>
 
-        {errorMessage && (
+        {error && (
           <S.PhotoError>
             <Typography variant="caption" color="inherit">
-              {errorMessage}
+              {error}
             </Typography>
           </S.PhotoError>
         )}
 
-        {!errorMessage && (
+        {!error && (
           <S.PhotoHint>
             <Typography variant="caption" color="inherit">
-              {C.PHOTO_HINT}
+              {labels.hint}
             </Typography>
           </S.PhotoHint>
         )}
@@ -117,8 +124,8 @@ export function LostItemPhotoField({ storedImageUrl }: LostItemPhotoFieldProps) 
         component="input"
         ref={fileInputRef}
         type="file"
-        accept={C.PHOTO_ACCEPT_ATTRIBUTE}
-        aria-label={C.LOST_ITEM_FORM_LABELS.photo}
+        accept={accept}
+        aria-label={labels.field}
         disabled={disabled}
         onChange={handleFileChange}
       />

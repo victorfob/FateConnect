@@ -10,11 +10,13 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Adiciona o registro de denúncias, com envio de imagem e acompanhamento de situação pela moderação (#391) [Backend]
 - Adiciona controle de permissões hierárquico, permitindo que perfis superiores herdem acessos de níveis inferiores automaticamente (#391) [Backend]
+- Adiciona a tela de denúncia, que até aqui só avisava que a função viria em breve: a pessoa escolhe o motivo entre nove opções, conta o que aconteceu e pode anexar uma foto. Ela pode enviar sem que os seus dados cheguem a quem analisa, e nesse caso a tela avisa que a denúncia continua ligada à conta (#407) [Frontend]
 
 ### Changed
 
 - Separa as rotas de acesso a arquivos enviados, restringindo a visualização de imagens de denúncias estritamente a administradores (#391) [Backend]
 - Centraliza o fluxo de upload de arquivos para garantir a exclusão automática de imagens órfãs em caso de falhas de salvamento (#391) [Backend]
+- Reescreve a promessa da landing sobre denúncia, que oferecia relatar sem se identificar: a denúncia sempre fica ligada à conta de quem a fez, e o que dá para esconder é o contato dela de quem for analisar (#407) [Frontend]
 
 ### Fixed
 

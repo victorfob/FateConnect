@@ -31,7 +31,8 @@ export const SERVICE_CARDS: ServiceCard[] = [
   },
   {
     title: 'Portal de denúncias',
-    description: 'Relate assédio, bullying ou conduta imprópria sem se identificar.',
+    description:
+      'Denuncie assédio, bullying ou conduta imprópria sem mostrar seu nome para quem analisar.',
     Icon: SecurityIcon,
   },
 ];
