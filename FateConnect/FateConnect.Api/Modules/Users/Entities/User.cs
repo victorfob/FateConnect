@@ -12,7 +12,7 @@ public class User
     public EnumGender Gender { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    public EnumProfileType ProfileType { get; set; }
+    public EnumProfileType ProfileType { get; set; } = EnumProfileType.Operator;
     public int TokenVersion { get; set; }
     public ICollection<Contact> Contacts { get; set; } = [];
 }

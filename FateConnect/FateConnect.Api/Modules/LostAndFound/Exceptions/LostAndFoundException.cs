@@ -20,8 +20,5 @@ public class InvalidLostAndFoundTypeException()
 public class InvalidLostAndFoundStatusException()
     : LostAndFoundDomainException("Status do registro inválido.");
 
-public class InvalidReporterException()
-    : LostAndFoundDomainException("Não foi possível identificar quem está reportando o item. Entre novamente.");
-
 public class LostAndFoundNotReportedByUserException()
     : Exception("Este registro foi criado por outra pessoa. Só quem o reportou pode alterá-lo.");
