@@ -10,5 +10,6 @@ public record ReadDenunciationDto(
     string? ImageUrl,
     EnumDenunciationStatus Status,
     UserContactDto? User,
+    bool IsAnonymous,
     DateTime CreatedAt
 );
