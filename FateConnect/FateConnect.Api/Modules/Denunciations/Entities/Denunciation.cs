@@ -25,8 +25,7 @@ public class Denunciation
         EnumDenunciationCategory category,
         string description,
         int userId,
-        bool isAnonymous,
-        string? imageUrl = null)
+        bool isAnonymous)
     {
         ValidateCategory(category);
         ValidateDescription(description);
@@ -37,7 +36,6 @@ public class Denunciation
         Category = category;
         Description = description.Trim();
         IsAnonymous = isAnonymous;
-        ImageUrl = imageUrl?.Trim();
         Status = EnumDenunciationStatus.Open;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
