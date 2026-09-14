@@ -129,6 +129,21 @@ Duas trocas neste repo, pelo mesmo diagnóstico:
 
 ⚠️ **A confirmação segue a mesma régua.** Ação reversível pela própria tela troca o diálogo por um `Desfazer` no aviso; ação sem volta mantém o porteiro. O diálogo não é enfeite de gravidade — é a única saída quando não há outra.
 
+### A palavra pode ter dono fora do produto
+
+⛔ **Antes de batizar algo que existe fora daqui — conceito jurídico, técnico ou regulatório —, procure a definição.** Coerência interna não torna a palavra certa: ela garante que o produto se repita, não que ele acerte o nome.
+
+⛔ Aconteceu em 14/09/2026, na opção de sigilo da denúncia. Passei a rodada inteira ajustando **o quanto** o rótulo promete — `Não mostrar meu nome para quem analisar`, depois `Anônimo` com uma frase condicional corrigindo a palavra —, medindo largura e comparando com as vizinhas. A palavra certa veio de fora, do Victor:
+
+| | O que significa |
+| --- | --- |
+| **Anônima** | o vínculo entre autor e relato **não existe** — nem para quem administra o banco, nem diante de ordem judicial |
+| **Sigilosa** (ou confidencial) | a identidade é registrada, e regras de acesso a escondem de determinados perfis |
+
+O sistema faz a segunda, e o rótulo virou `Sigilosa`. ⚠️ Repare no que isso desfez: a frase de apoio tinha nascido para **consertar** uma palavra errada. Com o nome certo, ela volta a ser o que um texto de apoio deve ser — explicação do que a opção faz, não remendo.
+
+**O tell é a rodada de copy gastar-se em "promete demais ou de menos" sem nunca perguntar como aquilo se chama.** Quando o objeto tem nome em lei ou na literatura técnica, esse nome decide — e conferir custa uma busca.
+
 ### O rótulo do campo de busca nomeia tudo o que ele alcança
 
 ⛔ **Busca que casa mais de um campo diz isso no rótulo.** O rótulo é o que o leitor de tela anuncia como nome do campo, e placeholder some ao digitar — precisão que mora só no placeholder é precisão que some.

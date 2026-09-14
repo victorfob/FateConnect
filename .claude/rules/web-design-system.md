@@ -41,6 +41,16 @@ paths:
 - **E a conta se refaz quando alguém sai.** Componente do barrel que fica com um consumidor único **dentro do próprio design system** desce para dentro dele, em `components/`, e sai do barrel — foi o caso do `ListCardSkeleton` quando o `CardsList` passou a ser o único a usá-lo. Exportar o que só um vizinho consome convida a aplicação a montar à mão o que o vizinho já monta.
 - **E o caso simétrico tira o componente daqui.** Consumidor único **na aplicação** ⇒ ele sai do design system e vai para a pasta de quem o usa. O `ThemeToggleButton` ficou com um consumidor quando a preferência de tema passou a morar numa tela própria, e desceu para dentro do `GuestLayout`. ⚠️ Efeito colateral a prever: teste do design system que usava aquele componente como sonda perde o alvo, e daqui não se importa de `@app`. A sonda passa a ser outro componente do próprio design system — e **quando não sobrar nenhum, ela nasce dentro do próprio arquivo de teste**: saindo o botão de tema e o interruptor, ninguém mais lia o modo aqui dentro, e o `ThemeProvider.test.tsx` passou a declarar a sua.
 
+## Estilo que sobe de uma tela para o tema perde o que o consumidor dava por fora
+
+⛔ **Ao promover o estilo de um componente de uma tela para o tema, liste o que aquela tela fornecia por **outro** caminho — slot, ícone, filho.** O que subiu é o `styled`; o que o consumidor montava em volta não sobe junto, e o segundo consumidor nasce sem ele.
+
+⛔ Aconteceu em 14/09/2026. O interruptor do produto vivia como `styled(Switch)` na tela de preferências, e subiu para `MuiSwitch` no tema quando o formulário de denúncia pediu o mesmo desenho. Fui pelo `styled`: trilho, base e o deslocamento do polegar. **O polegar saiu cinza** — quem o pintava de branco era o `SwitchThumb`, um `Box` que preferências passa na prop de **ícone**, não no estilo. O tema precisou declarar a cor do polegar, que naquela tela nunca fora estilo nenhum.
+
+⚠️ **O tell é o consumidor antigo continuar certo enquanto o novo sai errado.** Preferências não mudou de aparência em momento nenhum — ela seguia entregando a peça pela prop. Comparar as duas telas lado a lado é o que mostra a diferença; olhar só o arquivo de estilo, não.
+
+**E o par de cor que nasce disso entra no teste de contraste.** Ali o polegar branco passou a pousar sobre dois fundos — o trilho desligado e o ligado — e nenhum dos dois é superfície, então o par é escrito à mão, como a seção de cor acima já avisa.
+
 ## Tokens — proibições
 
 - **Nunca cor literal** (hex, rgb, rgba, hsl, nome de cor) em componente. Só token de `@design-system`.

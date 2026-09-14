@@ -28,6 +28,17 @@ Só as seções com mudança de verdade aparecem. Seção vazia não fica no arq
 - **Correção entra mesmo sem efeito visível hoje.** O changelog é registro de alteração, não nota de divulgação: defeito corrigido em serviço publicado entra ainda que nenhum cliente atual chegue nele — e o marcador de lado é o que avisa quem precisa subir. Descreva o defeito **como ele era**, sem sugerir que alguém o sofreu quando ninguém sofreu.
 - **Item que não muda comportamento não entra.** Remoção de helper morto, refactor sem efeito externo, ajuste de teste, configuração de lint ou de CI: isso vive no histórico de commit, não no changelog.
 
+### Citar o rótulo só quando o rename é a mudança
+
+⛔ **A entrada cita o texto da tela entre crases quando a troca de palavra **é** o que mudou** — foi o caso de `Excluir` virando `Arquivar`, em que a frase não se escreve sem as duas palavras. Fora disso, descreva o **efeito** e deixe o rótulo fora.
+
+Dois motivos, e o segundo é o que morde:
+
+- **A copy ainda se move.** O rótulo citado é o estado de um dia; o review mexe nele, e a entrada passa a citar texto que a tela não tem. Em 14/09/2026 a entrada da tela de denúncia citou um rótulo que mudou **duas vezes** durante o review.
+- ⛔ **Fora da tela, o rótulo perde quem o qualifica.** Ali a palavra era `Anônimo`, e o que a corrige é uma frase que só aparece ao ligar a opção. Sozinha numa nota de release, ela promete anonimato que o sistema não entrega — a entrada passou a dizer o efeito: *"pode enviar sem que os seus dados cheguem a quem analisa"*.
+
+⚠️ **O teste:** apague o rótulo da frase. Se a entrada continua dizendo o que mudou, ele não precisava estar lá.
+
 ### Faça
 
 ```markdown
