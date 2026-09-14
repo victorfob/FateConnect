@@ -28,7 +28,7 @@ public class UploadsController(IWebHostEnvironment environment) : ControllerBase
     {
         bool isValidContainer = Enum.TryParse(container, ignoreCase: true, out EnumStorageContainer storageContainer) && Enum.IsDefined(storageContainer);
 
-        if (isValidContainer)
+        if (!isValidContainer)
             return NotFound();
 
         if (storageContainer == EnumStorageContainer.Denunciation)
