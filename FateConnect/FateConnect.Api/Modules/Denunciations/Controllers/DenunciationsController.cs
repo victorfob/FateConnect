@@ -26,10 +26,10 @@ public class DenunciationsController(IDenunciationService service) : ControllerB
     }
 
     [HttpGet]
-    [AuthorizeProfile(EnumProfileType.Administrator)]
+    [AuthorizeProfile(EnumProfileType.Operator)]
     public async Task<ActionResult<PagedResultDto<ReadDenunciationDto>>> GetAllAsync([FromQuery] DenunciationFilterDto filter)
     {
-        var result = await service.GetAllAsync(filter);
+        var result = await service.GetAllAsync(filter, User.GetUserId(), User.IsAdministrator());
 
         return Ok(result);
     }

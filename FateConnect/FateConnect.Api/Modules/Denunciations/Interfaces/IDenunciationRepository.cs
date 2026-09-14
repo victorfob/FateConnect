@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 public interface IDenunciationRepository
 {
-    Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(DenunciationFilterDto filter);
+    Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(DenunciationFilterDto filter, int? reporterId = null);
     Task<Denunciation?> GetByIdAsync(Guid id, bool forChange = true);
     Task<Denunciation> AddAsync(Denunciation denunciation);
     Task SaveChangesAsync();

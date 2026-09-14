@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Security.Claims;
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.Exceptions;
+using FateConnect.Api.Modules.Users.Enums;
 
 public static class ClaimsPrincipalExtensions
 {
@@ -18,6 +19,9 @@ public static class ClaimsPrincipalExtensions
 
         return userId;
     }
+
+    public static bool IsAdministrator(this ClaimsPrincipal user) =>
+        user.IsInRole(nameof(EnumProfileType.Administrator));
 
     public static int GetTokenVersion(this ClaimsPrincipal user)
     {

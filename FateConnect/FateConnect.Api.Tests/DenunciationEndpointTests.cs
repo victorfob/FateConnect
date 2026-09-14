@@ -67,9 +67,9 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         return payload;
     }
 
-    private static MultipartFormDataContent FormWithImage()
+    private static MultipartFormDataContent FormWithImage(string description = ValidDescription)
     {
-        MultipartFormDataContent form = NewDenunciationForm();
+        MultipartFormDataContent form = NewDenunciationForm(description: description);
         form.Add(ImagePayload(0x11), "Image", "foto.png");
 
         return form;
@@ -233,13 +233,73 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task ListDenunciations_AsOperator_IsForbidden()
+    public async Task ListDenunciations_AsOperator_LeavesOutWhatOthersReported()
     {
-        HttpClient reporter = _factory.CreateClientForNewUser("Lucas Ferraz Bianchi");
+        HttpClient reporter = _factory.CreateClientForNewUser("Sabrina Toledo Marques");
+        HttpClient neighbour = _factory.CreateClientForNewUser("Thiago Barroso Estrela");
+        string subject = UniqueSubject();
 
-        HttpResponseMessage response = await reporter.GetAsync("/Denunciations");
+        await ReportedBy(reporter, NewDenunciationForm(description: $"{ValidDescription} {subject} minha"));
+        await ReportedBy(neighbour, NewDenunciationForm(description: $"{ValidDescription} {subject} alheia"));
 
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        PagedDenunciations mine = (await reporter.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}", JsonOptions))!;
+
+        Assert.Equal(1, mine.Total);
+        Assert.EndsWith("minha", Assert.Single(mine.Items).Description, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ListDenunciations_AsAdministrator_KeepsWhatOthersReported()
+    {
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Cibele Maranhão Duarte");
+        HttpClient neighbour = _factory.CreateClientForNewUser("Roberto Siqueira Vasques");
+        string subject = UniqueSubject();
+
+        await ReportedBy(moderation, NewDenunciationForm(description: $"{ValidDescription} {subject} minha"));
+        await ReportedBy(neighbour, NewDenunciationForm(description: $"{ValidDescription} {subject} alheia"));
+
+        PagedDenunciations everyone = (await moderation.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}", JsonOptions))!;
+
+        Assert.Equal(2, everyone.Total);
+    }
+
+    [Fact]
+    public async Task ListDenunciations_AsOperator_KeepsTheConfidentialOnesTheyReported()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Priscila Andrade Caiado");
+        string subject = UniqueSubject();
+
+        await ReportedBy(
+            reporter,
+            NewDenunciationForm(description: $"{ValidDescription} {subject}", isAnonymous: true));
+
+        PagedDenunciations mine = (await reporter.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}", JsonOptions))!;
+
+        ReadDenunciation listed = Assert.Single(mine.Items);
+        Assert.True(listed.IsAnonymous);
+        Assert.Null(listed.User);
+    }
+
+    [Fact]
+    public async Task ListDenunciations_OfAReportWithAnImage_HidesTheStoredAddressFromWhoReportedIt()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Alexandre Pontes Milhomem");
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Juliana Espíndola Rabelo");
+        string subject = UniqueSubject();
+
+        await ReportedBy(reporter, FormWithImage($"{ValidDescription} {subject}"));
+
+        ReadDenunciation asReporter = Assert.Single((await reporter.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}", JsonOptions))!.Items);
+        ReadDenunciation asModeration = Assert.Single((await moderation.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}", JsonOptions))!.Items);
+
+        Assert.True(asReporter.HasImage);
+        Assert.Null(asReporter.ImageUrl);
+        Assert.NotNull(asModeration.ImageUrl);
     }
 
     [Fact]
