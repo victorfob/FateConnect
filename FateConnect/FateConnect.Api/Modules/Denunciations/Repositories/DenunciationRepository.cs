@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Denunciations.Infrastructure;
+namespace FateConnect.Api.Modules.Denunciations.Repositories;
 
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Common.Utils;
