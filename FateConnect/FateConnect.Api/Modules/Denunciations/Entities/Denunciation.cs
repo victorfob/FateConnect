@@ -59,6 +59,7 @@ public class Denunciation
         bool isValidTransition = (currentStatus, newStatus) switch
         {
             (EnumDenunciationStatus.Open, EnumDenunciationStatus.InReview) => true,
+            (EnumDenunciationStatus.Open, EnumDenunciationStatus.Dismissed) => true,
             (EnumDenunciationStatus.InReview, EnumDenunciationStatus.Resolved) => true,
             (EnumDenunciationStatus.InReview, EnumDenunciationStatus.Dismissed) => true,
 
