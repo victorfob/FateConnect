@@ -102,6 +102,7 @@ public partial class DenunciationService(
             Category: record.Category,
             Description: record.Description,
             ImageUrl: record.ImageUrl,
+            HasImage: record.ImageUrl is not null,
             Status: record.Status,
             User: record.IsAnonymous ? null : record.User?.ToContactDto(),
             IsAnonymous: record.IsAnonymous,

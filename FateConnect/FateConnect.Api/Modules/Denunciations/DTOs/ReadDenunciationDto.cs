@@ -8,6 +8,7 @@ public record ReadDenunciationDto(
     EnumDenunciationCategory Category,
     string Description,
     string? ImageUrl,
+    bool HasImage,
     EnumDenunciationStatus Status,
     UserContactDto? User,
     bool IsAnonymous,
