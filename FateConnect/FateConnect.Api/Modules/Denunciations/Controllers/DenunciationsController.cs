@@ -22,7 +22,7 @@ public class DenunciationsController(IDenunciationService service) : ControllerB
     {
         var result = await service.CreateAsync(dto, User.GetUserId());
 
-        return CreatedAtRoute("GetDenunciationById", new { id = result.Id }, result);
+        return StatusCode(StatusCodes.Status201Created, result);
     }
 
     [HttpGet]
