@@ -116,6 +116,47 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         Assert.Equal(HttpStatusCode.Forbidden, (await reporter.GetAsync($"/{reviewed.ImageUrl}")).StatusCode);
     }
 
+    [Fact]
+    public async Task GetDenunciation_OfAnAnonymousReport_HidesTheReporterFromModeration()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Vera Lúcia Andrade");
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Sérgio Tavares Mendes");
+        ReadDenunciation created = await ReportedBy(reporter, NewDenunciationForm(isAnonymous: true));
+
+        ReadDenunciation reviewed = (await moderation
+            .GetFromJsonAsync<ReadDenunciation>($"/Denunciations/{created.Id}", JsonOptions))!;
+
+        Assert.True(reviewed.IsAnonymous);
+        Assert.Null(reviewed.User);
+    }
+
+    [Fact]
+    public async Task GetDenunciation_OfAnIdentifiedReport_ShowsTheReporterToModeration()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Aline Bezerra Dutra");
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Rogério Pinheiro Sales");
+        ReadDenunciation created = await ReportedBy(reporter, NewDenunciationForm());
+
+        ReadDenunciation reviewed = (await moderation
+            .GetFromJsonAsync<ReadDenunciation>($"/Denunciations/{created.Id}", JsonOptions))!;
+
+        Assert.False(reviewed.IsAnonymous);
+        Assert.Equal("Aline Bezerra Dutra", reviewed.User?.Name);
+    }
+
+    [Theory]
+    [InlineData("1", HttpStatusCode.NotFound)]
+    [InlineData("2", HttpStatusCode.Forbidden)]
+    public async Task StoredImage_AskedByItsNumericContainer_RefusesOnlyTheDenunciationOne(
+        string container, HttpStatusCode expected)
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Diego Albuquerque Rios");
+
+        HttpResponseMessage response = await reporter.GetAsync($"/uploads/{container}/{AbsentDenunciationId}.png");
+
+        Assert.Equal(expected, response.StatusCode);
+    }
+
     [Theory]
     [InlineData("Curta")]
     [InlineData("         x")]
