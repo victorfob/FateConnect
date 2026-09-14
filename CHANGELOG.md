@@ -6,15 +6,17 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-## [0.10.0] - 2026-09-13
-
 ### Added
+
 - Adiciona o registro de denúncias, com envio de imagem e acompanhamento de situação pela moderação (#391) [Backend]
 - Adiciona controle de permissões hierárquico, permitindo que perfis superiores herdem acessos de níveis inferiores automaticamente (#391) [Backend]
 
 ### Changed
+
 - Separa as rotas de acesso a arquivos enviados, restringindo a visualização de imagens de denúncias estritamente a administradores (#391) [Backend]
 - Centraliza o fluxo de upload de arquivos para garantir a exclusão automática de imagens órfãs em caso de falhas de salvamento (#391) [Backend]
+
+## [0.10.0] - 2026-09-13
 
 ### Added
 
