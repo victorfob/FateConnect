@@ -76,8 +76,11 @@ public class DenunciationRepository(FateConnectDbContext context) : IDenunciatio
         context.Denunciations.Add(denunciation);
         await context.SaveChangesAsync();
 
-        await context.Entry(denunciation).Reference(d => d.User).LoadAsync();
-        await context.Entry(denunciation.User).Collection(user => user.Contacts).LoadAsync();
+        if (!denunciation.IsAnonymous)
+        {
+            await context.Entry(denunciation).Reference(d => d.User).LoadAsync();
+            await context.Entry(denunciation.User).Collection(user => user.Contacts).LoadAsync();
+        }
 
         return denunciation;
     }
