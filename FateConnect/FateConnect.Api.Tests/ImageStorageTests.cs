@@ -5,6 +5,11 @@ using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Common.Validators;
+using FateConnect.Api.Modules.Denunciations.DTOs;
+using FateConnect.Api.Modules.Denunciations.Entities;
+using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.Denunciations.Interfaces;
+using FateConnect.Api.Modules.Denunciations.Services;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
@@ -60,6 +65,20 @@ public sealed class ImageStorageTests : IDisposable
 
         public Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord) =>
             throw new DbUpdateException("o banco recusou o registro");
+
+        public Task SaveChangesAsync() => throw new NotSupportedException();
+    }
+
+    private sealed class RefusingDenunciationRepository : IDenunciationRepository
+    {
+        public Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(DenunciationFilterDto filter) =>
+            throw new NotSupportedException();
+
+        public Task<Denunciation?> GetByIdAsync(Guid id, bool forChange = true) =>
+            throw new NotSupportedException();
+
+        public Task<Denunciation> AddAsync(Denunciation denunciation) =>
+            throw new DbUpdateException("o banco recusou a denúncia");
 
         public Task SaveChangesAsync() => throw new NotSupportedException();
     }
@@ -231,5 +250,25 @@ public sealed class ImageStorageTests : IDisposable
         await Assert.ThrowsAsync<DbUpdateException>(() => service.CreateAsync(dto, 1));
 
         Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "lostandfound")));
+    }
+
+    [Fact]
+    public async Task CreateDenunciation_WhenTheDatabaseRefusesIt_LeavesNoFileBehind()
+    {
+        StorageService storage = ServiceOn(_webRoot);
+        DenunciationService service = new(
+            new RefusingDenunciationRepository(), storage, NullLogger<DenunciationService>.Instance);
+
+        CreateDenunciationDto dto = new()
+        {
+            Category = EnumDenunciationCategory.ImproperCharging,
+            Description = "O motorista cobrou valor acima do combinado na carona de ontem.",
+            IsAnonymous = false,
+            Image = FileOf("image/png"),
+        };
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => service.CreateAsync(dto, 1));
+
+        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "denunciation")));
     }
 }

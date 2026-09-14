@@ -9,6 +9,7 @@ using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +60,10 @@ public class ApiFactory : WebApplicationFactory<Program>
             Directory.Delete(_webRoot, recursive: true);
     }
 
-    public static string IssueToken(int userId = 1, int tokenVersion = 0)
+    public static string IssueToken(
+        int userId = 1,
+        int tokenVersion = 0,
+        EnumProfileType profileType = EnumProfileType.Operator)
     {
         JwtOptions options = new()
         {
@@ -73,7 +77,8 @@ public class ApiFactory : WebApplicationFactory<Program>
             {
                 Id = userId,
                 FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
-                TokenVersion = tokenVersion
+                TokenVersion = tokenVersion,
+                ProfileType = profileType
             });
     }
 
@@ -108,7 +113,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public static string UniqueContactEmail() => $"contato{Guid.NewGuid():N}@gmail.com";
 
-    public SeededUser SeedUser(string fullName)
+    public SeededUser SeedUser(string fullName, EnumProfileType profileType = EnumProfileType.Operator)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
@@ -124,6 +129,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
+            ProfileType = profileType,
             Contacts = [new Contact { Phone = phone, ContactEmail = contactEmail }],
         };
 
@@ -175,11 +181,14 @@ public class ApiFactory : WebApplicationFactory<Program>
         return ride.Id;
     }
 
-    public HttpClient CreateClientFor(int userId, int tokenVersion = 0)
+    public HttpClient CreateClientFor(
+        int userId,
+        int tokenVersion = 0,
+        EnumProfileType profileType = EnumProfileType.Operator)
     {
         HttpClient client = CreateClient();
         client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", IssueToken(userId, tokenVersion));
+            new AuthenticationHeaderValue("Bearer", IssueToken(userId, tokenVersion, profileType));
 
         return client;
     }
@@ -187,5 +196,12 @@ public class ApiFactory : WebApplicationFactory<Program>
     public HttpClient CreateClientForNewUser(string fullName)
     {
         return CreateClientFor(SeedUser(fullName).Id);
+    }
+
+    public HttpClient CreateClientForNewAdministrator(string fullName)
+    {
+        int administratorId = SeedUser(fullName, EnumProfileType.Administrator).Id;
+
+        return CreateClientFor(administratorId, profileType: EnumProfileType.Administrator);
     }
 }

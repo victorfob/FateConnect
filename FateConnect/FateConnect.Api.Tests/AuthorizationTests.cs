@@ -26,6 +26,7 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     [MemberData(nameof(RideRoutes))]
     [MemberData(nameof(LostAndFoundRoutes))]
     [MemberData(nameof(UploadRoutes))]
+    [MemberData(nameof(DenunciationRoutes))]
     public async Task ProtectedEndpoints_WithoutToken_RespondUnauthorized(string method, string route)
     {
         var request = new HttpRequestMessage(new HttpMethod(method), route);
@@ -47,8 +48,27 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
 
     public static TheoryData<string, string> UploadRoutes() => new()
     {
-        { "GET", "/uploads/lostandfound/8a1b0f2e-0000-4000-8000-000000000000.png" }
+        { "GET", "/uploads/lostandfound/8a1b0f2e-0000-4000-8000-000000000000.png" },
+        { "GET", "/uploads/denunciation/8a1b0f2e-0000-4000-8000-000000000000.png" }
     };
+
+    public static TheoryData<string, string> DenunciationRoutes() => new()
+    {
+        { "GET", "/Denunciations" },
+        { "GET", "/Denunciations/8a1b0f2e-0000-4000-8000-000000000000" },
+        { "POST", "/Denunciations" },
+        { "PATCH", "/Denunciations/8a1b0f2e-0000-4000-8000-000000000000/status" }
+    };
+
+    [Fact]
+    public async Task DenunciationEndpoints_WithAnAdministratorToken_ReachTheController()
+    {
+        HttpClient client = _factory.CreateClientForNewAdministrator("Helena Braga Quintana");
+
+        HttpResponseMessage response = await client.GetAsync("/Denunciations");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
 
     public static TheoryData<string, string> LostAndFoundRoutes() => new()
     {

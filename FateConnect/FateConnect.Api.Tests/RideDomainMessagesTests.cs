@@ -59,13 +59,13 @@ public class RideDomainMessagesTests
     }
 
     [Fact]
-    public void ARideWithoutADriver_AnswersTheDriverMessageInPortuguese()
+    public void ARideWithoutADriver_AnswersTheUserIdentifierMessageInPortuguese()
     {
         InvalidUserIdentifierException exception = Assert.Throws<InvalidUserIdentifierException>(
             () => CreateRide(driverId: 0));
 
         Assert.Equal(
-            "Não foi possível identificar quem está ofertando a carona. Entre novamente.",
+            "Não foi possível processar a requisição. O identificador de usuário fornecido é inválido ou não existe.",
             exception.Message);
     }
 
