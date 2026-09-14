@@ -9,40 +9,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [0.10.0] - 2026-09-13
 
 ### Added
-
-- Módulo de Denúncias (Denunciations): Implementação completa do domínio seguindo princípios de Clean Architecture e DDD.
-- DenunciationsController: Novos endpoints RESTful com controle de acesso rigoroso "Secure by Default":
-    - POST /denunciations: Criação de denúncias, aceitando multipart/form-data para envio de imagens (acesso liberado para perfil Operator ou superior).
-    - GET /denunciations: Listagem paginada e filtrada (acesso exclusivo para Administrator).
-    - GET /denunciations/{id}: Consulta de detalhes da denúncia (acesso exclusivo para Administrator).
-    - PATCH /denunciations/{id}/status: Atualização pontual do status da denúncia (acesso exclusivo para Administrator).
-- DenunciationService & IDenunciationRepository: Implementação da camada de serviço com herança da BaseFileService para garantir o upload de imagens atrelado a transações, com rollback automático em caso de falha de persistência no banco.
-- Data Transfer Objects (DTOs): Criação dos contratos de dados, incluindo CreateDenunciationDto, ReadDenunciationDto, UpdateDenunciationStatusDto e DenunciationFilterDto.
-- Segurança Baseada em Perfil: Criação do atributo customizado [AuthorizeProfile] no módulo de Auth (Attributes/AuthorizeProfileAttribute.cs), permitindo controle de acesso hierárquico e tipado utilizando o EnumProfileType.
-- Infraestrutura de Banco de Dados: Configuração do mapeamento do EF Core e criação da migration referente ao novo módulo de denúncias.
+- Adiciona o registro de denúncias, com envio de imagem e acompanhamento de situação pela moderação (#391) [Backend]
+- Adiciona controle de permissões hierárquico, permitindo que perfis superiores herdem acessos de níveis inferiores automaticamente (#391) [Backend]
 
 ### Changed
-
-- Refatoração do UploadsController: Reestruturação do código para otimizar a legibilidade, clareza e fluidez dos endpoints de gerenciamento de arquivos.
-- Aplicação do Princípio DRY (Don't Repeat Yourself): Limpeza estrutural de classes para eliminação de código duplicado. Lógicas repetidas foram centralizadas em classes abstratas (como a nova BaseFileService para uploads e rollbacks) e classes de erro foram generalizadas, aumentando o reaproveitamento e facilitando a manutenção global.
-
-### Added
-
-- Módulo de Denúncias (Denunciations): Implementação completa do domínio seguindo princípios de Clean Architecture e DDD.
-- DenunciationsController: Novos endpoints RESTful com controle de acesso rigoroso "Secure by Default":
-    - POST /denunciations: Criação de denúncias, aceitando multipart/form-data para envio de imagens (acesso liberado para perfil Operator ou superior).
-    - GET /denunciations: Listagem paginada e filtrada (acesso exclusivo para Administrator).
-    - GET /denunciations/{id}: Consulta de detalhes da denúncia (acesso exclusivo para Administrator).
-    - PATCH /denunciations/{id}/status: Atualização pontual do status da denúncia (acesso exclusivo para Administrator).
-- DenunciationService & IDenunciationRepository: Implementação da camada de serviço com herança da BaseFileService para garantir o upload de imagens atrelado a transações, com rollback automático em caso de falha de persistência no banco.
-- Data Transfer Objects (DTOs): Criação dos contratos de dados, incluindo CreateDenunciationDto, ReadDenunciationDto, UpdateDenunciationStatusDto e DenunciationFilterDto.
-- Segurança Baseada em Perfil: Criação do atributo customizado [AuthorizeProfile] no módulo de Auth (Attributes/AuthorizeProfileAttribute.cs), permitindo controle de acesso hierárquico e tipado utilizando o EnumProfileType.
-- Infraestrutura de Banco de Dados: Configuração do mapeamento do EF Core e criação da migration referente ao novo módulo de denúncias.
-
-### Changed
-
-- Refatoração do UploadsController: Reestruturação do código para otimizar a legibilidade, clareza e fluidez dos endpoints de gerenciamento de arquivos.
-- Aplicação do Princípio DRY (Don't Repeat Yourself): Limpeza estrutural de classes para eliminação de código duplicado. Lógicas repetidas foram centralizadas em classes abstratas (como a nova BaseFileService para uploads e rollbacks) e classes de erro foram generalizadas, aumentando o reaproveitamento e facilitando a manutenção global.
+- Separa as rotas de acesso a arquivos enviados, restringindo a visualização de imagens de denúncias estritamente a administradores (#391) [Backend]
+- Centraliza o fluxo de upload de arquivos para garantir a exclusão automática de imagens órfãs em caso de falhas de salvamento (#391) [Backend]
 
 ### Added
 
