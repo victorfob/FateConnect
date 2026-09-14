@@ -39,12 +39,10 @@ public class UploadsController(IWebHostEnvironment environment) : ControllerBase
 
     private ActionResult ServeFile(EnumStorageContainer storageContainer, string fileName)
     {
-        bool isKnownImageFormat = ImageContentTypes.TryDescribeStoredFile(fileName, out string? storedFileName, out string? contentType);
-
-        if (!isKnownImageFormat)
+        if (!ImageContentTypes.TryDescribeStoredFile(fileName, out string? storedFileName, out string? contentType))
             return NotFound();
 
-        string physicalFilePath = Path.Combine(UploadsLocation.PhysicalRootOf(environment), storageContainer.ToString().ToLowerInvariant(), storedFileName!);
+        string physicalFilePath = Path.Combine(UploadsLocation.PhysicalRootOf(environment), storageContainer.ToString().ToLowerInvariant(), storedFileName);
 
         bool imageExistsOnDisk = System.IO.File.Exists(physicalFilePath);
 
@@ -53,6 +51,6 @@ public class UploadsController(IWebHostEnvironment environment) : ControllerBase
 
         Response.Headers.XContentTypeOptions = "nosniff";
 
-        return PhysicalFile(physicalFilePath, contentType!);
+        return PhysicalFile(physicalFilePath, contentType);
     }
 }
