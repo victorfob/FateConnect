@@ -71,7 +71,8 @@ public sealed class ImageStorageTests : IDisposable
 
     private sealed class RefusingDenunciationRepository : IDenunciationRepository
     {
-        public Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(DenunciationFilterDto filter) =>
+        public Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(
+            DenunciationFilterDto filter, int? reporterId = null) =>
             throw new NotSupportedException();
 
         public Task<Denunciation?> GetByIdAsync(Guid id, bool forChange = true) =>

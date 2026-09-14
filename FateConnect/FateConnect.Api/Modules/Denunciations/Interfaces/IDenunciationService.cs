@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 public interface IDenunciationService
 {
     Task<ReadDenunciationDto> CreateAsync(CreateDenunciationDto dto, int currentUserId);
-    Task<PagedResultDto<ReadDenunciationDto>> GetAllAsync(DenunciationFilterDto filter);
+    Task<PagedResultDto<ReadDenunciationDto>> GetAllAsync(DenunciationFilterDto filter, int currentUserId, bool isAdministrator);
     Task<ReadDenunciationDto?> GetByIdAsync(Guid id);
     Task<ReadDenunciationDto?> UpdateStatusAsync(Guid id, UpdateDenunciationStatusDto dto);
 }

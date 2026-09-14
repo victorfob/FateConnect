@@ -14,11 +14,14 @@ using System.Threading.Tasks;
 
 public class DenunciationRepository(FateConnectDbContext context) : IDenunciationRepository
 {
-    public async Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(DenunciationFilterDto filter)
+    public async Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(DenunciationFilterDto filter, int? reporterId = null)
     {
         IQueryable<Denunciation> query = context.Denunciations
             .AsNoTracking()
             .Include(d => d.User.Contacts);
+
+        if (reporterId.HasValue)
+            query = query.Where(d => d.UserId == reporterId.Value);
 
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {

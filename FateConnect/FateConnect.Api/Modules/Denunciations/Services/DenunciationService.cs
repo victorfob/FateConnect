@@ -44,15 +44,20 @@ public partial class DenunciationService(
         return MapToReporterDto(denunciation);
     }
 
-    public async Task<PagedResultDto<ReadDenunciationDto>> GetAllAsync(DenunciationFilterDto filter)
+    public async Task<PagedResultDto<ReadDenunciationDto>> GetAllAsync(
+        DenunciationFilterDto filter, int currentUserId, bool isAdministrator)
     {
-        (IReadOnlyList<Denunciation> records, int total) = await repository.GetAllAsync(filter);
+        int? reporterId = isAdministrator ? null : currentUserId;
+
+        (IReadOnlyList<Denunciation> records, int total) = await repository.GetAllAsync(filter, reporterId);
 
         LogDenunciationsRetrieved(logger, records.Count);
 
+        Func<Denunciation, ReadDenunciationDto> toDto = isAdministrator ? MapToReadDto : MapToReporterDto;
+
         return new PagedResultDto<ReadDenunciationDto>
         {
-            Items = [.. records.Select(MapToReadDto)],
+            Items = [.. records.Select(toDto)],
             Page = filter.EffectivePage,
             PageSize = filter.EffectivePageSize,
             Total = total,
