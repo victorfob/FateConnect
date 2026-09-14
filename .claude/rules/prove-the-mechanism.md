@@ -87,6 +87,18 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 
 ⛔ **E o complemento de "passou" não é "falhou".** No mesmo `gh pr checks`, tratar `bucket != "pass"` como falha reporta vermelho onde há `pending`: em 02/09/2026 anunciei um check falhando no #287 quando o front ainda estava `IN_PROGRESS`, porque a cascata da pilha havia reiniciado o CI. Estado de terceira via — `pending`, `skipping`, `neutral` — se nomeia, não se deduz por exclusão.
 
+⛔ **Job vermelho reporta o primeiro passo que caiu, e nada sobre os seguintes.** O que vem depois dele não passou: **não rodou**. Ler "está vermelho por causa de X" como "só X está errado" é tratar o não-medido como aprovado — e o passo escondido costuma ser o gate, que fica no fim.
+
+Medido em 14/09/2026, no #391. O job `.NET API` reprovava em 9 testes e eu relatei o CI como uma falha só. Corrigidos os testes, o job alcançou pela primeira vez o passo do Sonar e caiu de novo: o gate reprovava por duplicação em código novo desde sempre, e nenhuma corrida tinha chegado a medi-lo.
+
+**Quem discrimina é a lista de passos, não o resumo do check:**
+
+```bash
+gh run view <run-id> --json jobs --jq '.jobs[].steps[] | "\(.conclusion)\t\(.name)"'
+```
+
+As duas corridas, lado a lado, são o controle: antes `failure Tests` → **`skipped`** no passo do Sonar; depois `success Tests` → `failure` nele. `skipped` depois de um `failure` é passo que ninguém mediu.
+
 ⛔ **`performance.getEntriesByType('resource')` não enxerga requisição que falha na conexão.** Em 04/09/2026, provando que um formulário deixara de chamar a API, ele devolveu **zero** nos dois casos — no que não devia chamar e no que devia. O zero era do instrumento. Quem responde é o log de rede do navegador (`read_network_requests`), que registra a tentativa com o motivo da falha; e o par positivo — o caso que **deve** disparar a requisição — é o que separa "não chamou" de "não medi".
 
 ⛔ **E há a busca que só alcança o que tem nome de símbolo.** Um pedido entregue deixa rastro em **dois** lugares independentes — o código e o rastreador —, e o `grep` só responde bem quando existe um identificador a procurar.
@@ -238,6 +250,20 @@ gh api repos/<dono>/<repo>/issues/<n>/comments --jq '.[].body'
 ⚠️ **O custo não é a frase errada, é o que ela desliga.** Quem lê para de procurar: o Victor ia mergear achando que a limitação estava documentada para quem viesse depois.
 
 ⚠️ **É diferente de afirmar sobre o que não li.** Ali a fonte é de outra pessoa e eu pulei a leitura; aqui a fonte é minha, e é justamente por isso que releitura não parece necessária.
+
+### Truncar o artefato que você audita inventa o achado
+
+⛔ **Lendo um artefato para saber se algo FALTA, leia inteiro.** `| head`, `sed -n '1,80p'` e `--jq` recortado devolvem uma ausência com a mesma cara da ausência real — e aqui o truncamento não erra um número: ele **produz um achado que não existe**, e ele chega com a confiança de quem "leu a issue".
+
+⛔ Aconteceu em 14/09/2026. Levantei que os documentos legais não descreviam o módulo de denúncias e que faltava registrar isso na #162. A seção estava lá desde 12/09, **escrita por mim** na review daquele mesmo PR: o corpo tem 112 linhas, a seção começa na 99, e eu tinha lido com `head -80`. Quem viu foi o Victor — *"se eu não me engano já tem uma issue pra atualizar os termos"*.
+
+**O tell é a conclusão ser uma ausência.** Achado de presença se confere abrindo o que você achou; achado de ausência não tem o que abrir, então o instrumento é a única testemunha — e instrumento truncado testemunha a favor.
+
+```bash
+gh issue view <n> --json body -q .body > /tmp/corpo.md && wc -l < /tmp/corpo.md
+```
+
+⚠️ **É o irmão da seção acima, e custa mais.** Lá eu afirmo que um registro meu existe sem reler; aqui eu afirmo que ele não existe tendo lido só o começo — e a saída é abrir trabalho novo em cima de trabalho que já estava feito.
 
 ## O contorno pode ter mais de um motivo, e o comentário registra um
 

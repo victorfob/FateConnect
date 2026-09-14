@@ -19,6 +19,16 @@ Foi assim que os nove primeiros apareceram, ao referenciar o pacote: seis de `S6
 
 ⚠️ **`Program` não pode virar `static`** para satisfazer o `S1118`: `WebApplicationFactory<Program>` a usa como argumento genérico, e classe estática não serve. O construtor privado resolve.
 
+## Módulo novo renomeia o esqueleto que copiou — a duplicação conta identificador
+
+⛔ **Copiar a estrutura do módulo vizinho é certo; copiar os nomes genéricos dele é o que reprova o gate.** A detecção de duplicação do Sonar conta **identificador**, não só forma — então dois arquivos com o mesmo esqueleto e nomes diferentes não duplicam, e com os mesmos nomes duplicam.
+
+Medido em 14/09/2026, no #391: `DenunciationService.Logs.cs` nasceu com as quatro declarações `[LoggerMessage]` de `LostAndFoundService.Logs.cs` — `LogRecordCreated`, `LogRecordsRetrieved`, `LogRecordNotFound`, `LogRecordFound` e o parâmetro `recordId`. Deu **14 linhas em 1 bloco**, e o gate reprovou em 1,0% contra o teto de 0.
+
+⚠️ **O controle que decide a saída está no próprio repo.** `RideService.Logs.cs` tem a mesma estrutura, nomeia pelo domínio (`LogRideCreated`, `rideId`) e na `main` **nenhum arquivo aparece duplicado**. Ou seja, não era caso de `sonar.cpd.exclusions` — a exclusão é legítima só onde os blocos são espelhados por construção, como as migrations de rename (ver `dotnet-migrations.md`). Aqui a correção era nomear pelo que a coisa é, e ela melhora o nome de qualquer jeito: `LogRecordCreated` num serviço de denúncia não diz nada.
+
+⛔ **E esta reprovação só aparece depois que os testes ficam verdes**, porque o passo do Sonar roda **depois** do de testes: job vermelho nos testes esconde o gate inteiro.
+
 ## Regra `IDExxxx` é silenciosa até alguém declarar a severidade
 
 ⛔ **`EnforceCodeStyleInBuild` e `TreatWarningsAsErrors` não bastam.** As regras de estilo do Roslyn nascem **abaixo de `warning`**, e o `TreatWarningsAsErrors` só promove o que já é warning — então elas rodam e não reprovam nada.
