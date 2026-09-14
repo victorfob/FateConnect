@@ -34,6 +34,7 @@ public partial class GlobalExceptionMiddleware(
 
         switch (exception)
         {
+            case InvalidUserIdentifierException:
             case DenunciationDomainException:
             case InvalidImageException:
             case LostAndFoundDomainException:
@@ -54,7 +55,6 @@ public partial class GlobalExceptionMiddleware(
                 conflictingField = ex.Field;
                 break;
 
-            case InvalidUserIdentifierException:
             case UnidentifiedTokenException:
             case InvalidCredentialsException:
             case UnidentifiedUserException:
