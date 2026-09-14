@@ -182,6 +182,16 @@ Cobrado duas vezes no PR #186, com a mesma pergunta: *"nenhum achado novo nas no
 
 ⛔ **O resumo abre com o número de achados, e cada um aparece nomeado.** Destacar os mais graves é certo; comprimir a cauda num parágrafo corrido não é — quem lê conta o que consegue ver. Na rodada do PR #186 eu apresentei 3 em destaque e os outros 12 numa frase só, e a pergunta que veio foi *"só foram 3 mesmo?"*. Uma tabela de três colunas — estado, quantos, quais — resolve, e é a mesma contagem que o `gh api` acima confere.
 
+## Quem corrige depois de você também passa por skill
+
+⛔ **Publicados os comentários, a correção vai pela `resolve-pr-comments` — inclusive quando quem corrige somos nós.** Esta skill termina no comentário publicado; ela não cobre triagem com veredicto, resposta na thread nem o gate. Partir direto para o código pula os três.
+
+⛔ Cobrado em 14/09/2026, no #391: eu tinha postado sete comentários e comecei a corrigir, e a instrução veio como *"na hora de corrigir use essa skill"*.
+
+⚠️ **O caso que engana é revisar e corrigir o mesmo PR.** A `resolve-pr-comments` foi escrita para o feedback de outra pessoa — *"quem revisa costuma estar certo, às vezes está errado"* —, então, sendo nossos os comentários, ela parece não se aplicar. Aplica-se igual, e o passo que mais se perde é o de **responder cada thread dizendo o que foi feito**: sem ele o PR fica com N apontamentos abertos sobre código que já mudou, e quem for aprovar não sabe quais ainda valem.
+
+**O tell é a frase "agora é só corrigir".** Ela marca exatamente a fronteira entre as duas skills.
+
 ## Idioma
 
 Comentário em **pt-BR**, como issue e descrição de PR. Nome de símbolo, arquivo e comando ficam como estão no código.
