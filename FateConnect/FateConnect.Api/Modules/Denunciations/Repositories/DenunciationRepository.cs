@@ -58,8 +58,8 @@ public class DenunciationRepository(FateConnectDbContext context) : IDenunciatio
     }
     private static Expression<Func<Denunciation, bool>> CreatedWithin(DateOnly rangeStart, DateOnly rangeEnd)
     {
-        DateTime startUtc = rangeStart.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-        DateTime endUtc = rangeEnd.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc);
+        DateTime startUtc = DateTimeUtils.ToUtcFromProductTimeZone(rangeStart, TimeOnly.MinValue);
+        DateTime endUtc = DateTimeUtils.ToUtcFromProductTimeZone(rangeEnd, TimeOnly.MaxValue);
 
         return d => d.CreatedAt >= startUtc && d.CreatedAt <= endUtc;
     }
@@ -87,8 +87,6 @@ public class DenunciationRepository(FateConnectDbContext context) : IDenunciatio
 
     public async Task UpdateAsync(Denunciation denunciation)
     {
-        context.Denunciations.Update(denunciation);
-
         await context.SaveChangesAsync();
     }
 }
