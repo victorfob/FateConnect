@@ -65,6 +65,15 @@ until gh pr checks <n> --json name,bucket | jq -e 'length >= 4 and all(.bucket !
 
 ⛔ **`all`, `every` e `none` sobre coleção que ainda está sendo preenchida respondem "sim" sem medir nada.** Predicado de espera precisa dizer **quantos** itens espera, ou nomear o item que espera.
 
+⚠️ **E a cardinalidade envelhece — prefira nomear.** Em 14/09/2026 o mesmo laço, com `length >= 4`, saiu com quatro checks registrados e **sem** o da API, que é o único que mede um PR de backend: o número estava certo para o PR de front de onde ele veio, e o conjunto de checks depende do que o PR toca.
+
+```bash
+until gh pr checks <n> --json name,bucket \
+  | jq -e 'any(.[]; .name == ".NET API") and all(.[]; .bucket != "pending")'; do sleep 20; done
+```
+
+**Nomear o check que você espera** não envelhece com o filtro de caminhos, e diz no próprio comando o que a espera existe para provar.
+
 ⛔ **`grep` ancorado sobre diff filtrado responde zero.** O `git diff` desta máquina sai em **formato compacto**, e a forma dele não é estável: numa invocação ele renderiza as linhas `+` indentadas, noutra ele resume. Então `grep -E "^\+"` não casa nada — e o zero se lê como "nenhuma linha", que é justamente a resposta tranquilizadora.
 
 Medido em 03/09/2026 sobre um diff de 18 adições:
@@ -120,6 +129,10 @@ gh issue list --state all --limit 300 --json number,title,state \
 | `onlyMyItems` na base | **13 em 5 arquivos** | **18 em 8** — a API escreve `OnlyMyItems` |
 
 O segundo é o pior: eu ia relatar que os arquivos de API haviam desaparecido e que alguém já tinha feito o rename. **Busca que vai sustentar conclusão sobre presença ou contagem roda com `-i` e com `LC_ALL=pt_BR.UTF-8`**, e o controle é procurar um trecho que você sabe que existe — não aparecendo, o instrumento está cego, e não o repositório vazio.
+
+⛔ **E há o instrumento que nem chegou a rodar: no zsh, `--include=*.ts` sem aspas é expandido pelo shell.** Sem arquivo `.ts` no diretório atual, o zsh aborta o comando inteiro com `no matches found` — e o que sobra na tela é o cabeçalho que você mesmo imprimiu com `echo`, que se lê como "procurei e não achei nada".
+
+Medido em 14/09/2026: duas buscas seguidas morreram assim ao procurar quem lê claim do token no front, e as duas pareceram zero. **Aspas no padrão** — `--include='*.ts'` — e, quando o zero for sustentar conclusão, confira que o comando rodou: `echo "exit=$?"` logo depois.
 
 ⚠️ **`| head` num `grep` de investigação é o pior dos três**, porque some com a evidência sem avisar e a saída parece completa. Em busca que vai sustentar conclusão, conte antes (`grep -c`) ou não trunque.
 
