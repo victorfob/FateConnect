@@ -38,6 +38,7 @@ public class FilterContractTests(ApiFactory factory) : IClassFixture<ApiFactory>
     [Theory]
     [InlineData("/Rides")]
     [InlineData("/LostAndFound")]
+    [InlineData("/Denunciations")]
     public async Task ListEndpoints_PublishTheBoundFilterParameters(string path)
     {
         IReadOnlyList<string> names = await QueryParameterNamesAsync(path);
@@ -48,6 +49,7 @@ public class FilterContractTests(ApiFactory factory) : IClassFixture<ApiFactory>
     [Theory]
     [InlineData("/Rides")]
     [InlineData("/LostAndFound")]
+    [InlineData("/Denunciations")]
     public async Task ListEndpoints_DoNotPublishTheDerivedFilterProperties(string path)
     {
         IReadOnlyList<string> names = await QueryParameterNamesAsync(path);
