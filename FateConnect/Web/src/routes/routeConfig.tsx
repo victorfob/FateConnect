@@ -6,6 +6,7 @@ import { VisitorRoute } from '@app/components/VisitorRoute';
 import { GuestLayout } from '@app/layouts/GuestLayout';
 import { MainLayout } from '@app/layouts/MainLayout';
 import { RootLayout } from '@app/layouts/RootLayout';
+import { Denunciations } from '@app/pages/Denunciations';
 import { Home } from '@app/pages/Home';
 import { LostAndFound } from '@app/pages/LostAndFound';
 import { Menu } from '@app/pages/Menu';
@@ -49,10 +50,7 @@ export const routeConfig: RouteObject[] = [
                 path: RoutePathEnum.PROFILE,
                 element: <Unavailable description={C.PROFILE_DESCRIPTION} />,
               },
-              {
-                path: RoutePathEnum.DENUNCIATIONS,
-                element: <Unavailable description={C.DENUNCIATIONS_DESCRIPTION} />,
-              },
+              { path: RoutePathEnum.DENUNCIATIONS, element: <Denunciations /> },
               {
                 path: RoutePathEnum.NOTIFICATIONS,
                 element: <Unavailable description={C.NOTIFICATIONS_DESCRIPTION} />,

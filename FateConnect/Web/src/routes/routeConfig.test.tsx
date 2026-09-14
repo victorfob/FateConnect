@@ -6,6 +6,7 @@ import {
   TRIGGER_LABEL,
 } from '@app/layouts/MainLayout/components/AccountMenu/constants';
 import { server } from '@app/mocks/server';
+import { DENUNCIATIONS_TITLE } from '@app/pages/Denunciations/constants';
 import { DESCRIPTION_TITLE } from '@app/pages/Home/components/LandingDescription/constants';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
@@ -60,6 +61,7 @@ describe('routeConfig', () => {
     [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
     [RoutePathEnum.RIDES, RIDES_TITLE],
     [RoutePathEnum.PREFERENCES, PREFERENCES_TITLE],
+    [RoutePathEnum.DENUNCIATIONS, DENUNCIATIONS_TITLE],
   ])('should resolve %s with a session', async (path, title) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
 
@@ -70,7 +72,6 @@ describe('routeConfig', () => {
 
   it.each([
     [RoutePathEnum.PROFILE, C.PROFILE_DESCRIPTION],
-    [RoutePathEnum.DENUNCIATIONS, C.DENUNCIATIONS_DESCRIPTION],
     [RoutePathEnum.NOTIFICATIONS, C.NOTIFICATIONS_DESCRIPTION],
   ])('should resolve %s with the screen that has no owner yet', async (path, description) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));

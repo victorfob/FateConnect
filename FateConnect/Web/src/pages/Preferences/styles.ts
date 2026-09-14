@@ -5,11 +5,10 @@ import {
   spacingScale,
   Stack,
   styled,
-  Switch,
   Typography,
 } from '@design-system';
 
-const { none, xxs, xs, sm, md, lg } = spacingScale;
+const { xxs, xs, sm, md, lg } = spacingScale;
 
 export const SettingsCard = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
@@ -58,31 +57,4 @@ export const SwitchThumb = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
   boxShadow: shadowTokens.component,
   '& svg': { fontSize: '14px', color: theme.palette.chrome.main },
-}));
-
-/**
- * Interruptor no desenho do iOS: trilho sólido do tamanho do polegar, sem o véu
- * translúcido do Material — era ele que deixava o estado desligado em 2,68:1,
- * abaixo do mínimo de 3:1 para não-texto.
- */
-export const ThemeSwitch = styled(Switch)(({ theme }) => ({
-  width: '48px',
-  height: '30px',
-  padding: theme.space(none),
-  '& .MuiSwitch-switchBase': {
-    padding: theme.space(xxs),
-    '&.Mui-checked': {
-      transform: 'translateX(18px)',
-      '& + .MuiSwitch-track': {
-        backgroundColor: theme.palette.secondary.main,
-        opacity: 1,
-      },
-    },
-  },
-  '& .MuiSwitch-track': {
-    borderRadius: '15px',
-    backgroundColor: theme.palette.switchTrack,
-    opacity: 1,
-    transition: theme.transitions.create('background-color'),
-  },
 }));

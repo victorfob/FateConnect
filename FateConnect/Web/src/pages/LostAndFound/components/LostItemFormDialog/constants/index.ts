@@ -1,6 +1,7 @@
 import type { SelectOption } from '@design-system';
 import { AddIcon, SaveIcon } from '@design-system/icons';
 
+import type { PhotoFieldLabels } from '@app/components/PhotoField';
 import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { LOST_ITEM_KIND_OPTIONS } from '@app/pages/LostAndFound/helpers/lostItemKind';
 
@@ -61,15 +62,16 @@ export const LOST_ITEM_FORM_PLACEHOLDERS = {
 
 export const DESCRIPTION_ROWS = 3;
 
-export const PHOTO_ACTIONS = {
+export const PHOTO_FIELD_LABELS: PhotoFieldLabels = {
+  field: LOST_ITEM_FORM_LABELS.photo,
+  hint: `JPG, PNG ou WebP, até ${LOST_ITEM_LIMITS.maxPhotoMegabytes} MB.`,
   pick: 'Escolher foto',
   replace: 'Trocar foto',
   remove: 'Remover foto',
   previewAlt: 'Prévia da foto escolhida',
-  storedAlt: 'Foto do item',
 };
 
-export const PHOTO_HINT = `JPG, PNG ou WebP, até ${LOST_ITEM_LIMITS.maxPhotoMegabytes} MB.`;
+export const STORED_PHOTO_ALT = 'Foto do item';
 
 const EMPTY_CHOICE: SelectOption = { value: '', label: SELECT_PLACEHOLDER };
 
