@@ -41,7 +41,7 @@ public partial class DenunciationService(
 
         LogRecordCreated(logger, denunciation.Id);
 
-        return MapToReadDto(denunciation);
+        return MapToReporterDto(denunciation);
     }
 
     public async Task<PagedResultDto<ReadDenunciationDto>> GetAllAsync(DenunciationFilterDto filter)
@@ -92,6 +92,9 @@ public partial class DenunciationService(
 
         return MapToReadDto(denunciation);
     }
+
+    private static ReadDenunciationDto MapToReporterDto(Denunciation record) =>
+        MapToReadDto(record) with { ImageUrl = null };
 
     private static ReadDenunciationDto MapToReadDto(Denunciation record) =>
         new(
