@@ -239,6 +239,24 @@ const escala = el.getBoundingClientRect().width / el.offsetWidth;   // 1 = sem r
 
 ⚠️ **Nenhum gate pega isso.** ESLint, `tsc`, a suíte e o teste de contraste passam: nenhum deles renderiza o componente com o CSS do MUI competindo. A conferência é rodar na aplicação — ver `.claude/rules/parallelism-and-worktrees.md`.
 
+## Animação nossa nasce com a guarda de movimento
+
+⛔ **Toda animação e toda transição que a gente declara leva `@media (prefers-reduced-motion: reduce)` junto, zerando o movimento.** A guarda vai ao lado da declaração, no `styles.ts` de quem anima.
+
+```ts
+export const Hint = styled(Typography)(({ theme }) => ({
+  animation: `${entry} ${theme.transitions.duration.enteringScreen}ms ${theme.transitions.easing.easeOut}`,
+
+  '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+}));
+```
+
+**Por que:** é preferência do **sistema operacional**, não do navegador — no macOS fica em Acessibilidade → Tela → *Reduzir movimento*, e Windows, iOS e Android têm equivalente. Quem a liga costuma ligar porque movimento dispara sintoma vestibular — tontura, náusea, enxaqueca —, e a WCAG 2.3.3 pede que movimento disparado por interação possa ser desligado.
+
+⚠️ **A regra não é sobre a animação que a motivou.** A primeira do repo, escrita em 14/09/2026, desliza 6px em 225ms: nesse tamanho o risco é baixo e a guarda é seguro barato. Ela existe para a **próxima**, que pode ser ampla — e que sem convenção nasceria sem nada.
+
+⚠️ **Isto vale para o que nós declaramos.** Transição que vem de dentro de um componente da biblioteca não passa por aqui, e desligá-la seria outra decisão, tomada num lugar só.
+
 ## 📚 Referências
 
 - [Palette](https://mui.com/material-ui/customization/palette/)
