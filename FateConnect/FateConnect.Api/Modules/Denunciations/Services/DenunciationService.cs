@@ -61,7 +61,7 @@ public partial class DenunciationService(
 
     public async Task<ReadDenunciationDto?> GetByIdAsync(Guid id)
     {
-        var denunciation = await repository.GetByIdAsync(id);
+        var denunciation = await repository.GetByIdAsync(id, forChange: false);
 
         if (denunciation is null)
         {
@@ -86,7 +86,7 @@ public partial class DenunciationService(
 
         denunciation.UpdateStatus(dto.Status);
 
-        await repository.UpdateAsync(denunciation);
+        await repository.SaveChangesAsync();
 
         LogRecordStatusUpdated(logger, id, dto.Status.ToString());
 

@@ -64,11 +64,15 @@ public class DenunciationRepository(FateConnectDbContext context) : IDenunciatio
         return d => d.CreatedAt >= startUtc && d.CreatedAt <= endUtc;
     }
 
-    public async Task<Denunciation?> GetByIdAsync(Guid id)
+    public async Task<Denunciation?> GetByIdAsync(Guid id, bool forChange = true)
     {
-        return await context.Denunciations
-            .Include(d => d.User.Contacts)
-            .FirstOrDefaultAsync(d => d.Id == id);
+        IQueryable<Denunciation> query = context.Denunciations
+            .Include(d => d.User.Contacts);
+
+        if (!forChange)
+            query = query.AsNoTracking();
+
+        return await query.FirstOrDefaultAsync(d => d.Id == id);
     }
 
     public async Task<Denunciation> AddAsync(Denunciation denunciation)
@@ -85,7 +89,7 @@ public class DenunciationRepository(FateConnectDbContext context) : IDenunciatio
         return denunciation;
     }
 
-    public async Task UpdateAsync(Denunciation denunciation)
+    public async Task SaveChangesAsync()
     {
         await context.SaveChangesAsync();
     }
