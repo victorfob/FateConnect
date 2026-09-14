@@ -41,8 +41,6 @@ A voz acima descreve texto **transacional** — aviso, botão, erro. A landing t
 
 A landing **pode** anunciar funcionalidade que ainda não existe, enquanto ela estiver numa milestone aberta: este é um trabalho acadêmico de escopo público declarado, e a apresentação descreve o produto inteiro.
 
-Hoje vale para o **Portal de denúncias**, na milestone 14/09. Entrando o módulo, esta exceção sai da regra.
-
 ⚠️ A exceção é do **que** se anuncia, não de **como**: o texto de uma funcionalidade futura segue a mesma régua acima.
 
 Fundamentando a seção: [Concise, SCANNABLE, and Objective](https://www.nngroup.com/articles/concise-scannable-and-objective-how-to-write-for-the-web/) e [How Users Read on the Web](https://www.nngroup.com/articles/how-users-read-on-the-web/), Nielsen Norman Group.
