@@ -4,9 +4,6 @@ public static class SearchQueryUtils
 {
     public static string SanitizeSearchTerm(this string searchTerm)
     {
-        if (string.IsNullOrWhiteSpace(searchTerm))
-            return string.Empty;
-
         return searchTerm
             .Replace(@"\", @"\\")
             .Replace("%", @"\%")
