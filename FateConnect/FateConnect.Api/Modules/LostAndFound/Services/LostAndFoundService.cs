@@ -14,9 +14,9 @@ using FateConnect.Api.Modules.Common.Services;
 
 public partial class LostAndFoundService(
     ILostAndFoundRepository repository,
-    IStorageService storageService,
+    IStorageService baseStorageService,
     ILogger<LostAndFoundService> logger
-) : BaseFileService(storageService), ILostAndFoundService
+) : BaseFileService(baseStorageService), ILostAndFoundService
 {
     public async Task<ReadLostAndFoundDto> CreateAsync(CreateLostAndFoundDto dto, int currentUserId)
     {

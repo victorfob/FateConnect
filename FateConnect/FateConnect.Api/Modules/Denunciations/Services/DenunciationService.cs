@@ -16,9 +16,9 @@ using FateConnect.Api.Modules.Common.Services;
 
 public partial class DenunciationService(
     IDenunciationRepository repository,
-    IStorageService storageService,
+    IStorageService baseStorageService,
     ILogger<DenunciationService> logger
-) : BaseFileService(storageService), IDenunciationService
+) : BaseFileService(baseStorageService), IDenunciationService
 {
     public async Task<ReadDenunciationDto> CreateAsync(CreateDenunciationDto dto, int currentUserId)
     {
