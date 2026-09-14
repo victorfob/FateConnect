@@ -1,12 +1,16 @@
-import { getClient } from '@sentry/react';
+import { captureException, getClient } from '@sentry/react';
 
 async function loadSessionReplay(): Promise<void> {
   const client = getClient();
   if (!client) return;
 
-  const { createSessionReplay } = await import('./sessionReplay');
+  try {
+    const { createSessionReplay } = await import('./sessionReplay');
 
-  client.addIntegration(createSessionReplay());
+    client.addIntegration(createSessionReplay());
+  } catch (error) {
+    captureException(error, { level: 'warning' });
+  }
 }
 
 function handleWindowLoad(): void {

@@ -3,6 +3,7 @@ import { getClient, replayIntegration } from '@sentry/react';
 import { scheduleSessionReplay } from './loadSessionReplay';
 
 vi.mock('@sentry/react', () => ({
+  captureException: vi.fn(),
   getClient: vi.fn(),
   replayIntegration: vi.fn(),
 }));
@@ -27,6 +28,8 @@ describe('scheduleSessionReplay', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+    vi.doUnmock('./sessionReplay');
+    vi.resetModules();
     stubReadyState('complete');
   });
 
@@ -72,5 +75,27 @@ describe('scheduleSessionReplay', () => {
 
     await vi.waitFor(() => expect(mockGetClient).toHaveBeenCalled());
     expect(mockReplayIntegration).not.toHaveBeenCalled();
+  });
+
+  it('should report a chunk that fails to load as a handled warning', async () => {
+    stubReadyState('complete');
+    vi.resetModules();
+    vi.doMock('./sessionReplay', () => {
+      throw new Error('Failed to fetch dynamically imported module');
+    });
+
+    const sentry = await import('@sentry/react');
+    (sentry.getClient as Mock).mockReturnValue({ addIntegration });
+
+    const { scheduleSessionReplay: scheduleOverABrokenChunk } = await import('./loadSessionReplay');
+
+    scheduleOverABrokenChunk();
+
+    await vi.waitFor(() =>
+      expect(sentry.captureException as Mock).toHaveBeenCalledWith(expect.any(Error), {
+        level: 'warning',
+      }),
+    );
+    expect(addIntegration).not.toHaveBeenCalled();
   });
 });
