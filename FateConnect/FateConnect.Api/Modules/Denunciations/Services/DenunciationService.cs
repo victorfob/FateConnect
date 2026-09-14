@@ -39,7 +39,7 @@ public partial class DenunciationService(
 
         await PersistOrDropImageAsync(() => repository.AddAsync(denunciation), storedImageUrl);
 
-        LogRecordCreated(logger, denunciation.Id);
+        LogDenunciationCreated(logger, denunciation.Id);
 
         return MapToReporterDto(denunciation);
     }
@@ -48,7 +48,7 @@ public partial class DenunciationService(
     {
         (IReadOnlyList<Denunciation> records, int total) = await repository.GetAllAsync(filter);
 
-        LogRecordsRetrieved(logger, records.Count);
+        LogDenunciationsRetrieved(logger, records.Count);
 
         return new PagedResultDto<ReadDenunciationDto>
         {
@@ -65,11 +65,11 @@ public partial class DenunciationService(
 
         if (denunciation is null)
         {
-            LogRecordNotFound(logger, id);
+            LogDenunciationNotFound(logger, id);
             return null;
         }
 
-        LogRecordFound(logger, id);
+        LogDenunciationFound(logger, id);
 
         return MapToReadDto(denunciation);
     }
@@ -80,7 +80,7 @@ public partial class DenunciationService(
 
         if (denunciation is null)
         {
-            LogRecordNotFound(logger, id);
+            LogDenunciationNotFound(logger, id);
             return null;
         }
 
@@ -88,7 +88,7 @@ public partial class DenunciationService(
 
         await repository.SaveChangesAsync();
 
-        LogRecordStatusUpdated(logger, id, dto.Status.ToString());
+        LogDenunciationStatusUpdated(logger, id, dto.Status.ToString());
 
         return MapToReadDto(denunciation);
     }

@@ -5,18 +5,18 @@ using System;
 
 public partial class DenunciationService
 {
-    [LoggerMessage(Level = LogLevel.Information, Message = "Denunciation record {RecordId} created successfully.")]
-    private static partial void LogRecordCreated(ILogger logger, Guid recordId);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Denunciation {DenunciationId} created successfully.")]
+    private static partial void LogDenunciationCreated(ILogger logger, Guid denunciationId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Count} denunciation records retrieved successfully.")]
-    private static partial void LogRecordsRetrieved(ILogger logger, int count);
+    [LoggerMessage(Level = LogLevel.Information, Message = "{DenunciationsCount} denunciations retrieved successfully.")]
+    private static partial void LogDenunciationsRetrieved(ILogger logger, int denunciationsCount);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Denunciation record {RecordId} not found.")]
-    private static partial void LogRecordNotFound(ILogger logger, Guid recordId);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Denunciation {DenunciationId} not found.")]
+    private static partial void LogDenunciationNotFound(ILogger logger, Guid denunciationId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Denunciation record {RecordId} found.")]
-    private static partial void LogRecordFound(ILogger logger, Guid recordId);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Denunciation {DenunciationId} found.")]
+    private static partial void LogDenunciationFound(ILogger logger, Guid denunciationId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Denunciation record {RecordId} status updated to {Status} successfully.")]
-    private static partial void LogRecordStatusUpdated(ILogger logger, Guid recordId, string status);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Denunciation {DenunciationId} status updated to {Status} successfully.")]
+    private static partial void LogDenunciationStatusUpdated(ILogger logger, Guid denunciationId, string status);
 }
