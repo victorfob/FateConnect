@@ -3,6 +3,7 @@ import { init } from '@sentry/react';
 import { initSentry } from './initSentry';
 
 vi.mock('@sentry/react', () => ({
+  captureException: vi.fn(),
   init: vi.fn(),
   reactRouterBrowserTracingIntegration: vi.fn(),
   replayIntegration: vi.fn(),
