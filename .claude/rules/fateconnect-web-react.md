@@ -115,5 +115,17 @@ Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/b
 - Helper de render com providers em `src/test/testing-library.tsx`.
 - **Cobertura mínima de 90%** em statements, branches, functions e lines, sobre a base inteira. O limite está em `vite.config.ts` e é aplicado pelo `yarn test:ci`, que a pipeline executa. Exclusões conscientes: `main.tsx` (bootstrap), infraestrutura de teste e declarações de tipo. Ampliar a lista de exclusão exige justificativa; o caminho normal é escrever o teste.
 - ⛔ **`yarn test:ci` verde não prova a cobertura do que você escreveu.** O limite de 90% do `vite.config.ts` é sobre a base inteira, e as centenas de testes existentes seguram a média; o quality gate do Sonar mede **código novo**, por PR. Arquivo novo mal coberto passa no gate local e reprova no do PR — duas vezes em 04/09/2026, no `logout()` e no popover ancorado, que derrubou o gate para 84%. Antes de empurrar, leia o bloco de cada arquivo do diff em `coverage/lcov.info` (`LF`/`LH` e `BRF`/`BRH`), em vez de confiar no verde global.
+- ⛔ **E o gate rodado pelo binário direto não confere a versão do Node — só o `yarn` confere.** `./node_modules/.bin/vitest`, `./node_modules/.bin/eslint` e `./node_modules/.bin/tsc` rodam em qualquer versão e respondem verde; o campo `engines` do `package.json` é cobrado pelo `yarn`, e por mais ninguém. O verde vale então sobre um mundo que ninguém vai mergear.
+
+  Medido em 14/09/2026, com o Node 22 forçado de propósito no repo que exige `>=24.18.0`:
+
+  | Pelo `yarn` | Pelo binário |
+  | --- | --- |
+  | `yarn test:ci` → **exit 1**, `The engine "node" is incompatible` | `./node_modules/.bin/vitest run <caminho>` → **16 passed** |
+  | `yarn lint` → **exit 1**, a mesma recusa | `./node_modules/.bin/eslint <arquivo>` → **exit 0** |
+  | | `./node_modules/.bin/tsc --noEmit` → **exit 0** |
+
+  ⚠️ **O tell é você nunca ter passado por um `yarn`.** Sessão que só invoca binário não tem quem cobre a versão — a primeira cobrança chega no `pre-push`, ou no CI. Antes de reportar gate, `node -v` contra o `.nvmrc`; e o `nvm use` de dentro de `FateConnect/Web`, que é onde o `.nvmrc` mora.
+
 - ⚠️ **Em jsdom a geometria é toda zero.** Componente que mede `getBoundingClientRect` ou `offsetWidth` volta pelo `if` de guarda, e as linhas de cálculo **nunca executam** mesmo com o componente renderizado no teste. Cobri-las exige forjar a geometria — `vi.spyOn` no `getBoundingClientRect` e `Object.defineProperty` no `offsetWidth`, desfeitos no `afterEach`.
 - `renderHook` vem de `@testing-library/react` — **não** do pacote `@testing-library/react-hooks`, que é do React 17 e está morto.

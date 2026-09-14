@@ -3,6 +3,7 @@ import { init } from '@sentry/react';
 import { initSentry } from './initSentry';
 
 vi.mock('@sentry/react', () => ({
+  captureException: vi.fn(),
   init: vi.fn(),
   reactRouterBrowserTracingIntegration: vi.fn(),
   replayIntegration: vi.fn(),
@@ -50,5 +51,23 @@ describe('initSentry', () => {
         tracePropagationTargets: ['localhost', 'https://api.fateconnect.test'],
       }),
     );
+  });
+
+  it('should tag the events with the environment the bundle was published to', () => {
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@sentry.test/1');
+    vi.stubEnv('VITE_SENTRY_ENVIRONMENT', 'hml');
+
+    initSentry();
+
+    expect(mockInit).toHaveBeenCalledWith(expect.objectContaining({ environment: 'hml' }));
+  });
+
+  it('should fall back to the vite mode when no environment is declared', () => {
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@sentry.test/1');
+    vi.stubEnv('VITE_SENTRY_ENVIRONMENT', '');
+
+    initSentry();
+
+    expect(mockInit).toHaveBeenCalledWith(expect.objectContaining({ environment: 'test' }));
   });
 });

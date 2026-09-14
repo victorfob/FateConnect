@@ -16,6 +16,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Separa as rotas de acesso a arquivos enviados, restringindo a visualização de imagens de denúncias estritamente a administradores (#391) [Backend]
 - Centraliza o fluxo de upload de arquivos para garantir a exclusão automática de imagens órfãs em caso de falhas de salvamento (#391) [Backend]
 
+### Fixed
+
+- Corrige o que o monitoramento relata: a falha ao carregar a gravação de sessão chegava como erro não tratado e de prioridade alta, sem nada quebrar na tela, e passa a chegar como aviso; e os eventos de homologação chegavam marcados como produção, o que impedia separar os dois ambientes (#405) [Frontend]
+
 ## [0.10.0] - 2026-09-13
 
 ### Added
