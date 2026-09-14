@@ -50,6 +50,18 @@ O nível depende de o controller ser homogêneo ou misto, e são casos diferente
 
 Endpoint novo entra na teoria de rotas do `AuthorizationTests`, que prova por HTTP (401 sem token, 200 com token). O par positivo é obrigatório — ver `dotnet-testing.md`.
 
+## O recorte que o token responde não vira parâmetro da consulta
+
+⛔ **Quando a identidade de quem chama já decide o que a resposta deve conter, quem decide é a API — não um campo que quem chama precisa acertar.** Parâmetro que existe para a pessoa pedir aquilo que ela já é só acrescenta um jeito de errar: quem o esquece recebe outra coisa, e quem o manda errado recebe uma recusa que não precisava existir.
+
+⛔ Decidido em 14/09/2026, no #410, revertendo o desenho que a própria issue tinha fechado. A listagem de denúncias ia ganhar um `OnlyMine` na consulta, liberando `Operator` só quando ele viesse e respondendo **403** sem ele. Ficou assim: sem perfil de administrador, a listagem devolve as denúncias de quem pediu; com ele, as de todo mundo. *"É melhor a API já tratar isso do que deixarmos aberto pra erro."*
+
+**O que isso apagou do diff:** o campo do DTO, a exceção de recusa, o caso dela no middleware e os testes do 403 — três arquivos saíram inteiros da branch, e o PR encolheu de treze para dez.
+
+⚠️ **Não é regra contra filtro.** `OnlyMine` continua certo em caronas e em achados e perdidos, onde as duas respostas são legítimas para a mesma pessoa: ver tudo, ou ver só o que ela publicou. O que não se parametriza é o recorte que o **papel** decide — ali existe uma resposta certa por quem pergunta, e oferecer a outra é oferecer um erro.
+
+**O tell é a tabela de autorização depender de um valor da consulta.** Escrevendo "liberado para X quando o campo Y vier", pare: o que decide é quem chama, e isso o token já diz.
+
 ## Encerrar sessão exige estado no servidor
 
 ⛔ **Limpar o token no cliente não encerra nada.** O JWT é uma string assinada e autossuficiente: a API não guarda registro dele, só confere a assinatura e lê as claims. O `exp` está **dentro** do payload assinado, e quem interceptou o token tem a própria cópia — apagar o `localStorage` apaga a cópia de quem saiu.

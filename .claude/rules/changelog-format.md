@@ -39,6 +39,12 @@ Dois motivos, e o segundo é o que morde:
 
 ⚠️ **O teste:** apague o rótulo da frase. Se a entrada continua dizendo o que mudou, ele não precisava estar lá.
 
+### E o mesmo vale para nome de contrato
+
+⛔ **Citar o nome de um campo de API amarra a entrada a um contrato que o review ainda pode mudar.** Em 14/09/2026 a entrada do #410 citava o campo `onlyMine` da consulta; o campo foi **removido no mesmo PR**, e a entrada teve de ser reescrita do zero — o que ela dizia deixou de existir.
+
+**Cite quando o nome é a mudança** — foi o caso de `onlyMyItems` virando `onlyMine`, que não se escreve sem os dois. Fora disso, descreva o efeito: *"o recorte vem do perfil de quem pede, sem campo na consulta"* sobrevive a qualquer renomeação.
+
 ### Faça
 
 ```markdown

@@ -45,6 +45,16 @@ O que fechou a conversa foi a tabela que eu devia ter apresentado antes:
 
 ⚠️ **O tell é a sua tabela de custos só ter caminhos que passam por código seu.** Se nenhuma linha dela é "configurar o que já existe", falta procurar.
 
+### E o caminho mais barato pode não ser código nenhum
+
+⛔ **Antes de automatizar um passo que acontece uma vez por ambiente, ponha na mesa a versão manual e documentada.** Automação é código para escrever, testar e documentar; passo manual escrito num lugar que alguém relê custa um parágrafo.
+
+⛔ Aconteceu em 14/09/2026, na #193. Eu tinha recomendado — e ele aprovado — uma variável de ambiente nomeando o primeiro administrador, com promoção idempotente na subida da API, testes e documentação em dois `.env.example`. A pergunta que derrubou tudo foi *"a gente não pode setar direto no banco isso?"*: o perfil é uma coluna `integer`, promover é um `UPDATE`, e o caminho até o banco já estava documentado em `deploy/DATABASE.md`. A issue encolheu para escrever o comando no lugar certo.
+
+**O critério não é "manual é pior".** É a frequência contra o custo: passo que roda **uma vez por ambiente** não paga automação; passo que roda a cada deploy, ou que quebra calado quando esquecido, paga.
+
+⚠️ **O manual só vale escrito.** "Rodar um SQL" que vive na cabeça de quem rodou não é alternativa: é a mesma automação faltando, com ninguém sabendo — e ambiente novo vira investigação.
+
 ## Antes de afrouxar uma regra do projeto, procure a ferramenta padrão
 
 ⛔ **Código que não passa numa regra daqui é sinal de que falta uma ferramenta, não de que a regra está larga demais.** Editar a regra é o caminho mais curto e o mais caro: ela deixa de valer para todo mundo, para sempre, por causa de um caso.

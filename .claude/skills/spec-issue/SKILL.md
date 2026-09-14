@@ -44,6 +44,18 @@ Quatro na mesma rodada, ao especificar o menu da conta:
 
 **Onde a divergência mora:** uma lista no corpo da issue, junto do link do protótipo, dizendo o que difere e qual lado vale. Sem ela, cada uma volta como pergunta durante a implementação.
 
+### O anexo vive no comentário, e o corpo aponta para ele
+
+⛔ **Imagem colada numa issue costuma ir para um comentário, não para o corpo** — e `gh issue view --json body` não a enxerga. Antes de dizer que o protótipo não chegou, procure onde ele de fato cai:
+
+```bash
+gh api repos/<dono>/<repo>/issues/<n>/comments --jq '[.[] | select(.body | test("user-attachments"))] | length'
+```
+
+Em 14/09/2026 os corpos de três issues respondiam zero imagem, com os quatro anexos publicados em comentário.
+
+⚠️ **E marcador de "cole aqui" vira mentira no instante em que ele cola.** Publicado o anexo, troque o marcador por um ponteiro — *"o esboço está no comentário desta issue"* —, senão o corpo continua pedindo o que já foi entregue.
+
 ### A premissa do pedido também se mede
 
 ⛔ **O pedido carrega afirmações sobre o código, e elas podem estar erradas.** Confira cada uma antes da sabatina: é leitura barata e decide o desenho inteiro da issue.
@@ -87,6 +99,14 @@ Cada pergunta tem:
 Priorize o que trava decisão adiante: contrato e modelo de dados primeiro, depois navegação e estrutura, por último texto e cor.
 
 ⛔ **Não pergunte o que o código responde.** "Qual o limite do campo?" é leitura, não sabatina. Pergunte o que só o usuário sabe: produto, prioridade, e o que o protótipo não mostra.
+
+### A pergunta se lê sem o jargão que a motivou
+
+⛔ **O termo técnico que justifica a pergunta não pode ser a pergunta.** Quem responde está olhando o produto, não o mecanismo que você acabou de medir.
+
+⛔ Aconteceu em 14/09/2026: perguntei o que a tela responde quando o e-mail digitado não tem conta, sob o cabeçalho `Enumeração`. A devolução foi *"redefinição de email? não entendi essa"*. Reescrita com o fluxo por extenso — a tela do "Esqueci minha senha", o que a pessoa digita, o que ela lê —, foi respondida na hora.
+
+**O teste:** a pergunta cita um conceito que só existe na sua medição? Troque pelo que a pessoa faz na tela, e deixe o conceito para o corpo da issue.
 
 ### A primeira pergunta é o artefato, não onde ele mora
 
@@ -191,6 +211,20 @@ gh project item-list 1 --owner <owner> --format json --limit 300
 
 Antes de dizer que acabou, cruzar **cada** coisa conversada contra o que entrou. Cada item termina em um de três estados ditos em voz alta: **coberto** (por qual sub-issue), **fora de escopo por decisão** (com o motivo), ou **aberto** (com quem destrava). Item conversado que evapora é o defeito clássico desta skill.
 
+### A varredura é mecânica, e cobre o que a rodada tocou
+
+⛔ **Não conte de cabeça, e não olhe só o que você criou.** O que evapora está nas issues **vizinhas** que a rodada editou — e o que engana é a suposição que você mesmo escreveu com a voz de decisão.
+
+```bash
+gh issue view <n> --json body -q .body | grep -n -i -E "suposi|a decidir|em aberto|falta decidir"
+```
+
+Uma passada por **cada** issue que a rodada criou ou editou. Cada achado termina decidido, ou dito em voz alta.
+
+⛔ Pedido em 14/09/2026, com catorze issues tocadas: *"sem pontos abertos, quero fechar tudo antes de ir pro desenvolvimento pra não ter erro"*. A varredura achou suposições minhas em duas issues, uma frase envelhecida numa terceira, e **sete** checkboxes de "decidir antes de implementar" numa quarta, que ninguém reabria desde agosto — quatro deles já respondidos pelas decisões daquela mesma rodada.
+
+⚠️ **Nem toda suposição vira pergunta.** A que é decisão técnica derivada de regra do repo — a pasta de um componente com um consumidor só, o tamanho de página que as outras listas usam — vira decisão escrita, dizendo de qual regra ela sai. Pergunta é para o que só ele sabe.
+
 ## 7. Cada merge envelhece as irmãs
 
 ⛔ **Ao mergear uma sub-issue, releia as que sobraram.** Uma árvore de sub-issues é escrita de uma vez, com o repositório de um instante — e cada PR que entra invalida um pedaço do que as outras dizem. Nada avisa: o texto continua sintaticamente perfeito.
@@ -207,6 +241,14 @@ Quatro vezes na árvore da #207:
 ⚠️ **A terceira foi o Victor quem pegou**, perguntando *"editorconfig já foi arrumado, tá lá ainda?"* — depois de eu ter editado aquela seção **antes** do merge e não ter voltado nela.
 
 **O gatilho é o merge, não o fim da árvore.** Ao fechar uma sub-issue, abra as irmãs abertas e procure: escopo que outro PR já entregou, símbolo que deixou de existir, e decisão que mudou. Item entregue vira `[x]` com a nota de onde saiu; item morto sai.
+
+### E a decisão revista com o PR aberto envelhece na hora
+
+⛔ **O gatilho não é só o merge.** Decisão trocada durante o review invalida o corpo das issues que a citam, e ali não há merge nenhum para lembrar você de reler.
+
+Em 14/09/2026 o campo `OnlyMine` saiu do contrato com o #410 aberto e verde. A issue de API mandava criá-lo; a de front mandava o serviço **sempre** enviá-lo. Texto velho nas duas, e o da segunda faria nascer código que manda um parâmetro que a API ignora. As duas foram corrigidas no mesmo turno em que o código mudou, junto do corpo do PR.
+
+**O tell é você reescrever o corpo de um PR aberto.** Se o que mudou foi decisão, e não redação, as issues que a decidiram mudaram junto.
 
 ### O raio de um rename é o quadro, não a árvore
 
