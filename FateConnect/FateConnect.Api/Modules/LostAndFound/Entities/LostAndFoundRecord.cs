@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.LostAndFound.Entities;
 
+using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
@@ -135,7 +136,7 @@ public class LostAndFoundRecord
     private static void ValidateUser(int userId)
     {
         if (userId < 1)
-            throw new InvalidReporterException();
+            throw new InvalidUserIdentifierException();
     }
 
     private static void ValidateType(EnumLostAndFoundType type)

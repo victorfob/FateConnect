@@ -4,6 +4,7 @@ using System.Text;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -51,5 +52,30 @@ public class TokenServiceTests
 
         Assert.Equal("7", principal.FindFirstValue(ClaimTypes.NameIdentifier));
         Assert.Equal("Mariana Alves Rocha", principal.FindFirstValue(ClaimTypes.Name));
+    }
+
+    [Fact]
+    public void GenerateJwtToken_ForAUserWhoseProfileWasNeverSet_CarriesADefinedRole()
+    {
+        JwtOptions options = new()
+        {
+            Secret = SecretWithAccent,
+            Issuer = Issuer,
+            Audience = Audience,
+        };
+
+        string token = new TokenService(Options.Create(options))
+            .GenerateJwtToken(new User
+            {
+                Id = 7,
+                FullName = "Mariana Alves Rocha",
+                FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
+            });
+
+        Claim role = Assert.Single(
+            new JwtSecurityTokenHandler().ReadJwtToken(token).Claims,
+            claim => claim.Type is ClaimTypes.Role or "role");
+
+        Assert.Equal(nameof(EnumProfileType.Operator), role.Value);
     }
 }

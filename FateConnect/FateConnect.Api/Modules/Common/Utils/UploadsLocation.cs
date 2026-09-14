@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Hosting;
 public static class UploadsLocation
 {
     public const string FolderName = "uploads";
-
     private const string WebRootFolderName = "wwwroot";
 
     public static string WebRootOf(IWebHostEnvironment environment) =>

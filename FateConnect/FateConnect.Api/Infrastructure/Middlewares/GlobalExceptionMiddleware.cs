@@ -4,6 +4,7 @@ using System.Net;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Exceptions;
+using FateConnect.Api.Modules.Denunciations.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Exceptions;
@@ -33,6 +34,8 @@ public partial class GlobalExceptionMiddleware(
 
         switch (exception)
         {
+            case InvalidUserIdentifierException:
+            case DenunciationDomainException:
             case InvalidImageException:
             case LostAndFoundDomainException:
             case RideDomainException:
