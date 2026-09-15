@@ -106,7 +106,37 @@ Se o `psql` pedir senha, o túnel está funcionando e o resto é credencial.
 
 ## O que você vai encontrar
 
-As tabelas de contas e as de caronas convivem no mesmo banco, junto da tabela
-de controle das migrations.
-O schema é criado pelas migrations na subida da aplicação — não altere tabela
-pelo DBeaver, ou o próximo deploy vai divergir do que o código espera.
+As tabelas dos módulos convivem no mesmo banco, junto da tabela de controle das
+migrations. O schema é criado pelas migrations na subida da aplicação — não
+altere **estrutura** pelo DBeaver, ou o próximo deploy vai divergir do que o
+código espera. Mudar o **dado** de uma linha é outra coisa, e a seção abaixo é
+o caso em que isso é o procedimento.
+
+## Promover alguém a administrador
+
+Todo cadastro nasce **operador** — o perfil é gravado fixo no cadastro, e não
+existe tela que promova ninguém. O primeiro administrador de um ambiente nasce
+deste `UPDATE`, que se dá uma vez.
+
+⚠️ **A conta precisa já existir.** Promova alguém que se cadastrou pela tela;
+não crie a linha à mão, porque é o cadastro que gera o hash da senha.
+
+```sql
+UPDATE "Users" SET "ProfileType" = 2 WHERE "FatecEmail" = 'a-conta@aluno.cps.sp.gov.br';
+```
+
+`ProfileType` é `integer`, e os valores são `1` para operador e `2` para
+administrador.
+
+⛔ **Quem já estava dentro precisa sair e entrar de novo.** O perfil viaja no
+token, na claim `role`, e o que já foi emitido continua dizendo operador até
+expirar — nada no servidor reescreve um token em uso. Sem esse passo a pessoa
+está promovida no banco e segue sem a área de gestão na tela.
+
+Para conferir sem abrir o DBeaver, de dentro da VPS:
+
+```bash
+cd ~/FateConnect/deploy && set -a && . ./.env.hml && set +a
+PGPASSWORD="$POSTGRES_PASSWORD" psql -h 127.0.0.1 -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" -c 'SELECT "ProfileType", count(*) FROM "Users" GROUP BY 1;'
+```
