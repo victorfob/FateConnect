@@ -12,6 +12,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona controle de permissões hierárquico, permitindo que perfis superiores herdem acessos de níveis inferiores automaticamente (#391) [Backend]
 - Adiciona a tela de denúncia, que até aqui só avisava que a função viria em breve: a pessoa escolhe o motivo entre nove opções, conta o que aconteceu e pode anexar uma foto. Ela pode enviar sem que os seus dados cheguem a quem analisa, e nesse caso a tela avisa que a denúncia continua ligada à conta (#407) [Frontend]
 - Adiciona a consulta das próprias denúncias, que até aqui respondia só a administrador e recusava os demais: quem não é administrador passa a receber as denúncias que enviou, com os filtros de situação, categoria, período, busca e paginação que já existiam, e sem o endereço da foto guardada; administrador segue recebendo as de todo mundo. O recorte vem do perfil de quem pede, sem campo na consulta (#410) [Backend]
+- Adiciona à tela de denúncia a lista do que a própria pessoa enviou, que até aqui não existia em lugar nenhum: a tela passa a ter duas abas, uma com a lista e outra que abre o envio, como caronas e achados e perdidos já fazem. Cada denúncia aparece com o motivo, a data, a situação e os marcadores de sigilo e de foto, e a descrição longa vem recolhida e abre quando a pessoa pede. A lista tem filtro por situação e páginas de 10, com a situação guardada no endereço — copiar a URL devolve a mesma lista filtrada —, e a denúncia recém-enviada entra nela sem recarregar (#422) [Frontend]
 
 ### Changed
 

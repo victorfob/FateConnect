@@ -31,11 +31,12 @@ function renderRoute(initialPath: string) {
 const NO_CONTENT = 204;
 
 describe('routeConfig', () => {
-  // Caronas e achados e perdidos listam assim que montam.
+  // Caronas, achados e perdidos e denúncias listam assim que montam.
   beforeEach(() => {
     server.use(
       http.get('https://api.fateconnect.test/rides', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/lostandfound', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/denunciations', () => HttpResponse.json([])),
     );
   });
 

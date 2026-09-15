@@ -1,5 +1,12 @@
 import type { FormHTMLAttributes } from 'react';
-import { Button, PolymorphicStack, radiusScale, spacingScale, styled } from '@design-system';
+import {
+  Button,
+  PolymorphicStack,
+  radiusScale,
+  spacingScale,
+  styled,
+  Typography,
+} from '@design-system';
 
 const { xs, lg } = spacingScale;
 
@@ -12,6 +19,10 @@ export const DenunciationForm = styled(PolymorphicStack)<FormHTMLAttributes<HTML
     minHeight: 0,
   }),
 );
+
+export const ChannelNote = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+}));
 
 export const SubmitButton = styled(Button)(({ theme }) => ({
   gap: theme.space(xs),
