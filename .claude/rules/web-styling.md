@@ -239,6 +239,24 @@ const escala = el.getBoundingClientRect().width / el.offsetWidth;   // 1 = sem r
 
 ⚠️ **Nenhum gate pega isso.** ESLint, `tsc`, a suíte e o teste de contraste passam: nenhum deles renderiza o componente com o CSS do MUI competindo. A conferência é rodar na aplicação — ver `.claude/rules/parallelism-and-worktrees.md`.
 
+## Antes de acrescentar espaço, meça o que o contêiner já dá
+
+⛔ **Margem posta "para respirar" soma com o `gap` do pai e com o recuo do vizinho, e o total não aparece em lugar nenhum do código.** Cada um dos três está num arquivo diferente e cada um parece razoável sozinho.
+
+Medido em 14/09/2026, na nota que abre o diálogo de denúncia — o vão até o primeiro campo era de **52px**:
+
+| De onde vinha | Quanto |
+| --- | --- |
+| `gap` do corpo do diálogo, no design system | 16px |
+| a margem que eu pus na nota | 24px |
+| `paddingTop` da coluna de campos, que existe para o rótulo flutuante não sair cortado | 12px |
+
+A minha margem era a sobra: o corpo já espaça os filhos. Tirando-a, sobra o ritmo que o diálogo já tinha.
+
+**A conferência é ler o pai antes de escrever o filho** — `Stack` com `gap`, `Dialog.Body`, `PageShell`, `FieldsColumn` e `CardsList` todos espaçam o que está dentro. Quem viu o vão foi o Victor, na tela.
+
+⚠️ **O tell é a palavra "respiro" no seu próprio raciocínio.** Espaço se acrescenta quando o contêiner não dá nenhum, não quando o que ele dá parece pouco — aí o que se ajusta é o contêiner, e para todo mundo.
+
 ## Animação nossa nasce com a guarda de movimento
 
 ⛔ **Toda animação e toda transição que a gente declara leva `@media (prefers-reduced-motion: reduce)` junto, zerando o movimento.** A guarda vai ao lado da declaração, no `styles.ts` de quem anima.
