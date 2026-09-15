@@ -1,4 +1,4 @@
-import type { UserContact } from '../types';
+import type { PageQuery, UserContact } from '../types';
 
 /** Valores canônicos alinhados à serialização do backend. */
 export enum DenunciationCategoryEnum {
@@ -33,6 +33,14 @@ export type Denunciation = {
   isAnonymous: boolean;
   createdAt: string;
 };
+
+/**
+ * Sem campo de autoria: a API recorta pelo perfil do token, e quem não é
+ * administrador só recebe as próprias.
+ */
+export interface DenunciationFilter extends PageQuery {
+  status?: DenunciationStatusEnum;
+}
 
 export type DenunciationInput = {
   category: DenunciationCategoryEnum;
