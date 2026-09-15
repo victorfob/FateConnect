@@ -203,6 +203,14 @@ Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase`
 
 ⛔ **Tabela de substituição confere também que cada regra dela disparou.** Regra que nunca casa não faz nada e não reclama: o arquivo sai plausível, com um trecho intacto no meio do que você acha que traduziu.
 
+⛔ **E o instrumento que destrói pode ser um `UPDATE` de uma linha: coluna que o pedido não nomeia fica de fora.** Escrever apaga o valor anterior, e num banco não há diff para abrir depois — o que estava ali some sem deixar registro.
+
+Aconteceu em 14/09/2026, promovendo duas contas a administrador em homologação. O comando pedido era `SET "ProfileType" = 2`; eu acrescentei `"UpdatedAt" = now()` por conta própria e sobrescrevi os dois valores anteriores sem tê-los lido. Um deles era real: `IncrementTokenVersionAsync` grava ali a cada logout, e aquela conta tinha 12 versões de token.
+
+**A guarda são dois passos, e o que faltou foi o primeiro:** `SELECT` das colunas que você vai **escrever**, antes, e `RETURNING` no `UPDATE` para conferir o número de linhas. Eu tinha o `RETURNING`; do `SELECT` eu tinha lido `ProfileType` e `TokenVersion`, que eram as colunas do pedido — não a que eu ia escrever por fora dele.
+
+⚠️ **E `now()` não é `DateTime.UtcNow`.** A VPS roda em `America/Sao_Paulo` e a API grava UTC em coluna `timestamp without time zone`, então SQL manual com `now()` planta um valor três horas fora da convenção da aplicação e nada reclama. Escrevendo timestamp à mão, `timezone('UTC', now())`.
+
 Na mesma tradução de 09/09/2026, a reescrita de uma frase inteira da #193 nunca casou — as trocas de token que rodaram antes já tinham mudado `Operador` para `Operator` **dentro dela**, então o texto que eu procurava já não existia. Quem parou foi o `assert` de que toda entrada casou ao menos uma vez. **Reescrita de frase vai antes das trocas de token**, e entre as trocas a ordem é do mais longo para o mais curto: sem isso `AgenteUsuario` vira `AgenteUser`.
 
 ## O número que eu prometo se deriva rodando, não contando
@@ -226,6 +234,21 @@ git merge-base --is-ancestor <branch> origin/main   # exit 0 = está toda lá
 ```
 
 ⚠️ Provado assim, o `-D` é seguro — e a prova vai dita junto, senão forçar parece atalho.
+
+⛔ **E contenção se mede restrita aos arquivos que a branch tocou.** `git diff <branch> develop` sobre a árvore inteira devolve também tudo que entrou na base **depois** — e isso se lê como trabalho seu que ficou de fora, quando é exatamente o contrário.
+
+Aconteceu em 14/09/2026, limpando a `feat/409` já mergeada: o comando respondeu 46 inserções e eu quase tratei como conteúdo perdido. Eram as regras de um PR que entrou na `develop` em seguida.
+
+```bash
+base=$(git merge-base develop <branch>)
+git diff --name-only "$base" <branch> > /tmp/tocados.txt
+wc -l < /tmp/tocados.txt          # zero aqui é o instrumento falhando, não contenção
+tr '\n' '\0' < /tmp/tocados.txt | xargs -0 git diff <branch> develop --
+```
+
+Saída vazia **com a contagem acima de zero** ⇒ nesses arquivos a base está idêntica à branch, e nada ficou de fora.
+
+⚠️ **A contagem não é zelo: sem ela o passo mente conforme o `xargs`.** Com lista vazia, o `xargs` do BSD não roda nada e o do GNU roda o comando sem pathspec — aí ele imprime a árvore inteira e você lê como conteúdo perdido.
 
 ## O alcance de uma mudança de token se mede no consumidor renderizado
 
