@@ -88,6 +88,21 @@ grep -oE 'href="/assets/[^"]*\.js"' dist/index.html
 
 ⛔ **E procurar o pedaço ausente nessa lista responde zero por vacuidade** quando ele não foi criado. Confira as duas coisas: que o pedaço **existe** na saída do build, e que **não** está no `index.html`.
 
+## Tela de módulo copia a casca do módulo vizinho
+
+⛔ **Antes de desenhar a tela de um módulo novo, abra a do módulo que já existe e copie a casca.** Caronas e achados e perdidos usam o mesmo arranjo, e ele é o padrão da casa:
+
+| Peça | O que ocupa |
+| --- | --- |
+| `PageShell` com `title` e `PageShell.Back` | o topo e a volta ao menu |
+| `titleAction` | o filtro, como botão de ícone que abre o diálogo |
+| `tabs` com duas `PageShell.Tab` | a lista à esquerda, e à direita a aba que abre o diálogo de cadastro |
+| `CardsList` + `Pagination` | a lista, o esqueleto de carregamento e o estado vazio |
+
+⛔ Aconteceu em 14/09/2026: a tela de denúncia nasceu com um cartão de abertura e um botão, porque foi escrita antes da lista — e ficou a **única** fora do padrão. A cobrança veio como *"a tela de denúncias é a única que foge do padrão das outras"*, e o conserto custou um redesenho com o PR já aberto e verde.
+
+⚠️ **O tell é a tela ter uma única ação e ainda não ter lista.** Aí o cartão com botão parece a saída natural, e ele é justamente o que não se parece com as vizinhas quando a lista chegar.
+
 ## Rotas
 
 Os caminhos são em **pt-BR** — `/inicio`, `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas`, com `/` → `/inicio` e curinga → `/inicio`. Trocar um segmento quebra link salvo; só com decisão de produto.
@@ -98,6 +113,9 @@ Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/b
 
 - `axios` com baseURL de `import.meta.env.VITE_*`. **Nenhuma URL de API literal em arquivo versionado.**
 - **Caminho de rota da API em minúsculo**, mesmo quando o controlador é `PascalCase`: `/rides` e `/lostandfound`, nunca `/Rides` nem `/LostAndFound`. O roteamento do ASP.NET não olha caixa, então as duas grafias casam — e copiar a do `[Route("[controller]")]` espalha duas escritas para a mesma rota, que é o que se evita.
+- ⛔ **A função de serviço nomeia o endpoint, não o recorte que o servidor decide.** `listDenunciations`, e não `listMyDenunciations`: o `GET` é um só, e quem recorta é o perfil que vai no token — quando a tela de gestão consumir a mesma função, ela lista tudo, e o nome com `My` passaria a mentir. Nome com recorte só quando o **parâmetro** do recorte existe na chamada, como o `onlyMine` de caronas e achados e perdidos.
+
+  ⚠️ Em 14/09/2026 o nome nasceu certo para o desenho anterior, em que havia esse parâmetro, e sobreviveu à troca de desenho no mesmo PR. Quem viu foi o Victor. Ao mudar o contrato, releia quem o chama: o consumidor envelhece calado.
 - Interceptor de request injeta o token; interceptor de response centraliza o tratamento de erro.
 - Requisição em componente via `@tanstack/react-query` — não `useEffect` + `setState` na mão. Erro de rede vira notificação ao usuário, não só log.
 
