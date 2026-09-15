@@ -18,6 +18,8 @@ const CATEGORY_LABEL: Readonly<Record<DenunciationCategoryEnum, string>> = {
 
 const CATEGORY_VALUES: ReadonlySet<string> = new Set(Object.values(DenunciationCategoryEnum));
 
+const UNKNOWN_LABEL = '—';
+
 /** As escolhas do campo, na ordem do enum: geral, caronas, achados e perdidos. */
 export const DENUNCIATION_CATEGORY_OPTIONS: readonly {
   value: DenunciationCategoryEnum;
@@ -33,4 +35,11 @@ export const DENUNCIATION_CATEGORY_OPTIONS: readonly {
  */
 export function isDenunciationCategory(value: string): value is DenunciationCategoryEnum {
   return CATEGORY_VALUES.has(value);
+}
+
+/** O motivo vem da API, então o tipo aceita um valor que o produto não conhece. */
+export function denunciationCategoryLabel(value: string): string {
+  if (!isDenunciationCategory(value)) return value.trim() || UNKNOWN_LABEL;
+
+  return CATEGORY_LABEL[value];
 }

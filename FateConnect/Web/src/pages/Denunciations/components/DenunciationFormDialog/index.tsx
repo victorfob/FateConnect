@@ -2,10 +2,11 @@ import { useEffect } from 'react';
 import { Dialog, Typography } from '@design-system';
 import { SendIcon } from '@design-system/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { useNotification } from '@app/hooks/useNotification';
+import { DENUNCIATIONS_QUERY_KEY } from '@app/pages/Denunciations/constants';
 import { createDenunciation } from '@app/services/denunciations/denunciationsService';
 import type { DenunciationInput } from '@app/services/denunciations/types';
 
@@ -24,12 +25,14 @@ export type DenunciationFormDialogProps = Readonly<{ open: boolean; onClose: Voi
 
 export function DenunciationFormDialog({ open, onClose }: DenunciationFormDialogProps) {
   const { notifySuccess } = useNotification();
+  const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationFn: (input: DenunciationInput) => createDenunciation(input),
-    onSuccess: () => {
+    onSuccess: async () => {
       notifySuccess(C.DENUNCIATION_FORM.succeeded);
       onClose();
+      await queryClient.invalidateQueries({ queryKey: [DENUNCIATIONS_QUERY_KEY] });
     },
     // Não fecha no erro: refazer o formulário inteiro puniria quem já digitou.
     meta: { errorMessage: C.DENUNCIATION_FORM.failed },
