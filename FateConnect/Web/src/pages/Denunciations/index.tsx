@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { NavLink } from 'react-router';
-import { CardsList, PageShell, Pagination, Typography } from '@design-system';
-import { ArrowBackIcon, SendIcon } from '@design-system/icons';
+import { CardsList, PageShell, Pagination } from '@design-system';
+import { ArrowBackIcon, FormatListBulletedIcon, SendIcon } from '@design-system/icons';
 
 import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import { RoutePathEnum } from '@app/routes/paths';
@@ -13,7 +13,6 @@ import { DenunciationFilter } from './components/DenunciationFilter';
 import { DenunciationFormDialog } from './components/DenunciationFormDialog';
 import { denunciationSearchCodec } from './helpers/searchQuery';
 import * as C from './constants';
-import * as S from './styles';
 
 const NO_ITEMS = 0;
 
@@ -43,21 +42,22 @@ export function Denunciations() {
           to={RoutePathEnum.MENU}
         />
       }
+      tabs={
+        <>
+          <PageShell.Tab
+            label={C.LIST_TAB_LABEL}
+            icon={<FormatListBulletedIcon fontSize="small" />}
+            selected={!isFormOpen}
+          />
+          <PageShell.Tab
+            label={C.SEND_TAB_LABEL}
+            icon={<SendIcon fontSize="small" />}
+            selected={isFormOpen}
+            onClick={handleOpenForm}
+          />
+        </>
+      }
     >
-      <S.IntroCard>
-        <Typography variant="h2">{C.DENUNCIATIONS_INTRO.title}</Typography>
-        <S.IntroText variant="subtitle">{C.DENUNCIATIONS_INTRO.description}</S.IntroText>
-
-        <S.StartButton variant="contained" color="secondary" onClick={handleOpenForm}>
-          <SendIcon fontSize="small" />
-          <Typography variant="subtitleBold" color="inherit">
-            {C.DENUNCIATIONS_INTRO.action}
-          </Typography>
-        </S.StartButton>
-      </S.IntroCard>
-
-      <Typography variant="h2">{C.LIST_SECTION_TITLE}</Typography>
-
       <CardsList
         isLoading={isPending}
         skeletonCount={PAGE_SIZE}

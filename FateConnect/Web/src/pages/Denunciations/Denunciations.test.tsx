@@ -22,7 +22,7 @@ import {
   FILTER_SUBMIT_LABEL,
   FILTER_TITLE,
 } from './components/DenunciationFilter/constants';
-import { DENUNCIATION_FORM } from './components/DenunciationFormDialog/constants';
+import { CHANNEL_NOTE, DENUNCIATION_FORM } from './components/DenunciationFormDialog/constants';
 import * as C from './constants';
 import { Denunciations } from '.';
 
@@ -92,33 +92,36 @@ describe('Denunciations', () => {
     Reflect.deleteProperty(HTMLElement.prototype, 'clientHeight');
   });
 
-  it('should name the screen, explain the channel and offer the way back', () => {
+  it('should name the screen, offer the two tabs and the way back', () => {
     renderScreen();
 
     expect(screen.getByRole('heading', { name: C.DENUNCIATIONS_TITLE })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: C.DENUNCIATIONS_INTRO.title })).toBeInTheDocument();
-    expect(screen.getByText(C.DENUNCIATIONS_INTRO.description)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: C.LIST_SECTION_TITLE })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: C.LIST_TAB_LABEL })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.getByRole('tab', { name: C.SEND_TAB_LABEL })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: C.BACK_LABEL })).toBeInTheDocument();
   });
 
-  it('should open the form from the card, and only from it', async () => {
+  it('should open the form from the tab, and explain the channel inside it', async () => {
     renderScreen();
 
     expect(
       screen.queryByRole('heading', { name: DENUNCIATION_FORM.title }),
     ).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: C.DENUNCIATIONS_INTRO.action }));
+    await userEvent.click(screen.getByRole('tab', { name: C.SEND_TAB_LABEL }));
 
     expect(
       await screen.findByRole('heading', { name: DENUNCIATION_FORM.title }),
     ).toBeInTheDocument();
+    expect(screen.getByText(CHANNEL_NOTE)).toBeInTheDocument();
   });
 
-  it('should close the form and leave the card in place', async () => {
+  it('should close the form and select the list tab again', async () => {
     renderScreen();
-    await userEvent.click(screen.getByRole('button', { name: C.DENUNCIATIONS_INTRO.action }));
+    await userEvent.click(screen.getByRole('tab', { name: C.SEND_TAB_LABEL }));
     await screen.findByRole('heading', { name: DENUNCIATION_FORM.title });
 
     await userEvent.keyboard('{Escape}');
@@ -128,7 +131,10 @@ describe('Denunciations', () => {
         screen.queryByRole('heading', { name: DENUNCIATION_FORM.title }),
       ).not.toBeInTheDocument(),
     );
-    expect(screen.getByRole('button', { name: C.DENUNCIATIONS_INTRO.action })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: C.LIST_TAB_LABEL })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
   });
 
   it('should list what the person sent, with the situation of each one', async () => {
@@ -233,7 +239,7 @@ describe('Denunciations', () => {
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
     const askedBefore = asked.length;
 
-    await userEvent.click(screen.getByRole('button', { name: C.DENUNCIATIONS_INTRO.action }));
+    await userEvent.click(screen.getByRole('tab', { name: C.SEND_TAB_LABEL }));
     await screen.findByRole('heading', { name: DENUNCIATION_FORM.title });
     await userEvent.click(screen.getByRole('combobox', { name: /Motivo/ }));
     await userEvent.click(await screen.findByRole('option', { name: 'Cadastro falso de item' }));

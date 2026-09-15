@@ -59,6 +59,8 @@ export function DenunciationFormDialog({ open, onClose }: DenunciationFormDialog
       <FormProvider {...form}>
         <S.DenunciationForm component="form" onSubmit={handleSubmit} noValidate>
           <Dialog.Body>
+            <S.ChannelNote variant="caption">{C.CHANNEL_NOTE}</S.ChannelNote>
+
             <DenunciationFormFields />
           </Dialog.Body>
 

@@ -21,6 +21,7 @@ export { default as EmailIcon } from '@mui/icons-material/Email';
 export { default as ExpandLessIcon } from '@mui/icons-material/ExpandLess';
 export { default as ExpandMoreIcon } from '@mui/icons-material/ExpandMore';
 export { default as FilterAltIcon } from '@mui/icons-material/FilterAlt';
+export { default as FormatListBulletedIcon } from '@mui/icons-material/FormatListBulleted';
 export { default as GroupsIcon } from '@mui/icons-material/Groups';
 export { default as ImageIcon } from '@mui/icons-material/Image';
 export { default as InfoIcon } from '@mui/icons-material/Info';

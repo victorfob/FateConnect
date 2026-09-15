@@ -31,6 +31,14 @@ export const DENUNCIATION_FORM = {
   failed: 'Erro ao enviar a denúncia. Tente novamente.',
 };
 
+/**
+ * Responde a dúvida de quem está com o diálogo aberto — se o caso vale aqui — e
+ * garante que nada é automático. ⛔ As medidas possíveis ficam de fora: elas já
+ * estão no §8 dos termos, e no momento de denunciar elas pesam em vez de informar.
+ */
+export const CHANNEL_NOTE =
+  'Vale para condutas que desrespeitam as regras da plataforma, dentro ou fora dela. Cada denúncia é analisada antes de qualquer medida.';
+
 export const DENUNCIATION_FORM_LABELS = {
   confidential: 'Sigilosa',
   category: 'Motivo',
