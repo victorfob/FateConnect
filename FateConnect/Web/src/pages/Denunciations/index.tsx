@@ -3,12 +3,12 @@ import { NavLink } from 'react-router';
 import { CardsList, PageShell, Pagination } from '@design-system';
 import { ArrowBackIcon, FormatListBulletedIcon, SendIcon } from '@design-system/icons';
 
+import { DenunciationCard } from '@app/components/DenunciationCard';
 import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import { RoutePathEnum } from '@app/routes/paths';
 import { listDenunciations } from '@app/services/denunciations/denunciationsService';
 import { PAGE_SIZE } from '@app/utils/searchParams';
 
-import { DenunciationCard } from './components/DenunciationCard';
 import { DenunciationFilter } from './components/DenunciationFilter';
 import { DenunciationFormDialog } from './components/DenunciationFormDialog';
 import { denunciationSearchCodec } from './helpers/searchQuery';

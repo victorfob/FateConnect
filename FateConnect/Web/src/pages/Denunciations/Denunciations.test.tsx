@@ -1,5 +1,9 @@
 import { http, HttpResponse } from 'msw';
 
+import {
+  DENUNCIATION_CARD_MARKERS,
+  DESCRIPTION_TOGGLE_LABELS,
+} from '@app/components/DenunciationCard/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import {
@@ -11,10 +15,6 @@ import { screen, userEvent, waitFor } from '@app/test/testing-library';
 import { pagedListHandler } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
-import {
-  DENUNCIATION_CARD_MARKERS,
-  DESCRIPTION_TOGGLE_LABELS,
-} from './components/DenunciationCard/constants';
 import {
   DENUNCIATION_STATUS_FILTER_OPTIONS,
   FILTER_CLEAR_LABEL,

@@ -3,7 +3,7 @@ import { Input } from '@design-system';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 import { PhotoField } from '@app/components/PhotoField';
-import { useStoredImage } from '@app/pages/LostAndFound/hooks/useStoredImage';
+import { useStoredImage } from '@app/hooks/useStoredImage';
 
 import type { LostItemFormInput, LostItemFormValues } from '../schema';
 import * as C from '../constants';

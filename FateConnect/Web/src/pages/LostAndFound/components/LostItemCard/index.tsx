@@ -2,6 +2,7 @@ import { ListCard, StatusTag, Typography } from '@design-system';
 import { CalendarTodayIcon, LocationOnIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
+import { StoredPhoto } from '@app/components/StoredPhoto';
 import { lostItemKindLabel } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import {
   lostItemStatusLabel,
@@ -11,7 +12,6 @@ import type { LostItem } from '@app/services/lostAndFound/types';
 
 import { LostItemActions } from './LostItemActions';
 import { LostItemKindIcon } from './LostItemKindIcon';
-import { LostItemPhoto } from './LostItemPhoto';
 import { LostItemStatusAction } from './LostItemStatusAction';
 import * as C from './constants';
 import * as S from './styles';
@@ -35,7 +35,7 @@ export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: L
     <ListCard
       own={item.isOwner}
       ownLabel={C.OWN_ITEM_LABEL}
-      media={<LostItemPhoto url={item.imageUrl} itemName={item.name} />}
+      media={<StoredPhoto url={item.imageUrl} alt={C.photoAlt(item.name)} />}
     >
       <ListCard.Header>
         <Typography variant="subtitleBold">{item.name}</Typography>
