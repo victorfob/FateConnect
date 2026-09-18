@@ -1,4 +1,5 @@
+/** Os valores vão para a barra de endereço, então são os rótulos em pt-BR. */
 export enum ManagementTabEnum {
-  USERS = 'users',
-  DENUNCIATIONS = 'denunciations',
+  USERS = 'usuarios',
+  DENUNCIATIONS = 'denuncias',
 }
