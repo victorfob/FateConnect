@@ -11,6 +11,7 @@ export enum RoutePathEnum {
   PREFERENCES = '/preferencias',
   PROFILE = '/perfil',
   DENUNCIATIONS = '/denuncias',
+  MANAGEMENT = '/gestao',
   NOTIFICATIONS = '/notificacoes',
 }
 

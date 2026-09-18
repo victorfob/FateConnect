@@ -7,6 +7,7 @@
  */
 export { default as AccessTimeIcon } from '@mui/icons-material/AccessTime';
 export { default as AddIcon } from '@mui/icons-material/Add';
+export { default as AdminPanelSettingsIcon } from '@mui/icons-material/AdminPanelSettings';
 export { default as ArrowBackIcon } from '@mui/icons-material/ArrowBack';
 export { default as BackHandOutlinedIcon } from '@mui/icons-material/BackHandOutlined';
 export { default as CalendarTodayIcon } from '@mui/icons-material/CalendarToday';

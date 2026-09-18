@@ -1,5 +1,6 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 
+import { APP_LINKS, NOTIFICATIONS_LINK } from '@app/constants/navigation';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
 
@@ -54,7 +55,7 @@ describe('DrawerNavigation', () => {
       .getAllByRole('link')
       .map((link) => link.textContent);
 
-    expect(labels).toEqual(C.SERVICE_LINKS.map(({ label }) => label));
+    expect(labels).toEqual([...APP_LINKS.map(({ label }) => label), NOTIFICATIONS_LINK.label]);
   });
 
   it('should carry the account and the preferences entries in their own sections', () => {

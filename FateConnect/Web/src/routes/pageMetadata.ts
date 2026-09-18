@@ -43,6 +43,7 @@ export const PAGE_METADATA: Record<RoutePathEnum, PageMetadata> = {
   [RoutePathEnum.PREFERENCES]: { title: titleFor('Preferências') },
   [RoutePathEnum.PROFILE]: { title: titleFor('Meu perfil') },
   [RoutePathEnum.DENUNCIATIONS]: { title: titleFor('Denúncias') },
+  [RoutePathEnum.MANAGEMENT]: { title: titleFor('Gestão') },
   [RoutePathEnum.NOTIFICATIONS]: { title: titleFor('Notificações') },
 };
 
