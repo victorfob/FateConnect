@@ -23,7 +23,6 @@ export const routeConfig: RouteObject[] = [
     element: <RootLayout />,
     errorElement: <ErrorBoundary />,
     children: [
-      { path: RoutePathEnum.ROOT, element: <Navigate to={RoutePathEnum.LANDING} replace /> },
       {
         element: <VisitorRoute />,
         children: [
