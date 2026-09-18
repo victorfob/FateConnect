@@ -3,6 +3,7 @@ import {
   denunciationStatusLabel,
   denunciationStatusSlug,
   denunciationStatusTone,
+  denunciationStatusTransitions,
   isDenunciationStatus,
   parseDenunciationStatus,
 } from './denunciationStatus';
@@ -47,5 +48,35 @@ describe('denunciationStatus', () => {
     expect(parseDenunciationStatus('  NAO-ACOLHIDA ')).toBe(DenunciationStatusEnum.DISMISSED);
     expect(parseDenunciationStatus('resolvido')).toBeNull();
     expect(parseDenunciationStatus(null)).toBeNull();
+  });
+});
+
+describe('denunciationStatusTransitions', () => {
+  // Medido em `Denunciation.ValidateTransition`: são exatamente estes quatro pares.
+  it.each([
+    [
+      DenunciationStatusEnum.OPEN,
+      [DenunciationStatusEnum.IN_REVIEW, DenunciationStatusEnum.DISMISSED],
+    ],
+    [
+      DenunciationStatusEnum.IN_REVIEW,
+      [DenunciationStatusEnum.RESOLVED, DenunciationStatusEnum.DISMISSED],
+    ],
+  ])('should offer what the api accepts from %s', (from, expected) => {
+    expect(denunciationStatusTransitions(from)).toEqual(expected);
+  });
+
+  it.each([DenunciationStatusEnum.RESOLVED, DenunciationStatusEnum.DISMISSED])(
+    'should offer nothing from %s, which is terminal',
+    (from) => {
+      expect(denunciationStatusTransitions(from)).toEqual([]);
+    },
+  );
+
+  // O caminho que a tela não pode oferecer: resolver exige passar pela análise.
+  it('should keep an open denunciation away from resolved', () => {
+    expect(denunciationStatusTransitions(DenunciationStatusEnum.OPEN)).not.toContain(
+      DenunciationStatusEnum.RESOLVED,
+    );
   });
 });

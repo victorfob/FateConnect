@@ -29,6 +29,26 @@ const STATUS_TONE: Readonly<Record<DenunciationStatusEnum, StatusTagTone>> = {
   [DenunciationStatusEnum.DISMISSED]: 'danger',
 };
 
+/**
+ * ⛔ Para onde a API deixa ir, a partir de cada situação. `Resolved` e
+ * `Dismissed` são terminais, e `Open` não alcança `Resolved` sem passar pela
+ * análise — oferecer um par fora daqui é a tela pedindo o 400.
+ */
+const STATUS_TRANSITIONS: Readonly<
+  Record<DenunciationStatusEnum, readonly DenunciationStatusEnum[]>
+> = {
+  [DenunciationStatusEnum.OPEN]: [
+    DenunciationStatusEnum.IN_REVIEW,
+    DenunciationStatusEnum.DISMISSED,
+  ],
+  [DenunciationStatusEnum.IN_REVIEW]: [
+    DenunciationStatusEnum.RESOLVED,
+    DenunciationStatusEnum.DISMISSED,
+  ],
+  [DenunciationStatusEnum.RESOLVED]: [],
+  [DenunciationStatusEnum.DISMISSED]: [],
+};
+
 const STATUS_VALUES: ReadonlySet<string> = new Set(Object.values(DenunciationStatusEnum));
 
 const UNKNOWN_LABEL = '—';
@@ -69,6 +89,13 @@ export function denunciationStatusLabel(value: string | null | undefined): strin
   if (!isDenunciationStatus(value)) return value.trim() || UNKNOWN_LABEL;
 
   return STATUS_LABEL[value];
+}
+
+/** Vazio quando a situação é terminal: aí a tela não oferece ação nenhuma. */
+export function denunciationStatusTransitions(
+  value: DenunciationStatusEnum,
+): readonly DenunciationStatusEnum[] {
+  return STATUS_TRANSITIONS[value];
 }
 
 export function denunciationStatusTone(value: string | null | undefined): StatusTagTone {

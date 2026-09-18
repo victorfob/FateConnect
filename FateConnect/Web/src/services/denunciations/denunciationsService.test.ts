@@ -3,8 +3,8 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 
 import { apiClient } from '../httpClient';
-import { createDenunciation } from './denunciationsService';
-import { DenunciationCategoryEnum, type DenunciationInput } from './types';
+import { createDenunciation, updateDenunciationStatus } from './denunciationsService';
+import { DenunciationCategoryEnum, DenunciationStatusEnum, type DenunciationInput } from './types';
 
 const DENUNCIATIONS_URL = 'https://api.fateconnect.test/denunciations';
 
@@ -87,5 +87,29 @@ describe('denunciationsService', () => {
     expect(created.id).toBe(NEW_DENUNCIATION_ID);
 
     post.mockRestore();
+  });
+});
+
+describe('updateDenunciationStatus', () => {
+  const NO_CONTENT = 204;
+
+  it('should send the chosen status to the denunciation it names', async () => {
+    const received: { id: string; body: unknown }[] = [];
+    server.use(
+      http.patch<{ denunciationId: string }>(
+        `${DENUNCIATIONS_URL}/:denunciationId/status`,
+        async ({ params, request }) => {
+          received.push({ id: params.denunciationId, body: await request.json() });
+
+          return new HttpResponse(null, { status: NO_CONTENT });
+        },
+      ),
+    );
+
+    await updateDenunciationStatus(NEW_DENUNCIATION_ID, DenunciationStatusEnum.IN_REVIEW);
+
+    expect(received).toEqual([
+      { id: NEW_DENUNCIATION_ID, body: { Status: DenunciationStatusEnum.IN_REVIEW } },
+    ]);
   });
 });

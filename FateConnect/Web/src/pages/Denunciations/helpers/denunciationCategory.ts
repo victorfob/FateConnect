@@ -16,6 +16,19 @@ const CATEGORY_LABEL: Readonly<Record<DenunciationCategoryEnum, string>> = {
   [DenunciationCategoryEnum.OTHER]: 'Outro motivo',
 };
 
+/** O que vai para a URL: o rótulo encurtado, sem acento, porque o endereço se lê. */
+const CATEGORY_SLUG: Readonly<Record<DenunciationCategoryEnum, string>> = {
+  [DenunciationCategoryEnum.INAPPROPRIATE_BEHAVIOR]: 'assedio',
+  [DenunciationCategoryEnum.FAKE_PROFILE]: 'perfil-falso',
+  [DenunciationCategoryEnum.SPAM]: 'spam',
+  [DenunciationCategoryEnum.RECKLESS_DRIVING]: 'direcao-imprudente',
+  [DenunciationCategoryEnum.NO_SHOW]: 'ausencia',
+  [DenunciationCategoryEnum.IMPROPER_CHARGING]: 'cobranca-indevida',
+  [DenunciationCategoryEnum.FRAUDULENT_CLAIM]: 'pedido-indevido',
+  [DenunciationCategoryEnum.FAKE_ITEM_POSTING]: 'cadastro-falso',
+  [DenunciationCategoryEnum.OTHER]: 'outro',
+};
+
 const CATEGORY_VALUES: ReadonlySet<string> = new Set(Object.values(DenunciationCategoryEnum));
 
 const UNKNOWN_LABEL = '—';
@@ -42,4 +55,22 @@ export function denunciationCategoryLabel(value: string): string {
   if (!isDenunciationCategory(value)) return value.trim() || UNKNOWN_LABEL;
 
   return CATEGORY_LABEL[value];
+}
+
+export function denunciationCategorySlug(value: DenunciationCategoryEnum): string {
+  return CATEGORY_SLUG[value];
+}
+
+/** Interpreta o que a URL escreve, que é o rótulo encurtado e sem acento. */
+export function parseDenunciationCategory(
+  raw: string | null | undefined,
+): DenunciationCategoryEnum | null {
+  if (!raw) return null;
+
+  const slug = raw.trim().toLowerCase();
+  const found = Object.values(DenunciationCategoryEnum).find(
+    (category) => CATEGORY_SLUG[category] === slug,
+  );
+
+  return found ?? null;
 }

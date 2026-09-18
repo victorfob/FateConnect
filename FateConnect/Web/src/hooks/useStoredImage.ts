@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { fetchStoredImage } from '@app/services/lostAndFound/lostAndFoundService';
+import { fetchStoredImage } from '@app/services/uploads/uploadsService';
 
 type StoredImage = { url: string; objectUrl: string };
 

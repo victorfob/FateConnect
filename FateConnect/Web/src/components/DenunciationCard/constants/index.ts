@@ -1,6 +1,6 @@
 /**
- * `Com foto` não promete ver: a API devolve o endereço da imagem nulo para quem
- * denuncia, e só confirma que há anexo.
+ * `Com foto` só aparece no cartão que não mostra a foto: ali ele é o único sinal
+ * de que há anexo. Onde a miniatura está à vista, ele repetiria o que se vê.
  */
 export const DENUNCIATION_CARD_MARKERS = {
   confidential: 'Sigilosa',

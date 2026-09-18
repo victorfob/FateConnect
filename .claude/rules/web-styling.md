@@ -231,6 +231,24 @@ const escala = el.getBoundingClientRect().width / el.offsetWidth;   // 1 = sem r
 
 **A conferência é o próprio resultado:** o valor lido tem de corresponder ao arquivo em disco. Discordando, é a página que está velha, não o código que está errado.
 
+## Seletor de componente do Emotion não funciona aqui
+
+⛔ **`` `${OutroStyled} &` `` compila, não casa nada e não avisa.** A interpolação de um componente dentro do seletor depende do `@emotion/babel-plugin`, que este projeto não liga — sem ele o alvo não vira classe, a regra morre e o estilo simplesmente não aparece.
+
+Aconteceu em 18/09/2026, no véu de download da miniatura: `` `${DownloadTrigger}:hover &` `` para revelá-lo sob o cursor. Nenhum gate pegou — ESLint, `tsc` e a suíte passam, porque nada disso lê a cascata. Quem viu foi o Victor, na tela.
+
+**A saída é o seletor casar com o próprio elemento**, e quase sempre ela existe: o véu cobria a miniatura inteira, então o cursor sobre ela já era cursor sobre ele, e `'&:hover, &:focus-within'` resolveu. Precisando mesmo falar do ancestral, o caminho é uma classe ou um atributo de dado — não o componente.
+
+⚠️ **O sintoma é o estilo ausente sem erro nenhum.** Antes de brigar por especificidade, liste as regras que **de fato** casam com o elemento, como a seção do estado do MUI já ensina: seletor que não aparece na lista não perdeu a disputa, ele nunca entrou nela.
+
+## Contraste sobre fundo que você não controla
+
+⛔ **Ícone ou texto sobre foto do usuário não se resolve escurecendo a foto.** Véu uniforme funciona sobre imagem escura e some sobre imagem clara e cheia de detalhe, e a foto é justamente o que varia.
+
+Aconteceu na mesma rodada: o véu a 30% deixava a seta de download quase invisível sobre a foto de uma lata clara. Subir a opacidade resolveria a legibilidade escurecendo a imagem inteira, que é o que a miniatura existe para mostrar.
+
+**A saída é o elemento carregar o próprio fundo** — disco sólido atrás do ícone, com um par de cor da paleta. Aí o contraste é conhecido e medido, em vez de depender do que a pessoa anexou. ⚠️ Use par que o teste de contraste já cubra; par novo entra em `contentColours` ou em `boundPairs`, como a regra de cor manda.
+
 ## Sobrescrever estado do MUI: repita a classe do componente
 
 ⛔ **`& .Mui-selected` empata com o seletor da biblioteca e perde no desempate por ordem de fonte.** Use `& .MuiPaginationItem-root.Mui-selected` — a classe do componente mais a do estado —, que sobe a especificidade acima da do MUI. Vale para `.Mui-selected`, `.Mui-disabled`, `.Mui-focused`, `.Mui-checked` e companhia.

@@ -1,6 +1,6 @@
 import { PersonIcon, SettingsIcon } from '@design-system/icons';
 
-import { type AppLink } from '@app/constants/navigation';
+import type { AppLink } from '@app/constants/navigation';
 import { RoutePathEnum } from '@app/routes/paths';
 
 export const SERVICES_LABEL = 'Serviços';

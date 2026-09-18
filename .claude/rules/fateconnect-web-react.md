@@ -111,6 +111,14 @@ Os caminhos são em **pt-BR** — `/cadastro`, `/menu`, `/achados-perdidos`, `/c
 
 Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/buscar` e `/caronas/ofertar` existiram e foram removidas — não recriar a rota ao mexer em `routeConfig`.
 
+### Quem busca a lista fica acima do `PageShell`
+
+⛔ **O filtro mora no `titleAction`, encostado no título — então quem chama `usePagedSearch` precisa estar acima do cabeçalho.** O hook devolve `filters` e `applyFilters`, e o filtro precisa dos dois: montando a casca por fora e a busca por dentro, o filtro não alcança o slot e cai solto no corpo da tela.
+
+Aconteceu em 18/09/2026, na aba de gestão: a tela montava o `PageShell` e a aba chamava o hook, e o filtro ficou solto acima da lista. A correção foi cada aba montar a própria casca, com o cromo comum num componente que lê a aba do endereço — e não passar estado de filtro para cima.
+
+⚠️ **O tell é a busca e o cabeçalho nascerem em componentes diferentes.** Aí não há como o filtro chegar ao título sem estado atravessando para cima, que é o desenho a evitar.
+
 ## Dados
 
 - `axios` com baseURL de `import.meta.env.VITE_*`. **Nenhuma URL de API literal em arquivo versionado.**

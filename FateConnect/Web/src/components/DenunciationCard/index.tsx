@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { IconButton, ListCard, StatusTag, Typography } from '@design-system';
 import {
   CalendarTodayIcon,
   ExpandLessIcon,
   ExpandMoreIcon,
   ImageIcon,
-  VisibilityOffIcon,
+  IncognitoIcon,
 } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
@@ -21,9 +21,23 @@ import * as S from './styles';
 
 const DATE_FORMAT = 'dd/MM/yyyy';
 
-type DenunciationCardProps = Readonly<{ denunciation: Denunciation }>;
+type DenunciationCardProps = Readonly<{
+  denunciation: Denunciation;
+  /** A miniatura da foto, que a API entrega a quem analisa. */
+  media?: ReactNode;
+  /** O contato de quem denunciou. Só a gestão o oferece: na lista de quem
+   * enviou ele seria o próprio. */
+  reporterContact?: ReactNode;
+  /** A mudança de situação, que só a gestão faz. */
+  actions?: ReactNode;
+}>;
 
-export function DenunciationCard({ denunciation }: DenunciationCardProps) {
+export function DenunciationCard({
+  denunciation,
+  media,
+  reporterContact,
+  actions,
+}: DenunciationCardProps) {
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
@@ -46,7 +60,7 @@ export function DenunciationCard({ denunciation }: DenunciationCardProps) {
   }, [isExpanded]);
 
   return (
-    <ListCard>
+    <ListCard media={media}>
       <ListCard.Header>
         <Typography variant="subtitleBold">
           {denunciationCategoryLabel(denunciation.category)}
@@ -56,6 +70,8 @@ export function DenunciationCard({ denunciation }: DenunciationCardProps) {
           <StatusTag tone={denunciationStatusTone(denunciation.status)}>
             {denunciationStatusLabel(denunciation.status)}
           </StatusTag>
+
+          {reporterContact && <ListCard.ActionButtons>{reporterContact}</ListCard.ActionButtons>}
         </ListCard.Actions>
       </ListCard.Header>
 
@@ -69,14 +85,14 @@ export function DenunciationCard({ denunciation }: DenunciationCardProps) {
 
         {denunciation.isAnonymous && (
           <ListCard.InfoItem>
-            <VisibilityOffIcon />
+            <IncognitoIcon />
             <Typography variant="caption" color="inherit">
               {C.DENUNCIATION_CARD_MARKERS.confidential}
             </Typography>
           </ListCard.InfoItem>
         )}
 
-        {denunciation.hasImage && (
+        {!media && denunciation.hasImage && (
           <ListCard.InfoItem>
             <ImageIcon />
             <Typography variant="caption" color="inherit">
@@ -108,6 +124,8 @@ export function DenunciationCard({ denunciation }: DenunciationCardProps) {
           </S.DescriptionToggle>
         )}
       </ListCard.Description>
+
+      {actions}
     </ListCard>
   );
 }

@@ -1,6 +1,11 @@
 import { apiClient } from '../httpClient';
 import type { PagedResult } from '../types';
-import type { Denunciation, DenunciationFilter, DenunciationInput } from './types';
+import type {
+  Denunciation,
+  DenunciationFilter,
+  DenunciationInput,
+  DenunciationStatusEnum,
+} from './types';
 
 const DENUNCIATIONS_PATH = '/denunciations';
 
@@ -33,6 +38,14 @@ export async function listDenunciations(
   if (!Array.isArray(data?.items)) throw new Error(INVALID_LIST_PAYLOAD_MESSAGE);
 
   return data;
+}
+
+/** A API recusa par inválido com 400, mas a tela não deve chegar a pedi-lo. */
+export async function updateDenunciationStatus(
+  denunciationId: string,
+  status: DenunciationStatusEnum,
+): Promise<void> {
+  await apiClient.patch(`${DENUNCIATIONS_PATH}/${denunciationId}/status`, { Status: status });
 }
 
 export async function createDenunciation(input: DenunciationInput): Promise<Denunciation> {

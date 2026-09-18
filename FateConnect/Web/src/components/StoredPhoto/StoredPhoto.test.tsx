@@ -2,13 +2,12 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
-import { render, screen, waitFor } from '@app/test/testing-library';
+import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
-import { photoAlt } from '../constants';
-import { LostItemPhoto, type LostItemPhotoProps } from '.';
+import { StoredPhoto, type StoredPhotoProps } from '.';
 
-const ITEM_NAME = 'Carteira preta';
+const PHOTO_ALT = 'Foto de Carteira preta';
 const STORED_PATH = 'uploads/lostandfound/6f0b8e3a-1c2d-4e5f-8a9b-0c1d2e3f4a5b.png';
 const STORED_URL = `https://api.fateconnect.test/${STORED_PATH}`;
 const OBJECT_URL = 'blob:https://fateconnect.test/foto';
@@ -17,11 +16,13 @@ const PNG_BYTES = '\x89PNG\r\n\x1a\n';
 
 const SERVER_ERROR = 500;
 
-const DEFAULT_PROPS: LostItemPhotoProps = { url: STORED_PATH, itemName: ITEM_NAME };
+const DOWNLOAD = { label: 'Baixar a foto', fileName: 'denuncia.png' };
 
-const renderComponent = (props = DEFAULT_PROPS) => render(<LostItemPhoto {...props} />);
+const DEFAULT_PROPS: StoredPhotoProps = { url: STORED_PATH, alt: PHOTO_ALT };
 
-const photo = () => screen.queryByRole('img', { name: photoAlt(ITEM_NAME) });
+const renderComponent = (props = DEFAULT_PROPS) => render(<StoredPhoto {...props} />);
+
+const photo = () => screen.queryByRole('img', { name: PHOTO_ALT });
 
 function storedImageServing(onRequest?: (request: Request) => void) {
   server.use(
@@ -33,7 +34,7 @@ function storedImageServing(onRequest?: (request: Request) => void) {
   );
 }
 
-describe('LostItemPhoto', () => {
+describe('StoredPhoto', () => {
   beforeEach(() => {
     // jsdom não implementa a fábrica de URL de objeto, e é dela que sai a foto.
     URL.createObjectURL = vi.fn(() => OBJECT_URL);
@@ -45,7 +46,7 @@ describe('LostItemPhoto', () => {
     vi.restoreAllMocks();
   });
 
-  it('should keep the drawn placeholder when the item has no photo', async () => {
+  it('should keep the drawn placeholder when there is no photo', async () => {
     let asked = false;
     storedImageServing(() => {
       asked = true;
@@ -94,7 +95,7 @@ describe('LostItemPhoto', () => {
     const { rerender } = renderComponent();
     await waitFor(() => expect(photo()).toBeInTheDocument());
 
-    rerender(<LostItemPhoto url={OTHER_PATH} itemName={ITEM_NAME} />);
+    rerender(<StoredPhoto url={OTHER_PATH} alt={PHOTO_ALT} />);
 
     expect(photo()).not.toBeInTheDocument();
   });
@@ -107,5 +108,30 @@ describe('LostItemPhoto', () => {
     unmount();
 
     expect(URL.revokeObjectURL).toHaveBeenCalledWith(OBJECT_URL);
+  });
+
+  it('should offer no trigger when no download is asked for', async () => {
+    storedImageServing();
+
+    renderComponent();
+
+    await waitFor(() => expect(photo()).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: DOWNLOAD.label })).not.toBeInTheDocument();
+  });
+
+  it('should hand the loaded photo to the browser when the trigger is used', async () => {
+    storedImageServing();
+    const clicked: { href: string; download: string }[] = [];
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement,
+    ) {
+      clicked.push({ href: this.href, download: this.download });
+    });
+
+    renderComponent({ ...DEFAULT_PROPS, download: DOWNLOAD });
+    await waitFor(() => expect(photo()).toBeInTheDocument());
+    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD.label }));
+
+    expect(clicked).toEqual([{ href: OBJECT_URL, download: DOWNLOAD.fileName }]);
   });
 });
