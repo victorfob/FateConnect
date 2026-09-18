@@ -6,4 +6,3 @@ export const DENUNCIATIONS_TAB_LABEL = 'Denúncias';
 
 export const UNAVAILABLE_TITLE = 'Ainda não disponível';
 export const USERS_DESCRIPTION = 'A gestão de usuários chega em uma próxima versão.';
-export const DENUNCIATIONS_DESCRIPTION = 'A gestão de denúncias chega em uma próxima versão.';
