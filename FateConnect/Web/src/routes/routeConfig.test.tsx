@@ -9,12 +9,14 @@ import { server } from '@app/mocks/server';
 import { DENUNCIATIONS_TITLE } from '@app/pages/Denunciations/constants';
 import { DESCRIPTION_TITLE } from '@app/pages/Home/components/LandingDescription/constants';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
+import { MANAGEMENT_TITLE } from '@app/pages/Management/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
 import { PREFERENCES_TITLE } from '@app/pages/Preferences/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
 import * as C from '@app/pages/Unavailable/constants';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { ProfileTypeEnum } from '@app/services/auth/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
@@ -81,6 +83,27 @@ describe('routeConfig', () => {
 
     await expectTitle(C.UNAVAILABLE_TITLE);
     expect(screen.getByText(description)).toBeInTheDocument();
+  });
+
+  it.each([
+    ['an operator', ProfileTypeEnum.OPERATOR],
+    ['somebody whose token carries no profile', undefined],
+  ])('should keep %s out of the management screen, typed by hand', async (_name, profile) => {
+    tokenStorage.save(tokenWithName('Maria da Silva', profile));
+    const router = createMemoryRouter(routeConfig, {
+      initialEntries: [RoutePathEnum.MANAGEMENT],
+    });
+    render(<RouterProvider router={router} />);
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
+  });
+
+  it('should open the management screen for an administrator', async () => {
+    tokenStorage.save(tokenWithName('Maria da Silva', ProfileTypeEnum.ADMINISTRATOR));
+
+    renderRoute(RoutePathEnum.MANAGEMENT);
+
+    await expectTitle(MANAGEMENT_TITLE);
   });
 
   it.each([
