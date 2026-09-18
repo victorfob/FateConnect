@@ -1,5 +1,6 @@
 import type { LinkProps } from 'react-router';
 import {
+  Box,
   iconSizeTokens,
   PolymorphicStack,
   radiusScale,
@@ -16,8 +17,10 @@ const ICON_DISC_SIZE_PX = 70;
 /** O cartão cresce um pouco sob o cursor — mesma proporção e curva do produto. */
 const CARD_HOVER_SCALE = 1.05;
 const CARD_TRANSITION = 'transform 0.3s ease';
+const SINGLE_COLUMN = '1fr';
 
 type CardProps = Pick<LinkProps, 'to'>;
+type CardsContainerProps = { columns: number };
 
 export const MenuRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
@@ -38,11 +41,12 @@ export const MenuIntro = styled(Stack)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export const CardsContainer = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
+export const CardsContainer = styled(Box)<CardsContainerProps>(({ theme, columns }) => ({
+  display: 'grid',
+  gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
   gap: theme.space(xl),
 
-  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
+  [theme.breakpoints.down('md')]: { gridTemplateColumns: SINGLE_COLUMN },
 }));
 
 export const ServiceCard = styled(PolymorphicStack)<CardProps>(({ theme }) => ({
