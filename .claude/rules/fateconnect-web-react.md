@@ -105,7 +105,9 @@ grep -oE 'href="/assets/[^"]*\.js"' dist/index.html
 
 ## Rotas
 
-Os caminhos são em **pt-BR** — `/inicio`, `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas`, com `/` → `/inicio` e curinga → `/inicio`. Trocar um segmento quebra link salvo; só com decisão de produto.
+Os caminhos são em **pt-BR** — `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas` —, e a landing é a **raiz**: `RoutePathEnum.LANDING` vale `/`, sem rota própria e sem redirecionamento. O curinga leva até ela. Trocar um segmento quebra link salvo; só com decisão de produto.
+
+⛔ **Rota aposentada ganha 301 no `deploy/nginx/site.conf.template`, não um `<Navigate>`.** O redirecionamento do React Router responde 200 e só muda depois de renderizar — o robô precisa executar JavaScript para descobri-lo, e a URL antiga continua indexada. Foi o que aconteceu com `/inicio`.
 
 Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/buscar` e `/caronas/ofertar` existiram e foram removidas — não recriar a rota ao mexer em `routeConfig`.
 
