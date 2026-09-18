@@ -5,9 +5,9 @@ import { RoutePathEnum } from '@app/routes/paths';
 import { scrollToSection } from '@app/utils/scrollToSection';
 
 /**
- * Navegação para as seções da landing. Estando em outra rota, navega para
- * `/inicio` com o fragmento; já estando na landing, apenas rola — o roteador
- * ignora navegação para a mesma rota quando só o fragmento muda.
+ * Navegação para as seções da landing. Estando em outra rota, navega para a
+ * landing com o fragmento; já estando nela, apenas rola — o roteador ignora
+ * navegação para a mesma rota quando só o fragmento muda.
  */
 export function useLandingAnchor(): (sectionId: string) => void {
   const navigate = useNavigate();

@@ -10,8 +10,7 @@ import { PageMetadata } from '.';
 
 const UNKNOWN_PATH = '/rota-que-nao-existe';
 
-/** Sem a raiz, que só redireciona e herda a landing de propósito. */
-const RENDERED_ROUTES = Object.values(RoutePathEnum).filter((path) => path !== RoutePathEnum.ROOT);
+const RENDERED_ROUTES = Object.values(RoutePathEnum);
 
 function renderAt(path: string) {
   const router = createMemoryRouter([{ path: '*', element: <PageMetadata /> }], {
@@ -58,10 +57,6 @@ describe('PageMetadata', () => {
 
   it('should store the canonical as a path, leaving the origin to the environment', () => {
     expect(PAGE_METADATA[RoutePathEnum.LANDING].canonical).toBe(RoutePathEnum.LANDING);
-  });
-
-  it('should let the root inherit the landing, so the redirect shows no other title', () => {
-    expect(PAGE_METADATA[RoutePathEnum.ROOT]).toBe(PAGE_METADATA[RoutePathEnum.LANDING]);
   });
 
   it('should write the title of the current route into the document head', async () => {

@@ -84,7 +84,7 @@ describe('routeConfig', () => {
   });
 
   it.each([
-    ['the root path', RoutePathEnum.ROOT],
+    ['the landing', RoutePathEnum.LANDING],
     ['an unknown route', '/rota-que-nao-existe'],
   ])('should send %s to the menu when there is a session', async (_name, from) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
@@ -94,14 +94,6 @@ describe('routeConfig', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
   });
 
-  it('should redirect the root path to the landing page', () => {
-    const router = renderRoute(RoutePathEnum.ROOT);
-
-    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
-  });
-
-  // A raiz fica fora deste grupo de propósito: ela é redirecionamento explícito
-  // de índice, e continuaria passando com o curinga quebrado.
   it.each([
     ['a dropped rides sub-route', '/caronas/ofertar'],
     ['a dropped route', '/contato'],
