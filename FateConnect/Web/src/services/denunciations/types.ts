@@ -40,6 +40,11 @@ export type Denunciation = {
  */
 export interface DenunciationFilter extends PageQuery {
   status?: DenunciationStatusEnum;
+  category?: DenunciationCategoryEnum;
+  searchTerm?: string;
+  /** Uma ponta só filtra o dia inteiro dela; sem nenhuma, a data sai da consulta. */
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export type DenunciationInput = {
