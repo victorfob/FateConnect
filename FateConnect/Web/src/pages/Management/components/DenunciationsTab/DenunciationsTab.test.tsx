@@ -1,4 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
+import { FILTER_TITLE_PLURAL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { CONTACT_LABEL } from '@app/components/ContactButton/constants';
@@ -17,7 +18,6 @@ import {
   FILTER_CLEAR_LABEL,
   FILTER_LABELS,
   FILTER_SUBMIT_LABEL,
-  FILTER_TITLE,
 } from './components/DenunciationsFilter/constants';
 import {
   STATUS_DIALOG,
@@ -207,7 +207,7 @@ describe('DenunciationsTab', () => {
     const router = renderTab();
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
-    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE }));
+    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE_PLURAL }));
     await userEvent.type(await screen.findByLabelText(FILTER_LABELS.searchTerm), 'velocidade');
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
@@ -225,7 +225,7 @@ describe('DenunciationsTab', () => {
     const router = renderTab(`${RoutePathEnum.MANAGEMENT}?aba=denuncias&busca=velocidade`);
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
-    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE }));
+    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE_PLURAL }));
     await userEvent.click(await screen.findByRole('button', { name: FILTER_CLEAR_LABEL }));
 
     await waitFor(() => expect(asked.at(-1)).not.toContain('searchTerm'));
@@ -241,7 +241,7 @@ describe('DenunciationsTab', () => {
     renderTab();
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
-    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE }));
+    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE_PLURAL }));
     await userEvent.type(
       await screen.findByLabelText(FILTER_LABELS.period),
       '01/09/2026 - 30/09/2026',

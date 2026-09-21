@@ -1,3 +1,4 @@
+import { FILTER_TITLE_SINGULAR } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import {
@@ -21,7 +22,6 @@ import {
   FILTER_CLEAR_LABEL,
   FILTER_LABELS,
   FILTER_SUBMIT_LABEL,
-  FILTER_TITLE,
 } from './components/DenunciationFilter/constants';
 import { CHANNEL_NOTE, DENUNCIATION_FORM } from './components/DenunciationFormDialog/constants';
 import * as C from './constants';
@@ -212,7 +212,7 @@ describe('Denunciations', () => {
     renderScreen();
     await screen.findByText(DENUNCIATION.description);
 
-    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE }));
+    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE_SINGULAR }));
     await userEvent.click(await screen.findByRole('combobox', { name: FILTER_LABELS.status }));
     await userEvent.click(
       await screen.findByRole('option', {
@@ -232,7 +232,7 @@ describe('Denunciations', () => {
     renderScreen();
     await screen.findByText(DENUNCIATION.description);
 
-    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE }));
+    await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE_SINGULAR }));
     await userEvent.click(await screen.findByRole('combobox', { name: FILTER_LABELS.status }));
     await userEvent.click(
       await screen.findByRole('option', {
@@ -243,7 +243,7 @@ describe('Denunciations', () => {
     await waitFor(() => expect(asked.at(-1)?.searchParams.get('status')).not.toBeNull());
 
     // O gatilho só volta a ser alcançável quando o diálogo termina de sair.
-    await userEvent.click(await screen.findByRole('button', { name: FILTER_TITLE }));
+    await userEvent.click(await screen.findByRole('button', { name: FILTER_TITLE_SINGULAR }));
     await userEvent.click(await screen.findByRole('button', { name: FILTER_CLEAR_LABEL }));
 
     await waitFor(() => expect(asked.at(-1)?.searchParams.get('status')).toBeNull());

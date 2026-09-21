@@ -3,7 +3,6 @@ import type { SelectOption } from '@design-system';
 import { LOST_ITEM_KIND_OPTIONS } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import { LOST_ITEM_STATUS_OPTIONS } from '@app/pages/LostAndFound/helpers/lostItemStatus';
 
-export const FILTER_TITLE = 'Filtros';
 export const FILTER_SUBMIT_LABEL = 'Filtrar';
 export const FILTER_CLEAR_LABEL = 'Limpar';
 

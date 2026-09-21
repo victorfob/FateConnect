@@ -1,18 +1,17 @@
-import { useCallback, useState, type ReactNode, type SubmitEvent } from 'react';
+import { useCallback, useMemo, useState, type ReactNode, type SubmitEvent } from 'react';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { Dialog } from '../Dialog';
+import { Dialog, type DialogWidth } from '../Dialog';
 import { IconButton } from '../IconButton';
 import { FilterDialogField } from './FilterDialogField';
+import { countFields } from './helpers/countFields';
+import * as C from './constants';
 import * as S from './styles';
 
 export type FilterDialogProps = Readonly<{
-  /** Nome do gatilho: vira tooltip e nome acessível do botão de ícone. */
-  triggerLabel: string;
-  title: string;
   submitLabel: string;
   clearLabel: string;
   /** Ponto no gatilho enquanto a lista está filtrada. */
@@ -27,10 +26,11 @@ export type FilterDialogProps = Readonly<{
  * Filtros das listas: um botão de ícone que avisa quando há filtro valendo e
  * abre o diálogo da aplicação com os campos. Quem usa entrega só os campos, em
  * `Field`, e recebe de volta o pedido de aplicar e o de limpar.
+ *
+ * ⛔ O número de campos decide o título e a largura do papel: com um, `Filtro`
+ * num papel estreito; com vários, `Filtros` nos 600px e duas colunas.
  */
 function FilterDialog({
-  triggerLabel,
-  title,
   submitLabel,
   clearLabel,
   active,
@@ -39,6 +39,13 @@ function FilterDialog({
   children,
 }: FilterDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { title, width } = useMemo<{ title: string; width: DialogWidth }>(() => {
+    if (countFields(children) === C.SINGLE_FIELD)
+      return { title: C.FILTER_TITLE_SINGULAR, width: 'narrow' };
+
+    return { title: C.FILTER_TITLE_PLURAL, width: 'standard' };
+  }, [children]);
 
   const handleOpen = useCallback(() => setIsOpen(true), []);
   const handleClose = useCallback(() => setIsOpen(false), []);
@@ -60,12 +67,12 @@ function FilterDialog({
   return (
     <>
       <S.TriggerBadge variant="dot" color="secondary" invisible={!active}>
-        <IconButton type="button" label={triggerLabel} onClick={handleOpen}>
+        <IconButton type="button" label={title} onClick={handleOpen}>
           <FilterAltIcon />
         </IconButton>
       </S.TriggerBadge>
 
-      <Dialog open={isOpen} onClose={handleClose} title={title}>
+      <Dialog open={isOpen} onClose={handleClose} title={title} width={width}>
         <S.FilterForm component="form" onSubmit={handleSubmit}>
           <Dialog.Body>
             <S.FieldsGrid>{children}</S.FieldsGrid>
