@@ -30,6 +30,24 @@ docker run -d --name prova -p 8091:8091 \
 
 ⚠️ **O `nginx -t` só responde sobre sintaxe.** Ele aprova uma configuração que serve a coisa errada — o que discrimina é o `curl` em cada caminho, lendo status, `Content-Type` e os cabeçalhos que você espera.
 
+## ⛔ O template no repo não é o que está no ar
+
+**Mudou o `site.conf.template`? Nada instala isso.** O `deploy.sh` atualiza o checkout e publica o front; o nginx é passo manual por `sudo`. Ninguém avisa que ele não rodou — a configuração antiga segue respondendo 200, correta para o mundo anterior.
+
+Aconteceu com o #426: em 18/09/2026 o template ganhou `location = /inicio { return 301 /; }` e o `sitemap.prod.xml` passou a apontar para a raiz, e os **dois** ambientes seguiram com a configuração velha por três dias, atravessando um release em produção. Nenhum gate olha para isso.
+
+⛔ **"Está atualizado" não é estado mensurável — a diretiva é.** Template não tem número de versão, então a afirmação envelhece calada assim que o arquivo muda de novo. Procure a linha que você espera, no arquivo **instalado**:
+
+```bash
+ssh <host> 'grep -c "<a diretiva nova>" /etc/nginx/sites-available/fateconnect-{prod,hml}'
+```
+
+Em 21/09/2026 ele respondeu **0** nos dois antes do `install-site.sh` e **2** depois — é essa diferença que prova, não a data do arquivo.
+
+**São quatro camadas, e só as duas últimas falam do ar:** o repo, o checkout da VPS, o arquivo instalado, e o que o servidor devolve. As duas primeiras concordam entre si desde o merge e não dizem nada.
+
+⚠️ A camada do ar se confere **daqui** quando o efeito for status ou corpo — o 301 e o conteúdo do sitemap são os dois. Só transporte exige o loopback, pela seção abaixo.
+
 ## Depois de instalar, o transporte se confere de dentro
 
 ⛔ **Medição feita de fora atravessa tudo que estiver no caminho, e o que ela descreve pode ser o caminho, não o servidor.** Vale para o que é negociado na conexão — versão do protocolo, TLS, tamanho comprimido.

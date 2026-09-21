@@ -153,3 +153,13 @@ Ao fim de uma rodada com correções do usuário, antes de partir para a próxim
 Aconteceu em 2026-08-28. Saíram **dois** PRs de harness no mesmo dia e um item conhecido não entrou em nenhum: o Victor tinha corrigido, horas antes do primeiro, que suposição com ele presente deveria virar pergunta. Eu só cruzei as correções contra o harness depois do segundo PR mergear, e a cobrança foi direta — *"acabamos de fazer um PR de harness, pq vc não sugeriu colocar nele isso?"*.
 
 **O gatilho é escrever `gh pr create` num PR que toca `.claude/`.** Antes de rodar: releia a conversa inteira procurando correção do usuário, não só a que motivou este PR.
+
+### Memória que declara estado concluído envelhece calada
+
+⛔ **Grave como medir, não o veredito.** "Os dois ambientes estão com o template novo", "nada pendente no servidor" — as duas eram verdadeiras quando escritas, sobre um arquivo que mudou de novo depois. Rule é relida quando alguém mexe no código; memória não é relida por nada.
+
+Custou em 21/09/2026. A memória de produção afirmava que não faltava nada no servidor, e faltava havia três dias: o passo manual do #426 não tinha rodado em nenhum dos dois ambientes. Eu só não repeti a afirmação para o Victor porque fui medir antes de responder — e a própria memória me mandaria não medir.
+
+**A forma que não envelhece** amarra o veredito ao que ele mediu — "o template **de 13/09**" em vez de "o template novo" — e guarda ao lado o comando que responde hoje.
+
+⚠️ **O tell é a frase de completude:** "nada pendente", "já está atualizado", "os dois estão iguais", "isso já foi feito". Nenhuma delas se sustenta sozinha; cada uma pede o comando junto.
