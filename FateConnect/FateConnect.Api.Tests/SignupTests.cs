@@ -25,6 +25,11 @@ public class SignupTests : IClassFixture<ApiFactory>
         birthDate = birthDate ?? "2000-01-01T00:00:00Z",
         gender = "Male",
         contacts = contacts,
+        acceptances = new[]
+        {
+            new { document = "TermsOfUse", version = "2026-01-15" },
+            new { document = "PrivacyPolicy", version = "2026-02-20" },
+        },
     };
 
     private async Task<(HttpStatusCode StatusCode, string? Field)> SignupAnswerFor(object payload)
@@ -114,6 +119,11 @@ public class SignupTests : IClassFixture<ApiFactory>
             gender = "Male",
             addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
             contacts = new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = ApiFactory.UniqueContactEmail() } },
+        acceptances = new[]
+        {
+            new { document = "TermsOfUse", version = "2026-01-15" },
+            new { document = "PrivacyPolicy", version = "2026-02-20" },
+        },
         });
 
         string corpo = await r.Content.ReadAsStringAsync();
@@ -183,6 +193,11 @@ public class SignupTests : IClassFixture<ApiFactory>
             birthDate = "2000-01-01T00:00:00Z",
             gender = "Male",
             contacts = new[] { new { phone, contactEmail } },
+            acceptances = new[]
+            {
+                new { document = "TermsOfUse", version = "2026-01-15" },
+                new { document = "PrivacyPolicy", version = "2026-02-20" },
+            },
         };
 
         (HttpStatusCode first, _) = await SignupAnswerFor(
