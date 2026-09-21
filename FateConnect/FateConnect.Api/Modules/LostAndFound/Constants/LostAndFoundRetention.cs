@@ -6,5 +6,5 @@ public static class LostAndFoundRetention
 
     public static readonly TimeSpan TerminalStatusBeforeImageRemoval = TimeSpan.FromDays(30);
 
-    public static readonly TimeSpan SweepInterval = TimeSpan.FromDays(1);
+    public static readonly TimeOnly SweepTimeOfDayUtc = new(6, 0);
 }

@@ -8,25 +8,42 @@ using Microsoft.Extensions.Logging;
 
 public sealed partial class LostAndFoundRetentionWorker(
     IServiceScopeFactory scopeFactory,
+    TimeProvider timeProvider,
     ILogger<LostAndFoundRetentionWorker> logger
 ) : BackgroundService
 {
+    private static readonly TimeSpan OneDay = TimeSpan.FromDays(1);
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using PeriodicTimer timer = new(LostAndFoundRetention.SweepInterval);
-
         try
         {
-            do
+            while (!stoppingToken.IsCancellationRequested)
             {
+                await Task.Delay(DelayUntilNextSweep(), timeProvider, stoppingToken);
+
                 await SweepAsync();
             }
-            while (await timer.WaitForNextTickAsync(stoppingToken));
         }
         catch (OperationCanceledException)
         {
             LogSweepLoopStopped(logger);
         }
+    }
+
+    private TimeSpan DelayUntilNextSweep()
+    {
+        DateTimeOffset now = timeProvider.GetUtcNow();
+
+        DateTimeOffset sweepTimeToday = new(
+            DateOnly.FromDateTime(now.UtcDateTime),
+            LostAndFoundRetention.SweepTimeOfDayUtc,
+            TimeSpan.Zero);
+
+        if (sweepTimeToday > now)
+            return sweepTimeToday - now;
+
+        return sweepTimeToday.Add(OneDay) - now;
     }
 
     private async Task SweepAsync()
