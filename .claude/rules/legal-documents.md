@@ -32,6 +32,33 @@ Conta como fluxo novo, e portanto obriga a releitura:
 - **dado novo exibido para outros usuários** — há uma seção inteira sobre o que fica visível;
 - **funcionalidade que muda o que a plataforma faz** — os termos descrevem caronas e achados e perdidos; denúncia, notificação e administração ainda **não** estão descritas.
 
+## Reler não audita: cada afirmação se confere contra o código
+
+⛔ **A releitura confirma o que você já acredita.** O documento foi escrito por alguém que conhecia o produto, então cada frase soa plausível — e continua soando depois de deixar de ser verdade. O que encontra o falso é comparar **afirmação por afirmação** com uma medição.
+
+Em 21/09/2026, atualizando os documentos para o módulo de denúncias, esse método achou **quatro** afirmações falsas que nenhuma releitura tinha pego, e nenhuma delas estava no escopo daquela issue:
+
+| Onde | Dizia | Era |
+| --- | --- | --- |
+| `termos.html` §6 | item sem movimentação é `cancelado` e **deixa de aparecer** | é `arquivado` e **segue visível** — a política já dizia o contrário, no mesmo repositório |
+| `privacidade.html` §7 | guarda no navegador o token **e o nome** | só o token; o nome viaja dentro dele, na claim |
+| `privacidade.html` §7 | ao sair, remove o token **e o nome** | remove o token |
+| `privacidade.html` §2.1 | lista os campos do cadastro | faltavam as preferências de contato, recém-entregues |
+
+**O que medir, e contra o quê:**
+
+| A afirmação | A medição |
+| --- | --- |
+| a lista de campos do cadastro | o que o mapper de fato envia |
+| o que fica no navegador | `grep` por `setItem` no código |
+| cada terceiro nomeado | o que o código realmente chama |
+| cada prazo de guarda | o que apaga de verdade |
+| o vocabulário dos dois documentos | um contra o outro |
+
+⚠️ **Busca por ausência precisa de controle positivo.** "A política não cita denúncia" só valeu porque a mesma busca encontrou `carona` quatro vezes. Sem o par, o zero pode ser do instrumento.
+
+⚠️ **A contradição entre os dois documentos é a mais fácil de não ver**, porque cada um, lido sozinho, é coerente. Ela só aparece lendo os dois sobre o mesmo assunto.
+
 ## Mudou o texto? A data de versão sobe junto
 
 ⛔ **Alterar o HTML e não mexer em `legalDocuments.ts` quebra o registro de aceite.** A constante de versão é o que o cadastro grava para dizer **qual texto** a pessoa aceitou. Sem subir a data, o aceite passa a apontar para um documento que não existe mais — e o registro perde justamente a serventia que o justifica.
