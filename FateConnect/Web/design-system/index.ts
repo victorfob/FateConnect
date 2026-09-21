@@ -20,6 +20,7 @@ export { NavigationDrawer } from './components/NavigationDrawer';
 export { InitialsAvatar } from './components/InitialsAvatar';
 export { Dialog } from './components/Dialog';
 export { FilterDialog } from './components/FilterDialog';
+export { FILTER_TITLE_PLURAL, FILTER_TITLE_SINGULAR } from './components/FilterDialog/constants';
 export { HiddenField } from './components/HiddenField';
 export type { FilterDialogProps } from './components/FilterDialog';
 export { IconButton } from './components/IconButton';

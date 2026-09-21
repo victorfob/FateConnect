@@ -71,8 +71,6 @@ export function DenunciationsFilter({ initialFilters, onApply }: DenunciationsFi
 
   return (
     <FilterDialog
-      triggerLabel={C.FILTER_TITLE}
-      title={C.FILTER_TITLE}
       submitLabel={C.FILTER_SUBMIT_LABEL}
       clearLabel={C.FILTER_CLEAR_LABEL}
       active={isFiltered}

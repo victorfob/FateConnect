@@ -2,7 +2,6 @@ import type { SelectOption } from '@design-system';
 
 import { DENUNCIATION_STATUS_OPTIONS } from '@app/services/denunciations/denunciationStatus';
 
-export const FILTER_TITLE = 'Filtros';
 export const FILTER_SUBMIT_LABEL = 'Filtrar';
 export const FILTER_CLEAR_LABEL = 'Limpar';
 

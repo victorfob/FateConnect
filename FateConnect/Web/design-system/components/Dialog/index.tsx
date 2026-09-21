@@ -9,13 +9,22 @@ import { DialogBody } from './DialogBody';
 import { DialogFooter } from './DialogFooter';
 import * as S from './styles';
 
+export type DialogWidth = 'narrow' | 'standard';
+
 export type DialogProps = Readonly<{
   open: boolean;
   onClose: VoidFunction;
   title: string;
+  /** `narrow` para o conteúdo curto, que num papel de 600px abriria com metade vazia. */
+  width?: DialogWidth;
   /** Conteúdo por composição: `Dialog.Body` no miolo, `Dialog.Footer` no rodapé. */
   children: ReactNode;
 }>;
+
+const MAX_WIDTH_BY_WIDTH: Readonly<Record<DialogWidth, 'xs' | 'sm'>> = {
+  narrow: 'xs',
+  standard: 'sm',
+};
 
 /**
  * Esqueleto de diálogo da aplicação — superfície, título e o fechar. É o único
@@ -23,16 +32,22 @@ export type DialogProps = Readonly<{
  * outro, e o cromo (recuo, alinhamento, comportamento no estreito) fica num
  * lugar só.
  */
-function Dialog({ open, onClose, title, children }: DialogProps) {
+function Dialog({ open, onClose, title, width = 'standard', children }: DialogProps) {
   // O id nasce do React: título fixo colidiria se dois diálogos coexistissem.
   const titleId = useId();
 
   return (
     // `fullWidth` faz o papel ocupar a largura disponível até o teto, em vez de
     // acompanhar o conteúdo — sem ele cada diálogo abre com uma largura, porque
-    // o formulário de dentro é quem decidia. O teto é o `sm` do MUI (600px), que
-    // não sobrescrevemos; o `md` é o nosso limite de desktop, largo demais aqui.
-    <MuiDialog open={open} onClose={onClose} aria-labelledby={titleId} fullWidth maxWidth="sm">
+    // o formulário de dentro é quem decidia. O teto padrão é o `sm` do MUI
+    // (600px); o `md` é o nosso limite de desktop, largo demais aqui.
+    <MuiDialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby={titleId}
+      fullWidth
+      maxWidth={MAX_WIDTH_BY_WIDTH[width]}
+    >
       <S.DialogSurface>
         <S.TitleRow>
           <S.DialogTitleText variant="h2" id={titleId}>
