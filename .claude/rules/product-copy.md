@@ -246,6 +246,16 @@ Decidido em 10/09/2026, ao revisar os documentos legais: eram **15** travessões
 
 ⚠️ **A régua é da copy, não dos nossos documentos.** Rule, skill, issue, corpo de PR e comentário seguem usando travessão à vontade — este arquivo tem dezenas. O alvo é o texto que a pessoa lê dentro do produto, mais os dois documentos legais, que são texto de produto por outro nome.
 
+### Documento que sobe de versão se limpa inteiro, não de passagem
+
+⛔ **Boy-scout é a regra geral, e o documento versionado é a exceção: quando a versão dele já vai subir, a limpeza é do arquivo todo.** O que torna o boy-scout estreito correto em código é que alargar o diff custa review; aqui alargar não custa nada — a versão sobe de qualquer forma, o PDF é regerado de qualquer forma, e quem lê o documento lê inteiro.
+
+⛔ Aconteceu em 21/09/2026, no #447. Atualizando os dois documentos legais eu introduzi dois travessões, vi a regra, e tirei **só os meus dois** — deixando os 12 que já estavam ali, num arquivo cuja versão eu estava subindo na mesma linha. A cobrança foi *"ce aproveitou pra tirar todos os travessões?"*.
+
+**O custo de adiar é a unidade que se paga:** feita depois, a limpeza exige uma **versão nova** do documento só para ela, e versão que anda sem o texto ter andado é o que esta régua proíbe noutro lugar.
+
+⚠️ **O tell é você corrigir uma ocorrência sua e enxergar as vizinhas.** Em código isso é para deixar quieto; em documento cuja versão está subindo, é para varrer.
+
 ## Neutro e acessível
 
 - Linguagem neutra de gênero: "a pessoa responsável", não "o responsável". Nunca `x` ou `@`.
