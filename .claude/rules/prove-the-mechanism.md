@@ -74,6 +74,17 @@ until gh pr checks <n> --json name,bucket \
 
 **Nomear o check que você espera** não envelhece com o filtro de caminhos, e diz no próprio comando o que a espera existe para provar.
 
+⛔ **Nomear resolve a espera, e não resolve o relato: a lista de checks só fica completa no fim.** O laço pergunta *já posso ler?*, e para isso nomear basta. O relatório afirma *passou tudo* — e aí não há o que nomear, porque check que ainda não foi criado não aparece em lista nenhuma.
+
+Medido em 21/09/2026, no #451. Esperei nomeando `.NET API` e `Version`, o que estava certo, e li o resultado com `gh pr checks <n> | tail -12`. Havia **13** linhas: o `tail` cortou exatamente o `React front (Web)`, que era o vermelho, e eu anunciei "12 de 12 verdes". Consertado o job, a lista fechou em **14** — o novo é o check que o Sonar do front publica, e ele não existia antes porque o passo que o cria tinha ficado `skipped`.
+
+⚠️ **Então `length >= N` também não salvaria: o N cresce conforme o run anda.** Relato se lê da lista inteira, e o resumo **nomeia cada bucket** em vez de contar o complemento de `pass` — a seção abaixo já diz por quê, e eu reincidi nela ao escrever esta: o primeiro resumo que escrevi aqui usava `select(.bucket != "pass")` e acusou **2 reprovados** no PR desta própria rule, que eram os dois `skipping` do filtro de caminhos.
+
+```bash
+gh pr checks <n> --json name,bucket --jq '.[] | "\(.bucket)\t\(.name)"' | sort
+gh pr checks <n> --json name,bucket --jq 'group_by(.bucket)[] | "\(.[0].bucket)=\(length)"'
+```
+
 ⛔ **`grep` ancorado sobre diff filtrado responde zero.** O `git diff` desta máquina sai em **formato compacto**, e a forma dele não é estável: numa invocação ele renderiza as linhas `+` indentadas, noutra ele resume. Então `grep -E "^\+"` não casa nada — e o zero se lê como "nenhuma linha", que é justamente a resposta tranquilizadora.
 
 Medido em 03/09/2026 sobre um diff de 18 adições:
@@ -93,6 +104,18 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 ⛔ **E o mesmo envelope infla: ele acrescenta linha, e o `wc -l` conta o enfeite.** Em 10/09/2026, conferindo o que ia num commit, `git diff --cached --name-only | wc -l` respondeu **14** para **11** arquivos preparados — a diferença era cabeçalho e rodapé impressos pelo filtro. Quem discriminou foi a listagem ao lado, com os 11 caminhos certos; a contagem sozinha teria me mandado caçar três arquivos que não existiam.
 
 ⚠️ **Contagem que vai conferir alguma coisa se lê na saída crua** — `rtk proxy <comando>` — ou se conta na listagem. Engolir e inflar são o mesmo defeito: medir através de algo que reescreve a saída.
+
+⛔ **E o envelope pode comer a ENTRADA, e aí o comando não roda.** Engolir e inflar dão número errado sobre algo que aconteceu; este dá veredito sobre algo que **nunca executou** — e o resultado não é um falso verde, é um falso **vermelho** cravado no alvo que você estava medindo.
+
+Medido em 21/09/2026, com o controle nas três formas:
+
+| Comando | Responde |
+| --- | --- |
+| `dotnet build -v q --nologo` | **`0 projects, 1 errors`**, `Project file does not exist` |
+| `rtk proxy dotnet build -v q --nologo` | `0 Error(s)` ✅ |
+| `dotnet build --verbosity quiet --nologo` | `3 projects, 0 errors` ✅ |
+
+O `-v q` são dois argumentos, o filtro fica com o `q`, e o build nunca recebe projeto. A linha do meio é o controle que separa culpa do filtro de culpa do comando. **Flag curta com valor separado se escreve por extenso**, ou o comando vai por `rtk proxy`. A skill `create-release` prescrevia a primeira forma e foi corrigida junto.
 
 ⛔ **E o complemento de "passou" não é "falhou".** No mesmo `gh pr checks`, tratar `bucket != "pass"` como falha reporta vermelho onde há `pending`: em 02/09/2026 anunciei um check falhando no #287 quando o front ainda estava `IN_PROGRESS`, porque a cascata da pilha havia reiniciado o CI. Estado de terceira via — `pending`, `skipping`, `neutral` — se nomeia, não se deduz por exclusão.
 
