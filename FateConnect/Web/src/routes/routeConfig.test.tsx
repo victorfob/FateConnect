@@ -39,6 +39,7 @@ describe('routeConfig', () => {
       http.get('https://api.fateconnect.test/rides', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/lostandfound', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/denunciations', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/denunciations/mine', () => HttpResponse.json([])),
     );
   });
 
