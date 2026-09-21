@@ -48,6 +48,11 @@ Só as seções com mudança de verdade aparecem. Seção vazia não fica no arq
 - **Termina no número do PR**, entre parênteses: `(#84)`. **Sempre o PR, nunca a issue** — o link precisa cair no diff e no review, não no planejamento. Se o PR ainda não existe, use `(#?)` e troque antes do merge.
 - **Fecha com o lado que mudou:** `[Frontend]` ou `[Backend]`, **depois** do número do PR. O repositório guarda o front e a API .NET, e quem lê a release precisa saber o que precisa subir. Mudança que só funciona com os dois lados leva os dois marcadores, nessa ordem — e se cada lado produzir um efeito diferente, são duas entradas, não uma com dois marcadores.
 - **Correção entra mesmo sem efeito visível hoje.** O changelog é registro de alteração, não nota de divulgação: defeito corrigido em serviço publicado entra ainda que nenhum cliente atual chegue nele — e o marcador de lado é o que avisa quem precisa subir. Descreva o defeito **como ele era**, sem sugerir que alguém o sofreu quando ninguém sofreu.
+- ⛔ **Mas `develop` não é "publicado": defeito que nasceu e morreu dentro da mesma seção `Unreleased` não entra.** A linha acima existe contra o reflexo de omitir correção que ninguém alcançou; ela não pede registro de estado intermediário da base. Entrada de `Fixed` ali descreveria uma janela entre dois merges, e quem lê a release veria a correção de algo que nunca chegou até ele.
+
+  Aconteceu em 21/09/2026: o #437 restringiu uma rota e o #439 moveu o consumidor, com a tela respondendo 403 entre os dois. Os dois saem na mesma release, e o changelog registrou só o ganho.
+
+  **O corte é a release, não o commit:** o defeito atravessou uma versão publicada? Entra. Viveu só entre dois merges da mesma seção? Não entra — e isso vai reaparecer sempre que uma funcionalidade sair em dois ou três PRs.
 - **Item que não muda comportamento não entra.** Remoção de helper morto, refactor sem efeito externo, ajuste de teste, configuração de lint ou de CI: isso vive no histórico de commit, não no changelog.
 
 ### Citar o rótulo só quando o rename é a mudança

@@ -116,6 +116,16 @@ A escala vai de `none` (0) a `giant` (112). Os dois últimos degraus — `huge` 
 
 Os helpers **não são exportados** pelo barrel: não há como importá-los na aplicação, e é de propósito. O acesso é sempre pelo tema, o que também elimina dois imports por `styles.ts`. As demais escalas — `zIndex`, `transitions`, `shadows` — já vinham do `theme`, porque essas o MUI não distorce.
 
+### A largura base é 375px
+
+⛔ **Critério de aceite que cita largura escreve 375px** — um iPhone SE, e a base declarada do produto. Abaixo disso é limite conhecido, não defeito em aberto.
+
+⚠️ **Nenhum outro número deste repositório é a base**, e é fácil pegar o errado: a `product-copy.md` registra medições a 409px, e os tokens de breakpoint falam de 933 e 965. Os três existem por outros motivos.
+
+O que a escolha decide é o significado de "cabe": na fileira de abas do `PageShell`, a 320px cinco dos oito rótulos quebram e a 375px quebra **um**. Em 21/09/2026 um critério escrito contra 320px levou a concluir que nenhuma das quatro saídas propostas resolvia — com a base certa, faltavam 6,9px e a saída mais barata servia.
+
+⚠️ **Isto fixa onde o critério mora, não onde a medição para.** Continua valendo varrer a faixa e medir cada limite com um pixel de cada lado, como a `prove-the-mechanism.md` exige.
+
 ### Duas visões, um limite
 
 O produto tem **mobile e desktop**, e nada entre os dois:

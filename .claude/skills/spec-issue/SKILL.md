@@ -174,6 +174,14 @@ Das quatro, a pior foi a generalização: perguntei o glossário **de achados e 
 
 **O tell é a frase que estica o alcance da resposta**: "e portanto", "seguindo o mesmo critério", "por consistência". Área vizinha, objeto parecido e tela irmã são perguntas separadas, e costumam ter respostas separadas — esta teve.
 
+### `Depende de` tem frase espelhada, e é ela que morde
+
+⛔ **Issue que declara `Depende de X` obriga uma frase em X: o que X quebra até esta sair.** A seta escrita num sentido só se lê como **ordem**; o que ela esconde é o **estrago** — a janela entre o merge de X e o desta, em que a base carrega um defeito que ninguém previu.
+
+⛔ Aconteceu em 21/09/2026. A #430 dizia *"depende da #429"*, e a #429 partiu a rota de listagem deixando a geral só para administrador. Entre os dois merges a `develop` respondeu **403** na aba `Minhas denúncias` para quem não é administrador. Nenhum teste pegou, nenhum CI pegou, nenhum review pegou: o defeito só apareceu porque eu reli o corpo da #430 ao planejar a issue seguinte.
+
+**O tell é a dependência ser de contrato** — rota, campo, permissão, enum. Aí a base não só habilita a dependente: ela **quebra** o consumidor atual enquanto a dependente não chega. Escreva isso no corpo de X, e decida ali se as duas saem juntas ou em que ordem.
+
 ## 4. Dividir em sub-issues
 
 **Uma sub-issue é um PR.** O teste: dá para revisar e reverter sozinha?

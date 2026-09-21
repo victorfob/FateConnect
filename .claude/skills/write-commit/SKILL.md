@@ -99,7 +99,31 @@ cd /tmp/checa/<app> && ./node_modules/.bin/tsc --noEmit
 git worktree remove --force /tmp/checa
 ```
 
-**Rode isso nos commits que mexem em índice**, não em todos. Achando erro, a correção é mover a linha do índice para o commit que traz o símbolo — não reordenar os commits.
+⛔ **E há um segundo tell, que não é arquivo: uma interface que ganha método.** Quem a implementa mora noutros arquivos, e o **duplo de teste** é o que se esquece — ninguém pensa nele como consumidor. O commit que alarga a interface não compila enquanto o duplo não a acompanha.
+
+Aconteceu em 21/09/2026, na #374: o commit da varredura acrescentou dois métodos à `ILostAndFoundRepository`, e o duplo que `ImageStorageTests` declara só os ganhava dois commits depois. Três erros `CS0535` — invisíveis para o `pre-commit`, que compila a **árvore de trabalho** e não o estado do commit.
+
+No back-end a sonda é a mesma, trocando o compilador:
+
+```bash
+git worktree add --detach /tmp/checa <commit>
+cd /tmp/checa && dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
+git worktree remove --force /tmp/checa
+```
+
+**Rode isso nos commits que mexem em índice ou alargam interface**, não em todos. Achando erro, a correção é mover para o commit que traz o símbolo **só o trecho que depende dele** — não o arquivo inteiro, e não reordenar os commits.
+
+⚠️ **Mover o arquivo inteiro carrega junto o que não era dali.** Naquele `ImageStorageTests` havia duas mudanças independentes — a conformidade com a interface e a extração de uma classe aninhada —, e só a primeira pertencia ao commit da interface.
+
+### Corte que exige inventar um estado é corte errado
+
+⛔ **Se dividir por assunto obriga você a autorar uma versão de arquivo que nunca existiu, o corte está errado — recorte, não invente.** O commit do meio passa a carregar código que ninguém escreveu e que morre no commit seguinte; quem revisa lê history ficcional, e nenhum gate acusa.
+
+⛔ Aconteceu em 21/09/2026, na #429. O plano tinha três commits — extrair o serviço de imagem, separar as listagens, mover a rota da foto — e as duas últimas mudanças haviam **reescrito as mesmas regiões** do mesmo serviço: uma função morreu justamente *porque* a outra mudança aconteceu. O commit do meio só sairia com aquela função ressuscitada para morrer de novo depois. O corte virou dois, e o que sobrou foi o único pedaço com estado intermediário **real**: a extração, que existiu antes da mudança de rota.
+
+⚠️ **Isto é o oposto da seção de replay abaixo.** Lá os estados intermediários **existiram** e se reconstroem reaplicando a transformação; aqui eles nunca existiram, e reconstruí-los é escrever ficção.
+
+**O tell é você abrindo o editor para "desfazer" parte de uma mudança** só para o commit anterior fechar.
 
 ### Quando as mudanças se sobrepõem nos mesmos arquivos
 
