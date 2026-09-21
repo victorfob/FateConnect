@@ -1,3 +1,4 @@
+using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Rides.Exceptions;
@@ -58,13 +59,13 @@ public class RideDomainMessagesTests
     }
 
     [Fact]
-    public void ARideWithoutADriver_AnswersTheDriverMessageInPortuguese()
+    public void ARideWithoutADriver_AnswersTheUserIdentifierMessageInPortuguese()
     {
-        InvalidRideDriverException exception = Assert.Throws<InvalidRideDriverException>(
+        InvalidUserIdentifierException exception = Assert.Throws<InvalidUserIdentifierException>(
             () => CreateRide(driverId: 0));
 
         Assert.Equal(
-            "Não foi possível identificar quem está ofertando a carona. Entre novamente.",
+            "Não foi possível processar a requisição. O identificador de usuário fornecido é inválido ou não existe.",
             exception.Message);
     }
 

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { PageShell, Typography, useThemeMode } from '@design-system';
+import { PageShell, Switch, Typography, useThemeMode } from '@design-system';
 import { ArrowBackIcon, DarkModeIcon, LightModeIcon, SettingsIcon } from '@design-system/icons';
 
 import { RoutePathEnum } from '@app/routes/paths';
@@ -34,8 +34,7 @@ export function Preferences() {
             <S.SettingDescription variant="caption">{C.THEME_DESCRIPTION}</S.SettingDescription>
           </S.SettingText>
 
-          <S.ThemeSwitch
-            disableRipple
+          <Switch
             checked={mode === 'dark'}
             onChange={toggleMode}
             slotProps={{ input: { 'aria-label': C.THEME_SWITCH_LABEL } }}

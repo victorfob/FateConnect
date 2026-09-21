@@ -95,6 +95,19 @@ function autofilledFieldText(theme: Theme): Par[] {
   return [['body text on an autofilled field', palette.text.primary, palette.inputAutofill]];
 }
 
+/**
+ * O polegar branco é o que diz o estado do interruptor, e ele pousa sobre dois
+ * fundos que `surfaces` não alcança: o trilho desligado e o ligado.
+ */
+function switchThumbPairs(theme: Theme): Par[] {
+  const { palette } = theme;
+
+  return [
+    ['the switch thumb when off', palette.common.white, palette.switchTrack],
+    ['the switch thumb when on', palette.common.white, palette.secondary.main],
+  ];
+}
+
 function floatingSurfaceNonText(theme: Theme): Par[] {
   return [
     [
@@ -162,12 +175,13 @@ describe.each([
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
   });
 
-  it.each([...against(theme, nonTextColours), ...floatingSurfaceNonText(theme)])(
-    'should meet the non-text threshold for %s',
-    (_name, foreground, background) => {
-      expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NON_TEXT);
-    },
-  );
+  it.each([
+    ...against(theme, nonTextColours),
+    ...floatingSurfaceNonText(theme),
+    ...switchThumbPairs(theme),
+  ])('should meet the non-text threshold for %s', (_name, foreground, background) => {
+    expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+  });
 
   // O logotipo é isento do mínimo da WCAG, então não há limite a cobrar dele — e
   // um limite que não se exige não entra na lista acima só para parecer medido.

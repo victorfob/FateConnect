@@ -1,5 +1,7 @@
 import {
+  AdminPanelSettingsIcon,
   DirectionsCarIcon,
+  NotificationsIcon,
   SearchIcon,
   SecurityIcon,
   type SvgIconComponent,
@@ -26,3 +28,17 @@ export const APP_LINKS: AppLink[] = [
   { path: RoutePathEnum.RIDES, label: 'Caronas', Icon: DirectionsCarIcon },
   { path: RoutePathEnum.DENUNCIATIONS, label: 'Denúncias', Icon: SecurityIcon },
 ];
+
+/** Fora de `APP_LINKS` porque só quem é administrador o enxerga. */
+export const MANAGEMENT_LINK: AppLink = {
+  path: RoutePathEnum.MANAGEMENT,
+  label: 'Gestão',
+  Icon: AdminPanelSettingsIcon,
+};
+
+/** Fora de `APP_LINKS` porque essa lista também desenha a navegação do topo. */
+export const NOTIFICATIONS_LINK: AppLink = {
+  path: RoutePathEnum.NOTIFICATIONS,
+  label: 'Notificações',
+  Icon: NotificationsIcon,
+};

@@ -41,8 +41,6 @@ A voz acima descreve texto **transacional** — aviso, botão, erro. A landing t
 
 A landing **pode** anunciar funcionalidade que ainda não existe, enquanto ela estiver numa milestone aberta: este é um trabalho acadêmico de escopo público declarado, e a apresentação descreve o produto inteiro.
 
-Hoje vale para o **Portal de denúncias**, na milestone 14/09. Entrando o módulo, esta exceção sai da regra.
-
 ⚠️ A exceção é do **que** se anuncia, não de **como**: o texto de uma funcionalidade futura segue a mesma régua acima.
 
 Fundamentando a seção: [Concise, SCANNABLE, and Objective](https://www.nngroup.com/articles/concise-scannable-and-objective-how-to-write-for-the-web/) e [How Users Read on the Web](https://www.nngroup.com/articles/how-users-read-on-the-web/), Nielsen Norman Group.
@@ -115,6 +113,36 @@ O mesmo objeto ou estado se chama igual em **toda** a tela — etiqueta, botão,
 ⛔ **O que fecha essa porta é o filtro, não preferência.** O campo `Situação` do painel não tem item, logo não tem tipo — ali `Resolvido` é a única palavra possível, e levar `Encontrado`/`Devolvido` para o estado deixaria o filtro sem nome para o que o cartão nomeia. O aviso de sucesso cai no mesmo teste por outro motivo: `Item encontrado.` colidiria com o estado vazio da própria tela, que diz `Nenhum item encontrado.`
 
 ⚠️ **O tell de que a distinção vazou para o lugar errado** é um rótulo de estado que só se consegue escrever tendo um item na mão.
+
+### O verbo da ação nomeia o resultado, não o gesto
+
+⛔ **Antes de nomear uma ação destrutiva, pergunte o que sobra depois dela.** O verbo promete um resultado; se o registro continua lá, a promessa é falsa — e ela contamina a etiqueta, a nota e o aviso junto.
+
+Duas trocas neste repo, pelo mesmo diagnóstico:
+
+| Era | Virou | Porque o antigo descrevia o gesto |
+| --- | --- | --- |
+| `Cancelar` | `Excluir` | prometia desistir da operação, não destruir o registro |
+| `Excluir` | `Arquivar` | prometia destruir um item que **continua visível para todo mundo** |
+
+⛔ **Por isso achados e perdidos diz `Arquivar` e caronas diz `Excluir`, e isso NÃO é inconsistência a corrigir.** A diferença é reversibilidade: o item arquivado segue no mural e tem `Desfazer` no aviso; a carona não volta — e é ela que **mantém o diálogo de confirmação**, porque ali não há caminho de volta pela tela. Levantei a divergência ao cortar a 0.10.0 e a decisão do Victor foi essa.
+
+⚠️ **A confirmação segue a mesma régua.** Ação reversível pela própria tela troca o diálogo por um `Desfazer` no aviso; ação sem volta mantém o porteiro. O diálogo não é enfeite de gravidade — é a única saída quando não há outra.
+
+### A palavra pode ter dono fora do produto
+
+⛔ **Antes de batizar algo que existe fora daqui — conceito jurídico, técnico ou regulatório —, procure a definição.** Coerência interna não torna a palavra certa: ela garante que o produto se repita, não que ele acerte o nome.
+
+⛔ Aconteceu em 14/09/2026, na opção de sigilo da denúncia. Passei a rodada inteira ajustando **o quanto** o rótulo promete — `Não mostrar meu nome para quem analisar`, depois `Anônimo` com uma frase condicional corrigindo a palavra —, medindo largura e comparando com as vizinhas. A palavra certa veio de fora, do Victor:
+
+| | O que significa |
+| --- | --- |
+| **Anônima** | o vínculo entre autor e relato **não existe** — nem para quem administra o banco, nem diante de ordem judicial |
+| **Sigilosa** (ou confidencial) | a identidade é registrada, e regras de acesso a escondem de determinados perfis |
+
+O sistema faz a segunda, e o rótulo virou `Sigilosa`. ⚠️ Repare no que isso desfez: a frase de apoio tinha nascido para **consertar** uma palavra errada. Com o nome certo, ela volta a ser o que um texto de apoio deve ser — explicação do que a opção faz, não remendo.
+
+**O tell é a rodada de copy gastar-se em "promete demais ou de menos" sem nunca perguntar como aquilo se chama.** Quando o objeto tem nome em lei ou na literatura técnica, esse nome decide — e conferir custa uma busca.
 
 ### O rótulo do campo de busca nomeia tudo o que ele alcança
 
@@ -217,6 +245,16 @@ Decidido em 10/09/2026, ao revisar os documentos legais: eram **15** travessões
 ⚠️ **O traço que marca ausência de valor não é pontuação, e fica.** `pages/Rides/helpers/rideType.ts` e `pages/LostAndFound/helpers/lostItemStatus.ts` declaram `UNKNOWN_LABEL = '—'` para a célula sem conteúdo. Ali ele é símbolo, e trocá-lo mudaria o que a tela mostra.
 
 ⚠️ **A régua é da copy, não dos nossos documentos.** Rule, skill, issue, corpo de PR e comentário seguem usando travessão à vontade — este arquivo tem dezenas. O alvo é o texto que a pessoa lê dentro do produto, mais os dois documentos legais, que são texto de produto por outro nome.
+
+### Documento que sobe de versão se limpa inteiro, não de passagem
+
+⛔ **Boy-scout é a regra geral, e o documento versionado é a exceção: quando a versão dele já vai subir, a limpeza é do arquivo todo.** O que torna o boy-scout estreito correto em código é que alargar o diff custa review; aqui alargar não custa nada — a versão sobe de qualquer forma, o PDF é regerado de qualquer forma, e quem lê o documento lê inteiro.
+
+⛔ Aconteceu em 21/09/2026, no #447. Atualizando os dois documentos legais eu introduzi dois travessões, vi a regra, e tirei **só os meus dois** — deixando os 12 que já estavam ali, num arquivo cuja versão eu estava subindo na mesma linha. A cobrança foi *"ce aproveitou pra tirar todos os travessões?"*.
+
+**O custo de adiar é a unidade que se paga:** feita depois, a limpeza exige uma **versão nova** do documento só para ela, e versão que anda sem o texto ter andado é o que esta régua proíbe noutro lugar.
+
+⚠️ **O tell é você corrigir uma ocorrência sua e enxergar as vizinhas.** Em código isso é para deixar quieto; em documento cuja versão está subindo, é para varrer.
 
 ## Neutro e acessível
 

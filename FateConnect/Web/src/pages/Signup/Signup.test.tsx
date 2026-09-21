@@ -6,11 +6,17 @@ import {
   FATEC_EMAIL_DOMAIN_MESSAGE,
   FATEC_EMAIL_LOCAL_PART_MESSAGE,
 } from '@app/constants/fatecEmail';
-import { PRIVACY_URL, TERMS_URL } from '@app/constants/legalDocuments';
+import {
+  PRIVACY_URL,
+  PRIVACY_VERSION,
+  TERMS_URL,
+  TERMS_VERSION,
+} from '@app/constants/legalDocuments';
 import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { DocumentTypeEnum } from '@app/services/signup/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { SignupConflictFieldEnum } from './@types';
@@ -259,6 +265,12 @@ describe('Signup', () => {
       gender: 'Female',
       birthDate: '1999-05-22T00:00:00Z',
       contacts: [{ phone: '11912345678', contactEmail: VALID_SIGNUP.contactEmail }],
+      acceptances: [
+        { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
+        { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },
+      ],
+      receiveEmails: false,
+      receiveNotifications: false,
     });
   });
 

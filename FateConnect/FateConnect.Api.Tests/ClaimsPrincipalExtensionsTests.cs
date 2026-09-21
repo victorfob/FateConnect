@@ -3,6 +3,7 @@ using System.Security.Claims;
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Auth.Extensions;
+using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Tests;
 
@@ -28,6 +29,18 @@ public class ClaimsPrincipalExtensionsTests
         ClaimsPrincipal user = PrincipalWith();
 
         Assert.Throws<UnidentifiedUserException>(() => user.GetUserId());
+    }
+
+    [Theory]
+    [InlineData(nameof(EnumProfileType.Administrator), true)]
+    [InlineData(nameof(EnumProfileType.Operator), false)]
+    public void IsAdministrator_FollowsTheProfileClaim(string profile, bool expected)
+    {
+        ClaimsPrincipal user = PrincipalWith(new Claim(ClaimTypes.Role, profile));
+
+        bool isAdministrator = user.IsAdministrator();
+
+        Assert.Equal(expected, isAdministrator);
     }
 
     [Fact]

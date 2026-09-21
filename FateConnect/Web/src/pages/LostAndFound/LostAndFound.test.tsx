@@ -1,4 +1,4 @@
-import { DATE_PICKER_LABEL, type SelectOption } from '@design-system';
+import { DATE_PICKER_LABEL, FILTER_TITLE_PLURAL, type SelectOption } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
@@ -27,7 +27,6 @@ import {
   FILTER_CLEAR_LABEL,
   FILTER_LABELS,
   FILTER_SUBMIT_LABEL,
-  FILTER_TITLE,
   LOST_ITEM_KIND_FILTER_OPTIONS,
   LOST_ITEM_OWNER_FILTER_OPTIONS,
   LostItemOwnerFilterEnum,
@@ -60,7 +59,7 @@ async function activeFilterDot() {
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
   return screen
-    .getByRole('button', { name: FILTER_TITLE })
+    .getByRole('button', { name: FILTER_TITLE_PLURAL })
     .closest('.MuiBadge-root')
     ?.querySelector('.MuiBadge-badge');
 }
@@ -71,7 +70,7 @@ async function openFilters() {
   // alcançável por papel depois que o diálogo sai de cena.
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
-  await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE }));
+  await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE_PLURAL }));
   await screen.findByRole('dialog');
 }
 

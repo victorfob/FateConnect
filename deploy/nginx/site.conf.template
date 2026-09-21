@@ -64,6 +64,11 @@ server {
         alias /etc/nginx/fateconnect-__ENVIRONMENT__/sitemap.xml;
     }
 
+    # A landing mora na raiz; este caminho ficou indexado e salvo em favorito.
+    # No React Router ele responderia 200 e só mudaria depois de renderizar.
+    location = /inicio  { return 301 /; }
+    location = /inicio/ { return 301 /; }
+
     # Caminho com extensão que não corresponde a arquivo responde 404, em vez do
     # index. Sem isto TODA URL responde 200 com a página, inclusive as que um
     # robô procura por convenção — e a lista delas cresce sozinha: robots.txt,

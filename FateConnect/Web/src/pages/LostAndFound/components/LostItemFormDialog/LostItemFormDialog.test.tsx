@@ -16,8 +16,9 @@ import {
   EDIT_MODE,
   LOST_ITEM_FORM_LABELS,
   MAX_PHOTO_BYTES,
-  PHOTO_ACTIONS,
+  PHOTO_FIELD_LABELS,
   REGISTER_MODE,
+  STORED_PHOTO_ALT,
 } from './constants';
 import { LostItemFormDialog, type LostItemFormDialogProps } from '.';
 
@@ -236,16 +237,18 @@ describe('LostItemFormDialog', () => {
 
     await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
 
-    const preview = await screen.findByRole('img', { name: PHOTO_ACTIONS.previewAlt });
+    const preview = await screen.findByRole('img', { name: PHOTO_FIELD_LABELS.previewAlt });
     expect(preview).toHaveAttribute('src', PREVIEW_URL);
-    expect(screen.getByRole('button', { name: PHOTO_ACTIONS.replace })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.replace })).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: PHOTO_ACTIONS.remove }));
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.remove }));
 
     await waitFor(() =>
-      expect(screen.queryByRole('img', { name: PHOTO_ACTIONS.previewAlt })).not.toBeInTheDocument(),
+      expect(
+        screen.queryByRole('img', { name: PHOTO_FIELD_LABELS.previewAlt }),
+      ).not.toBeInTheDocument(),
     );
-    expect(screen.getByRole('button', { name: PHOTO_ACTIONS.pick })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.pick })).toBeInTheDocument();
   });
 
   it('should bring the stored photo into the form when the item already has one', async () => {
@@ -253,25 +256,29 @@ describe('LostItemFormDialog', () => {
     renderComponent({ ...DEFAULT_PROPS, item: ITEM_WITH_PHOTO });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
 
-    expect(await screen.findByRole('img', { name: PHOTO_ACTIONS.storedAlt })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: PHOTO_ACTIONS.replace })).toBeInTheDocument();
+    expect(await screen.findByRole('img', { name: STORED_PHOTO_ALT })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.replace })).toBeInTheDocument();
     // A API não apaga a foto guardada, só a troca: oferecer remover seria mentira.
-    expect(screen.queryByRole('button', { name: PHOTO_ACTIONS.remove })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: PHOTO_FIELD_LABELS.remove }),
+    ).not.toBeInTheDocument();
   });
 
   it('should put the stored photo back when the newly chosen one is dropped', async () => {
     storedPhotoServing();
     renderComponent({ ...DEFAULT_PROPS, item: ITEM_WITH_PHOTO });
-    await screen.findByRole('img', { name: PHOTO_ACTIONS.storedAlt });
+    await screen.findByRole('img', { name: STORED_PHOTO_ALT });
 
     await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
 
-    expect(await screen.findByRole('img', { name: PHOTO_ACTIONS.previewAlt })).toBeInTheDocument();
-    expect(screen.queryByRole('img', { name: PHOTO_ACTIONS.storedAlt })).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole('img', { name: PHOTO_FIELD_LABELS.previewAlt }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: STORED_PHOTO_ALT })).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: PHOTO_ACTIONS.remove }));
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.remove }));
 
-    expect(await screen.findByRole('img', { name: PHOTO_ACTIONS.storedAlt })).toBeInTheDocument();
+    expect(await screen.findByRole('img', { name: STORED_PHOTO_ALT })).toBeInTheDocument();
   });
 
   it('should refuse a photo in a format the server will not take', async () => {

@@ -20,6 +20,7 @@ using FateConnect.Api.Modules.Users.Interfaces;
 using FateConnect.Api.Modules.Users.Repositories;
 using FateConnect.Api.Modules.Users.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -28,8 +29,12 @@ using Microsoft.OpenApi.Models;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
+using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Services;
+using FateConnect.Api.Modules.Denunciations.Interfaces;
+using FateConnect.Api.Modules.Denunciations.Services;
+using FateConnect.Api.Modules.Denunciations.Repositories;
 
 public class Program
 {
@@ -85,10 +90,24 @@ public class Program
         builder.Services.AddScoped<IRideRepository, RideRepository>();
         builder.Services.AddScoped<IRideService, RideService>();
 
+        builder.Services.AddSingleton(TimeProvider.System);
+
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
+
         builder.Services.AddScoped<ILostAndFoundRepository, LostAndFoundRepository>();
         builder.Services.AddScoped<ILostAndFoundService, LostAndFoundService>();
+        builder.Services.AddScoped<ILostAndFoundRetentionService, LostAndFoundRetentionService>();
+        builder.Services.AddHostedService<LostAndFoundRetentionWorker>();
 
         builder.Services.AddScoped<IStorageService, StorageService>();
+
+        builder.Services.AddScoped<IDenunciationRepository, DenunciationRepository>();
+        builder.Services.AddScoped<IDenunciationService, DenunciationService>();
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -188,6 +207,8 @@ public class Program
         }
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
+
+        app.UseForwardedHeaders();
 
         app.UseCors(corsPolicy);
 

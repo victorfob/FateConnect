@@ -23,6 +23,46 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("FateConnect.Api.Modules.Denunciations.Entities.Denunciation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Denunciations");
+                });
+
             modelBuilder.Entity("FateConnect.Api.Modules.LostAndFound.Entities.LostAndFoundRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -61,6 +101,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("StatusChangedAt")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -155,6 +198,45 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("Contacts");
                 });
 
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.DocumentAcceptance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AcceptedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("DocumentType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(45)
+                        .HasColumnType("character varying(45)");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DocumentAcceptances");
+                });
+
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -190,6 +272,12 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("ProfileType")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("ReceiveEmails")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReceiveNotifications")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("TokenVersion")
                         .HasColumnType("integer");
 
@@ -199,6 +287,17 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Denunciations.Entities.Denunciation", b =>
+                {
+                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.LostAndFound.Entities.LostAndFoundRecord", b =>
@@ -234,9 +333,22 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.DocumentAcceptance", b =>
+                {
+                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
+                        .WithMany("DocumentAcceptances")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.User", b =>
                 {
                     b.Navigation("Contacts");
+
+                    b.Navigation("DocumentAcceptances");
                 });
 #pragma warning restore 612, 618
         }

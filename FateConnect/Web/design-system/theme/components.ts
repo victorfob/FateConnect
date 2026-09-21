@@ -11,6 +11,11 @@ const { none, xxs, xs, md } = spacingScale;
 
 const SELECT_OPTION_MIN_HEIGHT_PX = 48;
 
+const SWITCH_WIDTH_PX = 48;
+const SWITCH_HEIGHT_PX = 30;
+const SWITCH_TRACK_RADIUS_PX = 15;
+const SWITCH_THUMB_TRAVEL_PX = 18;
+
 export const components: Components<Theme> = {
   MuiButton: {
     styleOverrides: {
@@ -124,6 +129,40 @@ export const components: Components<Theme> = {
         // no campo e alinha a 16px. Os 3px somavam altura em cada campo com erro.
         margin: spacing(none, md),
       },
+    },
+  },
+  /**
+   * Interruptor no desenho do iOS: trilho sólido do tamanho do polegar, sem o
+   * véu translúcido do Material — era ele que deixava o estado desligado em
+   * 2,68:1, abaixo do mínimo de 3:1 para não-texto.
+   */
+  MuiSwitch: {
+    defaultProps: { disableRipple: true },
+    styleOverrides: {
+      root: {
+        width: `${SWITCH_WIDTH_PX}px`,
+        height: `${SWITCH_HEIGHT_PX}px`,
+        padding: spacing(none),
+      },
+      switchBase: ({ theme }) => ({
+        padding: spacing(xxs),
+        // O polegar lê `currentColor`, e sem isto ele sai no cinza do Material.
+        color: theme.palette.common.white,
+        '&.Mui-checked': {
+          color: theme.palette.common.white,
+          transform: `translateX(${SWITCH_THUMB_TRAVEL_PX}px)`,
+          '& + .MuiSwitch-track': {
+            backgroundColor: theme.palette.secondary.main,
+            opacity: 1,
+          },
+        },
+      }),
+      track: ({ theme }) => ({
+        borderRadius: `${SWITCH_TRACK_RADIUS_PX}px`,
+        backgroundColor: theme.palette.switchTrack,
+        opacity: 1,
+        transition: theme.transitions.create('background-color'),
+      }),
     },
   },
   MuiCheckbox: {

@@ -88,16 +88,44 @@ grep -oE 'href="/assets/[^"]*\.js"' dist/index.html
 
 ⛔ **E procurar o pedaço ausente nessa lista responde zero por vacuidade** quando ele não foi criado. Confira as duas coisas: que o pedaço **existe** na saída do build, e que **não** está no `index.html`.
 
+## Tela de módulo copia a casca do módulo vizinho
+
+⛔ **Antes de desenhar a tela de um módulo novo, abra a do módulo que já existe e copie a casca.** Caronas e achados e perdidos usam o mesmo arranjo, e ele é o padrão da casa:
+
+| Peça | O que ocupa |
+| --- | --- |
+| `PageShell` com `title` e `PageShell.Back` | o topo e a volta ao menu |
+| `titleAction` | o filtro, como botão de ícone que abre o diálogo |
+| `tabs` com duas `PageShell.Tab` | a lista à esquerda, e à direita a aba que abre o diálogo de cadastro |
+| `CardsList` + `Pagination` | a lista, o esqueleto de carregamento e o estado vazio |
+
+⛔ Aconteceu em 14/09/2026: a tela de denúncia nasceu com um cartão de abertura e um botão, porque foi escrita antes da lista — e ficou a **única** fora do padrão. A cobrança veio como *"a tela de denúncias é a única que foge do padrão das outras"*, e o conserto custou um redesenho com o PR já aberto e verde.
+
+⚠️ **O tell é a tela ter uma única ação e ainda não ter lista.** Aí o cartão com botão parece a saída natural, e ele é justamente o que não se parece com as vizinhas quando a lista chegar.
+
 ## Rotas
 
-Os caminhos são em **pt-BR** — `/inicio`, `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas`, com `/` → `/inicio` e curinga → `/inicio`. Trocar um segmento quebra link salvo; só com decisão de produto.
+Os caminhos são em **pt-BR** — `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas` —, e a landing é a **raiz**: `RoutePathEnum.LANDING` vale `/`, sem rota própria e sem redirecionamento. O curinga leva até ela. Trocar um segmento quebra link salvo; só com decisão de produto.
+
+⛔ **Rota aposentada ganha 301 no `deploy/nginx/site.conf.template`, não um `<Navigate>`.** O redirecionamento do React Router responde 200 e só muda depois de renderizar — o robô precisa executar JavaScript para descobri-lo, e a URL antiga continua indexada. Foi o que aconteceu com `/inicio`.
 
 Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/buscar` e `/caronas/ofertar` existiram e foram removidas — não recriar a rota ao mexer em `routeConfig`.
+
+### Quem busca a lista fica acima do `PageShell`
+
+⛔ **O filtro mora no `titleAction`, encostado no título — então quem chama `usePagedSearch` precisa estar acima do cabeçalho.** O hook devolve `filters` e `applyFilters`, e o filtro precisa dos dois: montando a casca por fora e a busca por dentro, o filtro não alcança o slot e cai solto no corpo da tela.
+
+Aconteceu em 18/09/2026, na aba de gestão: a tela montava o `PageShell` e a aba chamava o hook, e o filtro ficou solto acima da lista. A correção foi cada aba montar a própria casca, com o cromo comum num componente que lê a aba do endereço — e não passar estado de filtro para cima.
+
+⚠️ **O tell é a busca e o cabeçalho nascerem em componentes diferentes.** Aí não há como o filtro chegar ao título sem estado atravessando para cima, que é o desenho a evitar.
 
 ## Dados
 
 - `axios` com baseURL de `import.meta.env.VITE_*`. **Nenhuma URL de API literal em arquivo versionado.**
 - **Caminho de rota da API em minúsculo**, mesmo quando o controlador é `PascalCase`: `/rides` e `/lostandfound`, nunca `/Rides` nem `/LostAndFound`. O roteamento do ASP.NET não olha caixa, então as duas grafias casam — e copiar a do `[Route("[controller]")]` espalha duas escritas para a mesma rota, que é o que se evita.
+- ⛔ **A função de serviço nomeia o endpoint, não o recorte que o servidor decide.** `listDenunciations`, e não `listMyDenunciations`: o `GET` é um só, e quem recorta é o perfil que vai no token — quando a tela de gestão consumir a mesma função, ela lista tudo, e o nome com `My` passaria a mentir. Nome com recorte só quando o **parâmetro** do recorte existe na chamada, como o `onlyMine` de caronas e achados e perdidos.
+
+  ⚠️ Em 14/09/2026 o nome nasceu certo para o desenho anterior, em que havia esse parâmetro, e sobreviveu à troca de desenho no mesmo PR. Quem viu foi o Victor. Ao mudar o contrato, releia quem o chama: o consumidor envelhece calado.
 - Interceptor de request injeta o token; interceptor de response centraliza o tratamento de erro.
 - Requisição em componente via `@tanstack/react-query` — não `useEffect` + `setState` na mão. Erro de rede vira notificação ao usuário, não só log.
 
@@ -115,5 +143,18 @@ Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/b
 - Helper de render com providers em `src/test/testing-library.tsx`.
 - **Cobertura mínima de 90%** em statements, branches, functions e lines, sobre a base inteira. O limite está em `vite.config.ts` e é aplicado pelo `yarn test:ci`, que a pipeline executa. Exclusões conscientes: `main.tsx` (bootstrap), infraestrutura de teste e declarações de tipo. Ampliar a lista de exclusão exige justificativa; o caminho normal é escrever o teste.
 - ⛔ **`yarn test:ci` verde não prova a cobertura do que você escreveu.** O limite de 90% do `vite.config.ts` é sobre a base inteira, e as centenas de testes existentes seguram a média; o quality gate do Sonar mede **código novo**, por PR. Arquivo novo mal coberto passa no gate local e reprova no do PR — duas vezes em 04/09/2026, no `logout()` e no popover ancorado, que derrubou o gate para 84%. Antes de empurrar, leia o bloco de cada arquivo do diff em `coverage/lcov.info` (`LF`/`LH` e `BRF`/`BRH`), em vez de confiar no verde global.
+- ⛔ **Suíte recortada não vale como gate para troca de rota ou de URL.** O stub que quebra vive no arquivo de teste que você não abriu, e o caso reprova **por console** — o `msw` diz `intercepted a request without a matching request handler` e o `vitest-fail-on-console` derruba —, não por asserção. Em 21/09/2026, no #439, a tela passou a chamar `/denunciations/mine` e o `routeConfig.test.tsx` seguiu servindo a rota antiga: rodar `vitest` só nos testes da tela deu **verde**, e quem pegou foi `yarn test:ci`.
+- ⛔ **E o gate rodado pelo binário direto não confere a versão do Node — só o `yarn` confere.** `./node_modules/.bin/vitest`, `./node_modules/.bin/eslint` e `./node_modules/.bin/tsc` rodam em qualquer versão e respondem verde; o campo `engines` do `package.json` é cobrado pelo `yarn`, e por mais ninguém. O verde vale então sobre um mundo que ninguém vai mergear.
+
+  Medido em 14/09/2026, com o Node 22 forçado de propósito no repo que exige `>=24.18.0`:
+
+  | Pelo `yarn` | Pelo binário |
+  | --- | --- |
+  | `yarn test:ci` → **exit 1**, `The engine "node" is incompatible` | `./node_modules/.bin/vitest run <caminho>` → **16 passed** |
+  | `yarn lint` → **exit 1**, a mesma recusa | `./node_modules/.bin/eslint <arquivo>` → **exit 0** |
+  | | `./node_modules/.bin/tsc --noEmit` → **exit 0** |
+
+  ⚠️ **O tell é você nunca ter passado por um `yarn`.** Sessão que só invoca binário não tem quem cobre a versão — a primeira cobrança chega no `pre-push`, ou no CI. Antes de reportar gate, `node -v` contra o `.nvmrc`; e o `nvm use` de dentro de `FateConnect/Web`, que é onde o `.nvmrc` mora.
+
 - ⚠️ **Em jsdom a geometria é toda zero.** Componente que mede `getBoundingClientRect` ou `offsetWidth` volta pelo `if` de guarda, e as linhas de cálculo **nunca executam** mesmo com o componente renderizado no teste. Cobri-las exige forjar a geometria — `vi.spyOn` no `getBoundingClientRect` e `Object.defineProperty` no `offsetWidth`, desfeitos no `afterEach`.
 - `renderHook` vem de `@testing-library/react` — **não** do pacote `@testing-library/react-hooks`, que é do React 17 e está morto.

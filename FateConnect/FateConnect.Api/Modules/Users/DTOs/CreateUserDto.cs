@@ -39,4 +39,15 @@ public class CreateUserDto
     [MinLength(1, ErrorMessage = "Informe ao menos um contato")]
     required public List<CreateContactDto> Contacts { get; set; } =
     [];
+
+    [Required(ErrorMessage = "Informe o aceite dos documentos")]
+    [MinLength(1, ErrorMessage = "Informe o aceite de ao menos um documento")]
+    required public List<DocumentAcceptanceDto> Acceptances { get; set; } =
+    [];
+
+    [DefaultValue(false)]
+    public bool? ReceiveEmails { get; set; }
+
+    [DefaultValue(false)]
+    public bool? ReceiveNotifications { get; set; }
 }

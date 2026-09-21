@@ -11,6 +11,12 @@ description: >-
 
 O formato está em `.claude/rules/changelog-format.md` — esta skill é o procedimento. Entradas vão direto em `## [Unreleased]` no `CHANGELOG.md` da raiz.
 
+⛔ **Abra a rule com o `Read` ANTES de redigir, não depois.** Ela tem `paths:` e carrega ao ler o `CHANGELOG.md` — então escrever a entrada primeiro e tocar o arquivo depois a traz **atrasada**, quando o texto já está pronto e parece bom. De memória saem as regras que se lembram (imperativo, efeito, número do PR, marcador de lado) e ficam de fora as que só existem no artefato.
+
+Aconteceu em 21/09/2026, no #442: escrevi a entrada sem abrir a rule e ela saiu com **402 caracteres** contra o teto de 300. A rule só apareceu na segunda edição do arquivo, para trocar o `(#?)` pelo número — com o PR já aberto, o que custou duas emendas e dois force-push.
+
+⚠️ **O tell é você já saber o que a entrada vai dizer.** É exatamente aí que abrir a régua parece desnecessário.
+
 ## 1. Descobrir o que mudou
 
 ```bash

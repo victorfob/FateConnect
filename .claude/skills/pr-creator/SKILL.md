@@ -50,6 +50,18 @@ The PR description must be in **pt-BR** and must include:
 - `## Issue`: reference to the GitHub issue derived from the branch (see **Issue reference** above). Omit this section only when no numeric issue id can be inferred from the branch.
 - `## Evidências`: reserved section for screenshots from the user.
 
+### A linha de atribuição fecha o corpo
+
+⛔ **Depois de `## Evidências`, o corpo termina com a linha de atribuição:**
+
+```
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+Ela era convenção viva e não estava escrita em lugar nenhum — e convenção cumprida por hábito falha na sessão longa. Medido em 14/09/2026: o #402, o #397 e o #394 a têm; o **#403**, aberto por mim no mesmo dia, saiu sem ela.
+
+⚠️ **Atualizando PR já aberto, ela já vem no corpo publicado de onde você parte** — conferir antes de acrescentar, senão saem duas.
+
 Do not add assumptions not present in the diff.
 
 ## Open or update the PR
@@ -88,3 +100,4 @@ Do not add assumptions not present in the diff.
 - `## Issue` present when the branch name yields a numeric id (e.g. `chore/3` → `- #3`).
 - `## Evidências` section present.
 - PR assigned to the authenticated user (`--assignee @me`).
+- Body ends with the attribution line, exactly once.

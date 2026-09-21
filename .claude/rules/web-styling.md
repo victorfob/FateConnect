@@ -116,6 +116,16 @@ A escala vai de `none` (0) a `giant` (112). Os dois últimos degraus — `huge` 
 
 Os helpers **não são exportados** pelo barrel: não há como importá-los na aplicação, e é de propósito. O acesso é sempre pelo tema, o que também elimina dois imports por `styles.ts`. As demais escalas — `zIndex`, `transitions`, `shadows` — já vinham do `theme`, porque essas o MUI não distorce.
 
+### A largura base é 375px
+
+⛔ **Critério de aceite que cita largura escreve 375px** — um iPhone SE, e a base declarada do produto. Abaixo disso é limite conhecido, não defeito em aberto.
+
+⚠️ **Nenhum outro número deste repositório é a base**, e é fácil pegar o errado: a `product-copy.md` registra medições a 409px, e os tokens de breakpoint falam de 933 e 965. Os três existem por outros motivos.
+
+O que a escolha decide é o significado de "cabe": na fileira de abas do `PageShell`, a 320px cinco dos oito rótulos quebram e a 375px quebra **um**. Em 21/09/2026 um critério escrito contra 320px levou a concluir que nenhuma das quatro saídas propostas resolvia — com a base certa, faltavam 6,9px e a saída mais barata servia.
+
+⚠️ **Isto fixa onde o critério mora, não onde a medição para.** Continua valendo varrer a faixa e medir cada limite com um pixel de cada lado, como a `prove-the-mechanism.md` exige.
+
 ### Duas visões, um limite
 
 O produto tem **mobile e desktop**, e nada entre os dois:
@@ -231,6 +241,24 @@ const escala = el.getBoundingClientRect().width / el.offsetWidth;   // 1 = sem r
 
 **A conferência é o próprio resultado:** o valor lido tem de corresponder ao arquivo em disco. Discordando, é a página que está velha, não o código que está errado.
 
+## Seletor de componente do Emotion não funciona aqui
+
+⛔ **`` `${OutroStyled} &` `` compila, não casa nada e não avisa.** A interpolação de um componente dentro do seletor depende do `@emotion/babel-plugin`, que este projeto não liga — sem ele o alvo não vira classe, a regra morre e o estilo simplesmente não aparece.
+
+Aconteceu em 18/09/2026, no véu de download da miniatura: `` `${DownloadTrigger}:hover &` `` para revelá-lo sob o cursor. Nenhum gate pegou — ESLint, `tsc` e a suíte passam, porque nada disso lê a cascata. Quem viu foi o Victor, na tela.
+
+**A saída é o seletor casar com o próprio elemento**, e quase sempre ela existe: o véu cobria a miniatura inteira, então o cursor sobre ela já era cursor sobre ele, e `'&:hover, &:focus-within'` resolveu. Precisando mesmo falar do ancestral, o caminho é uma classe ou um atributo de dado — não o componente.
+
+⚠️ **O sintoma é o estilo ausente sem erro nenhum.** Antes de brigar por especificidade, liste as regras que **de fato** casam com o elemento, como a seção do estado do MUI já ensina: seletor que não aparece na lista não perdeu a disputa, ele nunca entrou nela.
+
+## Contraste sobre fundo que você não controla
+
+⛔ **Ícone ou texto sobre foto do usuário não se resolve escurecendo a foto.** Véu uniforme funciona sobre imagem escura e some sobre imagem clara e cheia de detalhe, e a foto é justamente o que varia.
+
+Aconteceu na mesma rodada: o véu a 30% deixava a seta de download quase invisível sobre a foto de uma lata clara. Subir a opacidade resolveria a legibilidade escurecendo a imagem inteira, que é o que a miniatura existe para mostrar.
+
+**A saída é o elemento carregar o próprio fundo** — disco sólido atrás do ícone, com um par de cor da paleta. Aí o contraste é conhecido e medido, em vez de depender do que a pessoa anexou. ⚠️ Use par que o teste de contraste já cubra; par novo entra em `contentColours` ou em `boundPairs`, como a regra de cor manda.
+
 ## Sobrescrever estado do MUI: repita a classe do componente
 
 ⛔ **`& .Mui-selected` empata com o seletor da biblioteca e perde no desempate por ordem de fonte.** Use `& .MuiPaginationItem-root.Mui-selected` — a classe do componente mais a do estado —, que sobe a especificidade acima da do MUI. Vale para `.Mui-selected`, `.Mui-disabled`, `.Mui-focused`, `.Mui-checked` e companhia.
@@ -238,6 +266,42 @@ const escala = el.getBoundingClientRect().width / el.offsetWidth;   // 1 = sem r
 **O sintoma é traiçoeiro porque é parcial:** só as propriedades que o MUI também declara voltam ao valor dele. Na #171 o `color` aplicava e o `backgroundColor` não, e o número da página selecionada saía **branco sobre o cinza da biblioteca** — quase ilegível. Um seletor que "quase funciona" é mais difícil de ver do que um que não funciona.
 
 ⚠️ **Nenhum gate pega isso.** ESLint, `tsc`, a suíte e o teste de contraste passam: nenhum deles renderiza o componente com o CSS do MUI competindo. A conferência é rodar na aplicação — ver `.claude/rules/parallelism-and-worktrees.md`.
+
+## Antes de acrescentar espaço, meça o que o contêiner já dá
+
+⛔ **Margem posta "para respirar" soma com o `gap` do pai e com o recuo do vizinho, e o total não aparece em lugar nenhum do código.** Cada um dos três está num arquivo diferente e cada um parece razoável sozinho.
+
+Medido em 14/09/2026, na nota que abre o diálogo de denúncia — o vão até o primeiro campo era de **52px**:
+
+| De onde vinha | Quanto |
+| --- | --- |
+| `gap` do corpo do diálogo, no design system | 16px |
+| a margem que eu pus na nota | 24px |
+| `paddingTop` da coluna de campos, que existe para o rótulo flutuante não sair cortado | 12px |
+
+A minha margem era a sobra: o corpo já espaça os filhos. Tirando-a, sobra o ritmo que o diálogo já tinha.
+
+**A conferência é ler o pai antes de escrever o filho** — `Stack` com `gap`, `Dialog.Body`, `PageShell`, `FieldsColumn` e `CardsList` todos espaçam o que está dentro. Quem viu o vão foi o Victor, na tela.
+
+⚠️ **O tell é a palavra "respiro" no seu próprio raciocínio.** Espaço se acrescenta quando o contêiner não dá nenhum, não quando o que ele dá parece pouco — aí o que se ajusta é o contêiner, e para todo mundo.
+
+## Animação nossa nasce com a guarda de movimento
+
+⛔ **Toda animação e toda transição que a gente declara leva `@media (prefers-reduced-motion: reduce)` junto, zerando o movimento.** A guarda vai ao lado da declaração, no `styles.ts` de quem anima.
+
+```ts
+export const Hint = styled(Typography)(({ theme }) => ({
+  animation: `${entry} ${theme.transitions.duration.enteringScreen}ms ${theme.transitions.easing.easeOut}`,
+
+  '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+}));
+```
+
+**Por que:** é preferência do **sistema operacional**, não do navegador — no macOS fica em Acessibilidade → Tela → *Reduzir movimento*, e Windows, iOS e Android têm equivalente. Quem a liga costuma ligar porque movimento dispara sintoma vestibular — tontura, náusea, enxaqueca —, e a WCAG 2.3.3 pede que movimento disparado por interação possa ser desligado.
+
+⚠️ **A regra não é sobre a animação que a motivou.** A primeira do repo, escrita em 14/09/2026, desliza 6px em 225ms: nesse tamanho o risco é baixo e a guarda é seguro barato. Ela existe para a **próxima**, que pode ser ampla — e que sem convenção nasceria sem nada.
+
+⚠️ **Isto vale para o que nós declaramos.** Transição que vem de dentro de um componente da biblioteca não passa por aqui, e desligá-la seria outra decisão, tomada num lugar só.
 
 ## 📚 Referências
 

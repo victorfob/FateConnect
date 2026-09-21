@@ -37,6 +37,7 @@ public class ValidationMessagesTests
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             Gender = (EnumGender)99,
             Contacts = [],
+            Acceptances = [],
         });
 
         Assert.Contains(results, result => result.ErrorMessage == "Gênero inválido");
@@ -53,6 +54,7 @@ public class ValidationMessagesTests
             BirthDate = DateTime.UtcNow.Date.AddYears(-10),
             Gender = EnumGender.Female,
             Contacts = [],
+            Acceptances = [],
         });
 
         Assert.Contains(results, result => result.ErrorMessage == "É necessário ter pelo menos 18 anos");
@@ -102,6 +104,7 @@ public class ValidationMessagesTests
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             Gender = EnumGender.Male,
             Contacts = [],
+            Acceptances = [],
         });
 
         Assert.Contains(results, result => result.ErrorMessage == RegexConstants.FatecEmailLocalPartErrorMessage);

@@ -4,7 +4,7 @@ import { server } from '@app/mocks/server';
 
 import { tokenStorage } from '../auth/tokenStorage';
 import { signup } from './signupService';
-import type { SignupRequest } from './types';
+import { DocumentTypeEnum, type SignupRequest } from './types';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/users/signup';
 
@@ -15,6 +15,9 @@ const PAYLOAD: SignupRequest = {
   birthDate: '2000-01-01T00:00:00Z',
   gender: 'Female',
   contacts: [],
+  acceptances: [{ document: DocumentTypeEnum.TERMS_OF_USE, version: '2026-01-15' }],
+  receiveEmails: false,
+  receiveNotifications: false,
 };
 
 describe('signupService', () => {

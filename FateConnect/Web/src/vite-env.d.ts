@@ -4,6 +4,8 @@ type ImportMetaEnv = {
   readonly VITE_API_URL: string;
   /** Ausente em desenvolvimento e em teste: sem ela o Sentry não sobe. */
   readonly VITE_SENTRY_DSN?: string;
+  /** Ausente fora da publicação: aí o ambiente é o modo do Vite. */
+  readonly VITE_SENTRY_ENVIRONMENT?: string;
 };
 
 interface ImportMeta {
