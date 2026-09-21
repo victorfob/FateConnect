@@ -16,7 +16,7 @@ describe('denunciationStatus', () => {
     [DenunciationStatusEnum.OPEN, 'Aberta', 'warning'],
     [DenunciationStatusEnum.IN_REVIEW, 'Em análise', 'neutral'],
     [DenunciationStatusEnum.RESOLVED, 'Resolvida', 'success'],
-    [DenunciationStatusEnum.DISMISSED, 'Não acolhida', 'danger'],
+    [DenunciationStatusEnum.DISMISSED, 'Descartada', 'danger'],
   ])('should name and tone %s', (status, label, tone) => {
     expect(denunciationStatusLabel(status)).toBe(label);
     expect(denunciationStatusTone(status)).toBe(tone);
@@ -45,7 +45,7 @@ describe('denunciationStatus', () => {
   });
 
   it('should read the slug as the address may carry it, and refuse what is not one', () => {
-    expect(parseDenunciationStatus('  NAO-ACOLHIDA ')).toBe(DenunciationStatusEnum.DISMISSED);
+    expect(parseDenunciationStatus('  DESCARTADA ')).toBe(DenunciationStatusEnum.DISMISSED);
     expect(parseDenunciationStatus('resolvido')).toBeNull();
     expect(parseDenunciationStatus(null)).toBeNull();
   });

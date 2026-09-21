@@ -3,15 +3,15 @@ import type { StatusTagTone } from '@design-system';
 import { DenunciationStatusEnum } from './types';
 
 /**
- * ⛔ `Não acolhida` cobre os dois caminhos que a API permite até aqui: recusa na
- * triagem e recusa depois da análise. `Improcedente` afirmaria mérito que o
- * primeiro não teve.
+ * ⛔ `Descartada` cobre os dois caminhos que a API permite: recusa na triagem e
+ * recusa depois da análise. `Improcedente` afirmaria mérito que o primeiro não
+ * teve, e `Arquivada` é o estado reversível de achados e perdidos.
  */
 const STATUS_LABEL: Readonly<Record<DenunciationStatusEnum, string>> = {
   [DenunciationStatusEnum.OPEN]: 'Aberta',
   [DenunciationStatusEnum.IN_REVIEW]: 'Em análise',
   [DenunciationStatusEnum.RESOLVED]: 'Resolvida',
-  [DenunciationStatusEnum.DISMISSED]: 'Não acolhida',
+  [DenunciationStatusEnum.DISMISSED]: 'Descartada',
 };
 
 /** O que vai para a URL: o rótulo sem acento, porque a barra de endereço se lê. */
@@ -19,7 +19,7 @@ const STATUS_SLUG: Readonly<Record<DenunciationStatusEnum, string>> = {
   [DenunciationStatusEnum.OPEN]: 'aberta',
   [DenunciationStatusEnum.IN_REVIEW]: 'em-analise',
   [DenunciationStatusEnum.RESOLVED]: 'resolvida',
-  [DenunciationStatusEnum.DISMISSED]: 'nao-acolhida',
+  [DenunciationStatusEnum.DISMISSED]: 'descartada',
 };
 
 const STATUS_TONE: Readonly<Record<DenunciationStatusEnum, StatusTagTone>> = {

@@ -12,8 +12,8 @@ describe('denunciationSearchCodec', () => {
     expect(filter).toEqual({ page: FIRST_PAGE, pageSize: PAGE_SIZE });
   });
 
-  it('should read the situation that the address writes without accent', () => {
-    const filter = denunciationSearchCodec.fromParams(new URLSearchParams('situacao=nao-acolhida'));
+  it('should read the situation the address carries', () => {
+    const filter = denunciationSearchCodec.fromParams(new URLSearchParams('situacao=descartada'));
 
     expect(filter.status).toBe(DenunciationStatusEnum.DISMISSED);
   });

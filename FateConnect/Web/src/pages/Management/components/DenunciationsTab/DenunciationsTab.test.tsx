@@ -5,6 +5,7 @@ import { CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { DENUNCIATION_CARD_MARKERS } from '@app/components/DenunciationCard/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
+import { denunciationStatusLabel } from '@app/services/denunciations/denunciationStatus';
 import {
   DenunciationCategoryEnum,
   DenunciationStatusEnum,
@@ -26,6 +27,10 @@ import * as C from './constants';
 import { DenunciationsTab } from '.';
 
 const DENUNCIATIONS_URL = 'https://api.fateconnect.test/denunciations';
+
+const IN_REVIEW_LABEL = denunciationStatusLabel(DenunciationStatusEnum.IN_REVIEW);
+const DISMISSED_LABEL = denunciationStatusLabel(DenunciationStatusEnum.DISMISSED);
+const RESOLVED_LABEL = denunciationStatusLabel(DenunciationStatusEnum.RESOLVED);
 
 const OPEN_DENUNCIATION: Denunciation = {
   id: 'a3f1c0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
@@ -111,9 +116,9 @@ describe('DenunciationsTab', () => {
 
     await userEvent.click(screen.getByRole('combobox', { name: STATUS_SELECT_LABEL }));
 
-    expect(screen.getByRole('option', { name: 'Em análise' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Não acolhida' })).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: 'Resolvida' })).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: IN_REVIEW_LABEL })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: DISMISSED_LABEL })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: RESOLVED_LABEL })).not.toBeInTheDocument();
   });
 
   it('should offer no action at all once the denunciation is closed', async () => {
