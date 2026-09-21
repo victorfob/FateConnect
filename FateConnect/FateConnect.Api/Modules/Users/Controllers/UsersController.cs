@@ -1,5 +1,6 @@
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +28,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SignUpAsync([FromBody] CreateUserDto dto)
     {
-        TokenResponseDto response = await _userService.SignUpAsync(dto);
+        TokenResponseDto response = await _userService.SignUpAsync(dto, HttpContext.GetRequestOrigin());
 
         return StatusCode(StatusCodes.Status201Created, response);
     }

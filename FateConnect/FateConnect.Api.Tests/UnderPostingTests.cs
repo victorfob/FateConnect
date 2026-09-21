@@ -20,6 +20,11 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         ["fullName"] = "Mariana Alves Rocha",
         ["gender"] = "Male",
         ["contacts"] = new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = ApiFactory.UniqueContactEmail() } },
+        ["acceptances"] = new[]
+        {
+            new { document = "TermsOfUse", version = "2026-01-15" },
+            new { document = "PrivacyPolicy", version = "2026-02-20" },
+        },
     };
 
     [Fact]
