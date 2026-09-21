@@ -9,6 +9,9 @@ using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.LostAndFound.Entities;
+using FateConnect.Api.Modules.LostAndFound.Enums;
+using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.Entities;
@@ -16,6 +19,7 @@ using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -52,6 +56,11 @@ public class ApiFactory : WebApplicationFactory<Program>
             services.Remove(registration);
             services.AddDbContext<FateConnectDbContext>(
                 options => options.UseNpgsql(TestDatabase.ConnectionStringFor(_databaseName)));
+
+            ServiceDescriptor retentionWorker = services.Single(
+                service => service.ImplementationType == typeof(LostAndFoundRetentionWorker));
+
+            services.Remove(retentionWorker);
         });
     }
 
@@ -182,6 +191,41 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.SaveChanges();
 
         return ride.Id;
+    }
+
+    public Guid SeedLostAndFoundRecord(
+        int reporterId,
+        EnumStatusLostAndFound status = EnumStatusLostAndFound.Open,
+        DateTime? createdAt = null,
+        DateTime? updatedAt = null,
+        DateTime? statusChangedAt = null,
+        string? imageUrl = null)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        LostAndFoundRecord record = new(
+            "Garrafa térmica azul",
+            EnumLostAndFoundType.Lost,
+            "Biblioteca do bloco B",
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
+            "Ficou na mesa do fundo.",
+            reporterId);
+
+        if (imageUrl is not null)
+            record.AttachImage(imageUrl);
+
+        context.LostAndFoundRecords.Add(record);
+
+        EntityEntry<LostAndFoundRecord> entry = context.Entry(record);
+        entry.Property(entity => entity.Status).CurrentValue = status;
+        entry.Property(entity => entity.CreatedAt).CurrentValue = createdAt ?? DateTime.UtcNow;
+        entry.Property(entity => entity.UpdatedAt).CurrentValue = updatedAt;
+        entry.Property(entity => entity.StatusChangedAt).CurrentValue = statusChangedAt;
+
+        context.SaveChanges();
+
+        return record.Id;
     }
 
     public Guid SeedDenunciation(

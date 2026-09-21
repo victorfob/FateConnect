@@ -28,6 +28,7 @@ using Microsoft.OpenApi.Models;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
+using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
@@ -88,8 +89,12 @@ public class Program
         builder.Services.AddScoped<IRideRepository, RideRepository>();
         builder.Services.AddScoped<IRideService, RideService>();
 
+        builder.Services.AddSingleton(TimeProvider.System);
+
         builder.Services.AddScoped<ILostAndFoundRepository, LostAndFoundRepository>();
         builder.Services.AddScoped<ILostAndFoundService, LostAndFoundService>();
+        builder.Services.AddScoped<ILostAndFoundRetentionService, LostAndFoundRetentionService>();
+        builder.Services.AddHostedService<LostAndFoundRetentionWorker>();
 
         builder.Services.AddScoped<IStorageService, StorageService>();
 
