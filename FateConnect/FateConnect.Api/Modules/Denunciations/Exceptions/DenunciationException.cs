@@ -14,6 +14,9 @@ public class InvalidDenunciationCategoryException()
 public class InvalidDenunciationStatusException()
     : DenunciationDomainException("O status informado para a denúncia é inválido.");
 
+public class DenunciationNotReportedByUserException()
+    : Exception("Esta denúncia foi registrada por outra pessoa. Só quem a registrou pode ver o anexo dela.");
+
 public class InvalidDenunciationStatusTransitionException(EnumDenunciationStatus currentStatus, EnumDenunciationStatus newStatus)
     : DenunciationDomainException(
         currentStatus == newStatus

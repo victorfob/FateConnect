@@ -15,13 +15,6 @@ using System;
 [Authorize]
 public class UploadsController(IWebHostEnvironment environment) : ControllerBase
 {
-    [HttpGet("denunciation/{fileName}")]
-    [AuthorizeProfile(EnumProfileType.Administrator)]
-    public ActionResult GetDenunciationImage(string fileName)
-    {
-        return this.ServeStoredImage(environment, EnumStorageContainer.Denunciation, fileName);
-    }
-
     [HttpGet("{container}/{fileName}")]
     [AuthorizeProfile(EnumProfileType.Operator)]
     public ActionResult GetGenericImage(string container, string fileName)
