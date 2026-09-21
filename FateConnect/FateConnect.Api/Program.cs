@@ -28,6 +28,7 @@ using Microsoft.OpenApi.Models;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
+using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Denunciations.Interfaces;

@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.LostAndFound.Services;
+namespace FateConnect.Api.Modules.LostAndFound.Workers;
 
 using FateConnect.Api.Modules.LostAndFound.Constants;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;

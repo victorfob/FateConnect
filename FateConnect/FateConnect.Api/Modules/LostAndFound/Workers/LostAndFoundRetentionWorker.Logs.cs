@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.LostAndFound.Services;
+namespace FateConnect.Api.Modules.LostAndFound.Workers;
 
 using Microsoft.Extensions.Logging;
 

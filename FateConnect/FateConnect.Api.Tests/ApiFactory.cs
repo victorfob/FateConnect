@@ -11,7 +11,7 @@ using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Enums;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
-using FateConnect.Api.Modules.LostAndFound.Services;
+using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.Entities;
