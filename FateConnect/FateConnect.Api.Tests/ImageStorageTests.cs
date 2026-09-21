@@ -66,6 +66,12 @@ public sealed class ImageStorageTests : IDisposable
         public Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord) =>
             throw new DbUpdateException("o banco recusou o registro");
 
+        public Task<IReadOnlyList<LostAndFoundRecord>> GetOpenRecordsUntouchedSinceAsync(DateTime untouchedSince) =>
+            throw new NotSupportedException();
+
+        public Task<IReadOnlyList<LostAndFoundRecord>> GetTerminalRecordsWithImageSinceAsync(DateTime terminalSince) =>
+            throw new NotSupportedException();
+
         public Task SaveChangesAsync() => throw new NotSupportedException();
     }
 

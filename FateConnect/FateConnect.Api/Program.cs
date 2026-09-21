@@ -88,8 +88,12 @@ public class Program
         builder.Services.AddScoped<IRideRepository, RideRepository>();
         builder.Services.AddScoped<IRideService, RideService>();
 
+        builder.Services.AddSingleton(TimeProvider.System);
+
         builder.Services.AddScoped<ILostAndFoundRepository, LostAndFoundRepository>();
         builder.Services.AddScoped<ILostAndFoundService, LostAndFoundService>();
+        builder.Services.AddScoped<ILostAndFoundRetentionService, LostAndFoundRetentionService>();
+        builder.Services.AddHostedService<LostAndFoundRetentionWorker>();
 
         builder.Services.AddScoped<IStorageService, StorageService>();
 
