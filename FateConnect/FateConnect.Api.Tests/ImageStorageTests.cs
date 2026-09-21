@@ -15,10 +15,8 @@ using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Services;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FateConnect.Api.Tests;
@@ -26,16 +24,6 @@ namespace FateConnect.Api.Tests;
 public sealed class ImageStorageTests : IDisposable
 {
     private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-uploads-{Guid.NewGuid():N}");
-
-    private sealed class TemporaryWebRoot(string webRootPath) : IWebHostEnvironment
-    {
-        public string WebRootPath { get; set; } = webRootPath;
-        public IFileProvider WebRootFileProvider { get; set; } = new NullFileProvider();
-        public string ContentRootPath { get; set; } = webRootPath;
-        public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
-        public string EnvironmentName { get; set; } = "Test";
-        public string ApplicationName { get; set; } = "FateConnect.Api";
-    }
 
     private static FormFile FileOf(string contentType, int sizeInBytes = 12, string fileName = "foto.png")
     {
