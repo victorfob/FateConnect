@@ -3,6 +3,7 @@ import { http, HttpResponse } from 'msw';
 import {
   DENUNCIATION_CARD_MARKERS,
   DESCRIPTION_TOGGLE_LABELS,
+  photoAlt,
 } from '@app/components/DenunciationCard/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
@@ -27,6 +28,14 @@ import * as C from './constants';
 import { Denunciations } from '.';
 
 const DENUNCIATIONS_URL = 'https://api.fateconnect.test/denunciations';
+
+const MY_DENUNCIATIONS_URL = `${DENUNCIATIONS_URL}/mine`;
+
+const PHOTO_PATH = 'Denunciations/a1f0/image';
+const PHOTO_URL = `https://api.fateconnect.test/${PHOTO_PATH}`;
+const OBJECT_URL = 'blob:https://fateconnect.test/foto';
+/** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
+const PNG_BYTES = '\x89PNG\r\n\x1a\n';
 
 const CREATED = 201;
 const SERVER_ERROR = 500;
@@ -74,7 +83,7 @@ function stubOverflow() {
 const renderScreen = () => renderAtRoute(RoutePathEnum.DENUNCIATIONS, <Denunciations />);
 
 function listing(all: Denunciation[], onRequest?: (url: URL) => void) {
-  server.use(pagedListHandler(DENUNCIATIONS_URL, all, onRequest));
+  server.use(pagedListHandler(MY_DENUNCIATIONS_URL, all, onRequest));
 }
 
 const statusOptionLabel = (status: DenunciationStatusEnum) =>
@@ -83,6 +92,9 @@ const statusOptionLabel = (status: DenunciationStatusEnum) =>
 describe('Denunciations', () => {
   beforeEach(() => {
     listing([]);
+    // jsdom não implementa a fábrica de URL de objeto, e é dela que sai a foto.
+    URL.createObjectURL = vi.fn(() => OBJECT_URL);
+    URL.revokeObjectURL = vi.fn();
   });
 
   // As alturas forjadas são do protótipo do elemento: sem devolvê-las, o caso
@@ -147,12 +159,36 @@ describe('Denunciations', () => {
     expect(screen.getByText(statusOptionLabel(DenunciationStatusEnum.OPEN))).toBeInTheDocument();
   });
 
-  it('should mark the confidential one and the one with a photo', async () => {
+  it('should mark the confidential one, and drop the photo marker now that the photo shows', async () => {
     listing([denunciationWith({ isAnonymous: true, hasImage: true })]);
     renderScreen();
 
     expect(await screen.findByText(DENUNCIATION_CARD_MARKERS.confidential)).toBeInTheDocument();
-    expect(screen.getByText(DENUNCIATION_CARD_MARKERS.photo)).toBeInTheDocument();
+    expect(screen.queryByText(DENUNCIATION_CARD_MARKERS.photo)).not.toBeInTheDocument();
+  });
+
+  it('should ask the api for what the person reported, not for every denunciation', async () => {
+    const asked: URL[] = [];
+    listing([DENUNCIATION], (url) => asked.push(url));
+    renderScreen();
+    await screen.findByText(DENUNCIATION.description);
+
+    expect(asked.map((url) => url.pathname)).toEqual(['/denunciations/mine']);
+  });
+
+  it('should draw the attached photo on the card', async () => {
+    listing([denunciationWith({ imageUrl: PHOTO_PATH, hasImage: true })]);
+    server.use(
+      http.get(PHOTO_URL, () => {
+        return new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': 'image/png' } });
+      }),
+    );
+    renderScreen();
+
+    expect(await screen.findByRole('img', { name: photoAlt(DENUNCIATION) })).toHaveAttribute(
+      'src',
+      OBJECT_URL,
+    );
   });
 
   it('should leave both markers out of a denunciation that has neither', async () => {
@@ -253,7 +289,9 @@ describe('Denunciations', () => {
   });
 
   it('should keep the list readable when the api refuses it', async () => {
-    server.use(http.get(DENUNCIATIONS_URL, () => new HttpResponse(null, { status: SERVER_ERROR })));
+    server.use(
+      http.get(MY_DENUNCIATIONS_URL, () => new HttpResponse(null, { status: SERVER_ERROR })),
+    );
     renderScreen();
 
     // O cliente tenta a requisição de novo antes de desistir.
