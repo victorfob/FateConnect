@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 
 import { fetchStoredImage } from '@app/services/uploads/uploadsService';
 
-type StoredImage = { url: string; objectUrl: string };
+export type StoredImage = { objectUrl: string; contentType: string };
+
+type LoadedImage = StoredImage & { url: string };
 
 /** Endereço que o navegador possa exibir, buscado com o token e revogado ao sair. */
-export function useStoredImage(url: string | null): string | null {
-  const [loaded, setLoaded] = useState<StoredImage | null>(null);
+export function useStoredImage(url: string | null): StoredImage | null {
+  const [loaded, setLoaded] = useState<LoadedImage | null>(null);
 
   useEffect(() => {
     if (!url) return;
@@ -25,7 +27,7 @@ export function useStoredImage(url: string | null): string | null {
           return;
         }
 
-        setLoaded({ url: imageUrl, objectUrl: created });
+        setLoaded({ url: imageUrl, objectUrl: created, contentType: image.type });
       } catch {
         // Sem a foto o cartão fica com o lugar dela, do mesmo tamanho.
         setLoaded(null);
@@ -46,5 +48,5 @@ export function useStoredImage(url: string | null): string | null {
   // anterior não pode aparecer no lugar da nova enquanto ela não chega.
   if (loaded.url !== url) return null;
 
-  return loaded.objectUrl;
+  return loaded;
 }

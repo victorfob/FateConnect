@@ -19,4 +19,7 @@ public partial class DenunciationService
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Denunciation {DenunciationId} status updated to {Status} successfully.")]
     private static partial void LogDenunciationStatusUpdated(ILogger logger, Guid denunciationId, string status);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "User {UserId} was refused the image of denunciation {DenunciationId}.")]
+    private static partial void LogDenunciationImageRefused(ILogger logger, int userId, Guid denunciationId);
 }

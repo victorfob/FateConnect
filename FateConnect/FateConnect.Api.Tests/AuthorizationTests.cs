@@ -55,7 +55,9 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     public static TheoryData<string, string> DenunciationRoutes() => new()
     {
         { "GET", "/Denunciations" },
+        { "GET", "/Denunciations/mine" },
         { "GET", "/Denunciations/8a1b0f2e-0000-4000-8000-000000000000" },
+        { "GET", "/Denunciations/8a1b0f2e-0000-4000-8000-000000000000/image" },
         { "POST", "/Denunciations" },
         { "PATCH", "/Denunciations/8a1b0f2e-0000-4000-8000-000000000000/status" }
     };
@@ -66,6 +68,16 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewAdministrator("Helena Braga Quintana");
 
         HttpResponseMessage response = await client.GetAsync("/Denunciations");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task MyDenunciations_WithAnOperatorToken_ReachTheController()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Otávio Bastos Rodrigues");
+
+        HttpResponseMessage response = await client.GetAsync("/Denunciations/mine");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
