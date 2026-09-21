@@ -3,7 +3,7 @@
  * registrar **qual texto** a pessoa aceitou — mudar o documento sem mudar a data
  * aqui deixa o aceite apontando para um texto que não existe mais.
  */
-export const TERMS_VERSION = '2026-08-27';
+export const TERMS_VERSION = '2026-09-21';
 export const PRIVACY_VERSION = '2026-09-21';
 
 /** Arquivos servidos de `public/`, gerados por `legal/build-pdfs.sh`. */

@@ -36,12 +36,15 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Renomeia para `Acompanhar` e `Enviar` as duas abas da tela de denúncias, porque `Minhas denúncias` não cabia na largura de um celular de 375px e quebrava a fileira em duas linhas; o título e o botão do diálogo de envio seguem `Enviar denúncia` (#440) [Frontend]
 - Renomeia para `Descartada` a situação da denúncia recusada, que se chamava `Não acolhida` e não dizia o desfecho; a etiqueta, os dois filtros e a confirmação acompanham. O endereço segue o rótulo, então link salvo com a situação antiga abre a lista sem o filtro (#442) [Frontend]
 - Passa a abrir o filtro de um campo só num diálogo estreito, com o campo ocupando a largura inteira em vez de metade e o título no singular; hoje é o caso da lista de denúncias de quem denunciou. Os filtros com mais de um campo seguem iguais (#443) [Frontend]
-- Passa a enviar no cadastro o aceite dos documentos e a preferência de contato, que o formulário coletava e descartava antes de chamar a API: quem marca as caixas passa a ter a escolha registrada, cada documento com a versão que estava no ar naquele momento (#?) [Frontend]
+- Passa a enviar no cadastro o aceite dos documentos e a preferência de contato, que o formulário coletava e descartava antes de chamar a API: quem marca as caixas passa a ter a escolha registrada, cada documento com a versão que estava no ar naquele momento (#445) [Frontend]
+- Passa a descrever nos termos e na política o módulo de denúncias, que nenhum dos dois mencionava: o que se coleta, que só quem administra lê, e que o envio sigiloso esconde o seu contato de quem analisa sem tornar a denúncia anônima (#447) [Frontend]
+- Passa a descrever nos dois documentos a desativação da conta e o banimento, e sobe a versão dos termos por causa disso. ⚠️ O texto antecipa o que as issues de perfil e de gestão vão entregar: por ora ele descreve função que o produto ainda não tem (#447) [Frontend]
 - Passa a exigir o aceite dos documentos para criar conta: cadastro sem eles é recusado, e cliente que ainda não os envia para de conseguir criar conta até ser atualizado. A API também passa a registrar o endereço de quem chega pelo proxy, e não mais o do próprio proxy (#444) [Backend]
 
 ### Fixed
 
 - Corrige o que o monitoramento relata: a falha ao carregar a gravação de sessão chegava como erro não tratado e de prioridade alta, sem nada quebrar na tela, e passa a chegar como aviso; e os eventos de homologação chegavam marcados como produção, o que impedia separar os dois ambientes (#405) [Frontend]
+- Corrige nos termos a descrição do item de achados e perdidos arquivado, que dizia sair da vista dos demais usuários: ele continua visível, como a política já dizia e como o produto sempre fez. O texto também ainda o chamava de cancelado (#447) [Frontend]
 
 ## [0.10.0] - 2026-09-13
 
