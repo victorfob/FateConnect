@@ -22,6 +22,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona o arquivamento automático do item de achados e perdidos aberto e sem movimentação há 60 dias, que a nota do cartão já sabia descrever e nada escrevia: ele deixa o estado aberto com o motivo registrado como inatividade, e segue visível para quem procura (#438) [Backend]
 - Adiciona a exclusão da foto do item de achados e perdidos 30 dias depois de ele ser resolvido ou arquivado, mantendo o registro; item reaberto depois disso volta sem foto. A política de privacidade passa a declarar os dois prazos, em nova versão do documento (#438) [Backend] [Frontend]
 - Adiciona a foto anexada ao cartão da lista de denúncias de quem a enviou, que até aqui não a via em lugar nenhum: a miniatura baixa ao ser clicada, e sem foto o lugar dela segue ocupado. O marcador de anexo sai desses cartões, porque a foto passou a estar à vista (#439) [Frontend]
+- Adiciona o registro do aceite dos documentos no cadastro, que a API recebia sem guardar: cada documento aceito vira uma linha com a versão, a data, o endereço IP e o navegador que o servidor observou (#444) [Backend]
+- Adiciona as preferências de e-mail e de notificação à conta, escolhidas no cadastro e desligadas quando a pessoa não as marca (#444) [Backend]
 
 ### Changed
 
@@ -34,6 +36,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Renomeia para `Acompanhar` e `Enviar` as duas abas da tela de denúncias, porque `Minhas denúncias` não cabia na largura de um celular de 375px e quebrava a fileira em duas linhas; o título e o botão do diálogo de envio seguem `Enviar denúncia` (#440) [Frontend]
 - Renomeia para `Descartada` a situação da denúncia recusada, que se chamava `Não acolhida` e não dizia o desfecho; a etiqueta, os dois filtros e a confirmação acompanham. O endereço segue o rótulo, então link salvo com a situação antiga abre a lista sem o filtro (#442) [Frontend]
 - Passa a abrir o filtro de um campo só num diálogo estreito, com o campo ocupando a largura inteira em vez de metade e o título no singular; hoje é o caso da lista de denúncias de quem denunciou. Os filtros com mais de um campo seguem iguais (#443) [Frontend]
+- Passa a exigir o aceite dos documentos para criar conta: cadastro sem eles é recusado, e cliente que ainda não os envia para de conseguir criar conta até ser atualizado. A API também passa a registrar o endereço de quem chega pelo proxy, e não mais o do próprio proxy (#444) [Backend]
 
 ### Fixed
 
