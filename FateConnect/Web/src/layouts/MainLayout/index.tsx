@@ -5,7 +5,7 @@ import { Button, Footer, Header, NavigationDrawer } from '@design-system';
 import { BrandLogo } from '@app/components/BrandLogo';
 import { LegalFooterLinks } from '@app/components/LegalFooterLinks';
 import * as C from '@app/constants/appContact';
-import { APP_LINKS } from '@app/constants/navigation';
+import { useAppLinks } from '@app/hooks/useAppLinks';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 import * as S from '../shell.styles';
@@ -19,6 +19,7 @@ const MENU_BUTTON_LABEL = 'Abrir menu';
 export function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { pathname } = useLocation();
+  const appLinks = useAppLinks();
 
   const handleMenuClick = useCallback(() => setDrawerOpen(true), []);
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);
@@ -35,7 +36,7 @@ export function MainLayout() {
         }
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
-        navigation={APP_LINKS.map(({ path, label }) => (
+        navigation={appLinks.map(({ path, label }) => (
           <Button
             key={path}
             color="inherit"

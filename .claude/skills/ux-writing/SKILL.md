@@ -33,6 +33,16 @@ Estudante da faculdade, no celular ou no laptop, geralmente com pressa e no meio
    ⛔ **Medir as candidatas não substitui oferecê-las — e quanto mais medição, maior o risco.** O atalho não vem da preguiça: vem do trabalho bem feito. Com a régua lida, as vizinhas conferidas e as larguras medidas no campo real, a escolha parece decidida pelos números, e a tabela parece cerimônia sobre um resultado que já se impôs.
 
    ⛔ **O gesto que denuncia é escrever "pela skill".** Aconteceu em 11/09/2026, na #354: medi quatro candidatas para a recusa do e-mail institucional, entreguei uma, e escrevi no corpo do PR *"a copy, pela skill de UX writing"*. Havia três defensáveis e o Victor viu uma — a pergunta dele foi *"usou a skill de ux-writing pra definir esse copy?"*. **Se ele não recusou uma alternativa, a decisão é minha e se anuncia como minha.**
+### A candidata se oferece por extenso
+
+⛔ **Mostre cada opção como a frase inteira que vai para a tela, não só o pedaço que muda.** Tabela que lista o trecho variável obriga quem decide a montar a frase de cabeça — e ele decide sobre a montagem dele, não sobre o texto que você escreveu.
+
+⛔ Aconteceu em 14/09/2026, ao encurtar a nota do diálogo de denúncia: entreguei quatro candidatas numa tabela de tamanho e do que cada uma cortava, com só o fim de cada frase. A devolução foi *"vc não me mostrou como ficaria a frase completa em cada uma"*.
+
+⚠️ **E ler as quatro por extenso mudou a conversa.** Lado a lado ficou visível que todas começavam igual, e que a primeira frase sozinha já respondia a dúvida de quem estava com o diálogo aberto — o que varia é só o assunto da segunda. Isso não aparecia na tabela de diferenças.
+
+**A medição continua valendo, e vai junto**: tamanho, largura no campo real, o que cada uma abre mão. O que não pode é a medição substituir a frase.
+
 5. **Separe copy de produto.** Pergunta que trava a escrita — qual é o nome real da feature, o que o botão faz de fato, qual é a regra de negócio — vem **antes** e bloqueia a versão final. Fricção que o texto não resolve (um fluxo que exige três telas para uma ação simples) vira observação, não maquiagem.
 6. **Ao receber captura de tela**, diga qual elemento está revisando antes de propor — "o botão do rodapé do diálogo", não "o botão".
 

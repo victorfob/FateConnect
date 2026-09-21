@@ -3,8 +3,7 @@
  * usuário salvou.
  */
 export enum RoutePathEnum {
-  ROOT = '/',
-  LANDING = '/inicio',
+  LANDING = '/',
   SIGNUP = '/cadastro',
   MENU = '/menu',
   LOST_AND_FOUND = '/achados-perdidos',
@@ -12,6 +11,7 @@ export enum RoutePathEnum {
   PREFERENCES = '/preferencias',
   PROFILE = '/perfil',
   DENUNCIATIONS = '/denuncias',
+  MANAGEMENT = '/gestao',
   NOTIFICATIONS = '/notificacoes',
 }
 

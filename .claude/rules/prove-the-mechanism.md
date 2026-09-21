@@ -65,6 +65,15 @@ until gh pr checks <n> --json name,bucket | jq -e 'length >= 4 and all(.bucket !
 
 ⛔ **`all`, `every` e `none` sobre coleção que ainda está sendo preenchida respondem "sim" sem medir nada.** Predicado de espera precisa dizer **quantos** itens espera, ou nomear o item que espera.
 
+⚠️ **E a cardinalidade envelhece — prefira nomear.** Em 14/09/2026 o mesmo laço, com `length >= 4`, saiu com quatro checks registrados e **sem** o da API, que é o único que mede um PR de backend: o número estava certo para o PR de front de onde ele veio, e o conjunto de checks depende do que o PR toca.
+
+```bash
+until gh pr checks <n> --json name,bucket \
+  | jq -e 'any(.[]; .name == ".NET API") and all(.[]; .bucket != "pending")'; do sleep 20; done
+```
+
+**Nomear o check que você espera** não envelhece com o filtro de caminhos, e diz no próprio comando o que a espera existe para provar.
+
 ⛔ **`grep` ancorado sobre diff filtrado responde zero.** O `git diff` desta máquina sai em **formato compacto**, e a forma dele não é estável: numa invocação ele renderiza as linhas `+` indentadas, noutra ele resume. Então `grep -E "^\+"` não casa nada — e o zero se lê como "nenhuma linha", que é justamente a resposta tranquilizadora.
 
 Medido em 03/09/2026 sobre um diff de 18 adições:
@@ -87,6 +96,18 @@ Medido em 03/09/2026 sobre um diff de 18 adições:
 
 ⛔ **E o complemento de "passou" não é "falhou".** No mesmo `gh pr checks`, tratar `bucket != "pass"` como falha reporta vermelho onde há `pending`: em 02/09/2026 anunciei um check falhando no #287 quando o front ainda estava `IN_PROGRESS`, porque a cascata da pilha havia reiniciado o CI. Estado de terceira via — `pending`, `skipping`, `neutral` — se nomeia, não se deduz por exclusão.
 
+⛔ **Job vermelho reporta o primeiro passo que caiu, e nada sobre os seguintes.** O que vem depois dele não passou: **não rodou**. Ler "está vermelho por causa de X" como "só X está errado" é tratar o não-medido como aprovado — e o passo escondido costuma ser o gate, que fica no fim.
+
+Medido em 14/09/2026, no #391. O job `.NET API` reprovava em 9 testes e eu relatei o CI como uma falha só. Corrigidos os testes, o job alcançou pela primeira vez o passo do Sonar e caiu de novo: o gate reprovava por duplicação em código novo desde sempre, e nenhuma corrida tinha chegado a medi-lo.
+
+**Quem discrimina é a lista de passos, não o resumo do check:**
+
+```bash
+gh run view <run-id> --json jobs --jq '.jobs[].steps[] | "\(.conclusion)\t\(.name)"'
+```
+
+As duas corridas, lado a lado, são o controle: antes `failure Tests` → **`skipped`** no passo do Sonar; depois `success Tests` → `failure` nele. `skipped` depois de um `failure` é passo que ninguém mediu.
+
 ⛔ **`performance.getEntriesByType('resource')` não enxerga requisição que falha na conexão.** Em 04/09/2026, provando que um formulário deixara de chamar a API, ele devolveu **zero** nos dois casos — no que não devia chamar e no que devia. O zero era do instrumento. Quem responde é o log de rede do navegador (`read_network_requests`), que registra a tentativa com o motivo da falha; e o par positivo — o caso que **deve** disparar a requisição — é o que separa "não chamou" de "não medi".
 
 ⛔ **E há a busca que só alcança o que tem nome de símbolo.** Um pedido entregue deixa rastro em **dois** lugares independentes — o código e o rastreador —, e o `grep` só responde bem quando existe um identificador a procurar.
@@ -108,6 +129,10 @@ gh issue list --state all --limit 300 --json number,title,state \
 | `onlyMyItems` na base | **13 em 5 arquivos** | **18 em 8** — a API escreve `OnlyMyItems` |
 
 O segundo é o pior: eu ia relatar que os arquivos de API haviam desaparecido e que alguém já tinha feito o rename. **Busca que vai sustentar conclusão sobre presença ou contagem roda com `-i` e com `LC_ALL=pt_BR.UTF-8`**, e o controle é procurar um trecho que você sabe que existe — não aparecendo, o instrumento está cego, e não o repositório vazio.
+
+⛔ **E há o instrumento que nem chegou a rodar: no zsh, `--include=*.ts` sem aspas é expandido pelo shell.** Sem arquivo `.ts` no diretório atual, o zsh aborta o comando inteiro com `no matches found` — e o que sobra na tela é o cabeçalho que você mesmo imprimiu com `echo`, que se lê como "procurei e não achei nada".
+
+Medido em 14/09/2026: duas buscas seguidas morreram assim ao procurar quem lê claim do token no front, e as duas pareceram zero. **Aspas no padrão** — `--include='*.ts'` — e, quando o zero for sustentar conclusão, confira que o comando rodou: `echo "exit=$?"` logo depois.
 
 ⚠️ **`| head` num `grep` de investigação é o pior dos três**, porque some com a evidência sem avisar e a saída parece completa. Em busca que vai sustentar conclusão, conte antes (`grep -c`) ou não trunque.
 
@@ -178,7 +203,52 @@ Ele imprimiu `seções fundidas:` com a lista vazia, e nada mais. O `git rebase`
 
 ⛔ **Tabela de substituição confere também que cada regra dela disparou.** Regra que nunca casa não faz nada e não reclama: o arquivo sai plausível, com um trecho intacto no meio do que você acha que traduziu.
 
+⛔ **E o instrumento que destrói pode ser um `UPDATE` de uma linha: coluna que o pedido não nomeia fica de fora.** Escrever apaga o valor anterior, e num banco não há diff para abrir depois — o que estava ali some sem deixar registro.
+
+Aconteceu em 14/09/2026, promovendo duas contas a administrador em homologação. O comando pedido era `SET "ProfileType" = 2`; eu acrescentei `"UpdatedAt" = now()` por conta própria e sobrescrevi os dois valores anteriores sem tê-los lido. Um deles era real: `IncrementTokenVersionAsync` grava ali a cada logout, e aquela conta tinha 12 versões de token.
+
+**A guarda são dois passos, e o que faltou foi o primeiro:** `SELECT` das colunas que você vai **escrever**, antes, e `RETURNING` no `UPDATE` para conferir o número de linhas. Eu tinha o `RETURNING`; do `SELECT` eu tinha lido `ProfileType` e `TokenVersion`, que eram as colunas do pedido — não a que eu ia escrever por fora dele.
+
+⚠️ **E `now()` não é `DateTime.UtcNow`.** A VPS roda em `America/Sao_Paulo` e a API grava UTC em coluna `timestamp without time zone`, então SQL manual com `now()` planta um valor três horas fora da convenção da aplicação e nada reclama. Escrevendo timestamp à mão, `timezone('UTC', now())`.
+
 Na mesma tradução de 09/09/2026, a reescrita de uma frase inteira da #193 nunca casou — as trocas de token que rodaram antes já tinham mudado `Operador` para `Operator` **dentro dela**, então o texto que eu procurava já não existia. Quem parou foi o `assert` de que toda entrada casou ao menos uma vez. **Reescrita de frase vai antes das trocas de token**, e entre as trocas a ordem é do mais longo para o mais curto: sem isso `AgenteUsuario` vira `AgenteUser`.
+
+## O número que eu prometo se deriva rodando, não contando
+
+⛔ **Valor esperado que vai junto de um comando para outra pessoa rodar se obtém executando aquele comando exato.** Contar de cabeça o que ele *deveria* achar transforma a conferência em ruído: quem roda recebe um número diferente e não sabe se o defeito é do ambiente ou do seu palpite.
+
+Aconteceu em 13/09/2026, entregando `grep -cE 'http2 on;|gzip_static on;|immutable'` com "tem que responder 3" — as três diretivas que eu tinha na cabeça. Respondeu **4**: o **comentário** acima de `http2 on;` cita a própria diretiva que documenta. O Victor teve que perguntar se estava errado.
+
+⚠️ **O tell é montar o comando a partir de uma busca anterior com padrão diferente.** O padrão mudou, o número não foi refeito. Comando novo ⇒ rodar antes de prometer a saída — e, quando a contagem for sustentar conclusão, listar **quais** linhas casaram (`grep -n`), porque a listagem denuncia o casamento que você não previu.
+
+## O comando de conferência tem referência própria, e pode não ser a sua
+
+⛔ **Provar contenção contra uma referência não autoriza um comando que mede contra outra.** Os dois números estão certos e respondem perguntas diferentes — e o segundo parece contradizer o primeiro.
+
+Na mesma rodada: provei `git rev-list --count origin/main..release/0.10.0` = **0** e mandei `git branch -d`. Ele recusou com *"not fully merged"*, porque **o `-d` mede contra a branch em que você está** — a `develop`, que ainda não tinha recebido o back-merge. Nada estava perdido; a recusa era sobre outra coisa.
+
+**O teste que responde a pergunta certa é explícito na referência:**
+
+```bash
+git merge-base --is-ancestor <branch> origin/main   # exit 0 = está toda lá
+```
+
+⚠️ Provado assim, o `-D` é seguro — e a prova vai dita junto, senão forçar parece atalho.
+
+⛔ **E contenção se mede restrita aos arquivos que a branch tocou.** `git diff <branch> develop` sobre a árvore inteira devolve também tudo que entrou na base **depois** — e isso se lê como trabalho seu que ficou de fora, quando é exatamente o contrário.
+
+Aconteceu em 14/09/2026, limpando a `feat/409` já mergeada: o comando respondeu 46 inserções e eu quase tratei como conteúdo perdido. Eram as regras de um PR que entrou na `develop` em seguida.
+
+```bash
+base=$(git merge-base develop <branch>)
+git diff --name-only "$base" <branch> > /tmp/tocados.txt
+wc -l < /tmp/tocados.txt          # zero aqui é o instrumento falhando, não contenção
+tr '\n' '\0' < /tmp/tocados.txt | xargs -0 git diff <branch> develop --
+```
+
+Saída vazia **com a contagem acima de zero** ⇒ nesses arquivos a base está idêntica à branch, e nada ficou de fora.
+
+⚠️ **A contagem não é zelo: sem ela o passo mente conforme o `xargs`.** Com lista vazia, o `xargs` do BSD não roda nada e o do GNU roda o comando sem pathspec — aí ele imprime a árvore inteira e você lê como conteúdo perdido.
 
 ## O alcance de uma mudança de token se mede no consumidor renderizado
 
@@ -216,6 +286,20 @@ gh api repos/<dono>/<repo>/issues/<n>/comments --jq '.[].body'
 ⚠️ **O custo não é a frase errada, é o que ela desliga.** Quem lê para de procurar: o Victor ia mergear achando que a limitação estava documentada para quem viesse depois.
 
 ⚠️ **É diferente de afirmar sobre o que não li.** Ali a fonte é de outra pessoa e eu pulei a leitura; aqui a fonte é minha, e é justamente por isso que releitura não parece necessária.
+
+### Truncar o artefato que você audita inventa o achado
+
+⛔ **Lendo um artefato para saber se algo FALTA, leia inteiro.** `| head`, `sed -n '1,80p'` e `--jq` recortado devolvem uma ausência com a mesma cara da ausência real — e aqui o truncamento não erra um número: ele **produz um achado que não existe**, e ele chega com a confiança de quem "leu a issue".
+
+⛔ Aconteceu em 14/09/2026. Levantei que os documentos legais não descreviam o módulo de denúncias e que faltava registrar isso na #162. A seção estava lá desde 12/09, **escrita por mim** na review daquele mesmo PR: o corpo tem 112 linhas, a seção começa na 99, e eu tinha lido com `head -80`. Quem viu foi o Victor — *"se eu não me engano já tem uma issue pra atualizar os termos"*.
+
+**O tell é a conclusão ser uma ausência.** Achado de presença se confere abrindo o que você achou; achado de ausência não tem o que abrir, então o instrumento é a única testemunha — e instrumento truncado testemunha a favor.
+
+```bash
+gh issue view <n> --json body -q .body > /tmp/corpo.md && wc -l < /tmp/corpo.md
+```
+
+⚠️ **É o irmão da seção acima, e custa mais.** Lá eu afirmo que um registro meu existe sem reler; aqui eu afirmo que ele não existe tendo lido só o começo — e a saída é abrir trabalho novo em cima de trabalho que já estava feito.
 
 ## O contorno pode ter mais de um motivo, e o comentário registra um
 

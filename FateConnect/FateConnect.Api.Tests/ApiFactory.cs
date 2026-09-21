@@ -6,12 +6,20 @@ using System.Text;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
+using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.Denunciations.Entities;
+using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.LostAndFound.Entities;
+using FateConnect.Api.Modules.LostAndFound.Enums;
+using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -48,6 +56,11 @@ public class ApiFactory : WebApplicationFactory<Program>
             services.Remove(registration);
             services.AddDbContext<FateConnectDbContext>(
                 options => options.UseNpgsql(TestDatabase.ConnectionStringFor(_databaseName)));
+
+            ServiceDescriptor retentionWorker = services.Single(
+                service => service.ImplementationType == typeof(LostAndFoundRetentionWorker));
+
+            services.Remove(retentionWorker);
         });
     }
 
@@ -59,7 +72,10 @@ public class ApiFactory : WebApplicationFactory<Program>
             Directory.Delete(_webRoot, recursive: true);
     }
 
-    public static string IssueToken(int userId = 1, int tokenVersion = 0)
+    public static string IssueToken(
+        int userId = 1,
+        int tokenVersion = 0,
+        EnumProfileType profileType = EnumProfileType.Operator)
     {
         JwtOptions options = new()
         {
@@ -73,7 +89,8 @@ public class ApiFactory : WebApplicationFactory<Program>
             {
                 Id = userId,
                 FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
-                TokenVersion = tokenVersion
+                TokenVersion = tokenVersion,
+                ProfileType = profileType
             });
     }
 
@@ -108,7 +125,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public static string UniqueContactEmail() => $"contato{Guid.NewGuid():N}@gmail.com";
 
-    public SeededUser SeedUser(string fullName)
+    public SeededUser SeedUser(string fullName, EnumProfileType profileType = EnumProfileType.Operator)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
@@ -124,6 +141,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
+            ProfileType = profileType,
             Contacts = [new Contact { Phone = phone, ContactEmail = contactEmail }],
         };
 
@@ -175,11 +193,71 @@ public class ApiFactory : WebApplicationFactory<Program>
         return ride.Id;
     }
 
-    public HttpClient CreateClientFor(int userId, int tokenVersion = 0)
+    public Guid SeedLostAndFoundRecord(
+        int reporterId,
+        EnumStatusLostAndFound status = EnumStatusLostAndFound.Open,
+        DateTime? createdAt = null,
+        DateTime? updatedAt = null,
+        DateTime? statusChangedAt = null,
+        string? imageUrl = null)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        LostAndFoundRecord record = new(
+            "Garrafa térmica azul",
+            EnumLostAndFoundType.Lost,
+            "Biblioteca do bloco B",
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
+            "Ficou na mesa do fundo.",
+            reporterId);
+
+        if (imageUrl is not null)
+            record.AttachImage(imageUrl);
+
+        context.LostAndFoundRecords.Add(record);
+
+        EntityEntry<LostAndFoundRecord> entry = context.Entry(record);
+        entry.Property(entity => entity.Status).CurrentValue = status;
+        entry.Property(entity => entity.CreatedAt).CurrentValue = createdAt ?? DateTime.UtcNow;
+        entry.Property(entity => entity.UpdatedAt).CurrentValue = updatedAt;
+        entry.Property(entity => entity.StatusChangedAt).CurrentValue = statusChangedAt;
+
+        context.SaveChanges();
+
+        return record.Id;
+    }
+
+    public Guid SeedDenunciation(
+        int reporterId,
+        string description,
+        DateOnly reportedOn,
+        EnumDenunciationCategory category = EnumDenunciationCategory.ImproperCharging,
+        EnumDenunciationStatus status = EnumDenunciationStatus.Open,
+        bool isAnonymous = false)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        Denunciation denunciation = new(category, description, reporterId, isAnonymous);
+
+        context.Denunciations.Add(denunciation);
+        context.Entry(denunciation).Property(entity => entity.CreatedAt).CurrentValue =
+            DateTimeUtils.ToUtcFromProductTimeZone(reportedOn, new TimeOnly(10, 0));
+        context.Entry(denunciation).Property(entity => entity.Status).CurrentValue = status;
+        context.SaveChanges();
+
+        return denunciation.Id;
+    }
+
+    public HttpClient CreateClientFor(
+        int userId,
+        int tokenVersion = 0,
+        EnumProfileType profileType = EnumProfileType.Operator)
     {
         HttpClient client = CreateClient();
         client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", IssueToken(userId, tokenVersion));
+            new AuthenticationHeaderValue("Bearer", IssueToken(userId, tokenVersion, profileType));
 
         return client;
     }
@@ -187,5 +265,12 @@ public class ApiFactory : WebApplicationFactory<Program>
     public HttpClient CreateClientForNewUser(string fullName)
     {
         return CreateClientFor(SeedUser(fullName).Id);
+    }
+
+    public HttpClient CreateClientForNewAdministrator(string fullName)
+    {
+        int administratorId = SeedUser(fullName, EnumProfileType.Administrator).Id;
+
+        return CreateClientFor(administratorId, profileType: EnumProfileType.Administrator);
     }
 }

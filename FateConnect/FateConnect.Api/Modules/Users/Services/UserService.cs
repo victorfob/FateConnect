@@ -14,19 +14,21 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
+    private readonly TimeProvider _timeProvider;
 
-    public UserService(IUserRepository userRepository, ITokenService tokenService)
+    public UserService(IUserRepository userRepository, ITokenService tokenService, TimeProvider timeProvider)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
+        _timeProvider = timeProvider;
     }
 
-    public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto)
+    public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto, RequestOrigin origin)
     {
         await EnsureEmailIsUniqueAsync(dto.FatecEmail);
         await EnsureContactsAreUniqueAsync(dto.Contacts);
 
-        User newUser = BuildUser(dto);
+        User newUser = BuildUser(dto, origin, _timeProvider.GetUtcNow().UtcDateTime);
 
         await _userRepository.AddAsync(newUser);
 
@@ -64,7 +66,7 @@ public class UserService : IUserService
         }
     }
 
-    private static User BuildUser(CreateUserDto dto)
+    private static User BuildUser(CreateUserDto dto, RequestOrigin origin, DateTime now)
     {
         string hashedPassword = HashPassword(dto.Password);
 
@@ -78,13 +80,29 @@ public class UserService : IUserService
             Gender = dto.Gender,
             Password = hashedPassword,
             ProfileType = EnumProfileType.Operator,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = now,
             UpdatedAt = null,
-            Contacts = mappedContacts
+            ReceiveEmails = dto.ReceiveEmails ?? false,
+            ReceiveNotifications = dto.ReceiveNotifications ?? false,
+            Contacts = mappedContacts,
+            DocumentAcceptances = BuildAcceptances(dto.Acceptances, origin, now)
         };
 
         return user;
     }
+
+    private static List<DocumentAcceptance> BuildAcceptances(
+        List<DocumentAcceptanceDto> dtos,
+        RequestOrigin origin,
+        DateTime acceptedAt) =>
+        [.. dtos.Select(dto => new DocumentAcceptance
+        {
+            DocumentType = dto.Document,
+            Version = dto.Version,
+            AcceptedAt = acceptedAt,
+            IpAddress = origin.IpAddress,
+            UserAgent = origin.UserAgent
+        })];
 
     private static List<Contact> BuildContacts(List<CreateContactDto>? dtos)
     {

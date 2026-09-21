@@ -21,7 +21,7 @@ const LANDING_METADATA: PageMetadata = {
   description:
     'Caronas entre quem estuda na Fatec Sorocaba e um mural de achados e perdidos. Ofereça uma vaga no seu trajeto ou encontre quem faz o mesmo caminho.',
   // Caminho, não endereço: quem monta a URL absoluta é o PageMetadata, com a
-  // origem do ambiente. A raiz serve este mesmo documento sem redirecionar.
+  // origem do ambiente.
   canonical: RoutePathEnum.LANDING,
 };
 
@@ -31,8 +31,6 @@ const LANDING_METADATA: PageMetadata = {
  * distingui-las. Trocar o marcador pela tela real não pode perder o título.
  */
 export const PAGE_METADATA: Record<RoutePathEnum, PageMetadata> = {
-  // A raiz só redireciona; herda a landing para não piscar outro título antes.
-  [RoutePathEnum.ROOT]: LANDING_METADATA,
   [RoutePathEnum.LANDING]: LANDING_METADATA,
   [RoutePathEnum.SIGNUP]: {
     title: titleFor('Criar conta'),
@@ -45,6 +43,7 @@ export const PAGE_METADATA: Record<RoutePathEnum, PageMetadata> = {
   [RoutePathEnum.PREFERENCES]: { title: titleFor('Preferências') },
   [RoutePathEnum.PROFILE]: { title: titleFor('Meu perfil') },
   [RoutePathEnum.DENUNCIATIONS]: { title: titleFor('Denúncias') },
+  [RoutePathEnum.MANAGEMENT]: { title: titleFor('Gestão') },
   [RoutePathEnum.NOTIFICATIONS]: { title: titleFor('Notificações') },
 };
 

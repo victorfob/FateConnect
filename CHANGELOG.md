@@ -6,6 +6,48 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-21
+
+### Added
+
+- Adiciona o registro de denúncias, com envio de imagem e acompanhamento de situação pela moderação (#391) [Backend]
+- Adiciona controle de permissões hierárquico, permitindo que perfis superiores herdem acessos de níveis inferiores automaticamente (#391) [Backend]
+- Adiciona a tela de denúncia, que até aqui só avisava que a função viria em breve: a pessoa escolhe o motivo entre nove opções, conta o que aconteceu e pode anexar uma foto. Ela pode enviar sem que os seus dados cheguem a quem analisa, e nesse caso a tela avisa que a denúncia continua ligada à conta (#407) [Frontend]
+- Adiciona a consulta das próprias denúncias, que até aqui respondia só a administrador e recusava os demais: quem não é administrador passa a receber as denúncias que enviou, com os filtros de situação, categoria, período, busca e paginação que já existiam, e sem o endereço da foto guardada; administrador segue recebendo as de todo mundo. O recorte vem do perfil de quem pede, sem campo na consulta (#410) [Backend]
+- Adiciona à tela de denúncia a lista do que a própria pessoa enviou, que até aqui não existia em lugar nenhum: a tela passa a ter duas abas, uma com a lista e outra que abre o envio, como caronas e achados e perdidos já fazem. Cada denúncia aparece com o motivo, a data, a situação e os marcadores de sigilo e de foto, e a descrição longa vem recolhida e abre quando a pessoa pede. A lista tem filtro por situação e páginas de 10, com a situação guardada no endereço — copiar a URL devolve a mesma lista filtrada —, e a denúncia recém-enviada entra nela sem recarregar (#422) [Frontend]
+- Adiciona a área de gestão para quem é administrador, que até aqui não existia em lugar nenhum: um item `Gestão` no topo e no menu, e a tela com as abas `Usuários` e `Denúncias`. As duas abas ainda avisam que a função vem em uma próxima versão, então o que entra agora é o acesso: quem não é administrador não vê o item e não abre a tela digitando o endereço (#427) [Frontend]
+- Adiciona à gestão a lista das denúncias de todo mundo, onde a aba só avisava que a função viria: cada uma com o motivo, a data, a descrição e a situação. A aba de usuários segue avisando (#428) [Frontend]
+- Adiciona à gestão o contato de quem denunciou, com o e-mail copiável e a conversa no WhatsApp; denúncia enviada como sigilosa não traz contato nenhum (#428) [Frontend]
+- Adiciona a miniatura da foto anexada à denúncia, na gestão, que baixa ao ser clicada; sem foto, o lugar dela continua ocupado (#428) [Frontend]
+- Adiciona a mudança de situação da denúncia pela gestão, que oferece só os destinos aceitos a partir da situação atual e pede confirmação, porque nenhuma mudança volta atrás; denúncia já encerrada não oferece ação nenhuma (#428) [Frontend]
+- Adiciona à gestão o filtro de denúncias por descrição, período, motivo e situação, com páginas de 10 e as escolhas guardadas no endereço, junto da aba escolhida (#428) [Frontend]
+- Adiciona o arquivamento automático do item de achados e perdidos aberto e sem movimentação há 60 dias, que a nota do cartão já sabia descrever e nada escrevia: ele deixa o estado aberto com o motivo registrado como inatividade, e segue visível para quem procura (#438) [Backend]
+- Adiciona a exclusão da foto do item de achados e perdidos 30 dias depois de ele ser resolvido ou arquivado, mantendo o registro; item reaberto depois disso volta sem foto. A política de privacidade passa a declarar os dois prazos, em nova versão do documento (#438) [Backend] [Frontend]
+- Adiciona a foto anexada ao cartão da lista de denúncias de quem a enviou, que até aqui não a via em lugar nenhum: a miniatura baixa ao ser clicada, e sem foto o lugar dela segue ocupado. O marcador de anexo sai desses cartões, porque a foto passou a estar à vista (#439) [Frontend]
+- Adiciona o registro do aceite dos documentos no cadastro, que a API recebia sem guardar: cada documento aceito vira uma linha com a versão, a data, o endereço IP e o navegador que o servidor observou (#444) [Backend]
+- Adiciona as preferências de e-mail e de notificação à conta, escolhidas no cadastro e desligadas quando a pessoa não as marca (#444) [Backend]
+
+### Changed
+
+- Separa as rotas de acesso a arquivos enviados, restringindo a visualização de imagens de denúncias estritamente a administradores (#391) [Backend]
+- Centraliza o fluxo de upload de arquivos para garantir a exclusão automática de imagens órfãs em caso de falhas de salvamento (#391) [Backend]
+- Passa a separar em duas rotas a consulta de denúncias, que era uma só com o recorte decidido pelo perfil de quem pedia: quem denunciou consulta as suas por uma rota própria, e a lista de todas passa a exigir administrador. Os filtros e a paginação seguem os mesmos nas duas (#437) [Backend]
+- Passa a servir a foto da denúncia pelo módulo de denúncias, por id, em vez do endereço genérico de arquivos enviados: quem denunciou passa a alcançar a própria foto, que só a gestão via, e a de denúncia alheia é recusada. O endereço antigo deixa de servir foto de denúncia (#437) [Backend] [Frontend]
+- Reescreve a promessa da landing sobre denúncia, que oferecia relatar sem se identificar: a denúncia sempre fica ligada à conta de quem a fez, e o que dá para esconder é o contato dela de quem for analisar (#407) [Frontend]
+- Passa a servir a landing na raiz do site, que até aqui só redirecionava para `/inicio`: o endereço da página inicial vira o domínio sozinho, e a rota antiga deixa de existir. Link salvo com `/inicio` continua chegando, agora por redirecionamento permanente do servidor em vez de um salto que o navegador só dava depois de carregar a página; o endereço canônico e o sitemap passam a apontar para a raiz (#426) [Frontend]
+- Renomeia para `Acompanhar` e `Enviar` as duas abas da tela de denúncias, porque `Minhas denúncias` não cabia na largura de um celular de 375px e quebrava a fileira em duas linhas; o título e o botão do diálogo de envio seguem `Enviar denúncia` (#440) [Frontend]
+- Renomeia para `Descartada` a situação da denúncia recusada, que se chamava `Não acolhida` e não dizia o desfecho; a etiqueta, os dois filtros e a confirmação acompanham. O endereço segue o rótulo, então link salvo com a situação antiga abre a lista sem o filtro (#442) [Frontend]
+- Passa a abrir o filtro de um campo só num diálogo estreito, com o campo ocupando a largura inteira em vez de metade e o título no singular; hoje é o caso da lista de denúncias de quem denunciou. Os filtros com mais de um campo seguem iguais (#443) [Frontend]
+- Passa a enviar no cadastro o aceite dos documentos e a preferência de contato, que o formulário coletava e descartava antes de chamar a API: quem marca as caixas passa a ter a escolha registrada, cada documento com a versão que estava no ar naquele momento (#445) [Frontend]
+- Passa a descrever nos termos e na política o módulo de denúncias, que nenhum dos dois mencionava: o que se coleta, que só quem administra lê, e que o envio sigiloso esconde o seu contato de quem analisa sem tornar a denúncia anônima (#447) [Frontend]
+- Passa a descrever nos dois documentos a desativação da conta e o banimento, e sobe a versão dos termos por causa disso. ⚠️ O texto antecipa o que as issues de perfil e de gestão vão entregar: por ora ele descreve função que o produto ainda não tem (#447) [Frontend]
+- Passa a exigir o aceite dos documentos para criar conta: cadastro sem eles é recusado, e cliente que ainda não os envia para de conseguir criar conta até ser atualizado. A API também passa a registrar o endereço de quem chega pelo proxy, e não mais o do próprio proxy (#444) [Backend]
+
+### Fixed
+
+- Corrige o que o monitoramento relata: a falha ao carregar a gravação de sessão chegava como erro não tratado e de prioridade alta, sem nada quebrar na tela, e passa a chegar como aviso; e os eventos de homologação chegavam marcados como produção, o que impedia separar os dois ambientes (#405) [Frontend]
+- Corrige nos termos a descrição do item de achados e perdidos arquivado, que dizia sair da vista dos demais usuários: ele continua visível, como a política já dizia e como o produto sempre fez. O texto também ainda o chamava de cancelado (#447) [Frontend]
+
 ## [0.10.0] - 2026-09-13
 
 ### Added

@@ -6,14 +6,17 @@ import {
   TRIGGER_LABEL,
 } from '@app/layouts/MainLayout/components/AccountMenu/constants';
 import { server } from '@app/mocks/server';
+import { DENUNCIATIONS_TITLE } from '@app/pages/Denunciations/constants';
 import { DESCRIPTION_TITLE } from '@app/pages/Home/components/LandingDescription/constants';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
+import { MANAGEMENT_TITLE } from '@app/pages/Management/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
 import { PREFERENCES_TITLE } from '@app/pages/Preferences/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
 import * as C from '@app/pages/Unavailable/constants';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { ProfileTypeEnum } from '@app/services/auth/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
@@ -30,11 +33,13 @@ function renderRoute(initialPath: string) {
 const NO_CONTENT = 204;
 
 describe('routeConfig', () => {
-  // Caronas e achados e perdidos listam assim que montam.
+  // Caronas, achados e perdidos e denúncias listam assim que montam.
   beforeEach(() => {
     server.use(
       http.get('https://api.fateconnect.test/rides', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/lostandfound', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/denunciations', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/denunciations/mine', () => HttpResponse.json([])),
     );
   });
 
@@ -60,6 +65,7 @@ describe('routeConfig', () => {
     [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
     [RoutePathEnum.RIDES, RIDES_TITLE],
     [RoutePathEnum.PREFERENCES, PREFERENCES_TITLE],
+    [RoutePathEnum.DENUNCIATIONS, DENUNCIATIONS_TITLE],
   ])('should resolve %s with a session', async (path, title) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
 
@@ -70,7 +76,6 @@ describe('routeConfig', () => {
 
   it.each([
     [RoutePathEnum.PROFILE, C.PROFILE_DESCRIPTION],
-    [RoutePathEnum.DENUNCIATIONS, C.DENUNCIATIONS_DESCRIPTION],
     [RoutePathEnum.NOTIFICATIONS, C.NOTIFICATIONS_DESCRIPTION],
   ])('should resolve %s with the screen that has no owner yet', async (path, description) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
@@ -82,7 +87,28 @@ describe('routeConfig', () => {
   });
 
   it.each([
-    ['the root path', RoutePathEnum.ROOT],
+    ['an operator', ProfileTypeEnum.OPERATOR],
+    ['somebody whose token carries no profile', undefined],
+  ])('should keep %s out of the management screen, typed by hand', async (_name, profile) => {
+    tokenStorage.save(tokenWithName('Maria da Silva', profile));
+    const router = createMemoryRouter(routeConfig, {
+      initialEntries: [RoutePathEnum.MANAGEMENT],
+    });
+    render(<RouterProvider router={router} />);
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
+  });
+
+  it('should open the management screen for an administrator', async () => {
+    tokenStorage.save(tokenWithName('Maria da Silva', ProfileTypeEnum.ADMINISTRATOR));
+
+    renderRoute(RoutePathEnum.MANAGEMENT);
+
+    await expectTitle(MANAGEMENT_TITLE);
+  });
+
+  it.each([
+    ['the landing', RoutePathEnum.LANDING],
     ['an unknown route', '/rota-que-nao-existe'],
   ])('should send %s to the menu when there is a session', async (_name, from) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
@@ -92,14 +118,6 @@ describe('routeConfig', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
   });
 
-  it('should redirect the root path to the landing page', () => {
-    const router = renderRoute(RoutePathEnum.ROOT);
-
-    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
-  });
-
-  // A raiz fica fora deste grupo de propósito: ela é redirecionamento explícito
-  // de índice, e continuaria passando com o curinga quebrado.
   it.each([
     ['a dropped rides sub-route', '/caronas/ofertar'],
     ['a dropped route', '/contato'],

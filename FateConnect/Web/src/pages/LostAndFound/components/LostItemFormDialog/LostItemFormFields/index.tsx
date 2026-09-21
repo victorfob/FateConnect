@@ -1,10 +1,12 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Input } from '@design-system';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
+
+import { PhotoField } from '@app/components/PhotoField';
+import { useStoredImage } from '@app/hooks/useStoredImage';
 
 import type { LostItemFormInput, LostItemFormValues } from '../schema';
 import * as C from '../constants';
-import { LostItemPhotoField } from './LostItemPhotoField';
 import * as S from './styles';
 
 export type LostItemFormFieldsProps = Readonly<{ storedImageUrl: string | null }>;
@@ -13,9 +15,24 @@ export function LostItemFormFields({ storedImageUrl }: LostItemFormFieldsProps) 
   const {
     control,
     register,
-    formState: { errors },
+    setValue,
+    formState: { errors, disabled },
   } = useFormContext<LostItemFormInput, unknown, LostItemFormValues>();
+  const photo = useWatch({ control, name: 'photo' });
   const today = useMemo(() => new Date(), []);
+  const storedPhoto = useStoredImage(storedImageUrl);
+
+  const storedPreview = useMemo(() => {
+    if (!storedPhoto) return null;
+
+    return { src: storedPhoto.objectUrl, alt: C.STORED_PHOTO_ALT };
+  }, [storedPhoto]);
+
+  // Valida na escolha: o formato e o tamanho se sabem na hora, não no envio.
+  const handlePhotoChange = useCallback(
+    (chosen: File | null) => setValue('photo', chosen, { shouldValidate: true }),
+    [setValue],
+  );
 
   return (
     <S.FieldsGrid>
@@ -82,7 +99,15 @@ export function LostItemFormFields({ storedImageUrl }: LostItemFormFieldsProps) 
       </S.WideCell>
 
       <S.WideCell>
-        <LostItemPhotoField storedImageUrl={storedImageUrl} />
+        <PhotoField
+          labels={C.PHOTO_FIELD_LABELS}
+          accept={C.PHOTO_ACCEPT_ATTRIBUTE}
+          value={photo}
+          onChange={handlePhotoChange}
+          disabled={disabled}
+          storedPreview={storedPreview}
+          error={errors.photo?.message}
+        />
       </S.WideCell>
     </S.FieldsGrid>
   );

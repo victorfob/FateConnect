@@ -4,10 +4,10 @@ import { UnderlinedLink } from '.';
 
 describe('UnderlinedLink', () => {
   it('should render an anchor that stays in the same tab by default', () => {
-    render(<UnderlinedLink href="/inicio">Início</UnderlinedLink>);
+    render(<UnderlinedLink href="/pagina">Página</UnderlinedLink>);
 
-    const link = screen.getByRole('link', { name: 'Início' });
-    expect(link).toHaveAttribute('href', '/inicio');
+    const link = screen.getByRole('link', { name: 'Página' });
+    expect(link).toHaveAttribute('href', '/pagina');
     expect(link).not.toHaveAttribute('target');
     expect(link).not.toHaveAttribute('rel');
   });
@@ -26,12 +26,12 @@ describe('UnderlinedLink', () => {
 
   it('should keep the icon inside the clickable area, next to the text', () => {
     render(
-      <UnderlinedLink href="/inicio" icon={<svg data-testid="icone" />}>
-        Início
+      <UnderlinedLink href="/pagina" icon={<svg data-testid="icone" />}>
+        Página
       </UnderlinedLink>,
     );
 
-    const link = screen.getByRole('link', { name: 'Início' });
+    const link = screen.getByRole('link', { name: 'Página' });
     expect(link).toContainElement(screen.getByTestId('icone'));
   });
 

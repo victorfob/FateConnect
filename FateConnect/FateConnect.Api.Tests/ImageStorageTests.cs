@@ -5,15 +5,18 @@ using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Common.Validators;
+using FateConnect.Api.Modules.Denunciations.DTOs;
+using FateConnect.Api.Modules.Denunciations.Entities;
+using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.Denunciations.Interfaces;
+using FateConnect.Api.Modules.Denunciations.Services;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Services;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FateConnect.Api.Tests;
@@ -21,16 +24,6 @@ namespace FateConnect.Api.Tests;
 public sealed class ImageStorageTests : IDisposable
 {
     private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-uploads-{Guid.NewGuid():N}");
-
-    private sealed class TemporaryWebRoot(string webRootPath) : IWebHostEnvironment
-    {
-        public string WebRootPath { get; set; } = webRootPath;
-        public IFileProvider WebRootFileProvider { get; set; } = new NullFileProvider();
-        public string ContentRootPath { get; set; } = webRootPath;
-        public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
-        public string EnvironmentName { get; set; } = "Test";
-        public string ApplicationName { get; set; } = "FateConnect.Api";
-    }
 
     private static FormFile FileOf(string contentType, int sizeInBytes = 12, string fileName = "foto.png")
     {
@@ -60,6 +53,27 @@ public sealed class ImageStorageTests : IDisposable
 
         public Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord) =>
             throw new DbUpdateException("o banco recusou o registro");
+
+        public Task<IReadOnlyList<LostAndFoundRecord>> GetOpenRecordsUntouchedSinceAsync(DateTime untouchedSince) =>
+            throw new NotSupportedException();
+
+        public Task<IReadOnlyList<LostAndFoundRecord>> GetTerminalRecordsWithImageSinceAsync(DateTime terminalSince) =>
+            throw new NotSupportedException();
+
+        public Task SaveChangesAsync() => throw new NotSupportedException();
+    }
+
+    private sealed class RefusingDenunciationRepository : IDenunciationRepository
+    {
+        public Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(
+            DenunciationFilterDto filter, int? reporterId = null) =>
+            throw new NotSupportedException();
+
+        public Task<Denunciation?> GetByIdAsync(Guid id, bool forChange = true) =>
+            throw new NotSupportedException();
+
+        public Task<Denunciation> AddAsync(Denunciation denunciation) =>
+            throw new DbUpdateException("o banco recusou a denúncia");
 
         public Task SaveChangesAsync() => throw new NotSupportedException();
     }
@@ -231,5 +245,25 @@ public sealed class ImageStorageTests : IDisposable
         await Assert.ThrowsAsync<DbUpdateException>(() => service.CreateAsync(dto, 1));
 
         Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "lostandfound")));
+    }
+
+    [Fact]
+    public async Task CreateDenunciation_WhenTheDatabaseRefusesIt_LeavesNoFileBehind()
+    {
+        StorageService storage = ServiceOn(_webRoot);
+        DenunciationService service = new(
+            new RefusingDenunciationRepository(), storage, NullLogger<DenunciationService>.Instance);
+
+        CreateDenunciationDto dto = new()
+        {
+            Category = EnumDenunciationCategory.ImproperCharging,
+            Description = "O motorista cobrou valor acima do combinado na carona de ontem.",
+            IsAnonymous = false,
+            Image = FileOf("image/png"),
+        };
+
+        await Assert.ThrowsAsync<DbUpdateException>(() => service.CreateAsync(dto, 1));
+
+        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "denunciation")));
     }
 }

@@ -121,6 +121,12 @@ rsync -az --delete dist/ usuario@servidor:/var/www/fateconnect/<ambiente>/
 O banco de cada ambiente nasce vazio e as tabelas são criadas pelas migrations
 na primeira subida, sem passo manual.
 
+O que **não** nasce sozinho é o primeiro administrador: todo cadastro entra
+como operador, e a área de gestão fica inalcançável até alguém ser promovido
+por um `UPDATE`. O comando está em
+[DATABASE.md](DATABASE.md#promover-alguém-a-administrador), e o passo é uma vez
+por ambiente, depois de a pessoa ter se cadastrado pela tela.
+
 Confira os dois endereços em `http://`.
 
 ## 6. Ligar o HTTPS

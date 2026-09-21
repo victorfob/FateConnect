@@ -21,6 +21,8 @@ export type SelectInputProps = Readonly<{
   required?: boolean;
   disabled?: boolean;
   autoComplete?: string;
+  /** `small` encolhe a altura do campo; é a mesma escala do MUI. */
+  size?: 'small' | 'medium';
   ref?: Ref<HTMLInputElement>;
 }>;
 

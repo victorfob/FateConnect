@@ -1,3 +1,6 @@
+import { PRIVACY_VERSION, TERMS_VERSION } from '@app/constants/legalDocuments';
+import { DocumentTypeEnum } from '@app/services/signup/types';
+
 import { GenderValueEnum } from '../@types';
 import { SIGNUP_DEFAULT_VALUES, type SignupFormValues } from '../schema';
 import { toSignupRequest } from './mapper';
@@ -43,5 +46,51 @@ describe('toSignupRequest', () => {
     const request = toSignupRequest({ ...FILLED, birthDate: '99/99/9999' });
 
     expect(request.birthDate).toBe('');
+  });
+
+  it('should send one acceptance per document, each with the version it was read at', () => {
+    const request = toSignupRequest(FILLED);
+
+    expect(request.acceptances).toEqual([
+      { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
+      { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },
+    ]);
+  });
+
+  it('should turn both preferences on from the single checkbox', () => {
+    const request = toSignupRequest({ ...FILLED, acceptMarketing: true });
+
+    expect(request.receiveEmails).toBe(true);
+    expect(request.receiveNotifications).toBe(true);
+  });
+
+  it('should leave both preferences off when the checkbox is unticked', () => {
+    const request = toSignupRequest({ ...FILLED, acceptMarketing: false });
+
+    expect(request.receiveEmails).toBe(false);
+    expect(request.receiveNotifications).toBe(false);
+  });
+
+  /**
+   * ⛔ `toEqual` e não `toMatchObject`: o que esta asserção guarda é o que
+   * **sobra** — nada do formulário pode vazar para o corpo da requisição.
+   */
+  it('should send the contract and nothing else', () => {
+    const request = toSignupRequest(FILLED);
+
+    expect(request).toEqual({
+      fullName: 'Maria Silva',
+      fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
+      password: 'segredo123',
+      birthDate: '1999-05-22T00:00:00Z',
+      gender: GenderValueEnum.FEMALE,
+      contacts: [{ phone: '15999999999', contactEmail: 'maria@exemplo.com' }],
+      acceptances: [
+        { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
+        { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },
+      ],
+      receiveEmails: false,
+      receiveNotifications: false,
+    });
   });
 });
