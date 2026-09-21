@@ -19,6 +19,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a miniatura da foto anexada à denúncia, na gestão, que baixa ao ser clicada; sem foto, o lugar dela continua ocupado (#428) [Frontend]
 - Adiciona a mudança de situação da denúncia pela gestão, que oferece só os destinos aceitos a partir da situação atual e pede confirmação, porque nenhuma mudança volta atrás; denúncia já encerrada não oferece ação nenhuma (#428) [Frontend]
 - Adiciona à gestão o filtro de denúncias por descrição, período, motivo e situação, com páginas de 10 e as escolhas guardadas no endereço, junto da aba escolhida (#428) [Frontend]
+- Adiciona o arquivamento automático do item de achados e perdidos aberto e sem movimentação há 60 dias, que a nota do cartão já sabia descrever e nada escrevia: ele deixa o estado aberto com o motivo registrado como inatividade, e segue visível para quem procura (#438) [Backend]
+- Adiciona a exclusão da foto do item de achados e perdidos 30 dias depois de ele ser resolvido ou arquivado, mantendo o registro; item reaberto depois disso volta sem foto. A política de privacidade passa a declarar os dois prazos, em nova versão do documento (#438) [Backend] [Frontend]
 
 ### Changed
 

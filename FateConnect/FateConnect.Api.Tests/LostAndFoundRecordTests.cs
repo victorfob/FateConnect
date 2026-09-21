@@ -227,6 +227,52 @@ public class LostAndFoundRecordTests
         Assert.Equal(EnumStatusLostAndFound.Deleted, record.Status);
         Assert.Equal(EnumDeletionReason.User, record.DeletionReason);
         Assert.NotNull(record.UpdatedAt);
+        Assert.Equal(record.UpdatedAt, record.StatusChangedAt);
+    }
+
+    [Fact]
+    public void Constructor_LeavesTheRecordWithoutAStatusStamp()
+    {
+        LostAndFoundRecord record = NewRecord();
+
+        Assert.Null(record.StatusChangedAt);
+    }
+
+    [Theory]
+    [InlineData(EnumStatusLostAndFound.Resolved)]
+    [InlineData(EnumStatusLostAndFound.Deleted)]
+    public void UpdateBasicAttributes_ReachingATerminalStatus_StampsTheChange(EnumStatusLostAndFound status)
+    {
+        LostAndFoundRecord record = NewRecord();
+
+        record.UpdateBasicAttributes(null, null, null, null, null, status);
+
+        Assert.NotNull(record.StatusChangedAt);
+    }
+
+    [Theory]
+    [InlineData(EnumStatusLostAndFound.Resolved)]
+    [InlineData(EnumStatusLostAndFound.Deleted)]
+    public void UpdateBasicAttributes_ReopeningARecord_ClearsTheStatusStamp(EnumStatusLostAndFound terminalStatus)
+    {
+        LostAndFoundRecord record = NewRecord();
+        record.UpdateBasicAttributes(null, null, null, null, null, terminalStatus);
+
+        record.UpdateBasicAttributes(null, null, null, null, null, EnumStatusLostAndFound.Open);
+
+        Assert.Equal(EnumStatusLostAndFound.Open, record.Status);
+        Assert.Null(record.StatusChangedAt);
+    }
+
+    [Fact]
+    public void DetachImage_LeavesTheRecordWithoutAnImage()
+    {
+        LostAndFoundRecord record = NewRecord();
+        record.AttachImage("uploads/lostandfound/foto.png");
+
+        record.DetachImage();
+
+        Assert.Null(record.ImageUrl);
     }
 
     [Theory]

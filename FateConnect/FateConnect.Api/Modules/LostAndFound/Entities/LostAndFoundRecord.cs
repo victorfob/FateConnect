@@ -18,6 +18,7 @@ public class LostAndFoundRecord
     public EnumStatusLostAndFound Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
+    public DateTime? StatusChangedAt { get; private set; }
     public int UserId { get; private set; }
     public User User { get; private set; } = null!;
     public EnumDeletionReason? DeletionReason { get; private set; }
@@ -107,11 +108,16 @@ public class LostAndFoundRecord
 
     public void AttachImage(string imageUrl) => ImageUrl = imageUrl.Trim();
 
+    public void DetachImage() => ImageUrl = null;
+
     public void MarkAsDeleted(EnumDeletionReason reason)
     {
+        DateTime changedAt = DateTime.UtcNow;
+
         Status = EnumStatusLostAndFound.Deleted;
         DeletionReason = reason;
-        UpdatedAt = DateTime.UtcNow;
+        StatusChangedAt = changedAt;
+        UpdatedAt = changedAt;
     }
 
     public bool IsReportedBy(int userId) => UserId == userId;
@@ -128,6 +134,15 @@ public class LostAndFoundRecord
 
         Status = status;
         DeletionReason = null;
+        StatusChangedAt = StampFor(status);
+    }
+
+    private static DateTime? StampFor(EnumStatusLostAndFound status)
+    {
+        if (status == EnumStatusLostAndFound.Resolved)
+            return DateTime.UtcNow;
+
+        return null;
     }
 
     private static string? NormalizeDescription(string? description) =>

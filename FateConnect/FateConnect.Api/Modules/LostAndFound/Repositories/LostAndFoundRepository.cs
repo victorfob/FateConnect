@@ -5,6 +5,7 @@ using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
+using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -85,6 +86,30 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
 
         return lostAndFoundRecord;
     }
+
+    public async Task<IReadOnlyList<LostAndFoundRecord>> GetOpenRecordsUntouchedSinceAsync(DateTime untouchedSince)
+    {
+        return await context.LostAndFoundRecords
+            .Where(UntouchedWhileOpenSince(untouchedSince))
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<LostAndFoundRecord>> GetTerminalRecordsWithImageSinceAsync(DateTime terminalSince)
+    {
+        return await context.LostAndFoundRecords
+            .Where(HoldsAnImageAndIsTerminalSince(terminalSince))
+            .ToListAsync();
+    }
+
+    private static Expression<Func<LostAndFoundRecord, bool>> UntouchedWhileOpenSince(DateTime untouchedSince) =>
+        record => record.Status == EnumStatusLostAndFound.Open
+            && (record.UpdatedAt ?? record.CreatedAt) <= untouchedSince;
+
+    private static Expression<Func<LostAndFoundRecord, bool>> HoldsAnImageAndIsTerminalSince(DateTime terminalSince) =>
+        record => record.ImageUrl != null
+            && (record.Status == EnumStatusLostAndFound.Resolved || record.Status == EnumStatusLostAndFound.Deleted)
+            && record.StatusChangedAt != null
+            && record.StatusChangedAt <= terminalSince;
 
     public async Task SaveChangesAsync()
     {
