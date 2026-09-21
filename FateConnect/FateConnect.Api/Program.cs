@@ -20,6 +20,7 @@ using FateConnect.Api.Modules.Users.Interfaces;
 using FateConnect.Api.Modules.Users.Repositories;
 using FateConnect.Api.Modules.Users.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -90,6 +91,13 @@ public class Program
         builder.Services.AddScoped<IRideService, RideService>();
 
         builder.Services.AddSingleton(TimeProvider.System);
+
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
 
         builder.Services.AddScoped<ILostAndFoundRepository, LostAndFoundRepository>();
         builder.Services.AddScoped<ILostAndFoundService, LostAndFoundService>();
@@ -199,6 +207,8 @@ public class Program
         }
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
+
+        app.UseForwardedHeaders();
 
         app.UseCors(corsPolicy);
 
