@@ -23,7 +23,7 @@ const DATE_FORMAT = 'dd/MM/yyyy';
 
 type DenunciationCardProps = Readonly<{
   denunciation: Denunciation;
-  /** A miniatura da foto, que a API entrega a quem analisa. */
+  /** A miniatura da foto anexada, que as duas listas montam com o `StoredPhoto`. */
   media?: ReactNode;
   /** O contato de quem denunciou. Só a gestão o oferece: na lista de quem
    * enviou ele seria o próprio. */
