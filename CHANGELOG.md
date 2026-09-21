@@ -33,6 +33,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a servir a landing na raiz do site, que até aqui só redirecionava para `/inicio`: o endereço da página inicial vira o domínio sozinho, e a rota antiga deixa de existir. Link salvo com `/inicio` continua chegando, agora por redirecionamento permanente do servidor em vez de um salto que o navegador só dava depois de carregar a página; o endereço canônico e o sitemap passam a apontar para a raiz (#426) [Frontend]
 - Renomeia para `Acompanhar` e `Enviar` as duas abas da tela de denúncias, porque `Minhas denúncias` não cabia na largura de um celular de 375px e quebrava a fileira em duas linhas; o título e o botão do diálogo de envio seguem `Enviar denúncia` (#440) [Frontend]
 - Renomeia para `Descartada` a situação da denúncia recusada, que se chamava `Não acolhida` e não dizia o desfecho; a etiqueta, os dois filtros e a confirmação acompanham. O endereço segue o rótulo, então link salvo com a situação antiga abre a lista sem o filtro (#442) [Frontend]
+- Passa a abrir o filtro de um campo só num diálogo estreito, com o campo ocupando a largura inteira em vez de metade e o título no singular; hoje é o caso da lista de denúncias de quem denunciou. Os filtros com mais de um campo seguem iguais (#443) [Frontend]
 
 ### Fixed
 
