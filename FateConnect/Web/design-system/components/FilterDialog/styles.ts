@@ -53,5 +53,9 @@ export const FieldsGrid = styled(Stack)(({ theme }) => ({
       flex: `0 1 calc(${FULL_WIDTH_PERCENT / DESKTOP_COLUMNS}% - ${spacingScale.md}px)`,
       minWidth: `${FIELD_MIN_WIDTH_PX}px`,
     },
+
+    // Filtro de um campo só: o papel já abre estreito, e meia largura ali
+    // deixaria o campo menor que o mínimo com o resto da linha vazio.
+    '& > *:only-child': { flex: `1 1 ${FULL_WIDTH_PERCENT}%` },
   },
 }));
