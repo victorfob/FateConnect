@@ -24,6 +24,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Separa as rotas de acesso a arquivos enviados, restringindo a visualização de imagens de denúncias estritamente a administradores (#391) [Backend]
 - Centraliza o fluxo de upload de arquivos para garantir a exclusão automática de imagens órfãs em caso de falhas de salvamento (#391) [Backend]
+- Passa a separar em duas rotas a consulta de denúncias, que era uma só com o recorte decidido pelo perfil de quem pedia: quem denunciou consulta as suas por uma rota própria, e a lista de todas passa a exigir administrador. Os filtros e a paginação seguem os mesmos nas duas (#437) [Backend]
+- Passa a servir a foto da denúncia pelo módulo de denúncias, por id, em vez do endereço genérico de arquivos enviados: quem denunciou passa a alcançar a própria foto, que só a gestão via, e a de denúncia alheia é recusada. O endereço antigo deixa de servir foto de denúncia (#437) [Backend] [Frontend]
 - Reescreve a promessa da landing sobre denúncia, que oferecia relatar sem se identificar: a denúncia sempre fica ligada à conta de quem a fez, e o que dá para esconder é o contato dela de quem for analisar (#407) [Frontend]
 - Passa a servir a landing na raiz do site, que até aqui só redirecionava para `/inicio`: o endereço da página inicial vira o domínio sozinho, e a rota antiga deixa de existir. Link salvo com `/inicio` continua chegando, agora por redirecionamento permanente do servidor em vez de um salto que o navegador só dava depois de carregar a página; o endereço canônico e o sitemap passam a apontar para a raiz (#426) [Frontend]
 
