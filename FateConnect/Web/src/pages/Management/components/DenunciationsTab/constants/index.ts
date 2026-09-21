@@ -4,7 +4,6 @@ import { denunciationCategoryLabel } from '@app/pages/Denunciations/helpers/denu
 import type { Denunciation } from '@app/services/denunciations/types';
 
 const FILE_DATE_FORMAT = 'dd-MM-yyyy';
-const DEFAULT_PHOTO_EXTENSION = 'png';
 
 export const DENUNCIATIONS_QUERY_KEY = 'management-denunciations';
 
@@ -20,10 +19,8 @@ export const DENUNCIATION_LIST_MESSAGES = {
 export const DOWNLOAD_LABEL = 'Baixar a foto';
 
 /** A data no nome diz o que um GUID não diria na pasta de downloads. */
-export function photoFileName({ createdAt, imageUrl }: Denunciation): string {
-  const extension = imageUrl?.split('.').pop() ?? DEFAULT_PHOTO_EXTENSION;
-
-  return `denuncia-${format(parseISO(createdAt), FILE_DATE_FORMAT)}.${extension}`;
+export function photoBaseName({ createdAt }: Denunciation): string {
+  return `denuncia-${format(parseISO(createdAt), FILE_DATE_FORMAT)}`;
 }
 
 export function photoAlt({ category }: Denunciation): string {

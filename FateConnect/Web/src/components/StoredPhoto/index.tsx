@@ -4,9 +4,11 @@ import { DownloadIcon, ImageIcon } from '@design-system/icons';
 
 import { useStoredImage } from '@app/hooks/useStoredImage';
 
+import { downloadFileName } from './helpers/downloadFileName';
 import * as S from './styles';
 
-export type StoredPhotoDownload = Readonly<{ label: string; fileName: string }>;
+/** Sem o sufixo: quem o escolhe é o formato que a resposta declara. */
+export type StoredPhotoDownload = Readonly<{ label: string; baseName: string }>;
 
 export type StoredPhotoProps = Readonly<{
   url: string | null;
@@ -16,29 +18,29 @@ export type StoredPhotoProps = Readonly<{
 }>;
 
 export function StoredPhoto({ url, alt, download }: StoredPhotoProps) {
-  const source = useStoredImage(url);
+  const image = useStoredImage(url);
 
   const handleDownload = useCallback(() => {
-    if (!source || !download) return;
+    if (!image || !download) return;
 
     const link = document.createElement('a');
-    link.href = source;
-    link.download = download.fileName;
+    link.href = image.objectUrl;
+    link.download = downloadFileName(download.baseName, image.contentType);
     link.click();
-  }, [source, download]);
+  }, [image, download]);
 
-  if (source === null)
+  if (image === null)
     return (
       <S.PhotoPlaceholder aria-hidden>
         <ImageIcon />
       </S.PhotoPlaceholder>
     );
 
-  if (!download) return <S.Photo component="img" src={source} alt={alt} />;
+  if (!download) return <S.Photo component="img" src={image.objectUrl} alt={alt} />;
 
   return (
     <S.DownloadTrigger>
-      <S.Photo component="img" src={source} alt={alt} />
+      <S.Photo component="img" src={image.objectUrl} alt={alt} />
 
       <S.DownloadOverlay>
         <IconButton label={download.label} size="small" onClick={handleDownload}>

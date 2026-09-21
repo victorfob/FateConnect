@@ -16,7 +16,7 @@ const PNG_BYTES = '\x89PNG\r\n\x1a\n';
 
 const SERVER_ERROR = 500;
 
-const DOWNLOAD = { label: 'Baixar a foto', fileName: 'denuncia.png' };
+const DOWNLOAD = { label: 'Baixar a foto', baseName: 'denuncia' };
 
 const DEFAULT_PROPS: StoredPhotoProps = { url: STORED_PATH, alt: PHOTO_ALT };
 
@@ -24,14 +24,25 @@ const renderComponent = (props = DEFAULT_PROPS) => render(<StoredPhoto {...props
 
 const photo = () => screen.queryByRole('img', { name: PHOTO_ALT });
 
-function storedImageServing(onRequest?: (request: Request) => void) {
+function storedImageServing(onRequest?: (request: Request) => void, contentType = 'image/png') {
   server.use(
     http.get(STORED_URL, ({ request }) => {
       onRequest?.(request);
 
-      return new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': 'image/png' } });
+      return new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': contentType } });
     }),
   );
+}
+
+function downloadsCaptured(): { href: string; download: string }[] {
+  const clicked: { href: string; download: string }[] = [];
+  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+    this: HTMLAnchorElement,
+  ) {
+    clicked.push({ href: this.href, download: this.download });
+  });
+
+  return clicked;
 }
 
 describe('StoredPhoto', () => {
@@ -121,17 +132,36 @@ describe('StoredPhoto', () => {
 
   it('should hand the loaded photo to the browser when the trigger is used', async () => {
     storedImageServing();
-    const clicked: { href: string; download: string }[] = [];
-    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
-      this: HTMLAnchorElement,
-    ) {
-      clicked.push({ href: this.href, download: this.download });
-    });
+    const clicked = downloadsCaptured();
 
     renderComponent({ ...DEFAULT_PROPS, download: DOWNLOAD });
     await waitFor(() => expect(photo()).toBeInTheDocument());
     await userEvent.click(screen.getByRole('button', { name: DOWNLOAD.label }));
 
-    expect(clicked).toEqual([{ href: OBJECT_URL, download: DOWNLOAD.fileName }]);
+    expect(clicked).toEqual([{ href: OBJECT_URL, download: 'denuncia.png' }]);
+  });
+
+  // O endereço da foto de denúncia termina em `/image`, sem sufixo nenhum: quem
+  // diz o formato é a resposta, e o nome baixado precisa segui-la.
+  it('should take the downloaded extension from the served content type', async () => {
+    storedImageServing(undefined, 'image/webp');
+    const clicked = downloadsCaptured();
+
+    renderComponent({ ...DEFAULT_PROPS, download: DOWNLOAD });
+    await waitFor(() => expect(photo()).toBeInTheDocument());
+    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD.label }));
+
+    expect(clicked).toEqual([{ href: OBJECT_URL, download: 'denuncia.webp' }]);
+  });
+
+  it('should download without extension when the served type is unknown', async () => {
+    storedImageServing(undefined, 'application/octet-stream');
+    const clicked = downloadsCaptured();
+
+    renderComponent({ ...DEFAULT_PROPS, download: DOWNLOAD });
+    await waitFor(() => expect(photo()).toBeInTheDocument());
+    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD.label }));
+
+    expect(clicked).toEqual([{ href: OBJECT_URL, download: DOWNLOAD.baseName }]);
   });
 });

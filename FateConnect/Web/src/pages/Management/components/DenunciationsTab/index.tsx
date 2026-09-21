@@ -76,7 +76,7 @@ export function DenunciationsTab() {
                 alt={C.photoAlt(denunciation)}
                 download={{
                   label: C.DOWNLOAD_LABEL,
-                  fileName: C.photoFileName(denunciation),
+                  baseName: C.photoBaseName(denunciation),
                 }}
               />
             }
