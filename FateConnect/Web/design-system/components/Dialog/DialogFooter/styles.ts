@@ -9,7 +9,7 @@ const ACTION_MIN_WIDTH_PX = 120;
 const ACTION_MIN_WIDTH_MOBILE_PX = 100;
 const ACTION_LETTER_SPACING = '0.4px';
 
-/** As ações acompanham o título, que é centralizado em qualquer largura. */
+/** Centralizadas em qualquer largura, mesmo no estreito, onde o título e a frase vão para a esquerda. */
 export const FooterRegion = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',

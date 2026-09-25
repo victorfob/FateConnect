@@ -6,7 +6,6 @@ import { RIDE_CARD_LABELS } from '@app/pages/Rides/constants';
 import type { Ride } from '@app/services/rides/types';
 
 import { DELETE_DIALOG } from './constants';
-import * as S from './styles';
 
 type RideDeleteConfirmationProps = Readonly<{
   ride: Ride;
@@ -35,11 +34,11 @@ export function RideDeleteConfirmation({ ride, onDelete }: RideDeleteConfirmatio
 
       <Dialog open={confirming} onClose={handleDismiss} title={DELETE_DIALOG.title}>
         <Dialog.Body>
-          <S.ConfirmationMessage variant="subtitle">
+          <Dialog.Message>
             {DELETE_DIALOG.messagePrefix}
             <strong>{ride.destination}</strong>
             {DELETE_DIALOG.messageSuffix}
-          </S.ConfirmationMessage>
+          </Dialog.Message>
         </Dialog.Body>
 
         <Dialog.Footer>
