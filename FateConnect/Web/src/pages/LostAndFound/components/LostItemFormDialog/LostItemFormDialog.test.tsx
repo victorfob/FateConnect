@@ -119,6 +119,20 @@ describe('LostItemFormDialog', () => {
     ).toHaveValue(LOST_ITEM.description);
   });
 
+  it('should hold each text field to its limit and count the stored description', async () => {
+    renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+
+    expect(nameField()).toHaveAttribute('maxlength', '100');
+    expect(
+      screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.place) }),
+    ).toHaveAttribute('maxlength', '100');
+    expect(
+      screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.description) }),
+    ).toHaveAttribute('maxlength', '300');
+    expect(screen.getByText('39/300', { ignore: '[role="status"]' })).toBeInTheDocument();
+  });
+
   it('should refuse to submit an empty form and say what is missing', async () => {
     renderComponent();
     await screen.findByRole('heading', { name: REGISTER_MODE.title });

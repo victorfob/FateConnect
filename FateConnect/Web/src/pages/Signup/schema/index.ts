@@ -20,7 +20,7 @@ const MAX_PHONE_DIGITS = 11;
  * `CreateContactDto` os declaram. Sem eles a API recusa com o 400 genérico, que
  * não diz qual campo passou do limite.
  */
-const MAX_LENGTH = {
+export const MAX_LENGTH = {
   fullName: 200,
   fatecEmail: 150,
   contactEmail: 150,

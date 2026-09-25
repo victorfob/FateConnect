@@ -1,8 +1,11 @@
 import { useCallback, useRef, type ReactNode, type Ref } from 'react';
 import type { OutlinedTextFieldProps } from '@mui/material/TextField';
 
+import { CharacterCountAnnouncement } from '../components/CharacterCountAnnouncement';
+import { HelperTextWithCounter } from '../components/HelperTextWithCounter';
 import { InputHelpButton } from '../components/InputHelpButton';
 import { TimePickerButton } from '../components/TimePickerButton';
+import { inputLabelSlot } from '../helpers/inputLabelSlot';
 import * as S from '../styles';
 
 const TIME_TYPE = 'time';
@@ -19,15 +22,21 @@ type InputFieldOwnProps = {
   endAdornment?: ReactNode;
   /** Sobe o rótulo sem esperar o foco, para valor que chega de fora — o CEP. */
   shrinkLabel?: boolean;
-  maxLength?: number;
   ref?: Ref<HTMLInputElement>;
 };
 
-export type InputProps = InputFieldOwnProps &
-  Omit<
-    OutlinedTextFieldProps,
-    'label' | 'error' | 'helperText' | 'variant' | 'slotProps' | 'ref' | 'select'
-  >;
+type CharacterLimitProps =
+  | { maxLength?: number; characterCount?: undefined }
+  | { maxLength: number; characterCount: number };
+
+export type InputProps = Readonly<
+  InputFieldOwnProps &
+    CharacterLimitProps &
+    Omit<
+      OutlinedTextFieldProps,
+      'label' | 'error' | 'helperText' | 'variant' | 'slotProps' | 'ref' | 'select'
+    >
+>;
 
 /**
  * Campo do produto. O rótulo é uma string e quem o desenha é o MUI — é isso que
@@ -40,6 +49,7 @@ export function InputField({
   endAdornment,
   shrinkLabel,
   maxLength,
+  characterCount,
   ref,
   type,
   ...textFieldProps
@@ -67,27 +77,41 @@ export function InputField({
   const shrunk = shrinkLabel || ALWAYS_SHRUNK_TYPES.has(type ?? '');
 
   return (
-    <S.FieldRoot
-      {...textFieldProps}
-      type={type}
-      label={label}
-      inputRef={setInputRef}
-      error={Boolean(error)}
-      helperText={error}
-      slotProps={{
-        // Sem `shrink` o MUI decide sozinho, e o rótulo sobe animado no foco.
-        inputLabel: shrunk ? { shrink: true } : undefined,
-        htmlInput: maxLength ? { maxLength } : undefined,
-        input: {
-          endAdornment: hasAdornment ? (
-            <S.EndAdornment position="end">
-              {endAdornment}
-              {isTime ? <TimePickerButton onOpen={handleOpenTimePicker} /> : null}
-              {helpText ? <InputHelpButton fieldLabel={label} helpText={helpText} /> : null}
-            </S.EndAdornment>
-          ) : null,
-        },
-      }}
-    />
+    <>
+      <S.FieldRoot
+        {...textFieldProps}
+        type={type}
+        label={label}
+        inputRef={setInputRef}
+        error={Boolean(error)}
+        helperText={
+          characterCount === undefined ? (
+            error
+          ) : (
+            <HelperTextWithCounter
+              error={error}
+              characterCount={characterCount}
+              maxLength={maxLength}
+            />
+          )
+        }
+        slotProps={{
+          inputLabel: inputLabelSlot(shrunk),
+          htmlInput: { maxLength },
+          input: {
+            endAdornment: hasAdornment && (
+              <S.EndAdornment position="end">
+                {endAdornment}
+                {isTime && <TimePickerButton onOpen={handleOpenTimePicker} />}
+                {helpText && <InputHelpButton fieldLabel={label} helpText={helpText} />}
+              </S.EndAdornment>
+            ),
+          },
+        }}
+      />
+      {characterCount !== undefined && (
+        <CharacterCountAnnouncement characterCount={characterCount} maxLength={maxLength} />
+      )}
+    </>
   );
 }
