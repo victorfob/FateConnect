@@ -36,7 +36,8 @@ public class ValidationMessagesTests
             FullName = "Mariana Alves Rocha",
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             Gender = (EnumGender)99,
-            Contacts = [],
+            Phone = "15998765432",
+            ContactEmail = "mariana.rocha@gmail.com",
             Acceptances = [],
         });
 
@@ -53,7 +54,8 @@ public class ValidationMessagesTests
             FullName = "Mariana Alves Rocha",
             BirthDate = DateTime.UtcNow.Date.AddYears(-10),
             Gender = EnumGender.Female,
-            Contacts = [],
+            Phone = "15998765432",
+            ContactEmail = "mariana.rocha@gmail.com",
             Acceptances = [],
         });
 
@@ -103,7 +105,8 @@ public class ValidationMessagesTests
             FullName = "José Alves Rocha",
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             Gender = EnumGender.Male,
-            Contacts = [],
+            Phone = "15998765432",
+            ContactEmail = "mariana.rocha@gmail.com",
             Acceptances = [],
         });
 

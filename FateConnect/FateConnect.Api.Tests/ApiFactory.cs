@@ -142,7 +142,9 @@ public class ApiFactory : WebApplicationFactory<Program>
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             ProfileType = profileType,
-            Contacts = [new Contact { Phone = phone, ContactEmail = contactEmail }],
+            Phone = phone,
+            ContactEmail = contactEmail,
+            Preferences = new UserPreferences(),
         };
 
         context.Users.Add(user);
