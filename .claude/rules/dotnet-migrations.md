@@ -1,5 +1,5 @@
 ---
-description: Migration do EF que renomeia — o `dotnet ef` gera dropar e recriar, que apaga produção; como reescrever e como provar que os dados sobrevivem
+description: Migration do EF que renomeia ou move dado entre tabelas — o `dotnet ef` gera dropar e recriar, que apaga produção; como reescrever, como provar que os dados sobrevivem, e a chave da relação 1:1
 paths:
   - "FateConnect/FateConnect.Api/**"
 ---
@@ -43,6 +43,16 @@ O roteiro, na ordem:
 4. Recalcule a impressão digital **pelos nomes novos**. Igual = nada perdido.
 5. Aplique o `down.sql` e recalcule pelos nomes velhos. Igual = rollback seguro.
 
+### Mover dado de uma tabela para outra é o mesmo risco, com outra forma
+
+⛔ **Migration que leva colunas de uma tabela para outra sai do gerador com o `DropTable` na frente**, antes de qualquer cópia. Não há rename a escrever: a reescrita é de **ordem** — criar as colunas novas, copiar com `migrationBuilder.Sql`, e só então derrubar o formato antigo. O `Down()` faz o caminho inverso, na mesma ordem.
+
+Aconteceu em 25/09/2026, na #454, ao levar os contatos para o `User` e as preferências para `UserPreferences`: o `Up()` gerado abria com `DropTable("Contacts")`.
+
+⚠️ **Aqui o passo 3 do roteiro acusa, e é esperado.** Os `DROP` existem de propósito, e o que se confere é que eles vêm **depois** das cópias no `up.sql`.
+
+⛔ **E a impressão digital passa a comparar formas diferentes.** Antes e depois não têm as mesmas tabelas, então não dá para recalcular "pelos nomes novos": cada lado se projeta no **mesmo conjunto de campos**, com a regra de escolha explícita. Na #454 a forma antiga juntava o contato mais antigo por `LEFT JOIN LATERAL ... ORDER BY "Id" LIMIT 1`, e a nova lia as colunas do `User`. Semeie o caso que perde dado por decisão (ali, o usuário com dois contatos) e o caso vazio (o sem contato): são eles que a projeção precisa separar.
+
 A versão do Postgres se descobre no servidor, não se presume: `psql --version` na VPS.
 
 ## Depois de reescrever, confira o drift
@@ -54,6 +64,8 @@ dotnet ef migrations add _Drift && grep "migrationBuilder\." Infrastructure/Data
 ```
 
 Saída vazia é o que se espera. **Apague os dois arquivos da sonda à mão** — o `.cs` e o `.Designer.cs` — e confira com `git status`.
+
+⚠️ **E a sonda reescreve o `FateConnectDbContextModelSnapshot.cs`.** Com zero operações, o snapshot ainda pode sair modificado: o que mudou no modelo sem mudar o banco, como uma navegação que saiu, só aparece ali. Leia esse diff em vez de descartá-lo. Se ele for legítimo, o `.Designer.cs` da sua migration precisa da mesma mudança, para os dois descreverem o mesmo modelo.
 
 ⛔ **`dotnet ef migrations remove` não apaga a sonda neste repositório.** Ele reconstrói o projeto antes de remover, e a sonda não compila: o analisador reprova o nome com sublinhado (`S101`) e o **método vazio** (`S1186`), e o `TreatWarningsAsErrors` do `.csproj` transforma os dois em erro.
 
@@ -74,9 +86,26 @@ A chave que resolve é **`sonar.cpd.exclusions`**, separada da de cobertura — 
 
 ⚠️ **Não fundir as duas em `sonar.exclusions`.** Isso tiraria `Migrations/` da análise inteira, escondendo bug de verdade junto com a duplicação.
 
+## Relação 1:1: a chave primária é a do dono
+
+⛔ **Na tabela dependente de um 1:1, a chave primária é a própria chave estrangeira.** `UserPreferences` não tem `Id`: a chave é o `UserId`, e é isso que impede existir uma segunda linha para o mesmo usuário. Com `Id` próprio e um `UserId` único ao lado, a regra dependeria de um índice que alguém pode esquecer.
+
+```csharp
+builder.HasKey(p => p.UserId);
+
+builder.HasOne<User>()
+       .WithOne(u => u.Preferences)
+       .HasForeignKey<UserPreferences>(p => p.UserId)
+       .OnDelete(DeleteBehavior.Cascade);
+```
+
+Decidido pelo Victor em 25/09/2026, na #453, para **todo** 1:1 do projeto: *"faz isso pra todo relacionamento 1:1"*.
+
+⚠️ **A navegação vai só do dono para o dependente.** `HasOne<User>()` sem navegação de volta é o mesmo desenho de caronas e achados e perdidos, que apontam para o `User` com `.WithMany()` sem coleção. Navegação que nada lê é linha que nenhum teste cobre: foi ela que deixou a `UserPreferences` abaixo de 90%.
+
 ## O nome da tabela vem do `DbSet`, não de `ToTable`
 
-⛔ **Não declare `builder.ToTable(...)` para dizer o nome.** Sem ele, o EF usa o nome do `DbSet` — que é PascalCase, como as classes. É de onde saem `Users`, `Addresses`, `Contacts` e `Rides`.
+⛔ **Não declare `builder.ToTable(...)` para dizer o nome.** Sem ele, o EF usa o nome do `DbSet` — que é PascalCase, como as classes. É de onde saem `Users`, `Rides`, `LostAndFoundRecords` e `Denunciations`.
 
 `ToTable` só entra quando o nome **precisa** divergir do `DbSet`, e aí o motivo vai junto.
 
