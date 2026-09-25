@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FateConnect.Api.Modules.LostAndFound.Enums;
+using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Tests;
 
@@ -56,6 +57,28 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
 
     private static async Task<PagedItems> ListAsync(HttpClient client, string query) =>
         (await client.GetFromJsonAsync<PagedItems>($"/LostAndFound{query}", JsonOptions))!;
+
+    [Theory]
+    [InlineData(EnumAccountStatus.SelfDeactivated)]
+    [InlineData(EnumAccountStatus.Banned)]
+    public async Task GetItems_ReportedByAnAccountThatIsNoLongerActive_LeavesThemOut(EnumAccountStatus status)
+    {
+        int activeReporterId = _factory.SeedUser("Heloísa Brandão Lima").Id;
+        int leavingReporterId = _factory.SeedUser("Igor Salgado Freitas").Id;
+        string subject = $"marcador{Guid.NewGuid():N}";
+        Guid kept = await ReportAsync(_factory.CreateClientFor(activeReporterId), ItemForm($"Caderno {subject}"));
+        Guid hidden = await ReportAsync(_factory.CreateClientFor(leavingReporterId), ItemForm($"Estojo {subject}"));
+        HttpClient viewer = _factory.CreateClientFor(activeReporterId);
+
+        PagedItems before = await ListAsync(viewer, $"?SearchTerm={subject}");
+        _factory.SetAccountStatus(leavingReporterId, status);
+        PagedItems after = await ListAsync(viewer, $"?SearchTerm={subject}");
+
+        Assert.Contains(before.Items, item => item.Id == hidden);
+        Assert.Contains(after.Items, item => item.Id == kept);
+        Assert.DoesNotContain(after.Items, item => item.Id == hidden);
+        Assert.Equal(1, after.Total);
+    }
 
     [Theory]
     [InlineData("Cachecol de lã cinza", "cachecol de la")]
