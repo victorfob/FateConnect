@@ -1,4 +1,4 @@
-import { createRef, useState } from 'react';
+import { createRef, useState, type ChangeEvent } from 'react';
 
 import {
   act,
@@ -17,6 +17,7 @@ import {
   INVERTED_RANGE_MESSAGE,
 } from './components/DateRangeField/constants';
 import {
+  characterCountAnnouncement,
   DATE_PICKER_LABEL,
   DATE_TIME_PICKER_LABEL,
   HELP_TRIGGER_LABEL_PREFIX,
@@ -107,6 +108,104 @@ describe('Input', () => {
     await userEvent.type(field, '01/01/2000999');
 
     expect(field).toHaveValue('01/01/2000');
+  });
+});
+
+const DESCRIPTION_LABEL = 'Descrição';
+const DESCRIPTION_LIMIT = 10;
+const DESCRIPTION_ERROR = 'Informe a descrição';
+const TYPING_PAUSE_MS = 1000;
+const VISIBLE_COUNT_ONLY = '[role="status"]';
+
+function CountedHarness({ error }: Readonly<{ error?: string }>) {
+  const [description, setDescription] = useState('');
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => setDescription(event.target.value);
+
+  return (
+    <Input
+      label={DESCRIPTION_LABEL}
+      multiline
+      value={description}
+      onChange={handleChange}
+      maxLength={DESCRIPTION_LIMIT}
+      characterCount={description.length}
+      error={error}
+    />
+  );
+}
+
+const descriptionField = () => screen.getByRole('textbox', { name: DESCRIPTION_LABEL });
+
+describe('Input character counter', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should follow what is typed, over the limit the field declares', async () => {
+    render(<CountedHarness />);
+    expect(screen.getByText('0/10', { ignore: VISIBLE_COUNT_ONLY })).toBeInTheDocument();
+
+    await userEvent.type(descriptionField(), 'carro');
+
+    expect(screen.getByText('5/10', { ignore: VISIBLE_COUNT_ONLY })).toBeInTheDocument();
+  });
+
+  it('should stop taking text once the field reaches the limit', async () => {
+    render(<CountedHarness />);
+
+    await userEvent.type(descriptionField(), 'a'.repeat(DESCRIPTION_LIMIT + 2));
+
+    expect(descriptionField()).toHaveValue('a'.repeat(DESCRIPTION_LIMIT));
+    expect(screen.getByText('10/10', { ignore: VISIBLE_COUNT_ONLY })).toBeInTheDocument();
+  });
+
+  it('should keep the error and the counter on the same line, the error first', () => {
+    render(<CountedHarness error={DESCRIPTION_ERROR} />);
+
+    const line = screen.getByText(DESCRIPTION_ERROR).parentElement as HTMLElement;
+
+    expect(line.firstElementChild).toHaveTextContent(DESCRIPTION_ERROR);
+    expect(within(line).getByText('0/10', { ignore: VISIBLE_COUNT_ONLY })).toBeInTheDocument();
+    expect(descriptionField()).toBeInvalid();
+  });
+
+  // `fireEvent` porque o `userEvent` espera por timers que o relógio falso segura.
+  it('should announce the count once the typing pauses, not at every key', () => {
+    vi.useFakeTimers();
+    render(<CountedHarness />);
+
+    fireEvent.change(descriptionField(), { target: { value: 'car' } });
+    act(() => vi.advanceTimersByTime(TYPING_PAUSE_MS - 1));
+    fireEvent.change(descriptionField(), { target: { value: 'carro' } });
+    act(() => vi.advanceTimersByTime(TYPING_PAUSE_MS - 1));
+    expect(screen.getByRole('status')).toHaveTextContent(
+      characterCountAnnouncement(0, DESCRIPTION_LIMIT),
+    );
+
+    act(() => vi.advanceTimersByTime(1));
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      characterCountAnnouncement(5, DESCRIPTION_LIMIT),
+    );
+  });
+
+  it('should describe the field by the error alone, keeping the count out of what focus reads', () => {
+    render(<CountedHarness error={DESCRIPTION_ERROR} />);
+
+    expect(descriptionField()).toHaveAccessibleDescription(DESCRIPTION_ERROR);
+  });
+
+  it('should leave the field without description while there is no error', () => {
+    render(<CountedHarness />);
+
+    expect(descriptionField()).toHaveAccessibleDescription('');
+  });
+
+  it('should keep the plain field without a counter', () => {
+    renderComponent({ ...DEFAULT_PROPS, maxLength: DESCRIPTION_LIMIT });
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });
 
