@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { useMaskedField } from '@app/hooks/useMaskedField';
 import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
-import type { SignupFormValues } from '@app/pages/Signup/schema';
+import { MAX_LENGTH, type SignupFormValues } from '@app/pages/Signup/schema';
 import { maskPhone } from '@app/utils/masks/phoneMask';
 
 import * as S from './styles';
@@ -40,6 +40,7 @@ export function ContactSection() {
           fullWidth
           type="email"
           autoComplete="home email"
+          maxLength={MAX_LENGTH.contactEmail}
           error={errors.contactEmail?.message}
         />
       </S.HalfWidthCell>

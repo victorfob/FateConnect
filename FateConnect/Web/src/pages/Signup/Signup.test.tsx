@@ -136,6 +136,17 @@ describe('Signup', () => {
     expect(await screen.findByText(SIGNUP_MESSAGES.phoneInvalid)).toBeInTheDocument();
   });
 
+  it('should hold the name and both emails to the length the api accepts', () => {
+    renderSignup();
+
+    const textboxNamed = (label: string) =>
+      screen.getByRole('textbox', { name: new RegExp(label) });
+
+    expect(textboxNamed(C.FIELD_LABELS.fullName)).toHaveAttribute('maxlength', '200');
+    expect(textboxNamed(C.FIELD_LABELS.fatecEmail)).toHaveAttribute('maxlength', '150');
+    expect(textboxNamed(C.FIELD_LABELS.contactEmail)).toHaveAttribute('maxlength', '150');
+  });
+
   it('should format the birth date while it is typed', async () => {
     renderSignup();
     const birthDate = screen.getByLabelText(/Data de nascimento/);

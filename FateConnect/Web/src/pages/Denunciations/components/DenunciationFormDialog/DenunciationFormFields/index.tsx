@@ -17,6 +17,7 @@ export function DenunciationFormFields() {
   } = useFormContext<DenunciationFormInput, unknown, DenunciationFormValues>();
   const photo = useWatch({ control, name: 'photo' });
   const isAnonymous = useWatch({ control, name: 'isAnonymous' });
+  const description = useWatch({ control, name: 'description' });
 
   // Valida na escolha: o formato e o tamanho se sabem na hora, não no envio.
   const handlePhotoChange = useCallback(
@@ -62,6 +63,8 @@ export function DenunciationFormFields() {
         multiline
         rows={C.DESCRIPTION_ROWS}
         placeholder={C.DENUNCIATION_FORM_PLACEHOLDERS.description}
+        maxLength={C.DENUNCIATION_LIMITS.maxDescription}
+        characterCount={description.length}
         error={errors.description?.message}
       />
 
