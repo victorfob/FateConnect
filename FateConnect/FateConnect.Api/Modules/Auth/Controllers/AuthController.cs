@@ -21,9 +21,24 @@ public class AuthController : ControllerBase
 
     [HttpPost("login")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
     {
         var response = await _authService.LoginAsync(dto);
+        return Ok(response);
+    }
+
+    [HttpPost("reactivate")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ReactivateAsync([FromBody] LoginDto dto)
+    {
+        var response = await _authService.ReactivateAsync(dto);
         return Ok(response);
     }
 
