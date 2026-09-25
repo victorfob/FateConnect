@@ -7,6 +7,7 @@ using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Rides.Interfaces;
+using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.EntityFrameworkCore;
 
 public class RideRepository(FateConnectDbContext context) : IRideRepository
@@ -25,6 +26,7 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
             .AsNoTracking()
             .Include(r => r.Driver)
             .Where(r => r.IsActive)
+            .Where(IsOfferedByAnActiveAccount())
             .Where(HasNotDeparted(today, currentTime));
 
         if (currentUserId.HasValue)
@@ -71,6 +73,9 @@ public class RideRepository(FateConnectDbContext context) : IRideRepository
 
         return (items, total);
     }
+
+    private static Expression<Func<Ride, bool>> IsOfferedByAnActiveAccount() =>
+        ride => ride.Driver.Status == EnumAccountStatus.Active;
 
     private static Expression<Func<Ride, bool>> IsOfferedBy(int driverId) =>
         ride => ride.DriverId == driverId;
