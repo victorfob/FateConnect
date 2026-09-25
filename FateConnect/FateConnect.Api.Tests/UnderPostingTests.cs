@@ -19,7 +19,8 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         ["password"] = "SenhaForte123!",
         ["fullName"] = "Mariana Alves Rocha",
         ["gender"] = "Male",
-        ["contacts"] = new[] { new { phone = ApiFactory.UniquePhone(), contactEmail = ApiFactory.UniqueContactEmail() } },
+        ["phone"] = ApiFactory.UniquePhone(),
+        ["contactEmail"] = ApiFactory.UniqueContactEmail(),
         ["acceptances"] = new[]
         {
             new { document = "TermsOfUse", version = "2026-01-15" },

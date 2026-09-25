@@ -35,10 +35,16 @@ public class CreateUserDto
     [EnumDataType(typeof(EnumGender), ErrorMessage = "Gênero inválido")]
     required public EnumGender Gender { get; set; }
 
-    [Required]
-    [MinLength(1, ErrorMessage = "Informe ao menos um contato")]
-    required public List<CreateContactDto> Contacts { get; set; } =
-    [];
+    [Required(ErrorMessage = "Informe o telefone")]
+    [MaxLength(11)]
+    [DefaultValue("11999999999")]
+    public string Phone { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Informe o e-mail para contato")]
+    [EmailAddress(ErrorMessage = "E-mail inválido")]
+    [MaxLength(150)]
+    [DefaultValue("pedro.augusto@gmail.com")]
+    public string ContactEmail { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Informe o aceite dos documentos")]
     [MinLength(1, ErrorMessage = "Informe o aceite de ao menos um documento")]

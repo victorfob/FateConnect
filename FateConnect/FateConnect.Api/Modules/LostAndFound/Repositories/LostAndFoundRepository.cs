@@ -15,7 +15,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
     {
         IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
             .AsNoTracking()
-            .Include(r => r.User.Contacts);
+            .Include(r => r.User);
 
         if (currentUserId.HasValue)
             query = query.Where(r => r.UserId == currentUserId.Value);
@@ -68,7 +68,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
     public async Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true)
     {
         IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
-            .Include(r => r.User.Contacts);
+            .Include(r => r.User);
 
         if (!forChange)
             query = query.AsNoTracking();
@@ -82,7 +82,6 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         await context.SaveChangesAsync();
 
         await context.Entry(lostAndFoundRecord).Reference(r => r.User).LoadAsync();
-        await context.Entry(lostAndFoundRecord.User).Collection(user => user.Contacts).LoadAsync();
 
         return lostAndFoundRecord;
     }

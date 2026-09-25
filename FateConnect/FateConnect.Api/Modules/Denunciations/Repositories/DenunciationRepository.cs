@@ -18,7 +18,7 @@ public class DenunciationRepository(FateConnectDbContext context) : IDenunciatio
     {
         IQueryable<Denunciation> query = context.Denunciations
             .AsNoTracking()
-            .Include(d => d.User.Contacts);
+            .Include(d => d.User);
 
         if (reporterId.HasValue)
             query = query.Where(d => d.UserId == reporterId.Value);
@@ -70,7 +70,7 @@ public class DenunciationRepository(FateConnectDbContext context) : IDenunciatio
     public async Task<Denunciation?> GetByIdAsync(Guid id, bool forChange = true)
     {
         IQueryable<Denunciation> query = context.Denunciations
-            .Include(d => d.User.Contacts);
+            .Include(d => d.User);
 
         if (!forChange)
             query = query.AsNoTracking();
@@ -84,10 +84,7 @@ public class DenunciationRepository(FateConnectDbContext context) : IDenunciatio
         await context.SaveChangesAsync();
 
         if (!denunciation.IsAnonymous)
-        {
             await context.Entry(denunciation).Reference(d => d.User).LoadAsync();
-            await context.Entry(denunciation.User).Collection(user => user.Contacts).LoadAsync();
-        }
 
         return denunciation;
     }

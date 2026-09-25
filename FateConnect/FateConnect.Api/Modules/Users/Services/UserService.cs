@@ -26,7 +26,7 @@ public class UserService : IUserService
     public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto, RequestOrigin origin)
     {
         await EnsureEmailIsUniqueAsync(dto.FatecEmail);
-        await EnsureContactsAreUniqueAsync(dto.Contacts);
+        await EnsureContactIsUniqueAsync(dto.Phone, dto.ContactEmail);
 
         User newUser = BuildUser(dto, origin, _timeProvider.GetUtcNow().UtcDateTime);
 
@@ -45,32 +45,22 @@ public class UserService : IUserService
             throw new EmailAlreadyRegisteredException(email);
     }
 
-    private async Task EnsureContactsAreUniqueAsync(List<CreateContactDto> dtos)
+    private async Task EnsureContactIsUniqueAsync(string phone, string contactEmail)
     {
-        HashSet<string> phonesInRequest = [];
-        HashSet<string> emailsInRequest = [];
+        bool phoneIsTaken = await _userRepository.ContactPhoneExistsAsync(phone);
 
-        foreach (CreateContactDto dto in dtos)
-        {
-            bool phoneRepeatedInRequest = !phonesInRequest.Add(dto.Phone);
-            bool phoneIsTaken = phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.Phone);
+        if (phoneIsTaken)
+            throw new ContactPhoneAlreadyRegisteredException(phone);
 
-            if (phoneIsTaken)
-                throw new ContactPhoneAlreadyRegisteredException(dto.Phone);
+        bool contactEmailIsTaken = await _userRepository.ContactEmailExistsAsync(contactEmail);
 
-            bool emailRepeatedInRequest = !emailsInRequest.Add(dto.ContactEmail);
-            bool emailIsTaken = emailRepeatedInRequest || await _userRepository.ContactEmailExistsAsync(dto.ContactEmail);
-
-            if (emailIsTaken)
-                throw new ContactEmailAlreadyRegisteredException(dto.ContactEmail);
-        }
+        if (contactEmailIsTaken)
+            throw new ContactEmailAlreadyRegisteredException(contactEmail);
     }
 
     private static User BuildUser(CreateUserDto dto, RequestOrigin origin, DateTime now)
     {
         string hashedPassword = HashPassword(dto.Password);
-
-        List<Contact> mappedContacts = BuildContacts(dto.Contacts);
 
         User user = new User
         {
@@ -82,9 +72,14 @@ public class UserService : IUserService
             ProfileType = EnumProfileType.Operator,
             CreatedAt = now,
             UpdatedAt = null,
-            ReceiveEmails = dto.ReceiveEmails ?? false,
-            ReceiveNotifications = dto.ReceiveNotifications ?? false,
-            Contacts = mappedContacts,
+            Phone = dto.Phone,
+            ContactEmail = dto.ContactEmail,
+            Status = EnumAccountStatus.Active,
+            Preferences = new UserPreferences
+            {
+                ReceiveEmails = dto.ReceiveEmails ?? false,
+                ReceiveNotifications = dto.ReceiveNotifications ?? false
+            },
             DocumentAcceptances = BuildAcceptances(dto.Acceptances, origin, now)
         };
 
@@ -103,18 +98,4 @@ public class UserService : IUserService
             IpAddress = origin.IpAddress,
             UserAgent = origin.UserAgent
         })];
-
-    private static List<Contact> BuildContacts(List<CreateContactDto>? dtos)
-    {
-        if (dtos is null or { Count: 0 })
-            return [];
-
-        List<Contact> contacts = [.. dtos.Select(dto => new Contact
-        {
-            Phone = dto.Phone,
-            ContactEmail = dto.ContactEmail
-        })];
-
-        return contacts;
-    }
 }

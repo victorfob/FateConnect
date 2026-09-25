@@ -38,12 +38,12 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> ContactPhoneExistsAsync(string phone)
     {
-        return await _context.Contacts.AnyAsync(c => c.Phone == phone);
+        return await _context.Users.AnyAsync(u => u.Phone == phone);
     }
 
     public async Task<bool> ContactEmailExistsAsync(string contactEmail)
     {
-        return await _context.Contacts.AnyAsync(c => c.ContactEmail == contactEmail);
+        return await _context.Users.AnyAsync(u => u.ContactEmail == contactEmail);
     }
 
     public async Task<User?> GetByEmailAsync(string email)
