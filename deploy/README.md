@@ -87,6 +87,11 @@ e `/root/password-fateconnect_prod.txt`; gere os segredos de sessão com
 `openssl rand -base64 32`, **diferentes** em cada ambiente. Deixe `PUBLIC_URL`
 com `http://` por enquanto.
 
+`SIXLABORS_LICENSE` recebe o conteúdo inteiro do arquivo `sixlabors.lic`, entre aspas
+simples: a API gera a miniatura das fotos com o ImageSharp, e o build da imagem reprova
+sem a licença. Ela entra só no estágio de build e não chega à imagem que sobe. O arquivo
+nunca vai para o repositório: o `.gitignore` e o `.dockerignore` o recusam.
+
 Nenhum desses arquivos é versionado — eles têm senha dentro, e o repositório é
 público.
 
