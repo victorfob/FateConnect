@@ -1,5 +1,6 @@
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,15 @@ public class UserRepository : IUserRepository
             .Where(user => user.Id == userId)
             .ExecuteUpdateAsync(update => update
                 .SetProperty(user => user.TokenVersion, user => user.TokenVersion + 1)
+                .SetProperty(user => user.UpdatedAt, DateTime.UtcNow));
+    }
+
+    public async Task ReactivateAsync(int userId)
+    {
+        await _context.Users
+            .Where(user => user.Id == userId)
+            .ExecuteUpdateAsync(update => update
+                .SetProperty(user => user.Status, EnumAccountStatus.Active)
                 .SetProperty(user => user.UpdatedAt, DateTime.UtcNow));
     }
 

@@ -43,10 +43,16 @@ public partial class GlobalExceptionMiddleware(
                 errorMessage = exception.Message;
                 break;
 
+            case BannedAccountException:
             case DenunciationNotReportedByUserException:
             case LostAndFoundNotReportedByUserException:
             case RideNotDrivenByUserException:
                 statusCode = HttpStatusCode.Forbidden;
+                errorMessage = exception.Message;
+                break;
+
+            case DeactivatedAccountException:
+                statusCode = HttpStatusCode.Conflict;
                 errorMessage = exception.Message;
                 break;
 
