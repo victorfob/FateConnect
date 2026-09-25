@@ -88,6 +88,8 @@ O comentário que passou nos dois testes acima ainda mente com o tempo: ele foi 
 
 **Comentário ao lado de comentário é o caso mais fácil de pular**, porque o gesto não parece uma mudança de código: você está justamente escrevendo a explicação, então parece que a explicação já está sendo cuidada. Aconteceu em 2026-08-27 no `sonar-main.yml`: escrevi um bloco novo explicando por que a análise precisa declarar a versão, encostado num bloco que dizia que o run só fica vermelho *"quando algo escapou do gate do PR"* — a frase que acabara de se mostrar falsa, e a razão de eu ter procurado um culpado inexistente. Passei por cima dela para escrever ao lado. Quem apontou foi o Victor.
 
+⛔ **O vizinho pode estar em outro arquivo.** Comentário que a sua mudança torna falso é seu para corrigir no mesmo PR, mesmo que o arquivo dele não estivesse no diff — o limite do boy-scout é o que o PR **muda**, e ele mudou a verdade daquela frase. Em 25/09/2026, na #414, o `Dialog.Message` passou a acompanhar o título, e o rodapé do `Dialog` seguia dizendo que o título *"é centralizado em qualquer largura"*, falso desde que ele vai para a esquerda no estreito. Eu só apontei; a correção veio do Victor, para o mesmo PR.
+
 Aconteceu três vezes no mesmo arquivo, em 2026-08-25, no `eslint.config.js` — e quem achou a primeira foi o Victor:
 
 - *"Valor em `vw`/`vh` e constante nomeada seguem passando"* — duas regras adicionadas depois passaram a pegar exatamente isso.

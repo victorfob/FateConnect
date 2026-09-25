@@ -57,7 +57,9 @@ A API fala **inglês inteira** — caminho, query, corpo e resposta. Não há tr
 
 - **Caronas.** Caminho `/Rides`. Valores do enum de tipo: `Solidarity` | `Egalitarian`; do enum de turno: `Morning` | `Afternoon` | `Night`.
 - **Achados e perdidos.** Caminho `/LostAndFound`. O campo de autoria se chama `OnlyMine` **nos dois módulos**.
-- **Cadastro.** `POST /Users/signup` com `fullName`, `fatecEmail`, `password`, `birthDate`, `gender` e `contacts` (`phone`, `contactEmail`). Resposta: `{ token }` — o cadastro já autentica. Valores de gênero: `Male` | `Female` | `Other`.
+- **Cadastro.** `POST /Users/signup`, com o corpo do `CreateUserDto`: os dados da pessoa, **um** telefone e **um** e-mail de contato direto no corpo (não numa lista), o aceite de cada documento e as duas preferências de contato. Resposta: `{ token }` — o cadastro já autentica. Valores de gênero: `Male` | `Female` | `Other`.
+
+  ⛔ **Os campos se leem no DTO, não aqui.** Esta linha listava o corpo campo a campo e envelheceu duas vezes: não trazia o aceite nem as preferências, que entraram na 1.0.0, e ainda descrevia `contacts` como lista.
 - **Login.** `POST /Auth/login` com `{ fatecEmail, password }`, resposta `{ token }`.
 - **Sessão.** `GET /Auth/session`, autenticada, responde `204` enquanto o token vale e `401` quando não vale mais. É quem diz se a sessão continua de pé — o front não julga validade por conta própria, e não lê o `exp` do token.
 - **O nome de quem está logado sai do token**, na claim `unique_name`, e não de nenhuma resposta. Cadastro e login devolvem o mesmo `TokenResponseDto`.
@@ -75,6 +77,8 @@ A API fala **inglês inteira** — caminho, query, corpo e resposta. Não há tr
 ⛔ **Não enumere aqui os parâmetros de filtro.** Esta seção os listava e drifou três vezes em uma semana: `destination` já era `SearchTerm`, `departureDate` saiu com o filtro de período, `departureTime` saiu com o de turno. Enumerar num lugar que ninguém revisita produz uma lista que mente com confiança. Eles se leem na fonte — o DTO de filtro de cada módulo, mais o `DateRangeFilterDto` e o `PagedFilterDto` que os dois herdam — e, no ar, no documento do Swagger de cada ambiente.
 
 ⚠️ **A query e o JSON de resposta não têm os mesmos nomes**, e já tiveram. Hoje a query de caronas filtra por `DateFrom`, `DateTo` e `DepartureShift`, enquanto o JSON devolve `DepartureDate` e `DepartureTime` — dos dois lados só `RideType` coincide. Não presuma simetria entre o que se filtra e o que se recebe.
+
+⚠️ **O Swagger não diz o que pode chegar nulo.** O Swashbuckle daqui não lê a anulabilidade do C#: no `UserContactDto` ele marca `nullable: true` nos três campos, inclusive no `name`, que nunca é nulo. Medido em 25/09/2026, no #456, quando o `UserContactDto` passou de `string` a `string?` e o documento não mudou uma linha. Quem responde se um campo aceita nulo é o tipo do DTO.
 
 ⚠️ **A API publica com a inicial maiúscula e o front chama minúsculo.** `[Route("[controller]")]` gera `/Rides`, `/Users` e `/Auth`, que é o que o Swagger mostra; os serviços do front padronizam `/rides`, `/users/signup` e `/auth`, porque o roteamento do ASP.NET é case-insensitive. Não "corrija" nenhum dos dois lados — a divergência é deliberada.
 

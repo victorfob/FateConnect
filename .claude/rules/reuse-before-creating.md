@@ -80,3 +80,7 @@ O que fechou a conversa foi a tabela que eu devia ter apresentado antes:
 Vale também para duplicação **fora da tarefa**. Se eu vi, eu proponho na hora, sem esperar ser cobrado — a sugestão é obrigação, não favor. Trazer três coisas: o que está repetido, o que fica no lugar dos dois, e **onde** passa a morar. E **esperar o sim**.
 
 ⛔ **O destino nunca se decide sozinho.** As opções deste repo: `design-system/` (dois consumidores ou mais, e nada de `@app`), `src/components/` (compartilhado da aplicação, pode usar `@app`), `src/hooks/`, `src/utils/`, ou a pasta de quem usa quando o consumidor é **um só**. O critério está em `web-design-system.md` e `fateconnect-web-react.md` — e ele se reavalia quando o número de consumidores muda: unificar dois consumidores em um tira o componente do design system.
+
+⛔ **Aprovada a unificação, ela migra todos os consumidores no mesmo PR — inclusive a variante que diverge.** A cópia idêntica é a que se enxerga; a que resolve o mesmo papel de outro jeito é a que fica para trás, e passa a ser a única fora do padrão. Não é alargar o diff por boy-scout: é a unificação terminando.
+
+Aconteceu em 25/09/2026, na #414. Achei dois `ConfirmationMessage` idênticos e tratei o terceiro diálogo — o da gestão, com uma `Typography` sem estilo — como pergunta à parte. A resposta foi *"atualiza todos os consumidores"*, e os quatro passaram ao `Dialog.Message`.

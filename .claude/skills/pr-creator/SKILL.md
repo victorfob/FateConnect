@@ -92,6 +92,24 @@ Do not add assumptions not present in the diff.
    - If the PR already exists without an assignee, fix it with `gh pr edit <n> --add-assignee @me`.
 4. If GitHub CLI is unavailable, stop and tell the user — do not invent another path.
 
+## PR empilhado à mão: o squash da base o deixa em conflito
+
+⛔ **PR que aponta para a branch de outro PR, sem pilha nativa, entra em conflito quando a base é mergeada por squash.** O GitHub reaponta a base para a `develop` sozinho, mas não rebaseia: o PR continua carregando os commits da base, que na `develop` viraram **um** commit com outro SHA. Nenhum patch casa, e o `mergeable` vira `CONFLICTING`.
+
+Aconteceu em 25/09/2026, no #460. Ele ficou fora da pilha nativa de propósito: o #456 e o #457, embaixo dele, já tinham aprovação de outra pessoa, e linkar reapontaria bases.
+
+**A saída é replay com `--onto`, nunca `git rebase origin/develop`:**
+
+```bash
+git rev-parse <branch-da-base>                        # guarde o tip ANTES: a branch some no merge
+git diff --quiet <tip-antigo-da-base> origin/develop  # vazio = a base está inteira na develop
+git rebase --onto origin/develop <tip-antigo-da-base> <branch>
+```
+
+**A prova é o patch, não o verde:** compare as linhas `+`/`-` de `git diff <tip-antigo-da-base> <tip-antigo>` com as de `git diff origin/develop <branch>`. Iguais, o replay não tocou em nada. Depois, `push --force-with-lease=<branch>:<tip-antigo>`. O corpo do PR que falava da pilha também muda, partindo do corpo publicado.
+
+⚠️ **Squash se reconhece pelo pai:** `git log -1 --format=%P origin/develop` com **um** SHA só. Neste repo o commit squashado leva o título do PR com o número no fim — `refactor(454): … (#456)` —, e merge commit tem dois pais.
+
 ## Validation checklist
 
 - Title derived from diff and formatted as `pr-type(Github Issue ID): breve descrição`.

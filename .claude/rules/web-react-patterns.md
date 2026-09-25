@@ -112,6 +112,24 @@ if (useSessionStatus() === SessionStatusEnum.VALID)
 
 ⚠️ O Prettier mantém essa forma quando a linha estoura a largura; não é ele que reintroduz as chaves.
 
+## Ternário é o último recurso, e cada um tem uma saída
+
+⛔ **Fora do JSX, ternário vira `if` com retorno antecipado.** Quando a decisão é o valor de uma propriedade, ela sai para um helper puro com `if` — é o `inputLabelSlot` do `Input`, que devolve `{ shrink: true }` ou nada.
+
+⛔ **Dentro do JSX, `cond ? <A /> : null` é `cond && <A />`.** O ternário só se justifica quando os **dois** lados são conteúdo.
+
+⛔ Cobrado no review do #461: *"esse código ta bem confuso com esse tanto de if ternário"*. O `InputField` tinha **sete** e ficou com um. As saídas foram três, e a terceira é a que se esquece:
+
+| Era | Virou | Por quê |
+| --- | --- | --- |
+| `isTime ? <TimePickerButton /> : null` | `isTime && <TimePickerButton />` | o outro lado era nada |
+| `shrunk ? { shrink: true } : undefined` | `inputLabelSlot(shrunk)` | decisão fora do JSX, num `if` |
+| `maxLength ? { maxLength } : undefined` | `{ maxLength }` | **o ternário não fazia nada**: atributo indefinido já some do DOM |
+
+⚠️ **Trocar `: null` por `&&` pode mudar o que a biblioteca vê**, porque ela passa a receber `false`. Antes de trocar numa prop de componente do MUI, confira se ele decide por **veracidade** ou por **presença**. No `endAdornment` do `InputBase`, a regra é `ownerState.endAdornment && styles.adornedEnd`, e aí `false` e `null` dão o mesmo recuo.
+
+⚠️ **O ternário que fica é o de dois conteúdos.** No `InputField` sobrou o do `helperText`: o campo comum recebe a string do erro, e o contado recebe o componente.
+
 ## Constante de módulo mora no topo
 
 Depois dos imports, num bloco só, junto das que já existem — não encostada na função que a usa. Constante espalhada pelo arquivo esconde que o mesmo número já tinha nome três linhas acima.

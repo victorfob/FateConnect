@@ -119,6 +119,18 @@ Nunca exponha membro só para testar. O que interessa é o resultado do método 
 
 ⛔ **A suíte precisa de Docker.** O `TestDatabase` sobe **um** container `postgres:17` para a suíte inteira, e cada `ApiFactory` registra `UseNpgsql` apontando para um banco próprio dentro dele — o isolamento entre classes de teste é o banco, não o container. Sem Docker a suíte falha inteira, com a mensagem que o `TestDatabase` escreve; não há caminho de fallback, porque verde com testes pulados é o falso verde que esta seção existe para impedir.
 
+⛔ **O `pre-push` roda esta suíte em silêncio, e a falha chega sem motivo.** O que aparece é só o placar e a lista de `[FAIL]`. Antes de repetir o push ou de mexer em código, rode `dotnet test` direto: é ele que imprime a primeira mensagem de erro.
+
+⚠️ **Docker recém-ligado ainda não está pronto, mesmo com o daemon respondendo.** Em 25/09/2026, rebaseando o #461, o push caiu duas vezes com os **mesmos 224 de 372**:
+
+| Tentativa | Estado do Docker | O que mostrou |
+| --- | --- | --- |
+| primeira | tinha caído | `docker.sock` inexistente, corrida de 14s |
+| segunda | recém-ligado, com `docker info` respondendo | nenhuma mensagem, corrida de **1min13s** |
+| direto na worktree, logo depois | aquecido | **372 de 372**, em 15s |
+
+**O tell é a corrida levar muito mais que os ~15s de sempre.** Aí a causa é o contêiner, não o código, e o controle é rodar a suíte direto uma vez antes de empurrar de novo. ⛔ `--no-verify` pularia a suíte inteira da API, e não é saída.
+
 **A tag casa com a produção.** A VPS roda o `postgres-17` do Ubuntu, então a imagem é `postgres:17` e não a mais recente. Não pinamos versão de Docker: o Testcontainers não declara mínimo, e nada no nosso código fixa versão de API.
 
 **O schema nasce das migrations**, porque é o `Migrate()` do `Program` que roda — o mesmo caminho da produção. Migration quebrada aparece no teste, e o `unaccent` vem junto sem passo manual, porque o `FateConnectDbContext` o declara com `HasPostgresExtension`.
