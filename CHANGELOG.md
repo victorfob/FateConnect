@@ -14,6 +14,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Passa a deixar de fora das listagens de caronas e de achados e perdidos o que pertence a conta desativada ou banida; nada é apagado, e o registro volta a aparecer se a conta for reativada. As denúncias dessas contas continuam chegando a quem analisa (#463) [Backend]
 - Passa a avisar no login que a conta banida foi banida por infringir as regras da plataforma, sem oferecer ação, em vez do aviso genérico de erro (#462) [Frontend]
 - Passa a alinhar a frase dos diálogos de confirmação com o título, centralizada no desktop e à esquerda no celular; antes a da exclusão de carona e a de achados e perdidos centralizavam sempre, e a da gestão de denúncias ficava sempre à esquerda (#462) [Frontend]
 - Passa a recusar no login a conta banida, com 403 e com a senha certa ou errada, e a conta desativada, com 409 quando a senha confere, para quem chama poder oferecer a reativação; senha errada continua sendo 401 (#460) [Backend]

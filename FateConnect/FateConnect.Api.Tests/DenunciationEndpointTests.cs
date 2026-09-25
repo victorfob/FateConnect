@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Tests;
 
@@ -263,6 +264,23 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await moderation.PostAsync("/Denunciations", NewDenunciationForm());
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(EnumAccountStatus.SelfDeactivated)]
+    [InlineData(EnumAccountStatus.Banned)]
+    public async Task ListDenunciations_AsAdministrator_KeepsWhatAnAccountNoLongerActiveReported(EnumAccountStatus status)
+    {
+        int reporterId = _factory.SeedUser("Joana Rezende Castro").Id;
+        string subject = UniqueSubject();
+        await ReportedBy(_factory.CreateClientFor(reporterId), NewDenunciationForm(description: $"{ValidDescription} {subject}"));
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Lúcio Amaral Teixeira");
+
+        _factory.SetAccountStatus(reporterId, status);
+        PagedDenunciations all = (await moderation.GetFromJsonAsync<PagedDenunciations>(
+            $"/Denunciations?searchTerm={subject}", JsonOptions))!;
+
+        Assert.Equal(1, all.Total);
     }
 
     [Fact]

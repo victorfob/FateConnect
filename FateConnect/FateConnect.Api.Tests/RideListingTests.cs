@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Tests;
 
@@ -52,6 +53,28 @@ public class RideListingTests
     private static async Task<HttpResponseMessage> RequestPageAsync(ApiFactory factory, int userId, string query)
     {
         return await factory.CreateClientFor(userId).GetAsync($"/Rides{query}");
+    }
+
+    [Theory]
+    [InlineData(EnumAccountStatus.SelfDeactivated)]
+    [InlineData(EnumAccountStatus.Banned)]
+    public async Task GetRides_OfferedByAnAccountThatIsNoLongerActive_LeavesThemOut(EnumAccountStatus status)
+    {
+        using ApiFactory factory = new();
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        int activeDriverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        int leavingDriverId = factory.SeedUser("Bruno Carvalho Souza").Id;
+        Guid kept = factory.SeedRide(activeDriverId, tomorrow, new TimeOnly(8, 30));
+        Guid hidden = factory.SeedRide(leavingDriverId, tomorrow, new TimeOnly(9, 30));
+
+        PagedRides before = await GetPageAsync(factory, activeDriverId);
+        factory.SetAccountStatus(leavingDriverId, status);
+        PagedRides after = await GetPageAsync(factory, activeDriverId);
+
+        Assert.Contains(before.Items, ride => ride.Id == hidden);
+        Assert.Contains(after.Items, ride => ride.Id == kept);
+        Assert.DoesNotContain(after.Items, ride => ride.Id == hidden);
+        Assert.Equal(1, after.Total);
     }
 
     [Fact]

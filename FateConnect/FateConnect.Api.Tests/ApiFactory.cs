@@ -178,6 +178,16 @@ public class ApiFactory : WebApplicationFactory<Program>
         return (user.Id, user.FatecEmail);
     }
 
+    public void SetAccountStatus(int userId, EnumAccountStatus status)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        context.Users
+            .Where(user => user.Id == userId)
+            .ExecuteUpdate(setters => setters.SetProperty(user => user.Status, status));
+    }
+
     public Guid SeedRide(
         int driverId,
         DateOnly departureDate,
