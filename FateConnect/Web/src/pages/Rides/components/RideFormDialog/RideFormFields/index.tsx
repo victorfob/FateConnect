@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Input } from '@design-system';
 import { toZonedTime } from 'date-fns-tz';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 import type { RideFormInput, RideFormValues } from '../schema';
 import * as C from '../constants';
@@ -13,6 +13,7 @@ export function RideFormFields() {
     register,
     formState: { errors },
   } = useFormContext<RideFormInput, unknown, RideFormValues>();
+  const description = useWatch({ control, name: 'description' });
   // No fuso do produto, e não no de quem preenche: a leste daqui o dia já virou,
   // e o calendário desabilitaria uma partida que a API ainda aceita.
   const today = useMemo(() => toZonedTime(new Date(), C.PRODUCT_TIME_ZONE), []);
@@ -25,6 +26,7 @@ export function RideFormFields() {
         required
         fullWidth
         placeholder={C.RIDE_FORM_PLACEHOLDERS.destination}
+        maxLength={C.RIDE_LIMITS.maxDestination}
         error={errors.destination?.message}
       />
 
@@ -82,6 +84,8 @@ export function RideFormFields() {
           multiline
           rows={C.DESCRIPTION_ROWS}
           placeholder={C.RIDE_FORM_PLACEHOLDERS.description}
+          maxLength={C.RIDE_LIMITS.maxDescription}
+          characterCount={description.length}
           error={errors.description?.message}
         />
       </S.WideCell>

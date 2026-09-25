@@ -70,6 +70,17 @@ describe('RideFormDialog', () => {
     ).toHaveValue(RIDE.description);
   });
 
+  it('should hold each text field to its limit and count the stored description', async () => {
+    renderComponent({ ...DEFAULT_PROPS, ride: RIDE });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+
+    expect(destinationField()).toHaveAttribute('maxlength', '100');
+    expect(
+      screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.description) }),
+    ).toHaveAttribute('maxlength', '300');
+    expect(screen.getByText('40/300', { ignore: '[role="status"]' })).toBeInTheDocument();
+  });
+
   it('should refuse to submit an empty form and say what is missing', async () => {
     renderComponent();
     await screen.findByRole('heading', { name: OFFER_MODE.title });

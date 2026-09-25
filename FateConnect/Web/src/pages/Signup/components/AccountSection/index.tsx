@@ -4,7 +4,7 @@ import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
-import type { SignupFormValues } from '@app/pages/Signup/schema';
+import { MAX_LENGTH, type SignupFormValues } from '@app/pages/Signup/schema';
 
 import { BirthDateField } from '../BirthDateField';
 import { GENDER_SELECT_OPTIONS, PASSWORD_TOGGLE_LABEL } from './constants';
@@ -30,6 +30,7 @@ export function AccountSection() {
           fullWidth
           type="text"
           autoComplete="name"
+          maxLength={MAX_LENGTH.fullName}
           error={errors.fullName?.message}
         />
       </S.FullWidthCell>
@@ -64,6 +65,7 @@ export function AccountSection() {
           type="email"
           autoComplete="work email"
           placeholder={FIELD_PLACEHOLDERS.fatecEmail}
+          maxLength={MAX_LENGTH.fatecEmail}
           error={errors.fatecEmail?.message}
         />
       </S.HalfWidthCell>

@@ -19,6 +19,7 @@ export function LostItemFormFields({ storedImageUrl }: LostItemFormFieldsProps) 
     formState: { errors, disabled },
   } = useFormContext<LostItemFormInput, unknown, LostItemFormValues>();
   const photo = useWatch({ control, name: 'photo' });
+  const description = useWatch({ control, name: 'description' });
   const today = useMemo(() => new Date(), []);
   const storedPhoto = useStoredImage(storedImageUrl);
 
@@ -42,6 +43,7 @@ export function LostItemFormFields({ storedImageUrl }: LostItemFormFieldsProps) 
         required
         fullWidth
         placeholder={C.LOST_ITEM_FORM_PLACEHOLDERS.name}
+        maxLength={C.LOST_ITEM_LIMITS.maxName}
         error={errors.name?.message}
       />
 
@@ -65,6 +67,7 @@ export function LostItemFormFields({ storedImageUrl }: LostItemFormFieldsProps) 
         required
         fullWidth
         placeholder={C.LOST_ITEM_FORM_PLACEHOLDERS.place}
+        maxLength={C.LOST_ITEM_LIMITS.maxPlace}
         error={errors.place?.message}
       />
 
@@ -94,6 +97,8 @@ export function LostItemFormFields({ storedImageUrl }: LostItemFormFieldsProps) 
           multiline
           rows={C.DESCRIPTION_ROWS}
           placeholder={C.LOST_ITEM_FORM_PLACEHOLDERS.description}
+          maxLength={C.LOST_ITEM_LIMITS.maxDescription}
+          characterCount={description.length}
           error={errors.description?.message}
         />
       </S.WideCell>

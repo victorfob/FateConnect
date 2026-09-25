@@ -79,6 +79,15 @@ describe('DenunciationFormDialog', () => {
     expect(confidentialToggle()).not.toBeChecked();
   });
 
+  it('should hold the description to its limit and show how much of it is used', async () => {
+    renderComponent();
+
+    await userEvent.type(descriptionField(), TYPED_DESCRIPTION);
+
+    expect(descriptionField()).toHaveAttribute('maxlength', '500');
+    expect(screen.getByText('56/500', { ignore: '[role="status"]' })).toBeInTheDocument();
+  });
+
   /**
    * Sigilo não é anonimato, e quem conta a diferença é a frase — que só aparece
    * para quem escolheu a opção.
