@@ -27,11 +27,10 @@ describe('toSignupRequest', () => {
     expect(request.gender).toBe(GenderValueEnum.FEMALE);
   });
 
-  // A API recebe o telefone só com dígitos.
   it('should send the phone as digits', () => {
     const request = toSignupRequest(FILLED);
 
-    expect(request.contacts[0]?.phone).toBe('15999999999');
+    expect(request.phone).toBe('15999999999');
   });
 
   // `toISOString()` sobre a data local move o instante e, a leste de
@@ -84,7 +83,8 @@ describe('toSignupRequest', () => {
       password: 'segredo123',
       birthDate: '1999-05-22T00:00:00Z',
       gender: GenderValueEnum.FEMALE,
-      contacts: [{ phone: '15999999999', contactEmail: 'maria@exemplo.com' }],
+      phone: '15999999999',
+      contactEmail: 'maria@exemplo.com',
       acceptances: [
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
         { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },
