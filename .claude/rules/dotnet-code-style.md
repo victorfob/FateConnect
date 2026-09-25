@@ -62,7 +62,7 @@ if (phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.
     throw new ContactPhoneAlreadyRegisteredException(dto.Phone);
 ```
 
-O que ficou:
+A correção:
 
 ```csharp
 bool phoneRepeatedInRequest = !phonesInRequest.Add(dto.Phone);
@@ -184,3 +184,11 @@ public string? Description { get; init; }
 Medido em 11/09/2026, na #354, ao separar a recusa do e-mail institucional em formato e domínio. ⚠️ A ordem é comportamento, não detalhe: invertê-la faz `nao-e-email` ouvir a mensagem da parte local. Ela se trava com teste.
 
 ⚠️ **O tell é a entidade que decide por `is not null`.** Todo campo opcional de um `PATCH` passa por essa comparação; para cada um, pergunte se existe motivo de alguém querer apagá-lo — se existe, o atributo entra junto.
+
+### Coluna que passa a aceitar nulo chega ao DTO de leitura
+
+⛔ **Tornar anulável uma propriedade da entidade obriga a decidir o tipo de quem a devolve.** Com o `<Nullable>enable</Nullable>` e o `TreatWarningsAsErrors` do `.csproj`, passar `string?` para um parâmetro `string` não compila. Então a decisão aparece no build, não no review, e costuma aparecer tarde: ela é de contrato, e o contrato já foi especificado.
+
+Aconteceu em 25/09/2026, na #454. O telefone e o e-mail de contato viraram colunas anuláveis do `User`, e o `UserContactDto`, que caronas, itens e denúncias devolvem, declarava os dois como `string`. A decisão foi do Victor: o DTO passou a `string?`, e o front trata o nulo quando algum caminho passar a produzi-lo.
+
+⚠️ **O atalho que compila é o errado.** `?? string.Empty` fecha o tipo e esconde o nulo: a tela recebe `""` e monta um link para um telefone vazio sem ninguém ser avisado. Ao especificar uma coluna anulável, procure antes quem a devolve: `grep` pela propriedade nos DTOs de leitura.

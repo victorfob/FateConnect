@@ -33,6 +33,7 @@ paths:
 ## Diálogo: existe **um** esqueleto
 
 - Toda a aplicação usa o `Dialog` do design system, com conteúdo por composição — `Dialog.Body` para o miolo, `Dialog.Footer` para as ações. **Quem precisa de diálogo monta os slots; não escreve outro.** Foi assim que a confirmação de exclusão e o contato da carona passaram a dividir o mesmo cromo.
+- ⛔ **A frase do diálogo é `Dialog.Message`, dentro do `Dialog.Body`** — nunca uma `Typography` solta nem um `styled` local. Ele acompanha o alinhamento do título, centralizado no desktop e à esquerda no estreito, porque os dois leem a mesma função no estilo do `Dialog`.
 - O `Dialog`, o `DialogActions` e o `DialogContent` do MUI **não** estão no barrel: o diálogo da aplicação é o nosso, e o da biblioteca fica atrás da fronteira.
 - ⛔ **No desktop o diálogo não tem botão de fechar, e isso é decisão de produto.** `Esc` e clique fora já dispensam. Não adicionar um X ali achando que é melhoria de acessibilidade.
 - ⚠️ **No estreito a decisão foi revista**, em 31/08/2026: a 409px o diálogo ocupa 345px e sobram **32px** de faixa clicável de cada lado, alvo pequeno demais para o toque — e alargar a faixa estreitaria o diálogo. O X entra só abaixo do breakpoint de mobile, **dividindo a linha do título**, e é o **desenho** dele que cai na borda dos campos.

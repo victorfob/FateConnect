@@ -54,6 +54,8 @@ Branches: `<type>/<issue-code>` — e.g. `feature/123`, `fix/123`, `chore/123`, 
 
 **Always ask for user review and confirmation before running any git command** (e.g. `git commit`, `git commit --amend`, `git add`, `git rebase -i`). This applies even when command execution is allowed. Show: (1) what will be committed or staged, (2) the proposed commit message, (3) the exact command to run. Only execute after the user explicitly confirms.
 
+⛔ **A confirmação cobre o fluxo que ela nomeia, não um comando só.** Autorizado "segue até abrir o PR" ou "pode seguir até fechar", o commit, a reescrita, o `push --force-with-lease` e a resposta em thread até aquele ponto não pedem um segundo sim. Cobrado em 25/09/2026, no #461, depois de eu reperguntar antes de dobrar um commit já decidido: *"já falei, segue até abrir o PR"*. **O que volta a ele é a decisão nova** — algo que a autorização não previa, como o conflito de lint que apareceu no meio daquele mesmo fluxo.
+
 ## One logical change per commit (mandatory)
 
 **You MUST NOT** stage and commit all changes in a single commit. **Before suggesting or running any commit:**
