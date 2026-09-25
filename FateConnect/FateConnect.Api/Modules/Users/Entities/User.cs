@@ -14,8 +14,10 @@ public class User
     public DateTime? UpdatedAt { get; set; }
     public EnumProfileType ProfileType { get; set; } = EnumProfileType.Operator;
     public int TokenVersion { get; set; }
-    public bool ReceiveEmails { get; set; }
-    public bool ReceiveNotifications { get; set; }
-    public ICollection<Contact> Contacts { get; set; } = [];
+    public string? Phone { get; set; }
+    public string? ContactEmail { get; set; }
+    public string? Neighborhood { get; set; }
+    public EnumAccountStatus Status { get; set; } = EnumAccountStatus.Active;
+    public UserPreferences Preferences { get; set; } = null!;
     public ICollection<DocumentAcceptance> DocumentAcceptances { get; set; } = [];
 }

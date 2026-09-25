@@ -39,10 +39,8 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
         ["fullName"] = "Mariana Alves Rocha",
         ["birthDate"] = "2000-01-01T00:00:00Z",
         ["gender"] = "Female",
-        ["contacts"] = new[]
-        {
-            new { phone = ApiFactory.UniquePhone(), contactEmail = ApiFactory.UniqueContactEmail() },
-        },
+        ["phone"] = ApiFactory.UniquePhone(),
+        ["contactEmail"] = ApiFactory.UniqueContactEmail(),
         ["acceptances"] = BothAcceptances(),
     };
 
@@ -68,6 +66,7 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
 
         return context.Users
             .Include(user => user.DocumentAcceptances)
+            .Include(user => user.Preferences)
             .AsNoTracking()
             .Single(user => user.FatecEmail == fatecEmail);
     }
@@ -161,8 +160,8 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
 
         User user = ReadUser(fatecEmail);
 
-        Assert.False(user.ReceiveEmails);
-        Assert.False(user.ReceiveNotifications);
+        Assert.False(user.Preferences.ReceiveEmails);
+        Assert.False(user.Preferences.ReceiveNotifications);
     }
 
     [Fact]
@@ -177,8 +176,9 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
 
         User user = ReadUser(fatecEmail);
 
-        Assert.True(user.ReceiveEmails);
-        Assert.True(user.ReceiveNotifications);
+        Assert.Equal(user.Id, user.Preferences.UserId);
+        Assert.True(user.Preferences.ReceiveEmails);
+        Assert.True(user.Preferences.ReceiveNotifications);
     }
 
     [Fact]

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options) : DbContext(options)
 {
     public DbSet<User> Users => Set<User>();
-    public DbSet<Contact> Contacts => Set<Contact>();
+    public DbSet<UserPreferences> UserPreferences => Set<UserPreferences>();
     public DbSet<DocumentAcceptance> DocumentAcceptances => Set<DocumentAcceptance>();
     public DbSet<Ride> Rides => Set<Ride>();
     public DbSet<LostAndFoundRecord> LostAndFoundRecords => Set<LostAndFoundRecord>();
