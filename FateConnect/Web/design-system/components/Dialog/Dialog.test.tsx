@@ -40,6 +40,19 @@ describe('Dialog', () => {
     expect(screen.getByRole('button', { name: 'Confirmar' })).toBeInTheDocument();
   });
 
+  it('should render the message inside the body', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Body>
+          <Dialog.Message>Deseja continuar?</Dialog.Message>
+        </Dialog.Body>
+      ),
+    });
+
+    expect(screen.getByRole('dialog')).toHaveTextContent('Deseja continuar?');
+  });
+
   it('should close when the user presses escape', async () => {
     const onClose = vi.fn();
     renderComponent({ ...DEFAULT_PROPS, onClose });

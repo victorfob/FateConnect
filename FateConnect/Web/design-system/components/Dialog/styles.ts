@@ -1,7 +1,8 @@
 import Stack from '@mui/material/Stack';
+import type { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 
-import { styled } from '@ds-root/styled';
+import { styled, type CSSObject } from '@ds-root/styled';
 import { spacingScale } from '@ds-root/tokens';
 
 const { sm, lg, xl } = spacingScale;
@@ -43,9 +44,16 @@ export const CloseButtonSlot = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.down('md')]: { display: 'flex' },
 }));
 
+/** No estreito o título divide a linha com o fechar; o texto do diálogo o acompanha. */
+export function alignedWithTitle(theme: Theme): CSSObject {
+  return {
+    textAlign: 'center',
+
+    [theme.breakpoints.down('md')]: { textAlign: 'left' },
+  };
+}
+
 export const DialogTitleText = styled(Typography)(({ theme }) => ({
   flex: 1,
-  textAlign: 'center',
-
-  [theme.breakpoints.down('md')]: { textAlign: 'left' },
+  ...alignedWithTitle(theme),
 }));
