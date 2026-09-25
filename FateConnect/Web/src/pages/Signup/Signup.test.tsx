@@ -264,7 +264,8 @@ describe('Signup', () => {
       password: VALID_SIGNUP.password,
       gender: 'Female',
       birthDate: '1999-05-22T00:00:00Z',
-      contacts: [{ phone: '11912345678', contactEmail: VALID_SIGNUP.contactEmail }],
+      phone: '11912345678',
+      contactEmail: VALID_SIGNUP.contactEmail,
       acceptances: [
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
         { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },
