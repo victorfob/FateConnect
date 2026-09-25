@@ -8,21 +8,26 @@ import { useForm } from 'react-hook-form';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
-import { login } from '@app/services/auth/authService';
+import { login, reactivate } from '@app/services/auth/authService';
+import type { LoginRequest } from '@app/services/auth/types';
 import type { ApiError } from '@app/services/httpClient';
 
+import { AccountReactivationDialog } from './components/AccountReactivationDialog';
 import { loginSchema, type LoginFormValues } from './schema';
 import * as C from './constants';
 import * as S from './styles';
 
 const UNAUTHORIZED = 401;
+const FORBIDDEN = 403;
+const CONFLICT = 409;
 
 export function LandingLoginCard() {
   const navigate = useNavigate();
   const { hash } = useLocation();
-  const { notifyError } = useNotification();
+  const { notifyError, notifySuccess } = useNotification();
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [passwordHidden, setPasswordHidden] = useState(true);
+  const [credentialsToReactivate, setCredentialsToReactivate] = useState<LoginRequest | null>(null);
 
   const {
     register,
@@ -40,6 +45,23 @@ export function LandingLoginCard() {
     emailInputRef.current?.focus();
   }, [hash]);
 
+  const notifyRefusal = useCallback(
+    (error: ApiError) => {
+      if (error.status === UNAUTHORIZED) {
+        notifyError(C.LOGIN_ERROR_MESSAGES.invalidCredentials);
+        return;
+      }
+
+      if (error.status === FORBIDDEN) {
+        notifyError(C.LOGIN_ERROR_MESSAGES.bannedAccount);
+        return;
+      }
+
+      notifyError(C.LOGIN_ERROR_MESSAGES.generic);
+    },
+    [notifyError],
+  );
+
   const { mutate, isPending } = useMutation({
     mutationFn: login,
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
@@ -47,15 +69,34 @@ export function LandingLoginCard() {
     onSuccess: () => {
       navigate(RoutePathEnum.MENU);
     },
-    onError: (error: ApiError) => {
-      if (error.status === UNAUTHORIZED) {
-        notifyError(C.LOGIN_ERROR_MESSAGES.invalidCredentials);
+    onError: (error: ApiError, credentials) => {
+      if (error.status === CONFLICT) {
+        setCredentialsToReactivate(credentials);
         return;
       }
 
-      notifyError(C.LOGIN_ERROR_MESSAGES.generic);
+      notifyRefusal(error);
     },
   });
+
+  const { mutate: mutateReactivation, isPending: isReactivating } = useMutation({
+    mutationFn: reactivate,
+    meta: { notifiesErrorItself: true },
+    onSuccess: () => {
+      notifySuccess(C.REACTIVATION_SUCCEEDED);
+      navigate(RoutePathEnum.MENU);
+    },
+    onError: (error: ApiError) => {
+      setCredentialsToReactivate(null);
+      notifyRefusal(error);
+    },
+  });
+
+  const handleDismissReactivation = useCallback(() => setCredentialsToReactivate(null), []);
+
+  const handleConfirmReactivation = useCallback(() => {
+    if (credentialsToReactivate) mutateReactivation(credentialsToReactivate);
+  }, [credentialsToReactivate, mutateReactivation]);
 
   const handleTogglePassword = useCallback(() => setPasswordHidden((hidden) => !hidden), []);
 
@@ -126,6 +167,13 @@ export function LandingLoginCard() {
           <Typography variant="captionBold">{C.SIGNUP_LINK_LABEL}</Typography>
         </RouterLink>
       </S.SignupRow>
+
+      <AccountReactivationDialog
+        open={credentialsToReactivate !== null}
+        reactivating={isReactivating}
+        onDismiss={handleDismissReactivation}
+        onConfirm={handleConfirmReactivation}
+      />
     </S.CardRoot>
   );
 }
