@@ -3,10 +3,11 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 import { apiClient } from '@app/services/httpClient';
 
-import { login, logout } from './authService';
+import { login, logout, reactivate } from './authService';
 import { tokenStorage } from './tokenStorage';
 
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
+const REACTIVATE_URL = 'https://api.fateconnect.test/auth/reactivate';
 const LOGOUT_URL = 'https://api.fateconnect.test/auth/logout';
 
 const NO_CONTENT = 204;
@@ -22,6 +23,23 @@ describe('authService', () => {
 
     expect(response).toEqual({ token: 'abc' });
     expect(tokenStorage.getToken()).toBe('abc');
+  });
+
+  it('should send the credentials to the reactivation route and store the session', async () => {
+    let body: unknown = null;
+    server.use(
+      http.post(REACTIVATE_URL, async ({ request }) => {
+        body = await request.json();
+
+        return HttpResponse.json({ token: 'def' });
+      }),
+    );
+
+    const response = await reactivate({ fatecEmail: 'a@fatec.sp.gov.br', password: 'segredo123' });
+
+    expect(body).toEqual({ fatecEmail: 'a@fatec.sp.gov.br', password: 'segredo123' });
+    expect(response).toEqual({ token: 'def' });
+    expect(tokenStorage.getToken()).toBe('def');
   });
 
   it('should clear the session on logout without waiting for the server', () => {

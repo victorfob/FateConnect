@@ -8,5 +8,8 @@ export const SIGNUP_LINK_LABEL = 'Criar conta';
 
 export const LOGIN_ERROR_MESSAGES = {
   invalidCredentials: 'E-mail ou senha inválidos.',
+  bannedAccount: 'Esta conta foi banida por infringir as regras da plataforma.',
   generic: 'Erro ao realizar login. Tente novamente.',
 };
+
+export const REACTIVATION_SUCCEEDED = 'Conta reativada.';

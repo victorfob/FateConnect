@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
-import { Button, Dialog, Input, ListCard, Typography } from '@design-system';
+import { Button, Dialog, Input, ListCard } from '@design-system';
 
 import {
   denunciationStatusLabel,
@@ -82,7 +82,7 @@ export function DenunciationStatusAction({
         title={`${C.STATUS_DIALOG.titlePrefix}${denunciationStatusLabel(chosen)}`}
       >
         <Dialog.Body>
-          <Typography variant="subtitle">{C.STATUS_DIALOG.message}</Typography>
+          <Dialog.Message>{C.STATUS_DIALOG.message}</Dialog.Message>
         </Dialog.Body>
 
         <Dialog.Footer>

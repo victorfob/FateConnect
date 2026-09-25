@@ -9,11 +9,19 @@ import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
+import { REACTIVATION_DIALOG } from './components/AccountReactivationDialog/constants';
 import { LOGIN_MESSAGES } from './schema';
 import * as C from './constants';
 import { LandingLoginCard } from '.';
 
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
+const REACTIVATE_URL = 'https://api.fateconnect.test/auth/reactivate';
+
+const FORBIDDEN = 403;
+const CONFLICT = 409;
+const SERVER_ERROR = 500;
+const EMAIL = 'aluno.teste@aluno.cps.sp.gov.br';
+const PASSWORD = 'segredo123';
 
 function renderCard(initialPath: string = RoutePathEnum.LANDING) {
   const router = createMemoryRouter(
@@ -115,6 +123,85 @@ describe('LandingLoginCard', () => {
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
 
     expect(await screen.findByText(C.LOGIN_ERROR_MESSAGES.generic)).toBeInTheDocument();
+  });
+
+  it('should report a banned account without offering any action', async () => {
+    server.use(http.post(LOGIN_URL, () => new HttpResponse(null, { status: FORBIDDEN })));
+    renderCard();
+    await preencher(EMAIL, PASSWORD);
+
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+
+    expect(await screen.findByText(C.LOGIN_ERROR_MESSAGES.bannedAccount)).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('should reactivate a deactivated account with the typed credentials and enter', async () => {
+    let reactivationBody: unknown = null;
+    server.use(
+      http.post(LOGIN_URL, () => new HttpResponse(null, { status: CONFLICT })),
+      http.post(REACTIVATE_URL, async ({ request }) => {
+        reactivationBody = await request.json();
+
+        return HttpResponse.json({ token: 'abc' });
+      }),
+    );
+    const router = renderCard();
+    await preencher(EMAIL, PASSWORD);
+
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+    const dialog = await screen.findByRole('dialog', { name: REACTIVATION_DIALOG.title });
+    expect(within(dialog).getByText(REACTIVATION_DIALOG.message)).toBeInTheDocument();
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: REACTIVATION_DIALOG.confirmLabel }),
+    );
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
+    expect(reactivationBody).toEqual({ fatecEmail: EMAIL, password: PASSWORD });
+    expect(await screen.findByText(C.REACTIVATION_SUCCEEDED)).toBeInTheDocument();
+  });
+
+  it('should stay on the landing without reactivating when the person gives up', async () => {
+    let reactivationCalled = false;
+    server.use(
+      http.post(LOGIN_URL, () => new HttpResponse(null, { status: CONFLICT })),
+      http.post(REACTIVATE_URL, () => {
+        reactivationCalled = true;
+
+        return HttpResponse.json({ token: 'abc' });
+      }),
+    );
+    const router = renderCard();
+    await preencher(EMAIL, PASSWORD);
+
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+    const dialog = await screen.findByRole('dialog', { name: REACTIVATION_DIALOG.title });
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: REACTIVATION_DIALOG.dismissLabel }),
+    );
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
+    expect(reactivationCalled).toBe(false);
+  });
+
+  it('should close the dialog and report the failure when the reactivation fails', async () => {
+    server.use(
+      http.post(LOGIN_URL, () => new HttpResponse(null, { status: CONFLICT })),
+      http.post(REACTIVATE_URL, () => new HttpResponse(null, { status: SERVER_ERROR })),
+    );
+    const router = renderCard();
+    await preencher(EMAIL, PASSWORD);
+
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+    const dialog = await screen.findByRole('dialog', { name: REACTIVATION_DIALOG.title });
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: REACTIVATION_DIALOG.confirmLabel }),
+    );
+
+    expect(await screen.findByText(C.LOGIN_ERROR_MESSAGES.generic)).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING);
   });
 
   it('should show the loading indicator while the request is in flight', async () => {

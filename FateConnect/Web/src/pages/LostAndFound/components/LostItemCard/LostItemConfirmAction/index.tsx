@@ -2,7 +2,6 @@ import { useCallback, useState, type ReactNode } from 'react';
 import { Button, Dialog } from '@design-system';
 
 import { CONFIRMATION } from './constants';
-import * as S from './styles';
 
 type LostItemConfirmActionProps = Readonly<{
   label: string;
@@ -44,11 +43,11 @@ export function LostItemConfirmAction({
 
       <Dialog open={confirming} onClose={handleDismiss} title={dialogTitle}>
         <Dialog.Body>
-          <S.ConfirmationMessage variant="subtitle">
+          <Dialog.Message>
             {messagePrefix}
             <strong>{itemName}</strong>
             {messageSuffix}
-          </S.ConfirmationMessage>
+          </Dialog.Message>
         </Dialog.Body>
 
         <Dialog.Footer>
