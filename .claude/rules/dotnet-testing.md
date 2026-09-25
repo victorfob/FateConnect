@@ -180,9 +180,13 @@ Na #172 foram seis mutações no que a paginação tem de arriscado — corte of
 ⛔ **A armadilha é o build da mutação.** Se ele falhar, `dotnet test --no-build` roda a **DLL anterior** e tudo passa — o que se lê como "a mutação sobreviveu", quando ela nem chegou a existir. Aconteceu ali: remover um filtro deixou duas variáveis sem uso e, com `TreatWarningsAsErrors`, a compilação reprovou.
 
 ```bash
-dotnet build <solução> -v q --nologo; echo "build da mutação exit=$?"   # 0, ou o resto não vale
+dotnet build <solução> --verbosity quiet --nologo; echo "build da mutação exit=$?"   # 0, ou o resto não vale
 dotnet test <solução> --no-build
 ```
+
+⚠️ **`--verbosity quiet` por extenso, nunca `-v q`:** o filtro do shell desta máquina fica com o `q`, e o build responde `Project file does not exist` sem nunca ter recebido a solução — ver `.claude/rules/prove-the-mechanism.md`.
+
+**A mutação que não derruba o build muda o corpo, não a chamada.** Tirar o `.Where(Predicado())` deixa o método privado sem uso, e o analisador reprova antes de qualquer teste rodar. Troque o que o predicado responde e mantenha o símbolo em uso: na #412, `ride => ride.Driver.Status == EnumAccountStatus.Active` virou `ride => ride.DriverId > 0`, sempre verdadeiro, e os dois casos do filtro caíram.
 
 **Restaure a árvore ao fim de cada mutação** e confirme com `git status` que nada sobrou.
 
