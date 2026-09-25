@@ -36,12 +36,8 @@ export function toSignupRequest(values: SignupFormValues): SignupRequest {
     password: values.password,
     birthDate: toApiBirthDateOrEmpty(values.birthDate),
     gender: values.gender,
-    contacts: [
-      {
-        phone: onlyDigits(values.phone),
-        contactEmail: values.contactEmail,
-      },
-    ],
+    phone: onlyDigits(values.phone),
+    contactEmail: values.contactEmail,
     acceptances: acceptedDocuments(),
     // Uma caixa só decide as duas: a tela de preferências as separa depois.
     receiveEmails: values.acceptMarketing,
