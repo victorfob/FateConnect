@@ -153,7 +153,10 @@ public class ApiFactory : WebApplicationFactory<Program>
         return new SeededUser(user.Id, phone, contactEmail);
     }
 
-    public (int Id, string FatecEmail) SeedUserWithPassword(string fullName, string password)
+    public (int Id, string FatecEmail) SeedUserWithPassword(
+        string fullName,
+        string password,
+        EnumAccountStatus status = EnumAccountStatus.Active)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
@@ -166,6 +169,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
+            Status = status,
         };
 
         context.Users.Add(user);

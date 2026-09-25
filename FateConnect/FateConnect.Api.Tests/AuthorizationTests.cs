@@ -103,6 +103,7 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
 
     [Theory]
     [InlineData("/auth/login")]
+    [InlineData("/auth/reactivate")]
     [InlineData("/Users/signup")]
     public async Task AnonymousEndpoints_WithoutToken_ReachTheController(string route)
     {

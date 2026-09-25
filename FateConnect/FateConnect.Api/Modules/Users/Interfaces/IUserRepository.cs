@@ -11,4 +11,5 @@ public interface IUserRepository
     Task AddAsync(User user);
     Task<int?> GetTokenVersionAsync(int userId);
     Task IncrementTokenVersionAsync(int userId);
+    Task ReactivateAsync(int userId);
 }
