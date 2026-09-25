@@ -4,6 +4,7 @@ import { http, HttpResponse } from 'msw';
 import {
   DENUNCIATION_CARD_MARKERS,
   DESCRIPTION_TOGGLE_LABELS,
+  DOWNLOAD_LABEL,
   photoAlt,
 } from '@app/components/DenunciationCard/constants';
 import { server } from '@app/mocks/server';
@@ -32,7 +33,8 @@ const DENUNCIATIONS_URL = 'https://api.fateconnect.test/denunciations';
 const MY_DENUNCIATIONS_URL = `${DENUNCIATIONS_URL}/mine`;
 
 const PHOTO_PATH = 'Denunciations/a1f0/image';
-const PHOTO_URL = `https://api.fateconnect.test/${PHOTO_PATH}`;
+const THUMBNAIL_PATH = `${PHOTO_PATH}/thumbnail`;
+const THUMBNAIL_URL = `https://api.fateconnect.test/${THUMBNAIL_PATH}`;
 const OBJECT_URL = 'blob:https://fateconnect.test/foto';
 /** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
 const PNG_BYTES = '\x89PNG\r\n\x1a\n';
@@ -51,7 +53,7 @@ const DENUNCIATION: Denunciation = {
   category: DenunciationCategoryEnum.RECKLESS_DRIVING,
   description: 'A pessoa dirigiu acima da velocidade no trajeto inteiro.',
   imageUrl: null,
-  hasImage: false,
+  thumbnailUrl: null,
   status: DenunciationStatusEnum.OPEN,
   user: null,
   isAnonymous: false,
@@ -159,12 +161,11 @@ describe('Denunciations', () => {
     expect(screen.getByText(statusOptionLabel(DenunciationStatusEnum.OPEN))).toBeInTheDocument();
   });
 
-  it('should mark the confidential one, and drop the photo marker now that the photo shows', async () => {
-    listing([denunciationWith({ isAnonymous: true, hasImage: true })]);
+  it('should mark the confidential one', async () => {
+    listing([denunciationWith({ isAnonymous: true })]);
     renderScreen();
 
     expect(await screen.findByText(DENUNCIATION_CARD_MARKERS.confidential)).toBeInTheDocument();
-    expect(screen.queryByText(DENUNCIATION_CARD_MARKERS.photo)).not.toBeInTheDocument();
   });
 
   it('should ask the api for what the person reported, not for every denunciation', async () => {
@@ -177,9 +178,9 @@ describe('Denunciations', () => {
   });
 
   it('should draw the attached photo on the card', async () => {
-    listing([denunciationWith({ imageUrl: PHOTO_PATH, hasImage: true })]);
+    listing([denunciationWith({ imageUrl: PHOTO_PATH, thumbnailUrl: THUMBNAIL_PATH })]);
     server.use(
-      http.get(PHOTO_URL, () => {
+      http.get(THUMBNAIL_URL, () => {
         return new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': 'image/png' } });
       }),
     );
@@ -191,13 +192,38 @@ describe('Denunciations', () => {
     );
   });
 
-  it('should leave both markers out of a denunciation that has neither', async () => {
+  it('should show the thumbnail and download the original', async () => {
+    const asked: string[] = [];
+    listing([denunciationWith({ imageUrl: PHOTO_PATH, thumbnailUrl: THUMBNAIL_PATH })]);
+    server.use(
+      http.get(THUMBNAIL_URL, ({ request }) => {
+        asked.push(new URL(request.url).pathname);
+
+        return new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': 'image/webp' } });
+      }),
+      http.get(`https://api.fateconnect.test/${PHOTO_PATH}`, ({ request }) => {
+        asked.push(new URL(request.url).pathname);
+
+        return new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': 'image/jpeg' } });
+      }),
+    );
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    renderScreen();
+    await screen.findByRole('img', { name: photoAlt(DENUNCIATION) });
+
+    expect(asked).toEqual([`/${THUMBNAIL_PATH}`]);
+
+    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD_LABEL }));
+
+    await waitFor(() => expect(asked).toEqual([`/${THUMBNAIL_PATH}`, `/${PHOTO_PATH}`]));
+  });
+
+  it('should leave the confidential marker out of a denunciation that is not confidential', async () => {
     listing([DENUNCIATION]);
     renderScreen();
     await screen.findByText(DENUNCIATION.description);
 
     expect(screen.queryByText(DENUNCIATION_CARD_MARKERS.confidential)).not.toBeInTheDocument();
-    expect(screen.queryByText(DENUNCIATION_CARD_MARKERS.photo)).not.toBeInTheDocument();
   });
 
   it('should say what the empty list would hold, and how to fill it', async () => {
