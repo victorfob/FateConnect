@@ -6,8 +6,13 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Adiciona a reativação da conta desativada pela própria pessoa, que pede o e-mail e a senha de novo, devolve a conta ao ar e já responde o token de acesso, como o login; conta banida continua recusada (#460) [Backend]
+
 ### Changed
 
+- Passa a recusar no login a conta banida, com 403 e com a senha certa ou errada, e a conta desativada, com 409 quando a senha confere, para quem chama poder oferecer a reativação; senha errada continua sendo 401 (#460) [Backend]
 - Passa a receber o telefone e o e-mail de contato direto no corpo do cadastro, um de cada por pessoa, em vez de uma lista: o formato antigo é recusado. Quem tinha mais de um contato fica com o mais antigo, que já era o exibido, e os demais se perdem (#456) [Backend]
 - Passa a enviar o telefone e o e-mail de contato direto no corpo do cadastro, no formato que a API passou a exigir: o front anterior deixa de conseguir criar conta. A tela e os campos não mudam (#457) [Frontend]
 
