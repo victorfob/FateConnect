@@ -68,7 +68,7 @@ Sai, sempre:
 
 ⛔ **Estourou? A saída não é apagar, é mudar de lugar.** Volte à escada acima; o que ainda não couber é explicação que pertence ao **corpo do PR, à issue ou a uma rule** — onde alguém a relê quando o código mudar. O comentário fica com a **decisão**, não com a derivação dela.
 
-O caso que prova: `design-system/tokens/breakpoints.ts` carrega **14 linhas** derivando o limite a partir das larguras medidas do cabeçalho. Ninguém revisita aquilo ao mexer no tema, e nada avisa quando um dos números muda.
+O caso que prova: `design-system/tokens/breakpoints.ts` chegou a carregar **14 linhas** derivando o limite a partir das larguras medidas do cabeçalho, e ninguém revisitava aquilo ao mexer no tema. Hoje cada limite leva três, e a medição inteira está na #435.
 
 ⚠️ **Os 51 de hoje saem por boy-scout**, conforme alguém passe por eles. Não se abre varredura para isto.
 
