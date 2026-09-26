@@ -7,7 +7,7 @@ export const OFFER_TAB_LABEL = 'Ofertar carona';
 export const RIDES_QUERY_KEY = 'rides';
 
 export const EMPTY_LIST_MESSAGE =
-  'Nenhuma carona encontrada. As caronas oferecidas por quem estuda na Fatec aparecem aqui — ajuste os filtros ou oferte uma carona.';
+  'Nenhuma carona encontrada. As caronas oferecidas por quem estuda na Fatec aparecem aqui. Ajuste os filtros para ampliar a busca ou oferte uma carona.';
 
 export const RIDE_LIST_MESSAGES = {
   loadFailed: 'Erro ao carregar caronas. Tente novamente.',
