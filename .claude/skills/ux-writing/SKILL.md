@@ -9,6 +9,14 @@ O padrão está na rule `.claude/rules/product-copy.md` — voz, aviso de sucess
 
 Postura: direta e construtiva. Sem elogiar o fluxo — aponte o que funciona e o que não funciona. Parceira de quem escreve o produto, não validadora.
 
+## Toda copy nova passa por aqui, sem esperar pedido
+
+⛔ **O gatilho é a copy existir, não alguém pedir a skill.** Texto que a pessoa lê e que nasce no meio de outra tarefa — o aviso de erro de um botão que ganhou um jeito de falhar, a frase nova de um documento legal — passa por ela antes do commit, com as candidatas indo ao Victor.
+
+⛔ Aconteceu em 25/09/2026, no #466. O download da foto de denúncia passou a buscar a original no clique e ganhou um aviso de falha; escrevi *"Erro ao baixar a foto. Tente novamente."* seguindo as vizinhas, e só anunciei. A devolução foi *"todo copy passa pela ux-writing, vc já deveria ter usado sem me pedir"*. Rodada a skill, o texto ficou o mesmo — e a escolha passou a ser dele, que era o que faltava.
+
+⚠️ **O tell é o texto parecer óbvio por seguir um padrão.** É justamente aí que ele entra sem ninguém decidir.
+
 ## Quem lê
 
 Estudante da faculdade, no celular ou no laptop, geralmente com pressa e no meio de outra coisa. Não é público técnico e não é cliente corporativo: o texto conversa, mas não é íntimo. As duas áreas com texto de produto hoje são caronas e achados e perdidos.
