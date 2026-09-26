@@ -120,22 +120,26 @@ Os helpers **não são exportados** pelo barrel: não há como importá-los na a
 
 ⛔ **Critério de aceite que cita largura escreve 375px** — um iPhone SE, e a base declarada do produto. Abaixo disso é limite conhecido, não defeito em aberto.
 
-⚠️ **Nenhum outro número deste repositório é a base**, e é fácil pegar o errado: a `product-copy.md` registra medições a 409px, e os tokens de breakpoint falam de 933 e 965. Os três existem por outros motivos.
+⚠️ **Nenhum outro número deste repositório é a base**, e é fácil pegar o errado: a `product-copy.md` registra medições a 409px, e os tokens de breakpoint falam de 822 e 965. Os três existem por outros motivos.
 
 O que a escolha decide é o significado de "cabe": na fileira de abas do `PageShell`, a 320px cinco dos oito rótulos quebram e a 375px quebra **um**. Em 21/09/2026 um critério escrito contra 320px levou a concluir que nenhuma das quatro saídas propostas resolvia — com a base certa, faltavam 6,9px e a saída mais barata servia.
 
 ⚠️ **Isto fixa onde o critério mora, não onde a medição para.** Continua valendo varrer a faixa e medir cada limite com um pixel de cada lado, como a `prove-the-mechanism.md` exige.
 
-### Duas visões, um limite
+### Duas visões, dois limites que não se misturam
 
-O produto tem **mobile e desktop**, e nada entre os dois:
+As telas têm **mobile e desktop**, e nada entre os dois:
 
 ```ts
 [theme.breakpoints.down('md')]: { flexDirection: 'column' }   // mobile
 [theme.breakpoints.up('md')]: { gridColumn: 'span 2' }        // desktop
 ```
 
-O `md` está sobrescrito em **769px**, e é o único que mexemos: `Toolbar` e `Dialog` leem o `sm` por dentro, então esse fica nos valores do MUI. ⛔ Não declare consulta de media à mão nem crie um terceiro limite — havia quatro constantes para três valores, e a quarta sobrepunha as outras: em exatos 768px o cabeçalho ficava mobile enquanto a grade do cadastro ficava desktop. As consultas do MUI não se sobrepõem, porque o `down` para meio centésimo antes do `up`.
+O `md` é o limite das **telas**, em **822px**. O cabeçalho tem o seu, **`header`**, em **965px**: é onde a nav do topo cabe numa linha, e só quem troca junto com ela o consulta — a própria nav, o botão de menu, o recuo da barra e o gatilho do menu da conta. São duas perguntas diferentes: *esta tela vira o desenho de celular?* e *a nav cabe numa linha?* Os dois valores são medidos, e a derivação de cada um mora no token dele, em `design-system/tokens/breakpoints.ts`.
+
+⛔ **Tela, cartão, diálogo ou rodapé consultam `md`, nunca `header`.** Foi o limite do cabeçalho decidindo por todas as telas que pôs notebook pequeno e tablet no desenho de celular com conteúdo que cabia, até a #435 separar os dois.
+
+`sm`, `lg` e `xl` ficam nos valores do MUI: `Toolbar` e `Dialog` leem o `sm` por dentro. ⛔ Não declare consulta de media à mão nem crie um terceiro limite — havia quatro constantes para três valores, e a quarta sobrepunha as outras: em exatos 768px o cabeçalho ficava mobile enquanto a grade do cadastro ficava desktop. As consultas do MUI não se sobrepõem, porque o `down` para meio centésimo antes do `up`.
 
 Para decidir em JS, `useMediaQuery(theme.breakpoints.up('md'))` — não meça `window.innerWidth`.
 
@@ -143,7 +147,11 @@ Para decidir em JS, `useMediaQuery(theme.breakpoints.up('md'))` — não meça `
 
 Em 11/09/2026 a barra do cabeçalho quebrava em duas linhas numa faixa de ~47px e eu fui direto ao limite, que precisaria subir 12px. A correção do Victor foi *"diminuir o vão primeiro e aumentar a faixa pro resultado após a diminuição"*: dois vãos de 24px para 16px tiraram 32px da conta, e o limite subiu **4px**.
 
-**A ordem é encolher o conteúdo, remedir, e só então mover o limite para o que sobrou.** O limite é medido no cabeçalho — ver `design-system/tokens/breakpoints.ts` —, então mexer no que mora nele obriga a remedir de qualquer forma.
+**A ordem é encolher o conteúdo, remedir, e só então mover o limite para o que sobrou.** Os dois limites são medidos — o do cabeçalho na nav, o das telas no conteúdo delas, ver `design-system/tokens/breakpoints.ts` —, então mexer no que cada um mede obriga a remedir de qualquer forma.
+
+⚠️ **Medir o limite das telas é forçar o desenho de desktop e varrer a faixa, e o vazamento é metade da medida.** Na #435 a primeira varredura só procurava elemento saindo da janela e disse 720px; a segunda acrescentou sobreposição de vizinhos, link ou botão quebrando linha e texto com uma palavra por linha, e o número subiu para 806px. Os cartões do menu se sobrepunham a 740px sem nada vazar.
+
+⛔ **E o limite é o primeiro valor limpo, mais a barra de rolagem, e não o último com defeito.** Na mesma medição eu somei os 15px a 805, a última largura da varredura de 5 em 5 que ainda tinha defeito, e propus 820 — medido de 1 em 1, o defeito ia até 806, e o valor certo era 822.
 
 ### 4. CSS puro / classe solta
 
