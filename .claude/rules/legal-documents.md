@@ -30,7 +30,7 @@ Conta como fluxo novo, e portanto obriga a releitura:
 - **entidade nova ou campo novo que persista dado de pessoa**;
 - **integração com terceiro** — provedor, serviço de consulta, telemetria: a política nomeia cada um e diz o que sai;
 - **dado novo exibido para outros usuários** — há uma seção inteira sobre o que fica visível;
-- **funcionalidade que muda o que a plataforma faz** — os termos descrevem caronas e achados e perdidos; denúncia, notificação e administração ainda **não** estão descritas.
+- **funcionalidade que muda o que a plataforma faz** — os termos descrevem caronas, achados e perdidos, denúncias e a gestão de contas.
 
 ## Reler não audita: cada afirmação se confere contra o código
 
@@ -50,7 +50,7 @@ Em 21/09/2026, atualizando os documentos para o módulo de denúncias, esse mét
 | A afirmação | A medição |
 | --- | --- |
 | a lista de campos do cadastro | o que o mapper de fato envia |
-| o que fica no navegador | `grep` por `setItem` no código |
+| o que fica no navegador | as chaves da página **no ar**, não só o `grep` por `setItem`: biblioteca de terceiro escreve sem passar pelo nosso código |
 | cada terceiro nomeado | o que o código realmente chama |
 | cada prazo de guarda | o que apaga de verdade |
 | o vocabulário dos dois documentos | um contra o outro |
@@ -58,6 +58,16 @@ Em 21/09/2026, atualizando os documentos para o módulo de denúncias, esse mét
 ⚠️ **Busca por ausência precisa de controle positivo.** "A política não cita denúncia" só valeu porque a mesma busca encontrou `carona` quatro vezes. Sem o par, o zero pode ser do instrumento.
 
 ⚠️ **A contradição entre os dois documentos é a mais fácil de não ver**, porque cada um, lido sozinho, é coerente. Ela só aparece lendo os dois sobre o mesmo assunto.
+
+## O texto descreve o produto final, não só o que já está no ar
+
+⛔ **Afirmação sobre funcionalidade planejada não é divergência a corrigir.** Desativar a própria conta, banir, trocar a senha e alterar as preferências de contato estão nos documentos antes de existirem no código, e isso é decisão do Victor: *"a ideia é refletir o estado final do produto"*. O dono de cada uma é uma issue aberta — #114, #108 e #118.
+
+**A auditoria separa duas perguntas:** o que o texto diz sobre o que **já existe** tem de bater com o código, e aí qualquer divergência se corrige; o que ele diz sobre o que **ainda vai existir** se confere contra o escopo das issues abertas, não contra o código.
+
+⚠️ **O tell é a divergência cair em cima de um fluxo sem endpoint nenhum.** Antes de propor a correção, procure a issue que o entrega. Em 26/09/2026 eu apresentei as quatro como divergências, e a resposta foi a decisão acima.
+
+⛔ **E o `grep` do nosso código não alcança o que a biblioteca grava.** Na mesma rodada, a §7 da política dizia que o navegador guardava só o token e o tema, e o `grep` por `setItem` concordava. A página no ar tinha uma terceira chave, `sentryReplaySession` no `sessionStorage`, escrita pelo SDK do Sentry em toda visita, com ou sem login. Quem responde é abrir a página publicada e listar as chaves dos dois armazenamentos.
 
 ## Mudou o texto? A data de versão sobe junto
 
@@ -80,7 +90,7 @@ Serve para conferir rápido se algo que você acrescentou já está coberto:
 - coleta do cadastro, campo a campo, e o que o uso gera (caronas e itens);
 - **IP e identificação do navegador** no registro do aceite;
 - **Sentry** com replay de sessão — 10% das sessões e 100% das que dão erro, com texto mascarado e mídia bloqueada, sem dado de usuário e sem corpo de requisição;
-- **`localStorage`** com token, nome e preferência de tema;
+- **`localStorage`** com o token e a preferência de tema, e o **`sessionStorage`** com o identificador da gravação de sessão do Sentry;
 - o que fica visível para outros usuários, prazos de guarda, e os direitos do Art. 18 da LGPD.
 
 ⚠️ **O texto não passou por revisão jurídica.** Ele é verdadeiro sobre o que o código faz — que é o que dá para garantir daqui —, e continua pendente de revisão por quem tenha competência para isso.
