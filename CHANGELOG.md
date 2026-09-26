@@ -26,6 +26,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a receber o telefone e o e-mail de contato direto no corpo do cadastro, um de cada por pessoa, em vez de uma lista: o formato antigo é recusado. Quem tinha mais de um contato fica com o mais antigo, que já era o exibido, e os demais se perdem (#456) [Backend]
 - Passa a enviar o telefone e o e-mail de contato direto no corpo do cadastro, no formato que a API passou a exigir: o front anterior deixa de conseguir criar conta. A tela e os campos não mudam (#457) [Frontend]
 
+### Fixed
+
+- Corrige na política de privacidade o que fica no navegador, que omitia o identificador da sessão de diagnóstico guardado pelo monitoramento de erros, e a forma como a senha é guardada, que ela dizia cifrada e é um hash sem volta; o documento ganha nova versão (#468) [Frontend]
+- Corrige nos termos a descrição do item de achados e perdidos, que aparecia como obrigatória: ela é opcional, como o cadastro do item sempre aceitou; o documento ganha nova versão (#468) [Frontend]
+
 ## [1.0.0] - 2026-09-21
 
 ### Added
