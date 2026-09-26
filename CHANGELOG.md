@@ -15,6 +15,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Passa a declarar na política de privacidade que a foto do item e a imagem da denúncia são guardadas sem as informações que o aparelho grava no arquivo, como o local onde ele foi feito, em nova versão do documento (#466) [Frontend]
+- Passa a exibir a miniatura das fotos em achados e perdidos e nas duas telas de denúncia, em vez de baixar o arquivo inteiro da câmera; o botão de baixar a foto da denúncia busca a original no clique e avisa quando não consegue (#466) [Frontend]
 - Passa a guardar a foto enviada sem os metadados, inclusive a localização de onde foi tirada, e com a rotação do celular já aplicada; arquivo que não é imagem de verdade passa a ser recusado com 400, mesmo declarado como imagem (#465) [Backend]
 - Passa a deixar de fora das listagens de caronas e de achados e perdidos o que pertence a conta desativada ou banida; nada é apagado, e o registro volta a aparecer se a conta for reativada. As denúncias dessas contas continuam chegando a quem analisa (#463) [Backend]
 - Passa a avisar no login que a conta banida foi banida por infringir as regras da plataforma, sem oferecer ação, em vez do aviso genérico de erro (#462) [Frontend]

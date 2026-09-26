@@ -3,7 +3,10 @@ import { FILTER_TITLE_PLURAL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { CONTACT_LABEL } from '@app/components/ContactButton/constants';
-import { DENUNCIATION_CARD_MARKERS } from '@app/components/DenunciationCard/constants';
+import {
+  DENUNCIATION_CARD_MARKERS,
+  DOWNLOAD_LABEL,
+} from '@app/components/DenunciationCard/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { denunciationStatusLabel } from '@app/services/denunciations/denunciationStatus';
@@ -37,7 +40,7 @@ const OPEN_DENUNCIATION: Denunciation = {
   category: DenunciationCategoryEnum.RECKLESS_DRIVING,
   description: 'Dirigiu acima da velocidade o trajeto inteiro.',
   imageUrl: null,
-  hasImage: false,
+  thumbnailUrl: null,
   status: DenunciationStatusEnum.OPEN,
   user: { name: 'Maria da Silva', email: 'maria@aluno.test', phone: '15999998888' },
   isAnonymous: false,
@@ -97,15 +100,59 @@ describe('DenunciationsTab', () => {
     expect(screen.queryByRole('button', { name: CONTACT_LABEL })).not.toBeInTheDocument();
   });
 
-  it('should drop the photo marker on a card that already shows the photo', async () => {
+  it('should draw the thumbnail of the attached photo on the card', async () => {
+    URL.createObjectURL = vi.fn(() => 'blob:https://fateconnect.test/foto');
+    URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get(
+        'https://api.fateconnect.test/Denunciations/a1f0/image/thumbnail',
+        () => new HttpResponse('\x89PNG', { headers: { 'Content-Type': 'image/webp' } }),
+      ),
+    );
     listServing([
-      { ...OPEN_DENUNCIATION, imageUrl: 'uploads/denunciation/foto.png', hasImage: true },
+      {
+        ...OPEN_DENUNCIATION,
+        imageUrl: 'Denunciations/a1f0/image',
+        thumbnailUrl: 'Denunciations/a1f0/image/thumbnail',
+      },
     ]);
 
     renderTab();
     await screen.findByText(OPEN_DENUNCIATION.description);
 
-    expect(screen.queryByText(DENUNCIATION_CARD_MARKERS.photo)).not.toBeInTheDocument();
+    expect(await screen.findByRole('img')).toBeInTheDocument();
+  });
+
+  it('should download the original, not the thumbnail on the card', async () => {
+    const asked: string[] = [];
+    URL.createObjectURL = vi.fn(() => 'blob:https://fateconnect.test/foto');
+    URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get('https://api.fateconnect.test/Denunciations/a1f0/image/thumbnail', () => {
+        asked.push('miniatura');
+
+        return new HttpResponse('\x89PNG', { headers: { 'Content-Type': 'image/webp' } });
+      }),
+      http.get('https://api.fateconnect.test/Denunciations/a1f0/image', () => {
+        asked.push('original');
+
+        return new HttpResponse('\x89PNG', { headers: { 'Content-Type': 'image/jpeg' } });
+      }),
+    );
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    listServing([
+      {
+        ...OPEN_DENUNCIATION,
+        imageUrl: 'Denunciations/a1f0/image',
+        thumbnailUrl: 'Denunciations/a1f0/image/thumbnail',
+      },
+    ]);
+
+    renderTab();
+    await screen.findByRole('img');
+    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD_LABEL }));
+
+    await waitFor(() => expect(asked).toEqual(['miniatura', 'original']));
   });
 
   it('should offer only what the api accepts from the current status', async () => {

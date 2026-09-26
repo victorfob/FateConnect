@@ -47,7 +47,7 @@ const LOST_ITEM: LostItem = {
   place: 'Biblioteca',
   ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos.',
-  imageUrl: null,
+  thumbnailUrl: null,
   contact: { name: 'Marina Duarte', email: 'marina.duarte@example.com', phone: '(15) 99999-0001' },
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
@@ -55,9 +55,10 @@ const LOST_ITEM: LostItem = {
   createdAt: '2026-08-12T00:00:00',
 };
 
-const STORED_PHOTO_PATH = 'uploads/lostandfound/6f0b8e3a-1c2d-4e5f-8a9b-0c1d2e3f4a5b.png';
+const STORED_PHOTO_PATH =
+  'uploads/lostandfound/thumbnails/6f0b8e3a-1c2d-4e5f-8a9b-0c1d2e3f4a5b.webp';
 
-const ITEM_WITH_PHOTO: LostItem = { ...LOST_ITEM, imageUrl: STORED_PHOTO_PATH };
+const ITEM_WITH_PHOTO: LostItem = { ...LOST_ITEM, thumbnailUrl: STORED_PHOTO_PATH };
 
 function storedPhotoServing() {
   server.use(
