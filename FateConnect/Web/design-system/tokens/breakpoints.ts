@@ -1,10 +1,12 @@
 /**
- * O `md` do tema, e o único breakpoint que sobrescrevemos — `Toolbar` e `Dialog`
- * leem o `sm` por dentro. ⛔ O valor é medido: é a largura em que a nav do topo
- * ainda cabe numa linha, então mexer no conteúdo do cabeçalho obriga a remedir.
- *
- * ⚠️ A nav precisa de 950px de **conteúdo**, e a consulta de media resolve
- * contra a janela **com** a barra de rolagem. Os 15px a mais são ela: sem eles
- * a nav quebra em duas linhas em toda página alta o bastante para rolar.
+ * A largura em que a nav do topo cabe numa linha: 950px de conteúdo mais os 15px
+ * da barra de rolagem, que a consulta de media conta. ⛔ Mexer no cabeçalho obriga a remedir.
  */
-export const DESKTOP_MIN_WIDTH_PX = 965;
+export const HEADER_NAV_MIN_WIDTH_PX = 965;
+
+/**
+ * O `md` do tema. Medido com o desenho de desktop forçado: até 806px de conteúdo
+ * o endereço do rodapé quebra, e mais abaixo os cartões do menu se sobrepõem.
+ * Os 15px a mais são a barra de rolagem, como no cabeçalho.
+ */
+export const DESKTOP_MIN_WIDTH_PX = 822;

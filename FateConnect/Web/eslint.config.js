@@ -42,14 +42,14 @@ const styleConventions = [
       'Espaçamento nunca é número cru: use `theme.space()` com o token de `spacingScale` — `none` para zero.',
   },
   {
-    // Duas visões, um limite. `xs`, `sm`, `lg` e `xl` seguem nos valores do MUI
-    // e não são do produto. A regra vale em todo lugar: o único ponto que
+    // As telas têm duas visões e um limite, `md`; `header` é o da nav do topo.
+    // `xs`, `sm`, `lg` e `xl` seguem nos valores do MUI e não são do produto. A regra vale em todo lugar: o único ponto que
     // precisa falar `sm` é o override do `MuiMenuItem`, que desfaz um
     // `min-width:600px` do próprio MUI, e ali há um disable com o motivo.
     selector:
       "CallExpression[callee.object.property.name='breakpoints'] > Literal[value=/^(xs|sm|lg|xl)$/]",
     message:
-      "Só existem duas visões: use `md` — `theme.breakpoints.down('md')` para mobile e `up('md')` para desktop.",
+      "Só existem duas visões: use `md` — `theme.breakpoints.down('md')` para mobile e `up('md')` para desktop. O cabeçalho usa `header`.",
   },
   {
     // Unidade de viewport em medida é goteira fluida disfarçada: ela reaparecia

@@ -39,7 +39,7 @@ export const HeaderToolbar = styled(Toolbar)(({ theme }) => ({
   },
   '& .MuiIconButton-root:hover': { backgroundColor: theme.palette.chrome.hover },
 
-  [theme.breakpoints.down('md')]: { padding: theme.space(none, lg) },
+  [theme.breakpoints.down('header')]: { padding: theme.space(none, lg) },
 }));
 
 export const LogoSlot = styled(PolymorphicBox)(({ theme }) => ({
@@ -53,7 +53,7 @@ export const LogoSlot = styled(PolymorphicBox)(({ theme }) => ({
 }));
 
 /**
- * ⛔ Acrescentar item aqui obriga a remedir o `DESKTOP_MIN_WIDTH_PX`: ele é a
+ * ⛔ Acrescentar item aqui obriga a remedir o `HEADER_NAV_MIN_WIDTH_PX`: ele é a
  * largura em que esta fileira ainda cabe numa linha, e nada acusa quando ela
  * cresce — o defeito nasce entre o limite antigo e o ponto onde ela deixou de caber.
  */
@@ -93,7 +93,7 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   // O destaque não recebe o peso reforçado, como no produto.
   '& .MuiButton-contained': { fontWeight: CTA_FONT_WEIGHT },
 
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('header')]: {
     display: 'none',
   },
 }));
@@ -108,14 +108,14 @@ export const ActionsSlot = styled(PolymorphicStack)(({ theme }) => ({
 }));
 
 /**
- * Só existe abaixo do breakpoint mobile. O `display: flex` na consulta é o que
+ * Só existe abaixo do limite do cabeçalho. O `display: flex` na consulta é o que
  * volta a exibir o botão: sem ele o `display: none` da base vale em toda
  * largura e o ícone de menu nunca aparece.
  */
 export const MenuButtonSlot = styled(PolymorphicStack)(({ theme }) => ({
   display: 'none',
 
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('header')]: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
