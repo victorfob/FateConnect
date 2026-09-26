@@ -190,6 +190,12 @@ dotnet test <solução> --no-build
 
 **Restaure a árvore ao fim de cada mutação** e confirme com `git status` que nada sobrou.
 
+## Foto em teste é imagem de verdade
+
+⛔ **A API decodifica toda foto enviada, então bytes que só imitam um cabeçalho de PNG recebem 400.** Teste que envia foto monta a imagem com o `TestImages` do projeto de testes: `TestImages.Png()` para o caso comum, e `TestImages.JpegTakenWithAPhone()` quando o que se testa é rotação ou metadados, porque ela carrega orientação e localização no EXIF.
+
+Desde a #465: os dois `ImagePayload` dos testes de endpoint mandavam cinco bytes, e passaram a gerar PNG de verdade. A asserção que comparava o arquivo servido byte a byte também mudou, porque a original agora é regravada: ela decodifica a imagem e confere as dimensões.
+
 ## Fixture usa dado plausível, e válido
 
 ⛔ **Nada de rótulo no lugar de dado.** `"Pessoa de Teste"`, `"Rua A"` e `"pessoa@example.com"` não são dados — são etiquetas dizendo "isto é um teste". Use nome, endereço e contato que poderiam existir: `"Mariana Alves Rocha"`, `"Rua Cesário Mota"`, `"mariana.rocha@gmail.com"`.
