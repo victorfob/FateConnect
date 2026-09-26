@@ -1,0 +1,292 @@
+using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
+using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Auth.Entities;
+using FateConnect.Api.Modules.Auth.Services;
+using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.Denunciations.Entities;
+using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.LostAndFound.Entities;
+using FateConnect.Api.Modules.LostAndFound.Enums;
+using FateConnect.Api.Modules.LostAndFound.Workers;
+using FateConnect.Api.Modules.Rides.Entities;
+using FateConnect.Api.Modules.Rides.Enums;
+using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using static BCrypt.Net.BCrypt;
+
+namespace FateConnect.Api.Tests.Fixtures;
+
+public class ApiFactory : WebApplicationFactory<Program>
+{
+    public const string FakeSecret = "fake-test-secret-with-no-value-outside-this-suite";
+
+    private readonly string _databaseName = $"fateconnect-tests-{Guid.NewGuid()}";
+
+    private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-webroot-{Guid.NewGuid():N}");
+
+    public ApiFactory()
+    {
+        Directory.CreateDirectory(_webRoot);
+
+        Environment.SetEnvironmentVariable("JWT_SECRET", FakeSecret);
+        Environment.SetEnvironmentVariable("JWT_ISSUER", "FateConnectTest");
+        Environment.SetEnvironmentVariable("JWT_AUDIENCE", "FateConnectTestWeb");
+    }
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseWebRoot(_webRoot);
+
+        builder.ConfigureServices(services =>
+        {
+            ServiceDescriptor registration = services.Single(
+                service => service.ServiceType == typeof(DbContextOptions<FateConnectDbContext>));
+
+            services.Remove(registration);
+            services.AddDbContext<FateConnectDbContext>(
+                options => options.UseNpgsql(TestDatabase.ConnectionStringFor(_databaseName)));
+
+            ServiceDescriptor retentionWorker = services.Single(
+                service => service.ImplementationType == typeof(LostAndFoundRetentionWorker));
+
+            services.Remove(retentionWorker);
+        });
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+
+        if (disposing && Directory.Exists(_webRoot))
+            Directory.Delete(_webRoot, recursive: true);
+    }
+
+    public static string IssueToken(
+        int userId = 1,
+        int tokenVersion = 0,
+        EnumProfileType profileType = EnumProfileType.Operator)
+    {
+        JwtOptions options = new()
+        {
+            Secret = FakeSecret,
+            Issuer = "FateConnectTest",
+            Audience = "FateConnectTestWeb",
+        };
+
+        return new TokenService(Options.Create(options))
+            .GenerateJwtToken(new User
+            {
+                Id = userId,
+                FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
+                TokenVersion = tokenVersion,
+                ProfileType = profileType
+            });
+    }
+
+    public static string IssueTokenWithoutVersion(int userId = 1)
+    {
+        JwtSecurityTokenHandler handler = new();
+        byte[] securityKey = Encoding.UTF8.GetBytes(FakeSecret);
+
+        ClaimsIdentity claims = new(
+        [
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString(CultureInfo.InvariantCulture)),
+            new Claim(ClaimTypes.Name, "Mariana Alves Rocha"),
+            new Claim(ClaimTypes.Role, "Operator"),
+            new Claim(ClaimTypes.Email, "mariana.rocha@aluno.cps.sp.gov.br")
+        ]);
+
+        SecurityToken token = handler.CreateToken(new SecurityTokenDescriptor
+        {
+            Subject = claims,
+            Expires = DateTime.UtcNow.AddHours(1),
+            Issuer = "FateConnectTest",
+            Audience = "FateConnectTestWeb",
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(securityKey),
+                SecurityAlgorithms.HmacSha256Signature)
+        });
+
+        return handler.WriteToken(token);
+    }
+
+    public static string UniquePhone() => $"15{Random.Shared.Next(100_000_000, 999_999_999)}";
+
+    public static string UniqueContactEmail() => $"contato{Guid.NewGuid():N}@gmail.com";
+
+    public SeededUser SeedUser(string fullName, EnumProfileType profileType = EnumProfileType.Operator)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        string phone = UniquePhone();
+        string contactEmail = UniqueContactEmail();
+
+        User user = new()
+        {
+            FullName = fullName,
+            FatecEmail = $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+            Password = "hash-sem-valor-fora-desta-suite",
+            BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            ProfileType = profileType,
+            Phone = phone,
+            ContactEmail = contactEmail,
+            Preferences = new UserPreferences(),
+        };
+
+        context.Users.Add(user);
+        context.SaveChanges();
+
+        return new SeededUser(user.Id, phone, contactEmail);
+    }
+
+    public (int Id, string FatecEmail) SeedUserWithPassword(
+        string fullName,
+        string password,
+        EnumAccountStatus status = EnumAccountStatus.Active)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        User user = new()
+        {
+            FullName = fullName,
+            FatecEmail = $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+            Password = HashPassword(password),
+            BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Status = status,
+        };
+
+        context.Users.Add(user);
+        context.SaveChanges();
+
+        return (user.Id, user.FatecEmail);
+    }
+
+    public void SetAccountStatus(int userId, EnumAccountStatus status)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        context.Users
+            .Where(user => user.Id == userId)
+            .ExecuteUpdate(setters => setters.SetProperty(user => user.Status, status));
+    }
+
+    public Guid SeedRide(
+        int driverId,
+        DateOnly departureDate,
+        TimeOnly departureTime,
+        string destination = "Sorocaba centro",
+        string? description = null)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        DateOnly acceptedDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
+        Ride ride = new(3, destination, acceptedDate, departureTime, EnumRideType.Solidarity, driverId, description);
+
+        context.Rides.Add(ride);
+        context.Entry(ride).Property(entity => entity.DepartureDate).CurrentValue = departureDate;
+        context.Entry(ride).Property(entity => entity.DepartureTime).CurrentValue = departureTime;
+        context.SaveChanges();
+
+        return ride.Id;
+    }
+
+    public Guid SeedLostAndFoundRecord(
+        int reporterId,
+        EnumStatusLostAndFound status = EnumStatusLostAndFound.Open,
+        DateTime? createdAt = null,
+        DateTime? updatedAt = null,
+        DateTime? statusChangedAt = null,
+        string? imageUrl = null)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        LostAndFoundRecord record = new(
+            "Garrafa térmica azul",
+            EnumLostAndFoundType.Lost,
+            "Biblioteca do bloco B",
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
+            "Ficou na mesa do fundo.",
+            reporterId);
+
+        if (imageUrl is not null)
+            record.AttachImage(imageUrl);
+
+        context.LostAndFoundRecords.Add(record);
+
+        EntityEntry<LostAndFoundRecord> entry = context.Entry(record);
+        entry.Property(entity => entity.Status).CurrentValue = status;
+        entry.Property(entity => entity.CreatedAt).CurrentValue = createdAt ?? DateTime.UtcNow;
+        entry.Property(entity => entity.UpdatedAt).CurrentValue = updatedAt;
+        entry.Property(entity => entity.StatusChangedAt).CurrentValue = statusChangedAt;
+
+        context.SaveChanges();
+
+        return record.Id;
+    }
+
+    public Guid SeedDenunciation(
+        int reporterId,
+        string description,
+        DateOnly reportedOn,
+        EnumDenunciationCategory category = EnumDenunciationCategory.ImproperCharging,
+        EnumDenunciationStatus status = EnumDenunciationStatus.Open,
+        bool isAnonymous = false)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        Denunciation denunciation = new(category, description, reporterId, isAnonymous);
+
+        context.Denunciations.Add(denunciation);
+        context.Entry(denunciation).Property(entity => entity.CreatedAt).CurrentValue =
+            DateTimeUtils.ToUtcFromProductTimeZone(reportedOn, new TimeOnly(10, 0));
+        context.Entry(denunciation).Property(entity => entity.Status).CurrentValue = status;
+        context.SaveChanges();
+
+        return denunciation.Id;
+    }
+
+    public HttpClient CreateClientFor(
+        int userId,
+        int tokenVersion = 0,
+        EnumProfileType profileType = EnumProfileType.Operator)
+    {
+        HttpClient client = CreateClient();
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", IssueToken(userId, tokenVersion, profileType));
+
+        return client;
+    }
+
+    public HttpClient CreateClientForNewUser(string fullName)
+    {
+        return CreateClientFor(SeedUser(fullName).Id);
+    }
+
+    public HttpClient CreateClientForNewAdministrator(string fullName)
+    {
+        int administratorId = SeedUser(fullName, EnumProfileType.Administrator).Id;
+
+        return CreateClientFor(administratorId, profileType: EnumProfileType.Administrator);
+    }
+}
