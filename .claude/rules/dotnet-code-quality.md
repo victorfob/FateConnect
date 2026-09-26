@@ -42,3 +42,12 @@ dotnet_style_prefer_collection_expression = true:warning
 ⚠️ **A prova de que o mecanismo funciona já estava no arquivo:** `csharp_style_namespace_declarations = file_scoped:warning` reprova de verdade — um namespace block-scoped plantado derruba a build com `IDE0161`. A diferença entre as duas é só o `:warning`.
 
 **A consequência prática:** a regra que você quer cobrada precisa estar escrita. Não existe "o analisador pega" — existe "o analisador pega o que foi declarado".
+
+## Dependência que valida licença na compilação: o ImageSharp 4
+
+⛔ **O `SixLabors.ImageSharp` 4 roda um alvo de licença antes de compilar: em Debug ele só avisa, em Release ele reprova.** O CI compila em Debug e fica verde com o aviso; a imagem Docker publica em Release, na VPS, e ali reprova com `No Six Labors license found` se a chave faltar.
+
+- **A chave é o conteúdo inteiro do `sixlabors.lic`** (licença comunitária, para código aberto) e é segredo: vai em `SIXLABORS_LICENSE` no `.env` de cada ambiente da VPS, como o `deploy/README.md` descreve, e nunca no repositório — `.gitignore` e `.dockerignore` recusam o arquivo.
+- **Build em Release na sua máquina** pede o arquivo fora do repositório: `dotnet build -c Release -p:SixLaborsLicenseFile=<caminho>`.
+- ⚠️ **O "License ID" que a Six Labors mostra não é a chave**: passado sozinho, o validador responde `The given key 'Kind' was not present in the dictionary`.
+

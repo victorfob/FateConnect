@@ -131,6 +131,8 @@ gh run view <run-id> --json jobs --jq '.jobs[].steps[] | "\(.conclusion)\t\(.nam
 
 As duas corridas, lado a lado, são o controle: antes `failure Tests` → **`skipped`** no passo do Sonar; depois `success Tests` → `failure` nele. `skipped` depois de um `failure` é passo que ninguém mediu.
 
+⛔ **`Process.PeakWorkingSet64` responde 0 no macOS**, e medir memória no mesmo processo que gerou a carga põe a carga no "antes". Na #465 o que mediu o custo de processar uma foto foi separar em processos: um gera o arquivo, outro só o processa sob `/usr/bin/time -l` (máximo residente), e um terceiro só o lê — esse é o controle.
+
 ⛔ **`performance.getEntriesByType('resource')` não enxerga requisição que falha na conexão.** Em 04/09/2026, provando que um formulário deixara de chamar a API, ele devolveu **zero** nos dois casos — no que não devia chamar e no que devia. O zero era do instrumento. Quem responde é o log de rede do navegador (`read_network_requests`), que registra a tentativa com o motivo da falha; e o par positivo — o caso que **deve** disparar a requisição — é o que separa "não chamou" de "não medi".
 
 ⛔ **E há a busca que só alcança o que tem nome de símbolo.** Um pedido entregue deixa rastro em **dois** lugares independentes — o código e o rastreador —, e o `grep` só responde bem quando existe um identificador a procurar.
