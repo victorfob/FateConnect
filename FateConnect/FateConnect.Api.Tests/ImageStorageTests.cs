@@ -18,6 +18,7 @@ using FateConnect.Api.Modules.LostAndFound.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
+using SixLabors.ImageSharp;
 
 namespace FateConnect.Api.Tests;
 
@@ -25,16 +26,22 @@ public sealed class ImageStorageTests : IDisposable
 {
     private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-uploads-{Guid.NewGuid():N}");
 
-    private static FormFile FileOf(string contentType, int sizeInBytes = 12, string fileName = "foto.png")
+    private static FormFile FileOf(string contentType, byte[]? content = null, string fileName = "foto.png")
     {
-        MemoryStream content = new(Encoding.UTF8.GetBytes(new string('x', sizeInBytes)));
+        MemoryStream stream = new(content ?? TestImages.Png());
 
-        return new FormFile(content, 0, content.Length, "Image", fileName)
+        return new FormFile(stream, 0, stream.Length, "Image", fileName)
         {
             Headers = new HeaderDictionary(),
             ContentType = contentType,
         };
     }
+
+    private static FormFile FileOfSize(string contentType, int sizeInBytes) =>
+        FileOf(contentType, Encoding.UTF8.GetBytes(new string('x', sizeInBytes)));
+
+    private string PhysicalPathOf(string storedPath) =>
+        Path.Combine(_webRoot, storedPath.Replace('/', Path.DirectorySeparatorChar));
 
     private static ValidationResult? Validate(IFormFile? image) =>
         new ValidImageAttribute().GetValidationResult(image, new ValidationContext(new object()));
@@ -124,7 +131,7 @@ public sealed class ImageStorageTests : IDisposable
     [Fact]
     public void ValidImage_WithAnEmptyFile_IsRefused()
     {
-        ValidationResult? result = Validate(FileOf("image/png", sizeInBytes: 0));
+        ValidationResult? result = Validate(FileOfSize("image/png", 0));
 
         Assert.Equal("A imagem enviada está vazia ou corrompida.", result?.ErrorMessage);
     }
@@ -132,7 +139,7 @@ public sealed class ImageStorageTests : IDisposable
     [Fact]
     public void ValidImage_WithAFileAboveTheSizeLimit_IsRefused()
     {
-        ValidationResult? result = Validate(FileOf("image/png", sizeInBytes: 5 * 1024 * 1024 + 1));
+        ValidationResult? result = Validate(FileOfSize("image/png", 5 * 1024 * 1024 + 1));
 
         Assert.Equal("O tamanho da imagem não pode ultrapassar 5MB.", result?.ErrorMessage);
     }
@@ -169,15 +176,81 @@ public sealed class ImageStorageTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteImage_RemovesTheFileItStored()
+    public async Task UploadImage_WritesTheOriginalAndAThumbnailWhoseShortestSideFitsTheScreen()
+    {
+        StorageService service = ServiceOn(_webRoot);
+
+        string path = await service.UploadImageAsync(
+            FileOf("image/png", TestImages.Png(600, 400)), EnumStorageContainer.LostAndFound);
+
+        string thumbnailPath = UploadsLocation.ThumbnailOf(path);
+        using Image original = await Image.LoadAsync(PhysicalPathOf(path));
+        using Image thumbnail = await Image.LoadAsync(PhysicalPathOf(thumbnailPath));
+
+        Assert.Equal((600, 400), (original.Width, original.Height));
+        Assert.Equal((432, ImageVariants.ThumbnailEdgeInPixels), (thumbnail.Width, thumbnail.Height));
+        Assert.Equal("image/webp", thumbnail.Metadata.DecodedImageFormat?.DefaultMimeType);
+    }
+
+    [Fact]
+    public async Task UploadImage_SmallerThanTheThumbnail_KeepsItsSize()
+    {
+        StorageService service = ServiceOn(_webRoot);
+
+        string path = await service.UploadImageAsync(FileOf("image/png", TestImages.Png(40, 30)), EnumStorageContainer.LostAndFound);
+
+        using Image thumbnail = await Image.LoadAsync(PhysicalPathOf(UploadsLocation.ThumbnailOf(path)));
+
+        Assert.Equal((40, 30), (thumbnail.Width, thumbnail.Height));
+    }
+
+    [Fact]
+    public async Task UploadImage_TakenWithAPhone_AppliesTheRotationAndDropsTheMetadata()
+    {
+        StorageService service = ServiceOn(_webRoot);
+        byte[] photo = TestImages.JpegTakenWithAPhone(600, 400, TestImages.RotatedClockwise);
+
+        string path = await service.UploadImageAsync(FileOf("image/jpeg", photo, "foto.jpg"), EnumStorageContainer.Denunciation);
+
+        using Image original = await Image.LoadAsync(PhysicalPathOf(path));
+        using Image thumbnail = await Image.LoadAsync(PhysicalPathOf(UploadsLocation.ThumbnailOf(path)));
+
+        Assert.Equal((400, 600), (original.Width, original.Height));
+        Assert.Equal((ImageVariants.ThumbnailEdgeInPixels, 432), (thumbnail.Width, thumbnail.Height));
+        Assert.Null(original.Metadata.ExifProfile);
+        Assert.Null(thumbnail.Metadata.ExifProfile);
+    }
+
+    [Fact]
+    public async Task UploadImage_OfBytesThatAreNotAnImage_IsRefusedAndWritesNothing()
+    {
+        StorageService service = ServiceOn(_webRoot);
+
+        InvalidImageException exception = await Assert.ThrowsAsync<InvalidImageException>(
+            () => service.UploadImageAsync(FileOfSize("image/png", 12), EnumStorageContainer.LostAndFound));
+
+        Assert.Equal(ImageVariants.CorruptedMessage, exception.Message);
+        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "lostandfound"), "*", SearchOption.AllDirectories));
+    }
+
+    [Fact]
+    public void ThumbnailOf_AStoredImage_LivesBesideItUnderTheSameName()
+    {
+        Assert.Equal(
+            "uploads/lostandfound/thumbnails/8a1b0f2e-0000-4000-8000-000000000000.webp",
+            UploadsLocation.ThumbnailOf("uploads/lostandfound/8a1b0f2e-0000-4000-8000-000000000000.jpg"));
+    }
+
+    [Fact]
+    public async Task DeleteImage_RemovesTheOriginalAndItsThumbnail()
     {
         StorageService service = ServiceOn(_webRoot);
         string path = await service.UploadImageAsync(FileOf("image/webp"), EnumStorageContainer.LostAndFound);
-        string physicalPath = Path.Combine(_webRoot, path.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
 
         await service.DeleteImageAsync(path);
 
-        Assert.False(File.Exists(physicalPath));
+        Assert.False(File.Exists(PhysicalPathOf(path)));
+        Assert.False(File.Exists(PhysicalPathOf(UploadsLocation.ThumbnailOf(path))));
     }
 
     [Theory]
@@ -244,7 +317,7 @@ public sealed class ImageStorageTests : IDisposable
 
         await Assert.ThrowsAsync<DbUpdateException>(() => service.CreateAsync(dto, 1));
 
-        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "lostandfound")));
+        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "lostandfound"), "*", SearchOption.AllDirectories));
     }
 
     [Fact]
@@ -264,6 +337,6 @@ public sealed class ImageStorageTests : IDisposable
 
         await Assert.ThrowsAsync<DbUpdateException>(() => service.CreateAsync(dto, 1));
 
-        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "denunciation")));
+        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "denunciation"), "*", SearchOption.AllDirectories));
     }
 }

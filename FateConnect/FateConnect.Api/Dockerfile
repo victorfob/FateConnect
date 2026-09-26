@@ -5,7 +5,9 @@ COPY FateConnect.Api.csproj ./
 RUN dotnet restore
 
 COPY . ./
-RUN dotnet publish FateConnect.Api.csproj -c Release -o /app --no-restore
+ARG SIXLABORS_LICENSE
+RUN if [ -n "$SIXLABORS_LICENSE" ]; then printf '%s' "$SIXLABORS_LICENSE" > sixlabors.lic; fi \
+    && dotnet publish FateConnect.Api.csproj -c Release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app

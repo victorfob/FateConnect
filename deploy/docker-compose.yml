@@ -9,6 +9,10 @@ services:
   api:
     build:
       context: ../FateConnect/FateConnect.Api
+      # O ImageSharp reprova o build de publicação sem licença. Ela fica só no
+      # estágio de build e não chega à imagem que sobe.
+      args:
+        SIXLABORS_LICENSE: ${SIXLABORS_LICENSE}
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production

@@ -33,6 +33,7 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         EnumDenunciationCategory Category,
         string Description,
         string? ImageUrl,
+        string? ThumbnailUrl,
         bool HasImage,
         EnumDenunciationStatus Status,
         Contact? User,
@@ -60,9 +61,9 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
             { new StringContent(isAnonymous.ToString(CultureInfo.InvariantCulture)), "IsAnonymous" },
         };
 
-    private static ByteArrayContent ImagePayload(byte pattern)
+    private static ByteArrayContent ImagePayload(byte shade)
     {
-        ByteArrayContent payload = new([0x89, 0x50, 0x4E, 0x47, pattern]);
+        ByteArrayContent payload = new(TestImages.Png(shade: shade));
         payload.Headers.ContentType = new MediaTypeHeaderValue("image/png");
 
         return payload;
@@ -118,6 +119,7 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
 
         Assert.True(created.HasImage);
         Assert.Equal($"Denunciations/{created.Id}/image", created.ImageUrl);
+        Assert.Equal($"Denunciations/{created.Id}/image/thumbnail", created.ThumbnailUrl);
     }
 
     [Fact]
@@ -129,6 +131,7 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
 
         Assert.False(created.HasImage);
         Assert.Null(created.ImageUrl);
+        Assert.Null(created.ThumbnailUrl);
     }
 
     [Fact]
@@ -166,6 +169,42 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await neighbour.GetAsync($"/{created.ImageUrl}");
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DenunciationThumbnail_AskedByModeration_IsServedAsWebp()
+    {
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Tânia Brasileiro Vilela");
+        HttpClient reporter = _factory.CreateClientForNewUser("Otávio Queiroga Leme");
+        ReadDenunciation created = await ReportedBy(reporter, FormWithImage());
+
+        HttpResponseMessage response = await moderation.GetAsync($"/{created.ThumbnailUrl}");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("image/webp", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task DenunciationThumbnail_AskedByAnotherOperator_IsForbidden()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Priscila Moreira Arruda");
+        HttpClient neighbour = _factory.CreateClientForNewUser("Rui Albuquerque Seixas");
+        ReadDenunciation created = await ReportedBy(reporter, FormWithImage());
+
+        HttpResponseMessage response = await neighbour.GetAsync($"/{created.ThumbnailUrl}");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DenunciationThumbnail_OfAReportWithoutAnImage_IsNotFound()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Silas Guimarães Neto");
+        ReadDenunciation created = await ReportedBy(reporter, NewDenunciationForm());
+
+        HttpResponseMessage response = await reporter.GetAsync($"/Denunciations/{created.Id}/image/thumbnail");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]

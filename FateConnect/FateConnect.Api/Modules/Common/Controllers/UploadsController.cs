@@ -17,16 +17,11 @@ public class UploadsController(IWebHostEnvironment environment) : ControllerBase
 {
     [HttpGet("{container}/{fileName}")]
     [AuthorizeProfile(EnumProfileType.Operator)]
-    public ActionResult GetGenericImage(string container, string fileName)
-    {
-        bool isValidContainer = Enum.TryParse(container, ignoreCase: true, out EnumStorageContainer storageContainer) && Enum.IsDefined(storageContainer);
+    public ActionResult GetGenericImage(string container, string fileName) =>
+        this.ServeGenericImage(environment, container, fileName, EnumStoredImageVariant.Original);
 
-        if (!isValidContainer)
-            return NotFound();
-
-        if (storageContainer == EnumStorageContainer.Denunciation)
-            return Forbid();
-
-        return this.ServeStoredImage(environment, storageContainer, fileName);
-    }
+    [HttpGet("{container}/" + UploadsLocation.ThumbnailsFolderName + "/{fileName}")]
+    [AuthorizeProfile(EnumProfileType.Operator)]
+    public ActionResult GetGenericThumbnail(string container, string fileName) =>
+        this.ServeGenericImage(environment, container, fileName, EnumStoredImageVariant.Thumbnail);
 }

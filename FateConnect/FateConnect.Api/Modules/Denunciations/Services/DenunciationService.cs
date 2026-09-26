@@ -135,6 +135,7 @@ public partial class DenunciationService(
             Category: record.Category,
             Description: record.Description,
             ImageUrl: ImageAddressOf(record),
+            ThumbnailUrl: ThumbnailAddressOf(record),
             HasImage: record.ImageUrl is not null,
             Status: record.Status,
             User: record.IsAnonymous ? null : record.User?.ToContactDto(),
@@ -148,5 +149,13 @@ public partial class DenunciationService(
             return null;
 
         return $"Denunciations/{record.Id}/image";
+    }
+
+    private static string? ThumbnailAddressOf(Denunciation record)
+    {
+        if (record.ImageUrl is null)
+            return null;
+
+        return $"Denunciations/{record.Id}/image/thumbnail";
     }
 }

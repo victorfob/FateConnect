@@ -8,6 +8,7 @@ using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using SixLabors.ImageSharp;
 
 namespace FateConnect.Api.Tests;
 
@@ -37,6 +38,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         DateOnly OcurredOn,
         string? Description,
         string? ImageUrl,
+        string? ThumbnailUrl,
         Contact Contact,
         bool IsOwner,
         EnumStatusLostAndFound Status,
@@ -63,9 +65,9 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         return form;
     }
 
-    private static ByteArrayContent ImagePayload(byte pattern)
+    private static ByteArrayContent ImagePayload(byte shade)
     {
-        ByteArrayContent payload = new([0x89, 0x50, 0x4E, 0x47, pattern]);
+        ByteArrayContent payload = new(TestImages.Png(shade: shade));
         payload.Headers.ContentType = new MediaTypeHeaderValue("image/png");
 
         return payload;
@@ -289,9 +291,14 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Assert.StartsWith("uploads/lostandfound/", item.ImageUrl, StringComparison.Ordinal);
 
         HttpResponseMessage stored = await client.GetAsync($"/{item.ImageUrl}");
+        HttpResponseMessage thumbnail = await client.GetAsync($"/{item.ThumbnailUrl}");
 
         Assert.Equal(HttpStatusCode.OK, stored.StatusCode);
-        Assert.Equal([0x89, 0x50, 0x4E, 0x47, 0x01], await stored.Content.ReadAsByteArrayAsync());
+        using Image original = TestImages.Decode(await stored.Content.ReadAsByteArrayAsync());
+        Assert.Equal((40, 30), (original.Width, original.Height));
+        Assert.Equal(UploadsLocation.ThumbnailOf(item.ImageUrl), item.ThumbnailUrl);
+        Assert.Equal(HttpStatusCode.OK, thumbnail.StatusCode);
+        Assert.Equal("image/webp", thumbnail.Content.Headers.ContentType?.MediaType);
     }
 
     [Fact]
@@ -317,6 +324,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Assert.NotEqual(created.ImageUrl, updated.ImageUrl);
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync($"/{updated.ImageUrl}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/{created.ImageUrl}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/{created.ThumbnailUrl}")).StatusCode);
     }
 
     [Fact]
@@ -351,7 +359,10 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
 
         HttpResponseMessage anonymous = await _factory.CreateClient().GetAsync($"/{item.ImageUrl}");
 
+        HttpResponseMessage anonymousThumbnail = await _factory.CreateClient().GetAsync($"/{item.ThumbnailUrl}");
+
         Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, anonymousThumbnail.StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await reporter.GetAsync($"/{item.ImageUrl}")).StatusCode);
     }
 
