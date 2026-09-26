@@ -4,12 +4,6 @@ import { CardsList, PageShell, Pagination } from '@design-system';
 import { ArrowBackIcon, FormatListBulletedIcon, SendIcon } from '@design-system/icons';
 
 import { DenunciationCard } from '@app/components/DenunciationCard';
-import {
-  DOWNLOAD_LABEL,
-  photoAlt,
-  photoBaseName,
-} from '@app/components/DenunciationCard/constants';
-import { StoredPhoto } from '@app/components/StoredPhoto';
 import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import { RoutePathEnum } from '@app/routes/paths';
 import { listMyDenunciations } from '@app/services/denunciations/denunciationsService';
@@ -72,17 +66,7 @@ export function Denunciations() {
         pagination={<Pagination count={totalPages} page={currentPage} onChange={changePage} />}
       >
         {items.map((denunciation) => (
-          <DenunciationCard
-            key={denunciation.id}
-            denunciation={denunciation}
-            media={
-              <StoredPhoto
-                url={denunciation.imageUrl}
-                alt={photoAlt(denunciation)}
-                download={{ label: DOWNLOAD_LABEL, baseName: photoBaseName(denunciation) }}
-              />
-            }
-          />
+          <DenunciationCard key={denunciation.id} denunciation={denunciation} />
         ))}
       </CardsList>
 

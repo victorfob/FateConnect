@@ -9,9 +9,9 @@ import type { LostItemFormInput, LostItemFormValues } from '../schema';
 import * as C from '../constants';
 import * as S from './styles';
 
-export type LostItemFormFieldsProps = Readonly<{ storedImageUrl: string | null }>;
+export type LostItemFormFieldsProps = Readonly<{ storedThumbnailUrl: string | null }>;
 
-export function LostItemFormFields({ storedImageUrl }: LostItemFormFieldsProps) {
+export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsProps) {
   const {
     control,
     register,
@@ -21,7 +21,7 @@ export function LostItemFormFields({ storedImageUrl }: LostItemFormFieldsProps) 
   const photo = useWatch({ control, name: 'photo' });
   const description = useWatch({ control, name: 'description' });
   const today = useMemo(() => new Date(), []);
-  const storedPhoto = useStoredImage(storedImageUrl);
+  const storedPhoto = useStoredImage(storedThumbnailUrl);
 
   const storedPreview = useMemo(() => {
     if (!storedPhoto) return null;

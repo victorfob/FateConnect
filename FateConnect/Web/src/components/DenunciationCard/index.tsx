@@ -4,11 +4,11 @@ import {
   CalendarTodayIcon,
   ExpandLessIcon,
   ExpandMoreIcon,
-  ImageIcon,
   IncognitoIcon,
 } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
+import { StoredPhoto } from '@app/components/StoredPhoto';
 import { denunciationCategoryLabel } from '@app/pages/Denunciations/helpers/denunciationCategory';
 import {
   denunciationStatusLabel,
@@ -23,8 +23,6 @@ const DATE_FORMAT = 'dd/MM/yyyy';
 
 type DenunciationCardProps = Readonly<{
   denunciation: Denunciation;
-  /** A miniatura da foto anexada, que as duas listas montam com o `StoredPhoto`. */
-  media?: ReactNode;
   /** O contato de quem denunciou. Só a gestão o oferece: na lista de quem
    * enviou ele seria o próprio. */
   reporterContact?: ReactNode;
@@ -34,7 +32,6 @@ type DenunciationCardProps = Readonly<{
 
 export function DenunciationCard({
   denunciation,
-  media,
   reporterContact,
   actions,
 }: DenunciationCardProps) {
@@ -60,7 +57,19 @@ export function DenunciationCard({
   }, [isExpanded]);
 
   return (
-    <ListCard media={media}>
+    <ListCard
+      media={
+        <StoredPhoto
+          url={denunciation.thumbnailUrl}
+          alt={C.photoAlt(denunciation)}
+          download={{
+            label: C.DOWNLOAD_LABEL,
+            baseName: C.photoBaseName(denunciation),
+            originalUrl: denunciation.imageUrl,
+          }}
+        />
+      }
+    >
       <ListCard.Header>
         <Typography variant="subtitleBold">
           {denunciationCategoryLabel(denunciation.category)}
@@ -88,15 +97,6 @@ export function DenunciationCard({
             <IncognitoIcon />
             <Typography variant="caption" color="inherit">
               {C.DENUNCIATION_CARD_MARKERS.confidential}
-            </Typography>
-          </ListCard.InfoItem>
-        )}
-
-        {!media && denunciation.hasImage && (
-          <ListCard.InfoItem>
-            <ImageIcon />
-            <Typography variant="caption" color="inherit">
-              {C.DENUNCIATION_CARD_MARKERS.photo}
             </Typography>
           </ListCard.InfoItem>
         )}

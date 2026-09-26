@@ -14,7 +14,7 @@ const LOST_ITEM: LostItem = {
   place: 'Biblioteca',
   ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta.',
-  imageUrl: 'https://fotos.fateconnect.test/carteira.png',
+  thumbnailUrl: 'uploads/lostandfound/thumbnails/carteira.webp',
   contact: { name: 'Marina Duarte', email: 'marina.duarte@example.com', phone: '(15) 99999-0001' },
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
