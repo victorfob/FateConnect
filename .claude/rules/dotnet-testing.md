@@ -52,6 +52,12 @@ Vão para dentro do contêiner de produção `xunit.core`, `xunit.assert`, `xuni
 
 **A única peça de apoio a teste que pode morar no app** é tornar o `Program` visível para o `WebApplicationFactory`. O eShop faz isso com um arquivo de três linhas, e explica que `InternalsVisibleTo` não resolve porque a acessibilidade do tipo é verificada. Aqui o `Program` já é público, então nem isso é preciso.
 
+## Dentro do projeto de teste, uma pasta por domínio
+
+⛔ **Teste novo vai para a pasta do código que ele exercita**, espelhando o projeto principal: uma por módulo de `Modules/` e `Infrastructure/` para o que mora lá. O namespace acompanha a pasta, e o apoio compartilhado — a fábrica da aplicação, o banco de teste, os relógios fixos, as imagens — mora em `Fixtures/`. Nenhum arquivo fica solto na raiz.
+
+⚠️ **O que atravessa módulos vai para onde mora o código que ele de fato exercita**, não para o módulo da maioria das rotas: a política de autorização mora em `Auth` mesmo passando por rotas de quatro módulos.
+
 ⚠️ **Quando a suíte crescer, separe por tipo.** Hoje `FateConnect.Api.Tests` mistura unidade (`TokenServiceTests`) e integração (`AuthorizationTests`, que sobe a aplicação). Com 10 testes não paga; o eShop separaria em `.UnitTests` e `.FunctionalTests`, e é para lá que a divisão vai quando a suíte justificar.
 
 ## Nome em três partes

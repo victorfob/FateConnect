@@ -204,7 +204,7 @@ Nas três quem viu foi o Victor, olhando a tela.
 
 **Os pontos que a faixa exige:** cada limite declarado e **um pixel de cada lado dele** — é ali que os dois estados se encostam e o buraco aparece —, mais a largura em que cada contêiner elástico para de crescer.
 
-⚠️ **Elemento que divide a linha com outro não tem a largura da janela.** A coluna da landing vai de 314px a 600px enquanto a janela vai de 937 a 1920, e é a **dela** que decide a quebra. Meça a largura do contêiner junto da janela, sempre — como já se faz com a porta.
+⚠️ **Elemento que divide a linha com outro não tem a largura da janela.** Medido em 11/09/2026, quando o desktop começava em 937px: a coluna da landing ia de 314px a 600px enquanto a janela ia de 937 a 1920, e era a **dela** que decidia a quebra. Meça a largura do contêiner junto da janela, sempre — como já se faz com a porta.
 
 ⛔ **E o eixo esquecido nem sempre é espacial: pode ser o tempo desde que o artefato nasceu.** Em 11/09/2026, medindo se um `Cache-Control` novo mudava alguma coisa, o navegador respondeu **zero requisição** tanto com ele quanto sem — e o controle contra produção é que denunciou o empate. O que faltava segurar era a **idade do arquivo**: sem `Cache-Control`, o navegador arbitra a validade em ~10% da idade, então recém-publicado ele revalida tudo e dias depois não revalida nada. A mesma configuração responde diferente conforme o dia em que se mede.
 
