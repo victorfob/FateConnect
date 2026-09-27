@@ -58,7 +58,7 @@ Vão para dentro do contêiner de produção `xunit.core`, `xunit.assert`, `xuni
 
 ⚠️ **O que atravessa módulos vai para onde mora o código que ele de fato exercita**, não para o módulo da maioria das rotas: a política de autorização mora em `Auth` mesmo passando por rotas de quatro módulos.
 
-⚠️ **Quando a suíte crescer, separe por tipo.** Hoje `FateConnect.Api.Tests` mistura unidade (`TokenServiceTests`) e integração (`AuthorizationTests`, que sobe a aplicação). Com 10 testes não paga; o eShop separaria em `.UnitTests` e `.FunctionalTests`, e é para lá que a divisão vai quando a suíte justificar.
+⚠️ **Quando a suíte crescer, separe por tipo.** Hoje `FateConnect.Api.Tests` mistura unidade (`TokenServiceTests`) e integração (`AuthorizationTests`, que sobe a aplicação), dentro das pastas de domínio. A divisão ainda não foi feita; o eShop separaria em `.UnitTests` e `.FunctionalTests`, e é para lá que a divisão vai quando a suíte justificar.
 
 ## Nome em três partes
 
