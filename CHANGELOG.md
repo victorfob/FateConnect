@@ -15,6 +15,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Passa a explicar, na lista vazia de achados e perdidos, o que aparece ali e como sair dela, ampliando a busca ou cadastrando um item, como caronas já faz (#472) [Frontend]
 - Passa a mostrar o desenho de desktop das telas a partir de 822px, em vez de 965px, que é onde a navegação do topo deixa de caber e decidia por todas as telas; o cabeçalho continua recolhendo a navegação no menu abaixo de 965px (#470) [Frontend]
 - Passa a declarar na política de privacidade que a foto do item e a imagem da denúncia são guardadas sem as informações que o aparelho grava no arquivo, como o local onde ele foi feito, em nova versão do documento (#466) [Frontend]
 - Passa a exibir a miniatura das fotos em achados e perdidos e nas duas telas de denúncia, em vez de baixar o arquivo inteiro da câmera; o botão de baixar a foto da denúncia busca a original no clique e avisa quando não consegue (#466) [Frontend]
