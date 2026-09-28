@@ -146,6 +146,20 @@ O tempo verbal denuncia: *"vai ficar"*, *"responderia"*, *"em banco novo"*. Troq
 
 **Errou depois de publicar?** Edite o comentário para o texto correto e sem meta-narrativa — o histórico de edição do GitHub já registra. A explicação do erro vai para o usuário, não para o thread do autor.
 
+### A issue se cita pelo que ela escreve, não pelo que você deduziu
+
+⛔ **Atribuir à issue uma exigência que ela não escreve é afirmar sem medir, com um agravante: a issue é a autoridade que o autor não discute.** Antes de escrever "a #N pede", abra o corpo e ache a frase. Sem a frase, a exigência é sua, e se diz como sua.
+
+⛔ Aconteceu em 28/09/2026, no #482. A #108 pede que banir e rebaixar incrementem o `TokenVersion`, e que a promoção valha "no token emitido no login seguinte". Eu escrevi que ela pedia a promoção "sem derrubar a sessão", uma dedução minha publicada com a voz da issue. O autor perguntou se derrubar não fazia mais sentido, e fazia: o token antigo carrega `Operator`, que é menos poder do que o banco já dá, e os dois desenhos cumprem a frase da issue. O comentário foi apagado e refeito sobre o defeito real, que estava no fixture.
+
+**O tell é o verbo de exigência com a issue como sujeito:** "a #N pede", "a #N proíbe", "como a #N quer". Cada um é uma busca que você ainda não rodou:
+
+```bash
+gh issue view <n> --json body -q .body | grep -n -i "<o termo>"
+```
+
+⚠️ **E o que a issue não diz não é proibição.** Fica em aberto, e a escolha é de quem escreve ou de quem revisa, não um defeito do PR.
+
 ## O certo mora no consumidor e no módulo irmão
 
 ⛔ **Todo apontamento que diz "o certo seria X" pede dois arquivos abertos antes do texto: o consumidor e o módulo irmão.** A definição do comportamento correto quase nunca está no arquivo revisado.
