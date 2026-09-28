@@ -74,7 +74,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public static string IssueToken(
         int userId = 1,
-        int tokenVersion = 1, // Default alterado para 1, igual a entidade real
+        int tokenVersion = 1,
         EnumProfileType profileType = EnumProfileType.Operator)
     {
         JwtOptions options = new()
