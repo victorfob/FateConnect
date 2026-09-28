@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Users.Interfaces;
 
+using System.Linq.Expressions;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
 
@@ -10,9 +11,12 @@ public interface IUserRepository
     Task<bool> ContactEmailExistsAsync(string contactEmail, int? excludeUserId = null);
 
     Task<User?> GetByEmailAsync(string email);
-    Task<User?> GetByIdAsync(int id, bool includePreferences = false);
+    Task<User?> GetByIdAsync(int id, bool includePreferences = false, bool asNoTracking = false);
     Task<UserPreferences?> GetPreferencesByUserIdAsync(int userId);
-    Task<(IReadOnlyList<ReadUserSummaryDto> Users, int Total)> GetAllAsync(UserFilterDto filter);
+    Task<(IReadOnlyList<TResult> Items, int Total)> GetAllAsync<TResult>(
+        UserFilterDto filter,
+        Expression<Func<User, TResult>> selector
+    );
 
     Task AddAsync(User user);
     Task SaveChangesAsync();

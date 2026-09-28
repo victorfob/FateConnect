@@ -4,13 +4,11 @@ using FateConnect.Api.Modules.Auth.Attributes;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Common.DTOs;
-using FateConnect.Api.Modules.Common.Enums;
 using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -18,10 +16,15 @@ using System.Threading.Tasks;
 [ApiController]
 [Route("[controller]")]
 [Authorize]
+[ApiConventionType(typeof(DefaultApiConventions))]
 public class UsersController(IUserService service) : ControllerBase
 {
     [HttpPost("signup")]
     [AllowAnonymous]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<TokenResponseDto>> SignUpAsync([FromBody] CreateUserDto dto)
     {
         var result = await service.SignUpAsync(dto, HttpContext.GetRequestOrigin());
@@ -43,6 +46,7 @@ public class UsersController(IUserService service) : ControllerBase
 
     [HttpPatch("me")]
     [AuthorizeProfile(EnumProfileType.Operator)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ReadUserDto>> UpdateProfileAsync([FromForm] UpdateUserDto dto)
     {
         var result = await service.UpdateProfileAsync(User.GetUserId(), dto);
@@ -76,13 +80,16 @@ public class UsersController(IUserService service) : ControllerBase
 
     [HttpPatch("me/password")]
     [AuthorizeProfile(EnumProfileType.Operator)]
-    public async Task<ActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto dto)
+    [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<TokenResponseDto>> ChangePasswordAsync([FromBody] ChangePasswordDto dto)
     {
-        await service.ChangePasswordAsync(User.GetUserId(), dto);
+        var tokenResponse = await service.ChangePasswordAsync(User.GetUserId(), dto);
 
-        return NoContent();
+        if (tokenResponse is null)
+            return NotFound();
+
+        return Ok(tokenResponse);
     }
-
     [HttpPost("me/deactivate")]
     [AuthorizeProfile(EnumProfileType.Operator)]
     public async Task<ActionResult> DeactivateAccountAsync()
@@ -115,6 +122,7 @@ public class UsersController(IUserService service) : ControllerBase
 
     [HttpPatch("{id:int}")]
     [AuthorizeProfile(EnumProfileType.Administrator)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ReadUserDto>> UpdateUserByAdminAsync(int id, [FromBody] AdminUpdateUserDto dto)
     {
         var result = await service.UpdateUserByAdminAsync(id, dto);

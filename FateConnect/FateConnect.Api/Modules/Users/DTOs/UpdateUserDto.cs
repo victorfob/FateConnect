@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 public class UpdateUserDto
 {
-    [MaxLength(200)]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "O nome completo deve ter entre 3 e 200 caracteres.")]
     public string? FullName { get; set; }
 
     [MinimumAge(18, ErrorMessage = "É necessário ter pelo menos 18 anos")]
@@ -25,6 +25,7 @@ public class UpdateUserDto
     [MaxLength(150)]
     public string? ContactEmail { get; set; }
 
+    [DisplayFormat(ConvertEmptyStringToNull = false)]
     [MaxLength(100, ErrorMessage = "O bairro deve ter no máximo 100 caracteres")]
     public string? Neighborhood { get; set; }
 

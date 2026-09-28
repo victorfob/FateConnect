@@ -42,11 +42,11 @@ public class User
         EnumGender gender,
         string phone,
         string contactEmail,
-        string? neighborhood)
+        string? neighborhood,
+        DateTime createdAt)
     {
         ValidateEmail(fatecEmail);
         ValidateFullName(fullName);
-        ValidateBirthDate(birthDate);
         ValidateGender(gender);
         ValidateNeighborhood(neighborhood);
 
@@ -62,8 +62,8 @@ public class User
 
         ProfileType = EnumProfileType.Operator;
         Status = EnumAccountStatus.Active;
-        TokenVersion = 1;
-        CreatedAt = DateTime.UtcNow;
+        TokenVersion = 0;
+        CreatedAt = createdAt;
         UpdatedAt = null;
     }
 
@@ -76,7 +76,6 @@ public class User
         string? neighborhood)
     {
         ValidateFullName(fullName);
-        ValidateBirthDate(birthDate);
         ValidateGender(gender);
         ValidateNeighborhood(neighborhood);
 
@@ -199,30 +198,14 @@ public class User
     {
         bool isNullOrEmpty = string.IsNullOrWhiteSpace(email);
 
-        bool isInvalidDomain = !isNullOrEmpty && !Regex.IsMatch(
-            email,
-            RegexConstants.FatecEmailDomainPattern,
-            RegexOptions.None,
-            TimeSpan.FromMilliseconds(250));
-
-        if (isNullOrEmpty || isInvalidDomain)
+        if (isNullOrEmpty)
             throw new InvalidFatecEmailDomainException();
-    }
 
-    private static void ValidateBirthDate(DateTime birthDate)
-    {
-        DateTime today = DateTimeUtils.NowInProductTimeZone().Date;
-        int age = today.Year - birthDate.Year;
+        bool isInvalidLocalPart = !RegexConstants.LocalPartRegex().IsMatch(email);
+        bool isInvalidDomain = !RegexConstants.DomainRegex().IsMatch(email);
 
-        bool hasNotHadBirthdayThisYear = birthDate.Date > today.AddYears(-age);
-
-        if (hasNotHadBirthdayThisYear)
-            age--;
-
-        bool isUnderage = age < 18;
-
-        if (isUnderage)
-            throw new UnderageUserException();
+        if (isInvalidLocalPart || isInvalidDomain)
+            throw new InvalidFatecEmailDomainException();
     }
 
     private static void ValidateGender(EnumGender gender)

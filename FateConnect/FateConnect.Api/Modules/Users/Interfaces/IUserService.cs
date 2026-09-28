@@ -13,7 +13,7 @@ public interface IUserService
     Task<ReadUserPreferencesDto?> GetPreferencesAsync(int currentUserId);
     Task<ReadUserDto?> UpdateProfileAsync(int currentUserId, UpdateUserDto dto);
     Task UpdatePreferencesAsync(int currentUserId, UpdatePreferencesDto dto);
-    Task ChangePasswordAsync(int currentUserId, ChangePasswordDto dto);
+    Task<TokenResponseDto?> ChangePasswordAsync(int currentUserId, ChangePasswordDto dto);
     Task DeactivateAccountAsync(int currentUserId);
 
     Task<PagedResultDto<ReadUserSummaryDto>> GetAllUsersAsync(UserFilterDto filter);

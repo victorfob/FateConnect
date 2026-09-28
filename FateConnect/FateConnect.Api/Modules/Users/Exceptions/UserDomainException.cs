@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.Users.Exceptions;
 
 using System;
+using FateConnect.Api.Modules.Users.Enums;
 
 public abstract class UserDomainException(string message) : Exception(message);
 
@@ -38,3 +39,9 @@ public class CannotModifyOwnAccountException()
 
 public class InvalidDocumentVersionException()
     : UserDomainException("A versão do documento aceito é obrigatória e não pode estar em branco.");
+
+public class IncorrectCurrentPasswordException()
+    : UserDomainException("A senha atual informada está incorreta.");
+
+public class InvalidUserStatusTransitionException(EnumAccountStatus currentStatus, EnumAccountStatus requestedStatus)
+    : UserDomainException($"Não é possível alterar o status da conta de '{currentStatus}' para '{requestedStatus}' por este endpoint.");

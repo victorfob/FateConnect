@@ -44,7 +44,8 @@ public partial class UserService(
             dto.Gender,
             dto.Phone,
             dto.ContactEmail,
-            null
+            null,
+            now
         );
 
         UserPreferences newPreferences = new UserPreferences(
@@ -74,7 +75,7 @@ public partial class UserService(
 
     public async Task<ReadUserDto?> GetProfileAsync(int currentUserId)
     {
-        var user = await userRepository.GetByIdAsync(currentUserId);
+        var user = await userRepository.GetByIdAsync(currentUserId, asNoTracking: true);
 
         if (user is null)
         {
@@ -114,7 +115,17 @@ public partial class UserService(
         string newPhone = dto.Phone?.Trim() ?? user.Phone;
         string newContactEmail = dto.ContactEmail?.Trim().ToLowerInvariant() ?? user.ContactEmail;
 
-        await EnsureContactIsUniqueAsync(newPhone, newContactEmail, excludeUserId: currentUserId);
+        bool isPhoneDuplicated = newPhone != user.Phone &&
+            await userRepository.ContactPhoneExistsAsync(newPhone, excludeUserId: currentUserId);
+
+        if (isPhoneDuplicated)
+            throw new ContactPhoneAlreadyRegisteredException(newPhone);
+
+        bool isContactEmailDuplicated = newContactEmail != user.ContactEmail &&
+            await userRepository.ContactEmailExistsAsync(newContactEmail, excludeUserId: currentUserId);
+
+        if (isContactEmailDuplicated)
+            throw new ContactEmailAlreadyRegisteredException(newContactEmail);
 
         user.UpdatePersonalData(
             dto.FullName ?? user.FullName,
@@ -167,30 +178,35 @@ public partial class UserService(
         await userRepository.SaveChangesAsync();
     }
 
-    public async Task ChangePasswordAsync(int currentUserId, ChangePasswordDto dto)
+    public async Task<TokenResponseDto?> ChangePasswordAsync(int currentUserId, ChangePasswordDto dto)
     {
         var user = await userRepository.GetByIdAsync(currentUserId);
 
         if (user is null)
         {
             LogUserNotFound(logger, currentUserId);
-            return;
+            return null;
         }
 
         if (!Verify(dto.CurrentPassword, user.Password))
-            throw new InvalidCredentialsException();
+            throw new IncorrectCurrentPasswordException();
 
         user.ChangePassword(HashPassword(dto.NewPassword));
 
         await userRepository.SaveChangesAsync();
         LogUserPasswordChanged(logger, currentUserId);
+
+        return new TokenResponseDto
+        {
+            Token = tokenService.GenerateJwtToken(user)
+        };
     }
 
     public async Task DeactivateAccountAsync(int currentUserId)
     {
         var user = await userRepository.GetByIdAsync(currentUserId);
 
-        if (user is null) // vê se não seria melhor colocar isso tudo numa função a parte para não repetir tanto
+        if (user is null)
         {
             LogUserNotFound(logger, currentUserId);
             return;
@@ -204,7 +220,16 @@ public partial class UserService(
 
     public async Task<PagedResultDto<ReadUserSummaryDto>> GetAllUsersAsync(UserFilterDto filter)
     {
-        (IReadOnlyList<ReadUserSummaryDto> records, int total) = await userRepository.GetAllAsync(filter);
+        (IReadOnlyList<ReadUserSummaryDto> records, int total) = await userRepository.GetAllAsync(
+            filter,
+            u => new ReadUserSummaryDto(
+                u.Id,
+                u.FullName,
+                u.ContactEmail,
+                string.IsNullOrEmpty(u.Phone) ? null : u.Phone,
+                u.Status
+            )
+        );
 
         return new PagedResultDto<ReadUserSummaryDto>
         {
@@ -217,7 +242,7 @@ public partial class UserService(
 
     public async Task<ReadUserDto?> GetUserByIdAsync(int id)
     {
-        var user = await userRepository.GetByIdAsync(id);
+        var user = await userRepository.GetByIdAsync(id, asNoTracking: true);
 
         if (user is null)
         {
@@ -242,10 +267,23 @@ public partial class UserService(
         string newPhone = dto.Phone?.Trim() ?? user.Phone;
         string newContactEmail = dto.ContactEmail?.Trim().ToLowerInvariant() ?? user.ContactEmail;
 
-        if (newFatecEmail != user.FatecEmail)
-            await EnsureEmailIsUniqueAsync(newFatecEmail, excludeUserId: id);
+        bool isFatecEmailDuplicated = newFatecEmail != user.FatecEmail &&
+            await userRepository.EmailExistsAsync(newFatecEmail, excludeUserId: id);
 
-        await EnsureContactIsUniqueAsync(newPhone, newContactEmail, excludeUserId: id);
+        if (isFatecEmailDuplicated)
+            throw new EmailAlreadyRegisteredException(newFatecEmail);
+
+        bool isPhoneDuplicated = newPhone != user.Phone &&
+            await userRepository.ContactPhoneExistsAsync(newPhone, excludeUserId: id);
+
+        if (isPhoneDuplicated)
+            throw new ContactPhoneAlreadyRegisteredException(newPhone);
+
+        bool isContactEmailDuplicated = newContactEmail != user.ContactEmail &&
+            await userRepository.ContactEmailExistsAsync(newContactEmail, excludeUserId: id);
+
+        if (isContactEmailDuplicated)
+            throw new ContactEmailAlreadyRegisteredException(newContactEmail);
 
         user.UpdateByAdmin(
             dto.FullName ?? user.FullName,
@@ -311,6 +349,9 @@ public partial class UserService(
             case EnumAccountStatus.Active when user.Status == EnumAccountStatus.Banned:
                 user.ReactivateFromBan();
                 break;
+
+            default:
+                throw new InvalidUserStatusTransitionException(user.Status, newStatus);
         }
 
         await userRepository.SaveChangesAsync();

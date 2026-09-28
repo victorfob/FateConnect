@@ -74,7 +74,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public static string IssueToken(
         int userId = 1,
-        int tokenVersion = 1,
+        int tokenVersion = 0,
         EnumProfileType profileType = EnumProfileType.Operator)
     {
         JwtOptions options = new()
@@ -294,7 +294,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public HttpClient CreateClientFor(
         int userId,
-        int tokenVersion = 1,
+        int tokenVersion = 0,
         EnumProfileType profileType = EnumProfileType.Operator)
     {
         HttpClient client = CreateClient();

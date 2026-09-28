@@ -20,7 +20,7 @@ public class CreateUserDto
     public string Password { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Informe o nome completo")]
-    [MaxLength(200)]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "O nome completo deve ter entre 3 e 200 caracteres.")]
     [DefaultValue("João da Silva")]
     public string FullName { get; set; } = string.Empty;
 

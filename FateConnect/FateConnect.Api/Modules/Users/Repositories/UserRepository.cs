@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Users.Repositories;
 
+using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.DTOs;
@@ -19,7 +20,9 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> EmailExistsAsync(string email, int? excludeUserId = null)
     {
-        return await _context.Users.AnyAsync(u => u.FatecEmail == email && u.Id != excludeUserId);
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+
+        return await _context.Users.AnyAsync(u => u.FatecEmail == normalizedEmail && u.Id != excludeUserId);
     }
 
     public async Task<bool> ContactPhoneExistsAsync(string phone, int? excludeUserId = null)
@@ -29,17 +32,27 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> ContactEmailExistsAsync(string contactEmail, int? excludeUserId = null)
     {
-        return await _context.Users.AnyAsync(u => u.ContactEmail == contactEmail && u.Id != excludeUserId);
+        var normalizedEmail = contactEmail.Trim().ToLowerInvariant();
+
+        return await _context.Users.AnyAsync(u => u.ContactEmail == normalizedEmail && u.Id != excludeUserId);
     }
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.FatecEmail == email);
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.FatecEmail == normalizedEmail);
     }
 
-    public async Task<User?> GetByIdAsync(int id, bool includePreferences = false)
+    public async Task<User?> GetByIdAsync(int id, bool includePreferences = false, bool asNoTracking = false)
     {
         var query = _context.Users.AsQueryable();
+
+        if (asNoTracking)
+        {
+            query = query.AsNoTracking();
+        }
 
         if (includePreferences)
         {
@@ -57,7 +70,9 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<(IReadOnlyList<ReadUserSummaryDto> Users, int Total)> GetAllAsync(UserFilterDto filter)
+    public async Task<(IReadOnlyList<TResult> Items, int Total)> GetAllAsync<TResult>(
+        UserFilterDto filter,
+        Expression<Func<User, TResult>> selector)
     {
         IQueryable<User> query = _context.Users.AsNoTracking();
 
@@ -96,19 +111,13 @@ public class UserRepository : IUserRepository
 
         int total = await query.CountAsync();
 
-        List<ReadUserSummaryDto> items = await query
-            .OrderByDescending(u => u.CreatedAt)
-            .ThenBy(u => u.Id)
-            .Skip(filter.ItemsToSkip)
-            .Take(filter.EffectivePageSize)
-            .Select(u => new ReadUserSummaryDto(
-                u.Id,
-                u.FullName,
-                u.FatecEmail,
-                u.Phone == "" ? null : u.Phone,
-                u.Status
-            ))
-            .ToListAsync();
+        List<TResult> items = await query
+        .OrderByDescending(u => u.CreatedAt)
+        .ThenBy(u => u.Id)
+        .Skip(filter.ItemsToSkip)
+        .Take(filter.EffectivePageSize)
+        .Select(selector)
+        .ToListAsync();
 
         return (items, total);
     }
