@@ -117,6 +117,8 @@ Nunca exponha membro só para testar. O que interessa é o resultado do método 
 
 **O padrão é o `MinimumAgeAttribute`:** ele pergunta o relógio ao `ValidationContext` — `GetService(typeof(TimeProvider))` — e cai para `TimeProvider.System` quando ninguém fornece. O teste entrega um `TimeProvider` fixo por um `IServiceProvider` de duas linhas, e cada borda vira caso determinístico. `TimeProvider` é do .NET 8: não escreva interface de relógio própria.
 
+**No teste de endpoint, a costura atravessa a aplicação.** `RideRepository` e `RideService` recebem `TimeProvider`, e o `DateTimeUtils.NowInProductTimeZone(TimeProvider)` pergunta a ele. A `ApiFactory` aceita um `Clock`, que ela registra no lugar do relógio do sistema; ele é propriedade `init`, e não parâmetro, porque o xUnit só aceita um construtor público na fixture. O `MovableTimeProvider` anda entre duas requisições: foi assim que a #476 provou que a carona semanal de hoje às 14:00 responde a partida de hoje antes das 14:00 e a da semana seguinte depois.
+
 ⛔ **`Ride.ValidateDepartureDateTime` continua sem costura**: compara a partida com `DateTime.UtcNow` direto, então testar "partida no futuro" ainda exige injetar o tempo antes.
 
 ⚠️ **Depender do relógio não é ser sensível a ele.** O caso **na borda** é o que quebra: na virada de meia-noite UTC o limite anda um dia e a data muda de lado — e quem cai é o teste de **recusa**, não o de aceitação. Teste de endpoint com uma década de folga do limite lê o relógio e nunca vira. Data literal fixa não é a saída: ela envelhece calada, porque um dia deixa de ser menor de idade. A borda fica no teste de unidade com relógio fixo; o endpoint fica com o caso folgado, provando só a fiação.
