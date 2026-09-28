@@ -24,6 +24,8 @@ export type DateFieldProps = Readonly<{
   disabled?: boolean;
   minDate?: Date;
   maxDate?: Date;
+  /** Dia que o calendário não deixa escolher; digitado, quem recusa é a validação. */
+  shouldDisableDate?: (day: Date) => boolean;
 }>;
 
 /** Campo de data do produto: o calendário é auxiliar do texto mascarado. */
@@ -38,6 +40,7 @@ export function DateField({
   disabled,
   minDate,
   maxDate,
+  shouldDisableDate,
 }: DateFieldProps) {
   const { inputRef, anchor, handleChange, handleOpenPicker, handleClosePicker } = useMaskedPicker(
     maskDate,
@@ -96,6 +99,7 @@ export function DateField({
           onChange={handleDatePick}
           minDate={minDate}
           maxDate={maxDate}
+          shouldDisableDate={shouldDisableDate}
         />
       </Popover>
     </>

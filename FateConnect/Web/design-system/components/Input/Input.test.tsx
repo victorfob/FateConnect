@@ -325,6 +325,24 @@ describe('Input.Date', () => {
     expect(calendar.getByRole('gridcell', { name: '11' })).toBeDisabled();
   });
 
+  it('should not offer a day the consumer rules out', async () => {
+    const isTheEleventh = (day: Date) => day.getDate() === 11;
+    render(
+      <Input.Date
+        label="Data"
+        value="10/08/2026"
+        shouldDisableDate={isTheEleventh}
+        onChange={vi.fn()}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '10' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '11' })).toBeDisabled();
+  });
+
   it('should close the calendar once the day is picked, which is all it asks for', async () => {
     render(<Input.Date label="Data" value="10/08/2026" onChange={vi.fn()} />);
     await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
@@ -670,6 +688,24 @@ describe('Input.DateTime', () => {
     const minDay = new Date(2026, 4, 22);
     render(
       <Input.DateTime label="Data e hora" value={DEPARTURE} minDate={minDay} onChange={vi.fn()} />,
+    );
+
+    await openDateTimePicker();
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '22' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '21' })).toBeDisabled();
+  });
+
+  it('should not offer a day the consumer rules out', async () => {
+    const isTheTwentyFirst = (day: Date) => day.getDate() === 21;
+    render(
+      <Input.DateTime
+        label="Data e hora"
+        value={DEPARTURE}
+        shouldDisableDate={isTheTwentyFirst}
+        onChange={vi.fn()}
+      />,
     );
 
     await openDateTimePicker();

@@ -32,6 +32,8 @@ export type DateTimeFieldProps = Readonly<{
   disabled?: boolean;
   minDate?: Date;
   maxDate?: Date;
+  /** Dia que o calendário não deixa escolher; digitado, quem recusa é a validação. */
+  shouldDisableDate?: (day: Date) => boolean;
 }>;
 
 /**
@@ -49,6 +51,7 @@ export function DateTimeField({
   disabled,
   minDate,
   maxDate,
+  shouldDisableDate,
 }: DateTimeFieldProps) {
   const { inputRef, anchor, handleChange, handleOpenPicker, handleClosePicker } = useMaskedPicker(
     maskDateTime,
@@ -147,6 +150,7 @@ export function DateTimeField({
           views={PICKER_VIEWS}
           minDate={minDate}
           maxDate={maxDate}
+          shouldDisableDate={shouldDisableDate}
           slotProps={PICKER_SLOT_PROPS}
         />
       </S.PickerPopover>
