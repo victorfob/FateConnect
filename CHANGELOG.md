@@ -12,6 +12,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona ao login da landing a oferta de reativar a conta desativada: confirmando, a conta volta ao ar e a pessoa entra com o e-mail e a senha já digitados; desistindo, nada muda (#462) [Frontend]
 - Adiciona a reativação da conta desativada pela própria pessoa, que pede o e-mail e a senha de novo, devolve a conta ao ar e já responde o token de acesso, como o login; conta banida continua recusada (#460) [Backend]
 - Adiciona às descrições de denúncia, de item perdido e de carona a contagem do que já foi escrito sobre o limite, ao lado do erro quando há um; o leitor de tela anuncia a contagem por extenso quando a digitação para, sem interromper a cada tecla (#461) [Frontend]
+- Adicionados novos endpoints para o gerenciamento completo do módulo de usuários (#482) [Backend]
 
 ### Changed
 
@@ -27,6 +28,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a travar a digitação no limite dos nove campos de texto que têm um, em vez de recusar só ao enviar; a mensagem de máximo deixa de aparecer pela digitação, e a de mínimo continua (#461) [Frontend]
 - Passa a receber o telefone e o e-mail de contato direto no corpo do cadastro, um de cada por pessoa, em vez de uma lista: o formato antigo é recusado. Quem tinha mais de um contato fica com o mais antigo, que já era o exibido, e os demais se perdem (#456) [Backend]
 - Passa a enviar o telefone e o e-mail de contato direto no corpo do cadastro, no formato que a API passou a exigir: o front anterior deixa de conseguir criar conta. A tela e os campos não mudam (#457) [Frontend]
+- Melhoria na estrutura interna de validação de usuários, garantindo maior integridade e segurança na atualização dos dados do perfil (#482) [Backend]
 
 ### Removed
 
