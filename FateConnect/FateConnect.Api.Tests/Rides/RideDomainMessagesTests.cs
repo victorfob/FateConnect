@@ -11,12 +11,11 @@ public class RideDomainMessagesTests
     private static readonly TimeOnly DepartureTime = new(8, 30);
 
     private static Ride CreateRide(
-        int availableSeats = 3,
         string destination = "Fatec Sorocaba",
         DateOnly? departureDate = null,
         EnumRideType rideType = EnumRideType.Solidarity,
         int driverId = 1) =>
-        new(availableSeats, destination, departureDate ?? FutureDate, DepartureTime, rideType, driverId);
+        new(destination, departureDate ?? FutureDate, DepartureTime, rideType, driverId);
 
     [Fact]
     public void ARideInThePast_AnswersTheScheduleMessageInPortuguese()
@@ -27,17 +26,6 @@ public class RideDomainMessagesTests
             () => CreateRide(departureDate: pastDate));
 
         Assert.Equal("A carona deve ser em data e hora futuras.", exception.Message);
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(8)]
-    public void ARideWithSeatsOutOfRange_NamesTheReceivedAmountInPortuguese(int seats)
-    {
-        InvalidAvailableSeatsException exception = Assert.Throws<InvalidAvailableSeatsException>(
-            () => CreateRide(availableSeats: seats));
-
-        Assert.Equal($"A carona deve ter entre 1 e 7 vagas. Recebido: {seats}.", exception.Message);
     }
 
     [Fact]

@@ -20,7 +20,6 @@ export function toFormValues(ride: Ride | undefined): RideFormInput {
     destination: ride.destination,
     departure: `${toDisplayDate(ride.departureDate)} ${time}`,
     rideType: ride.rideType,
-    seats: String(ride.availableSeats),
     description: ride.description ?? '',
   };
 }
@@ -28,7 +27,6 @@ export function toFormValues(ride: Ride | undefined): RideFormInput {
 /** A API guarda o dia e a hora em campos separados, e o schema entregou os dois juntos. */
 export function toRideInput(values: RideFormValues): RideInput {
   return {
-    availableSeats: Number(values.seats),
     destination: values.destination,
     departureDate: toApiDate(values.departure),
     departureTime: format(values.departure, API_TIME_FORMAT),
