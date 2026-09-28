@@ -62,20 +62,6 @@ export function RideFormFields() {
         )}
       />
 
-      <Controller
-        name="seats"
-        control={control}
-        render={({ field }) => (
-          <Input.Select
-            {...field}
-            label={C.RIDE_FORM_LABELS.seats}
-            options={C.SEAT_OPTIONS}
-            required
-            error={errors.seats?.message}
-          />
-        )}
-      />
-
       <S.WideCell>
         <Input
           {...register('description')}

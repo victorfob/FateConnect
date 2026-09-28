@@ -23,7 +23,6 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
 
     private static object NewRidePayload(string destination) => new
     {
-        availableSeats = 3,
         destination,
         departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
         departureTime = "08:30:00",
@@ -80,7 +79,7 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
         (ReadRide ride, _, int otherUserId) = await OfferRideAsync("Itu");
 
         HttpResponseMessage response = await _factory.CreateClientFor(otherUserId)
-            .PutAsJsonAsync($"/Rides/{ride.Id}", new { availableSeats = 1 });
+            .PutAsJsonAsync($"/Rides/{ride.Id}", new { description = "Sai do portão principal." });
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -103,7 +102,7 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
         HttpClient driver = _factory.CreateClientFor(owner.Id);
 
         HttpResponseMessage update = await driver
-            .PutAsJsonAsync($"/Rides/{ride.Id}", new { availableSeats = 1 });
+            .PutAsJsonAsync($"/Rides/{ride.Id}", new { description = "Sai do portão principal." });
 
         HttpResponseMessage delete = await driver.DeleteAsync($"/Rides/{ride.Id}");
 

@@ -9,7 +9,6 @@ using FateConnect.Api.Modules.Users.Entities;
 public class Ride
 {
     public Guid Id { get; private set; }
-    public int AvailableSeats { get; private set; }
     public string Destination { get; private set; } = default!;
     public DateOnly DepartureDate { get; private set; }
     public TimeOnly DepartureTime { get; private set; }
@@ -24,7 +23,6 @@ public class Ride
     private Ride() { }
 
     public Ride(
-        int availableSeats,
         string destination,
         DateOnly departureDate,
         TimeOnly departureTime,
@@ -32,7 +30,6 @@ public class Ride
         int driverId,
         string? description = null)
     {
-        ValidateAvailableSeats(availableSeats);
         ValidateDestination(destination);
         ValidateDepartureDateTime(departureDate, departureTime);
         ValidateRideType(rideType);
@@ -40,7 +37,6 @@ public class Ride
 
         Id = Guid.NewGuid();
         DriverId = driverId;
-        AvailableSeats = availableSeats;
         Destination = destination.Trim();
         DepartureDate = departureDate;
         DepartureTime = departureTime;
@@ -52,17 +48,10 @@ public class Ride
     }
 
     public void UpdateBasicAttributes(
-        int? availableSeats,
         string? destination,
         EnumRideType? rideType,
         string? description)
     {
-        if (availableSeats.HasValue)
-        {
-            ValidateAvailableSeats(availableSeats.Value);
-            AvailableSeats = availableSeats.Value;
-        }
-
         if (destination is not null)
         {
             ValidateDestination(destination);
@@ -123,12 +112,6 @@ public class Ride
 
         if (departureUtc < DateTime.UtcNow)
             throw new InvalidDepartureScheduleException();
-    }
-
-    private static void ValidateAvailableSeats(int seats)
-    {
-        if (seats is < 1 or > 7)
-            throw new InvalidAvailableSeatsException(seats);
     }
 
     private static void ValidateDestination(string? destination)

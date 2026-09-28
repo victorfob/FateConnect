@@ -1,5 +1,5 @@
 import { ListCard, StatusTag, Typography } from '@design-system';
-import { AccessTimeIcon, CalendarTodayIcon, GroupsIcon } from '@design-system/icons';
+import { AccessTimeIcon, CalendarTodayIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
 import * as C from '@app/pages/Rides/constants';
@@ -52,13 +52,6 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
           <AccessTimeIcon />
           <Typography variant="caption" color="inherit">
             {firstCharacters(ride.departureTime, TIME_LENGTH)}
-          </Typography>
-        </ListCard.InfoItem>
-
-        <ListCard.InfoItem>
-          <GroupsIcon />
-          <Typography variant="caption" color="inherit">
-            {C.seatsLabel(ride.availableSeats)}
           </Typography>
         </ListCard.InfoItem>
       </ListCard.InfoRow>

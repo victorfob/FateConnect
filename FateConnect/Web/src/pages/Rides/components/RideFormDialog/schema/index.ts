@@ -10,12 +10,6 @@ const REQUIRED = 1;
 /** O campo entrega o que a pessoa digitou, não o formato da API. */
 const DEPARTURE_FORMAT = 'dd/MM/yyyy HH:mm';
 
-function isSeatCount(value: string): boolean {
-  const seats = Number(value);
-
-  return Number.isInteger(seats) && seats >= RIDE_LIMITS.minSeats && seats <= RIDE_LIMITS.maxSeats;
-}
-
 function parseDeparture(departure: string): Date {
   return parse(departure, DEPARTURE_FORMAT, new Date());
 }
@@ -52,7 +46,6 @@ export const rideFormSchema = z.object({
   // O predicado estreita a saída: o formulário guarda texto, o schema entrega
   // `RideTypeEnum`, e o mapeamento para a requisição não precisa de conversão.
   rideType: z.string().refine(isRideType, RIDE_FORM_MESSAGES.rideTypeRequired),
-  seats: z.string().refine(isSeatCount, RIDE_FORM_MESSAGES.seatsRequired),
   description: z
     .string()
     .trim()
@@ -68,6 +61,5 @@ export const EMPTY_RIDE_FORM: RideFormInput = {
   destination: '',
   departure: '',
   rideType: '',
-  seats: '',
   description: '',
 };

@@ -5,8 +5,6 @@ using FateConnect.Api.Modules.Rides.Enums;
 
 public record CreateRideDto
 {
-    public required int AvailableSeats { get; init; }
-
     [StringLength(100)]
     public required string Destination { get; init; }
 
