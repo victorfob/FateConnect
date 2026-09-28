@@ -55,7 +55,7 @@ export function initSentry(): void {
     tracePropagationTargets: tracePropagationTargets(),
     replaysSessionSampleRate: REPLAY_SESSION_SAMPLE_RATE,
     replaysOnErrorSampleRate: REPLAY_ON_ERROR_SAMPLE_RATE,
-    // O cadastro envia senha, e-mail e endereço: nenhum corpo de requisição e
+    // Senha e dados pessoais viajam no corpo das requisições: nenhum corpo e
     // nenhum dado de usuário sai do navegador.
     dataCollection: { userInfo: false, httpBodies: [] },
     // `enableLogs` vem `true` do SDK; o repo não tem console em produção.

@@ -5,9 +5,6 @@ public abstract class RideDomainException(string message) : Exception(message);
 public class InvalidDepartureScheduleException()
     : RideDomainException("A carona deve ser em data e hora futuras.");
 
-public class InvalidAvailableSeatsException(int seats)
-    : RideDomainException($"A carona deve ter entre 1 e 7 vagas. Recebido: {seats}.");
-
 public class InvalidDestinationException()
     : RideDomainException("O destino deve ter entre 3 e 100 caracteres.");
 

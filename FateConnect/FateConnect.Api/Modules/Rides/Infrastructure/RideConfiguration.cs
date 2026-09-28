@@ -10,9 +10,6 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
     {
         builder.HasKey(r => r.Id);
 
-        builder.Property(r => r.AvailableSeats)
-              .IsRequired();
-
         builder.Property(r => r.Destination)
               .HasMaxLength(100)
               .IsRequired();

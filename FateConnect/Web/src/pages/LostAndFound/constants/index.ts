@@ -6,7 +6,8 @@ export const REGISTER_TAB_LABEL = 'Cadastrar item';
 /** Chave do cache da lista; cadastrar e mudar de situação invalidam por ela. */
 export const LOST_ITEMS_QUERY_KEY = 'lostItems';
 
-export const EMPTY_LIST_MESSAGE = 'Nenhum item encontrado.';
+export const EMPTY_LIST_MESSAGE =
+  'Nenhum item encontrado. Os itens achados e perdidos por quem estuda na Fatec aparecem aqui. Ajuste os filtros para ampliar a busca ou cadastre um item.';
 
 export const UNDO_LABEL = 'Desfazer';
 

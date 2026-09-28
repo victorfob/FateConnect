@@ -15,6 +15,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Passa a explicar, na lista vazia de achados e perdidos, o que aparece ali e como sair dela, ampliando a busca ou cadastrando um item, como caronas já faz (#472) [Frontend]
 - Passa a mostrar o desenho de desktop das telas a partir de 822px, em vez de 965px, que é onde a navegação do topo deixa de caber e decidia por todas as telas; o cabeçalho continua recolhendo a navegação no menu abaixo de 965px (#470) [Frontend]
 - Passa a declarar na política de privacidade que a foto do item e a imagem da denúncia são guardadas sem as informações que o aparelho grava no arquivo, como o local onde ele foi feito, em nova versão do documento (#466) [Frontend]
 - Passa a exibir a miniatura das fotos em achados e perdidos e nas duas telas de denúncia, em vez de baixar o arquivo inteiro da câmera; o botão de baixar a foto da denúncia busca a original no clique e avisa quando não consegue (#466) [Frontend]
@@ -26,6 +27,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a travar a digitação no limite dos nove campos de texto que têm um, em vez de recusar só ao enviar; a mensagem de máximo deixa de aparecer pela digitação, e a de mínimo continua (#461) [Frontend]
 - Passa a receber o telefone e o e-mail de contato direto no corpo do cadastro, um de cada por pessoa, em vez de uma lista: o formato antigo é recusado. Quem tinha mais de um contato fica com o mais antigo, que já era o exibido, e os demais se perdem (#456) [Backend]
 - Passa a enviar o telefone e o e-mail de contato direto no corpo do cadastro, no formato que a API passou a exigir: o front anterior deixa de conseguir criar conta. A tela e os campos não mudam (#457) [Frontend]
+
+### Removed
+
+- Remove a quantidade de vagas da carona: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A coluna é apagada, então as vagas das caronas já ofertadas se perdem (#478) [Backend]
+- Remove a quantidade de vagas do formulário de ofertar e editar carona e do cartão da lista; os termos e a política deixam de citar as vagas, e os termos passam a dizer que elas se combinam fora da plataforma, em nova versão dos dois documentos (#478) [Frontend]
 
 ### Fixed
 

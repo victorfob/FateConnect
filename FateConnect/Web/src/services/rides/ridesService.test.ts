@@ -11,7 +11,6 @@ const SINGLE_PAGE = 1;
 const PAGE_SIZE = 10;
 
 const RIDE_INPUT: RideInput = {
-  availableSeats: 3,
   destination: 'Fatec Sorocaba',
   departureDate: '2026-05-22',
   departureTime: '07:30',

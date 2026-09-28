@@ -16,7 +16,6 @@ export enum RideShiftEnum {
 /** Entidade como a API devolve. O id é o `Guid` do backend. */
 export type Ride = {
   id: string;
-  availableSeats: number;
   destination: string;
   departureDate: string;
   departureTime: string;
