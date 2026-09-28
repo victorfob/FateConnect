@@ -47,22 +47,22 @@ public partial class UserService(
             null
         );
 
-        newUser.SetPreferences(new UserPreferences
-        {
-            ReceiveEmails = dto.ReceiveEmails ?? false,
-            ReceiveNotifications = dto.ReceiveNotifications ?? false
-        });
+        UserPreferences newPreferences = new UserPreferences(
+            dto.ReceiveEmails ?? false,
+            dto.ReceiveNotifications ?? false
+        );
+
+        newUser.SetPreferences(newPreferences);
 
         foreach (var acceptanceDto in dto.Acceptances)
         {
-            newUser.AddDocumentAcceptance(new DocumentAcceptance
-            {
-                DocumentType = acceptanceDto.Document,
-                Version = acceptanceDto.Version,
-                AcceptedAt = now,
-                IpAddress = origin.IpAddress,
-                UserAgent = origin.UserAgent
-            });
+            newUser.AddDocumentAcceptance(new DocumentAcceptance(
+                documentType: acceptanceDto.Document,
+                version: acceptanceDto.Version,
+                acceptedAt: now,
+                ipAddress: origin.IpAddress,
+                userAgent: origin.UserAgent
+            ));
         }
 
         await userRepository.AddAsync(newUser);
@@ -74,7 +74,7 @@ public partial class UserService(
 
     public async Task<ReadUserDto?> GetProfileAsync(int currentUserId)
     {
-        var user = await userRepository.GetByIdAsync(currentUserId, includePreferences: true);
+        var user = await userRepository.GetByIdAsync(currentUserId);
 
         if (user is null)
         {
@@ -85,9 +85,25 @@ public partial class UserService(
         return MapToReadDto(user);
     }
 
+    public async Task<ReadUserPreferencesDto?> GetPreferencesAsync(int currentUserId)
+    {
+        var preferences = await userRepository.GetPreferencesByUserIdAsync(currentUserId);
+
+        if (preferences is null)
+        {
+            LogUserNotFound(logger, currentUserId);
+            return null;
+        }
+
+        return new ReadUserPreferencesDto(
+            ReceiveEmails: preferences.ReceiveEmails,
+            ReceiveNotifications: preferences.ReceiveNotifications
+        );
+    }
+
     public async Task<ReadUserDto?> UpdateProfileAsync(int currentUserId, UpdateUserDto dto)
     {
-        var user = await userRepository.GetByIdAsync(currentUserId, includePreferences: true);
+        var user = await userRepository.GetByIdAsync(currentUserId);
 
         if (user is null)
         {
@@ -141,11 +157,14 @@ public partial class UserService(
             return;
         }
 
-        user.Preferences.ReceiveEmails = dto.ReceiveEmails ?? user.Preferences.ReceiveEmails;
-        user.Preferences.ReceiveNotifications = dto.ReceiveNotifications ?? user.Preferences.ReceiveNotifications;
+        var newPreferences = new UserPreferences(
+            receiveEmails: dto.ReceiveEmails ?? user.Preferences.ReceiveEmails,
+            receiveNotifications: dto.ReceiveNotifications ?? user.Preferences.ReceiveNotifications
+        );
+
+        user.SetPreferences(newPreferences);
 
         await userRepository.SaveChangesAsync();
-        LogUserPreferencesUpdated(logger, currentUserId);
     }
 
     public async Task ChangePasswordAsync(int currentUserId, ChangePasswordDto dto)
@@ -198,7 +217,7 @@ public partial class UserService(
 
     public async Task<ReadUserDto?> GetUserByIdAsync(int id)
     {
-        var user = await userRepository.GetByIdAsync(id, includePreferences: true);
+        var user = await userRepository.GetByIdAsync(id);
 
         if (user is null)
         {
@@ -211,7 +230,7 @@ public partial class UserService(
 
     public async Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto)
     {
-        var user = await userRepository.GetByIdAsync(id, includePreferences: true);
+        var user = await userRepository.GetByIdAsync(id);
 
         if (user is null)
         {
@@ -246,7 +265,7 @@ public partial class UserService(
         if (id == currentUserId)
             throw new CannotModifyOwnAccountException();
 
-        var user = await userRepository.GetByIdAsync(id, includePreferences: true);
+        var user = await userRepository.GetByIdAsync(id);
 
         if (user is null)
         {
@@ -275,7 +294,7 @@ public partial class UserService(
         if (id == currentUserId)
             throw new CannotModifyOwnAccountException();
 
-        var user = await userRepository.GetByIdAsync(id, includePreferences: true);
+        var user = await userRepository.GetByIdAsync(id);
 
         if (user is null)
         {
@@ -328,10 +347,6 @@ public partial class UserService(
             ImageUrl: record.ImageUrl,
             ProfileType: record.ProfileType,
             Status: record.Status,
-            CreatedAt: record.CreatedAt,
-            Preferences: record.Preferences != null ? new ReadUserPreferencesDto(
-                ReceiveEmails: record.Preferences.ReceiveEmails,
-                ReceiveNotifications: record.Preferences.ReceiveNotifications
-            ) : new ReadUserPreferencesDto(false, false)
+            CreatedAt: record.CreatedAt
         );
 }

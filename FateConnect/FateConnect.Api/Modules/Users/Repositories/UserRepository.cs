@@ -42,9 +42,19 @@ public class UserRepository : IUserRepository
         var query = _context.Users.AsQueryable();
 
         if (includePreferences)
+        {
             query = query.Include(u => u.Preferences);
+        }
 
         return await query.FirstOrDefaultAsync(u => u.Id == id);
+    }
+
+    public async Task<UserPreferences?> GetPreferencesByUserIdAsync(int userId)
+    {
+        return await _context.Users
+            .Where(u => u.Id == userId)
+            .Select(u => u.Preferences)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<(IReadOnlyList<User> Users, int Total)> GetAllAsync(UserFilterDto filter)

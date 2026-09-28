@@ -35,3 +35,6 @@ public class EmailAlreadyRegisteredException(string email)
 
 public class CannotModifyOwnAccountException()
     : UserDomainException("Não é permitido banir, rebaixar ou alterar o status da própria conta administrativa.");
+
+public class InvalidDocumentVersionException()
+    : UserDomainException("A versão do documento aceito é obrigatória e não pode estar em branco.");

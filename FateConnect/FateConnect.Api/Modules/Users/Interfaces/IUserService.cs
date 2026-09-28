@@ -10,6 +10,7 @@ public interface IUserService
 {
     Task<TokenResponseDto> SignUpAsync(CreateUserDto dto, RequestOrigin origin);
     Task<ReadUserDto?> GetProfileAsync(int currentUserId);
+    Task<ReadUserPreferencesDto?> GetPreferencesAsync(int currentUserId);
     Task<ReadUserDto?> UpdateProfileAsync(int currentUserId, UpdateUserDto dto);
     Task UpdatePreferencesAsync(int currentUserId, UpdatePreferencesDto dto);
     Task ChangePasswordAsync(int currentUserId, ChangePasswordDto dto);

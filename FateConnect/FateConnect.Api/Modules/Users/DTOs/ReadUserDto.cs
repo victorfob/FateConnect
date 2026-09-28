@@ -15,11 +15,7 @@ public record ReadUserDto(
     string? ImageUrl,
     EnumProfileType ProfileType,
     EnumAccountStatus Status,
-    DateTime CreatedAt,
-    ReadUserPreferencesDto Preferences
+    DateTime CreatedAt
 );
 
-public record ReadUserPreferencesDto(
-    bool ReceiveEmails,
-    bool ReceiveNotifications
-);
+

@@ -157,7 +157,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             neighborhood: null
         );
 
-        user.SetPreferences(new UserPreferences());
+        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
 
         if (profileType == EnumProfileType.Administrator)
             user.PromoteToAdministrator();
@@ -191,7 +191,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             neighborhood: null
         );
 
-        user.SetPreferences(new UserPreferences());
+        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
 
         context.Users.Add(user);
 

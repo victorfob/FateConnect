@@ -53,6 +53,18 @@ public class UsersController(IUserService service) : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("me/preferences")]
+    [AuthorizeProfile(EnumProfileType.Operator)]
+    public async Task<ActionResult<ReadUserPreferencesDto>> GetPreferencesAsync()
+    {
+        var result = await service.GetPreferencesAsync(User.GetUserId());
+
+        if (result is null)
+            return NotFound();
+
+        return Ok(result);
+    }
+
     [HttpPatch("me/preferences")]
     [AuthorizeProfile(EnumProfileType.Operator)]
     public async Task<ActionResult> UpdatePreferencesAsync([FromBody] UpdatePreferencesDto dto)
