@@ -35,7 +35,8 @@ public class TokenServiceTests
             gender: EnumGender.Female,
             phone: "11999999999",
             contactEmail: "mariana.contato@gmail.com",
-            neighborhood: null
+            neighborhood: null,
+            createdAt: DateTime.UtcNow
         )
         {
             Id = 7
@@ -80,7 +81,8 @@ public class TokenServiceTests
             gender: EnumGender.Female,
             phone: "11999999999",
             contactEmail: "mariana.contato@gmail.com",
-            neighborhood: null
+            neighborhood: null,
+            createdAt: DateTime.UtcNow
         )
         {
             Id = 7

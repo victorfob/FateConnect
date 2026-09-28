@@ -92,7 +92,8 @@ public class ApiFactory : WebApplicationFactory<Program>
             gender: EnumGender.Female,
             phone: "11999999999",
             contactEmail: "mariana.contato@gmail.com",
-            neighborhood: null
+            neighborhood: null,
+            createdAt: DateTime.UtcNow
         )
         {
             Id = userId
@@ -154,7 +155,8 @@ public class ApiFactory : WebApplicationFactory<Program>
             gender: EnumGender.Other,
             phone: phone,
             contactEmail: contactEmail,
-            neighborhood: null
+            neighborhood: null,
+            createdAt: DateTime.UtcNow
         );
 
         user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
@@ -188,7 +190,8 @@ public class ApiFactory : WebApplicationFactory<Program>
             gender: EnumGender.Other,
             phone: UniquePhone(),
             contactEmail: UniqueContactEmail(),
-            neighborhood: null
+            neighborhood: null,
+            createdAt: DateTime.UtcNow
         );
 
         user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
