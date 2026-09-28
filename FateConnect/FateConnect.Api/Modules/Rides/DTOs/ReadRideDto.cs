@@ -12,5 +12,7 @@ public record ReadRideDto(
     EnumRideType RideType,
     string? Description,
     UserContactDto Driver,
-    bool IsOwner
+    bool IsOwner,
+    EnumRideFrequency Frequency,
+    DateOnly? RepeatUntil
 );

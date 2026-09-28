@@ -8,8 +8,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-
 - Adiciona a edição do próprio perfil, das preferências e da senha, a desativação da conta e a gestão de usuários pelo administrador (#482) [Backend]
+- Adiciona a carona com recorrência em dias úteis, toda semana ou todo mês, até uma data final de no máximo 6 meses, pulando feriado e, na de dias úteis, o fim de semana; sem recorrência ela continua valendo uma vez só, e as já ofertadas ficam assim (#480) [Backend]
+- Adiciona a consulta dos feriados de um ano, com os nacionais, o estadual de São Paulo e o municipal de Sorocaba, que as caronas com recorrência vão pular; ano ausente ou fora do calendário aceito é recusado com 400 (#479) [Backend]
 - Adiciona a miniatura das fotos de achados e perdidos e de denúncias: toda foto enviada ganha uma versão pequena em WebP, servida com a mesma autorização da original, e apagar ou trocar a foto apaga as duas (#465) [Backend]
 - Adiciona ao login da landing a oferta de reativar a conta desativada: confirmando, a conta volta ao ar e a pessoa entra com o e-mail e a senha já digitados; desistindo, nada muda (#462) [Frontend]
 - Adiciona a reativação da conta desativada pela própria pessoa, que pede o e-mail e a senha de novo, devolve a conta ao ar e já responde o token de acesso, como o login; conta banida continua recusada (#460) [Backend]
@@ -18,6 +19,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - Melhoria na estrutura interna de validação de usuários, garantindo maior integridade e segurança na atualização dos dados do perfil (#482) [Backend]
+- Passa a manter a carona na listagem enquanto houver partida por vir, com a próxima partida como data, a ordem por ela e o filtro de período valendo para qualquer partida (#480) [Backend]
 - Passa a explicar, na lista vazia de achados e perdidos, o que aparece ali e como sair dela, ampliando a busca ou cadastrando um item, como caronas já faz (#472) [Frontend]
 - Passa a mostrar o desenho de desktop das telas a partir de 822px, em vez de 965px, que é onde a navegação do topo deixa de caber e decidia por todas as telas; o cabeçalho continua recolhendo a navegação no menu abaixo de 965px (#470) [Frontend]
 - Passa a declarar na política de privacidade que a foto do item e a imagem da denúncia são guardadas sem as informações que o aparelho grava no arquivo, como o local onde ele foi feito, em nova versão do documento (#466) [Frontend]

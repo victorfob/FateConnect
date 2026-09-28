@@ -27,6 +27,7 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     [MemberData(nameof(RideRoutes))]
     [MemberData(nameof(LostAndFoundRoutes))]
     [MemberData(nameof(UploadRoutes))]
+    [MemberData(nameof(HolidayRoutes))]
     [MemberData(nameof(DenunciationRoutes))]
     public async Task ProtectedEndpoints_WithoutToken_RespondUnauthorized(string method, string route)
     {
@@ -46,6 +47,11 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+    public static TheoryData<string, string> HolidayRoutes() => new()
+    {
+        { "GET", "/Holidays?year=2026" }
+    };
 
     public static TheoryData<string, string> UploadRoutes() => new()
     {
