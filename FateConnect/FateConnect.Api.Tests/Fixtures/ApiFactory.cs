@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using static BCrypt.Net.BCrypt;
@@ -34,6 +35,8 @@ public class ApiFactory : WebApplicationFactory<Program>
     private readonly string _databaseName = $"fateconnect-tests-{Guid.NewGuid()}";
 
     private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-webroot-{Guid.NewGuid():N}");
+
+    public TimeProvider? Clock { get; init; }
 
     public ApiFactory()
     {
@@ -61,6 +64,12 @@ public class ApiFactory : WebApplicationFactory<Program>
                 service => service.ImplementationType == typeof(LostAndFoundRetentionWorker));
 
             services.Remove(retentionWorker);
+
+            if (Clock is null)
+                return;
+
+            services.RemoveAll<TimeProvider>();
+            services.AddSingleton(Clock);
         });
     }
 
@@ -205,6 +214,10 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.Entry(ride).Property(entity => entity.DepartureDate).CurrentValue = departureDate;
         context.Entry(ride).Property(entity => entity.DepartureTime).CurrentValue = departureTime;
         context.SaveChanges();
+
+        context.RideDepartures
+            .Where(departure => departure.RideId == ride.Id)
+            .ExecuteUpdate(setters => setters.SetProperty(departure => departure.Date, departureDate));
 
         return ride.Id;
     }

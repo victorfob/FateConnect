@@ -145,8 +145,14 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("DriverId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Frequency")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<DateOnly?>("RepeatUntil")
+                        .HasColumnType("date");
 
                     b.Property<int>("RideType")
                         .HasColumnType("integer");
@@ -159,6 +165,19 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.HasIndex("DriverId");
 
                     b.ToTable("Rides");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.RideDeparture", b =>
+                {
+                    b.Property<Guid>("RideId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.HasKey("RideId", "Date");
+
+                    b.ToTable("RideDepartures");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.DocumentAcceptance", b =>
@@ -316,6 +335,15 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Navigation("Driver");
                 });
 
+            modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.RideDeparture", b =>
+                {
+                    b.HasOne("FateConnect.Api.Modules.Rides.Entities.Ride", null)
+                        .WithMany("Departures")
+                        .HasForeignKey("RideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.DocumentAcceptance", b =>
                 {
                     b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
@@ -334,6 +362,11 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasForeignKey("FateConnect.Api.Modules.Users.Entities.UserPreferences", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.Ride", b =>
+                {
+                    b.Navigation("Departures");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.User", b =>

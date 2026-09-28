@@ -16,4 +16,8 @@ public record UpdateRideDto
 
     [StringLength(300)]
     public string? Description { get; init; }
+
+    public EnumRideFrequency? Frequency { get; init; }
+
+    public DateOnly? RepeatUntil { get; init; }
 }
