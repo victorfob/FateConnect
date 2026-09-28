@@ -52,6 +52,9 @@ gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
 - **Problema num arquivo apagado: `side: LEFT`, no arquivo antigo.** É a melhor âncora para comportamento removido: o thread nasce em cima do código que some, e não numa linha vizinha parecida. Ancore na **declaração** — a classe, o método —, nunca na chave de fechamento.
 - Editar: `PATCH .../pulls/comments/<id>`. Apagar: `DELETE` no mesmo caminho.
 - ⛔ **O `POST` falhou com erro de rede? Conte os comentários antes de repetir.** Esta rede derruba escrita no GitHub mantendo a leitura boa, e o `EOF` aparece tanto quando o comentário não entrou quanto quando ele entrou e a resposta se perdeu. Repetir às cegas publica dois threads idênticos no PR de outra pessoa. Aconteceu duas vezes em 12/09/2026: `gh api .../pulls/<n>/comments --jq length` respondeu o número exato de antes, e aí a repetição foi segura.
+- ⛔ **O head que você revisou pode não ser o head em que vai publicar.** O autor empurra enquanto você redige, e o `headRefOid` do comando acima pega o novo sem avisar: a linha que você ancora e o código que o comentário descreve podem ter mudado. Antes do primeiro comentário, compare o head atual com o revisado; diferindo, leia o `git diff <revisado> <atual>`, confira cada âncora no arquivo do head novo e reveja os comentários que o diff alcança.
+
+  Aconteceu em 28/09/2026, no #482: revisei `1e21e040`, o autor empurrou dois commits, e publiquei o primeiro comentário em `0aeb8152` sem olhar. A linha ainda era a mesma por sorte, e um dos commits mexia no changelog, que outro comentário planejado citava pela linha.
 
 ⛔ **Bloco `suggestion` substitui exatamente as linhas ancoradas, e a faixa se decide na CRIAÇÃO.** O `PATCH` de um comentário de review aceita só o `body` — não há como alargar o intervalo depois. Comentário nascido de linha única fica preso a uma linha para sempre.
 
@@ -195,6 +198,10 @@ Cada achado termina num estado dito em voz alta: **comentado**, **virou issue**,
 Cobrado duas vezes no PR #186, com a mesma pergunta: *"nenhum achado novo nas novas alterações?"*. Da primeira vez o passe encontrou uma validação de enum que sumira junto com o que eu pedi para remover. Da segunda, um defeito pior que o original: a correção do escape trocou concatenação por interpolação, e a busca por destino passou a responder 500.
 
 ⛔ **O resumo abre com o número de achados, e cada um aparece nomeado.** Destacar os mais graves é certo; comprimir a cauda num parágrafo corrido não é — quem lê conta o que consegue ver. Na rodada do PR #186 eu apresentei 3 em destaque e os outros 12 numa frase só, e a pergunta que veio foi *"só foram 3 mesmo?"*. Uma tabela de três colunas — estado, quantos, quais — resolve, e é a mesma contagem que o `gh api` acima confere.
+
+⛔ **O número só vale depois de o diff inteiro ter sido lido.** Ferramenta de revisão tem teto de achados por rodada, e o teto se lê como total: a lista cheia parece completa. Antes de dizer quantos são, confira que cada arquivo do diff foi aberto, inclusive o que parece gerado ou acessório — o `.Designer.cs`, o snapshot, o fixture —, e cruze o PR contra as issues que ele fecha.
+
+Aconteceu em 28/09/2026, no #482, duas vezes seguidas. A primeira rodada entregou 10 achados porque 10 era o teto; a pergunta foi *"só tem 10 achados?"*. A segunda entregou 18 depois de cruzar com as issues, e a pergunta voltou: *"só 18? ou tem mais?"*. Só a terceira abriu o `.Designer.cs`, as claims do token e os helpers vizinhos, e fechou em 27.
 
 ## Quem corrige depois de você também passa por skill
 
