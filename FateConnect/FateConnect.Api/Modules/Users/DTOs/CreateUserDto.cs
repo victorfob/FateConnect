@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.Validation;
-using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Modules.Users.DTOs;

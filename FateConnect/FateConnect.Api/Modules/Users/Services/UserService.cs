@@ -1,101 +1,337 @@
+namespace FateConnect.Api.Modules.Users.Services;
+
 using FateConnect.Api.Modules.Auth.DTOs;
+using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Enums;
+using FateConnect.Api.Modules.Common.Interfaces;
+using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
 using FateConnect.Api.Modules.Users.Interfaces;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static BCrypt.Net.BCrypt;
 
-namespace FateConnect.Api.Modules.Users.Services;
-
-public class UserService : IUserService
+public partial class UserService(
+    IUserRepository userRepository,
+    ITokenService tokenService,
+    TimeProvider timeProvider,
+    IStorageService baseStorageService,
+    ILogger<UserService> logger
+) : BaseFileService(baseStorageService), IUserService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly ITokenService _tokenService;
-    private readonly TimeProvider _timeProvider;
-
-    public UserService(IUserRepository userRepository, ITokenService tokenService, TimeProvider timeProvider)
-    {
-        _userRepository = userRepository;
-        _tokenService = tokenService;
-        _timeProvider = timeProvider;
-    }
 
     public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto, RequestOrigin origin)
     {
         await EnsureEmailIsUniqueAsync(dto.FatecEmail);
         await EnsureContactIsUniqueAsync(dto.Phone, dto.ContactEmail);
 
-        User newUser = BuildUser(dto, origin, _timeProvider.GetUtcNow().UtcDateTime);
+        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+        string hashedPassword = HashPassword(dto.Password);
 
-        await _userRepository.AddAsync(newUser);
+        User newUser = new User(
+            dto.FatecEmail,
+            hashedPassword,
+            dto.FullName,
+            dto.BirthDate,
+            dto.Gender,
+            dto.Phone,
+            dto.ContactEmail,
+            null
+        );
 
-        string generatedToken = _tokenService.GenerateJwtToken(newUser);
+        newUser.SetPreferences(new UserPreferences
+        {
+            ReceiveEmails = dto.ReceiveEmails ?? false,
+            ReceiveNotifications = dto.ReceiveNotifications ?? false
+        });
 
-        return new TokenResponseDto { Token = generatedToken };
+        foreach (var acceptanceDto in dto.Acceptances)
+        {
+            newUser.AddDocumentAcceptance(new DocumentAcceptance
+            {
+                DocumentType = acceptanceDto.Document,
+                Version = acceptanceDto.Version,
+                AcceptedAt = now,
+                IpAddress = origin.IpAddress,
+                UserAgent = origin.UserAgent
+            });
+        }
+
+        await userRepository.AddAsync(newUser);
+
+        LogUserCreated(logger, newUser.Id);
+
+        return new TokenResponseDto { Token = tokenService.GenerateJwtToken(newUser) };
     }
 
-    private async Task EnsureEmailIsUniqueAsync(string email)
+    public async Task<ReadUserDto?> GetProfileAsync(int currentUserId)
     {
-        bool emailInUse = await _userRepository.EmailExistsAsync(email);
+        var user = await userRepository.GetByIdAsync(currentUserId, includePreferences: true);
 
-        if (emailInUse)
+        if (user is null)
+        {
+            LogUserNotFound(logger, currentUserId);
+            return null;
+        }
+
+        return MapToReadDto(user);
+    }
+
+    public async Task<ReadUserDto?> UpdateProfileAsync(int currentUserId, UpdateUserDto dto)
+    {
+        var user = await userRepository.GetByIdAsync(currentUserId, includePreferences: true);
+
+        if (user is null)
+        {
+            LogUserNotFound(logger, currentUserId);
+            return null;
+        }
+
+        string newPhone = dto.Phone?.Trim() ?? user.Phone;
+        string newContactEmail = dto.ContactEmail?.Trim().ToLowerInvariant() ?? user.ContactEmail;
+
+        await EnsureContactIsUniqueAsync(newPhone, newContactEmail, excludeUserId: currentUserId);
+
+        user.UpdatePersonalData(
+            dto.FullName ?? user.FullName,
+            dto.BirthDate ?? user.BirthDate,
+            dto.Gender ?? user.Gender,
+            newPhone,
+            newContactEmail,
+            dto.Neighborhood ?? user.Neighborhood
+        );
+
+        string? replacedImageUrl = null;
+        string? storedImageUrl = null;
+
+        if (dto.Image is not null)
+        {
+            replacedImageUrl = user.ImageUrl;
+            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.User);
+            user.AttachImage(storedImageUrl);
+        }
+
+        await PersistOrDropImageAsync(userRepository.SaveChangesAsync, storedImageUrl);
+
+        if (dto.Image is not null && !string.IsNullOrWhiteSpace(replacedImageUrl))
+        {
+            await StorageService.DeleteImageAsync(replacedImageUrl);
+        }
+
+        LogUserProfileUpdated(logger, currentUserId);
+
+        return MapToReadDto(user);
+    }
+
+    public async Task UpdatePreferencesAsync(int currentUserId, UpdatePreferencesDto dto)
+    {
+        var user = await userRepository.GetByIdAsync(currentUserId, includePreferences: true);
+
+        if (user is null)
+        {
+            LogUserNotFound(logger, currentUserId);
+            return;
+        }
+
+        user.Preferences.ReceiveEmails = dto.ReceiveEmails ?? user.Preferences.ReceiveEmails;
+        user.Preferences.ReceiveNotifications = dto.ReceiveNotifications ?? user.Preferences.ReceiveNotifications;
+
+        await userRepository.SaveChangesAsync();
+        LogUserPreferencesUpdated(logger, currentUserId);
+    }
+
+    public async Task ChangePasswordAsync(int currentUserId, ChangePasswordDto dto)
+    {
+        var user = await userRepository.GetByIdAsync(currentUserId);
+
+        if (user is null)
+        {
+            LogUserNotFound(logger, currentUserId);
+            return;
+        }
+
+        if (!Verify(dto.CurrentPassword, user.Password))
+            throw new InvalidCredentialsException();
+
+        user.ChangePassword(HashPassword(dto.NewPassword));
+
+        await userRepository.SaveChangesAsync();
+        LogUserPasswordChanged(logger, currentUserId);
+    }
+
+    public async Task DeactivateAccountAsync(int currentUserId)
+    {
+        var user = await userRepository.GetByIdAsync(currentUserId);
+
+        if (user is null) // vê se não seria melhor colocar isso tudo numa função a parte para não repetir tanto
+        {
+            LogUserNotFound(logger, currentUserId);
+            return;
+        }
+
+        user.Deactivate();
+
+        await userRepository.SaveChangesAsync();
+        LogUserDeactivated(logger, currentUserId);
+    }
+
+    public async Task<PagedResultDto<ReadUserDto>> GetAllUsersAsync(UserFilterDto filter)
+    {
+        (IReadOnlyList<User> records, int total) = await userRepository.GetAllAsync(filter);
+
+        return new PagedResultDto<ReadUserDto>
+        {
+            Items = [.. records.Select(MapToReadDto)],
+            Page = filter.EffectivePage,
+            PageSize = filter.EffectivePageSize,
+            Total = total
+        };
+    }
+
+    public async Task<ReadUserDto?> GetUserByIdAsync(int id)
+    {
+        var user = await userRepository.GetByIdAsync(id, includePreferences: true);
+
+        if (user is null)
+        {
+            LogUserNotFound(logger, id);
+            return null;
+        }
+
+        return MapToReadDto(user);
+    }
+
+    public async Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto)
+    {
+        var user = await userRepository.GetByIdAsync(id, includePreferences: true);
+
+        if (user is null)
+        {
+            LogUserNotFound(logger, id);
+            return null;
+        }
+
+        string newFatecEmail = dto.FatecEmail?.Trim().ToLowerInvariant() ?? user.FatecEmail;
+        string newPhone = dto.Phone?.Trim() ?? user.Phone;
+        string newContactEmail = dto.ContactEmail?.Trim().ToLowerInvariant() ?? user.ContactEmail;
+
+        if (newFatecEmail != user.FatecEmail)
+            await EnsureEmailIsUniqueAsync(newFatecEmail, excludeUserId: id);
+
+        await EnsureContactIsUniqueAsync(newPhone, newContactEmail, excludeUserId: id);
+
+        user.UpdateByAdmin(
+            dto.FullName ?? user.FullName,
+            newFatecEmail,
+            newPhone,
+            newContactEmail
+        );
+
+        await userRepository.SaveChangesAsync();
+        LogUserUpdatedByAdmin(logger, id);
+
+        return MapToReadDto(user);
+    }
+
+    public async Task<ReadUserDto?> ChangeUserProfileAsync(int id, EnumProfileType newProfile, int currentUserId)
+    {
+        if (id == currentUserId)
+            throw new CannotModifyOwnAccountException();
+
+        var user = await userRepository.GetByIdAsync(id, includePreferences: true);
+
+        if (user is null)
+        {
+            LogUserNotFound(logger, id);
+            return null;
+        }
+
+        switch (newProfile)
+        {
+            case EnumProfileType.Administrator:
+                user.PromoteToAdministrator();
+                break;
+            case EnumProfileType.Operator:
+                user.DemoteToOperator();
+                break;
+        }
+
+        await userRepository.SaveChangesAsync();
+        LogUserProfileTypeChangedByAdmin(logger, id, newProfile.ToString());
+
+        return MapToReadDto(user);
+    }
+
+    public async Task<ReadUserDto?> ChangeUserStatusAsync(int id, EnumAccountStatus newStatus, int currentUserId)
+    {
+        if (id == currentUserId)
+            throw new CannotModifyOwnAccountException();
+
+        var user = await userRepository.GetByIdAsync(id, includePreferences: true);
+
+        if (user is null)
+        {
+            LogUserNotFound(logger, id);
+            return null;
+        }
+
+        switch (newStatus)
+        {
+            case EnumAccountStatus.Banned:
+                user.Ban();
+                break;
+
+            case EnumAccountStatus.Active when user.Status == EnumAccountStatus.Banned:
+                user.ReactivateFromBan();
+                break;
+        }
+
+        await userRepository.SaveChangesAsync();
+        LogUserStatusChangedByAdmin(logger, id, newStatus.ToString());
+
+        return MapToReadDto(user);
+    }
+
+    private async Task EnsureEmailIsUniqueAsync(string email, int? excludeUserId = null)
+    {
+        if (await userRepository.EmailExistsAsync(email, excludeUserId))
             throw new EmailAlreadyRegisteredException(email);
     }
 
-    private async Task EnsureContactIsUniqueAsync(string phone, string contactEmail)
+    private async Task EnsureContactIsUniqueAsync(string phone, string contactEmail, int? excludeUserId = null)
     {
-        bool phoneIsTaken = await _userRepository.ContactPhoneExistsAsync(phone);
-
-        if (phoneIsTaken)
+        if (await userRepository.ContactPhoneExistsAsync(phone, excludeUserId))
             throw new ContactPhoneAlreadyRegisteredException(phone);
 
-        bool contactEmailIsTaken = await _userRepository.ContactEmailExistsAsync(contactEmail);
-
-        if (contactEmailIsTaken)
+        if (await userRepository.ContactEmailExistsAsync(contactEmail, excludeUserId))
             throw new ContactEmailAlreadyRegisteredException(contactEmail);
     }
 
-    private static User BuildUser(CreateUserDto dto, RequestOrigin origin, DateTime now)
-    {
-        string hashedPassword = HashPassword(dto.Password);
-
-        User user = new User
-        {
-            FatecEmail = dto.FatecEmail,
-            FullName = dto.FullName,
-            BirthDate = dto.BirthDate,
-            Gender = dto.Gender,
-            Password = hashedPassword,
-            ProfileType = EnumProfileType.Operator,
-            CreatedAt = now,
-            UpdatedAt = null,
-            Phone = dto.Phone,
-            ContactEmail = dto.ContactEmail,
-            Status = EnumAccountStatus.Active,
-            Preferences = new UserPreferences
-            {
-                ReceiveEmails = dto.ReceiveEmails ?? false,
-                ReceiveNotifications = dto.ReceiveNotifications ?? false
-            },
-            DocumentAcceptances = BuildAcceptances(dto.Acceptances, origin, now)
-        };
-
-        return user;
-    }
-
-    private static List<DocumentAcceptance> BuildAcceptances(
-        List<DocumentAcceptanceDto> dtos,
-        RequestOrigin origin,
-        DateTime acceptedAt) =>
-        [.. dtos.Select(dto => new DocumentAcceptance
-        {
-            DocumentType = dto.Document,
-            Version = dto.Version,
-            AcceptedAt = acceptedAt,
-            IpAddress = origin.IpAddress,
-            UserAgent = origin.UserAgent
-        })];
+    private static ReadUserDto MapToReadDto(User record) =>
+        new(
+            Id: record.Id,
+            FatecEmail: record.FatecEmail,
+            FullName: record.FullName,
+            BirthDate: record.BirthDate,
+            Gender: record.Gender,
+            Phone: record.Phone,
+            ContactEmail: record.ContactEmail,
+            Neighborhood: record.Neighborhood,
+            ImageUrl: record.ImageUrl,
+            ProfileType: record.ProfileType,
+            Status: record.Status,
+            CreatedAt: record.CreatedAt,
+            Preferences: record.Preferences != null ? new ReadUserPreferencesDto(
+                ReceiveEmails: record.Preferences.ReceiveEmails,
+                ReceiveNotifications: record.Preferences.ReceiveNotifications
+            ) : new ReadUserPreferencesDto(false, false)
+        );
 }
