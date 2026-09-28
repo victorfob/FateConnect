@@ -39,5 +39,13 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
               .WithMany()
               .HasForeignKey(r => r.DriverId)
               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(r => r.Frequency)
+              .IsRequired();
+
+        builder.HasMany(r => r.Departures)
+              .WithOne()
+              .HasForeignKey(departure => departure.RideId)
+              .OnDelete(DeleteBehavior.Cascade);
     }
 }

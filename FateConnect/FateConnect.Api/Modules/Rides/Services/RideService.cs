@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.Rides.Services;
 
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Exceptions;
@@ -11,6 +12,8 @@ using Microsoft.Extensions.Logging;
 
 public partial class RideService(
     IRideRepository repository,
+    IHolidayCalendar holidays,
+    TimeProvider clock,
     ILogger<RideService> logger
 ) : IRideService
 {
@@ -24,6 +27,8 @@ public partial class RideService(
             currentUserId,
             dto.Description
         );
+
+        ride.ChangeRepetition(dto.Frequency, dto.RepeatUntil, holidays);
 
         await repository.AddAsync(ride);
 
@@ -82,10 +87,16 @@ public partial class RideService(
             dto.Description
         );
 
-        bool hasScheduleChanged = dto.DepartureDate.HasValue || dto.DepartureTime.HasValue;
+        bool hasScheduleChanged = dto.DepartureDate.HasValue
+            || dto.DepartureTime.HasValue
+            || dto.Frequency.HasValue
+            || dto.RepeatUntil.HasValue;
 
         if (hasScheduleChanged)
-            ride.ChangeDepartureSchedule(dto.DepartureDate, dto.DepartureTime);
+            ride.Reschedule(
+                new RideScheduleChange(dto.DepartureDate, dto.DepartureTime, dto.Frequency, dto.RepeatUntil),
+                DateTimeUtils.NowInProductTimeZone(clock),
+                holidays);
 
         await repository.UpdateAsync(ride);
 
@@ -124,16 +135,18 @@ public partial class RideService(
         throw new RideNotDrivenByUserException();
     }
 
-    private static ReadRideDto MapToReadDto(Ride ride, int currentUserId) =>
+    private ReadRideDto MapToReadDto(Ride ride, int currentUserId) =>
         new(
             ride.Id,
             ride.Destination,
-            ride.DepartureDate,
+            ride.NextDepartureDate(DateTimeUtils.NowInProductTimeZone(clock)),
             ride.DepartureTime,
             ride.CreatedAt,
             ride.RideType,
             ride.Description,
             ride.Driver.ToContactDto(),
-            ride.IsDrivenBy(currentUserId)
+            ride.IsDrivenBy(currentUserId),
+            ride.Frequency,
+            ride.RepeatUntil
         );
 }

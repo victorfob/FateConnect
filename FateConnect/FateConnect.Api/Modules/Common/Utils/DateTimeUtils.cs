@@ -8,6 +8,9 @@ public static class DateTimeUtils
     public static DateTime NowInProductTimeZone() =>
         TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ProductTimeZone);
 
+    public static DateTime NowInProductTimeZone(TimeProvider clock) =>
+        TimeZoneInfo.ConvertTimeFromUtc(clock.GetUtcNow().UtcDateTime, ProductTimeZone);
+
     public static DateTime ToUtcFromProductTimeZone(DateOnly date, TimeOnly time) =>
         TimeZoneInfo.ConvertTimeToUtc(date.ToDateTime(time), ProductTimeZone);
 }
