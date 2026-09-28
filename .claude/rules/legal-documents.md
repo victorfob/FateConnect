@@ -75,6 +75,10 @@ Em 21/09/2026, atualizando os documentos para o módulo de denúncias, esse mét
 
 Ao mudar o texto: edite o HTML, suba a data nos dois lugares (no `<header>` e no rodapé do HTML, e na constante), e rode `build-pdfs.sh`.
 
+⚠️ **A exceção é a versão que ainda não saiu em produção:** ela pode receber mais texto sem mudar de data. O aceite que importa é o de produção, e lá essa versão nunca existiu, então ela não passa a apontar para dois textos. Os aceites de teste feitos em homologação passam a apontar para o texto novo, e isso é aceito.
+
+Decidido pelo Victor em 28/09/2026, no #481. A versão 28/09 tinha entrado horas antes pelo #478, só em homologação, e o texto da recorrência entrou nela. **A conferência é a release:** versão que já está numa tag publicada não recebe texto novo nunca.
+
 ⚠️ **E suba a data só do documento que mudou.** Mexendo na política, `PRIVACY_VERSION` sobe e `TERMS_VERSION` fica — versão que anda sem o texto ter andado faz o aceite apontar para uma revisão que não existiu.
 
 ⚠️ **O `build-pdfs.sh` gera os dois PDFs, inclusive o do documento que você não tocou.** O carimbo de geração muda, então o `git status` acusa os dois e o diff carrega um binário sem uma linha de conteúdo diferente. Devolva o que não mudou antes de commitar — medido em 11/09/2026, ao corrigir só a política:
@@ -82,6 +86,20 @@ Ao mudar o texto: edite o HTML, suba a data nos dois lugares (no `<header>` e no
 ```bash
 git checkout -- FateConnect/Web/public/termos.pdf
 ```
+
+⛔ **Só devolva o PDF do documento que não mudou nesta branch.** O `git checkout --` restaura para o `HEAD` sem avisar. Se o outro documento também mudou, o PDF dele volta ao texto antigo, e o HTML e o PDF passam a dizer coisas diferentes. Aconteceu em 28/09/2026, no #478: as duas versões tinham subido, eu devolvi a política por hábito, e só percebi ao ler o comando que tinha acabado de rodar.
+
+**Confira o texto do PDF, não o carimbo do arquivo.** Não há `pdftotext` nesta máquina, e o texto do PDF que o Chrome gera não se lê cru. O PDFKit do macOS lê:
+
+```bash
+cat > /tmp/pdftext.swift <<'SWIFT'
+import PDFKit
+print(PDFDocument(url: URL(fileURLWithPath: CommandLine.arguments[1]))!.string ?? "")
+SWIFT
+swift /tmp/pdftext.swift FateConnect/Web/public/termos.pdf | tr '\n' ' ' | grep -o '28 de setembro'
+```
+
+O controle é procurar junto um termo que você sabe que está lá, como *carona*. Sem ele, o zero da busca pelo termo que saiu pode ser só o instrumento sem enxergar nada.
 
 ## O que os documentos hoje declaram
 
