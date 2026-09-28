@@ -89,6 +89,7 @@ public class Program
 
         builder.Services.AddScoped<IRideRepository, RideRepository>();
         builder.Services.AddScoped<IRideService, RideService>();
+        builder.Services.AddSingleton<IHolidayCalendar, HolidayCalendar>();
 
         builder.Services.AddSingleton(TimeProvider.System);
 
