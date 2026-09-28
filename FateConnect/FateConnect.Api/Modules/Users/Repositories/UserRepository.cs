@@ -57,7 +57,7 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<(IReadOnlyList<User> Users, int Total)> GetAllAsync(UserFilterDto filter)
+    public async Task<(IReadOnlyList<ReadUserSummaryDto> Users, int Total)> GetAllAsync(UserFilterDto filter)
     {
         IQueryable<User> query = _context.Users.AsNoTracking();
 
@@ -96,11 +96,18 @@ public class UserRepository : IUserRepository
 
         int total = await query.CountAsync();
 
-        List<User> items = await query
+        List<ReadUserSummaryDto> items = await query
             .OrderByDescending(u => u.CreatedAt)
             .ThenBy(u => u.Id)
             .Skip(filter.ItemsToSkip)
             .Take(filter.EffectivePageSize)
+            .Select(u => new ReadUserSummaryDto(
+                u.Id,
+                u.FullName,
+                u.FatecEmail,
+                u.Phone == "" ? null : u.Phone,
+                u.Status
+            ))
             .ToListAsync();
 
         return (items, total);

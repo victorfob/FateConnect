@@ -94,7 +94,7 @@ public class UsersController(IUserService service) : ControllerBase
 
     [HttpGet]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    public async Task<ActionResult<PagedResultDto<ReadUserDto>>> GetAllUsersAsync([FromQuery] UserFilterDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadUserSummaryDto>>> GetAllUsersAsync([FromQuery] UserFilterDto filter)
     {
         var result = await service.GetAllUsersAsync(filter);
 

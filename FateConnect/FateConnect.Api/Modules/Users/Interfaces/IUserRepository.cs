@@ -12,7 +12,7 @@ public interface IUserRepository
     Task<User?> GetByEmailAsync(string email);
     Task<User?> GetByIdAsync(int id, bool includePreferences = false);
     Task<UserPreferences?> GetPreferencesByUserIdAsync(int userId);
-    Task<(IReadOnlyList<User> Users, int Total)> GetAllAsync(UserFilterDto filter);
+    Task<(IReadOnlyList<ReadUserSummaryDto> Users, int Total)> GetAllAsync(UserFilterDto filter);
 
     Task AddAsync(User user);
     Task SaveChangesAsync();

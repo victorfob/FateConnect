@@ -16,7 +16,7 @@ public interface IUserService
     Task ChangePasswordAsync(int currentUserId, ChangePasswordDto dto);
     Task DeactivateAccountAsync(int currentUserId);
 
-    Task<PagedResultDto<ReadUserDto>> GetAllUsersAsync(UserFilterDto filter);
+    Task<PagedResultDto<ReadUserSummaryDto>> GetAllUsersAsync(UserFilterDto filter);
     Task<ReadUserDto?> GetUserByIdAsync(int id);
     Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto);
     Task<ReadUserDto?> ChangeUserProfileAsync(int id, EnumProfileType newProfile, int currentUserId);
