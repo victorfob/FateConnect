@@ -22,7 +22,6 @@ const TYPED_DEPARTURE = `${format(OFFERED_AT, 'ddMMyyyy')}${onlyDigits(OFFERED_H
 
 const RIDE: Ride = {
   id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
-  availableSeats: 4,
   destination: 'Fatec Sorocaba',
   departureDate: toApiDate(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
   departureTime: '07:30:00',
@@ -113,7 +112,6 @@ describe('RideFormDialog', () => {
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
-      availableSeats: RIDE.availableSeats,
       destination: RIDE.destination,
       departureDate: RIDE.departureDate,
       departureTime: '07:30',
@@ -151,16 +149,11 @@ describe('RideFormDialog', () => {
       screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.rideType) }),
     );
     await userEvent.click(await screen.findByRole('option', { name: 'Solidária' }));
-    await userEvent.click(
-      screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.seats) }),
-    );
-    await userEvent.click(await screen.findByRole('option', { name: '3 vagas' }));
 
     await userEvent.click(screen.getByRole('button', { name: OFFER_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
-      availableSeats: 3,
       destination: 'Terminal Santo Antônio',
       departureDate: toApiDate(OFFERED_AT),
       departureTime: OFFERED_HOUR,

@@ -17,7 +17,6 @@ const VALID: RideFormInput = {
   destination: 'Fatec Sorocaba',
   departure: toFieldDeparture(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
   rideType: RideTypeEnum.SOLIDARITY,
-  seats: '3',
   description: 'Saída do centro.',
 };
 
@@ -116,15 +115,6 @@ describe('rideFormSchema', () => {
   it('should require a ride type from the api vocabulary', () => {
     expect(firstErrorOf({ rideType: '' })).toBe(RIDE_FORM_MESSAGES.rideTypeRequired);
     expect(firstErrorOf({ rideType: 'Gratuita' })).toBe(RIDE_FORM_MESSAGES.rideTypeRequired);
-  });
-
-  it('should hold the seats inside the range the api accepts', () => {
-    expect(firstErrorOf({ seats: '' })).toBe(RIDE_FORM_MESSAGES.seatsRequired);
-    expect(firstErrorOf({ seats: '0' })).toBe(RIDE_FORM_MESSAGES.seatsRequired);
-    expect(firstErrorOf({ seats: String(RIDE_LIMITS.maxSeats + 1) })).toBe(
-      RIDE_FORM_MESSAGES.seatsRequired,
-    );
-    expect(firstErrorOf({ seats: '2.5' })).toBe(RIDE_FORM_MESSAGES.seatsRequired);
   });
 
   it('should accept an empty description but cap a long one', () => {

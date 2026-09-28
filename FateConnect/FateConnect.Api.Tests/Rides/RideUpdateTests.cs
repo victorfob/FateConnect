@@ -23,7 +23,6 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
 
     private sealed record ReadRide(
         Guid Id,
-        int AvailableSeats,
         string Destination,
         DateOnly DepartureDate,
         string DepartureTime,
@@ -32,7 +31,6 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
 
     private static object NewRidePayload() => new
     {
-        availableSeats = 3,
         destination = "Sorocaba centro",
         departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
         departureTime = "08:30:00",
@@ -59,7 +57,6 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
 
         HttpResponseMessage response = await driver.PutAsJsonAsync($"/Rides/{ride.Id}", new
         {
-            availableSeats = 2,
             destination = "Votorantim",
             departureDate = newDate.ToString("yyyy-MM-dd"),
             departureTime = "19:45:00",
@@ -69,7 +66,6 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
 
         ReadRide updated = (await response.Content.ReadFromJsonAsync<ReadRide>(JsonOptions))!;
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal(2, updated.AvailableSeats);
         Assert.Equal("Votorantim", updated.Destination);
         Assert.Equal(newDate, updated.DepartureDate);
         Assert.Equal("19:45:00", updated.DepartureTime);
@@ -89,19 +85,25 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         Assert.Equal("21:15:00", updated.DepartureTime);
         Assert.Equal(ride.DepartureDate, updated.DepartureDate);
         Assert.Equal(ride.Destination, updated.Destination);
-        Assert.Equal(ride.AvailableSeats, updated.AvailableSeats);
+        Assert.Equal(ride.Description, updated.Description);
     }
 
     [Fact]
-    public async Task UpdateRide_WithASeatCountOutsideTheRange_IsRejectedWithTheDomainMessage()
+    public async Task CreateRide_WithTheRemovedSeatCount_IsAcceptedAndDoesNotAnswerIt()
     {
-        (ReadRide ride, HttpClient driver) = await OfferRideAsync();
+        HttpClient driver = _factory.CreateClientForNewUser("Ana Beatriz Nogueira");
 
-        HttpResponseMessage response = await driver
-            .PutAsJsonAsync($"/Rides/{ride.Id}", new { availableSeats = 9 });
+        HttpResponseMessage response = await driver.PostAsJsonAsync("/Rides", new
+        {
+            availableSeats = 3,
+            destination = "Sorocaba centro",
+            departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
+            departureTime = "08:30:00",
+            rideType = "Solidarity",
+        });
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("9", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.DoesNotContain("availableSeats", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -132,7 +134,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Bruno Carvalho Souza");
 
         HttpResponseMessage response = await client
-            .PutAsJsonAsync($"/Rides/{AbsentRideId}", new { availableSeats = 2 });
+            .PutAsJsonAsync($"/Rides/{AbsentRideId}", new { description = "Sai do portão principal." });
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }

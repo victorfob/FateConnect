@@ -17,7 +17,6 @@ public partial class RideService(
     public async Task<ReadRideDto> CreateAsync(CreateRideDto dto, int currentUserId)
     {
         var ride = new Ride(
-            dto.AvailableSeats,
             dto.Destination,
             dto.DepartureDate,
             dto.DepartureTime,
@@ -78,7 +77,6 @@ public partial class RideService(
         EnsureRideIsDrivenBy(ride, currentUserId);
 
         ride.UpdateBasicAttributes(
-            dto.AvailableSeats,
             dto.Destination,
             dto.RideType,
             dto.Description
@@ -129,7 +127,6 @@ public partial class RideService(
     private static ReadRideDto MapToReadDto(Ride ride, int currentUserId) =>
         new(
             ride.Id,
-            ride.AvailableSeats,
             ride.Destination,
             ride.DepartureDate,
             ride.DepartureTime,

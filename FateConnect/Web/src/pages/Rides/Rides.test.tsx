@@ -39,7 +39,6 @@ const DRIVER: UserContact = {
 
 const RIDE: Ride = {
   id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
-  availableSeats: 3,
   destination: 'Fatec Sorocaba',
   departureDate: '2026-05-22T00:00:00',
   departureTime: '07:30:00',
@@ -203,7 +202,6 @@ describe('Rides', () => {
     expect(await screen.findByText(RIDE.destination)).toBeInTheDocument();
     expect(screen.getByText('22/05/2026')).toBeInTheDocument();
     expect(screen.getByText('07:30')).toBeInTheDocument();
-    expect(screen.getByText(C.seatsLabel(RIDE.availableSeats))).toBeInTheDocument();
     expect(screen.getAllByText('Solidária')).toHaveLength(1);
   });
 

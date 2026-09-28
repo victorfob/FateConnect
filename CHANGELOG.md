@@ -28,6 +28,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a receber o telefone e o e-mail de contato direto no corpo do cadastro, um de cada por pessoa, em vez de uma lista: o formato antigo é recusado. Quem tinha mais de um contato fica com o mais antigo, que já era o exibido, e os demais se perdem (#456) [Backend]
 - Passa a enviar o telefone e o e-mail de contato direto no corpo do cadastro, no formato que a API passou a exigir: o front anterior deixa de conseguir criar conta. A tela e os campos não mudam (#457) [Frontend]
 
+### Removed
+
+- Remove a quantidade de vagas da carona: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A coluna é apagada, então as vagas das caronas já ofertadas se perdem (#478) [Backend]
+- Remove a quantidade de vagas do formulário de ofertar e editar carona e do cartão da lista; os termos e a política deixam de citar as vagas, e os termos passam a dizer que elas se combinam fora da plataforma, em nova versão dos dois documentos (#478) [Frontend]
+
 ### Fixed
 
 - Corrige na política de privacidade o que fica no navegador, que omitia o identificador da sessão de diagnóstico guardado pelo monitoramento de erros, e a forma como a senha é guardada, que ela dizia cifrada e é um hash sem volta; o documento ganha nova versão (#468) [Frontend]

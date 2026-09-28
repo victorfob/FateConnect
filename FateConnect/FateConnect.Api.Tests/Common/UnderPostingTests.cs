@@ -51,14 +51,13 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task CreateRide_WithSeatsOutOfRange_AnswersTheDomainMessage()
+    public async Task CreateRide_WithAShortDestination_AnswersTheDomainMessage()
     {
         HttpClient client = _factory.CreateClientForNewUser("Ana Beatriz Nogueira");
 
         HttpResponseMessage response = await client.PostAsJsonAsync("/Rides", new
         {
-            availableSeats = 99,
-            destination = "Fatec Sorocaba",
+            destination = "AB",
             departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
             departureTime = "08:30:00",
             rideType = "Solidarity",
@@ -67,6 +66,6 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         string body = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("entre 1 e 7 vagas", body, StringComparison.Ordinal);
+        Assert.Contains("O destino deve ter entre 3 e 100 caracteres.", body, StringComparison.Ordinal);
     }
 }
