@@ -6,13 +6,9 @@ export const DATE_TIME_PLACEHOLDER = 'dd/mm/aaaa hh:mm';
 export const MASKED_DATE_TIME_LENGTH = 16;
 
 /**
- * Nenhum botão na barra da biblioteca, porque nenhum dos dela funciona aqui: o
- * painel foi feito para ser o seletor inteiro, dono do próprio ciclo, e aqui ele
- * é conteúdo do nosso popover. O de avançar usa um setter que a vista controlada
- * torna inerte, e o de confirmar só reage quando há mudança pendente — abrir e
- * confirmar sem tocar em nada não fazia nada.
- *
- * Quem fecha é escolher o minuto, como no campo só de data escolher o dia.
+ * Nenhum botão na barra da biblioteca: o painel é conteúdo do nosso popover, e
+ * não o seletor dono do próprio ciclo. O de avançar fica inerte com a vista
+ * controlada, e o de confirmar não reage sem mudança pendente.
  */
 export const PICKER_SLOT_PROPS = { actionBar: { actions: [] } };
 

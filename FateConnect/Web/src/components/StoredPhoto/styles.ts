@@ -13,8 +13,8 @@ const { xs } = spacingScale;
 const OVERLAY_OPACITY = 0.55;
 
 /**
- * O disco fica translúcido para não pesar sobre a foto. Medido: o glifo branco
- * sobre ele cai de 5,14:1 para 3,84:1 no pior fundo, acima do piso de 3:1.
+ * O disco fica translúcido para não pesar sobre a foto, e mesmo no pior fundo o
+ * glifo branco segue acima do piso de 3:1.
  */
 const BADGE_OPACITY = 0.8;
 

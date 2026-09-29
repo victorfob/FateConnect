@@ -11,20 +11,14 @@ const VARIANTS: NotificationVariant[] = ['success', 'error', 'warning'];
 const MESSAGE_PADDING_Y_PX = 14;
 /**
  * Largura da caixa do aviso no produto. É **fixa**: com largura variável a ação
- * mudava de lugar a cada mensagem — as duas mensagens de erro mais longas
- * empurravam o "OK" uns 19px para a direita. Fixando, o texto quebra em duas
- * linhas quando não cabe e a ação fica sempre no mesmo ponto.
+ * muda de lugar a cada mensagem. Fixando, o texto quebra em duas linhas quando
+ * não cabe e a ação fica sempre no mesmo ponto.
  */
 const BOX_WIDTH_PX = 378;
 /**
- * O notistack marca o conteúdo com `notistack-MuiContent-<variante>`, e é por
- * essa classe que a cor do produto entra: a prop `classes` do provider só
- * alcança o contêiner e a âncora, não o conteúdo.
- *
- * As medidas vêm do aviso do produto: caixa de 378x47, recuo da mensagem
- * `14px 8px 14px 16px`, recuo direito de 8px para a ação, texto de 16px com
- * peso 400 e `line-height` natural — a biblioteca usa 14px e entrelinha fixa,
- * o que deixava a caixa 9px mais alta.
+ * O notistack marca o conteúdo com `notistack-MuiContent-<variante>`, e a cor do
+ * produto entra por essa classe: a prop `classes` do provider não alcança o
+ * conteúdo. As medidas são as do aviso do produto, não as da biblioteca.
  */
 export function notificationStyles(theme: Theme) {
   const perVariant = VARIANTS.map((variant) => [
@@ -55,7 +49,7 @@ export function notificationStyles(theme: Theme) {
       padding: theme.space(MESSAGE_PADDING_Y_PX, xs, MESSAGE_PADDING_Y_PX, md),
       flexGrow: 1,
     },
-    // A biblioteca envolve a ação num elemento com recuo próprio, que somava 8px
+    // A biblioteca envolve a ação num elemento com recuo próprio, que soma 8px
     // à caixa. A classe dele é gerada, então o alvo é "o filho que não é a
     // mensagem" — o `id` da mensagem é o único seletor estável ali.
     '.notistack-MuiContent > :not(#notistack-snackbar)': {

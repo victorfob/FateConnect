@@ -46,7 +46,7 @@ export const DrawerRoot = styled(Drawer)(({ theme }) => ({
       ...theme.typography.body,
     },
     // O ícone do MUI nasce em `action.active`, que é preto a 54% — sobre o
-    // cromo isso dá 1,93:1, abaixo do mínimo de 3:1 para não-texto.
+    // cromo isso fica abaixo do mínimo de 3:1 para não-texto.
     '& .MuiListItemIcon-root': {
       color: theme.palette.chrome.contrastText,
       minWidth: 'unset',

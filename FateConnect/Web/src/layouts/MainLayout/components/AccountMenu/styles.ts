@@ -15,7 +15,7 @@ export const AvatarTrigger = styled(IconButton)(({ theme }) => ({
   [theme.breakpoints.down('header')]: { display: 'none' },
 }));
 
-/** O vermelho da marca como texto — `secondary.main` é cor de fundo e dá 3,24:1. */
+/** O vermelho da marca como texto — `secondary.main` é cor de fundo e como texto reprova. */
 export const SignOutItem = styled(ListItemButton)(({ theme }) => ({
   color: theme.palette.brandText,
   '& .MuiListItemIcon-root': { color: 'inherit' },

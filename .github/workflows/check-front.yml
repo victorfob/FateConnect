@@ -97,9 +97,9 @@ jobs:
         with:
           node-version-file: FateConnect/Web/.nvmrc
 
-      # O pacote comprime de 565 MB para 81 MB e descomprime em 1s, contra 33s
-      # de `yarn install` a frio. O prefixo solto deixa a árvore anterior ser
-      # restaurada quando o lockfile muda, e aí o yarn reconcilia só a diferença.
+      # O pacote comprimido volta muito mais rápido que um `yarn install` a frio. O
+      # prefixo solto deixa a árvore anterior ser restaurada quando o lockfile muda,
+      # e aí o yarn reconcilia só a diferença.
       - uses: actions/cache@v4
         with:
           path: FateConnect/Web/node_modules

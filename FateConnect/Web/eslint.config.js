@@ -26,8 +26,7 @@ const styleConventions = [
   {
     // Constante nomeada passa no `no-magic-numbers` e ainda assim não é o token:
     // aqui o valor tem de vir de `spacingScale`/`radiusScale`. Cobre as duas
-    // formas de chamada — a do tema e o helper livre do `theme/`, que foi por
-    // onde dois escaparam.
+    // formas de chamada — a do tema e o helper livre do `theme/`.
     selector:
       "CallExpression[callee.object.name='theme'][callee.property.name=/^(space|radius)$/] > Literal, " +
       'CallExpression[callee.name=/^(spacing|radius)$/] > Literal',
@@ -52,18 +51,16 @@ const styleConventions = [
       "Só existem duas visões: use `md` — `theme.breakpoints.down('md')` para mobile e `up('md')` para desktop. O cabeçalho usa `header`.",
   },
   {
-    // Unidade de viewport em medida é goteira fluida disfarçada: ela reaparecia
-    // escondida numa constante nomeada, longe da propriedade que a usava.
-    // Nem para altura de tela: `html, body, #root` já são 100%, então
-    // `minHeight: '100%'` preenche a janela sem unidade de viewport — e sem o
-    // problema do `100vh` com a barra do navegador no celular.
+    // Unidade de viewport em medida é goteira fluida disfarçada, e se esconde numa
+    // constante longe da propriedade. Nem para altura de tela: `html, body, #root`
+    // já são 100%, e `minHeight: '100%'` preenche a janela sem o problema do `100vh`.
     selector: String.raw`Literal[value=/[0-9](\.[0-9]+)?v[wh]\b/]`,
     message:
       "Sem unidade de viewport em medida: use o token de `spacingScale` por `theme.space()`, com override em `theme.breakpoints.down('md')` quando mobile e desktop diferirem.",
   },
   {
-    // Consulta de largura escrita à mão volta a criar limite paralelo, que foi
-    // o que produziu a contradição de 768px entre o cabeçalho e o cadastro.
+    // Consulta de largura escrita à mão cria limite paralelo, e dois limites
+    // discordam justamente na fronteira.
     selector: 'Literal[value=/@media[^)]*width/]',
     message: "Sem media query à mão: use `theme.breakpoints.down('md')` ou `up('md')`.",
   },
@@ -73,13 +70,9 @@ const styleConventions = [
       'Sem tag HTML crua: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
   },
   {
-    // O seletor acima só olha a chamada de `styled`, e por isso deixou passar
-    // três `<li>` escritos direto no JSX da paginação — quem viu foi o Victor.
-    // Ênfase de texto fica de fora: `<strong>` no meio de uma frase é marcação
-    // semântica, não contêiner, e embrulhá-la num `styled` piora o que se lê.
-    // `title`, `meta` e `link` também: o React 19 as hasteia para o `<head>`,
-    // onde não há caixa para estilizar — e renderizá-las é o mecanismo dele,
-    // não uma alternativa a `styled`.
+    // O seletor acima só olha a chamada de `styled`; este pega a tag crua no JSX.
+    // Ficam de fora `<strong>`, que é ênfase no meio da frase, e `title`, `meta` e
+    // `link`, que o React 19 hasteia para o `<head>`, onde não há caixa a estilizar.
     selector:
       'JSXOpeningElement > JSXIdentifier[name=/^[a-z]/]:not([name=/^(strong|em|b|i|u|s|small|sub|sup|abbr|code|kbd|mark|br|wbr|title|meta|link)$/])',
     message:
@@ -87,10 +80,8 @@ const styleConventions = [
   },
   {
     // Os quatro nomes barrados são a diferença entre a união de cor do MUI e o
-    // que o produto usa: sobram `inherit`, `primary` e `secondary`. Sete botões
-    // pediam `error` só por ser vermelho, e o resultado eram dois vermelhos
-    // convivendo na mesma tela. Estado colorido não passa por esta prop — ele
-    // vem de `palette.statusTag` e `palette.notification`.
+    // que o produto usa: sobram `inherit`, `primary` e `secondary`. Estado colorido
+    // vem de `palette.statusTag` e `palette.notification`, e não desta prop.
     selector: "JSXAttribute[name.name='color'] > Literal[value=/^(error|success|info|warning)$/]",
     message:
       'A cor de ação é `secondary`. `error` fica reservado ao erro de verdade — validação de campo e mensagem —, e estado colorido vem de `palette.statusTag` ou `palette.notification`, não desta prop.',
@@ -151,11 +142,8 @@ export default defineConfig([
       ecmaVersion: 2022,
       globals: { ...globals.browser, ...globals.node },
       // Informação de tipo: é o que permite ao lint enxergar `@deprecated`.
-      //
-      // `allowDefaultProject` cobre este próprio arquivo: ele é `.js`, fica fora
-      // do `include` do tsconfig, e sem isto o serviço de projeto reprova com
-      // "was not found by the project service" — que foi como a deprecação do
-      // `tseslint.config()` passou despercebida pelo lint.
+      // `allowDefaultProject` cobre este próprio arquivo, que é `.js` e fica fora do
+      // `include` do tsconfig; sem isto o serviço de projeto o recusa.
       parserOptions: {
         projectService: { allowDefaultProject: ['eslint.config.js'] },
         tsconfigRootDir: import.meta.dirname,
