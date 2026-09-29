@@ -6,6 +6,7 @@ using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
 using System;
 using System.Collections.Generic;
+
 public class User
 {
     public int Id { get; init; }
@@ -91,6 +92,12 @@ public class User
     public void AttachImage(string imageUrl)
     {
         ImageUrl = imageUrl.Trim();
+        RegisterUpdate();
+    }
+
+    public void RemoveImage()
+    {
+        ImageUrl = null;
         RegisterUpdate();
     }
 
@@ -198,12 +205,16 @@ public class User
         bool isNullOrEmpty = string.IsNullOrWhiteSpace(email);
 
         if (isNullOrEmpty)
-            throw new InvalidFatecEmailDomainException();
+            throw new InvalidFatecEmailLocalPartException();
 
         bool isInvalidLocalPart = !RegexConstants.LocalPartRegex().IsMatch(email);
+
+        if (isInvalidLocalPart)
+            throw new InvalidFatecEmailLocalPartException();
+
         bool isInvalidDomain = !RegexConstants.DomainRegex().IsMatch(email);
 
-        if (isInvalidLocalPart || isInvalidDomain)
+        if (isInvalidDomain)
             throw new InvalidFatecEmailDomainException();
     }
 

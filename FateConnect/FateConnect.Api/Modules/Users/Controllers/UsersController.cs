@@ -24,7 +24,7 @@ public class UsersController(IUserService service) : ControllerBase
     [Consumes("application/json")]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<TokenResponseDto>> SignUpAsync([FromBody] CreateUserDto dto)
     {
         var result = await service.SignUpAsync(dto, HttpContext.GetRequestOrigin());
@@ -46,7 +46,8 @@ public class UsersController(IUserService service) : ControllerBase
 
     [HttpPatch("me")]
     [AuthorizeProfile(EnumProfileType.Operator)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ReadUserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ReadUserDto>> UpdateProfileAsync([FromForm] UpdateUserDto dto)
     {
         var result = await service.UpdateProfileAsync(User.GetUserId(), dto);
@@ -71,6 +72,7 @@ public class UsersController(IUserService service) : ControllerBase
 
     [HttpPatch("me/preferences")]
     [AuthorizeProfile(EnumProfileType.Operator)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> UpdatePreferencesAsync([FromBody] UpdatePreferencesDto dto)
     {
         await service.UpdatePreferencesAsync(User.GetUserId(), dto);
@@ -90,8 +92,20 @@ public class UsersController(IUserService service) : ControllerBase
 
         return Ok(tokenResponse);
     }
+
+    [HttpDelete("me/image")]
+    [AuthorizeProfile(EnumProfileType.Operator)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> RemoveProfileImageAsync()
+    {
+        await service.RemoveProfileImageAsync(User.GetUserId());
+
+        return NoContent();
+    }
+
     [HttpPost("me/deactivate")]
     [AuthorizeProfile(EnumProfileType.Operator)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> DeactivateAccountAsync()
     {
         await service.DeactivateAccountAsync(User.GetUserId());
@@ -122,7 +136,8 @@ public class UsersController(IUserService service) : ControllerBase
 
     [HttpPatch("{id:int}")]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ReadUserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ReadUserDto>> UpdateUserByAdminAsync(int id, [FromBody] AdminUpdateUserDto dto)
     {
         var result = await service.UpdateUserByAdminAsync(id, dto);

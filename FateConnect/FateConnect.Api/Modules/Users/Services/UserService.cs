@@ -202,6 +202,29 @@ public partial class UserService(
         };
     }
 
+    public async Task RemoveProfileImageAsync(int currentUserId)
+    {
+        var user = await userRepository.GetByIdAsync(currentUserId);
+
+        if (user is null)
+        {
+            LogUserNotFound(logger, currentUserId);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(user.ImageUrl))
+            return;
+
+        string imageToDelete = user.ImageUrl;
+
+        user.RemoveImage();
+
+        await userRepository.SaveChangesAsync();
+        await StorageService.DeleteImageAsync(imageToDelete);
+
+        LogUserProfileUpdated(logger, currentUserId);
+    }
+
     public async Task DeactivateAccountAsync(int currentUserId)
     {
         var user = await userRepository.GetByIdAsync(currentUserId);
@@ -351,7 +374,7 @@ public partial class UserService(
                 break;
 
             default:
-                throw new InvalidUserStatusTransitionException(user.Status, newStatus);
+                throw new InvalidUserStatusTransitionException();
         }
 
         await userRepository.SaveChangesAsync();

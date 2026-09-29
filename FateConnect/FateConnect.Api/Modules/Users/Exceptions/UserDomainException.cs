@@ -13,11 +13,11 @@ public abstract class AlreadyRegisteredException(string field, string message) :
 public class InvalidUserFullNameException()
     : UserDomainException("O nome completo deve ter entre 3 e 200 caracteres.");
 
+public class InvalidFatecEmailLocalPartException()
+    : UserDomainException("O endereço de e-mail contém caracteres inválidos antes do '@'.");
+
 public class InvalidFatecEmailDomainException()
     : UserDomainException("O e-mail fornecido não pertence a um domínio válido da Fatec.");
-
-public class UnderageUserException()
-    : UserDomainException("É necessário ter pelo menos 18 anos.");
 
 public class InvalidGenderException()
     : UserDomainException("O gênero informado é inválido.");
@@ -43,5 +43,5 @@ public class InvalidDocumentVersionException()
 public class IncorrectCurrentPasswordException()
     : UserDomainException("A senha atual informada está incorreta.");
 
-public class InvalidUserStatusTransitionException(EnumAccountStatus currentStatus, EnumAccountStatus requestedStatus)
-    : UserDomainException($"Não é possível alterar o status da conta de '{currentStatus}' para '{requestedStatus}' por este endpoint.");
+public class InvalidUserStatusTransitionException()
+    : UserDomainException("Não é possível realizar esta alteração de status de conta por este endpoint.");
