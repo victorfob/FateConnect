@@ -1,6 +1,6 @@
 import { tokenWithName } from '@app/test/token';
 
-import { loggedUserIsAdministrator, loggedUserName } from './loggedUser';
+import { loggedUserId, loggedUserIsAdministrator, loggedUserName } from './loggedUser';
 import { tokenStorage } from './tokenStorage';
 import { ProfileTypeEnum } from './types';
 
@@ -55,5 +55,23 @@ describe('loggedUserIsAdministrator', () => {
 
   it('should refuse when nobody is logged', () => {
     expect(loggedUserIsAdministrator()).toBe(false);
+  });
+});
+
+describe('loggedUserId', () => {
+  it('should read the id the token carries as text', () => {
+    tokenStorage.save(tokenWithName('Maria da Silva', ProfileTypeEnum.ADMINISTRATOR, 7));
+
+    expect(loggedUserId()).toBe(7);
+  });
+
+  it.each([
+    ['nobody is logged', null],
+    ['the token carries no id', tokenWithName('Maria da Silva')],
+    ['the id is not a number', 'cabecalho.eyJuYW1laWQiOiJzZXRlIn0.assinatura'],
+  ])('should return nothing when %s', (_name, token) => {
+    if (token) tokenStorage.save(token);
+
+    expect(loggedUserId()).toBeNull();
   });
 });
