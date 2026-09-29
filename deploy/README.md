@@ -89,7 +89,8 @@ com `http://` por enquanto.
 
 `SIXLABORS_LICENSE` recebe o conteúdo inteiro do arquivo `sixlabors.lic`, entre aspas
 simples: a API gera a miniatura das fotos com o ImageSharp, e o build da imagem reprova
-sem a licença. Ela entra só no estágio de build e não chega à imagem que sobe. O arquivo
+sem a licença. Ela entra como segredo do build: não aparece no log do deploy nem chega à
+imagem que sobe. O arquivo
 nunca vai para o repositório: o `.gitignore` e o `.dockerignore` o recusam.
 
 Nenhum desses arquivos é versionado — eles têm senha dentro, e o repositório é
