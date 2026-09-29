@@ -55,7 +55,7 @@ Separar o que é **experiência do usuário (pt-BR)** do que é **base de códig
 
 A API fala **inglês inteira** — caminho, query, corpo e resposta. Não há tradução na borda: o tipo do front vai direto na chamada.
 
-- **Caronas.** Caminho `/Rides`. Valores do enum de tipo: `Solidarity` | `Egalitarian`; do enum de turno: `Morning` | `Afternoon` | `Night`.
+- **Caronas.** Caminho `/Rides`. Valores do enum de tipo: `Solidarity` | `Egalitarian`; do enum de turno: `Morning` | `Afternoon` | `Night`. ⛔ **Nenhuma carona parte em feriado, nem a de uma vez só:** a API recusa com `RideOnAHolidayException`, o schema do formulário recusa o feriado digitado e o calendário o desabilita. Decidido pelo Victor em 29/09/2026, no #481.
 - **Achados e perdidos.** Caminho `/LostAndFound`. O campo de autoria se chama `OnlyMine` **nos dois módulos**.
 - **Cadastro.** `POST /Users/signup`, com o corpo do `CreateUserDto`: os dados da pessoa, **um** telefone e **um** e-mail de contato direto no corpo (não numa lista), o aceite de cada documento e as duas preferências de contato. Resposta: `{ token }` — o cadastro já autentica. Valores de gênero: `Male` | `Female` | `Other`.
 
