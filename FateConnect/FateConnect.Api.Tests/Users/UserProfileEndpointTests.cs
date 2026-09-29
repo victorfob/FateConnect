@@ -171,6 +171,40 @@ public class UserProfileEndpointTests(ApiFactory factory) : IClassFixture<ApiFac
     }
 
     [Fact]
+    public async Task RemoveProfileImage_WithAPhoto_ForgetsItOnTheProfile()
+    {
+        SignedInUser person = await SignedInAsync("Renata Moura Figueiredo");
+        await person.Client.PatchAsync("/Users/me", FormWithPhoto());
+
+        HttpResponseMessage response = await person.Client.DeleteAsync("/Users/me/image");
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Null((await ReadUserFrom(await person.Client.GetAsync("/Users/me"))).ImageUrl);
+    }
+
+    [Fact]
+    public async Task RemoveProfileImage_WithAPhoto_StopsServingTheFile()
+    {
+        SignedInUser person = await SignedInAsync("Otávio Lins Barreto");
+        ReadUser updated = await ReadUserFrom(await person.Client.PatchAsync("/Users/me", FormWithPhoto()));
+        await person.Client.DeleteAsync("/Users/me/image");
+
+        HttpResponseMessage response = await person.Client.GetAsync($"/{updated.ImageUrl}");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task RemoveProfileImage_WithoutAPhoto_IsAccepted()
+    {
+        SignedInUser person = await SignedInAsync("Letícia Campos Arantes");
+
+        HttpResponseMessage response = await person.Client.DeleteAsync("/Users/me/image");
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact]
     public async Task GetPreferences_OfANewAccount_AnswersBothOff()
     {
         SignedInUser person = await SignedInAsync("João Ribeiro Costa");
