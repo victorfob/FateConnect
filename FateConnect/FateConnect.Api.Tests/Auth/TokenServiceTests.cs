@@ -33,9 +33,7 @@ public class TokenServiceTests
             fullName: "Mariana Alves Rocha",
             birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             gender: EnumGender.Female,
-            phone: "11999999999",
-            contactEmail: "mariana.contato@gmail.com",
-            neighborhood: null,
+            contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
             createdAt: DateTime.UtcNow
         )
         {
@@ -79,9 +77,7 @@ public class TokenServiceTests
             fullName: "Mariana Alves Rocha",
             birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             gender: EnumGender.Female,
-            phone: "11999999999",
-            contactEmail: "mariana.contato@gmail.com",
-            neighborhood: null,
+            contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
             createdAt: DateTime.UtcNow
         )
         {

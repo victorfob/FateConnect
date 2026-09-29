@@ -29,6 +29,7 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     [MemberData(nameof(UploadRoutes))]
     [MemberData(nameof(HolidayRoutes))]
     [MemberData(nameof(DenunciationRoutes))]
+    [MemberData(nameof(UserRoutes))]
     public async Task ProtectedEndpoints_WithoutToken_RespondUnauthorized(string method, string route)
     {
         var request = new HttpRequestMessage(new HttpMethod(method), route);
@@ -85,6 +86,41 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Otávio Bastos Rodrigues");
 
         HttpResponseMessage response = await client.GetAsync("/Denunciations/mine");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    public static TheoryData<string, string> UserRoutes() => new()
+    {
+        { "GET", "/Users/me" },
+        { "PATCH", "/Users/me" },
+        { "GET", "/Users/me/preferences" },
+        { "PATCH", "/Users/me/preferences" },
+        { "PATCH", "/Users/me/password" },
+        { "POST", "/Users/me/deactivate" },
+        { "GET", "/Users" },
+        { "GET", "/Users/1" },
+        { "PATCH", "/Users/1" },
+        { "PATCH", "/Users/1/profile" },
+        { "PATCH", "/Users/1/status" }
+    };
+
+    [Fact]
+    public async Task OwnAccountEndpoints_WithAnOperatorToken_ReachTheController()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Vitória Salles Prado");
+
+        HttpResponseMessage response = await client.GetAsync("/Users/me");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UserManagementEndpoints_WithAnAdministratorToken_ReachTheController()
+    {
+        HttpClient client = _factory.CreateClientForNewAdministrator("Wesley Brandão Rocha");
+
+        HttpResponseMessage response = await client.GetAsync("/Users");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }

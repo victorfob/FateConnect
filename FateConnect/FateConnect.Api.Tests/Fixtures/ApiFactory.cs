@@ -99,9 +99,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             fullName: "Mariana Rocha",
             birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             gender: EnumGender.Female,
-            phone: "11999999999",
-            contactEmail: "mariana.contato@gmail.com",
-            neighborhood: null,
+            contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
             createdAt: DateTime.UtcNow
         )
         {
@@ -162,19 +160,15 @@ public class ApiFactory : WebApplicationFactory<Program>
             fullName: fullName,
             birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             gender: EnumGender.Other,
-            phone: phone,
-            contactEmail: contactEmail,
-            neighborhood: null,
+            contact: new UserContact(phone, contactEmail),
             createdAt: DateTime.UtcNow
         );
 
         user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
 
-        if (profileType == EnumProfileType.Administrator)
-            user.PromoteToAdministrator();
-
         context.Users.Add(user);
 
+        context.Entry(user).Property(u => u.ProfileType).CurrentValue = profileType;
         context.Entry(user).Property(u => u.CreatedAt).CurrentValue = DateTime.UtcNow;
         context.Entry(user).Property(u => u.UpdatedAt).CurrentValue = DateTime.UtcNow;
 
@@ -197,9 +191,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             fullName: fullName,
             birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             gender: EnumGender.Other,
-            phone: UniquePhone(),
-            contactEmail: UniqueContactEmail(),
-            neighborhood: null,
+            contact: new UserContact(UniquePhone(), UniqueContactEmail()),
             createdAt: DateTime.UtcNow
         );
 

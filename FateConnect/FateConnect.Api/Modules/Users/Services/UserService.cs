@@ -42,9 +42,7 @@ public partial class UserService(
             dto.FullName,
             dto.BirthDate,
             dto.Gender,
-            dto.Phone,
-            dto.ContactEmail,
-            null,
+            new UserContact(dto.Phone, dto.ContactEmail),
             now
         );
 
