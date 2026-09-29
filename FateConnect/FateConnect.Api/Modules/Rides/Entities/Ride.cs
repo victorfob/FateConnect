@@ -181,6 +181,9 @@ public class Ride
         if (isASingleRide && repeatUntil.HasValue)
             throw new RepeatUntilOnASingleRideException();
 
+        if (holidays.IsHoliday(firstDeparture))
+            throw new RideOnAHolidayException();
+
         if (isASingleRide)
             return;
 
@@ -197,9 +200,6 @@ public class Ride
 
         if (startsOnAWeekend)
             throw new WeekdaysRideOnAWeekendException();
-
-        if (holidays.IsHoliday(firstDeparture))
-            throw new RepeatingRideOnAHolidayException();
     }
 
     private static void ValidateDriver(int driverId)
