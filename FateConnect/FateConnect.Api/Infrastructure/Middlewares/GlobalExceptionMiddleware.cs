@@ -34,6 +34,7 @@ public partial class GlobalExceptionMiddleware(
 
         switch (exception)
         {
+            case UserDomainException:
             case InvalidUserIdentifierException:
             case DenunciationDomainException:
             case InvalidImageException:

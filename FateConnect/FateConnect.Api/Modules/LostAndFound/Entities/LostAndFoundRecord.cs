@@ -45,7 +45,7 @@ public class LostAndFoundRecord
         LostAndFoundType = lostAndFoundType;
         Place = place.Trim();
         OcurredOn = ocurredOn;
-        Description = NormalizeDescription(description);
+        Description = description.NormalizeOptionalText();
         Status = EnumStatusLostAndFound.Open;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
@@ -91,7 +91,7 @@ public class LostAndFoundRecord
 
         if (description is not null)
         {
-            Description = NormalizeDescription(description);
+            Description = description.NormalizeOptionalText();
             receivedAnyField = true;
         }
 
@@ -144,9 +144,6 @@ public class LostAndFoundRecord
 
         return null;
     }
-
-    private static string? NormalizeDescription(string? description) =>
-        string.IsNullOrWhiteSpace(description) ? null : description.Trim();
 
     private static void ValidateUser(int userId)
     {
