@@ -112,9 +112,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile --ignore-scripts
 
+      # O `blob` sozinho não imprime nada: shard reprovado saía só com o código
+      # de saída, e o relatório dele não chega a subir. O `default` põe no log
+      # qual teste caiu.
       - name: Tests
         run: |
-          yarn vitest run --coverage --reporter=blob \
+          yarn vitest run --coverage --reporter=blob --reporter=default \
             --shard=${{ matrix.index }}/2 \
             --coverage.thresholds.lines=0 \
             --coverage.thresholds.functions=0 \
