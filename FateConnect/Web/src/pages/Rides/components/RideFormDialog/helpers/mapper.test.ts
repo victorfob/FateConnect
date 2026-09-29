@@ -1,4 +1,4 @@
-import { RideTypeEnum, type Ride } from '@app/services/rides/types';
+import { RideFrequencyEnum, RideTypeEnum, type Ride } from '@app/services/rides/types';
 
 import { EMPTY_RIDE_FORM, type RideFormValues } from '../schema';
 import { toFormValues, toRideInput } from './mapper';
@@ -13,6 +13,8 @@ const RIDE: Ride = {
   description: 'Saída do centro.',
   driver: { name: 'Ana Ofertante', email: 'ana@example.com', phone: '(15) 90000-0000' },
   isOwner: true,
+  frequency: RideFrequencyEnum.ONCE,
+  repeatUntil: null,
 };
 
 describe('toFormValues', () => {
@@ -38,6 +40,8 @@ describe('toRideInput', () => {
       destination: 'Fatec Sorocaba',
       departure: new Date(2026, 4, 22, 7, 30),
       rideType: RideTypeEnum.EGALITARIAN,
+      frequency: RideFrequencyEnum.ONCE,
+      repeatUntil: null,
       description: 'Saída do centro.',
     };
 
@@ -46,7 +50,41 @@ describe('toRideInput', () => {
       departureDate: '2026-05-22',
       departureTime: '07:30',
       rideType: RideTypeEnum.EGALITARIAN,
+      frequency: RideFrequencyEnum.ONCE,
       description: 'Saída do centro.',
     });
+  });
+
+  it('should send the end date only when the ride repeats', () => {
+    const values: RideFormValues = {
+      destination: 'Fatec Sorocaba',
+      departure: new Date(2026, 4, 22, 7, 30),
+      rideType: RideTypeEnum.EGALITARIAN,
+      frequency: RideFrequencyEnum.WEEKLY,
+      repeatUntil: new Date(2026, 5, 19),
+      description: '',
+    };
+
+    expect(toRideInput(values).repeatUntil).toBe('2026-06-19');
+    expect(
+      toRideInput({ ...values, frequency: RideFrequencyEnum.ONCE, repeatUntil: null }),
+    ).not.toHaveProperty('repeatUntil');
+  });
+});
+
+describe('toFormValues with a recurrence', () => {
+  it('should bring the recurrence and its end date back into the fields', () => {
+    const values = toFormValues({
+      ...RIDE,
+      frequency: RideFrequencyEnum.MONTHLY,
+      repeatUntil: '2026-07-31',
+    });
+
+    expect(values.frequency).toBe(RideFrequencyEnum.MONTHLY);
+    expect(values.repeatUntil).toBe('31/07/2026');
+  });
+
+  it('should leave the end date empty for a single ride', () => {
+    expect(toFormValues(RIDE).repeatUntil).toBe('');
   });
 });

@@ -48,7 +48,7 @@ public class RideRepetitionRulesTests : IClassFixture<ApiFactory>
     [InlineData("Weekdays", "saturday", "oneWeek", HttpStatusCode.BadRequest)]
     [InlineData("Weekdays", "monday", "oneWeek", HttpStatusCode.Created)]
     [InlineData("Weekly", "holiday", "oneWeek", HttpStatusCode.BadRequest)]
-    [InlineData("Once", "holiday", "none", HttpStatusCode.Created)]
+    [InlineData("Once", "holiday", "none", HttpStatusCode.BadRequest)]
     [InlineData("Weekly", "ordinary", "none", HttpStatusCode.BadRequest)]
     [InlineData("Weekly", "ordinary", "oneWeek", HttpStatusCode.Created)]
     [InlineData("Weekly", "ordinary", "before", HttpStatusCode.BadRequest)]
@@ -108,6 +108,19 @@ public class RideRepetitionRulesTests : IClassFixture<ApiFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("Weekly", updated.Frequency);
         Assert.Equal(start.AddDays(7), updated.RepeatUntil);
+    }
+
+    [Fact]
+    public async Task UpdateRide_OfASingleRideToAHoliday_IsRefused()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Ana Beatriz Nogueira");
+        HttpResponseMessage created = await client.PostAsJsonAsync("/Rides", RidePayload("Once", StartFor("ordinary"), null));
+        ReadRide ride = (await created.Content.ReadFromJsonAsync<ReadRide>())!;
+
+        HttpResponseMessage response = await client.PutAsJsonAsync(
+            $"/Rides/{ride.Id}", new { departureDate = Iso(StartFor("holiday")) });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]

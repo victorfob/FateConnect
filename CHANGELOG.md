@@ -8,6 +8,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona ao formulário de ofertar e editar carona a recorrência em dias úteis, semanal ou mensal, com data final de até 6 meses; o formulário continua abrindo na carona de uma vez só (#481) [Frontend]
 - Adiciona a edição do próprio perfil, das preferências e da senha, a desativação da conta e a gestão de usuários pelo administrador (#482) [Backend]
 - Adiciona a carona com recorrência em dias úteis, toda semana ou todo mês, até uma data final de no máximo 6 meses, pulando feriado e, na de dias úteis, o fim de semana; sem recorrência ela continua valendo uma vez só, e as já ofertadas ficam assim (#480) [Backend]
 - Adiciona a consulta dos feriados de um ano, com os nacionais, o estadual de São Paulo e o municipal de Sorocaba, que as caronas com recorrência vão pular; ano ausente ou fora do calendário aceito é recusado com 400 (#479) [Backend]
@@ -18,6 +19,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Passa a mostrar no cartão de carona a recorrência ao lado da data e da hora, que passam a ser as da próxima partida (#481) [Frontend]
+- Passa a citar a recorrência entre os dados da carona nos termos de uso e na política de privacidade (#481) [Frontend]
+- Passa a desabilitar no calendário da carona os feriados e, na recorrência em dias úteis, o fim de semana (#481) [Frontend]
+- Passa a recusar a carona que parta em feriado, inclusive a de uma vez só (#481) [Backend]
 - Passa a declarar na política de privacidade o bairro e a foto de perfil, que aparece junto do nome nos anúncios e é apagada quando removida, e o que quem administra a plataforma vê da conta para gerenciá-la (#482) [Frontend]
 - Passa a dizer nos termos que quem administra a plataforma pode corrigir o nome, o e-mail institucional e os contatos de uma conta e dar ou retirar dela o acesso de administração (#482) [Frontend]
 - Passa a manter a carona na listagem enquanto houver partida por vir, com a próxima partida como data, a ordem por ela e o filtro de período valendo para qualquer partida (#480) [Backend]
@@ -41,6 +46,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Corrige o seletor de data e hora, que não fechava ao escolher o minuto que já vinha marcado, como o 00 de uma hora redonda (#481) [Frontend]
 - Corrige na política de privacidade o que fica no navegador, que omitia o identificador da sessão de diagnóstico guardado pelo monitoramento de erros, e a forma como a senha é guardada, que ela dizia cifrada e é um hash sem volta; o documento ganha nova versão (#468) [Frontend]
 - Corrige nos termos a descrição do item de achados e perdidos, que aparecia como obrigatória: ela é opcional, como o cadastro do item sempre aceitou; o documento ganha nova versão (#468) [Frontend]
 
