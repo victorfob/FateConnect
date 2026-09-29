@@ -93,14 +93,26 @@ public class ApiFactory : WebApplicationFactory<Program>
             Audience = "FateConnectTestWeb",
         };
 
-        return new TokenService(Options.Create(options))
-            .GenerateJwtToken(new User
-            {
-                Id = userId,
-                FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
-                TokenVersion = tokenVersion,
-                ProfileType = profileType
-            });
+        User user = new User(
+            fatecEmail: "mariana.rocha@aluno.cps.sp.gov.br",
+            passwordHash: "hash-sem-valor",
+            fullName: "Mariana Rocha",
+            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            gender: EnumGender.Female,
+            contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
+            createdAt: DateTime.UtcNow
+        )
+        {
+            Id = userId
+        };
+
+        if (profileType == EnumProfileType.Administrator)
+            user.PromoteToAdministrator();
+
+        if (tokenVersion != user.TokenVersion)
+            typeof(User).GetProperty(nameof(User.TokenVersion))?.SetValue(user, tokenVersion);
+
+        return new TokenService(Options.Create(options)).GenerateJwtToken(user);
     }
 
     public static string IssueTokenWithoutVersion(int userId = 1)
@@ -142,21 +154,24 @@ public class ApiFactory : WebApplicationFactory<Program>
         string phone = UniquePhone();
         string contactEmail = UniqueContactEmail();
 
-        User user = new()
-        {
-            FullName = fullName,
-            FatecEmail = $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
-            Password = "hash-sem-valor-fora-desta-suite",
-            BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            ProfileType = profileType,
-            Phone = phone,
-            ContactEmail = contactEmail,
-            Preferences = new UserPreferences(),
-        };
+        User user = new User(
+            fatecEmail: $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+            passwordHash: "hash-sem-valor-fora-desta-suite",
+            fullName: fullName,
+            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            gender: EnumGender.Other,
+            contact: new UserContact(phone, contactEmail),
+            createdAt: DateTime.UtcNow
+        );
+
+        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
 
         context.Users.Add(user);
+
+        context.Entry(user).Property(u => u.ProfileType).CurrentValue = profileType;
+        context.Entry(user).Property(u => u.CreatedAt).CurrentValue = DateTime.UtcNow;
+        context.Entry(user).Property(u => u.UpdatedAt).CurrentValue = DateTime.UtcNow;
+
         context.SaveChanges();
 
         return new SeededUser(user.Id, phone, contactEmail);
@@ -170,18 +185,24 @@ public class ApiFactory : WebApplicationFactory<Program>
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
-        User user = new()
-        {
-            FullName = fullName,
-            FatecEmail = $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
-            Password = HashPassword(password),
-            BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Status = status,
-        };
+        User user = new User(
+            fatecEmail: $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+            passwordHash: HashPassword(password),
+            fullName: fullName,
+            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            gender: EnumGender.Other,
+            contact: new UserContact(UniquePhone(), UniqueContactEmail()),
+            createdAt: DateTime.UtcNow
+        );
+
+        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
 
         context.Users.Add(user);
+
+        context.Entry(user).Property(u => u.Status).CurrentValue = status;
+        context.Entry(user).Property(u => u.CreatedAt).CurrentValue = DateTime.UtcNow;
+        context.Entry(user).Property(u => u.UpdatedAt).CurrentValue = DateTime.UtcNow;
+
         context.SaveChanges();
 
         return (user.Id, user.FatecEmail);

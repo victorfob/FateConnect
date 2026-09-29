@@ -17,6 +17,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.ContactEmail).HasMaxLength(150);
         builder.Property(e => e.Neighborhood).HasMaxLength(100);
         builder.Property(e => e.Status).IsRequired();
+        builder.Property(e => e.ImageUrl).HasMaxLength(500);
 
         builder.HasIndex(e => e.Phone).IsUnique();
         builder.HasIndex(e => e.ContactEmail).IsUnique();

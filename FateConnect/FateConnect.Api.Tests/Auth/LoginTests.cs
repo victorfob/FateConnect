@@ -43,6 +43,17 @@ public class LoginTests(ApiFactory factory) : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task Login_WithTheEmailInCapitalLetters_FindsTheAccount()
+    {
+        (_, string fatecEmail) = factory.SeedUserWithPassword("Mariana Alves Rocha", KnownPassword);
+
+        HttpResponseMessage response = await factory.CreateClient()
+            .PostAsJsonAsync("/Auth/login", new { fatecEmail = fatecEmail.ToUpperInvariant(), password = KnownPassword });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Login_WithAnUnknownEmail_IsRejected()
     {
         HttpResponseMessage response = await factory.CreateClient()

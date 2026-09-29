@@ -231,6 +231,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ContactEmail")
+                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
@@ -250,6 +251,10 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("Neighborhood")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -260,6 +265,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasMaxLength(11)
                         .HasColumnType("character varying(11)");
 

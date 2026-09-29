@@ -221,6 +221,28 @@ public class SignupTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task Signup_WithTheLoginEmailOfAnotherAccountInCapitalLetters_IsRejectedNamingTheLoginEmail()
+    {
+        (_, string takenEmail) = _factory.SeedUserWithPassword("Bruno Carvalho Souza", "SenhaForte123!");
+        object payload = new
+        {
+            fatecEmail = takenEmail.ToUpperInvariant(),
+            password = "SenhaForte123!",
+            fullName = "Mariana Alves Rocha",
+            birthDate = "2000-01-01T00:00:00Z",
+            gender = "Male",
+            phone = ApiFactory.UniquePhone(),
+            contactEmail = ApiFactory.UniqueContactEmail(),
+            acceptances = new[] { new { document = "TermsOfUse", version = "2026-01-15" } },
+        };
+
+        (HttpStatusCode status, string? field) = await SignupAnswerFor(payload);
+
+        Assert.Equal(HttpStatusCode.Conflict, status);
+        Assert.Equal("fatecEmail", field);
+    }
+
+    [Fact]
     public async Task Signup_ByWhoIsUnderage_IsRejected()
     {
         (HttpStatusCode statusCode, _) = await SignupAnswerFor(SignupPayload(

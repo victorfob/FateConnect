@@ -27,13 +27,20 @@ public class TokenServiceTests
             Audience = Audience,
         };
 
-        string token = new TokenService(Options.Create(options))
-            .GenerateJwtToken(new User
-            {
-                Id = 7,
-                FullName = "Mariana Alves Rocha",
-                FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
-            });
+        User testUser = new User(
+            fatecEmail: "mariana.rocha@aluno.cps.sp.gov.br",
+            passwordHash: "HashFalso123",
+            fullName: "Mariana Alves Rocha",
+            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            gender: EnumGender.Female,
+            contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
+            createdAt: DateTime.UtcNow
+        )
+        {
+            Id = 7
+        };
+
+        string token = new TokenService(Options.Create(options)).GenerateJwtToken(testUser);
 
         ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(
             token,
@@ -64,13 +71,20 @@ public class TokenServiceTests
             Audience = Audience,
         };
 
-        string token = new TokenService(Options.Create(options))
-            .GenerateJwtToken(new User
-            {
-                Id = 7,
-                FullName = "Mariana Alves Rocha",
-                FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
-            });
+        User testUser = new User(
+            fatecEmail: "mariana.rocha@aluno.cps.sp.gov.br",
+            passwordHash: "HashFalso123",
+            fullName: "Mariana Alves Rocha",
+            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            gender: EnumGender.Female,
+            contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
+            createdAt: DateTime.UtcNow
+        )
+        {
+            Id = 7
+        };
+
+        string token = new TokenService(Options.Create(options)).GenerateJwtToken(testUser);
 
         Claim role = Assert.Single(
             new JwtSecurityTokenHandler().ReadJwtToken(token).Claims,

@@ -8,6 +8,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona a edição do próprio perfil, das preferências e da senha, a desativação da conta e a gestão de usuários pelo administrador (#482) [Backend]
 - Adiciona a carona com recorrência em dias úteis, toda semana ou todo mês, até uma data final de no máximo 6 meses, pulando feriado e, na de dias úteis, o fim de semana; sem recorrência ela continua valendo uma vez só, e as já ofertadas ficam assim (#480) [Backend]
 - Adiciona a consulta dos feriados de um ano, com os nacionais, o estadual de São Paulo e o municipal de Sorocaba, que as caronas com recorrência vão pular; ano ausente ou fora do calendário aceito é recusado com 400 (#479) [Backend]
 - Adiciona a miniatura das fotos de achados e perdidos e de denúncias: toda foto enviada ganha uma versão pequena em WebP, servida com a mesma autorização da original, e apagar ou trocar a foto apaga as duas (#465) [Backend]
@@ -17,6 +18,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Passa a declarar na política de privacidade o bairro e a foto de perfil, que aparece junto do nome nos anúncios e é apagada quando removida, e o que quem administra a plataforma vê da conta para gerenciá-la (#482) [Frontend]
+- Passa a dizer nos termos que quem administra a plataforma pode corrigir o nome, o e-mail institucional e os contatos de uma conta e dar ou retirar dela o acesso de administração (#482) [Frontend]
 - Passa a manter a carona na listagem enquanto houver partida por vir, com a próxima partida como data, a ordem por ela e o filtro de período valendo para qualquer partida (#480) [Backend]
 - Passa a explicar, na lista vazia de achados e perdidos, o que aparece ali e como sair dela, ampliando a busca ou cadastrando um item, como caronas já faz (#472) [Frontend]
 - Passa a mostrar o desenho de desktop das telas a partir de 822px, em vez de 965px, que é onde a navegação do topo deixa de caber e decidia por todas as telas; o cabeçalho continua recolhendo a navegação no menu abaixo de 965px (#470) [Frontend]
