@@ -4,7 +4,12 @@ import { http, HttpResponse } from 'msw';
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
-import { RideShiftEnum, RideTypeEnum, type Ride } from '@app/services/rides/types';
+import {
+  RideFrequencyEnum,
+  RideShiftEnum,
+  RideTypeEnum,
+  type Ride,
+} from '@app/services/rides/types';
 import type { UserContact } from '@app/services/types';
 import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
@@ -22,10 +27,12 @@ import {
   RideOwnerFilterEnum,
 } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
+import { rideRecurrenceLabel } from './helpers/rideFrequency';
 import * as C from './constants';
 import { Rides } from '.';
 
 const RIDES_URL = 'https://api.fateconnect.test/rides';
+const HOLIDAYS_URL = 'https://api.fateconnect.test/holidays';
 const SECOND_PAGE_LABEL = 'Ir para a página 2';
 
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
@@ -47,6 +54,8 @@ const RIDE: Ride = {
   description: 'Saída do centro, com parada no terminal.',
   driver: DRIVER,
   isOwner: false,
+  frequency: RideFrequencyEnum.ONCE,
+  repeatUntil: null,
 };
 
 /** A posse vem calculada pela API; o cartão só a lê. */
@@ -112,6 +121,7 @@ describe('Rides', () => {
 
   beforeEach(() => {
     listReturning([]);
+    server.use(http.get(HOLIDAYS_URL, () => HttpResponse.json([])));
     clipboardWrite = vi.fn(() => Promise.resolve());
     Object.defineProperty(navigator, 'clipboard', {
       value: { writeText: clipboardWrite },
@@ -200,9 +210,27 @@ describe('Rides', () => {
     renderComponent();
 
     expect(await screen.findByText(RIDE.destination)).toBeInTheDocument();
-    expect(screen.getByText('22/05/2026')).toBeInTheDocument();
-    expect(screen.getByText('07:30')).toBeInTheDocument();
+    expect(screen.getByText('22/05 às 07:30')).toBeInTheDocument();
     expect(screen.getAllByText('Solidária')).toHaveLength(1);
+  });
+
+  it('should show the recurrence of a ride that repeats', async () => {
+    const weekly: Ride = {
+      ...RIDE,
+      id: 'weekly-ride',
+      destination: 'Votorantim',
+      departureDate: '2026-10-12',
+      frequency: RideFrequencyEnum.WEEKLY,
+      repeatUntil: '2026-11-30',
+    };
+    listReturning([RIDE, weekly]);
+    renderComponent();
+
+    expect(await screen.findByText(weekly.destination)).toBeInTheDocument();
+    expect(screen.getByText('Próxima: 12/10 às 07:30')).toBeInTheDocument();
+    expect(
+      screen.getByText(rideRecurrenceLabel(weekly.frequency, weekly.departureDate) ?? ''),
+    ).toBeInTheDocument();
   });
 
   it('should tell the user when no ride matches', async () => {

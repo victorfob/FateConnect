@@ -32,5 +32,5 @@ public class RepeatUntilTooFarException()
 public class WeekdaysRideOnAWeekendException()
     : RideDomainException("A recorrência em dias úteis começa num dia útil.");
 
-public class RepeatingRideOnAHolidayException()
-    : RideDomainException("Carona com recorrência não começa em feriado.");
+public class RideOnAHolidayException()
+    : RideDomainException("Escolha um dia que não seja feriado.");

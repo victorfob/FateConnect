@@ -1,4 +1,5 @@
 import { useCallback, useState, type FocusEvent, type MouseEvent } from 'react';
+import { usePickerTranslations } from '@mui/x-date-pickers/hooks';
 import type { DateOrTimeView } from '@mui/x-date-pickers/models';
 import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
 
@@ -13,10 +14,17 @@ import {
   DAY_VIEW,
   HOURS_VIEW,
   MASKED_DATE_TIME_LENGTH,
+  MINUTES_VIEW,
   PICKER_SLOT_PROPS,
   PICKER_VIEWS,
 } from './constants';
-import { formatDateTime, isPickerView, maskDateTime, parseDateTimeSoFar } from './helpers';
+import {
+  formatDateTime,
+  isOptionOfColumn,
+  isPickerView,
+  maskDateTime,
+  parseDateTimeSoFar,
+} from './helpers';
 import * as S from './styles';
 
 export type DateTimeFieldProps = Readonly<{
@@ -32,6 +40,8 @@ export type DateTimeFieldProps = Readonly<{
   disabled?: boolean;
   minDate?: Date;
   maxDate?: Date;
+  /** Dia que o calendário não deixa escolher; digitado, quem recusa é a validação. */
+  shouldDisableDate?: (day: Date) => boolean;
 }>;
 
 /**
@@ -49,12 +59,14 @@ export function DateTimeField({
   disabled,
   minDate,
   maxDate,
+  shouldDisableDate,
 }: DateTimeFieldProps) {
   const { inputRef, anchor, handleChange, handleOpenPicker, handleClosePicker } = useMaskedPicker(
     maskDateTime,
     onChange,
   );
   const [view, setView] = useState<DateOrTimeView>(DAY_VIEW);
+  const minutesColumnLabel = usePickerTranslations().selectViewText(MINUTES_VIEW);
 
   const handleViewChange = useCallback((next: string) => {
     if (isPickerView(next)) setView(next);
@@ -69,15 +81,9 @@ export function DateTimeField({
   );
 
   /**
-   * O painel anda sozinho: escolhido o dia ele vai para a hora — a aba de volta
-   * continua ali —, e escolhido o minuto ele fecha, como o campo só de data
-   * fecha ao escolher o dia.
-   *
-   * ⚠️ O seletor não diz qual trecho foi tocado: a prop recebe a data e um
-   * contexto, e nada mais. Do dia dá para saber pela vista, porque o calendário
-   * só aparece nela; do minuto, não — hora e minuto ficam **na tela ao mesmo
-   * tempo**, e mexer só no minuto não troca vista nenhuma. Aí quem responde é a
-   * comparação com o valor que já estava lá.
+   * Escolhido o dia, o painel vai para a hora; escolhido o minuto, ele fecha. O
+   * minuto que muda fecha aqui, e o que já estava escolhido, que não dispara
+   * mudança nenhuma no seletor, fecha em `handlePanelClick`.
    */
   const handlePick = useCallback(
     (date: Date | null) => {
@@ -93,6 +99,13 @@ export function DateTimeField({
       if (previous?.getMinutes() !== date.getMinutes()) handleClosePicker();
     },
     [onChange, value, view, handleClosePicker],
+  );
+
+  const handlePanelClick = useCallback(
+    (event: MouseEvent<HTMLElement>) => {
+      if (isOptionOfColumn(event.target, minutesColumnLabel)) handleClosePicker();
+    },
+    [minutesColumnLabel, handleClosePicker],
   );
 
   return (
@@ -129,6 +142,7 @@ export function DateTimeField({
         open={Boolean(anchor)}
         anchorEl={anchor}
         onClose={handleClosePicker}
+        onClick={handlePanelClick}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
@@ -141,12 +155,12 @@ export function DateTimeField({
           displayStaticWrapperAs="mobile"
           value={parseDateTimeSoFar(value)}
           onChange={handlePick}
-          onAccept={handleClosePicker}
           view={view}
           onViewChange={handleViewChange}
           views={PICKER_VIEWS}
           minDate={minDate}
           maxDate={maxDate}
+          shouldDisableDate={shouldDisableDate}
           slotProps={PICKER_SLOT_PROPS}
         />
       </S.PickerPopover>

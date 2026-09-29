@@ -325,6 +325,24 @@ describe('Input.Date', () => {
     expect(calendar.getByRole('gridcell', { name: '11' })).toBeDisabled();
   });
 
+  it('should not offer a day the consumer rules out', async () => {
+    const isTheEleventh = (day: Date) => day.getDate() === 11;
+    render(
+      <Input.Date
+        label="Data"
+        value="10/08/2026"
+        shouldDisableDate={isTheEleventh}
+        onChange={vi.fn()}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '10' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '11' })).toBeDisabled();
+  });
+
   it('should close the calendar once the day is picked, which is all it asks for', async () => {
     render(<Input.Date label="Data" value="10/08/2026" onChange={vi.fn()} />);
     await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
@@ -635,6 +653,26 @@ describe('Input.DateTime', () => {
     expect(field).toHaveValue('22/05/2026 18:45');
   });
 
+  // O seletor não avisa nada quando o minuto escolhido é o que já estava lá: é a
+  // hora redonda de quem pega o dia e confirma o 00 que veio marcado.
+  it('should close on the minute already picked, but not on the hour', async () => {
+    render(<DateTimeHarness />);
+    const field = screen.getByRole('textbox', { name: /Data e hora/ });
+    await userEvent.type(field, '220520261830');
+    await openDateTimePicker();
+    await userEvent.click(
+      within(await screen.findByRole('grid')).getByRole('gridcell', { name: '23' }),
+    );
+    const [hours, minutes] = await screen.findAllByRole('listbox');
+
+    await userEvent.click(within(hours as HTMLElement).getByText('18'));
+    expect(screen.getAllByRole('listbox')).toHaveLength(2);
+
+    await userEvent.click(within(minutes as HTMLElement).getByText('30'));
+    await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+    expect(field).toHaveValue('23/05/2026 18:30');
+  });
+
   it('should leave the year out of the panel top, since the calendar already shows it', async () => {
     render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
 
@@ -670,6 +708,24 @@ describe('Input.DateTime', () => {
     const minDay = new Date(2026, 4, 22);
     render(
       <Input.DateTime label="Data e hora" value={DEPARTURE} minDate={minDay} onChange={vi.fn()} />,
+    );
+
+    await openDateTimePicker();
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '22' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '21' })).toBeDisabled();
+  });
+
+  it('should not offer a day the consumer rules out', async () => {
+    const isTheTwentyFirst = (day: Date) => day.getDate() === 21;
+    render(
+      <Input.DateTime
+        label="Data e hora"
+        value={DEPARTURE}
+        shouldDisableDate={isTheTwentyFirst}
+        onChange={vi.fn()}
+      />,
     );
 
     await openDateTimePicker();

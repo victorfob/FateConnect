@@ -6,6 +6,14 @@ export enum RideTypeEnum {
   EGALITARIAN = 'Egalitarian',
 }
 
+/** Como a carona se repete; `ONCE` é a carona de uma vez só, a de sempre. */
+export enum RideFrequencyEnum {
+  ONCE = 'Once',
+  WEEKDAYS = 'Weekdays',
+  WEEKLY = 'Weekly',
+  MONTHLY = 'Monthly',
+}
+
 /** Faixas de partida que a API resolve; a noite atravessa a meia-noite. */
 export enum RideShiftEnum {
   MORNING = 'Morning',
@@ -17,6 +25,7 @@ export enum RideShiftEnum {
 export type Ride = {
   id: string;
   destination: string;
+  /** A próxima partida; na carona de uma vez só, a única. */
   departureDate: string;
   departureTime: string;
   createdAt: string;
@@ -28,13 +37,21 @@ export type Ride = {
    * o login guarda o nome, não o id de quem ofertou.
    */
   isOwner: boolean;
+  frequency: RideFrequencyEnum;
+  repeatUntil: string | null;
 };
 
 /**
  * Corpo de criação e de atualização — a API aceita o mesmo conjunto de campos
- * nos dois verbos.
+ * nos dois verbos. A data final só viaja com recorrência: a API a recusa na
+ * carona de uma vez só.
  */
-export type RideInput = Omit<Ride, 'id' | 'createdAt' | 'driver' | 'isOwner'>;
+export interface RideInput extends Omit<
+  Ride,
+  'id' | 'createdAt' | 'driver' | 'isOwner' | 'repeatUntil'
+> {
+  repeatUntil?: string;
+}
 
 /** Filtros da listagem, com os mesmos nomes que a API recebe na query. */
 export interface RideFilter extends PageQuery {

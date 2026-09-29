@@ -14,7 +14,7 @@ export const PICKER_SLOT_PROPS = { actionBar: { actions: [] } };
 
 export const DAY_VIEW = 'day';
 export const HOURS_VIEW = 'hours';
-const MINUTES_VIEW = 'minutes';
+export const MINUTES_VIEW = 'minutes';
 
 /**
  * Sem `year`: ele é um botão no topo do painel, e o cabeçalho do calendário

@@ -20,6 +20,7 @@ export { default as DirectionsCarIcon } from '@mui/icons-material/DirectionsCar'
 export { default as DownloadIcon } from '@mui/icons-material/Download';
 export { default as EditIcon } from '@mui/icons-material/Edit';
 export { default as EmailIcon } from '@mui/icons-material/Email';
+export { default as EventRepeatIcon } from '@mui/icons-material/EventRepeat';
 export { default as ExpandLessIcon } from '@mui/icons-material/ExpandLess';
 export { default as ExpandMoreIcon } from '@mui/icons-material/ExpandMore';
 export { default as FilterAltIcon } from '@mui/icons-material/FilterAlt';
