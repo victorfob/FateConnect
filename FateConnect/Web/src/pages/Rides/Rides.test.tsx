@@ -1,4 +1,9 @@
-import { FILTER_TITLE_PLURAL, type SelectOption } from '@design-system';
+import {
+  FILTER_CLEAR_LABEL,
+  FILTER_SUBMIT_LABEL,
+  FILTER_TITLE_PLURAL,
+  type SelectOption,
+} from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
@@ -18,9 +23,7 @@ import { PAGE_SIZE } from '@app/utils/searchParams';
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
 import {
-  FILTER_CLEAR_LABEL,
   FILTER_LABELS,
-  FILTER_SUBMIT_LABEL,
   RIDE_OWNER_FILTER_OPTIONS,
   RIDE_SHIFT_FILTER_OPTIONS,
   RIDE_TYPE_FILTER_OPTIONS,

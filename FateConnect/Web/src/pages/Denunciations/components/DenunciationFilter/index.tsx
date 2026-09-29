@@ -39,13 +39,7 @@ export function DenunciationFilter({ initialFilters, onApply }: DenunciationFilt
   }, [status, onApply]);
 
   return (
-    <FilterDialog
-      submitLabel={C.FILTER_SUBMIT_LABEL}
-      clearLabel={C.FILTER_CLEAR_LABEL}
-      active={isFiltered}
-      onSubmit={handleSubmit}
-      onClear={handleClear}
-    >
+    <FilterDialog active={isFiltered} onSubmit={handleSubmit} onClear={handleClear}>
       <FilterDialog.Field>
         <Input.Select
           label={C.FILTER_LABELS.status}

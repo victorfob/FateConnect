@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Input, Switch } from '@design-system';
+import { Dialog, Input, Switch } from '@design-system';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 import { PhotoField } from '@app/components/PhotoField';
@@ -26,7 +26,7 @@ export function DenunciationFormFields() {
   );
 
   return (
-    <S.FieldsColumn>
+    <Dialog.Fields layout="column">
       <S.ConfidentialGroup>
         <S.ConfidentialToggle
           control={<Switch {...register('isAnonymous')} disabled={disabled} />}
@@ -76,6 +76,6 @@ export function DenunciationFormFields() {
         disabled={disabled}
         error={errors.photo?.message}
       />
-    </S.FieldsColumn>
+    </Dialog.Fields>
   );
 }

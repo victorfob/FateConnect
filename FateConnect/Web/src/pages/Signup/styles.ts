@@ -12,8 +12,6 @@ import {
 
 const { none, xxs, md, xl, xxl } = spacingScale;
 
-/** Grade de seis colunas no desktop: combina metades, terços e a linha rua + número. */
-const DESKTOP_COLUMNS = 6;
 const SUBMIT_HEIGHT_PX = 40;
 const SUBMIT_MAX_WIDTH_REM = 20;
 const CARD_MAX_WIDTH_MOBILE = '90%';
@@ -21,7 +19,6 @@ const CARD_MAX_WIDTH_DESKTOP = '80%';
 const HAIRLINE = '1px';
 /** 2.5rem — sem token equivalente na escala, que salta de 32px para 48px. */
 const PAGE_BOTTOM_PADDING_PX = 40;
-/** Espaço entre a pergunta e o link de login, como no produto. */
 
 export const PageRoot = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
@@ -69,19 +66,10 @@ export const SectionDivider = styled(Box)(({ theme }) => ({
   margin: theme.space(xl, none, md),
 }));
 
-export const FieldGrid = styled(Box)(({ theme }) => ({
-  display: 'grid',
-  gridTemplateColumns: '1fr',
-  gap: theme.space(md),
+export const SectionFields = styled(Box)(({ theme }) => ({
   marginTop: theme.space(md),
-  // Impede que campos da mesma linha estiquem quando o vizinho exibe erro.
-  alignItems: 'start',
 
   '& .MuiInputAdornment-root svg': { color: theme.palette.text.secondary },
-
-  [theme.breakpoints.up('md')]: {
-    gridTemplateColumns: `repeat(${DESKTOP_COLUMNS}, minmax(0, 1fr))`,
-  },
 }));
 
 export const SubmitContainer = styled(Stack)(({ theme }) => ({

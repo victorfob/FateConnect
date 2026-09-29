@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Input } from '@design-system';
+import { Dialog, Input } from '@design-system';
 import { toZonedTime } from 'date-fns-tz';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
@@ -39,8 +39,8 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
   }, [hasRecurrence, setValue]);
 
   return (
-    <S.FieldsGrid>
-      <S.WideCell>
+    <Dialog.Fields>
+      <Dialog.Fields.Wide>
         <Input
           {...register('destination')}
           label={C.RIDE_FORM_LABELS.destination}
@@ -50,7 +50,7 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
           maxLength={C.RIDE_LIMITS.maxDestination}
           error={errors.destination?.message}
         />
-      </S.WideCell>
+      </Dialog.Fields.Wide>
 
       <Controller
         name="rideType"
@@ -124,7 +124,7 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
         />
       )}
 
-      <S.WideCell>
+      <Dialog.Fields.Wide>
         <Input
           {...register('description')}
           label={C.RIDE_FORM_LABELS.description}
@@ -136,7 +136,7 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
           characterCount={description.length}
           error={errors.description?.message}
         />
-      </S.WideCell>
-    </S.FieldsGrid>
+      </Dialog.Fields.Wide>
+    </Dialog.Fields>
   );
 }

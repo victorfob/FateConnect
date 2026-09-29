@@ -8,6 +8,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona à gestão a lista das contas, onde a aba de usuários só avisava que a função viria: cada uma com o nome, os contatos e a situação, com busca por nome, e-mail ou telefone e filtro por situação e perfil (#486) [Frontend]
+- Adiciona à gestão a edição de uma conta pelo administrador: nome, e-mail institucional, contatos e o acesso de administração, que ele não retira de si mesmo (#486) [Frontend]
+- Adiciona à gestão o banimento de uma conta, com confirmação, e a reversão dele; o administrador não bane a própria conta (#486) [Frontend]
 - Adiciona ao formulário de ofertar e editar carona a recorrência em dias úteis, semanal ou mensal, com data final de até 6 meses; o formulário continua abrindo na carona de uma vez só (#481) [Frontend]
 - Adiciona a edição do próprio perfil, das preferências e da senha, a desativação da conta e a gestão de usuários pelo administrador (#482) [Backend]
 - Adiciona a carona com recorrência em dias úteis, toda semana ou todo mês, até uma data final de no máximo 6 meses, pulando feriado e, na de dias úteis, o fim de semana; sem recorrência ela continua valendo uma vez só, e as já ofertadas ficam assim (#480) [Backend]

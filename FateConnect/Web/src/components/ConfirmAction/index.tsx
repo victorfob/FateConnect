@@ -2,29 +2,31 @@ import { useCallback, useState, type ReactNode } from 'react';
 import { Button, Dialog } from '@design-system';
 
 import { CONFIRMATION } from './constants';
+import * as S from './styles';
 
-type LostItemConfirmActionProps = Readonly<{
+export type ConfirmActionProps = Readonly<{
   label: string;
   icon: ReactNode;
   dialogTitle: string;
   messagePrefix: string;
-  /** Fecha a frase depois do nome do item, para quem precisa dizer mais que o `?`. */
+  /** Fecha a frase depois do nome em destaque, para quem precisa dizer mais que o `?`. */
   messageSuffix?: string;
-  itemName: string;
+  subject: string;
   confirmLabel: string;
   onConfirm: VoidFunction;
 }>;
 
-export function LostItemConfirmAction({
+/** O botão de uma ação sem volta pela tela e a confirmação que ele abre. */
+function ConfirmAction({
   label,
   icon,
   dialogTitle,
   messagePrefix,
   messageSuffix = CONFIRMATION.messageSuffix,
-  itemName,
+  subject,
   confirmLabel,
   onConfirm,
-}: LostItemConfirmActionProps) {
+}: ConfirmActionProps) {
   const [confirming, setConfirming] = useState(false);
 
   const handleAsk = useCallback(() => setConfirming(true), []);
@@ -45,7 +47,7 @@ export function LostItemConfirmAction({
         <Dialog.Body>
           <Dialog.Message>
             {messagePrefix}
-            <strong>{itemName}</strong>
+            <strong>{subject}</strong>
             {messageSuffix}
           </Dialog.Message>
         </Dialog.Body>
@@ -62,3 +64,7 @@ export function LostItemConfirmAction({
     </>
   );
 }
+
+ConfirmAction.Row = S.ActionRow;
+
+export { ConfirmAction };

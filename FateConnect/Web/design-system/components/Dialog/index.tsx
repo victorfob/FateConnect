@@ -6,8 +6,11 @@ import { IconButton } from '@ds-root/components/IconButton';
 
 import { CLOSE_LABEL } from './constants';
 import { DialogBody } from './DialogBody';
+import { DialogFields } from './DialogFields';
 import { DialogFooter } from './DialogFooter';
+import { DialogForm } from './DialogForm';
 import { DialogMessage } from './DialogMessage';
+import { DialogSubmit } from './DialogSubmit';
 import * as S from './styles';
 
 export type DialogWidth = 'narrow' | 'standard';
@@ -18,7 +21,10 @@ export type DialogProps = Readonly<{
   title: string;
   /** `narrow` para o conteúdo curto, que num papel de 600px abriria com metade vazia. */
   width?: DialogWidth;
-  /** Conteúdo por composição: `Dialog.Body` no miolo, com `Dialog.Message` para a frase, e `Dialog.Footer` no rodapé. */
+  /**
+   * Conteúdo por composição: `Dialog.Body` no miolo, com `Dialog.Message` para a
+   * frase, e `Dialog.Footer` no rodapé. Formulário envolve os dois em `Dialog.Form`.
+   */
   children: ReactNode;
 }>;
 
@@ -71,5 +77,8 @@ function Dialog({ open, onClose, title, width = 'standard', children }: DialogPr
 Dialog.Body = DialogBody;
 Dialog.Footer = DialogFooter;
 Dialog.Message = DialogMessage;
+Dialog.Form = DialogForm;
+Dialog.Fields = DialogFields;
+Dialog.Submit = DialogSubmit;
 
 export { Dialog };

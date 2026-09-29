@@ -87,13 +87,7 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
   }, [period, departureShift, searchTerm, rideType, owner, onApply]);
 
   return (
-    <FilterDialog
-      submitLabel={C.FILTER_SUBMIT_LABEL}
-      clearLabel={C.FILTER_CLEAR_LABEL}
-      active={isFiltered}
-      onSubmit={handleSubmit}
-      onClear={handleClear}
-    >
+    <FilterDialog active={isFiltered} onSubmit={handleSubmit} onClear={handleClear}>
       <FilterDialog.Field>
         <Input.DateRange label={C.FILTER_LABELS.period} value={period} onChange={setPeriod} />
       </FilterDialog.Field>

@@ -1,4 +1,4 @@
-import { FILTER_TITLE_SINGULAR } from '@design-system';
+import { FILTER_CLEAR_LABEL, FILTER_SUBMIT_LABEL, FILTER_TITLE_SINGULAR } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import {
@@ -20,9 +20,7 @@ import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
 import {
   DENUNCIATION_STATUS_FILTER_OPTIONS,
-  FILTER_CLEAR_LABEL,
   FILTER_LABELS,
-  FILTER_SUBMIT_LABEL,
 } from './components/DenunciationFilter/constants';
 import { CHANNEL_NOTE, DENUNCIATION_FORM } from './components/DenunciationFormDialog/constants';
 import * as C from './constants';

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router';
-import { Button, Typography } from '@design-system';
+import { Button, FormGrid, Typography } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -87,15 +87,19 @@ export function Signup() {
 
         <FormProvider {...form}>
           <S.SignupForm component="form" onSubmit={handleSubmit} noValidate>
-            <S.FieldGrid>
-              <AccountSection />
-            </S.FieldGrid>
+            <S.SectionFields>
+              <FormGrid>
+                <AccountSection />
+              </FormGrid>
+            </S.SectionFields>
 
             <S.SectionDivider />
             <S.SectionTitle variant="subtitleBold">{C.CONTACT_SECTION_TITLE}</S.SectionTitle>
-            <S.FieldGrid>
-              <ContactSection />
-            </S.FieldGrid>
+            <S.SectionFields>
+              <FormGrid>
+                <ContactSection />
+              </FormGrid>
+            </S.SectionFields>
 
             <S.SectionDivider />
             <ConsentSection />

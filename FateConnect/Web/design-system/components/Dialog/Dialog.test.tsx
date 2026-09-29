@@ -82,4 +82,50 @@ describe('Dialog', () => {
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
+
+  it('should submit the form from the submit slot, and leave validation to the screen', async () => {
+    const onSubmit = vi.fn((event: { preventDefault: VoidFunction }) => event.preventDefault());
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Form onSubmit={onSubmit}>
+          <Dialog.Body>
+            <Dialog.Fields>
+              <input aria-label="Nome" required />
+              <Dialog.Fields.Wide>
+                <input aria-label="Descrição" />
+              </Dialog.Fields.Wide>
+            </Dialog.Fields>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Dialog.Submit icon={null} label="Salvar alterações" />
+          </Dialog.Footer>
+        </Dialog.Form>
+      ),
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it('should hold the submit while it is loading', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Form onSubmit={vi.fn()}>
+          <Dialog.Body>
+            <Dialog.Fields layout="column">
+              <input aria-label="Nome" />
+            </Dialog.Fields>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Dialog.Submit icon={null} label="Enviar" loading />
+          </Dialog.Footer>
+        </Dialog.Form>
+      ),
+    });
+
+    expect(screen.getByRole('button', { name: 'Enviar' })).toBeDisabled();
+  });
 });

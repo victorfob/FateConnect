@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@design-system';
 
-const { none, xxs, sm, md } = spacingScale;
+const { none, xxs } = spacingScale;
 
 const HINT_ENTRY_OFFSET_PX = 6;
 
@@ -16,13 +16,6 @@ const hintEntry = keyframes({
   from: { opacity: 0, transform: `translateY(-${HINT_ENTRY_OFFSET_PX}px)` },
   to: { opacity: 1, transform: 'translateY(0)' },
 });
-
-export const FieldsColumn = styled(Stack)(({ theme }) => ({
-  flexDirection: 'column',
-  gap: theme.space(md),
-  // Respiro para o rótulo do campo preenchido não sair cortado na rolagem.
-  paddingTop: theme.space(sm),
-}));
 
 export const ConfidentialGroup = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
