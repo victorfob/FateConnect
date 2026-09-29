@@ -17,6 +17,14 @@ Os dois projetos referenciam o `SonarAnalyzer.CSharp`, então as regras que o So
 
 Foi assim que os nove primeiros apareceram, ao referenciar o pacote: seis de `S6964` (campo de tipo-valor sem `required`, que aceitava a omissão e virava o valor padrão), dois de `S1118` e um `WriteAsJsonAsync` sem `CancellationToken`.
 
+### A S107 é uma que só o Sonar da nuvem acusa
+
+⛔ **Construtor ou método com mais de 7 parâmetros passa no `dotnet build` daqui e vira apontamento no PR.** Então quem acrescenta um parâmetro conta os que já existem antes, em vez de esperar o build avisar.
+
+Aconteceu em 29/09/2026, no #482. O construtor do `User` nasceu com 8 parâmetros e ninguém viu, porque o passo do Sonar vinha `skipped` com os testes quebrando antes dele. Quando os testes voltaram a passar, a análise rodou e acusou 9: o nono tinha saído de uma sugestão do review.
+
+**As duas saídas já usadas:** tirar o parâmetro que todo chamador passa vazio e agrupar os que andam juntos num record, como o `UserContact` do telefone e do e-mail; ou mover o que é opcional para um método chamado depois do construtor, como o `Ride.ChangeRepetition`.
+
 ⚠️ **`Program` não pode virar `static`** para satisfazer o `S1118`: `WebApplicationFactory<Program>` a usa como argumento genérico, e classe estática não serve. O construtor privado resolve.
 
 ## Módulo novo renomeia o esqueleto que copiou — a duplicação conta identificador

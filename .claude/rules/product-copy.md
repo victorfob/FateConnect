@@ -162,6 +162,14 @@ Coincidir era o caso feliz, e deixou de existir: achados e perdidos também levo
 
 ⚠️ O tell de que alguém confundiu os dois papéis é um teste que escolhe uma opção pelo valor do enum. Ele passa enquanto os dois coincidem e cai no dia da tradução, apontando para a linha errada — a mensagem diz que não existe opção chamada `Found`, e não que o rótulo mudou de dono.
 
+### Carona que se repete tem recorrência
+
+⛔ **O conceito se chama recorrência, em todo texto que alguém lê:** *carona com recorrência*, *data final da recorrência*, e o campo `Recorrência`. Não *carona que repete*, nem *repetição*, nem *frequência*.
+
+Decidido pelo Victor em 28/09/2026, no review do #480. As mensagens da API diziam *a carona que repete*, *a carona repete por* e *até quando a carona repete*: três formas para o mesmo conceito, em quatro frases vizinhas.
+
+⚠️ **A regra é da copy, não do código.** `frequency`, `EnumRideFrequency` e `ChangeRepetition` são identificadores em inglês e ficam como estão. Não *corrija* um pelo outro.
+
 ## Erro: o problema e a saída
 
 Diz o que aconteceu e o que fazer: `Erro ao carregar os itens. Tente novamente.`
@@ -301,6 +309,12 @@ Mensagem de validação sai como `helperText` abaixo do campo, e ali a sobra é 
 ⚠️ **Estourar aqui é barato:** o `helperText` cresce **21px por linha** e empurra o resto do formulário para baixo. É o oposto do rodapé de diálogo, onde duas ações que não cabem saltam de 36px para 80px.
 
 ⛔ **Aqui a largura saiu da decisão pelo motivo oposto ao do caso acima.** Lá o candidato mais longo cabia; aqui **nenhuma** candidata cabe — 291,5px, 324,0px e 372,4px contra 243,3px de sobra, e a frase que já estava em produção também não cabe (336,7px). Nos dois a conclusão é a mesma e a leitura é diferente: **meça para saber se a largura decide**. Ela decide quando separa as opções, e é indiferente tanto quando todas cabem quanto quando nenhuma cabe.
+
+### A largura da fileira do cartão, medida
+
+A fileira de informações do cartão de carona tem 291px a 375px, com vão de 16px entre os itens e 20px de ícone mais 4px de vão dentro de cada um. Depois da data (96px) e da hora (59px), **sobram 80px** para o texto de um terceiro item. Medido em 28/09/2026, ao nomear o rótulo da recorrência.
+
+⚠️ **Estourar aqui quebra a fileira:** o item desce sozinho para uma segunda linha, e o cartão fica 24px mais alto só nos casos em que o texto é longo. Foi o que decidiu o rótulo da semanal. *Toda segunda* (88px) e *Aos domingos* (90px) não cabem. O dia no plural cabe nos sete: o mais longo, *Domingos*, tem 64px.
 
 ### As larguras do diálogo, medidas
 
