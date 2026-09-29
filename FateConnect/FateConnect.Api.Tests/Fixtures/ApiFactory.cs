@@ -170,11 +170,9 @@ public class ApiFactory : WebApplicationFactory<Program>
 
         user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
 
-        if (profileType == EnumProfileType.Administrator)
-            user.PromoteToAdministrator();
-
         context.Users.Add(user);
 
+        context.Entry(user).Property(u => u.ProfileType).CurrentValue = profileType;
         context.Entry(user).Property(u => u.CreatedAt).CurrentValue = DateTime.UtcNow;
         context.Entry(user).Property(u => u.UpdatedAt).CurrentValue = DateTime.UtcNow;
 
