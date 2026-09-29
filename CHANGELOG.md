@@ -18,8 +18,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- Melhoria na estrutura interna de validação de usuários, garantindo maior integridade e segurança na atualização dos dados do perfil (#482) [Backend]
-- Passa a declarar na política de privacidade o bairro e a foto de perfil, que aparece junto do nome nos anúncios, e o que quem administra a plataforma vê da conta para gerenciá-la (#482) [Frontend]
+- Passa a declarar na política de privacidade o bairro e a foto de perfil, que aparece junto do nome nos anúncios e é apagada quando removida, e o que quem administra a plataforma vê da conta para gerenciá-la (#482) [Frontend]
 - Passa a dizer nos termos que quem administra a plataforma pode corrigir o nome, o e-mail institucional e os contatos de uma conta e dar ou retirar dela o acesso de administração (#482) [Frontend]
 - Passa a manter a carona na listagem enquanto houver partida por vir, com a próxima partida como data, a ordem por ela e o filtro de período valendo para qualquer partida (#480) [Backend]
 - Passa a explicar, na lista vazia de achados e perdidos, o que aparece ali e como sair dela, ampliando a busca ou cadastrando um item, como caronas já faz (#472) [Frontend]
