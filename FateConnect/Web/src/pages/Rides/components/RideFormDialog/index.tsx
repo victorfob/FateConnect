@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Dialog, Typography } from '@design-system';
+import { Dialog } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toZonedTime } from 'date-fns-tz';
@@ -20,7 +20,6 @@ import {
   type RideFormValues,
 } from './schema';
 import * as C from './constants';
-import * as S from './styles';
 
 const FOLLOWING_YEAR = 1;
 
@@ -100,26 +99,19 @@ export function RideFormDialog({ open, onClose, ride }: RideFormDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} title={mode.title}>
       <FormProvider {...form}>
-        <S.RideForm component="form" onSubmit={handleSubmit} noValidate>
+        <Dialog.Form onSubmit={handleSubmit}>
           <Dialog.Body>
             <RideFormFields holidays={holidays} />
           </Dialog.Body>
 
           <Dialog.Footer>
-            <S.SubmitButton
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
+            <Dialog.Submit
+              icon={<SubmitIcon fontSize="small" />}
+              label={mode.submitLabel}
               loading={isPending}
-            >
-              <SubmitIcon fontSize="small" />
-              <Typography variant="subtitleBold" color="inherit">
-                {mode.submitLabel}
-              </Typography>
-            </S.SubmitButton>
+            />
           </Dialog.Footer>
-        </S.RideForm>
+        </Dialog.Form>
       </FormProvider>
     </Dialog>
   );
