@@ -653,6 +653,26 @@ describe('Input.DateTime', () => {
     expect(field).toHaveValue('22/05/2026 18:45');
   });
 
+  // O seletor não avisa nada quando o minuto escolhido é o que já estava lá: é a
+  // hora redonda de quem pega o dia e confirma o 00 que veio marcado.
+  it('should close on the minute already picked, but not on the hour', async () => {
+    render(<DateTimeHarness />);
+    const field = screen.getByRole('textbox', { name: /Data e hora/ });
+    await userEvent.type(field, '220520261830');
+    await openDateTimePicker();
+    await userEvent.click(
+      within(await screen.findByRole('grid')).getByRole('gridcell', { name: '23' }),
+    );
+    const [hours, minutes] = await screen.findAllByRole('listbox');
+
+    await userEvent.click(within(hours as HTMLElement).getByText('18'));
+    expect(screen.getAllByRole('listbox')).toHaveLength(2);
+
+    await userEvent.click(within(minutes as HTMLElement).getByText('30'));
+    await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+    expect(field).toHaveValue('23/05/2026 18:30');
+  });
+
   it('should leave the year out of the panel top, since the calendar already shows it', async () => {
     render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
 
