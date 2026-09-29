@@ -6,7 +6,6 @@ using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 public class User
 {
     public int Id { get; init; }
