@@ -201,17 +201,17 @@ public class User
         bool isNullOrEmpty = string.IsNullOrWhiteSpace(email);
 
         if (isNullOrEmpty)
-            throw new InvalidFatecEmailLocalPartException();
-
-        bool isInvalidLocalPart = !RegexConstants.LocalPartRegex().IsMatch(email);
-
-        if (isInvalidLocalPart)
-            throw new InvalidFatecEmailLocalPartException();
+            throw new InvalidFatecEmailDomainException();
 
         bool isInvalidDomain = !RegexConstants.DomainRegex().IsMatch(email);
 
         if (isInvalidDomain)
             throw new InvalidFatecEmailDomainException();
+
+        bool isInvalidLocalPart = !RegexConstants.LocalPartRegex().IsMatch(email);
+
+        if (isInvalidLocalPart)
+            throw new InvalidFatecEmailLocalPartException();
     }
 
     private static void ValidateGender(EnumGender gender)
