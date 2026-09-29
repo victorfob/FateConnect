@@ -2,11 +2,10 @@ import { useCallback } from 'react';
 import { Button } from '@design-system';
 import { CheckCircleIcon, RestoreIcon } from '@design-system/icons';
 
+import { ConfirmAction } from '@app/components/ConfirmAction';
 import { LostItemStatusEnum, type LostItem } from '@app/services/lostAndFound/types';
 
-import { LostItemConfirmAction } from '../LostItemConfirmAction';
 import * as C from './constants';
-import * as S from './styles';
 
 type LostItemStatusActionProps = Readonly<{
   item: LostItem;
@@ -22,12 +21,12 @@ export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemSta
 
   if (item.status === LostItemStatusEnum.DELETED) {
     return (
-      <S.ActionRow>
+      <ConfirmAction.Row>
         <Button type="button" variant="soft" onClick={handleRestore}>
           <RestoreIcon fontSize="small" />
           {C.RESTORE_LABEL}
         </Button>
-      </S.ActionRow>
+      </ConfirmAction.Row>
     );
   }
 
@@ -36,17 +35,17 @@ export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemSta
   const resolveLabel = C.lostItemResolveLabel(item.lostAndFoundType);
 
   return (
-    <S.ActionRow>
-      <LostItemConfirmAction
+    <ConfirmAction.Row>
+      <ConfirmAction
         label={resolveLabel}
         icon={<CheckCircleIcon fontSize="small" />}
         dialogTitle={resolveLabel}
         messagePrefix={C.RESOLVE_DIALOG.messagePrefix}
         messageSuffix={C.lostItemResolveSuffix(item.lostAndFoundType)}
-        itemName={item.name}
+        subject={item.name}
         confirmLabel={C.RESOLVE_DIALOG.confirmLabel}
         onConfirm={handleResolve}
       />
-    </S.ActionRow>
+    </ConfirmAction.Row>
   );
 }

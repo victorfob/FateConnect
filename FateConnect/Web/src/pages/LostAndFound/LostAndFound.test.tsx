@@ -7,6 +7,7 @@ import {
 } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
+import { CONFIRMATION } from '@app/components/ConfirmAction/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import {
@@ -21,7 +22,6 @@ import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
 import { OWN_ITEM_LABEL } from './components/LostItemCard/constants';
 import { LOST_ITEM_ACTION_LABELS } from './components/LostItemCard/LostItemActions/constants';
-import { CONFIRMATION } from './components/LostItemCard/LostItemConfirmAction/constants';
 import {
   lostItemResolveLabel,
   lostItemResolveSuffix,
