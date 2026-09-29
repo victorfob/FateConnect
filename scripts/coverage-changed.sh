@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 # Mede a cobertura da API por arquivo de produção que o diff toca, contra os 90%
-# que a `dotnet-testing.md` exige.
-#
-# O `dotnet test` sozinho não mede cobertura, e o gate do SonarCloud exige 33% —
-# então uma PR pode passar verde nos dois e ainda violar a regra da casa. Foi o
-# que aconteceu na #222, com o `AuthService` em 22,7%.
+# que a `dotnet-testing.md` exige: o `dotnet test` sozinho não mede cobertura, e
+# o gate do SonarCloud aceita 33%.
 #
 #   ./scripts/coverage-changed.sh [ref-base]     # base padrão: origin/develop
 
@@ -53,15 +50,9 @@ def is_synthesized(method):
 
 
 def is_generated_copy_constructor(class_name, method):
-    # O compilador gera um construtor de cópia para todo `record`, e só uma
-    # expressão `with` o chama. Nada em produção usa `with`, então ele fica
-    # eternamente descoberto e derruba DTO de dados puros para 80%: num arquivo
-    # de cinco linhas, uma linha que ninguém pode alcançar vale 20%.
-    #
-    # As duas condições precisam andar juntas: sem a segunda, um construtor de
-    # cópia escrito à mão também sairia da conta, e é justamente a lógica dele
-    # que o gate existe para cobrar. Medido em 08/09/2026 sobre a suíte inteira,
-    # o par alcança os 8 gerados e nenhum dos 22 escritos à mão.
+    # O construtor de cópia que o compilador gera para todo `record` só é chamado
+    # por `with`, que nada em produção usa, e derrubaria DTO de dados puros. As
+    # duas condições andam juntas para não tirar da conta o escrito à mão.
     signature = re.search(r"::\.ctor\((.*)\)$", method.findtext("Name") or "")
 
     if signature is None:

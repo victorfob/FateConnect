@@ -78,9 +78,8 @@ describe('PageMetadata', () => {
     );
   });
 
-  // O Lighthouse reprova canonical relativa com nota zero, e foi assim que ela
-  // saiu: afirmar a origem montada repetiria a implementação, então o que se
-  // afirma aqui é que o endereço se resolve sozinho, sem base.
+  // O Lighthouse reprova canonical relativa. Afirmar a origem montada repetiria
+  // a implementação, então o que se afirma é que o endereço se resolve sem base.
   it('should render a canonical that is absolute on its own', async () => {
     renderAt(RoutePathEnum.LANDING);
 
@@ -115,10 +114,9 @@ describe('PageMetadata', () => {
   });
 
   /**
-   * ⛔ Medido no navegador: o React insere `<title>` no começo do `<head>` e
-   * `<meta>` no fim. Uma description estática ficaria à frente da que a rota
-   * declara e venceria — `/cadastro` serviria o texto da landing. O jsdom não
-   * carrega o `index.html`, então só este caso guarda a assimetria.
+   * ⛔ O React insere `<title>` no começo do `<head>` e `<meta>` no fim: uma
+   * description estática venceria a da rota. O jsdom não carrega o `index.html`,
+   * então só este caso guarda a assimetria.
    */
   it('should keep a static description out of index.html, which would outrank the route one', () => {
     expect(indexHtml()).not.toContain('name="description"');

@@ -21,7 +21,7 @@ export const TriggerBadge = styled(Badge)({
 /**
  * Envolve o corpo e o rodapé, para o botão de aplicar ser um `submit` de dentro
  * do formulário — é o que mantém o Enter num campo filtrando. Assume o vão e o
- * crescimento que eram do miolo do diálogo, senão o corpo deixa de rolar.
+ * crescimento do miolo do diálogo, senão o corpo deixa de rolar.
  */
 export const FilterForm = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>>(
   ({ theme }) => ({
@@ -33,8 +33,8 @@ export const FilterForm = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormEl
 );
 
 /**
- * Duas colunas no desktop e uma no estreito. Três não cabem: com 536px úteis no
- * diálogo, a terceira coluna daria 168px e o campo pede 180px no mínimo.
+ * Duas colunas no desktop e uma no estreito. Três não cabem: a terceira coluna
+ * ficaria mais estreita que a largura mínima do campo.
  */
 export const FieldsGrid = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',

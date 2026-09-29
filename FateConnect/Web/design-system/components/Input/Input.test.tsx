@@ -703,7 +703,7 @@ describe('Input.DateTime', () => {
 /**
  * A cor primária do tema claro **é** a cor de texto, então lá as duas coincidem
  * e nada distingue a sobrescrita da ausência dela. O defeito mora só no escuro,
- * onde a primária é a superfície do cromo e como texto fica em 4,11:1.
+ * onde a primária é a superfície do cromo e, como texto, reprova no contraste.
  */
 describe('Input.DateTime in the dark theme', () => {
   beforeEach(() => {
