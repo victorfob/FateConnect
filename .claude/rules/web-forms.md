@@ -57,6 +57,16 @@ O ícone mostra a situação atual, não o destino do clique: olho aberto quando
 - Máscara de data precisa **preservar a posição do cursor** ao editar no meio do campo e ao colar. É requisito herdado do produto, não detalhe.
 - Máscara alternativa por comprimento (telefone fixo e celular) é resolvida na função pura.
 
+## O seletor não avisa o clique no valor que já está marcado
+
+⛔ **O seletor do MUI só chama `onChange` quando o valor muda.** Clicar no dia, na hora ou no minuto que já estão escolhidos não dispara nada: nem mudança, nem troca de vista. Comportamento do campo que dependa desse clique precisa escutar o clique, não a mudança.
+
+⛔ Aconteceu em 29/09/2026, no #481, e o defeito vinha do #316. O painel do `Input.DateTime` fechava quando o minuto mudava, então quem pegava o dia e confirmava o 00 que já vinha marcado ficava com o painel aberto sem entender por quê. Quem viu foi o Victor, capturando as evidências.
+
+**A saída foi escutar o clique no painel** e reconhecer a coluna pelo rótulo acessível que o MUI dá a ela (`Selecione minutos`), lido de `usePickerTranslations`, e não pela posição.
+
+⚠️ **O `onAccept` do seletor estático não é saída:** ele só dispara com `closeOnSelect`, que o seletor estático não aceita, ou pela barra de ações, que o campo esconde. Estava ligado no `Input.DateTime` e nunca foi chamado. Lido em `useValueAndOpenStates.js`, no `node_modules`.
+
 ## Testes
 
 Cobrir, no mínimo: mensagens de campo obrigatório, formato inválido, alternância de visibilidade (inclusive o ícone), sucesso, cada ramo de erro por status, e o estado de carregamento.

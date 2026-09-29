@@ -106,7 +106,7 @@ O controle é procurar junto um termo que você sabe que está lá, como *carona
 Serve para conferir rápido se algo que você acrescentou já está coberto:
 
 - coleta do cadastro, campo a campo, e o que o uso gera (caronas e itens);
-- os **dados do perfil**, bairro e foto, os dois opcionais, com a foto junto do nome nos anúncios e guardada enquanto a conta existir;
+- os **dados do perfil**, bairro e foto, os dois opcionais e removíveis, com a foto junto do nome nos anúncios e apagada quando a pessoa a remove ou a troca;
 - o que **quem administra a plataforma** vê das contas, inclusive nascimento, gênero e bairro, e o que corrige nelas;
 - **IP e identificação do navegador** no registro do aceite;
 - **Sentry** com replay de sessão — 10% das sessões e 100% das que dão erro, com texto mascarado e mídia bloqueada, sem dado de usuário e sem corpo de requisição;
