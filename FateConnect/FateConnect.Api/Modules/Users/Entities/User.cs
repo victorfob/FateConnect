@@ -39,15 +39,12 @@ public class User
         string fullName,
         DateTime birthDate,
         EnumGender gender,
-        string phone,
-        string contactEmail,
-        string? neighborhood,
+        UserContact contact,
         DateTime createdAt)
     {
         ValidateEmail(fatecEmail);
         ValidateFullName(fullName);
         ValidateGender(gender);
-        ValidateNeighborhood(neighborhood);
 
         FatecEmail = fatecEmail.Trim().ToLowerInvariant();
         Password = passwordHash;
@@ -55,9 +52,8 @@ public class User
         BirthDate = birthDate;
         Gender = gender;
 
-        Phone = phone.Trim();
-        ContactEmail = contactEmail.Trim().ToLowerInvariant();
-        Neighborhood = neighborhood.NormalizeOptionalText();
+        Phone = contact.Phone.Trim();
+        ContactEmail = contact.ContactEmail.Trim().ToLowerInvariant();
 
         ProfileType = EnumProfileType.Operator;
         Status = EnumAccountStatus.Active;
