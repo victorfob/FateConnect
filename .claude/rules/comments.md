@@ -1,5 +1,5 @@
 ---
-description: Quando comentar — zero no back-end .NET; fora dele, renomear, extrair e simplificar antes de escrever, e o teste é impedir uma mudança errada
+description: Quando comentar — zero no back-end .NET; fora dele, renomear, extrair e simplificar antes de escrever, só a decisão que o código não deixa deduzir sobrevive, e nada de histórico
 ---
 
 # Comentário
@@ -34,6 +34,21 @@ Aconteceu nesta mesma rodada: apagado o XML doc do `TimeOnlyJsonConverter`, a `w
 
 Só o que sobrevive às três chega a ser candidato.
 
+```ts
+// ❌ o comentário narra o que a condição confere
+// só quem administra ou quem ofertou pode excluir a carona
+if ((profile === ProfileTypeEnum.ADMINISTRATOR || ride.isOwner) && ride.isActive) removeRide(ride);
+
+// ✅ o nome carrega a intenção, e não sobra o que comentar
+if (canRemove(profile, ride)) removeRide(ride);
+```
+
+**O que sobrevive é a decisão que o código não deixa deduzir**, e ela tem três formas:
+
+- o porquê de uma escolha contraintuitiva;
+- uma armadilha de fora — contrato de terceiro, defeito de biblioteca, limite de plataforma;
+- o motivo de algo não ter sido feito do jeito óbvio.
+
 **E o candidato ainda passa por um teste:** este comentário impede alguém de fazer uma mudança errada? Se sim, fica. Se ele só conta o que o código já diz, sai.
 
 ⚠️ **A escada vem antes do teste porque o teste sozinho é permissivo.** Acabado de escrever, quase todo comentário parece impedir alguma mudança errada — quem o escreveu ainda tem na cabeça o contexto que o justifica. As três tentativas reduzem o volume porque removem a pergunta em vez de respondê-la.
@@ -46,6 +61,9 @@ Sai, sempre:
 - Narração do passo seguinte: `// monta os filtros`, `// abre o diálogo`.
 - Parágrafo de contexto que pertence ao corpo do PR ou à issue — por que a API ainda não guarda o arquivo, o que a #106 vai implementar.
 - Comentário que repete a constante declarada logo acima.
+- ⛔ **Histórico.** Data, "medido em", o número que decidiu a escolha, o que foi investigado, a issue em que o defeito apareceu. Isso vai para o commit e o PR, onde a conta fica datada; no arquivo ela envelhece calada e se lê como verdade de hoje.
+
+⚠️ **A restrição de fora fica; a derivação sai.** *"texto pede 4,5:1 pela WCAG"* é o limite que impede a troca errada. *"como texto ela dá 4,11:1"* é a conta que levou até a decisão, e a decisão se escreve sem ela: *"como texto ela reprova no contraste"*.
 
 ⛔ **E essa lista vale também para o que já está escrito.** Ao editar um trecho, passe os comentários **vizinhos** pelo mesmo teste e apague os que só repetem o código — editar é o único momento em que alguém relê aquilo. Varredura dedicada é cara e acontece uma vez por ano; limpeza de passagem é grátis e contínua.
 
@@ -55,22 +73,24 @@ Sai, sempre:
 
 ⛔ **Comentário tem até três linhas — e conta-se o texto, não o arquivo.** Um `/** … */` gasta duas linhas só com os delimitadores, então medir linha de arquivo vira um teto de **uma** linha sem ninguém perceber. Foi o erro que quase matou esta seção: a primeira medição disse que o teto condenava 33% da base, e ela contava delimitador.
 
-**O estado do front hoje, 572 blocos em código de produção:**
+**O estado do front hoje, 652 blocos em código de produção:**
 
 | Linhas de texto | Blocos | Acumulado |
 | --- | --- | --- |
-| 1 | 297 | 51% |
-| 2 | 130 | 74% |
-| 3 | 94 | **91%** |
-| 4 ou mais | 51 | 100% |
+| 1 | 344 | 53% |
+| 2 | 159 | 77% |
+| 3 | 112 | **94%** |
+| 4 ou mais | 37 | 100% |
 
-⚠️ **O teto é barato porque 91% já o cumprem.** Ele não corta o que existe — impede o comentário longo de nascer.
+⚠️ **O teto é barato porque 94% já o cumprem.** Ele não corta o que existe — impede o comentário longo de nascer.
+
+**Dentro do teto, siga o tamanho dos vizinhos.** Arquivo em que os comentários têm uma linha não recebe um de três.
 
 ⛔ **Estourou? A saída não é apagar, é mudar de lugar.** Volte à escada acima; o que ainda não couber é explicação que pertence ao **corpo do PR, à issue ou a uma rule** — onde alguém a relê quando o código mudar. O comentário fica com a **decisão**, não com a derivação dela.
 
 O caso que prova: `design-system/tokens/breakpoints.ts` chegou a carregar **14 linhas** derivando o limite a partir das larguras medidas do cabeçalho, e ninguém revisitava aquilo ao mexer no tema. Hoje cada limite leva três, e a medição inteira está na #435.
 
-⚠️ **Os 51 de hoje saem por boy-scout**, conforme alguém passe por eles. Não se abre varredura para isto.
+⚠️ **Os 37 de hoje saem por boy-scout**, conforme alguém passe por eles. Não se abre varredura para isto.
 
 ## Forma: JSDoc acima de declaração, `//` dentro de corpo
 

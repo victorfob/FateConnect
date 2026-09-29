@@ -78,10 +78,9 @@ jobs:
           chmod 700 ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          # A identidade do servidor vem fixada em secret. O `ssh-keyscan` que
-          # ficava aqui abria uma conexão por tipo de chave, em paralelo, e as
-          # três disputavam a fila de preauth justamente antes de o deploy
-          # precisar dela.
+          # A identidade do servidor vem fixada em secret, e não de um `ssh-keyscan`: ele
+          # abre uma conexão por tipo de chave, em paralelo, e as três disputam a fila de
+          # preauth justamente antes de o deploy precisar dela.
           if [[ -z "$DEPLOY_KNOWN_HOSTS" ]]; then
             echo "Falta o secret DEPLOY_KNOWN_HOSTS. Veja 'A identidade do servidor' em deploy/README.md." >&2
             exit 1
@@ -131,12 +130,9 @@ jobs:
             exit 1
           fi
 
-          # Contêiner de pé não prova aplicação viva. Em 08/09/2026 este passo
-          # ficou verde com a API caindo em laço por erro de migration: ele roda
-          # logo depois do `up -d`, e pegou o contêiner na primeira execução,
-          # antes de a exceção matá-lo — é corrida, não cegueira. Quem morreu e
-          # voltou tem `RestartCount` acima de zero, e o `up -d` zera o contador
-          # ao recriar o contêiner, então aqui zero é o único valor aceitável.
+          # Contêiner de pé não prova aplicação viva: logo após o `up -d` ele pode estar
+          # na primeira execução, antes de uma exceção matá-lo. O `up -d` zera o
+          # `RestartCount` ao recriar o contêiner, então aqui só zero é aceitável.
           reinicios=$(ssh $SSH_OPTIONS "$DEPLOY_USER@$DEPLOY_HOST" \
             "docker inspect -f '{{.RestartCount}}' '$(head -1 containers.txt)'")
           echo "Reinícios desde a subida: $reinicios"

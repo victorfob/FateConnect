@@ -15,7 +15,7 @@ describe('ListCardSkeleton', () => {
   });
 
   // ⛔ Reservar menos do que a página traz faz o conteúdo crescer depois da
-  // primeira pintura e empurra o rodapé para fora da janela — foi o defeito.
+  // primeira pintura e empurra o rodapé para fora da janela.
   it('should draw one ghost for each card the page is about to show', () => {
     const PAGE_WORTH_OF_CARDS = 10;
 

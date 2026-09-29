@@ -52,7 +52,7 @@ describe('denunciationStatus', () => {
 });
 
 describe('denunciationStatusTransitions', () => {
-  // Medido em `Denunciation.ValidateTransition`: são exatamente estes quatro pares.
+  // Os pares que `Denunciation.ValidateTransition` aceita: são exatamente estes quatro.
   it.each([
     [
       DenunciationStatusEnum.OPEN,

@@ -126,8 +126,8 @@ describe('Rides', () => {
 
   /**
    * ⛔ Reservar menos do que a página traz faz o conteúdo crescer depois da
-   * primeira pintura, e o rodapé desce com ele — foi o defeito da #385. O que
-   * se afirma aqui é a ligação entre a reserva e o tamanho da página.
+   * primeira pintura, e o rodapé desce com ele. O que se afirma aqui é a ligação
+   * entre a reserva e o tamanho da página.
    */
   it('should reserve one ghost card for each ride the page will show', async () => {
     // Resposta que nunca chega: prende a tela no estado de carregamento.
@@ -225,8 +225,8 @@ describe('Rides', () => {
   });
 
   // Sem endereço de API a requisição cai no servidor de desenvolvimento, que
-  // responde o HTML da aplicação com status 200. Antes de validar o formato, a
-  // tela recebia texto no lugar da lista e quebrava no `map`.
+  // responde o HTML da aplicação com status 200. Sem validar o formato, a tela
+  // receberia texto no lugar da lista e quebraria no `map`.
   it('should notify instead of breaking when the api does not return a list', async () => {
     server.use(http.get(RIDES_URL, () => HttpResponse.text('<!doctype html><html></html>')));
 

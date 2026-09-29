@@ -20,12 +20,9 @@ declare module '@mui/material/styles' {
   }
 
   /**
-   * `space` e `radius` são chaves **nossas**, não API do MUI. Existem para o
-   * estilo ler o helper do tema em vez de importá-lo em cada `styles.ts`.
-   *
-   * ⛔ Não substituem o `spacing` do MUI, e é de propósito: os componentes dele
-   * chamam `theme.spacing(1..3)` esperando o multiplicador de 8px, e trocar a
-   * transformação encolheu as gutters do `Toolbar` de 24px para 3px.
+   * `space` e `radius` são chaves **nossas**, para o estilo ler o helper do tema.
+   * ⛔ Não substituem o `spacing` do MUI: os componentes dele chamam
+   * `theme.spacing(1..3)` esperando o multiplicador de 8px.
    */
   interface Theme {
     space: typeof spacing;
@@ -133,8 +130,8 @@ export function createAppTheme(mode: ThemeMode = 'light'): Theme {
       palette: mode === 'dark' ? darkPalette : lightPalette,
       typography: {
         fontFamily,
-        // O ponto de virada é o `md` das telas, não o `sm` do MUI (600px):
-        // entre os dois o título ficava grande enquanto a tela já reduzia.
+        // O ponto de virada é o `md` das telas, não o `sm` do MUI (600px): entre os
+        // dois o título ficaria grande enquanto a tela já reduz.
         h1: {
           ...typographyTokens.h1,
           [MOBILE_MEDIA]: typographyTokens.h1Narrow,

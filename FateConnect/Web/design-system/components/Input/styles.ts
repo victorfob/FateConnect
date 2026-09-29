@@ -5,8 +5,7 @@ import { styled } from '@ds-root/styled';
 
 /**
  * Distância entre a borda do campo e o desenho do botão de adorno, menos a que
- * a seta do `select` já pratica. Medido a 412px: o botão soma o recuo do campo
- * ao recuo próprio e para a 24px, enquanto a seta desenha a 14px.
+ * a seta do `select` já pratica: o botão soma o recuo do campo ao próprio.
  */
 const SELECT_ARROW_ALIGNMENT_PX = 10;
 

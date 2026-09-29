@@ -104,11 +104,9 @@ describe('FilterDialog', () => {
   });
 
   /**
-   * O jsdom é o único ambiente que exercita isto: o painel do navegador não faz
-   * submissão implícita, medido com formulário mínimo de controle. Fechar por
-   * Enter faz o diálogo do MUI atualizar e suspender fora do `act` do teste, e o
-   * guardião de console reprovaria o caso — então o silêncio é por medida, e
-   * conferido: erro de qualquer outra natureza continua derrubando o teste.
+   * Só o jsdom exercita isto: o navegador não faz submissão implícita neste painel.
+   * Fechar por Enter faz o diálogo do MUI atualizar fora do `act`, e o guardião de
+   * console reprovaria o caso; erro de qualquer outra natureza continua derrubando.
    */
   it('should apply when Enter is pressed inside a field', async () => {
     const onSubmit = vi.fn();
