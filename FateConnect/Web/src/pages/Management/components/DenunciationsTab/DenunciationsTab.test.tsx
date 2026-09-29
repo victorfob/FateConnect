@@ -1,5 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { FILTER_TITLE_PLURAL } from '@design-system';
+import { FILTER_CLEAR_LABEL, FILTER_SUBMIT_LABEL, FILTER_TITLE_PLURAL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import { CONTACT_LABEL } from '@app/components/ContactButton/constants';
@@ -17,11 +17,7 @@ import {
 } from '@app/services/denunciations/types';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
 
-import {
-  FILTER_CLEAR_LABEL,
-  FILTER_LABELS,
-  FILTER_SUBMIT_LABEL,
-} from './components/DenunciationsFilter/constants';
+import { FILTER_LABELS } from './components/DenunciationsFilter/constants';
 import {
   STATUS_DIALOG,
   STATUS_SELECT_LABEL,

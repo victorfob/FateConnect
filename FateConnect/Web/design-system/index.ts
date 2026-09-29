@@ -20,7 +20,12 @@ export { NavigationDrawer } from './components/NavigationDrawer';
 export { InitialsAvatar } from './components/InitialsAvatar';
 export { Dialog } from './components/Dialog';
 export { FilterDialog } from './components/FilterDialog';
-export { FILTER_TITLE_PLURAL, FILTER_TITLE_SINGULAR } from './components/FilterDialog/constants';
+export {
+  FILTER_CLEAR_LABEL,
+  FILTER_SUBMIT_LABEL,
+  FILTER_TITLE_PLURAL,
+  FILTER_TITLE_SINGULAR,
+} from './components/FilterDialog/constants';
 export { FormGrid } from './components/FormGrid';
 export type { FormGridProps } from './components/FormGrid';
 export { HiddenField } from './components/HiddenField';

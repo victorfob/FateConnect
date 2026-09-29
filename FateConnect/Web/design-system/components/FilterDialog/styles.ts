@@ -1,12 +1,10 @@
-import type { FormHTMLAttributes } from 'react';
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
 
-import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { spacingScale } from '@ds-root/tokens';
 
-const { sm, md, lg } = spacingScale;
+const { sm, md } = spacingScale;
 
 const ACTIVE_DOT_OFFSET = 'translate(-6px, 6px)';
 const FIELD_MIN_WIDTH_PX = 180;
@@ -17,20 +15,6 @@ const FULL_WIDTH_PERCENT = 100;
 export const TriggerBadge = styled(Badge)({
   '& .MuiBadge-dot': { transform: ACTIVE_DOT_OFFSET },
 });
-
-/**
- * Envolve o corpo e o rodapé, para o botão de aplicar ser um `submit` de dentro
- * do formulário — é o que mantém o Enter num campo filtrando. Assume o vão e o
- * crescimento do miolo do diálogo, senão o corpo deixa de rolar.
- */
-export const FilterForm = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>>(
-  ({ theme }) => ({
-    flexDirection: 'column',
-    gap: theme.space(lg),
-    flexGrow: 1,
-    minHeight: 0,
-  }),
-);
 
 /**
  * Duas colunas no desktop e uma no estreito. Três não cabem: a terceira coluna
