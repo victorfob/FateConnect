@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Dialog, Typography } from '@design-system';
+import { Dialog } from '@design-system';
 import { SendIcon } from '@design-system/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -57,7 +57,7 @@ export function DenunciationFormDialog({ open, onClose }: DenunciationFormDialog
   return (
     <Dialog open={open} onClose={onClose} title={C.DENUNCIATION_FORM.title}>
       <FormProvider {...form}>
-        <S.DenunciationForm component="form" onSubmit={handleSubmit} noValidate>
+        <Dialog.Form onSubmit={handleSubmit}>
           <Dialog.Body>
             <S.ChannelNote variant="caption">{C.CHANNEL_NOTE}</S.ChannelNote>
 
@@ -65,20 +65,13 @@ export function DenunciationFormDialog({ open, onClose }: DenunciationFormDialog
           </Dialog.Body>
 
           <Dialog.Footer>
-            <S.SubmitButton
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
+            <Dialog.Submit
+              icon={<SendIcon fontSize="small" />}
+              label={C.DENUNCIATION_FORM.submitLabel}
               loading={isPending}
-            >
-              <SendIcon fontSize="small" />
-              <Typography variant="subtitleBold" color="inherit">
-                {C.DENUNCIATION_FORM.submitLabel}
-              </Typography>
-            </S.SubmitButton>
+            />
           </Dialog.Footer>
-        </S.DenunciationForm>
+        </Dialog.Form>
       </FormProvider>
     </Dialog>
   );

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { Input } from '@design-system';
+import { Dialog, Input } from '@design-system';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 import { PhotoField } from '@app/components/PhotoField';
@@ -7,7 +7,6 @@ import { useStoredImage } from '@app/hooks/useStoredImage';
 
 import type { LostItemFormInput, LostItemFormValues } from '../schema';
 import * as C from '../constants';
-import * as S from './styles';
 
 export type LostItemFormFieldsProps = Readonly<{ storedThumbnailUrl: string | null }>;
 
@@ -36,7 +35,7 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
   );
 
   return (
-    <S.FieldsGrid>
+    <Dialog.Fields>
       <Input
         {...register('name')}
         label={C.LOST_ITEM_FORM_LABELS.name}
@@ -89,7 +88,7 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
         )}
       />
 
-      <S.WideCell>
+      <Dialog.Fields.Wide>
         <Input
           {...register('description')}
           label={C.LOST_ITEM_FORM_LABELS.description}
@@ -101,9 +100,9 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
           characterCount={description.length}
           error={errors.description?.message}
         />
-      </S.WideCell>
+      </Dialog.Fields.Wide>
 
-      <S.WideCell>
+      <Dialog.Fields.Wide>
         <PhotoField
           labels={C.PHOTO_FIELD_LABELS}
           accept={C.PHOTO_ACCEPT_ATTRIBUTE}
@@ -113,7 +112,7 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
           storedPreview={storedPreview}
           error={errors.photo?.message}
         />
-      </S.WideCell>
-    </S.FieldsGrid>
+      </Dialog.Fields.Wide>
+    </Dialog.Fields>
   );
 }

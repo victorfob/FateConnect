@@ -8,12 +8,15 @@ const ONLY_CHARACTER_INDEX = 0;
 const NUL_BYTE = 0;
 
 /**
- * `unique_name` e `role`, e não `name` e `ClaimTypes.Role`: o .NET traduz os
- * nomes longos ao escrever o token, e ler o longo devolveria `undefined` sem
- * erro nenhum.
+ * `unique_name`, `role` e `nameid`, e não os nomes do `ClaimTypes`: o .NET
+ * traduz os nomes longos ao escrever o token, e ler o longo devolveria
+ * `undefined` sem erro nenhum.
  */
 const NAME_CLAIM = 'unique_name';
 const ROLE_CLAIM = 'role';
+const ID_CLAIM = 'nameid';
+
+const DECIMAL = 10;
 
 function decodePayload(token: string): unknown {
   const encoded = token.split('.')[PAYLOAD_INDEX];
@@ -61,6 +64,16 @@ function readStringClaim(claim: string): string | null {
  */
 export function loggedUserName(): string | null {
   return readStringClaim(NAME_CLAIM);
+}
+
+export function loggedUserId(): number | null {
+  const claim = readStringClaim(ID_CLAIM);
+  if (!claim) return null;
+
+  const id = Number.parseInt(claim, DECIMAL);
+  if (!Number.isInteger(id)) return null;
+
+  return id;
 }
 
 /**

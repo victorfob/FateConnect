@@ -97,13 +97,7 @@ export function LostItemFilter({ initialFilters, onApply }: LostItemFilterProps)
   }, [itemName, period, kind, owner, status, onApply]);
 
   return (
-    <FilterDialog
-      submitLabel={C.FILTER_SUBMIT_LABEL}
-      clearLabel={C.FILTER_CLEAR_LABEL}
-      active={isFiltered}
-      onSubmit={handleSubmit}
-      onClear={handleClear}
-    >
+    <FilterDialog active={isFiltered} onSubmit={handleSubmit} onClear={handleClear}>
       <FilterDialog.Field>
         <Input
           label={C.FILTER_LABELS.searchTerm}

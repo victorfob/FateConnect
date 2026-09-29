@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { Dialog, Typography } from '@design-system';
+import { Dialog } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -18,7 +18,6 @@ import {
   type LostItemFormValues,
 } from './schema';
 import * as C from './constants';
-import * as S from './styles';
 
 export type LostItemFormDialogProps = Readonly<{
   open: boolean;
@@ -70,26 +69,19 @@ export function LostItemFormDialog({ open, onClose, item }: LostItemFormDialogPr
   return (
     <Dialog open={open} onClose={onClose} title={mode.title}>
       <FormProvider {...form}>
-        <S.LostItemForm component="form" onSubmit={handleSubmit} noValidate>
+        <Dialog.Form onSubmit={handleSubmit}>
           <Dialog.Body>
             <LostItemFormFields storedThumbnailUrl={item?.thumbnailUrl ?? null} />
           </Dialog.Body>
 
           <Dialog.Footer>
-            <S.SubmitButton
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
+            <Dialog.Submit
+              icon={<SubmitIcon fontSize="small" />}
+              label={mode.submitLabel}
               loading={isPending}
-            >
-              <SubmitIcon fontSize="small" />
-              <Typography variant="subtitleBold" color="inherit">
-                {mode.submitLabel}
-              </Typography>
-            </S.SubmitButton>
+            />
           </Dialog.Footer>
-        </S.LostItemForm>
+        </Dialog.Form>
       </FormProvider>
     </Dialog>
   );

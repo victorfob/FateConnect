@@ -10,6 +10,7 @@ export { default as AddIcon } from '@mui/icons-material/Add';
 export { default as AdminPanelSettingsIcon } from '@mui/icons-material/AdminPanelSettings';
 export { default as ArrowBackIcon } from '@mui/icons-material/ArrowBack';
 export { default as BackHandOutlinedIcon } from '@mui/icons-material/BackHandOutlined';
+export { default as BlockIcon } from '@mui/icons-material/Block';
 export { default as CalendarTodayIcon } from '@mui/icons-material/CalendarToday';
 export { default as CheckCircleIcon } from '@mui/icons-material/CheckCircle';
 export { default as ChevronRightIcon } from '@mui/icons-material/ChevronRight';

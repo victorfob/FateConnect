@@ -5,6 +5,8 @@ import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
 
+import { EMPTY_LIST_MESSAGE as DENUNCIATIONS_EMPTY_MESSAGE } from './components/DenunciationsTab/constants';
+import { EMPTY_LIST_MESSAGE as USERS_EMPTY_MESSAGE } from './components/UsersTab/constants';
 import * as C from './constants';
 import { Management } from '.';
 
@@ -27,6 +29,7 @@ describe('Management', () => {
   beforeEach(() => {
     server.use(
       http.get('https://api.fateconnect.test/denunciations', () => HttpResponse.json(EMPTY_PAGE)),
+      http.get('https://api.fateconnect.test/users', () => HttpResponse.json(EMPTY_PAGE)),
     );
   });
 
@@ -40,14 +43,14 @@ describe('Management', () => {
     );
   });
 
-  it('should open on users when the address names no tab', () => {
+  it('should open on users when the address names no tab', async () => {
     renderAt();
 
     expect(screen.getByRole('tab', { name: C.USERS_TAB_LABEL })).toHaveAttribute(
       'aria-selected',
       'true',
     );
-    expect(screen.getByText(C.USERS_DESCRIPTION)).toBeInTheDocument();
+    expect(await screen.findByText(USERS_EMPTY_MESSAGE)).toBeInTheDocument();
   });
 
   // O endereço é o que devolve a mesma aba a quem salvou o link.
@@ -60,7 +63,8 @@ describe('Management', () => {
         'true',
       ),
     );
-    expect(screen.queryByText(C.USERS_DESCRIPTION)).not.toBeInTheDocument();
+    expect(await screen.findByText(DENUNCIATIONS_EMPTY_MESSAGE)).toBeInTheDocument();
+    expect(screen.queryByText(USERS_EMPTY_MESSAGE)).not.toBeInTheDocument();
   });
 
   it('should write the chosen tab into the address', async () => {
@@ -76,6 +80,6 @@ describe('Management', () => {
 
     await userEvent.click(screen.getByRole('tab', { name: C.USERS_TAB_LABEL }));
 
-    expect(await screen.findByText(C.USERS_DESCRIPTION)).toBeInTheDocument();
+    expect(await screen.findByText(USERS_EMPTY_MESSAGE)).toBeInTheDocument();
   });
 });

@@ -1,6 +1,13 @@
-import { DATE_PICKER_LABEL, FILTER_TITLE_PLURAL, type SelectOption } from '@design-system';
+import {
+  DATE_PICKER_LABEL,
+  FILTER_CLEAR_LABEL,
+  FILTER_SUBMIT_LABEL,
+  FILTER_TITLE_PLURAL,
+  type SelectOption,
+} from '@design-system';
 import { http, HttpResponse } from 'msw';
 
+import { CONFIRMATION } from '@app/components/ConfirmAction/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import {
@@ -15,7 +22,6 @@ import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
 import { OWN_ITEM_LABEL } from './components/LostItemCard/constants';
 import { LOST_ITEM_ACTION_LABELS } from './components/LostItemCard/LostItemActions/constants';
-import { CONFIRMATION } from './components/LostItemCard/LostItemConfirmAction/constants';
 import {
   lostItemResolveLabel,
   lostItemResolveSuffix,
@@ -24,9 +30,7 @@ import {
   RESTORE_LABEL,
 } from './components/LostItemCard/LostItemStatusAction/constants';
 import {
-  FILTER_CLEAR_LABEL,
   FILTER_LABELS,
-  FILTER_SUBMIT_LABEL,
   LOST_ITEM_KIND_FILTER_OPTIONS,
   LOST_ITEM_OWNER_FILTER_OPTIONS,
   LostItemOwnerFilterEnum,

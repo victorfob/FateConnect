@@ -12,8 +12,6 @@ import * as C from './constants';
 import * as S from './styles';
 
 export type FilterDialogProps = Readonly<{
-  submitLabel: string;
-  clearLabel: string;
   /** Ponto no gatilho enquanto a lista está filtrada. */
   active?: boolean;
   onSubmit: VoidFunction;
@@ -30,14 +28,7 @@ export type FilterDialogProps = Readonly<{
  * ⛔ O número de campos decide o título e a largura do papel: com um, `Filtro`
  * num papel estreito; com vários, `Filtros` nos 600px e duas colunas.
  */
-function FilterDialog({
-  submitLabel,
-  clearLabel,
-  active,
-  onSubmit,
-  onClear,
-  children,
-}: FilterDialogProps) {
+function FilterDialog({ active, onSubmit, onClear, children }: FilterDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const { title, width } = useMemo<{ title: string; width: DialogWidth }>(() => {
@@ -73,7 +64,7 @@ function FilterDialog({
       </S.TriggerBadge>
 
       <Dialog open={isOpen} onClose={handleClose} title={title} width={width}>
-        <S.FilterForm component="form" onSubmit={handleSubmit}>
+        <Dialog.Form onSubmit={handleSubmit}>
           <Dialog.Body>
             <S.FieldsGrid>{children}</S.FieldsGrid>
           </Dialog.Body>
@@ -82,7 +73,7 @@ function FilterDialog({
             {active && (
               <Button type="button" variant="contained" color="primary" onClick={handleClear}>
                 <Typography variant="subtitleBold" color="inherit">
-                  {clearLabel}
+                  {C.FILTER_CLEAR_LABEL}
                 </Typography>
               </Button>
             )}
@@ -90,11 +81,11 @@ function FilterDialog({
             <Button type="submit" variant="contained" color="secondary">
               <SearchIcon fontSize="small" />
               <Typography variant="subtitleBold" color="inherit">
-                {submitLabel}
+                {C.FILTER_SUBMIT_LABEL}
               </Typography>
             </Button>
           </Dialog.Footer>
-        </S.FilterForm>
+        </Dialog.Form>
       </Dialog>
     </>
   );
