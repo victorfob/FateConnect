@@ -18,9 +18,9 @@ paths:
 
 ## Duas formas de erro
 
-- O que a aplicação lança sai do `GlobalExceptionMiddleware` como `ErrorResponseDto`: `{ error, field? }`, com a mensagem em pt-BR. `field` usa o nome da **requisição** (`fatecEmail`, `phone`, `contactEmail`) e só vem quando o erro aponta um campo.
+- O que a aplicação lança sai do `GlobalExceptionMiddleware` como `ErrorResponseDto`: `{ error, field?, code? }`, com a mensagem em pt-BR. `field` usa o nome da **requisição** (`fatecEmail`, `phone`, `contactEmail`) e só vem quando o erro aponta um campo. `code` só vem quando o mesmo status tem mais de um motivo que a tela precisa separar (`ContactRequired` no 403 de criar carona, item e denúncia sem sigilo).
 - O que a validação de modelo ou o binder recusa sai como `ProblemDetails` padrão do ASP.NET, com o campo como chave dentro de `errors` e sem `field` no topo: recusa de validação não aponta o campo.
-- ⛔ **O front escolhe a copy por `status` ou `field`, nunca pela mensagem da API.** A mensagem documenta o contrato; o que a pessoa lê, cada tela escreve.
+- ⛔ **O front escolhe a copy por `status`, `field` ou `code`, nunca pela mensagem da API.** A mensagem documenta o contrato; o que a pessoa lê, cada tela escreve.
 
 ## Feriado
 
