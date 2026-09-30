@@ -50,6 +50,24 @@ describe('Input', () => {
     expect(screen.getByRole('textbox', { name: /Destino/ })).toBeInvalid();
   });
 
+  it('should describe the field by the hint, without marking it invalid', () => {
+    renderComponent({ ...DEFAULT_PROPS, hint: 'O destino não pode ser alterado.' });
+
+    const field = screen.getByRole('textbox', { name: /Destino/ });
+
+    expect(field).toHaveAccessibleDescription('O destino não pode ser alterado.');
+    expect(field).toBeValid();
+  });
+
+  it('should put the error in place of the hint while there is one', () => {
+    renderComponent({ ...DEFAULT_PROPS, hint: 'Cidade de destino', error: 'Informe o destino' });
+
+    expect(screen.getByRole('textbox', { name: /Destino/ })).toHaveAccessibleDescription(
+      'Informe o destino',
+    );
+    expect(screen.queryByText('Cidade de destino')).not.toBeInTheDocument();
+  });
+
   it('should hand the input element to the consumer ref, so it can be focused', () => {
     const inputRef = createRef<HTMLInputElement>();
     renderComponent({ ...DEFAULT_PROPS, ref: inputRef });
