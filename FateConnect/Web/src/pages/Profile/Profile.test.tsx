@@ -1,6 +1,9 @@
 import { http, HttpResponse } from 'msw';
 
+import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { PHOTO_FIELD_TEXTS, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
+import { DrawerSignOut } from '@app/layouts/MainLayout/components/DrawerSignOut';
+import { SIGN_OUT_LABEL } from '@app/layouts/MainLayout/components/DrawerSignOut/constants';
 import { server } from '@app/mocks/server';
 import { FIELD_LABELS } from '@app/pages/Signup/constants';
 import { RoutePathEnum } from '@app/routes/paths';
@@ -25,6 +28,7 @@ import { PHOTO_LABEL } from './components/PhotoCard/constants';
 import { PHOTO_CROP_TEXTS } from './components/PhotoCropDialog/constants';
 import { cropPhoto } from './components/PhotoCropDialog/helpers/cropPhoto';
 import { SAVE_BAR_TEXTS } from './components/SaveBar/constants';
+import { UNSAVED_CHANGES } from './components/UnsavedChangesDialog/constants';
 import { PROFILE_MESSAGES } from './constants';
 import { PASSWORD_MESSAGES } from './schema';
 import { Profile } from '.';
@@ -55,6 +59,7 @@ vi.mock('./components/PhotoCropDialog/helpers/cropPhoto', () => ({
 }));
 
 const PROFILE_URL = 'https://api.fateconnect.test/users/me';
+const LOGOUT_URL = 'https://api.fateconnect.test/auth/logout';
 const STORED_PHOTO_URL = 'https://api.fateconnect.test/uploads/user/perfil.png';
 const OBJECT_URL = 'blob:https://fateconnect.test/perfil';
 const NEW_TOKEN = tokenWithName('Maria da Silva');
@@ -72,6 +77,28 @@ async function renderProfile(profile = PROFILE) {
   renderAtRoute(RoutePathEnum.PROFILE, <Profile />);
 
   return screen.findByRole('textbox', { name: new RegExp(FIELD_LABELS.fullName) });
+}
+
+/** A saída da conta mora no cromo, e entra ao lado da tela para o caso alcançá-la. */
+async function renderProfileWithSignOut() {
+  serveProfile();
+  const router = renderAtRoute(
+    RoutePathEnum.PROFILE,
+    <>
+      <Profile />
+      <DrawerSignOut />
+    </>,
+  );
+  const fullName = await screen.findByRole('textbox', { name: new RegExp(FIELD_LABELS.fullName) });
+
+  return { router, fullName };
+}
+
+function unloadIsHeldBack(): boolean {
+  const unload = new Event('beforeunload', { cancelable: true });
+  window.dispatchEvent(unload);
+
+  return unload.defaultPrevented;
 }
 
 const saveButton = () => screen.getByRole('button', { name: SAVE_BAR_TEXTS.save });
@@ -361,5 +388,77 @@ describe('Profile', () => {
 
     expect(await screen.findByText(DEACTIVATE.succeeded)).toBeInTheDocument();
     await waitFor(() => expect(tokenStorage.getToken()).toBeNull());
+  });
+
+  it('should ask before leaving with unsaved changes, and stay when the leave is canceled', async () => {
+    const { router, fullName } = await renderProfileWithSignOut();
+    await userEvent.type(fullName, ' Rocha');
+
+    await userEvent.click(screen.getByRole('link', { name: BACK_TO_MENU_LABEL }));
+    const dialog = screen.getByRole('dialog', { name: UNSAVED_CHANGES.title });
+
+    expect(within(dialog).getByText(UNSAVED_CHANGES.message)).toBeInTheDocument();
+
+    await userEvent.click(within(dialog).getByRole('button', { name: UNSAVED_CHANGES.cancel }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(router.state.location.pathname).toBe(RoutePathEnum.PROFILE);
+    expect(fullName).toHaveValue(`${PROFILE.fullName} Rocha`);
+  });
+
+  it('should leave the screen once the changes are discarded', async () => {
+    const { router, fullName } = await renderProfileWithSignOut();
+    await userEvent.type(fullName, ' Rocha');
+
+    await userEvent.click(screen.getByRole('link', { name: BACK_TO_MENU_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: UNSAVED_CHANGES.discard }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
+  });
+
+  it('should leave without asking when nothing changed', async () => {
+    const { router } = await renderProfileWithSignOut();
+
+    await userEvent.click(screen.getByRole('link', { name: BACK_TO_MENU_LABEL }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('should not ask when the navigation stays on the screen', async () => {
+    const { router, fullName } = await renderProfileWithSignOut();
+    await userEvent.type(fullName, ' Rocha');
+
+    await act(() => router.navigate(RoutePathEnum.PROFILE));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(fullName).toHaveValue(`${PROFILE.fullName} Rocha`);
+  });
+
+  it('should hold the sign out too, and end the session only once the changes are discarded', async () => {
+    server.use(http.post(LOGOUT_URL, () => new HttpResponse(null, { status: NO_CONTENT })));
+    const { fullName } = await renderProfileWithSignOut();
+    await userEvent.type(fullName, ' Rocha');
+
+    await userEvent.click(screen.getByRole('button', { name: SIGN_OUT_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: UNSAVED_CHANGES.cancel }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    expect(tokenStorage.getToken()).not.toBeNull();
+
+    await userEvent.click(screen.getByRole('button', { name: SIGN_OUT_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: UNSAVED_CHANGES.discard }));
+
+    expect(tokenStorage.getToken()).toBeNull();
+  });
+
+  it('should have the browser warn on closing the tab only while there are unsaved changes', async () => {
+    const { fullName } = await renderProfileWithSignOut();
+
+    expect(unloadIsHeldBack()).toBe(false);
+
+    await userEvent.type(fullName, ' Rocha');
+
+    expect(unloadIsHeldBack()).toBe(true);
   });
 });

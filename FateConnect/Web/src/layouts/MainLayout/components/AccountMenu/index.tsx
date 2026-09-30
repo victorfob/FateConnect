@@ -12,8 +12,8 @@ import {
 import { LogoutIcon } from '@design-system/icons';
 
 import { useProfile } from '@app/hooks/useProfile';
+import { useSignOut } from '@app/hooks/useSignOut';
 import { useStoredImage } from '@app/hooks/useStoredImage';
-import { logout } from '@app/services/auth/authService';
 import { loggedUserName } from '@app/services/auth/loggedUser';
 import { getInitials } from '@app/utils/initials';
 
@@ -40,6 +40,11 @@ export function AccountMenu() {
     [],
   );
   const handleClose = useCallback(() => setAnchorEl(null), []);
+  const signOut = useSignOut();
+  const handleSignOut = useCallback(() => {
+    setAnchorEl(null);
+    signOut();
+  }, [signOut]);
 
   if (!initials) return null;
 
@@ -67,7 +72,7 @@ export function AccountMenu() {
 
           <S.MenuDivider component="li" />
 
-          <S.SignOutItem onClick={logout}>
+          <S.SignOutItem onClick={handleSignOut}>
             <ListItemIcon>
               <LogoutIcon fontSize="small" />
             </ListItemIcon>

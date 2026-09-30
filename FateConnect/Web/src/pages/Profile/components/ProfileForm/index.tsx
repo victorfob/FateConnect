@@ -5,12 +5,14 @@ import { FormProvider, useForm } from 'react-hook-form';
 import type { User } from '@app/services/users/types';
 
 import { toProfileFormValues } from '../../helpers/mapper';
+import { useLeaveConfirmation } from '../../hooks/useLeaveConfirmation';
 import { useProfileSave } from '../../hooks/useProfileSave';
 import { profileSchema, type ProfileFormInput, type ProfileFormValues } from '../../schema';
 import { AccountAccessCard } from '../AccountAccessCard';
 import { AccountDataCard } from '../AccountDataCard';
 import { PhotoCard } from '../PhotoCard';
 import { SaveBar } from '../SaveBar';
+import { UnsavedChangesDialog } from '../UnsavedChangesDialog';
 import * as S from './styles';
 
 export type ProfileFormProps = Readonly<{
@@ -25,6 +27,7 @@ export function ProfileForm({ profile, onSaved }: ProfileFormProps) {
   });
   const { save, isSaving } = useProfileSave({ form, profile, onSaved });
   const { isDirty } = form.formState;
+  const { confirming, confirmLeave, cancelLeave } = useLeaveConfirmation(isDirty);
 
   const handleSubmit = form.handleSubmit(save);
   const handleDiscard = useCallback(() => form.reset(), [form]);
@@ -45,6 +48,7 @@ export function ProfileForm({ profile, onSaved }: ProfileFormProps) {
         </S.CardsGrid>
 
         <SaveBar hasChanges={isDirty} saving={isSaving} onDiscard={handleDiscard} />
+        <UnsavedChangesDialog open={confirming} onCancel={cancelLeave} onDiscard={confirmLeave} />
       </S.ProfileFormRoot>
     </FormProvider>
   );
