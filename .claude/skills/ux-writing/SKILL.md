@@ -1,79 +1,33 @@
 ---
 name: ux-writing
-description: "Escreve e revisa o texto de interface do FateConnect — rótulo, botão, aviso, título de diálogo, estado vazio, placeholder, mensagem de erro e copy de tela inteira. Use sempre que a tarefa envolver o texto que o usuário lê: revisar a copy de uma tela ou fluxo (inclusive a partir de uma captura), nomear um botão, escrever a mensagem de um aviso ou de um erro, checar consistência de termo entre telas, ou decidir entre duas formulações. As regras estão em .claude/rules/product-copy.md; esta skill é o procedimento de aplicá-las."
+description: "Escreve e revisa o texto de interface do FateConnect — rótulo, botão, aviso, título de diálogo, estado vazio, placeholder, mensagem de erro, título de página e copy de tela inteira ou de documento legal. Use sempre que a tarefa envolver o texto que o usuário lê, inclusive quando ele nasce no meio de outra tarefa, sem pedido: revisar a copy de uma tela ou fluxo (também a partir de uma captura), nomear um botão, escrever um aviso ou um erro, checar consistência de termo entre telas, ou decidir entre duas formulações."
 ---
 
 # UX writing
 
-O padrão está na rule `.claude/rules/product-copy.md` — voz, aviso de sucesso, erro, botão, tooltip, estado vazio, caixa, verbos, data e número. **Leia a rule antes de propor qualquer texto**; aqui está só como conduzir o trabalho.
+## Paradas
 
-Postura: direta e construtiva. Sem elogiar o fluxo — aponte o que funciona e o que não funciona. Parceira de quem escreve o produto, não validadora.
+1. ⛔ **O gatilho é a copy existir, não alguém pedir.** Texto novo ou alterado no meio de outra tarefa passa por aqui antes do commit, mesmo quando parece óbvio por seguir as vizinhas — é aí que ele entra sem ninguém decidir.
+2. ⛔ **Havendo mais de uma candidata defensável, ofereça as frases inteiras e deixe a escolha ao dono.** Medição não substitui a oferta; quanto mais medição, mais a escolha parece decidida pelos números. Se ele não recusou uma alternativa, a escolha é sua e se anuncia como sua — nunca "pela skill".
 
-## Toda copy nova passa por aqui, sem esperar pedido
-
-⛔ **O gatilho é a copy existir, não alguém pedir a skill.** Texto que a pessoa lê e que nasce no meio de outra tarefa — o aviso de erro de um botão que ganhou um jeito de falhar, a frase nova de um documento legal — passa por ela antes do commit, com as candidatas indo ao Victor.
-
-⛔ Aconteceu em 25/09/2026, no #466. O download da foto de denúncia passou a buscar a original no clique e ganhou um aviso de falha; escrevi *"Erro ao baixar a foto. Tente novamente."* seguindo as vizinhas, e só anunciei. A devolução foi *"todo copy passa pela ux-writing, vc já deveria ter usado sem me pedir"*. Rodada a skill, o texto ficou o mesmo — e a escolha passou a ser dele, que era o que faltava.
-
-⚠️ **O tell é o texto parecer óbvio por seguir um padrão.** É justamente aí que ele entra sem ninguém decidir.
-
-## Quem lê
-
-Estudante da faculdade, no celular ou no laptop, geralmente com pressa e no meio de outra coisa. Não é público técnico e não é cliente corporativo: o texto conversa, mas não é íntimo. As duas áreas com texto de produto hoje são caronas e achados e perdidos.
+Postura: direta e construtiva, parceira de quem escreve o produto, não validadora. Quem lê o produto: estudante da faculdade, no celular ou no laptop, com pressa e no meio de outra coisa.
 
 ## Como conduzir
 
-1. **Entenda a função da tela antes de sugerir.** O texto serve ao que a tela faz. Se a função não estiver clara, **pergunte** — copy escrita sobre suposição é retrabalho.
-2. **Leia a rule e as telas vizinhas.** O termo que você vai usar já existe em algum lugar? Use o mesmo. Não invente sinônimo para estado que já tem nome.
-3. **Varra o artefato inteiro, não elemento a elemento.** Antes de fechar:
-   - **Naming:** o mesmo objeto se chama igual em rótulo, botão, título e aviso?
-   - **Precisão:** o texto promete o que a tela entrega? Desconfie de "automático" onde a ação é manual.
-   - **Paralelismo:** itens de lista e de menu na mesma forma gramatical.
-   - **Só ouvido:** quem usa leitor de tela entende onde está e o que vem depois?
-
-   ⛔ **A varredura de naming cobre também a palavra que a SUA sugestão introduz.** Os itens acima perguntam se o artefato se contradiz; nenhum deles pega o termo novo que você trouxe de fora e que o produto já batizou em outro lugar.
-
-   Aconteceu em 11/09/2026, na #357: propus `Cadastre-se` para um card da landing, e o produto chama essa ação de `Criar conta` em **quatro** lugares — o link do cartão de login, o título do passo de *Como funciona*, o título da tela de cadastro e o botão que a envia. Quem viu foi o Victor, e pelo sintoma, não pela regra: a mesma palavra abrindo dois cards vizinhos.
-
-   **Antes de propor um verbo, procure no código a ação que ele nomeia.** `grep` pelo verbo e pelos sinônimos dele; achando outro nome já em uso, o seu não entra.
-4. **Entregue em tabela Atual × Sugerido × Por quê**, com a justificativa em uma linha citando a regra aplicada. Havendo mais de uma opção defensável, mostre o trade-off em vez de escolher sozinho.
-
-   ⛔ **Medir as candidatas não substitui oferecê-las — e quanto mais medição, maior o risco.** O atalho não vem da preguiça: vem do trabalho bem feito. Com a régua lida, as vizinhas conferidas e as larguras medidas no campo real, a escolha parece decidida pelos números, e a tabela parece cerimônia sobre um resultado que já se impôs.
-
-   ⛔ **O gesto que denuncia é escrever "pela skill".** Aconteceu em 11/09/2026, na #354: medi quatro candidatas para a recusa do e-mail institucional, entreguei uma, e escrevi no corpo do PR *"a copy, pela skill de UX writing"*. Havia três defensáveis e o Victor viu uma — a pergunta dele foi *"usou a skill de ux-writing pra definir esse copy?"*. **Se ele não recusou uma alternativa, a decisão é minha e se anuncia como minha.**
-### A candidata se oferece por extenso
-
-⛔ **Mostre cada opção como a frase inteira que vai para a tela, não só o pedaço que muda.** Tabela que lista o trecho variável obriga quem decide a montar a frase de cabeça — e ele decide sobre a montagem dele, não sobre o texto que você escreveu.
-
-⛔ Aconteceu em 14/09/2026, ao encurtar a nota do diálogo de denúncia: entreguei quatro candidatas numa tabela de tamanho e do que cada uma cortava, com só o fim de cada frase. A devolução foi *"vc não me mostrou como ficaria a frase completa em cada uma"*.
-
-⚠️ **E ler as quatro por extenso mudou a conversa.** Lado a lado ficou visível que todas começavam igual, e que a primeira frase sozinha já respondia a dúvida de quem estava com o diálogo aberto — o que varia é só o assunto da segunda. Isso não aparecia na tabela de diferenças.
-
-**A medição continua valendo, e vai junto**: tamanho, largura no campo real, o que cada uma abre mão. O que não pode é a medição substituir a frase.
-
-5. **Separe copy de produto.** Pergunta que trava a escrita — qual é o nome real da feature, o que o botão faz de fato, qual é a regra de negócio — vem **antes** e bloqueia a versão final. Fricção que o texto não resolve (um fluxo que exige três telas para uma ação simples) vira observação, não maquiagem.
-6. **Ao receber captura de tela**, diga qual elemento está revisando antes de propor — "o botão do rodapé do diálogo", não "o botão".
-
-## Antes de entregar
-
-- Nenhum "com sucesso", "por favor" ou "!" em aviso de sistema.
-- Nenhum termo alternando para a mesma coisa.
-- Nenhum "você" em mensagem transacional; nenhuma frase que culpe quem lê.
-- Erro com problema **e** saída.
-- Botão no imperativo, verbo primeiro, sentence case.
-- Copy em pt-BR, identificador em inglês.
+1. **Entenda a função da tela.** Não estando clara, pergunte: copy sobre suposição é retrabalho.
+2. **Leia `references/copy-guide.md`, a rule `product-copy.md` e as telas vizinhas.** O termo já existe? Use o mesmo.
+3. **Varra o artefato inteiro:** naming (o mesmo objeto igual em rótulo, botão, título e aviso), precisão (o texto promete o que a tela entrega), paralelismo, e se funciona só ouvido.
+   - ⛔ A varredura cobre a palavra que **a sua** sugestão introduz: antes de propor um verbo, `grep` pelo verbo e pelos sinônimos; achando outro nome em uso para a mesma ação (`Criar conta` contra `Cadastre-se`), o seu não entra.
+4. **Meça o que carrega dado** no contêiner real (skill `visual-validation`) e leve o número junto.
+5. **Entregue em tabela Atual × Sugerido × Por quê**, cada candidata como a frase inteira que vai para a tela, não só o pedaço que muda. A medição vai junto (tamanho, largura, do que cada uma abre mão).
+6. **Separe copy de produto.** Pergunta que trava a escrita (nome real da feature, o que o botão faz, regra de negócio) vem antes e bloqueia a versão final; fricção que o texto não resolve vira observação.
+7. **Com captura de tela**, diga qual elemento está revisando ("o botão do rodapé do diálogo").
 
 ## A régua pode não alcançar o texto
 
-⛔ **Quando o texto é de um registro que a `product-copy.md` não cobre, a lacuna é da regra — e fechá-la vem antes de propor a copy.** Sugestão escrita contra uma régua que não alcança o caso é sugestão que ninguém consegue julgar: não há critério para aceitá-la nem para recusá-la.
-
-Aconteceu na #227. A regra descreve texto transacional — aviso, botão, erro — e a landing vende. Propor a copy dela ali seria aplicar o critério errado, ou inventar um em silêncio.
-
-**O caminho:** nomeie a lacuna, pesquise fonte externa que a fundamente, escreva a seção na `product-copy.md`, e só então proponha o texto. Seção e copy saem no **mesmo PR** — separadas, cada review se lê pela metade.
-
-⚠️ **A pesquisa pode contrariar a intuição, e é para isso que ela serve.** Na landing a expectativa era que vender pedisse tom mais animado; a medição da Nielsen Norman Group diz o contrário — a versão objetiva de um mesmo site rendeu +27% de usabilidade, e +124% somada a concisão e escaneabilidade, porque hipérbole cobra atenção de quem lê e derruba credibilidade. Leve número e fonte para o corpo do PR: é o que permite discordar da sua sugestão com base em algo.
+⛔ Texto de um registro que a régua não cobre: a lacuna é da régua, e fechá-la vem antes da copy. Nomeie a lacuna, pesquise fonte externa, escreva a seção em `references/copy-guide.md` e só então proponha o texto — seção e copy no mesmo PR, com número e fonte no corpo dele.
 
 ## Limites
 
-- Mudar a **rule** de copy → editar `.claude/rules/product-copy.md`, e a mudança sai por PR como qualquer código.
-- Implementar o texto no código → as constantes ficam na pasta do componente que as usa, conforme `.claude/rules/web-react-patterns.md`.
+- Mudar a régua → `references/copy-guide.md`; o glossário e as proibições → a rule `product-copy.md`. Sai por PR como qualquer código.
+- O texto no código mora nas constantes da pasta do componente que o usa (`web-react-patterns.md`).

@@ -93,7 +93,7 @@ A pasta **`.claude/`** guarda o contexto que um agente de código carrega ao tra
 | `rules/*.md`        | Padrão que vale para uma área do código                               | com `paths:`, ao abrir um arquivo que casa; sem `paths:`, sempre       |
 | `skills/*/SKILL.md` | Procedimento sob demanda, com passos                                  | quando a tarefa casa com a `description`, ou pelo nome (`/pr-creator`) |
 
-As skills de hoje: **`spec-issue`** (especificar uma issue e dividir em sub-issues), **`pr-creator`** (abrir e atualizar PR), **`resolve-pr-comments`** (triar e responder review), **`write-review-comment`** (comentar o PR de outra pessoa), **`write-commit`** (mensagem de commit e agrupamento em commits), **`changelog-writer`** (entrada do `CHANGELOG.md`), **`create-release`** (cortar uma versão e publicar), **`lighthouse-audit`** (auditar o site publicado e abrir as issues), **`ux-writing`** (texto de interface) e **`fateconnect-create-component`** (criar componente no front).
+As skills de hoje: **`spec-issue`** (especificar uma issue e dividir em sub-issues), **`pr-creator`** (abrir e atualizar PR), **`resolve-pr-comments`** (triar e responder review), **`write-review-comment`** (comentar o PR de outra pessoa), **`write-commit`** (mensagem de commit e agrupamento em commits), **`changelog-writer`** (entrada do `CHANGELOG.md`), **`create-release`** (cortar uma versão e publicar), **`lighthouse-audit`** (auditar o site publicado e abrir as issues), **`ux-writing`** (texto de interface), **`fateconnect-create-component`** (criar componente no front), **`harness-evolution`** (criar ou mudar rule e skill), **`parallel-work`** (worktrees e subagentes), **`prove-the-mechanism`** (receitas de medição) e **`visual-validation`** (validar mudança visual no app).
 
 ### Como mexer nela
 
@@ -101,7 +101,7 @@ As skills de hoje: **`spec-issue`** (especificar uma issue e dividir em sub-issu
 - **A rule anda junto com o código.** Padrão novo e a regra que o descreve entram no mesmo PR — separar os dois é como eles divergem.
 - **É conteúdo público.** Vale a mesma restrição do resto do repositório: nada de nome de empregador, repositório interno, pacote privado ou ferramenta corporativa. Quando a orientação vier de fonte interna, registre só a decisão e a justificativa.
 
-O raciocínio completo — quando uma correção merece virar regra, e onde cada coisa mora — está em `.claude/rules/harness-evolution.md`.
+O raciocínio completo — quando uma correção merece virar regra, e onde cada coisa mora — está na skill `harness-evolution` (`.claude/skills/harness-evolution/SKILL.md`).
 
 ## Licença
 

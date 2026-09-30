@@ -1,89 +1,44 @@
 ---
-description: Autorização da API .NET — as duas camadas que protegem um endpoint e onde o `[Authorize]` mora ao criar action ou controller novos.
+description: Autorização da API .NET — as duas camadas que protegem um endpoint, onde o `[Authorize]` mora, o gate por perfil e o encerramento de sessão
 paths:
-  - FateConnect/FateConnect.Api/**
-  - FateConnect/FateConnect.Api.Tests/**
+  - "FateConnect/FateConnect.Api/Modules/*/Controllers/**"
+  - "FateConnect/FateConnect.Api/Modules/Auth/**"
+  - "FateConnect/FateConnect.Api/Program.cs"
+  - "FateConnect/FateConnect.Api.Tests/Auth/**"
 ---
 
 # Autorização na API
 
-## São duas camadas, e as duas ficam
+## Duas camadas, e as duas ficam
 
-| Camada | Onde | O que faz |
-| --- | --- | --- |
-| Piso | `Program.cs` — `SetFallbackPolicy(RequireAuthenticatedUser())` | vale onde o endpoint **não declarou nada**: endpoint novo nasce fechado |
-| Explícito | `[Authorize]` | diz a regra no arquivo que quem lê abre |
+- **Piso:** `SetFallbackPolicy(RequireAuthenticatedUser())` no `Program.cs` fecha o endpoint que ninguém anotou.
+- **Explícito:** `[Authorize]` no controller, para a regra aparecer a quem o abre. ⛔ Nunca troque um pelo outro: sem o piso, esqueceu = aberto.
 
-⛔ **Nunca troque uma pela outra.** O atributo explícito documenta; a fallback policy protege o que alguém esqueceu de anotar. Sem o piso, o modo de falha volta a ser *esqueceu → aberto*, que é exatamente como os cinco endpoints de carona ficaram abertos para qualquer um com a URL até a #176.
+## Onde o `[Authorize]` mora
 
-⚠️ **Com `[Authorize]` explícito em todo endpoint, a suíte deixa de exercitar o piso** — todo endpoint testado passa pelo atributo. O piso segue valendo só para o endpoint que ninguém anotou, que por definição ainda não existe para ser testado. É o argumento de por que ele não sai, não de que ele é redundante.
+⛔ **Endpoint novo nasce com `[Authorize]` explícito**, e o nível depende do controller:
+
+- **Homogêneo** (toda action exige token): `[Authorize]` na classe, como no `RidesController`.
+- **Misto** (alguma action pública): `[Authorize]` em cada action protegida e `[AllowAnonymous]` na pública, como no `UsersController` e no `AuthController`. ⛔ Ao acrescentar a primeira action pública, o `[Authorize]` desce da classe: na classe, com `[AllowAnonymous]` embaixo, o topo mente sobre metade das actions.
+
+**Gate por perfil é `[AuthorizeProfile(EnumProfileType.X)]`**, que já inclui os perfis acima de X e conta como o `[Authorize]` da action. ⛔ `[Authorize(Roles = "Operator")]` cru barra o administrador: o token leva uma claim de role só.
+
+Endpoint novo entra na teoria de rotas do `AuthorizationTests` (401 sem token) e ganha o par positivo (a mesma rota atravessa com token).
 
 ## O piso responde 401 até para rota que não existe
 
-⛔ **Não use o código de status para decidir se uma rota existe.** A fallback policy vale para requisição que **não casa endpoint nenhum**, então caminho inexistente sob a API responde **401**, não 404. Medido em 08/09/2026: produção devolvia 401 em `/LostAndFound` antes de aquele módulo existir lá.
+⛔ **401 não prova que a rota existe.** Para saber se o código novo subiu, leia o `swagger.json`; para saber se a aplicação está viva, qualquer caminho serve (é o que a sonda de `.github/workflows/publish.yml` faz).
 
-Duas consequências práticas:
+## O que roda antes da autorização não passa por ela
 
-- **Para saber se o código novo subiu, leia o documento do Swagger**, que lista as rotas registradas — não o status de uma chamada. Foi assim que se confirmou que um deploy tinha levado o módulo, e não apenas que a porta estava aberta.
-- **Para saber se a aplicação está viva, qualquer caminho serve.** É o que a sonda de `.github/workflows/publish.yml` usa: ela pede um caminho que de propósito não existe e cobra ter havido resposta, porque 401 vem da aplicação e 502 vem do nginx sem ninguém atrás. Assim a checagem não quebra quando uma rota é renomeada.
+- Middleware registrado antes de `UseAuthentication`/`UseAuthorization` responde sem token. O que precisa de token precisa ser endpoint, como o `UploadsController`, e não middleware de arquivo estático.
+- ⛔ **O Swagger é público de propósito**, nos dois ambientes. Não "corrija" como vazamento.
 
-## Quem é registrado antes da autorização não passa por ela
+## O recorte que o token responde não vira parâmetro
 
-⛔ **Middleware que roda antes de `UseAuthentication`/`UseAuthorization` no `Program.cs` responde sem token, e o piso não o alcança.** O Swagger é o caso vivo: ele curto-circuita a requisição antes de a autorização existir. Mudar a ordem não resolveria — ele não é endpoint, e a autorização só decide sobre endpoint.
+⛔ **Quando o papel de quem chama já decide o que a resposta contém, quem decide é a API**, não um campo da consulta. O tell é a tabela de autorização depender de um valor da consulta ("liberado para X quando o campo Y vier"). Filtro que a mesma pessoa usa dos dois jeitos (`OnlyMine` em caronas e achados) continua certo.
 
-**Então o que precisa de token precisa ser endpoint.** É por isso que a imagem de achados e perdidos é servida por `UploadsController`, com `[Authorize]`, e não por middleware de arquivo estático: como estático ela era legível por qualquer pessoa com a URL, e o nome em GUID é obscuridade, não autorização.
+## Encerrar sessão
 
-⚠️ **O Swagger é público de propósito** — `swagger.json` e a interface respondem 200 sem token, nos dois ambientes. É documentação, e a decisão é do Victor, em 08/09/2026. Não "corrija" isso como se fosse vazamento.
-
-## Onde o `[Authorize]` mora: onde a regra vale para todo mundo
-
-⛔ **Endpoint novo nasce com `[Authorize]` explícito.** Não é o que protege — é o que faz a proteção aparecer para quem abre o controller em vez de ficar só no `Program.cs`. Pedido no review do #191.
-
-O nível depende de o controller ser homogêneo ou misto, e são casos diferentes:
-
-| Controller | Onde vai | Exemplo |
-| --- | --- | --- |
-| **Homogêneo** — toda action exige token | `[Authorize]` **na classe**, junto de `[ApiController]` e `[Route]` | `RidesController`: listar, ver, ofertar, editar e excluir |
-| **Misto** — tem pelo menos uma action pública | `[Authorize]` **em cada action** protegida, `[AllowAnonymous]` na pública | `UsersController`: `signup` é anônimo, e o `PATCH` de configurações e preferências vai exigir token |
-
-⛔ **Ao acrescentar a primeira action pública, o `[Authorize]` desce da classe para as actions.** Deixá-lo na classe com um `[AllowAnonymous]` embaixo afirma duas coisas contrárias no mesmo arquivo: funciona, mas quem lê o topo conclui errado sobre metade das actions.
-
-Endpoint novo entra na teoria de rotas do `AuthorizationTests`, que prova por HTTP (401 sem token, 200 com token). O par positivo é obrigatório — ver `dotnet-testing.md`.
-
-## O recorte que o token responde não vira parâmetro da consulta
-
-⛔ **Quando a identidade de quem chama já decide o que a resposta deve conter, quem decide é a API — não um campo que quem chama precisa acertar.** Parâmetro que existe para a pessoa pedir aquilo que ela já é só acrescenta um jeito de errar: quem o esquece recebe outra coisa, e quem o manda errado recebe uma recusa que não precisava existir.
-
-⛔ Decidido em 14/09/2026, no #410, revertendo o desenho que a própria issue tinha fechado. A listagem de denúncias ia ganhar um `OnlyMine` na consulta, liberando `Operator` só quando ele viesse e respondendo **403** sem ele. Ficou assim: sem perfil de administrador, a listagem devolve as denúncias de quem pediu; com ele, as de todo mundo. *"É melhor a API já tratar isso do que deixarmos aberto pra erro."*
-
-**O que isso apagou do diff:** o campo do DTO, a exceção de recusa, o caso dela no middleware e os testes do 403 — três arquivos saíram inteiros da branch, e o PR encolheu de treze para dez.
-
-⚠️ **Não é regra contra filtro.** `OnlyMine` continua certo em caronas e em achados e perdidos, onde as duas respostas são legítimas para a mesma pessoa: ver tudo, ou ver só o que ela publicou. O que não se parametriza é o recorte que o **papel** decide — ali existe uma resposta certa por quem pergunta, e oferecer a outra é oferecer um erro.
-
-**O tell é a tabela de autorização depender de um valor da consulta.** Escrevendo "liberado para X quando o campo Y vier", pare: o que decide é quem chama, e isso o token já diz.
-
-## Encerrar sessão exige estado no servidor
-
-⛔ **Limpar o token no cliente não encerra nada.** O JWT é uma string assinada e autossuficiente: a API não guarda registro dele, só confere a assinatura e lê as claims. O `exp` está **dentro** do payload assinado, e quem interceptou o token tem a própria cópia — apagar o `localStorage` apaga a cópia de quem saiu.
-
-Para um token que era válido parar de passar, o servidor tem de lembrar de algo. São **três** famílias, e todas guardam estado; o que se escolhe é onde ele mora:
-
-| Caminho | O que o servidor guarda |
-| --- | --- |
-| lista de revogados (`jti`) | os tokens mortos, mais o descarte dos vencidos |
-| **versão de sessão** | um inteiro por usuário — o que está implementado |
-| access curto + refresh | o refresh token |
-
-⚠️ **Memória de processo não é opção:** reinício esquece tudo e o token volta a valer, e reinício acontece em **todo deploy**.
-
-**O que está de pé:** `Users.TokenVersion` viaja como claim em cada token, `POST /Auth/logout` incrementa a coluna, e o gancho `OnTokenValidated` recusa quem carrega valor diferente. O login **lê** a coluna e estampa o valor atual — ⛔ nunca incremente no login: depois de emitir você mata o token que acabou de entregar, e antes de emitir você encerra as outras sessões da pessoa a cada entrada.
-
-⚠️ **Requisição autenticada passa a exigir que o usuário exista**, porque a comparação lê a coluna. Fixture que emite token para um id sem semear usuário recebe 401 — e um token de conta apagada deixa de ser aceito, o que é o comportamento desejado.
-
-## Perfil ainda não se cobra
-
-O token já emite o perfil como `ClaimTypes.Role` (`TokenService.BuildUserClaims`), então gate por perfil é `[Authorize(Roles = ...)]` na action — não precisa de guard próprio, o ASP.NET Core já entrega o atributo.
-
-⛔ **Mas não escreva a policy antes de existir o que ela proteja.** Quem decide o perfil de quem se cadastra é `UserService`, e é lá que se vê qual perfil o sistema realmente produz hoje. Policy sem endpoint administrativo e sem usuário que alcance o perfil nasce sem consumidor e sem teste possível — tem cara de segurança e não barra nada.
-
-Quando a hierarquia entre perfis for decidida (um perfil "conter" o outro), ela precisa sair no token ou numa policy nomeada: um `[Authorize(Roles = "Operator")]` **barra** quem tem só a claim de administrador, porque o `TokenService` emite uma claim de role por usuário.
+- `Users.TokenVersion` viaja como claim; `POST /Auth/logout` incrementa a coluna, e o `OnTokenValidated` recusa valor diferente. ⛔ O login só lê a coluna, nunca incrementa.
+- Toda requisição autenticada exige que o usuário exista: fixture que emite token sem semear o usuário recebe 401.
