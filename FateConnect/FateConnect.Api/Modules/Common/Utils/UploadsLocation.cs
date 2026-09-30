@@ -22,4 +22,12 @@ public static class UploadsLocation
 
         return $"{folder}{ThumbnailsFolderName}/{Path.GetFileNameWithoutExtension(imagePath)}{ThumbnailExtension}";
     }
+
+    public static string? ThumbnailOrNullOf(string? imagePath)
+    {
+        if (imagePath is null)
+            return null;
+
+        return ThumbnailOf(imagePath);
+    }
 }
