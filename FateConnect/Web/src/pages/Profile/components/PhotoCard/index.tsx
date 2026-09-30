@@ -36,7 +36,7 @@ export function PhotoCard({ storedPhotoUrl }: PhotoCardProps) {
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photoToCrop, setPhotoToCrop] = useState<File | null>(null);
-  const storedPhoto = useStoredImage(storedPhotoUrl);
+  const { image: storedPhoto } = useStoredImage(storedPhotoUrl);
   const initials = useMemo(() => getInitials(fullName), [fullName]);
 
   const chosenPhotoUrl = useFilePreviewUrl(photo);

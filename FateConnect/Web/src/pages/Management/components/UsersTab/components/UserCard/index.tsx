@@ -1,17 +1,20 @@
 import { useCallback, useMemo } from 'react';
-import { IconButton, ListCard, StatusTag, Typography } from '@design-system';
+import { IconButton, InitialsAvatar, ListCard, StatusTag, Typography } from '@design-system';
 import { EditIcon, EmailIcon, PhoneIcon } from '@design-system/icons';
 
+import { useStoredImage } from '@app/hooks/useStoredImage';
 import {
   accountStatusLabel,
   accountStatusTone,
 } from '@app/pages/Management/components/UsersTab/helpers/accountStatus';
 import type { UserSummary } from '@app/services/users/managementTypes';
 import type { AccountStatusEnum } from '@app/services/users/types';
+import { getInitials } from '@app/utils/initials';
 import { maskPhone } from '@app/utils/masks/phoneMask';
 
 import { UserStatusAction } from '../UserStatusAction';
 import { EDIT_LABEL, OWN_ACCOUNT_LABEL } from './constants';
+import * as S from './styles';
 
 type UserCardProps = Readonly<{
   user: UserSummary;
@@ -23,6 +26,8 @@ type UserCardProps = Readonly<{
 
 export function UserCard({ user, isOwnAccount, onEdit, onStatusConfirm }: UserCardProps) {
   const handleEdit = useCallback(() => onEdit(user), [onEdit, user]);
+  const photo = useStoredImage(user.thumbnailUrl);
+  const initials = useMemo(() => getInitials(user.fullName), [user.fullName]);
 
   const displayPhone = useMemo(() => {
     if (!user.phone) return null;
@@ -33,7 +38,15 @@ export function UserCard({ user, isOwnAccount, onEdit, onStatusConfirm }: UserCa
   return (
     <ListCard own={isOwnAccount} ownLabel={OWN_ACCOUNT_LABEL}>
       <ListCard.Header>
-        <Typography variant="subtitleBold">{user.fullName}</Typography>
+        <S.Identity>
+          <InitialsAvatar
+            initials={initials}
+            label={user.fullName}
+            photoSrc={photo.image?.objectUrl}
+            loading={photo.loading}
+          />
+          <Typography variant="subtitleBold">{user.fullName}</Typography>
+        </S.Identity>
 
         <ListCard.Actions>
           <StatusTag tone={accountStatusTone(user.status)}>

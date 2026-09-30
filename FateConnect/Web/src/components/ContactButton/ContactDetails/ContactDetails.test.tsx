@@ -5,6 +5,7 @@ import { ContactDetails, type ContactDetailsProps } from '.';
 const DEFAULT_PROPS: ContactDetailsProps = {
   name: 'Maria Silva',
   initials: 'MS',
+  thumbnailUrl: null,
   email: 'maria@example.com',
   phone: '(15) 90000-0000',
   phoneHref: 'https://wa.me/5515900000000?text=Ol%C3%A1',

@@ -19,12 +19,14 @@ const CONTACT: UserContact = {
   name: 'Marina Duarte',
   email: 'marina.duarte@example.com',
   phone: '(15) 99999-0001',
+  thumbnailUrl: null,
 };
 
 const OTHER_CONTACT: UserContact = {
   name: 'Rafael Nunes',
   email: 'rafael.nunes@example.com',
   phone: '(15) 99999-0002',
+  thumbnailUrl: null,
 };
 
 const LOST_ITEM: LostItem = {

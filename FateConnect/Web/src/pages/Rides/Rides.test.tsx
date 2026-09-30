@@ -46,6 +46,7 @@ const DRIVER: UserContact = {
   name: 'Ana Ofertante',
   email: 'ana@example.com',
   phone: '(15) 90000-0000',
+  thumbnailUrl: null,
 };
 
 const RIDE: Ride = {

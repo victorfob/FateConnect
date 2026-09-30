@@ -4,6 +4,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { PROFILE } from '@app/test/profile';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
@@ -15,6 +16,13 @@ const NO_CONTENT = 204;
 const SERVER_ERROR = 500;
 
 const USER_NAME = 'Maria da Silva';
+
+const PROFILE_URL = 'https://api.fateconnect.test/users/me';
+const ORIGINAL_PATH = 'uploads/user/perfil.png';
+const THUMBNAIL_PATH = 'uploads/user/thumbnails/perfil.webp';
+const OBJECT_URL = 'blob:https://fateconnect.test/perfil';
+/** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
+const WEBP_BYTES = 'RIFF\0\0\0\0WEBP';
 
 function renderMenu() {
   const router = createMemoryRouter(
@@ -40,11 +48,13 @@ describe('AccountMenu', () => {
     tokenStorage.save(tokenWithName(USER_NAME));
   });
 
-  it('should show the avatar as the trigger of the account menu', () => {
+  it('should show the avatar as the trigger of the account menu', async () => {
     renderMenu();
 
     expect(screen.getByRole('button', { name: C.TRIGGER_LABEL })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: USER_NAME })).toHaveTextContent('MS');
+    await waitFor(() =>
+      expect(screen.getByRole('img', { name: USER_NAME })).toHaveTextContent('MS'),
+    );
   });
 
   it('should render nothing when the token carries no name', () => {
@@ -109,5 +119,37 @@ describe('AccountMenu', () => {
     await userEvent.click(screen.getByRole('button', { name: C.SIGN_OUT_LABEL }));
 
     expect(tokenStorage.getToken()).toBeNull();
+  });
+
+  it('should pulse while the profile photo loads, then show the thumbnail, never the original', async () => {
+    const downloaded: string[] = [];
+    URL.createObjectURL = vi.fn(() => OBJECT_URL);
+    URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get(PROFILE_URL, () =>
+        HttpResponse.json({
+          ...PROFILE,
+          fullName: USER_NAME,
+          imageUrl: ORIGINAL_PATH,
+          thumbnailUrl: THUMBNAIL_PATH,
+        }),
+      ),
+      http.get('https://api.fateconnect.test/uploads/user/*', ({ request }) => {
+        downloaded.push(new URL(request.url).pathname);
+
+        return new HttpResponse(WEBP_BYTES, { headers: { 'Content-Type': 'image/webp' } });
+      }),
+    );
+
+    renderMenu();
+
+    expect(screen.getByRole('img', { name: USER_NAME })).toHaveAttribute('aria-busy', 'true');
+    await waitFor(() =>
+      expect(screen.getByRole('img', { name: USER_NAME }).querySelector('img')).toHaveAttribute(
+        'src',
+        OBJECT_URL,
+      ),
+    );
+    expect(downloaded).toEqual([`/${THUMBNAIL_PATH}`]);
   });
 });

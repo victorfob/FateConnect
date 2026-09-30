@@ -52,6 +52,7 @@ export function ContactButton({ contact, message }: ContactButtonProps) {
           <ContactDetails
             name={contact.name}
             initials={initials}
+            thumbnailUrl={contact.thumbnailUrl}
             email={contact.email}
             phone={displayPhone}
             phoneHref={phoneHref}

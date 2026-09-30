@@ -1,6 +1,7 @@
-import { InitialsAvatar, Typography } from '@design-system';
+import { Typography } from '@design-system';
 import { EmailIcon, PhoneIcon } from '@design-system/icons';
 
+import { ContactAvatar } from './ContactAvatar';
 import { ContactChannel } from './ContactChannel';
 import * as S from './styles';
 
@@ -10,6 +11,8 @@ const COPY_EMAIL_LABEL = 'Copiar';
 export type ContactDetailsProps = Readonly<{
   name: string;
   initials: string;
+  /** Miniatura da foto de perfil; sem ela, as iniciais. */
+  thumbnailUrl: string | null;
   email: string;
   /** Telefone como aparece em tela. */
   phone: string;
@@ -30,6 +33,7 @@ export type ContactDetailsProps = Readonly<{
 export function ContactDetails({
   name,
   initials,
+  thumbnailUrl,
   email,
   phone,
   phoneHref,
@@ -38,7 +42,7 @@ export function ContactDetails({
   return (
     <S.DetailsRow>
       <S.Identity>
-        <InitialsAvatar initials={initials} label={name} size="large" />
+        <ContactAvatar name={name} initials={initials} thumbnailUrl={thumbnailUrl} />
         <Typography variant="subtitleBold">{name}</Typography>
       </S.Identity>
 

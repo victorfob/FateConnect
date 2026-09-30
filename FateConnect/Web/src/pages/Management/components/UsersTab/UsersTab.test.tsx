@@ -38,11 +38,17 @@ const CONFLICT = 409;
 const BAD_REQUEST = 400;
 const SERVER_ERROR = 500;
 
+const THUMBNAIL_PATH = 'uploads/user/thumbnails/maria.webp';
+const OBJECT_URL = 'blob:https://fateconnect.test/maria';
+/** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
+const WEBP_BYTES = 'RIFF\0\0\0\0WEBP';
+
 const OWN_ACCOUNT: UserSummary = {
   id: ADMIN_ID,
   fullName: 'Ana Administradora',
   contactEmail: 'ana@exemplo.test',
   phone: '1533334444',
+  thumbnailUrl: null,
   status: AccountStatusEnum.ACTIVE,
 };
 
@@ -51,6 +57,7 @@ const ACTIVE_USER: UserSummary = {
   fullName: 'Maria da Silva',
   contactEmail: 'maria@exemplo.test',
   phone: '15999998888',
+  thumbnailUrl: null,
   status: AccountStatusEnum.ACTIVE,
 };
 
@@ -59,6 +66,7 @@ const BANNED_USER: UserSummary = {
   fullName: 'João Souza',
   contactEmail: 'joao@exemplo.test',
   phone: null,
+  thumbnailUrl: null,
   status: AccountStatusEnum.BANNED,
 };
 
@@ -67,6 +75,7 @@ const DEACTIVATED_USER: UserSummary = {
   fullName: 'Carla Lima',
   contactEmail: 'carla@exemplo.test',
   phone: '15988887777',
+  thumbnailUrl: null,
   status: AccountStatusEnum.SELF_DEACTIVATED,
 };
 
@@ -81,6 +90,7 @@ function fullUser(summary: UserSummary, profileType = ProfileTypeEnum.OPERATOR):
     contactEmail: summary.contactEmail,
     neighborhood: null,
     imageUrl: null,
+    thumbnailUrl: null,
     profileType,
     status: summary.status,
     createdAt: '2026-09-01T12:00:00',
@@ -159,6 +169,30 @@ describe('UsersTab', () => {
     expect(active.getByText('Ativa')).toBeInTheDocument();
     expect((await cardOf(BANNED_USER.fullName)).getByText('Banida')).toBeInTheDocument();
     expect((await cardOf(DEACTIVATED_USER.fullName)).getByText('Desativada')).toBeInTheDocument();
+  });
+
+  it('should show the photo of whoever has one and the initials of whoever has not', async () => {
+    URL.createObjectURL = vi.fn(() => OBJECT_URL);
+    URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get(
+        `https://api.fateconnect.test/${THUMBNAIL_PATH}`,
+        () => new HttpResponse(WEBP_BYTES, { headers: { 'Content-Type': 'image/webp' } }),
+      ),
+    );
+    listServing([{ ...ACTIVE_USER, thumbnailUrl: THUMBNAIL_PATH }, BANNED_USER]);
+
+    renderTab();
+
+    const withPhoto = await cardOf(ACTIVE_USER.fullName);
+    await waitFor(() =>
+      expect(
+        withPhoto.getByRole('img', { name: ACTIVE_USER.fullName }).querySelector('img'),
+      ).toHaveAttribute('src', OBJECT_URL),
+    );
+    expect(
+      (await cardOf(BANNED_USER.fullName)).getByRole('img', { name: BANNED_USER.fullName }),
+    ).toHaveTextContent('JS');
   });
 
   it('should build the request from every field the address names', async () => {
