@@ -12,6 +12,7 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
     public DbSet<User> Users => Set<User>();
     public DbSet<UserPreferences> UserPreferences => Set<UserPreferences>();
     public DbSet<DocumentAcceptance> DocumentAcceptances => Set<DocumentAcceptance>();
+    public DbSet<AdministrativeAction> AdministrativeActions => Set<AdministrativeAction>();
     public DbSet<Ride> Rides => Set<Ride>();
     public DbSet<RideDeparture> RideDepartures => Set<RideDeparture>();
     public DbSet<LostAndFoundRecord> LostAndFoundRecords => Set<LostAndFoundRecord>();

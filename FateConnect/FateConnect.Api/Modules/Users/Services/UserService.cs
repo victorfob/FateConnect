@@ -332,6 +332,8 @@ public partial class UserService(
             return null;
         }
 
+        EnumProfileType previousProfile = user.ProfileType;
+
         switch (newProfile)
         {
             case EnumProfileType.Administrator:
@@ -341,6 +343,11 @@ public partial class UserService(
                 user.DemoteToOperator();
                 break;
         }
+
+        bool profileChanged = user.ProfileType != previousProfile;
+
+        if (profileChanged)
+            RecordAdministrativeAction(currentUserId, id, ProfileChangeAction(user.ProfileType));
 
         await userRepository.SaveChangesAsync();
         LogUserProfileTypeChangedByAdmin(logger, id, newProfile.ToString());
@@ -361,25 +368,45 @@ public partial class UserService(
             return null;
         }
 
+        EnumAccountStatus previousStatus = user.Status;
+        EnumAdministrativeAction action;
+
         switch (newStatus)
         {
             case EnumAccountStatus.Banned:
                 user.Ban();
+                action = EnumAdministrativeAction.Banned;
                 break;
 
             case EnumAccountStatus.Active when user.Status == EnumAccountStatus.Banned:
                 user.ReactivateFromBan();
+                action = EnumAdministrativeAction.BanReverted;
                 break;
 
             default:
                 throw new InvalidUserStatusTransitionException();
         }
 
+        bool statusChanged = user.Status != previousStatus;
+
+        if (statusChanged)
+            RecordAdministrativeAction(currentUserId, id, action);
+
         await userRepository.SaveChangesAsync();
         LogUserStatusChangedByAdmin(logger, id, newStatus.ToString());
 
         return MapToReadDto(user);
     }
+
+    private void RecordAdministrativeAction(int actorId, int targetId, EnumAdministrativeAction action) =>
+        userRepository.AddAdministrativeAction(
+            new AdministrativeAction(actorId, targetId, action, timeProvider.GetUtcNow().UtcDateTime)
+        );
+
+    private static EnumAdministrativeAction ProfileChangeAction(EnumProfileType newProfile) =>
+        newProfile == EnumProfileType.Administrator
+            ? EnumAdministrativeAction.Promoted
+            : EnumAdministrativeAction.Demoted;
 
     private async Task EnsureEmailIsUniqueAsync(string email, int? excludeUserId = null)
     {
