@@ -11,4 +11,7 @@ public class ErrorResponseDto
 
     [DefaultValue("fatecEmail")]
     public string? Field { get; set; }
+
+    [DefaultValue(null)]
+    public string? Code { get; set; }
 }

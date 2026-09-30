@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Users.Exceptions;
 
+using FateConnect.Api.Modules.Users.Enums;
 using System;
 
 public abstract class UserDomainException(string message) : Exception(message);
@@ -41,6 +42,22 @@ public class InvalidDocumentVersionException()
 
 public class IncorrectCurrentPasswordException()
     : UserDomainException("A senha atual informada está incorreta.");
+
+public class IncompleteContactException()
+    : UserDomainException("Para salvar as informações de contato, preencha o telefone e o e-mail.");
+
+public class ContactRequiredException(EnumPublication publication)
+    : InvalidOperationException(MessageFor(publication))
+{
+    public const string ErrorCode = "ContactRequired";
+
+    private static string MessageFor(EnumPublication publication) => publication switch
+    {
+        EnumPublication.Ride => "Para ofertar carona, cadastre telefone e e-mail para contato em Meu perfil.",
+        EnumPublication.LostAndFoundItem => "Para cadastrar um item, cadastre telefone e e-mail para contato em Meu perfil.",
+        _ => throw new ArgumentOutOfRangeException(nameof(publication), publication, null)
+    };
+}
 
 public class InvalidUserStatusTransitionException()
     : UserDomainException("Não é possível realizar esta alteração de status de conta por este endpoint.");

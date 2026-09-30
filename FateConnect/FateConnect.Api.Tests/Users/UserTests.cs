@@ -40,4 +40,27 @@ public class UserTests
     {
         Assert.Throws<InvalidFatecEmailLocalPartException>(() => NewUser(fatecEmail));
     }
+
+    [Fact]
+    public void UpdatePersonalData_WithoutAContact_KeepsTheOneAlreadyRegistered()
+    {
+        User user = NewUser("mariana.rocha@aluno.cps.sp.gov.br");
+
+        user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, user.Gender, contact: null, neighborhood: null);
+
+        Assert.Equal("11999999999", user.Phone);
+        Assert.Equal("mariana.contato@gmail.com", user.ContactEmail);
+        Assert.True(user.HasContact);
+    }
+
+    [Fact]
+    public void UpdateByAdmin_WithoutAContact_KeepsTheOneAlreadyRegistered()
+    {
+        User user = NewUser("mariana.rocha@aluno.cps.sp.gov.br");
+
+        user.UpdateByAdmin("Mariana Alves Rocha", user.FatecEmail, contact: null);
+
+        Assert.Equal("11999999999", user.Phone);
+        Assert.Equal("mariana.contato@gmail.com", user.ContactEmail);
+    }
 }

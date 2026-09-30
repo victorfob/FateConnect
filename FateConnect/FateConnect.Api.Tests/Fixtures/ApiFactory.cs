@@ -183,6 +183,29 @@ public class ApiFactory : WebApplicationFactory<Program>
         return new SeededUser(user.Id, phone, contactEmail);
     }
 
+    public int SeedUserWithoutContact(string fullName)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        User user = new User(
+            fatecEmail: $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+            passwordHash: "hash-sem-valor-fora-desta-suite",
+            fullName: fullName,
+            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            gender: EnumGender.Other,
+            contact: null,
+            createdAt: DateTime.UtcNow
+        );
+
+        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
+
+        context.Users.Add(user);
+        context.SaveChanges();
+
+        return user.Id;
+    }
+
     public (int Id, string FatecEmail) SeedUserWithPassword(
         string fullName,
         string password,
