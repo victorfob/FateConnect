@@ -4,6 +4,8 @@ using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Interfaces;
+using FateConnect.Api.Modules.Users.Enums;
+using FateConnect.Api.Modules.Users.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -35,6 +37,7 @@ public class RidesController(IRideService rideService) : ControllerBase
     }
 
     [HttpPost]
+    [RequiresContact(EnumPublication.Ride)]
     [SwaggerOperation(Summary = "Create a new ride", Description = "Registers a new ride in the system, offered by the authenticated user.")]
     public async Task<ActionResult<ReadRideDto>> CreateAsync(CreateRideDto dto)
     {
