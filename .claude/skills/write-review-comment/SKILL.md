@@ -1,10 +1,6 @@
 ---
 name: write-review-comment
-description: >-
-  Escreve comentário de review em PR deste repositório, ancorado na linha exata — defeito no formato
-  Problema/Solução proposta, e o que não está errado como sugestão. Use quando o usuário pedir para
-  comentar, revisar ou apontar problemas no PR de outra pessoa, ou para levar achados de um code
-  review para o PR. Para responder comentários que outros escreveram, use `resolve-pr-comments`.
+description: "Escreve comentário de review em PR deste repositório, ancorado na linha exata — defeito no formato Problema/Solução proposta, e o que não está errado como sugestão. Use quando o usuário pedir para comentar, revisar ou apontar problemas no PR de outra pessoa, ou para levar achados de um code review para o PR. Para responder comentários que outros escreveram, use `resolve-pr-comments`."
 ---
 
 # Escrever comentário de review
@@ -56,20 +52,7 @@ gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
 
   Aconteceu em 28/09/2026, no #482: revisei `1e21e040`, o autor empurrou dois commits, e publiquei o primeiro comentário em `0aeb8152` sem olhar. A linha ainda era a mesma por sorte, e um dos commits mexia no changelog, que outro comentário planejado citava pela linha.
 
-⛔ **Bloco `suggestion` substitui exatamente as linhas ancoradas, e a faixa se decide na CRIAÇÃO.** O `PATCH` de um comentário de review aceita só o `body` — não há como alargar o intervalo depois. Comentário nascido de linha única fica preso a uma linha para sempre.
-
-Faixa se pede com `start_line` e `start_side` junto do `line`:
-
-```bash
-gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
-  -f commit_id="$(gh pr view <n> --json headRefOid --jq .headRefOid)" \
-  -f path="<caminho>" -F start_line=61 -F line=62 \
-  -f side="RIGHT" -f start_side="RIGHT" -f body='...'
-```
-
-⚠️ **Então decida a faixa antes de publicar, mesmo quando ainda não vai sugerir.** Em 12/09/2026 os dois comentários que mereciam bloco tinham nascido de linha única, e a saída foi apagar e repostar — barato porque nenhum tinha resposta, e impossível se tivesse.
-
-⛔ **E a faixa cobre da primeira à última linha que o conserto toca, não a que ilustra o argumento.** A correção do `Update()` parecia ser uma linha; eram três — a chamada, a linha em branco e o `SaveChangesAsync` que a sugestão absorve. Substituir só as duas primeiras teria **duplicado** a chamada, com um clique.
+⛔ **Comentário que leva, ou pode vir a levar, um bloco ` ```suggestion `:** leia `references/suggestion-blocks.md` antes de publicar. A faixa de linhas só se escolhe na criação, e o bloco precisa compilar no head do PR.
 
 ⛔ **Quando o problema é ausência, não há âncora.** Arquivo que o PR *não* tocou não está no diff. Aí o apontamento não é comentário: vira issue, ou não é levantado. **Decida com o usuário** — foi assim que o contrato do front virou uma issue em vez de um thread.
 
@@ -107,33 +90,6 @@ Aconteceu **três vezes no mesmo PR**, o #186, sempre pelo mesmo gesto meu:
 ⛔ **Sugestão de forma para código de consulta se mede antes de sair, não depois.** Na mesma rodada eu pedi escape de `%` e `_` no filtro por destino; o escape saiu correto, mas a edição trocou concatenação por interpolação — e dentro de uma árvore de expressão `$"%{x}%"` compila para `string.Format`, que o EF Core **não traduz**. Toda busca por destino passou a responder 500, pior que o defeito que eu tinha apontado.
 
 **O que a medição precisa ser:** chamar o método real do commit, não reconstruir a consulta numa sonda. O controle que provou foi chamar `GetAllAsync` duas vezes — sem `Destination` a query chega a abrir conexão, com `Destination` estoura na tradução. Reconstruir teria medido o meu código, não o dele.
-
-### Bloco `suggestion` é aplicado em um clique — compile antes de publicar
-
-⛔ **O que vai dentro de um bloco ` ```suggestion ` entra na branch exatamente como está escrito, sem ninguém reler.** Sugestão que não compila é defeito entregue por quem revisa, e chega lá com a autoridade de quem apontou o problema.
-
-⛔ Aconteceu em 12/09/2026, no PR #391, e só não foi publicada porque o Victor cobrou antes: *"pra sugestões verifique se o código roda ou se não está sugerindo algo quebrado"*. Eu ia sugerir devolver uma chamada para dentro do `if`, restaurando o `[NotNullWhen(true)]` e dispensando um `!`. Medido, o bloco reprovava o build:
-
-```
-error S8969: Remove this null-forgiving operator; the compiler already
-             knows this expression is not null here.
-```
-
-⚠️ **A correção parcial é que quebra.** Eram **dois** `!`, e removendo só o que estava no meu recorte, o outro passa a ser redundante — e redundante é **erro** aqui, porque o `.csproj` liga `TreatWarningsAsErrors`. O bloco tinha de cobrir da primeira à última linha afetada, não só o trecho que ilustra o argumento.
-
-⚠️ E o erro era a prova do argumento: o compilador só reclama do segundo `!` porque voltou a saber que a expressão não é nula.
-
-**A bancada:** worktree no head do PR (`git fetch origin pull/<n>/head`), **build de linha de base primeiro** — sem ele, uma falha depois não distingue a sua sugestão de algo que já estava quebrado —, aplicar, confirmar com `cmp -s` que o arquivo de fato mudou, e construir. O corpo do comentário sai do arquivo que passou no build, não do que você digitou no rascunho.
-
-⚠️ **Diga em que ambiente compilou**, como o resto desta skill exige: aqui é o SDK que o `global.json` fixa, e `dotnet --version` responde `8.0.4xx`.
-
-### Compilar não cobre o que quebra na borda
-
-⛔ **Sugestão pode compilar e estourar no driver.** A `suggestion` do fuso trocava a construção de um `DateTime` gravado em Postgres, e o Npgsql recusa `Kind` incompatível com o tipo da coluna — a coluna era `timestamp without time zone`, que reprova `Kind=Utc`.
-
-**O que liberou não foi o build: foi comparar as duas formas na dimensão que o driver olha.** `ToDateTime(..., DateTimeKind.Utc)` e `ConvertTimeToUtc(...)` devolvem os dois `Kind=Utc` — idêntico ao que já grava hoje, logo sem risco novo. Se diferissem, o build continuaria verde e a gravação quebraria em produção.
-
-⚠️ **A pergunta é sempre a mesma:** o valor que a minha sugestão produz difere do atual em algo que outra camada inspeciona? Tipo, `Kind`, encoding, precisão, nulidade. Compilar responde pela sintaxe; isso responde pela borda.
 
 ## Meça antes de afirmar
 

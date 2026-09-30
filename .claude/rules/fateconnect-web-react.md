@@ -1,176 +1,53 @@
 ---
-description: Padrões do front React + Vite em FateConnect/Web — stack, design system local, estilo, formulários, dados e testes
+description: Núcleo do front React + Vite em FateConnect/Web — consumo do design system, casca de tela, rotas, dados, gate e os gatilhos para as rules e skills de cada área
 paths:
   - "FateConnect/Web/**"
 ---
 
-# React + Vite — FateConnect/Web
+# Front — FateConnect/Web
 
-Front do FateConnect. Estas regras valem só dentro de `FateConnect/Web`.
+Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenciador de estado global.
 
-## Stack fixada (não introduzir alternativa sem decisão explícita)
+## Antes de escrever
 
-| Camada | Escolha |
-| ------ | ------- |
-| Build | Vite + `@vitejs/plugin-react` |
-| UI | MUI + `@mui/icons-material`; estilo com Emotion |
-| Datas | `@mui/x-date-pickers` + `date-fns`, locale pt-BR |
-| Feedback | `notistack` |
-| Rotas | React Router |
-| Formulários | `react-hook-form` + `zod` (`@hookform/resolvers`) |
-| Dados | `@tanstack/react-query` + `axios` |
-| Testes | Vitest + Testing Library |
+- ⛔ Antes de criar arquivo novo (teste, `styles.ts`, `constants/`, `schema/`), abra com `Read` um vizinho do mesmo tipo: o `Write` não carrega a rule com `paths` daquela área.
+- Texto que a pessoa lê, novo ou alterado, passa pela skill `ux-writing` antes do commit, com as candidatas ao dono — sem esperar pedido.
+- Mudança visual passa pela skill `visual-validation` antes de dizer que está pronta.
+- Campo novo em formulário, dado de pessoa que passa a persistir, integração com terceiro (inclui telemetria), dado novo visível a outros ou funcionalidade nova: releia `FateConnect/Web/legal/termos.html` e `privacidade.html` e conserte o que ficou falso, no mesmo PR (`legal-documents.md`).
+- Medir tamanho de pacote: skill `lighthouse-audit`, referência `bundle-size.md`.
 
-Fora da stack, por decisão: **sem SCSS**, **sem Tailwind**, **sem Nx**, **sem lib de máscara** e **sem gerenciador de estado global** (não há estado que justifique).
+## Consumo do design system
 
-## Design system local
+- Ação secundária é `variant="soft"`. No rodapé de diálogo as duas ações são `contained` (`primary` na neutra, `secondary` na que confirma): o `soft` sai 6px mais alto e desalinha o par. Falta variante: declare no tema, não componha no ponto de uso.
+- Diálogo é sempre o `Dialog` do DS: `Dialog.Body`, `Dialog.Footer` e a frase em `Dialog.Message`. ⛔ No desktop sem X (decisão de produto: `Esc` e clique fora dispensam); no estreito, com X.
+- Diálogo de formulário monta `Dialog.Form` (envio pela validação da tela), `Dialog.Fields` (grade com folga para o rótulo flutuante; `layout="column"` põe um campo por linha) e `Dialog.Submit` (largura cheia, com `loading`).
+- ⛔ O `Dialog.Body` rola e corta o que sai da largura dele: controle com halo (o `Slider`) vai fora do `Dialog.Body`, direto no diálogo.
+- Formulário em grade é o `FormGrid` (`FormGrid.Wide` ocupa a linha); cartão com título e ícone é o `SectionCard`. Não escreva outro.
+- ⛔ Ação destrutiva usa a variante `destructive` (o `ConfirmAction` a liga com `destructive`). O *Banir* da gestão ainda está neutro: pergunte antes de migrá-lo.
+- Barra de ações no estreito: conteúdo centralizado e botões em largura cheia, um sob o outro, a ação principal por último.
+- Esconder visualmente sem tirar da acessibilidade é `HiddenField`.
+- Tipografia só por variante do tema. `ListItemText`, `MenuItem`, `Chip` e `Alert` aplicam a escala deles se ninguém disser nada: a variante entra por `slotProps` (`slotProps={{ primary: { variant: 'caption' } }}`).
+- `palette.text.*` e `contrastText` nunca como fundo.
+- Linha de largura cheia com um controle na ponta: `FormControlLabel`, com o rótulo ocupando a sobra — a linha inteira é o alvo.
 
-- Tudo em `design-system/`, **irmão de `src`, não dentro dele**: `tokens/` (**não importa MUI**), `theme/`, `ThemeProvider/`, `GlobalStyles`, `components/`. Ele fica fora porque a aplicação o consome como biblioteca — é o mesmo motivo pelo qual o lint o ordena junto dos pacotes, e não junto dos aliases da aplicação.
-- A aplicação importa **somente dos barrels `@design-system` e `@design-system/icons`** — nunca caminho interno do design system. É o que mantém barato extrair para pacote depois.
-- ⛔ **Nunca sobrescrever o `spacing` do tema.** O MUI chama `theme.spacing(1..3)` dentro dos próprios componentes — gutters do `Toolbar`, padding de `Dialog` e de `Card`. Sobrescrever encolhe todos eles em silêncio: as gutters do `Toolbar` viraram **3px** onde deviam ser 24px. Os tokens em px passam por `theme.space()` e `theme.radius()`, chaves nossas adicionadas ao tema por augmentation; o `theme.spacing` do MUI fica intacto. Há teste travando as duas pontas — ele afirma que `theme.spacing(1)` continua `8px`.
-- **Tipografia:** variantes declaradas no tema + module augmentation do TypeScript. **Não** criar componente próprio de tipografia — usar o `Typography` do MUI com as variantes do projeto.
+## Tela de módulo
 
-## Estilo
-
-- Um `styles.ts` por componente, ao lado do `index.tsx`, com `styled(...)`. Nunca `sx` inline; nunca definir um `styled` no mesmo arquivo que o usa.
-- **Importar o arquivo de estilo como namespace:** `import * as S from './styles'`, usando `<S.PageContainer>` no JSX. Deixa evidente no ponto de uso o que é estilo e o que é componente. É a exceção prevista para arquivos de estilo na regra geral de evitar `import * as`.
-- Nomear o styled pelo que ele renderiza (`RideCardHeader`, `FilterRow`), nunca genérico (`Wrapper2`, `Box1`).
-- Espaçamento, raio e cor sempre por token do `@design-system`. Sem hex ou px solto quando existir token equivalente.
-
-## Estrutura de pasta
-
-Componente = pasta com `index.tsx`, `styles.ts`, `types.ts` (quando houver tipo) e `<Nome>.test.tsx`.
-
-`src/hooks/` guarda **só hooks** — arquivo ali dentro começa com `use` e obedece as regras de hooks. E a recíproca: **todo hook mora numa pasta `hooks/`**, nunca solto num arquivo de serviço ou de componente. Transversal vai para `src/hooks/`; de uma tela só, para a `hooks/` dela — é o que fazem `pages/Signup/hooks/` e `pages/LostAndFound/hooks/`. O erro que isso previne não é escolher a pasta errada, é não estar em pasta `hooks/` nenhuma. Função pura auxiliar vai para `src/utils/`, mesmo quando só um hook a consome. Feature em `src/pages/<feature>/`; reutilizável em `design-system/components/`. Import que sobe **dois níveis ou mais** usa path alias, nunca `../../`: `@app/*` na aplicação e `@ds-root/*` dentro do design system. Um nível (`../`) e o mesmo diretório (`./`) continuam relativos — são curtos e sobrevivem a mover a pasta. O ganho aparece em `styles.ts` de componente: `../../styled` não diz de onde vem, `@ds-root/styled` diz.
-
-### Mover pasta: varrer os recortes de config
-
-⛔ **Toda config recortada em `src/**` deixa de alcançar a pasta que sai de `src` — e não acusa erro.** `tsc`, `eslint`, a suíte e o build continuam verdes; só as regras enfraquecem. Ao mover pasta, abrir estes quatro e conferir o glob:
-
-| Arquivo | O que se perde em silêncio |
-| --- | --- |
-| `eslint.config.js`, bloco de convenções | `no-magic-numbers`, proibição de `sx` inline e de `theme.spacing` |
-| `eslint.config.js`, bloco de cor literal | `styles.ts` e `GlobalStyles.tsx` voltam a aceitar hex e `rgba` crus |
-| `vite.config.ts`, `coverage.include` | os arquivos saem do denominador, e o limite de 90% passa a medir outra coisa |
-| `sonar-project.properties` | a pasta sai da análise, inclusive da regra de 0% de duplicação |
-
-Mais `FateConnect/Web/scripts/test-changed.sh`, cujo `case` decide entre testes relacionados e suíte completa, e o script `format` do `package.json`.
-
-**Cada um se prova com número, porque "passou" não prova nada aqui:** `grep -c '^SF:' coverage/lcov.info` para a cobertura, `files indexed` no log do Sonar comparado com a run anterior, e rodar o hook de verdade no `/bin/bash` com um arquivo da pasta nova.
-
-Não estão em risco o gatilho do CI (`^FateConnect/Web/`) nem os `paths:` das rules (`FateConnect/Web/**`) — o que quebra é sempre o recorte escrito um nível mais fundo. Ancorado no PR #143, que tirou o design system de `src`.
-
-## Medir o pacote: o build local mede outro mundo
-
-⛔ **Sem `VITE_SENTRY_DSN` no ambiente, o build poda o SDK de observabilidade inteiro.** O `initSentry` abre com `if (!dsn) return`, o Vite inlina a variável ausente como `undefined`, o resto do corpo vira código morto e o rolldown o remove. Medido em 12/09/2026 com A/B na mesma sessão: **16,60 kB** sem a variável contra **286,24 kB** com ela — e os ambientes servem 279,9 kB.
-
-**Toda medição de tamanho de pacote roda com as variáveis do ambiente de verdade**, nem que seja um valor de fachada. O controle é comparar com o que está publicado: `ls -l` dos `assets/*.js` na máquina contra a saída do build.
-
-⚠️ **O mesmo vale para qualquer `if (!variável) return`** no caminho de um pacote pesado — o padrão não é do Sentry, é do Vite inlinar `import.meta.env` e o bundler podar o que ficou inalcançável.
-
-### `import()` que reentra num módulo já estático não separa nada
-
-⛔ **Import dinâmico de um módulo que o código também importa estaticamente não cria pedaço nenhum** — ele resolve para a mesma instância, e o bundler funde tudo de volta. `await import('@sentry/react')` dentro de um carregador cujo arquivo vizinho já faz `import { getClient } from '@sentry/react'` devolveu **286,56 kB** num pedaço só, sem pedaço assíncrono.
-
-**O alvo do `import()` tem de ser um módulo nosso alcançável só por ele**, que por sua vez importa o que é pesado. É por isso que existe `observability/sessionReplay.ts` — o comentário dele registra a medição.
-
-### A ordem dos grupos do `codeSplitting` decide se a economia existe
-
-⛔ **Grupo declarado antes rouba os módulos compartilhados, e o pedaço que devia ser assíncrono passa a ser alcançado estaticamente.** Com o grupo do replay **antes** do `sentry`, 68 módulos de `@sentry/core` caíram no pedaço do replay, o `index` passou a importar duas ligações de lá, e o `import()` não tirou um byte da carga inicial.
-
-Invertendo — `sentry` primeiro com `(?!replay)` no teste, depois o grupo do replay — o núcleo fica onde deve e o pedaço do replay vira assíncrono: **54,85 kB** na carga inicial contra 93,77 kB.
-
-⚠️ **A conferência não é o tamanho do pedaço, é quem está no `index.html`.** Pedaço separado e ainda assim pré-carregado não economiza nada:
-
-```bash
-grep -oE 'href="/assets/[^"]*\.js"' dist/index.html
-```
-
-⛔ **Dependência nova carregada só por `import()` cai no grupo `vendor`, que é pré-carregado, e o `lazy` não separa nada.** Ela precisa de um grupo próprio **antes** do `vendor`. Medido no #487: a `react-easy-crop` ficou no `vendor` até ganhar o grupo `photo-crop` — 24,8 KB, 7,2 KB comprimido, fora do `index.html`.
-
-⛔ **E procurar o pedaço ausente nessa lista responde zero por vacuidade** quando ele não foi criado. Confira as duas coisas: que o pedaço **existe** na saída do build, e que **não** está no `index.html`.
-
-## Saída com alterações não salvas
-
-A tela com formulário pendente segura **toda** saída — pedido do Victor em 29/09/2026: *"se ele tentar sair da tela por qualquer motivo"*. Cada caminho tem o seu mecanismo:
-
-| Saída | Quem segura |
-| --- | --- |
-| link, menu, seta do navegador, voltar do celular | `useBlocker`, do React Router |
-| *Sair* do menu da conta e da gaveta | o `LeaveGuardProvider`: a tela registra com `useLeaveInterceptor`, e o *Sair* chama `useSignOut` |
-| fechar ou recarregar a aba | `useBeforeUnload`, com o aviso nativo do navegador — texto nenhum nosso |
-
-⛔ **O `useBlocker` não alcança o *Sair*.** Ele só apaga o token; o guard troca a árvore, e a tela desmonta sem passar pelo roteador. Chamar `logout` direto num item novo de menu deixa a saída sem porteiro — use o `useSignOut`.
-
-⚠️ **Desativar a conta e a sessão expirar não perguntam**, porque nos dois casos não há sessão para onde voltar. O exemplo está em `pages/Profile/hooks/useLeaveConfirmation.ts`.
-
-## Tela de módulo copia a casca do módulo vizinho
-
-⛔ **Antes de desenhar a tela de um módulo novo, abra a do módulo que já existe e copie a casca.** Caronas e achados e perdidos usam o mesmo arranjo, e ele é o padrão da casa:
-
-| Peça | O que ocupa |
-| --- | --- |
-| `PageShell` com `title` e `PageShell.Back` | o topo e a volta ao menu |
-| `titleAction` | o filtro, como botão de ícone que abre o diálogo |
-| `tabs` com duas `PageShell.Tab` | a lista à esquerda, e à direita a aba que abre o diálogo de cadastro |
-| `CardsList` + `Pagination` | a lista, o esqueleto de carregamento e o estado vazio |
-
-⛔ Aconteceu em 14/09/2026: a tela de denúncia nasceu com um cartão de abertura e um botão, porque foi escrita antes da lista — e ficou a **única** fora do padrão. A cobrança veio como *"a tela de denúncias é a única que foge do padrão das outras"*, e o conserto custou um redesenho com o PR já aberto e verde.
-
-⚠️ **O tell é a tela ter uma única ação e ainda não ter lista.** Aí o cartão com botão parece a saída natural, e ele é justamente o que não se parece com as vizinhas quando a lista chegar.
+- ⛔ Tela de módulo novo copia a casca da vizinha: `PageShell` com `title` e `PageShell.Back`, filtro no `titleAction`, duas `PageShell.Tab` (lista e cadastro), `CardsList` + `Pagination`. Tela com uma ação só e sem lista é o sinal de que está saindo do padrão.
+- Quem chama `usePagedSearch` monta o `PageShell`: o filtro do `titleAction` precisa de `filters` e `applyFilters`. Busca e cabeçalho em componentes diferentes é o sinal.
 
 ## Rotas
 
-Os caminhos são em **pt-BR** — `/cadastro`, `/menu`, `/achados-perdidos`, `/caronas` —, e a landing é a **raiz**: `RoutePathEnum.LANDING` vale `/`, sem rota própria e sem redirecionamento. O curinga leva até ela. Trocar um segmento quebra link salvo; só com decisão de produto.
-
-⛔ **Rota aposentada ganha 301 no `deploy/nginx/site.conf.template`, não um `<Navigate>`.** O redirecionamento do React Router responde 200 e só muda depois de renderizar — o robô precisa executar JavaScript para descobri-lo, e a URL antiga continua indexada. Foi o que aconteceu com `/inicio`.
-
-Caronas é **uma rota só**: ofertar abre um diálogo sobre a lista. `/caronas/buscar` e `/caronas/ofertar` existiram e foram removidas — não recriar a rota ao mexer em `routeConfig`.
-
-### Quem busca a lista fica acima do `PageShell`
-
-⛔ **O filtro mora no `titleAction`, encostado no título — então quem chama `usePagedSearch` precisa estar acima do cabeçalho.** O hook devolve `filters` e `applyFilters`, e o filtro precisa dos dois: montando a casca por fora e a busca por dentro, o filtro não alcança o slot e cai solto no corpo da tela.
-
-Aconteceu em 18/09/2026, na aba de gestão: a tela montava o `PageShell` e a aba chamava o hook, e o filtro ficou solto acima da lista. A correção foi cada aba montar a própria casca, com o cromo comum num componente que lê a aba do endereço — e não passar estado de filtro para cima.
-
-⚠️ **O tell é a busca e o cabeçalho nascerem em componentes diferentes.** Aí não há como o filtro chegar ao título sem estado atravessando para cima, que é o desenho a evitar.
+- Caminhos em pt-BR; a landing é a raiz (`RoutePathEnum.LANDING = '/'`). Trocar segmento quebra link salvo: só com decisão de produto.
+- ⛔ Rota aposentada ganha 301 em `deploy/nginx/site.conf.template`, não `<Navigate>` (responde 200 e a URL antiga segue indexada).
+- ⛔ Tela com alterações não salvas segura toda saída: navegação pelo `useBlocker`, fechar a aba pelo `useBeforeUnload`, e o *Sair* pelo `LeaveGuardProvider` (a tela registra com `useLeaveInterceptor`). O `useBlocker` não alcança o *Sair*, que troca a árvore sem passar pelo roteador: item de menu novo que sai da conta chama `useSignOut`, nunca `logout` direto. Exemplo: `pages/Profile/hooks/useLeaveConfirmation.ts`.
+- Caronas é uma rota só: ofertar abre diálogo sobre a lista. Não recriar `/caronas/buscar` nem `/caronas/ofertar`.
+- Contato é seção da landing (`#contato`, `LandingSectionEnum.CONTACT`), atendida pelo rodapé; não há rota `/contato`. Ao mexer em `constants/navigation.ts` ou nas rotas, não restaurar rota nem item de menu.
 
 ## Dados
 
-- `axios` com baseURL de `import.meta.env.VITE_*`. **Nenhuma URL de API literal em arquivo versionado.**
-- **Caminho de rota da API em minúsculo**, mesmo quando o controlador é `PascalCase`: `/rides` e `/lostandfound`, nunca `/Rides` nem `/LostAndFound`. O roteamento do ASP.NET não olha caixa, então as duas grafias casam — e copiar a do `[Route("[controller]")]` espalha duas escritas para a mesma rota, que é o que se evita.
-- ⛔ **A função de serviço nomeia o endpoint, não o recorte que o servidor decide.** `listDenunciations`, e não `listMyDenunciations`: o `GET` é um só, e quem recorta é o perfil que vai no token — quando a tela de gestão consumir a mesma função, ela lista tudo, e o nome com `My` passaria a mentir. Nome com recorte só quando o **parâmetro** do recorte existe na chamada, como o `onlyMine` de caronas e achados e perdidos.
+- URL da API só de `import.meta.env.VITE_*`; caminho em minúsculo (`/rides`, `/lostandfound`), mesmo com o controlador em PascalCase.
+- ⛔ Função de serviço nomeia o endpoint, não o recorte que o servidor faz pelo token: `listDenunciations`, não `listMyDenunciations`. Nome com recorte só quando o parâmetro existe (`onlyMine`). Ao mudar contrato, releia quem o chama.
 
-  ⚠️ Em 14/09/2026 o nome nasceu certo para o desenho anterior, em que havia esse parâmetro, e sobreviveu à troca de desenho no mesmo PR. Quem viu foi o Victor. Ao mudar o contrato, releia quem o chama: o consumidor envelhece calado.
-- Interceptor de request injeta o token; interceptor de response centraliza o tratamento de erro.
-- Requisição em componente via `@tanstack/react-query` — não `useEffect` + `setState` na mão. Erro de rede vira notificação ao usuário, não só log.
+## Gate
 
-## Formulários
-
-- `react-hook-form` + `zod`; schema junto da feature.
-- **Máscara:** função pura (ex.: `toDdMmYyyy`) + hook que a consome. A máscara de data precisa **preservar a posição do cursor** ao editar no meio do campo e ao colar — é requisito, não detalhe.
-- Datas via `@mui/x-date-pickers` com `date-fns` no locale pt-BR; formato `dd/MM/yyyy`.
-
-## Testes
-
-- Vitest + Testing Library. Sempre `screen.*` — nunca desestruturar o retorno do `render`.
-- **Nomenclatura:** descrição de teste em **inglês**, no padrão `should <do something>` — `it('should redirect the root path to the landing page')`. O `describe` nomeia a unidade sob teste (componente, hook ou função), também em inglês. Identificadores dentro do spec em inglês; **copy de produto em asserção continua em pt-BR**, porque é o texto real que o usuário vê.
-- Query por papel de acessibilidade (`getByRole`, `getByLabelText`), não por classe CSS.
-- Helper de render com providers em `src/test/testing-library.tsx`.
-- **Cobertura mínima de 90%** em statements, branches, functions e lines, sobre a base inteira. O limite está em `vite.config.ts` e é aplicado pelo `yarn test:ci`, que a pipeline executa. Exclusões conscientes: `main.tsx` (bootstrap), infraestrutura de teste e declarações de tipo. Ampliar a lista de exclusão exige justificativa; o caminho normal é escrever o teste.
-- ⛔ **`yarn test:ci` verde não prova a cobertura do que você escreveu.** O limite de 90% do `vite.config.ts` é sobre a base inteira, e as centenas de testes existentes seguram a média; o quality gate do Sonar mede **código novo**, por PR. Arquivo novo mal coberto passa no gate local e reprova no do PR — duas vezes em 04/09/2026, no `logout()` e no popover ancorado, que derrubou o gate para 84%. Antes de empurrar, leia o bloco de cada arquivo do diff em `coverage/lcov.info` (`LF`/`LH` e `BRF`/`BRH`), em vez de confiar no verde global.
-- ⛔ **Suíte recortada não vale como gate para troca de rota ou de URL.** O stub que quebra vive no arquivo de teste que você não abriu, e o caso reprova **por console** — o `msw` diz `intercepted a request without a matching request handler` e o `vitest-fail-on-console` derruba —, não por asserção. Em 21/09/2026, no #439, a tela passou a chamar `/denunciations/mine` e o `routeConfig.test.tsx` seguiu servindo a rota antiga: rodar `vitest` só nos testes da tela deu **verde**, e quem pegou foi `yarn test:ci`.
-- ⛔ **E o gate rodado pelo binário direto não confere a versão do Node — só o `yarn` confere.** `./node_modules/.bin/vitest`, `./node_modules/.bin/eslint` e `./node_modules/.bin/tsc` rodam em qualquer versão e respondem verde; o campo `engines` do `package.json` é cobrado pelo `yarn`, e por mais ninguém. O verde vale então sobre um mundo que ninguém vai mergear.
-
-  Medido em 14/09/2026, com o Node 22 forçado de propósito no repo que exige `>=24.18.0`:
-
-  | Pelo `yarn` | Pelo binário |
-  | --- | --- |
-  | `yarn test:ci` → **exit 1**, `The engine "node" is incompatible` | `./node_modules/.bin/vitest run <caminho>` → **16 passed** |
-  | `yarn lint` → **exit 1**, a mesma recusa | `./node_modules/.bin/eslint <arquivo>` → **exit 0** |
-  | | `./node_modules/.bin/tsc --noEmit` → **exit 0** |
-
-  ⚠️ **O tell é você nunca ter passado por um `yarn`.** Sessão que só invoca binário não tem quem cobre a versão — a primeira cobrança chega no `pre-push`, ou no CI. Antes de reportar gate, `node -v` contra o `.nvmrc`; e o `nvm use` de dentro de `FateConnect/Web`, que é onde o `.nvmrc` mora.
-
-- ⚠️ **Em jsdom a geometria é toda zero.** Componente que mede `getBoundingClientRect` ou `offsetWidth` volta pelo `if` de guarda, e as linhas de cálculo **nunca executam** mesmo com o componente renderizado no teste. Cobri-las exige forjar a geometria — `vi.spyOn` no `getBoundingClientRect` e `Object.defineProperty` no `offsetWidth`, desfeitos no `afterEach`.
-- `renderHook` vem de `@testing-library/react` — **não** do pacote `@testing-library/react-hooks`, que é do React 17 e está morto.
+⛔ Gate só pelo `yarn` (`yarn lint`, `yarn typecheck`, `yarn test:ci`), de dentro de `FateConnect/Web` depois do `nvm use`: o binário de `node_modules/.bin` roda em qualquer Node e responde verde; só o `yarn` cobra o `engines`. O que o CI roda está em `.github/workflows/check-front.yml`.

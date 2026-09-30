@@ -31,6 +31,12 @@ if grep -q '^FateConnect/Web/.*\.tsx\?$' <<< "$staged"; then
 fi
 
 if grep -q '^FateConnect/FateConnect\.Api' <<< "$staged"; then
+  # Antes da build porque custa um grep: o analisador não acusa comentário.
+  staged_csharp="$(grep '^FateConnect/FateConnect\.Api.*\.cs$' <<< "$staged" || true)"
+  if [[ -n "$staged_csharp" ]]; then
+    tr '\n' '\0' <<< "$staged_csharp" | xargs -0 "$ROOT/scripts/check-csharp-comments.sh"
+  fi
+
   # Cobre as duas causas: dotnet fora do PATH e SDK que o global.json não aceita.
   if ! dotnet --version >/dev/null 2>&1; then
     echo "pre-commit: nenhum SDK .NET utilizável — confira o PATH e a versão que o global.json declara" >&2

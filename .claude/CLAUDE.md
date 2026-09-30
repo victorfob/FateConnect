@@ -4,29 +4,38 @@
 
 Este é um repositório **público** de trabalho acadêmico. **Nenhum conteúdo do repo** — issues, PRs, commits, código, comentários ou documentação — deve conter menção, nome ou referência a empregador, repositórios internos, pacotes privados ou ferramentas corporativas. Quando uma referência técnica vier de fonte interna, escrever no repo apenas a **decisão e a justificativa autônoma**.
 
-Planejamento e rastreio ficam no **GitHub** (issues + Project board do repositório). Não publicar nada em ferramentas de gestão de empresa.
+- Código de fonte interna é referência de comportamento, nunca origem: leia para entender o que ele faz, escreva o nosso, e não cite a origem em issue, commit ou comentário.
+- Planejamento e rastreio ficam no **GitHub** (issues + Project board do repositório). Não publicar nada em ferramentas de gestão de empresa.
+
+## Mapa do repositório
+
+- **Front:** `FateConnect/Web` — React + Vite, MUI + Emotion. Design system local em `Web/design-system/`, fora de `src`, com os barrels `@design-system` e `@design-system/icons`; alias `@app` para `Web/src`. Padrões em `fateconnect-web-react.md` e nas rules `web-*`.
+- **API (.NET 8):** `FateConnect/FateConnect.Api`, uma só, em módulos por domínio (`Auth`, `Common`, `Denunciations`, `LostAndFound`, `Rides`, `Users`). Os testes ficam em `FateConnect/FateConnect.Api.Tests`, pasta irmã.
 
 ## Idioma
 
 - Interface, URLs e copy de produto: **pt-BR**.
 - **Fluxo git:** mensagem de commit, nome de branch e **título** de PR em **inglês**; a **descrição** do PR é o único texto do fluxo em pt-BR.
-- Issues do GitHub: **pt-BR** (documento de planejamento lido pelo time).
+- Issues do GitHub: **pt-BR**.
 - Código e estrutura (identificadores, arquivos, pastas): **inglês**.
-- Detalhe completo na regra de locale (carrega ao trabalhar no front).
 
-## Organização desta configuração
+## Harness (`.claude/`)
 
-- `.claude/rules/` — regras do projeto. Sem `paths:` carregam sempre; com `paths:` carregam quando um arquivo que casa é lido.
-- `.claude/skills/` — fluxos sob demanda: `spec-issue` (especificar uma issue e dividir em sub-issues), `pr-creator` (abrir/atualizar PR), `resolve-pr-comments` (triar e responder review), `write-review-comment` (comentar o PR de outra pessoa), `write-commit` (mensagem de commit e agrupamento em commits), `changelog-writer` (entrada do CHANGELOG), `create-release` (cortar uma versão e publicar), `lighthouse-audit` (auditar o site publicado e abrir as issues), `ux-writing` (texto de interface) e `fateconnect-create-component` (criar componente no front).
-- `.claude/` é **versionada**: rule e skill passam por review no PR como qualquer código, e valem igual para quem clonar o repo. Por isso a restrição do repositório acima se aplica a elas também.
+- `.claude/` é **versionada**: rule e skill passam por review como código e valem igual para quem clonar o repo; a restrição acima vale para elas.
+- Rule sem `paths` carrega sempre; com `paths`, quando o **`Read`** abre um arquivo que casa — `cat`, `grep` e `sed` não disparam nada. ⛔ Área nova na sessão ⇒ um `Read` de propósito num arquivo dela antes de editar.
+- Skills carregam pela `description` ou por `/<nome>`: `spec-issue`, `pr-creator`, `resolve-pr-comments`, `write-review-comment`, `write-commit`, `changelog-writer`, `create-release`, `lighthouse-audit`, `ux-writing`, `fateconnect-create-component`, `harness-evolution`, `parallel-work`, `prove-the-mechanism` e `visual-validation`.
+- Correção de padrão feita pelo usuário vira rule ou skill: termine a tarefa e proponha (skill `harness-evolution`, que tem a escada de destino e o orçamento de contexto).
 
 ## Fluxo de trabalho
 
-- Branch base: **`develop`**. ⛔ **Nunca commitar direto nela** — toda mudança sai numa branch a partir da `develop` e volta por PR, **inclusive mudança em `.claude/`**. Nomear branch como `<tipo>/<número-da-issue>` (ex.: `chore/48`); quando não houver issue, um slug descritivo **em inglês** (`docs/spec-issue-skill`) — o idioma do fluxo git, como no commit e no título do PR.
+- Branch base: **`develop`**. ⛔ **Nunca commitar direto nela** — toda mudança sai numa branch a partir da `develop` e volta por PR, **inclusive mudança em `.claude/`**.
+- Nome de branch: `<tipo>/<número-da-issue>`, com o tipo do Conventional Commits (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`) — ex. `feat/118`. Sem issue, `<tipo>/<slug-em-inglês>` (`docs/spec-issue-skill`).
+- ⛔ Branch criada de `origin/develop` nasce rastreando a `develop`, e o `git push` vai para ela: rode `git branch --unset-upstream <nova>` logo depois de criar.
 - Toda correção ou alteração começa por uma **issue no GitHub** — o número dela alimenta a branch, o título do PR e o corpo do PR.
-- Criar ou especificar issue: usar a skill `spec-issue`. Abrir PR: usar a skill `pr-creator`. Commitar: usar a skill `write-commit` — e **pedir confirmação antes de qualquer comando git**. ⚠️ **A confirmação vale para o fluxo que ela nomeia:** autorizado *"segue até abrir o PR"*, commit, reescrita, push e resposta em thread até ali não se perguntam de novo. Volta a ele só a decisão nova, que ele não previu.
-- ⛔ **Nunca escrever changelog à mão** — usar a skill `changelog-writer`. À mão sai um bullet por commit, que é o oposto do formato: uma entrada principal descrevendo o efeito para quem usa. O formato está em `.claude/rules/changelog-format.md`.
-- ⛔ **Não criar artefato de processo por conta própria** — issue, branch, PR, label, milestone. A regra "toda alteração começa por uma issue" vale para o que o usuário tratou como **tarefa**, não para todo ajuste solto. Pedido pequeno e avulso ("adiciona o codeowner pra mim") entra na tarefa em andamento ou na próxima, em **commit separado**. Na dúvida, perguntar: uma pergunta custa menos que fechar issue, branch e PR depois.
+- Criar ou especificar issue: skill `spec-issue`. Abrir PR: skill `pr-creator`. Commitar: skill `write-commit` — e **pedir confirmação antes de qualquer comando git**. ⚠️ **A confirmação vale para o fluxo que ela nomeia:** autorizado *"segue até abrir o PR"*, commit, reescrita, push e resposta em thread até ali não se perguntam de novo. Volta a ele só a decisão nova, que ele não previu.
+- ⛔ **Nunca escrever changelog à mão** — usar a skill `changelog-writer`. À mão sai um bullet por commit, o oposto do formato: uma entrada principal com o efeito para quem usa.
+- ⛔ **Não criar artefato de processo por conta própria** — issue, branch, PR, label, milestone. "Toda alteração começa por uma issue" vale para o que o usuário tratou como **tarefa**; pedido pequeno e avulso entra na tarefa em andamento ou na próxima, em **commit separado**. Na dúvida, perguntar: uma pergunta custa menos que fechar issue, branch e PR depois.
+- ⛔ Paralelizar é por issue, nunca por fatia de issue, e quem decide é o usuário: proponha a fatiação e espere o ok; aprovada, todas as frentes saem no mesmo turno (skill `parallel-work`).
 
 ## Comandos
 
@@ -48,14 +57,4 @@ dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln
 git config core.hooksPath .githooks     # habilita os hooks deste clone
 ```
 
-Os dois usam o Node que o `.nvmrc` declara e reprovam quando ele não está disponível: gate rodado noutra versão responde verde sobre um mundo que ninguém vai mergear. O `pre-commit` conserta o front e compila a API; o `pre-push` roda os testes **relacionados** aos arquivos enviados (via `FateConnect/Web/scripts/test-changed.sh`) e a suíte da API. Cada bloco só roda se a mudança o alcança, e a suíte inteira com cobertura fica no CI.
-
-## Stack do front
-
-- Vite, React, MUI + Emotion, `@mui/x-date-pickers` + `date-fns`, notistack, React Router, react-hook-form + zod, TanStack Query, axios, Vitest + Testing Library.
-- Design system local em `Web/design-system/` — **fora de `src`**, porque a aplicação o consome como biblioteca. Dois barrels públicos: `@design-system` (componentes, estilo, tokens) e `@design-system/icons`. A aplicação usa também o alias `@app` para `Web/src`.
-- Padrões em `.claude/rules/fateconnect-web-react.md` e nas regras `web-*`.
-
-### Uma armadilha já mapeada
-
-O `spacing` default do MUI é **multiplicador de 8px**. Com escala de tokens em px, `theme.spacing(16)` daria 128px — por isso o estilo usa `theme.space()` e `theme.radius()`, chaves nossas no tema, e o `theme.spacing` do MUI fica intacto para os componentes dele. Sobrescrevê-lo encolheu as gutters do `Toolbar` de 24px para 3px.
+Os hooks usam o Node do `.nvmrc` e reprovam sem ele. O `pre-commit` roda o lint-staged no front e compila a API; o `pre-push` roda os testes relacionados aos arquivos enviados e a suíte da API; a suíte inteira com cobertura roda no CI.
