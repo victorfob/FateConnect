@@ -289,7 +289,7 @@ Medido em 14/09/2026, na nota que abre o diálogo de denúncia — o vão até o
 
 A minha margem era a sobra: o corpo já espaça os filhos. Tirando-a, sobra o ritmo que o diálogo já tinha.
 
-**A conferência é ler o pai antes de escrever o filho** — `Stack` com `gap`, `Dialog.Body`, `PageShell`, `FieldsColumn` e `CardsList` todos espaçam o que está dentro. Quem viu o vão foi o Victor, na tela.
+**A conferência é ler o pai antes de escrever o filho** — `Stack` com `gap`, `Dialog.Body`, `PageShell`, `Dialog.Fields` e `CardsList` todos espaçam o que está dentro. Quem viu o vão foi o Victor, na tela.
 
 ⚠️ **O tell é a palavra "respiro" no seu próprio raciocínio.** Espaço se acrescenta quando o contêiner não dá nenhum, não quando o que ele dá parece pouco — aí o que se ajusta é o contêiner, e para todo mundo.
 

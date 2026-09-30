@@ -4,6 +4,16 @@ description: Escolha que você tomou no lugar do Victor se anuncia na mensagem e
 
 # Diga o que você escolheu
 
+## O que é dele decidir vai por sabatina
+
+⛔ **Decisão do Victor vai em `AskUserQuestion`, em blocos de até quatro perguntas** — recomendação primeiro, o custo de cada alternativa na descrição, e copy por extenso. A mensagem de texto fica com o que ele precisa **saber**; o que ele precisa **decidir** vai para o formulário.
+
+Pedido em 29/09/2026, depois de duas mensagens seguidas com tabela e uma pergunta por parágrafo: *"faz uma sabatina sempre pra eu decidir coisas, é bem melhor do q ler o texto inteiro e responder um por um"*.
+
+⚠️ **A resposta em texto livre muda o desenho, e é ela que se reconcilia antes de seguir.** Em 30/09/2026 a ajuda do bairro teve três candidatas honestas sobre o estado de hoje, e a resposta foi outra coisa: descrever o uso final.
+
+## Decidiu sozinho? Diga na mesma mensagem
+
 ⛔ **Decidiu algo que ninguém te pediu? Diga na mesma mensagem.** Não no fim da tarefa, não no corpo do PR, não "mais para frente". Escolha não anunciada não fica pendente — ela vira decisão do Victor aos olhos de quem lê o código depois, inclusive dele.
 
 ⛔ Aconteceu em 03/09/2026, na tela de preferências. A skill de UX writing propôs `Aparência clara ou escura` para a frase de apoio da linha do tema; o Victor decidiu **outra coisa ali perto** — o cabeçalho da seção — e eu troquei o texto por `Claro ou escuro` sozinho, para não repetir "Aparência" duas linhas seguidas. Eu sabia que precisava contar: escrevi para mim mesmo que ia sinalizar em uma linha. Não sinalizei. A cobrança veio como *"vc deixou o texto de suporte apenas como 'Claro ou escuro', foi uma decisão minha?"*.

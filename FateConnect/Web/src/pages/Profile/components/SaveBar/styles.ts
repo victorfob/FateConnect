@@ -1,6 +1,6 @@
 import { radiusScale, shadowTokens, spacingScale, Stack, styled, Typography } from '@design-system';
 
-const { xs, sm, md, lg } = spacingScale;
+const { none, xs, sm, md, lg } = spacingScale;
 
 /** Colada no pé enquanto o formulário rola, e parada no fim dele, sem cobrir o rodapé. */
 export const SaveBarRoot = styled(Stack)(({ theme }) => ({
@@ -18,6 +18,11 @@ export const SaveBarRoot = styled(Stack)(({ theme }) => ({
   borderRadius: theme.radius(radiusScale.component),
 
   '& .MuiButton-root': { gap: theme.space(xs) },
+
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
 }));
 
 export const UnsavedNotice = styled(Typography)(({ theme }) => ({
@@ -26,4 +31,9 @@ export const UnsavedNotice = styled(Typography)(({ theme }) => ({
   gap: theme.space(xs),
   marginRight: 'auto',
   color: theme.palette.text.secondary,
+
+  [theme.breakpoints.down('md')]: {
+    justifyContent: 'center',
+    marginRight: theme.space(none),
+  },
 }));

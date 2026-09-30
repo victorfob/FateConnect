@@ -4,6 +4,7 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 import { RIDE_FREQUENCY_OPTIONS } from '@app/pages/Rides/helpers/rideFrequency';
+import { RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
 import {
   RideFrequencyEnum,
   RideTypeEnum,
@@ -106,6 +107,17 @@ describe('RideFormDialog', () => {
     expect(await screen.findByRole('heading', { name: OFFER_MODE.title })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: OFFER_MODE.submitLabel })).toBeInTheDocument();
     expect(destinationField()).toHaveValue('');
+  });
+
+  it('should explain the ride types beside the type field, as the filter does', async () => {
+    renderComponent();
+    await screen.findByRole('heading', { name: OFFER_MODE.title });
+
+    await userEvent.click(
+      screen.getByRole('button', { name: new RegExp(RIDE_FORM_LABELS.rideType) }),
+    );
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(RIDE_TYPE_HELP);
   });
 
   it('should edit the ride it gets, already filled in', async () => {

@@ -54,6 +54,7 @@ export function PersonalDataFields({ fatecEmail }: PersonalDataFieldsProps) {
       <Input
         {...register('neighborhood')}
         label={C.NEIGHBORHOOD_LABEL}
+        helpText={C.NEIGHBORHOOD_HELP}
         fullWidth
         autoComplete="address-level3"
         maxLength={MAX_NEIGHBORHOOD_LENGTH}

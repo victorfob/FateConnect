@@ -41,6 +41,12 @@ Aconteceu na #434. A contagem anunciada morava dentro da linha, então a descri�
 
 ⚠️ **No jsdom a descrição sai colada, e isso não diz como o navegador a monta.** O jsdom junta os textos dos filhos sem separador. No Chrome, os três `span` saíam com `display: block`, porque eram itens de flex, e o navegador tende a separar filhos de bloco com espaço. Mas **a descrição computada não foi lida**: este Chrome não expõe a API. Mover o `status` para fora resolveu sem depender de nenhuma das duas leituras.
 
+### A ajuda do campo vai em todo lugar que o campo aparece
+
+⛔ **O mesmo campo em duas telas leva a mesma ajuda (`helpText`).** Ela explica o **campo**, não a tela: quem abre o formulário de ofertar precisa saber o que é *Solidária* tanto quanto quem filtra. O texto mora ao lado das opções que o campo usa — `RIDE_TYPE_HELP` em `pages/Rides/helpers/rideType.ts`, junto do `RIDE_TYPE_OPTIONS` —, para as duas telas lerem da mesma fonte.
+
+Aconteceu em 30/09/2026: a ajuda do tipo de carona estava só no filtro, e quem viu foi o Victor. Ao dar ajuda a um campo, procure as outras telas que o montam: `grep` pelas opções dele.
+
 ## Ícone reflete estado
 
 O ícone mostra a situação atual, não o destino do clique: olho aberto quando o texto está visível. O rótulo acessível continua descrevendo a ação.

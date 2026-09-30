@@ -35,6 +35,9 @@ export const RIDE_TYPE_OPTIONS: readonly { value: RideTypeEnum; label: string }[
   { value: RideTypeEnum.EGALITARIAN, label: RIDE_TYPE_LABEL[RideTypeEnum.EGALITARIAN] },
 ];
 
+export const RIDE_TYPE_HELP =
+  'Solidária: a carona é gratuita. Igualitária: os participantes dividem os custos.';
+
 /**
  * Estreita o texto que o formulário guarda para o tipo da API. Usado como
  * validação do campo: o zod adota o tipo estreitado na saída do schema.
