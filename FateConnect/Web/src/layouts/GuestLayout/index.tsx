@@ -11,7 +11,7 @@ import { LANDING_LINKS } from '@app/constants/navigation';
 import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
-import * as S from '../shell.styles';
+import { ShellContent, ShellRoot } from '../shell.styles';
 import { ThemeToggleButton } from './components/ThemeToggleButton';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
@@ -31,7 +31,7 @@ export function GuestLayout() {
   );
 
   return (
-    <S.ShellRoot>
+    <ShellRoot>
       <Header
         logo={<BrandLogo to={RoutePathEnum.LANDING} />}
         actions={<ThemeToggleButton />}
@@ -63,9 +63,9 @@ export function GuestLayout() {
         ))}
       </NavigationDrawer>
 
-      <S.ShellContent component="main">
+      <ShellContent component="main">
         <Outlet />
-      </S.ShellContent>
+      </ShellContent>
 
       <Footer
         anchorId={LandingSectionEnum.CONTACT}
@@ -74,6 +74,6 @@ export function GuestLayout() {
         copyrightLines={C.FOOTER_COPYRIGHT_LINES}
         links={<LegalFooterLinks />}
       />
-    </S.ShellRoot>
+    </ShellRoot>
   );
 }

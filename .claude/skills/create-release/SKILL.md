@@ -1,10 +1,6 @@
 ---
 name: create-release
-description: >-
-  Corta uma release do FateConnect — escolhe a versão, sobe os bumps, fecha a seção do CHANGELOG
-  e abre o PR para a `main`. Use quando o usuário pedir para criar, cortar, publicar ou preparar
-  uma release, ou uma versão nova. Cobre as validações que o CI faz antes de você, o que a
-  automação faz sozinha depois do merge.
+description: "Corta uma release do FateConnect — escolhe a versão, sobe os bumps, fecha a seção do CHANGELOG e abre o PR para a `main`. Use quando o usuário pedir para criar, cortar, publicar ou preparar uma release, ou uma versão nova. Cobre as validações que o CI faz antes de você, o que a automação faz sozinha depois do merge."
 ---
 
 # Cortar uma release

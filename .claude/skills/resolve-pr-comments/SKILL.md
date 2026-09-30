@@ -1,6 +1,6 @@
 ---
 name: resolve-pr-comments
-description: "Resolve, responde e faz a triagem de comentários de review numa Pull Request deste repositório. Use sempre que o usuário apontar para feedback de review — \"resolve os comentários do PR\", \"responde o review\", uma URL de PR seguida de observações, ou uma nova rodada de comentários depois de um fix anterior. Busca os comentários inline, os gerais e os corpos de review, confere cada um contra o código atual antes de tocar em qualquer coisa, aplica o que é válido, responde a todos com justificativa (inclusive as recusas), roda o quality gate e pede confirmação antes de qualquer comando git. Não use para abrir ou atualizar PR (isso é pr-creator) nem para revisar código do zero."
+description: "Resolve, responde e faz a triagem de comentários de review numa Pull Request deste repositório. Use sempre que o usuário apontar para feedback de review — \"resolve os comentários do PR\", \"responde o review\", uma URL de PR seguida de observações, ou uma nova rodada de comentários depois de um fix anterior. Não use para abrir ou atualizar PR (pr-creator) nem para revisar código do zero ou comentar o PR de outra pessoa (write-review-comment)."
 ---
 
 # Resolver comentários de PR
@@ -31,8 +31,6 @@ Apresente em tabela curta (comentário → veredicto → plano) e **espere a con
 
 ⛔ **PR que é camada de uma pilha muda o cálculo, e o custo que escapa é o das camadas de cima.** Emendar a camada revisada reescreve a história dela, o merge-base das seguintes recua, e o diff delas passa a incluir os commits da camada de baixo — o PR de cima infla sem ninguém ter tocado nele.
 
-Aconteceu em 03/09/2026 no #284, fundo de uma pilha de três. Montei a tabela do caminho "emendar" citando só que o force-push desancora o comentário de linha de quem revisou, e **omiti a inflação do diff**. A escolha foi feita sobre a tabela incompleta e revertida quando o custo apareceu.
-
 | Caminho | Custo |
 | --- | --- |
 | emendar na camada revisada | reescreve as camadas de cima, o merge-base recua e infla o diff delas; o comentário de linha desancora |
@@ -59,22 +57,9 @@ Quando o comentário propõe **silenciar** um erro — desabilitar regra, captur
 
 ## 5. Rode o gate no que mudou
 
-De `FateConnect/Web`, com o Node do `.nvmrc`:
+Rode o gate da seção "Comandos" do `.claude/CLAUDE.md` sobre o que mudou (front e/ou API). Erro reprova; warning se ignora. Não reporte como pronto com erro de pé.
 
-```bash
-./node_modules/.bin/eslint <arquivos alterados>
-./node_modules/.bin/tsc --noEmit
-./node_modules/.bin/vitest run <caminho afetado>
-```
-
-Mexeu na API, da raiz do repositório:
-
-```bash
-dotnet build FateConnect/FateConnect.Api/FateConnect.Api.sln
-dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build
-```
-
-Erro reprova; warning se ignora. Não reporte como pronto com erro de pé.
+⛔ Esperar o CI depois do push nomeia o check que o PR exige, nunca `all(pending)` nem `length >= N`; o relato lê a lista inteira e nomeia cada bucket. Receita: `.claude/skills/prove-the-mechanism/references/ci-e-checks.md`.
 
 ## 6. Commit — peça confirmação antes
 
@@ -90,6 +75,8 @@ Resposta concreta — "ajustado X, por causa de Y" ou "mantido como está porque
 gh api --method POST repos/OWNER/REPO/pulls/PR/comments/ROOT_COMMENT_ID/replies \
   -f body='Ajustado: <o que mudou>.'
 ```
+
+⛔ **O `POST` falhou com erro de rede (`EOF`)? Conte as respostas antes de repetir** (`gh api repos/OWNER/REPO/pulls/PR/comments --jq length`): o erro aparece também quando a resposta entrou, e repetir às cegas publica duas.
 
 **Entre rodadas, edite a sua resposta anterior** em vez de empilhar outra — e só a sua:
 

@@ -6,7 +6,7 @@ import { HelperTextWithCounter } from '../components/HelperTextWithCounter';
 import { InputHelpButton } from '../components/InputHelpButton';
 import { TimePickerButton } from '../components/TimePickerButton';
 import { inputLabelSlot } from '../helpers/inputLabelSlot';
-import * as S from '../styles';
+import * as S from './styles';
 
 const TIME_TYPE = 'time';
 

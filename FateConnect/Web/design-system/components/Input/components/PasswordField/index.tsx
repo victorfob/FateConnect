@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
 
 import { IconButton } from '@ds-root/components/IconButton';
+import { InputField, type InputProps } from '@ds-root/components/Input/InputField';
 import { VisibilityIcon, VisibilityOffIcon } from '@ds-root/icons';
 
-import { InputField, type InputProps } from '../../InputField';
 import { PASSWORD_TOGGLE_LABEL } from './constants';
 import { passwordAutoComplete, passwordInputType } from './helpers';
 import type { PasswordPurpose } from './types';

@@ -15,7 +15,6 @@ cd "$(dirname "$0")/.."
 # Pastas documentadas de propósito que o git não rastreia.
 ignorados=(
   ".claude/worktrees"                                                    # worktree de agente, fora do versionamento
-  ".claude/projects/-Users-victorbrayner-Development-Projects-FateConnect/memory"  # memória, fora do repositório
 )
 
 raizes=$(git ls-files | cut -d/ -f1 | sort -u | sed 's/\./\\./' | tr '\n' '|' | sed 's/|$//')

@@ -1,217 +1,53 @@
 ---
-description: Os 90% de cobertura que escrevemos aqui — acima do gate de 33% de propósito — e como escrever teste na API .NET — projeto separado, nome em três partes, sem lógica e sem comentário, e o par positivo que impede a suíte de concordar com o defeito
+description: Teste na API .NET — os 90% de cobertura acima do portão e como medi-los, onde o teste mora, o par positivo, costura de relógio, a suíte contra PostgreSQL de verdade, mutação que prova o teste e fixture plausível
 paths:
-  - "FateConnect/FateConnect.Api/**"
   - "FateConnect/FateConnect.Api.Tests/**"
 ---
 
 # Teste na API .NET
 
-## Cobertura de 90% no que escrevemos aqui
+## Cobertura de 90%
 
-⛔ **Código novo escrito nesta sessão nasce com pelo menos 90% de cobertura**, o mesmo piso do front. Não é o número que o portão cobra — é o que a gente entrega.
+- ⛔ **Código novo sai com ≥90%**, acima do portão do Sonar de propósito: portão verde não é entrega.
+- Medir é `./scripts/coverage-changed.sh` (base padrão `origin/develop`), **com o trabalho commitado**: ele cruza o relatório com o diff commitado. Se a contagem não bate com os arquivos que você mexeu, a medida está errada. Rode antes de dizer que acabou.
+- Linha que não dá para cobrir se marca com `[ExcludeFromCodeCoverage]`; não se baixa o alvo. Cobertura baixa costuma acusar teste que falta.
 
-⚠️ **O gate `Backend` no SonarCloud reprova em 33%, e isso é de propósito.** Aquele é o piso do repositório, para quem escreve à mão sem agente ao lado; escrever teste tem um custo diferente para cada um. Os 90% são o nosso, e ficam **acima** do portão de propósito.
+## Onde o teste mora
 
-⛔ **A consequência prática: gate verde não é entrega pronta.** Cobertura de código novo em 40% passa no portão e **não** cumpre esta regra. Calibrar pelo que o Sonar aceita é o erro que esta seção existe para impedir.
+- ⛔ Nunca no projeto da API: `PackageReference` não tem `devDependencies` e vai para a publicação.
+- Uma pasta por domínio espelhando `Modules/` (e `Infrastructure/`), namespace igual à pasta, apoio compartilhado em `Fixtures/`, nada na raiz. O que atravessa módulos vai para onde mora o código que ele exercita (a política de autorização fica em `Auth/`).
 
-O relatório sai do `dotnet test` em formato **OpenCover** (`--collect:"XPlat Code Coverage;Format=opencover"`); o Sonar **não lê Cobertura para C#**, que é o padrão do `dotnet test`. Migrations e `obj/` ficam de fora da conta.
+## Forma
 
-### Medir é um comando, e não é `dotnet test`
-
-```bash
-./scripts/coverage-changed.sh            # base padrão: origin/develop
-```
-
-Ele roda a suíte com cobertura, cruza o relatório com os arquivos de produção do diff e **sai com erro** listando quem ficou abaixo dos 90%.
-
-⛔ **Commite antes de medir.** O script cruza o relatório com `git diff origin/develop` — o estado **commitado**. Rodado com o trabalho solto na árvore ele mede o conjunto de arquivos errado e sai com **exit 0** dizendo que todos atingem 90%. Em 03/09/2026 isso aconteceu duas vezes na mesma sessão: uma sobre **zero** arquivos (`nenhum arquivo de produção da API no diff`), outra listando 8 e deixando de fora justamente os dois novos, porque o diff commitado ainda descrevia o desenho anterior. **O sinal é a contagem não bater com os arquivos que você mexeu.**
-
-⛔ **Rode antes de dizer que acabou.** `dotnet build` + `dotnet test` não medem nada, e o portão do Sonar aceita 33% — as duas coisas ficam verdes sobre uma regra violada. Aconteceu na #222: o PR chegou a 79,5% no Sonar com o `AuthService` em **22,7%**, porque não existia um único teste de login. O que fechou o buraco foram três testes; o que impede a repetição é este comando.
-
-**Linha que não dá para cobrir se marca, não se ignora.** Construtor privado que existe só para impedir instanciação nunca é chamado: `[ExcludeFromCodeCoverage]` nele tira a linha do denominador e diz por quê. Baixar o alvo, não.
-
-⚠️ **Cobertura baixa costuma acusar teste que falta, não métrica injusta.** Na primeira medição o PR saiu com 25%: as propriedades de um DTO sem nenhum teste que criasse o recurso, e a linha do middleware de erro sem nenhum teste que disparasse exceção tratada. Um teste que criava carona com vagas fora da faixa cobriu as duas — e ainda passou a garantir a mensagem de erro, que nada verificava.
-
-## O teste mora em projeto separado
-
-⛔ **Nunca coloque teste dentro do projeto da API.** O MSBuild não tem `devDependencies`: `PackageReference` é dependência de compilação **e** de runtime, entra no `deps.json` e é copiada para a publicação.
-
-Medido em 2026-08-28, publicando a `FateConnect.Api` dos dois jeitos:
-
-| | dlls | tamanho |
-| --- | --- | --- |
-| projeto de teste separado | 22 | **10 MB** |
-| pacotes de teste dentro da API | 30 | **21 MB** |
-
-Vão para dentro do contêiner de produção `xunit.core`, `xunit.assert`, `xunit.execution.dotnet`, `xunit.abstractions`, `Microsoft.AspNetCore.Mvc.Testing`, `Microsoft.EntityFrameworkCore.InMemory` e um `MvcTestingAppManifest.json` — inclusive um provedor de banco alternativo disponível no processo que atende a internet.
-
-⚠️ **A lista é a daquela medição.** Trocado o `InMemory` pelo `Testcontainers.PostgreSql` na #237, o que vaza hoje é um cliente de Docker: o risco não encolheu, mudou de forma.
-
-É também o que a Microsoft manda por escrito — *"Separate unit tests from integration tests into different projects"* — e o que os projetos de referência fazem: o `dotnet/eShop` tem `src/Catalog.API` com `tests/Catalog.FunctionalTests` ao lado, o `dotnet/aspnetcore` repete `src/` e `test/` em cada módulo, o `MediatR` tem `src/` e `test/`.
-
-**A única peça de apoio a teste que pode morar no app** é tornar o `Program` visível para o `WebApplicationFactory`. O eShop faz isso com um arquivo de três linhas, e explica que `InternalsVisibleTo` não resolve porque a acessibilidade do tipo é verificada. Aqui o `Program` já é público, então nem isso é preciso.
-
-## Dentro do projeto de teste, uma pasta por domínio
-
-⛔ **Teste novo vai para a pasta do código que ele exercita**, espelhando o projeto principal: uma por módulo de `Modules/` e `Infrastructure/` para o que mora lá. O namespace acompanha a pasta, e o apoio compartilhado — a fábrica da aplicação, o banco de teste, os relógios fixos, as imagens — mora em `Fixtures/`. Nenhum arquivo fica solto na raiz.
-
-⚠️ **O que atravessa módulos vai para onde mora o código que ele de fato exercita**, não para o módulo da maioria das rotas: a política de autorização mora em `Auth` mesmo passando por rotas de quatro módulos.
-
-⚠️ **Quando a suíte crescer, separe por tipo.** Hoje `FateConnect.Api.Tests` mistura unidade (`TokenServiceTests`) e integração (`AuthorizationTests`, que sobe a aplicação), dentro das pastas de domínio. A divisão ainda não foi feita; o eShop separaria em `.UnitTests` e `.FunctionalTests`, e é para lá que a divisão vai quando a suíte justificar.
-
-## Nome em três partes
-
-`Método_Cenário_ComportamentoEsperado`, como a Microsoft padroniza — o nome é o que se lê quando o teste falha, e deve dispensar a leitura do corpo.
-
-```csharp
-RideEndpoints_WithoutToken_RespondUnauthorized
-GenerateJwtToken_IsAcceptedByAKeyBuiltInUtf8
-```
-
-Nome de teste é código, então segue a regra de idioma: **inglês**.
-
-## Arrange, Act, Assert — em branco, não em comentário
-
-A estrutura é obrigatória; **os rótulos `// Arrange`, `// Act`, `// Assert` não entram**. Os exemplos da Microsoft os usam, e a `comments.md` deste repo proíbe qualquer comentário em C#. As três fases se separam por **linha em branco**.
-
-```csharp
-[Fact]
-public async Task RideEndpoints_WithAValidToken_ReachTheController()
-{
-    HttpClient client = _factory.CreateClient();
-    client.DefaultRequestHeaders.Authorization =
-        new AuthenticationHeaderValue("Bearer", ApiFactory.IssueToken());
-
-    HttpResponseMessage response = await client.GetAsync("/Rides");
-
-    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-}
-```
-
-## O par positivo é obrigatório
-
-⛔ **Teste que só prova a recusa passa também numa API que recusa tudo.** Todo conjunto que afirma um bloqueio precisa do caso que atravessa.
-
-O par acima é o exemplo: `GET /Rides` sem cabeçalho responde 401, e **a mesma rota** com token válido responde 200. Sem o segundo, apagar a autenticação inteira mantém a suíte verde.
-
-Vale para além de autorização: validação que rejeita precisa do caso que aceita, filtro que exclui precisa do que inclui.
-
-## Um Act por teste, e nenhuma lógica
-
-Sem `if`, `for`, `while` ou concatenação dentro do teste — bug em suíte de teste é o pior lugar para procurar. Vários casos viram `[Theory]` com `[InlineData]` ou `[MemberData]`, nunca laço sobre uma lista.
-
-Valor fixo que não se explica sozinho vira constante nomeada, não literal solto no meio da chamada.
-
-## Estado compartilhado: helper, não Setup
-
-`SetUp`/`TearDown` não existem no xUnit 2.x. Estado comum vai em método auxiliar ou no construtor da classe de teste; fixture cara vai em `IClassFixture<T>`, como o `ApiFactory`.
-
-## Método privado se testa pelo público
-
-Nunca exponha membro só para testar. O que interessa é o resultado do método público que chama o privado.
+- `Método_Cenário_Comportamento`, em inglês. As fases se separam por linha em branco, sem rótulo (C# não leva comentário).
+- Vários casos viram `[Theory]`, nunca laço dentro do teste.
+- ⛔ **O par positivo é obrigatório.** Teste que só prova a recusa passa numa API que recusa tudo: a rota que responde 401 sem token responde 200 com token; validação que rejeita tem o caso que aceita; filtro que exclui, o que inclui.
 
 ## Estático precisa de costura
 
-`DateTime.UtcNow`, `TimeZoneInfo` e afins tiram o controle do teste. **Onde a costura não existir, não escreva o teste que depende do relógio** — ele passa hoje e falha sozinho depois.
+- Relógio via `TimeProvider`: o `MinimumAgeAttribute` o pede ao `ValidationContext`; no endpoint, a `ApiFactory.Clock` recebe um `FixedTimeProvider` ou um `MovableTimeProvider`, que anda entre duas requisições.
+- ⛔ Onde não há costura, não escreva o teste que depende do relógio: `Ride.ValidateDepartureDateTime` compara com `DateTime.UtcNow` direto.
+- A borda fica no teste de unidade com relógio fixo; o endpoint fica com um caso de folga larga, provando só a fiação. Data literal fixa envelhece calada.
 
-**O padrão é o `MinimumAgeAttribute`:** ele pergunta o relógio ao `ValidationContext` — `GetService(typeof(TimeProvider))` — e cai para `TimeProvider.System` quando ninguém fornece. O teste entrega um `TimeProvider` fixo por um `IServiceProvider` de duas linhas, e cada borda vira caso determinístico. `TimeProvider` é do .NET 8: não escreva interface de relógio própria.
+## A suíte roda contra PostgreSQL de verdade
 
-**No teste de endpoint, a costura atravessa a aplicação.** `RideRepository` e `RideService` recebem `TimeProvider`, e o `DateTimeUtils.NowInProductTimeZone(TimeProvider)` pergunta a ele. A `ApiFactory` aceita um `Clock`, que ela registra no lugar do relógio do sistema; ele é propriedade `init`, e não parâmetro, porque o xUnit só aceita um construtor público na fixture. O `MovableTimeProvider` anda entre duas requisições: foi assim que a #476 provou que a carona semanal de hoje às 14:00 responde a partida de hoje antes das 14:00 e a da semana seguinte depois.
-
-⛔ **`Ride.ValidateDepartureDateTime` continua sem costura**: compara a partida com `DateTime.UtcNow` direto, então testar "partida no futuro" ainda exige injetar o tempo antes.
-
-⚠️ **Depender do relógio não é ser sensível a ele.** O caso **na borda** é o que quebra: na virada de meia-noite UTC o limite anda um dia e a data muda de lado — e quem cai é o teste de **recusa**, não o de aceitação. Teste de endpoint com uma década de folga do limite lê o relógio e nunca vira. Data literal fixa não é a saída: ela envelhece calada, porque um dia deixa de ser menor de idade. A borda fica no teste de unidade com relógio fixo; o endpoint fica com o caso folgado, provando só a fiação.
-
-## Subir a aplicação contra PostgreSQL de verdade
-
-⛔ **A suíte precisa de Docker.** O `TestDatabase` sobe **um** container `postgres:17` para a suíte inteira, e cada `ApiFactory` registra `UseNpgsql` apontando para um banco próprio dentro dele — o isolamento entre classes de teste é o banco, não o container. Sem Docker a suíte falha inteira, com a mensagem que o `TestDatabase` escreve; não há caminho de fallback, porque verde com testes pulados é o falso verde que esta seção existe para impedir.
-
-⛔ **O `pre-push` roda esta suíte em silêncio, e a falha chega sem motivo.** O que aparece é só o placar e a lista de `[FAIL]`. Antes de repetir o push ou de mexer em código, rode `dotnet test` direto: é ele que imprime a primeira mensagem de erro.
-
-⚠️ **Docker recém-ligado ainda não está pronto, mesmo com o daemon respondendo.** Em 25/09/2026, rebaseando o #461, o push caiu duas vezes com os **mesmos 224 de 372**:
-
-| Tentativa | Estado do Docker | O que mostrou |
-| --- | --- | --- |
-| primeira | tinha caído | `docker.sock` inexistente, corrida de 14s |
-| segunda | recém-ligado, com `docker info` respondendo | nenhuma mensagem, corrida de **1min13s** |
-| direto na worktree, logo depois | aquecido | **372 de 372**, em 15s |
-
-**O tell é a corrida levar muito mais que os ~15s de sempre.** Aí a causa é o contêiner, não o código, e o controle é rodar a suíte direto uma vez antes de empurrar de novo. ⛔ `--no-verify` pularia a suíte inteira da API, e não é saída.
-
-**A tag casa com a produção.** A VPS roda o `postgres-17` do Ubuntu, então a imagem é `postgres:17` e não a mais recente. Não pinamos versão de Docker: o Testcontainers não declara mínimo, e nada no nosso código fixa versão de API.
-
-**O schema nasce das migrations**, porque é o `Migrate()` do `Program` que roda — o mesmo caminho da produção. Migration quebrada aparece no teste, e o `unaccent` vem junto sem passo manual, porque o `FateConnectDbContext` o declara com `HasPostgresExtension`.
-
-⚠️ **O custo é real e conhecido: ~6s contra ~1s do provedor em memória.** São **25 fábricas** — uma por classe com `IClassFixture`, mais uma por caso de teste do `RideListingTests` —, logo 25 bancos criados e migrados. Isso é aceitável para o que compra, e o que compra foi medido na #237, com três mutações:
-
-| mutação | o que cai |
-| --- | --- |
-| `Expression<Func<Ride, bool>>` vira método `bool` — ver `dotnet-code-style.md` | **20 testes** |
-| `Unaccent` sai da coluna | 2 casos de `GetRides_FilteredByDestination_IgnoresAccentsAndCase` |
-| `Unaccent` sai do padrão de busca | 2 casos, e **não os mesmos** |
-
-As três passavam verdes no provedor em memória, que executa LINQ em memória e não conhece função de PostgreSQL.
-
-⚠️ **Não serialize a criação dos bancos, e não desligue o paralelismo do xUnit.** As 25 fábricas criam banco ao mesmo tempo, e a falha clássica disso — `source database "template1" is being accessed by other users` — exige uma sessão aberta **no template**. Medido durante uma corrida real: os únicos bancos que recebem conexão são o `postgres`, onde o Npgsql abre a conexão administrativa, e os `fateconnect-tests-<guid>`; o `template1` recebe **zero**. Pico de **26 conexões de cliente contra o teto de 100**, e 120 `CREATE DATABASE` concorrentes numa sonda não produziram uma falha.
-
-⚠️ **Aquele zero só vale por causa do controle positivo.** Antes de acreditar nele, a mesma sonda forçou o erro de propósito — conexão aberta num banco e `CREATE DATABASE ... TEMPLATE` copiando dele — e ele apareceu. Sonda que não consegue produzir a falha não está medindo a ausência dela.
-
-⚠️ **Cada `[InlineData]` de acento precisa provar um lado.** As duas últimas mutações derrubam casos diferentes justamente porque um deles tem acento na coluna e busca sem, e o outro o inverso. Caso que nenhuma mutação derruba é caso que não está provando nada.
-
-## Teste que grava arquivo grava dentro do repositório
-
-⛔ **A raiz de arquivos do host de teste é a pasta do projeto.** O `WebApplicationFactory` deriva `WebRootPath` do `ContentRootPath`, que é `FateConnect.Api/` — então tudo que o código de produção escrever em `wwwroot` durante a suíte cai na árvore versionada, e o teste passa verde sujando o repositório.
-
-Aconteceu em 2026-09-08, ao cobrir o upload de imagem: **9 arquivos** em `wwwroot/uploads/lostandfound/`, dentro do projeto da API — caminho que, por existir só em tempo de execução, o `check-harness-paths.sh` acusaria como órfão se citado por extenso aqui. Nenhum erro, nenhum gate vermelho — apareceu num `git status` rodado por outro motivo.
-
-**A correção é dizer onde:** a `ApiFactory` declara a raiz num temporário e a apaga no `Dispose`.
-
-```csharp
-private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-webroot-{Guid.NewGuid():N}");
-
-protected override void ConfigureWebHost(IWebHostBuilder builder)
-{
-    builder.UseWebRoot(_webRoot);
-```
-
-⚠️ **O `.gitignore` daquela pasta é rede, não a correção.** Ele existe porque rodar a API na máquina cria o mesmo caminho, e ali o arquivo é legítimo — em produção aquele lugar é um volume do contêiner. Ignorar sem isolar deixa a suíte gravando em disco de verdade, só que invisível.
-
-**O que acusa é `git status` depois da suíte**, e vale para qualquer teste que escreva arquivo — não só imagem.
+- A suíte precisa de Docker (`TestDatabase`, um `postgres:17` com um banco por fábrica) e não tem fallback: verde com teste pulado é falso verde.
+- O `pre-push` roda a suíte e falha sem motivo; rode `dotnet test` direto para ver a primeira mensagem.
+- Corrida muito acima dos ~15s de sempre é Docker frio, não código: rode a suíte direto uma vez antes de empurrar de novo. ⛔ `--no-verify` pula a suíte inteira e não é saída.
+- ⛔ Não serialize a criação dos bancos nem desligue o paralelismo do xUnit: o `template1` não recebe conexão, e a falha clássica de `CREATE DATABASE` concorrente não acontece aqui.
+- Teste que grava arquivo: `git status` depois da suíte. A `ApiFactory` já isola o webroot num temporário.
 
 ## Suíte verde não prova que ela pega o defeito
 
-⛔ **Quebre o código de propósito e confira que a suíte cai.** É a única forma de saber se o teste testa o que o nome dele diz — e o caso clássico é o teste que passa porque o cenário nunca se montou, não porque o código está certo.
+Quebre o código de propósito e confira que a suíte cai; restaure e confira com `git status`.
 
-Na #172 foram seis mutações no que a paginação tem de arriscado — corte off-by-one, contar depois de cortar, ignorar o teto do `PageSize`, arredondar `TotalPages` para baixo, remover o filtro de carona partida e tirar o `- FirstPage` do salto. As seis derrubaram testes.
+- ⛔ Se a build da mutação falha, `dotnet test --no-build` roda a DLL anterior e tudo passa: confira o exit da build antes de ler o teste. Escreva `--verbosity quiet` por extenso: wrapper de shell que reescreve argumentos pode ficar com o `-v q`, e o build responde `Project file does not exist`.
+- Mute o corpo do predicado, não a chamada: tirar o `.Where(Predicado())` deixa o método sem uso, e o analisador reprova antes de qualquer teste.
+- ⛔ Medindo memória: `Process.PeakWorkingSet64` responde 0 no macOS, e medir no processo que gerou a carga põe a carga no "antes". Separe em processos: um gera o arquivo, outro só o processa sob `/usr/bin/time -l`, e um terceiro só o lê (o controle).
 
-⛔ **A armadilha é o build da mutação.** Se ele falhar, `dotnet test --no-build` roda a **DLL anterior** e tudo passa — o que se lê como "a mutação sobreviveu", quando ela nem chegou a existir. Aconteceu ali: remover um filtro deixou duas variáveis sem uso e, com `TreatWarningsAsErrors`, a compilação reprovou.
+## Fixture
 
-```bash
-dotnet build <solução> --verbosity quiet --nologo; echo "build da mutação exit=$?"   # 0, ou o resto não vale
-dotnet test <solução> --no-build
-```
-
-⚠️ **`--verbosity quiet` por extenso, nunca `-v q`:** o filtro do shell desta máquina fica com o `q`, e o build responde `Project file does not exist` sem nunca ter recebido a solução — ver `.claude/rules/prove-the-mechanism.md`.
-
-**A mutação que não derruba o build muda o corpo, não a chamada.** Tirar o `.Where(Predicado())` deixa o método privado sem uso, e o analisador reprova antes de qualquer teste rodar. Troque o que o predicado responde e mantenha o símbolo em uso: na #412, `ride => ride.Driver.Status == EnumAccountStatus.Active` virou `ride => ride.DriverId > 0`, sempre verdadeiro, e os dois casos do filtro caíram.
-
-**Restaure a árvore ao fim de cada mutação** e confirme com `git status` que nada sobrou.
-
-## Foto em teste é imagem de verdade
-
-⛔ **A API decodifica toda foto enviada, então bytes que só imitam um cabeçalho de PNG recebem 400.** Teste que envia foto monta a imagem com o `TestImages` do projeto de testes: `TestImages.Png()` para o caso comum, e `TestImages.JpegTakenWithAPhone()` quando o que se testa é rotação ou metadados, porque ela carrega orientação e localização no EXIF.
-
-Desde a #465: os dois `ImagePayload` dos testes de endpoint mandavam cinco bytes, e passaram a gerar PNG de verdade. A asserção que comparava o arquivo servido byte a byte também mudou, porque a original agora é regravada: ela decodifica a imagem e confere as dimensões.
-
-## Fixture usa dado plausível, e válido
-
-⛔ **Nada de rótulo no lugar de dado.** `"Pessoa de Teste"`, `"Rua A"` e `"pessoa@example.com"` não são dados — são etiquetas dizendo "isto é um teste". Use nome, endereço e contato que poderiam existir: `"Mariana Alves Rocha"`, `"Rua Cesário Mota"`, `"mariana.rocha@gmail.com"`.
-
-A referência já está no código: os `[DefaultValue]` dos DTOs, que alimentam o Swagger, usam `João da Silva` e `Avenida Engenheiro Carlos Reinaldo Mendes`.
-
-⚠️ **Nome de fixture não carrega papel.** `"Ana Ofertante"` e `"Bruno Passageiro"` viraram `"Ana Beatriz Nogueira"` e `"Bruno Carvalho Souza"`: quem diz o papel é a variável — `driverId`, `otherUserId` —, e o assert passou a verificar que a API devolve o nome de quem ofertou, não a palavra "Ofertante".
-
-⛔ **E o dado precisa ser válido pelas regras da própria aplicação.** `ApiFactory` e `TokenServiceTests` usavam `@fatec.sp.gov.br`, domínio que o `FatecEmailPattern` **recusa** — o institucional é `@(aluno.)?cps.sp.gov.br`. Passava porque emissão de token e seed direto no banco não validam. Fixture inválida não quebra hoje: quebra o próximo teste que passe por validação, e o motivo não aparece no erro.
-
-⚠️ **O valor fica em pt-BR; a chave, em inglês.** `password = "SenhaForte123!"` está certo — os dados são de um produto brasileiro. O que não pode é meia palavra em cada idioma, como o `"PasswordForte123!"` que um rename cego produziu.
+- Foto em teste é imagem de verdade, porque a API decodifica o envio: `TestImages.Png()`, ou `TestImages.JpegTakenWithAPhone()` quando o teste é de rotação ou EXIF.
+- Nome e contato plausíveis (`"Mariana Alves Rocha"`), sem rótulo de papel no nome: quem diz o papel é a variável (`driverId`).
+- ⛔ O dado passa pelas validações da própria aplicação: o e-mail institucional é `@(aluno.)?cps.sp.gov.br` (`FatecEmailAttribute`). Fixture inválida quebra o próximo teste que validar, sem dizer por quê.
+- Valor em pt-BR, chave em inglês (`password = "SenhaForte123!"`).

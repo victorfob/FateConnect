@@ -1,29 +1,12 @@
 ---
-description: Testes declarativos de schema Zod no front React
+description: Teste de schema Zod no front — contrato por campo, caminho do erro e a exceção da mensagem
 paths:
-  - "FateConnect/Web/**"
+  - "FateConnect/Web/**/schema/**"
 ---
 
-# Testes de schema Zod
+# Teste de schema Zod
 
-Vale a partir da tela de cadastro (#54), primeira a ter schema de validação.
-
-## Estrutura
-
-- Um arquivo de teste por schema, ao lado dele.
-- Verificar o **contrato**, não a biblioteca: para cada campo, um caso válido e os casos inválidos que a regra de negócio prevê.
-- Usar `schema.safeParse(entrada)` e asserir `success`; em falha, asserir o **caminho** do erro (`issues[0].path`), não a mensagem exata — mensagem é copy e muda.
-
-  ⚠️ **Exceção: quando a mensagem **é** o comportamento sob teste.** Campo com duas regras e duas mensagens precisa afirmar **qual** delas saiu — senão o teste passa com as duas trocadas, que era justamente o defeito. Aí se afirma caminho **e** mensagem, sempre pela **constante** que o schema usa, nunca pelo literal. Nasceu na #354, na recusa do e-mail institucional.
-
-## Casos obrigatórios por campo
-
-- Valor válido no limite (menor e maior aceitos, quando houver limite).
-- Ausência, quando o campo é obrigatório.
-- Formato inválido, quando há formato (e-mail, data, telefone).
-- Campo opcional: ausência **não** pode gerar erro.
-
-## O que não fazer
-
-- Não testar que o Zod rejeita tipo errado de dado — isso é a biblioteca, não o nosso contrato.
-- Não montar o objeto de entrada inteiro em cada caso: uma fixture válida no topo e sobrescrita do campo sob teste por caso.
+- Teste ao lado do schema, sobre o contrato, não sobre o Zod: `schema.safeParse(entrada)`, afirmando `success` e, na falha, o caminho do erro (`issues[0].path`), não a mensagem.
+- ⚠️ Exceção: campo com duas regras e duas mensagens afirma caminho **e** mensagem, pela constante que o schema usa — senão o teste passa com as duas trocadas.
+- Por campo: valor válido nos limites, ausência quando obrigatório, formato inválido quando há formato, e opcional ausente sem erro.
+- Uma fixture válida no topo, sobrescrevendo só o campo sob teste em cada caso.
