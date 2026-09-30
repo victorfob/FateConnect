@@ -28,11 +28,11 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         { new StringContent(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OcurredOn" },
     };
 
-    private static MultipartFormDataContent NewDenunciationForm() => new()
+    private static MultipartFormDataContent NewDenunciationForm(bool isAnonymous) => new()
     {
         { new StringContent("ImproperCharging"), "Category" },
         { new StringContent("O motorista cobrou valor acima do combinado na carona de ontem."), "Description" },
-        { new StringContent("false"), "IsAnonymous" },
+        { new StringContent(isAnonymous.ToString(CultureInfo.InvariantCulture)), "IsAnonymous" },
     };
 
     private static MultipartFormDataContent ContactForm(string? phone, string? contactEmail)
@@ -97,13 +97,38 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
     }
 
     [Fact]
-    public async Task WithoutContact_ListingAndDenouncing_KeepWorking()
+    public async Task CreateDenunciation_WithoutSecrecyAndWithoutContact_IsForbiddenOfferingTheSecretOne()
+    {
+        HttpClient client = factory.CreateClientFor(factory.SeedUserWithoutContact("Otávio Lins Barreto"));
+
+        HttpResponseMessage response = await client.PostAsync("/Denunciations", NewDenunciationForm(isAnonymous: false));
+
+        (string? code, string? error) = await ErrorOf(response);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal(ContactRequiredException.ErrorCode, code);
+        Assert.Equal(
+            "Para enviar uma denúncia sem sigilo, cadastre telefone e e-mail para contato em Meu perfil, ou marque a denúncia como sigilosa.",
+            error);
+    }
+
+    [Fact]
+    public async Task CreateDenunciation_WithoutSecrecyAndWithContact_IsCreated()
+    {
+        HttpClient client = factory.CreateClientForNewUser("Paula Siqueira Rios");
+
+        HttpResponseMessage response = await client.PostAsync("/Denunciations", NewDenunciationForm(isAnonymous: false));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task WithoutContact_ListingAndTheSecretDenunciation_KeepWorking()
     {
         HttpClient client = factory.CreateClientFor(factory.SeedUserWithoutContact("Diego Nunes Peixoto"));
 
         HttpResponseMessage rides = await client.GetAsync("/Rides");
         HttpResponseMessage items = await client.GetAsync("/LostAndFound");
-        HttpResponseMessage denunciation = await client.PostAsync("/Denunciations", NewDenunciationForm());
+        HttpResponseMessage denunciation = await client.PostAsync("/Denunciations", NewDenunciationForm(isAnonymous: true));
 
         Assert.Equal(HttpStatusCode.OK, rides.StatusCode);
         Assert.Equal(HttpStatusCode.OK, items.StatusCode);
