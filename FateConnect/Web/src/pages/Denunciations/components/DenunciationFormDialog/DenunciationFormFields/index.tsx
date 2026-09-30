@@ -8,7 +8,12 @@ import type { DenunciationFormInput, DenunciationFormValues } from '../schema';
 import * as C from '../constants';
 import * as S from './styles';
 
-export function DenunciationFormFields() {
+type DenunciationFormFieldsProps = Readonly<{
+  /** Sem contato, a denúncia só sai sigilosa: o interruptor vem ligado e travado. */
+  secrecyIsForced: boolean;
+}>;
+
+export function DenunciationFormFields({ secrecyIsForced }: DenunciationFormFieldsProps) {
   const {
     control,
     register,
@@ -29,14 +34,24 @@ export function DenunciationFormFields() {
     <Dialog.Fields layout="column">
       <S.ConfidentialGroup>
         <S.ConfidentialToggle
-          control={<Switch {...register('isAnonymous')} disabled={disabled} />}
+          control={
+            <Switch
+              {...register('isAnonymous')}
+              checked={isAnonymous}
+              disabled={disabled || secrecyIsForced}
+            />
+          }
           label={C.DENUNCIATION_FORM_LABELS.confidential}
           labelPlacement="start"
           slotProps={{ typography: { variant: 'subtitleBold' } }}
         />
 
+        {secrecyIsForced && (
+          <S.ConfidentialHint variant="caption">{C.FORCED_SECRECY_NOTE}</S.ConfidentialHint>
+        )}
+
         {/* Quem não pediu sigilo não precisa saber o que o sigilo implicaria. */}
-        {isAnonymous && (
+        {!secrecyIsForced && isAnonymous && (
           <S.ConfidentialHint variant="caption">{C.CONFIDENTIAL_HINT}</S.ConfidentialHint>
         )}
       </S.ConfidentialGroup>

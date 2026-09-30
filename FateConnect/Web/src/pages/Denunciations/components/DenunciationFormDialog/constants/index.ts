@@ -40,6 +40,9 @@ export const DENUNCIATION_FORM_LABELS = {
 export const CONFIDENTIAL_HINT =
   'A denúncia continua ligada à sua conta, o que permite apurar uso indevido do canal. Quem analisa não recebe os seus dados.';
 
+export const FORCED_SECRECY_NOTE =
+  'Sem telefone e e-mail para contato, a denúncia sai sigilosa: quem analisa não recebe os seus dados, mas ela continua ligada à sua conta, o que permite apurar uso indevido do canal. Para enviar sem sigilo, cadastre os contatos em Meu perfil.';
+
 export const DENUNCIATION_FORM_PLACEHOLDERS = {
   description: 'Conte o que aconteceu, com data e local',
 };

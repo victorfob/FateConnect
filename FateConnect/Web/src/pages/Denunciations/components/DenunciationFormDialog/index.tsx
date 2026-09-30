@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { useLacksContact } from '@app/hooks/useLacksContact';
 import { useNotification } from '@app/hooks/useNotification';
 import { DENUNCIATIONS_QUERY_KEY } from '@app/pages/Denunciations/constants';
 import { createDenunciation } from '@app/services/denunciations/denunciationsService';
@@ -26,6 +27,7 @@ export type DenunciationFormDialogProps = Readonly<{ open: boolean; onClose: Voi
 export function DenunciationFormDialog({ open, onClose }: DenunciationFormDialogProps) {
   const { notifySuccess } = useNotification();
   const queryClient = useQueryClient();
+  const secrecyIsForced = useLacksContact();
 
   const { mutate, isPending } = useMutation({
     mutationFn: (input: DenunciationInput) => createDenunciation(input),
@@ -49,10 +51,12 @@ export function DenunciationFormDialog({ open, onClose }: DenunciationFormDialog
   useEffect(() => {
     if (!open) return;
 
-    reset(EMPTY_DENUNCIATION_FORM);
-  }, [open, reset]);
+    reset({ ...EMPTY_DENUNCIATION_FORM, isAnonymous: secrecyIsForced });
+  }, [open, reset, secrecyIsForced]);
 
-  const handleSubmit = form.handleSubmit((values) => mutate(toDenunciationInput(values)));
+  const handleSubmit = form.handleSubmit((values) =>
+    mutate(toDenunciationInput({ ...values, isAnonymous: values.isAnonymous || secrecyIsForced })),
+  );
 
   return (
     <Dialog open={open} onClose={onClose} title={C.DENUNCIATION_FORM.title}>
@@ -61,7 +65,7 @@ export function DenunciationFormDialog({ open, onClose }: DenunciationFormDialog
           <Dialog.Body>
             <S.ChannelNote variant="caption">{C.CHANNEL_NOTE}</S.ChannelNote>
 
-            <DenunciationFormFields />
+            <DenunciationFormFields secrecyIsForced={secrecyIsForced} />
           </Dialog.Body>
 
           <Dialog.Footer>

@@ -15,10 +15,12 @@ import { photoAlt } from './constants';
 import { RESTORE_LABEL } from './LostItemStatusAction/constants';
 import { LostItemCard } from '.';
 
+const CONTACT_PHONE = '(15) 99999-0001';
+
 const CONTACT: UserContact = {
   name: 'Marina Duarte',
   email: 'marina.duarte@example.com',
-  phone: '(15) 99999-0001',
+  phone: CONTACT_PHONE,
   thumbnailUrl: null,
 };
 
@@ -124,7 +126,7 @@ describe('LostItemCard', () => {
 
     expect(dialog.getByText(CONTACT.name)).toBeInTheDocument();
     expect(dialog.getByRole('button', { name: COPY_EMAIL_LABEL })).toBeInTheDocument();
-    expect(dialog.getByRole('link', { name: CONTACT.phone })).toBeInTheDocument();
+    expect(dialog.getByRole('link', { name: CONTACT_PHONE })).toBeInTheDocument();
   });
 
   it('should take the contact from the item, not from a fixed one', async () => {
@@ -155,7 +157,7 @@ describe('LostItemCard', () => {
 
     const dialog = await openContact();
 
-    expect(dialog.getByRole('link', { name: CONTACT.phone })).toHaveAttribute(
+    expect(dialog.getByRole('link', { name: CONTACT_PHONE })).toHaveAttribute(
       'href',
       expect.stringContaining(encodeURIComponent(LOST_ITEM.name)),
     );

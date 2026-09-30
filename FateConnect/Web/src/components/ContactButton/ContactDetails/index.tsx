@@ -13,14 +13,15 @@ export type ContactDetailsProps = Readonly<{
   initials: string;
   /** Miniatura da foto de perfil; sem ela, as iniciais. */
   thumbnailUrl: string | null;
-  email: string;
-  /** Telefone como aparece em tela. */
-  phone: string;
+  /** Sem ele, o canal não aparece. */
+  email: string | null;
+  /** Telefone como aparece em tela; sem ele, o canal não aparece. */
+  phone: string | null;
   /**
    * Destino do link do telefone. Vem de fora porque para onde ele leva é decisão
    * de produto — conversa em aplicativo, chamada.
    */
-  phoneHref: string;
+  phoneHref: string | null;
   /** O que acontece ao acionar o e-mail. Quem compõe copia e avisa. */
   onCopyEmail: VoidFunction;
 }>;
@@ -47,17 +48,21 @@ export function ContactDetails({
       </S.Identity>
 
       <S.Channels>
-        <ContactChannel
-          onClick={onCopyEmail}
-          label={`${COPY_EMAIL_LABEL} ${email}`}
-          icon={<EmailIcon />}
-        >
-          {email}
-        </ContactChannel>
+        {email && (
+          <ContactChannel
+            onClick={onCopyEmail}
+            label={`${COPY_EMAIL_LABEL} ${email}`}
+            icon={<EmailIcon />}
+          >
+            {email}
+          </ContactChannel>
+        )}
 
-        <ContactChannel href={phoneHref} icon={<PhoneIcon />}>
-          {phone}
-        </ContactChannel>
+        {phone && phoneHref && (
+          <ContactChannel href={phoneHref} icon={<PhoneIcon />}>
+            {phone}
+          </ContactChannel>
+        )}
       </S.Channels>
     </S.DetailsRow>
   );

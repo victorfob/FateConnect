@@ -4,8 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { isContactRequiredError } from '@app/components/ContactRequiredDialog/helpers/isContactRequiredError';
 import { useNotification } from '@app/hooks/useNotification';
 import { LOST_ITEMS_QUERY_KEY } from '@app/pages/LostAndFound/constants';
+import { SessionExpiredError } from '@app/services/httpClient';
 import { createLostItem, updateLostItem } from '@app/services/lostAndFound/lostAndFoundService';
 import type { LostItem, LostItemInput } from '@app/services/lostAndFound/types';
 
@@ -23,11 +25,18 @@ export type LostItemFormDialogProps = Readonly<{
   open: boolean;
   onClose: VoidFunction;
   item?: LostItem;
+  /** A API recusou por falta de contato: quem abriu o diálogo mostra o aviso. */
+  onContactRequired: VoidFunction;
 }>;
 
-export function LostItemFormDialog({ open, onClose, item }: LostItemFormDialogProps) {
+export function LostItemFormDialog({
+  open,
+  onClose,
+  item,
+  onContactRequired,
+}: LostItemFormDialogProps) {
   const queryClient = useQueryClient();
-  const { notifySuccess } = useNotification();
+  const { notifySuccess, notifyError } = useNotification();
 
   const mode = useMemo(() => {
     if (!item) return C.REGISTER_MODE;
@@ -47,7 +56,18 @@ export function LostItemFormDialog({ open, onClose, item }: LostItemFormDialogPr
       await queryClient.invalidateQueries({ queryKey: [LOST_ITEMS_QUERY_KEY] });
     },
     // Não fecha no erro: refazer o formulário inteiro puniria quem já digitou.
-    meta: { errorMessage: mode.failed },
+    onError: (error) => {
+      if (error instanceof SessionExpiredError) return;
+
+      if (isContactRequiredError(error)) {
+        onClose();
+        onContactRequired();
+        return;
+      }
+
+      notifyError(mode.failed);
+    },
+    meta: { notifiesErrorItself: true },
   });
 
   const form = useForm<LostItemFormInput, unknown, LostItemFormValues>({

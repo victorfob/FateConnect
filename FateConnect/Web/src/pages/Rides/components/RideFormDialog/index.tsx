@@ -5,8 +5,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toZonedTime } from 'date-fns-tz';
 import { FormProvider, useForm, type Resolver } from 'react-hook-form';
 
+import { isContactRequiredError } from '@app/components/ContactRequiredDialog/helpers/isContactRequiredError';
 import { useNotification } from '@app/hooks/useNotification';
 import { RIDES_QUERY_KEY } from '@app/pages/Rides/constants';
+import { SessionExpiredError } from '@app/services/httpClient';
 import { createRide, updateRide } from '@app/services/rides/ridesService';
 import type { Ride, RideInput } from '@app/services/rides/types';
 
@@ -28,12 +30,14 @@ export type RideFormDialogProps = Readonly<{
   onClose: VoidFunction;
   /** Ausente, o diálogo oferta uma carona nova; presente, edita a informada. */
   ride?: Ride;
+  /** A API recusou por falta de contato: quem abriu o diálogo mostra o aviso. */
+  onContactRequired: VoidFunction;
 }>;
 
 /** Ofertar e editar são o mesmo formulário: só mudam os textos e o verbo HTTP. */
-export function RideFormDialog({ open, onClose, ride }: RideFormDialogProps) {
+export function RideFormDialog({ open, onClose, ride, onContactRequired }: RideFormDialogProps) {
   const queryClient = useQueryClient();
-  const { notifySuccess } = useNotification();
+  const { notifySuccess, notifyError } = useNotification();
 
   const mode = useMemo(() => {
     if (!ride) return C.OFFER_MODE;
@@ -54,7 +58,18 @@ export function RideFormDialog({ open, onClose, ride }: RideFormDialogProps) {
     },
     // Sem fechar no erro: refazer o formulário inteiro por causa de uma falha de
     // rede seria punir quem já digitou tudo.
-    meta: { errorMessage: mode.failed },
+    onError: (error) => {
+      if (error instanceof SessionExpiredError) return;
+
+      if (isContactRequiredError(error)) {
+        onClose();
+        onContactRequired();
+        return;
+      }
+
+      notifyError(mode.failed);
+    },
+    meta: { notifiesErrorItself: true },
   });
 
   // Este ano e o seguinte cobrem o calendário que a partida alcança na prática;

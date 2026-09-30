@@ -1,7 +1,6 @@
 import { SignupConflictFieldEnum } from '../@types';
 
 export const SIGNUP_TITLE = 'Criar conta';
-export const CONTACT_SECTION_TITLE = 'Dados para contato';
 
 export const FIELD_LABELS = {
   fullName: 'Nome completo',
@@ -9,14 +8,11 @@ export const FIELD_LABELS = {
   birthDate: 'Data de nascimento',
   gender: 'Gênero',
   password: 'Senha',
-  phone: 'Telefone',
-  contactEmail: 'E-mail para contato',
 };
 
 export const FIELD_PLACEHOLDERS = {
   fatecEmail: 'nome.sobrenome@aluno.cps.sp.gov.br',
   birthDate: 'dd/mm/aaaa',
-  phone: '(00) 00000-0000',
 };
 
 export const SUBMIT_LABEL = 'Criar conta';
