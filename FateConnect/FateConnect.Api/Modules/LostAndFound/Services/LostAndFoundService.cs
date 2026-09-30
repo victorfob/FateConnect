@@ -165,19 +165,11 @@ public partial class LostAndFoundService(
             record.OcurredOn,
             record.Description,
             record.ImageUrl,
-            ThumbnailAddressOf(record),
+            UploadsLocation.ThumbnailOrNullOf(record.ImageUrl),
             record.User.ToContactDto(),
             record.IsReportedBy(currentUserId),
             record.Status,
             record.DeletionReason,
             record.CreatedAt
         );
-
-    private static string? ThumbnailAddressOf(LostAndFoundRecord record)
-    {
-        if (record.ImageUrl is null)
-            return null;
-
-        return UploadsLocation.ThumbnailOf(record.ImageUrl);
-    }
 }

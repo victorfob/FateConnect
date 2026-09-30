@@ -28,6 +28,7 @@ public class UserProfileEndpointTests(ApiFactory factory) : IClassFixture<ApiFac
         string ContactEmail,
         string? Neighborhood,
         string? ImageUrl,
+        string? ThumbnailUrl,
         EnumProfileType ProfileType,
         EnumAccountStatus Status);
 
@@ -87,6 +88,20 @@ public class UserProfileEndpointTests(ApiFactory factory) : IClassFixture<ApiFac
         Assert.Equal(person.Id, body.Id);
         Assert.Equal("Mariana Alves Rocha", body.FullName);
         Assert.Equal(EnumAccountStatus.Active, body.Status);
+    }
+
+    [Theory]
+    [InlineData("uploads/user/perfil.png", "uploads/user/thumbnails/perfil.webp")]
+    [InlineData(null, null)]
+    public async Task GetProfile_WithOrWithoutAPhoto_AnswersTheOriginalAndTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
+    {
+        int personId = factory.SeedUser("Ivone Castilho Baptista", imageUrl: imageUrl).Id;
+
+        HttpResponseMessage response = await factory.CreateClientFor(personId).GetAsync("/Users/me");
+
+        ReadUser body = await ReadUserFrom(response);
+        Assert.Equal(imageUrl, body.ImageUrl);
+        Assert.Equal(thumbnailUrl, body.ThumbnailUrl);
     }
 
     [Fact]

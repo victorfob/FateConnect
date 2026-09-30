@@ -7,6 +7,7 @@ using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Enums;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Services;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
@@ -248,6 +249,7 @@ public partial class UserService(
                 u.FullName,
                 u.ContactEmail,
                 string.IsNullOrEmpty(u.Phone) ? null : u.Phone,
+                UploadsLocation.ThumbnailOrNullOf(u.ImageUrl),
                 u.Status
             )
         );
@@ -434,6 +436,7 @@ public partial class UserService(
             ContactEmail: record.ContactEmail,
             Neighborhood: record.Neighborhood,
             ImageUrl: record.ImageUrl,
+            ThumbnailUrl: UploadsLocation.ThumbnailOrNullOf(record.ImageUrl),
             ProfileType: record.ProfileType,
             Status: record.Status,
             CreatedAt: record.CreatedAt

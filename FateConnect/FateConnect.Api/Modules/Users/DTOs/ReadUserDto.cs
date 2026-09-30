@@ -13,6 +13,7 @@ public record ReadUserDto(
     string ContactEmail,
     string? Neighborhood,
     string? ImageUrl,
+    string? ThumbnailUrl,
     EnumProfileType ProfileType,
     EnumAccountStatus Status,
     DateTime CreatedAt

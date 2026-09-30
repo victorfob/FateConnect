@@ -6,6 +6,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Adiciona a miniatura da foto de perfil ao contato de quem publica uma carona, um item ou uma denúncia identificada, ao perfil e à lista de contas da gestão; quem não tem foto vem sem miniatura (#510) [Backend]
+
 ## [1.1.1] - 2026-09-30
 
 ### Security
