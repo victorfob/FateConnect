@@ -180,6 +180,33 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("RideDepartures");
                 });
 
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.AdministrativeAction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Action")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ActorId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("PerformedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("TargetId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TargetId");
+
+                    b.ToTable("AdministrativeActions");
+                });
+
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.DocumentAcceptance", b =>
                 {
                     b.Property<int>("Id")

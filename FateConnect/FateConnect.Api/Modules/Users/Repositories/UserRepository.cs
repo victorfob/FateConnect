@@ -128,6 +128,11 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
+    public void AddAdministrativeAction(AdministrativeAction action)
+    {
+        _context.AdministrativeActions.Add(action);
+    }
+
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();

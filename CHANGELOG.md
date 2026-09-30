@@ -8,6 +8,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona o registro das ações de administração sobre uma conta: dar ou retirar o acesso de administração, banir e reverter o banimento gravam quem fez, sobre qual conta e quando; ação recusada ou que não muda nada não grava, e o registro fica mesmo se a conta for apagada (#491) [Backend]
 - Adiciona a tela do próprio perfil, onde se editam os dados pessoais, o bairro e os contatos e se salva tudo de uma vez, com o aviso de alterações não salvas e a opção de descartá-las; o nome salvo passa a aparecer no topo (#487) [Frontend]
 - Adiciona ao perfil a confirmação antes de sair com alterações não salvas, por qualquer caminho: links, voltar do navegador ou do celular e saída da conta; fechar ou recarregar a aba mostra o aviso do próprio navegador (#487) [Frontend]
 - Adiciona a foto de perfil, escolhida, trocada e removida na tela do perfil, com o enquadramento ajustado por arraste e zoom antes de ser usada, e que aparece no avatar do topo no lugar das iniciais (#487) [Frontend]
@@ -27,6 +28,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Passa a declarar na política de privacidade o registro das ações de administração sobre uma conta, mantido mesmo após o encerramento dela (#491) [Frontend]
 - Passa a explicar os tipos de carona também no formulário de ofertar e editar, como o filtro já fazia: solidária é gratuita, e na igualitária os participantes dividem os custos (#489) [Frontend]
 - Passa a mostrar no cartão de carona a recorrência ao lado da data e da hora, que passam a ser as da próxima partida (#481) [Frontend]
 - Passa a citar a recorrência entre os dados da carona nos termos de uso e na política de privacidade (#481) [Frontend]
