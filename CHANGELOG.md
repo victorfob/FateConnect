@@ -6,6 +6,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-30
+
+### Security
+
+- Atualiza o cliente HTTP do site para a versão que corrige falhas de segurança apontadas pelo Dependabot, entre elas injeção de cabeçalho e poluição de protótipo nas requisições (#509) [Frontend]
+
 ## [1.1.0] - 2026-09-30
 
 ### Added
