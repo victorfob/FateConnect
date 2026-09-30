@@ -10,6 +10,14 @@ public sealed class RequiresContactFilter(IUserRepository userRepository, EnumPu
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        bool contactIsWaived = context.ActionArguments.Values.OfType<IWaivesContact>().Any(request => request.WaivesContact);
+
+        if (contactIsWaived)
+        {
+            await next();
+            return;
+        }
+
         var user = await userRepository.GetByIdAsync(context.HttpContext.User.GetUserId(), asNoTracking: true);
 
         if (user is not { HasContact: true })
