@@ -28,6 +28,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 - Esconder visualmente sem tirar da acessibilidade é `HiddenField`.
 - Tipografia só por variante do tema. `ListItemText`, `MenuItem`, `Chip` e `Alert` aplicam a escala deles se ninguém disser nada: a variante entra por `slotProps` (`slotProps={{ primary: { variant: 'caption' } }}`).
 - `palette.text.*` e `contrastText` nunca como fundo.
+- Ícone ao lado de outros segue a família deles: preenchido junto de preenchido.
 - Linha de largura cheia com um controle na ponta: `FormControlLabel`, com o rótulo ocupando a sobra — a linha inteira é o alvo.
 
 ## Tela de módulo
