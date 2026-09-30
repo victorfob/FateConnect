@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize]
 [ApiConventionType(typeof(DefaultApiConventions))]
 public class UsersController(IUserService service) : ControllerBase
 {
