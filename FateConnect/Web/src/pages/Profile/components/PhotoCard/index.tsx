@@ -1,9 +1,10 @@
-import { useCallback, useMemo, useRef, type ChangeEvent } from 'react';
+import { lazy, Suspense, useCallback, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { HiddenField, InitialsAvatar, SectionCard, Typography } from '@design-system';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import { PhotoActionButtons } from '@app/components/PhotoField/components/PhotoActionButtons';
 import { PHOTO_ACCEPT_ATTRIBUTE, PHOTO_FIELD_TEXTS } from '@app/components/PhotoField/constants';
+import { photoSchema } from '@app/components/PhotoField/schema';
 import { useFilePreviewUrl } from '@app/hooks/useFilePreviewUrl';
 import { useStoredImage } from '@app/hooks/useStoredImage';
 import type { ProfileFormInput, ProfileFormValues } from '@app/pages/Profile/schema';
@@ -16,10 +17,17 @@ export type PhotoCardProps = Readonly<{ storedPhotoUrl: string | null }>;
 
 const DIRTY_AND_VALIDATED = { shouldDirty: true, shouldValidate: true };
 
+/** A biblioteca de recorte só é baixada quando alguém escolhe uma foto. */
+const PhotoCropDialog = lazy(() =>
+  import('../PhotoCropDialog').then((module) => ({ default: module.PhotoCropDialog })),
+);
+
 export function PhotoCard({ storedPhotoUrl }: PhotoCardProps) {
   const {
     control,
     setValue,
+    setError,
+    clearErrors,
     formState: { errors, disabled },
   } = useFormContext<ProfileFormInput, unknown, ProfileFormValues>();
   const [photo, removeStoredPhoto, fullName] = useWatch({
@@ -27,6 +35,7 @@ export function PhotoCard({ storedPhotoUrl }: PhotoCardProps) {
     name: ['photo', 'removeStoredPhoto', 'fullName'],
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photoToCrop, setPhotoToCrop] = useState<File | null>(null);
   const storedPhoto = useStoredImage(storedPhotoUrl);
   const initials = useMemo(() => getInitials(fullName), [fullName]);
 
@@ -50,12 +59,32 @@ export function PhotoCard({ storedPhotoUrl }: PhotoCardProps) {
   const handleFileChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const [chosen] = event.target.files ?? [];
-      if (chosen) setValue('photo', chosen, DIRTY_AND_VALIDATED);
       // Zerar o campo deixa o mesmo arquivo, escolhido de novo, disparar a troca.
       event.target.value = '';
+      if (!chosen) return;
+
+      // Formato e tamanho se recusam antes de abrir o ajuste, que não teria o que mostrar.
+      const [issue] = photoSchema.safeParse(chosen).error?.issues ?? [];
+      if (issue) {
+        setError('photo', { message: issue.message });
+        return;
+      }
+
+      clearErrors('photo');
+      setPhotoToCrop(chosen);
+    },
+    [clearErrors, setError],
+  );
+
+  const handleCropApply = useCallback(
+    (cropped: File) => {
+      setValue('photo', cropped, DIRTY_AND_VALIDATED);
+      setPhotoToCrop(null);
     },
     [setValue],
   );
+
+  const handleCropCancel = useCallback(() => setPhotoToCrop(null), []);
 
   // Tira a escolha de agora e também a foto guardada, que sai de vez ao salvar.
   const handleRemove = useCallback(() => {
@@ -87,6 +116,16 @@ export function PhotoCard({ storedPhotoUrl }: PhotoCardProps) {
         {errors.photo && <S.PhotoError variant="caption">{errors.photo.message}</S.PhotoError>}
         {!errors.photo && <S.PhotoHint variant="caption">{PHOTO_FIELD_TEXTS.hint}</S.PhotoHint>}
       </S.PhotoCardContent>
+
+      {photoToCrop && (
+        <Suspense fallback={null}>
+          <PhotoCropDialog
+            photo={photoToCrop}
+            onApply={handleCropApply}
+            onCancel={handleCropCancel}
+          />
+        </Suspense>
+      )}
 
       <HiddenField
         component="input"

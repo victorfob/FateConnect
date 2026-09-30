@@ -19,6 +19,7 @@ export { default as ListItemIcon } from '@mui/material/ListItemIcon';
 export { default as ListItemText } from '@mui/material/ListItemText';
 export { default as ListSubheader } from '@mui/material/ListSubheader';
 export { default as Popover } from '@mui/material/Popover';
+export { default as Slider } from '@mui/material/Slider';
 export { default as Stack } from '@mui/material/Stack';
 export { default as Switch } from '@mui/material/Switch';
 export { default as Toolbar } from '@mui/material/Toolbar';

@@ -6,7 +6,7 @@ import { FIELD_LABELS } from '@app/pages/Signup/constants';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { PROFILE } from '@app/test/profile';
-import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { act, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
@@ -22,10 +22,37 @@ import { DEACTIVATE } from './components/DeactivateAccount/constants';
 import { PASSWORD_LABELS } from './components/PasswordFields/constants';
 import { FATEC_EMAIL_HINT, NEIGHBORHOOD_LABEL } from './components/PersonalDataFields/constants';
 import { PHOTO_LABEL } from './components/PhotoCard/constants';
+import { PHOTO_CROP_TEXTS } from './components/PhotoCropDialog/constants';
+import { cropPhoto } from './components/PhotoCropDialog/helpers/cropPhoto';
 import { SAVE_BAR_TEXTS } from './components/SaveBar/constants';
 import { PROFILE_MESSAGES } from './constants';
 import { PASSWORD_MESSAGES } from './schema';
 import { Profile } from '.';
+
+// No jsdom não há geometria: a área do recorte chega assim que o recortador monta.
+vi.mock('react-easy-crop', async () => {
+  const { useEffect } = await import('react');
+  const mockArea = { x: 0, y: 0, width: 400, height: 400 };
+
+  return {
+    default: function MockCropper({
+      onCropComplete,
+    }: {
+      onCropComplete: (area: typeof mockArea, areaPixels: typeof mockArea) => void;
+    }) {
+      useEffect(() => onCropComplete(mockArea, mockArea), [onCropComplete]);
+
+      return null;
+    },
+  };
+});
+
+// O canvas não existe no jsdom; o recorte em si tem teste próprio.
+vi.mock('./components/PhotoCropDialog/helpers/cropPhoto', () => ({
+  cropPhoto: vi.fn(
+    async (photo: File) => new File(['recortada'], photo.name, { type: photo.type }),
+  ),
+}));
 
 const PROFILE_URL = 'https://api.fateconnect.test/users/me';
 const STORED_PHOTO_URL = 'https://api.fateconnect.test/uploads/user/perfil.png';
@@ -49,10 +76,20 @@ async function renderProfile(profile = PROFILE) {
 
 const saveButton = () => screen.getByRole('button', { name: SAVE_BAR_TEXTS.save });
 
+const mockCropPhoto = cropPhoto as Mock;
+
 async function pickPhoto(name = 'perfil.png', type = 'image/png') {
   await userEvent.upload(screen.getByLabelText(PHOTO_LABEL), new File(['foto'], name, { type }), {
     applyAccept: false,
   });
+}
+
+/** O "Aplicar" só habilita com a área calculada, e ela espera a foto ser lida do arquivo. */
+async function applyCrop() {
+  const dialog = await screen.findByRole('dialog', { name: PHOTO_CROP_TEXTS.title });
+  const apply = within(dialog).getByRole('button', { name: PHOTO_CROP_TEXTS.apply });
+  await waitFor(() => expect(apply).toBeEnabled());
+  await userEvent.click(apply);
 }
 
 describe('Profile', () => {
@@ -238,16 +275,57 @@ describe('Profile', () => {
     expect(calls).toEqual(['patch', 'delete']);
   });
 
-  it('should offer swapping the photo once one is picked', async () => {
+  it('should ask to adjust the picked photo, and take the adjusted one', async () => {
     await renderProfile();
 
     await pickPhoto();
+    const dialog = await screen.findByRole('dialog', { name: PHOTO_CROP_TEXTS.title });
 
+    expect(within(dialog).getByText(PHOTO_CROP_TEXTS.hint)).toBeInTheDocument();
+    expect(within(dialog).getByRole('slider', { name: PHOTO_CROP_TEXTS.zoom })).toBeInTheDocument();
+
+    await applyCrop();
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     // A prévia é lida do arquivo em segundo plano, e só com ela o botão vira "Trocar".
     expect(
       await screen.findByRole('button', { name: PHOTO_FIELD_TEXTS.replace }),
     ).toBeInTheDocument();
     expect(saveButton()).toBeEnabled();
+  });
+
+  it('should zoom in on the photo from the keyboard', async () => {
+    await renderProfile();
+
+    await pickPhoto();
+    const zoom = await screen.findByRole('slider', { name: PHOTO_CROP_TEXTS.zoom });
+    act(() => zoom.focus());
+    await userEvent.keyboard('{ArrowRight}');
+
+    expect(zoom).toHaveAttribute('aria-valuenow', '1.1');
+  });
+
+  it('should leave the photo as it was when the adjustment is cancelled', async () => {
+    await renderProfile();
+
+    await pickPhoto();
+    const dialog = await screen.findByRole('dialog', { name: PHOTO_CROP_TEXTS.title });
+    await userEvent.click(within(dialog).getByRole('button', { name: PHOTO_CROP_TEXTS.cancel }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeInTheDocument();
+    expect(saveButton()).toBeDisabled();
+  });
+
+  it('should warn and keep the adjustment open when the photo cannot be cut', async () => {
+    mockCropPhoto.mockRejectedValueOnce(new Error('sem canvas'));
+    await renderProfile();
+
+    await pickPhoto();
+    await applyCrop();
+
+    expect(await screen.findByText(PHOTO_CROP_TEXTS.failed)).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: PHOTO_CROP_TEXTS.title })).toBeInTheDocument();
   });
 
   it('should refuse a photo in another format, in place of the hint', async () => {
@@ -257,12 +335,14 @@ describe('Profile', () => {
 
     expect(await screen.findByText(PHOTO_MESSAGES.formatInvalid)).toBeInTheDocument();
     expect(screen.queryByText(PHOTO_FIELD_TEXTS.hint)).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('should drop a picked photo without touching the stored one when there is none', async () => {
     await renderProfile();
 
     await pickPhoto();
+    await applyCrop();
     await userEvent.click(await screen.findByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
 
     expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeInTheDocument();
