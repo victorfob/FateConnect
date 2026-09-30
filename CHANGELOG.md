@@ -6,6 +6,63 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-30
+
+### Added
+
+- Adiciona o registro das ações de administração sobre uma conta: dar ou retirar o acesso de administração, banir e reverter o banimento gravam quem fez, sobre qual conta e quando; ação recusada ou que não muda nada não grava, e o registro fica mesmo se a conta for apagada (#491) [Backend]
+- Adiciona a tela do próprio perfil, onde se editam os dados pessoais, o bairro e os contatos e se salva tudo de uma vez, com o aviso de alterações não salvas e a opção de descartá-las; o nome salvo passa a aparecer no topo (#487) [Frontend]
+- Adiciona ao perfil a confirmação antes de sair com alterações não salvas, por qualquer caminho: links, voltar do navegador ou do celular e saída da conta; fechar ou recarregar a aba mostra o aviso do próprio navegador (#487) [Frontend]
+- Adiciona a foto de perfil, escolhida, trocada e removida na tela do perfil, com o enquadramento ajustado por arraste e zoom antes de ser usada, e que aparece no avatar do topo no lugar das iniciais (#487) [Frontend]
+- Adiciona a troca de senha pela tela do perfil, que pede a senha atual e mantém a sessão aberta (#487) [Frontend]
+- Adiciona a desativação da própria conta pela tela do perfil, com uma confirmação que diz o que acontece e como voltar (#487) [Frontend]
+- Adiciona à gestão a lista das contas, onde a aba de usuários só avisava que a função viria: cada uma com o nome, os contatos e a situação, com busca por nome, e-mail ou telefone e filtro por situação e perfil (#486) [Frontend]
+- Adiciona à gestão a edição de uma conta pelo administrador: nome, e-mail institucional, contatos e o acesso de administração, que ele não retira de si mesmo (#486) [Frontend]
+- Adiciona à gestão o banimento de uma conta, com confirmação, e a reversão dele; o administrador não bane a própria conta (#486) [Frontend]
+- Adiciona ao formulário de ofertar e editar carona a recorrência em dias úteis, semanal ou mensal, com data final de até 6 meses; o formulário continua abrindo na carona de uma vez só (#481) [Frontend]
+- Adiciona a edição do próprio perfil, das preferências e da senha, a desativação da conta e a gestão de usuários pelo administrador (#482) [Backend]
+- Adiciona a carona com recorrência em dias úteis, toda semana ou todo mês, até uma data final de no máximo 6 meses, pulando feriado e, na de dias úteis, o fim de semana; sem recorrência ela continua valendo uma vez só, e as já ofertadas ficam assim (#480) [Backend]
+- Adiciona a consulta dos feriados de um ano, com os nacionais, o estadual de São Paulo e o municipal de Sorocaba, que as caronas com recorrência vão pular; ano ausente ou fora do calendário aceito é recusado com 400 (#479) [Backend]
+- Adiciona a miniatura das fotos de achados e perdidos e de denúncias: toda foto enviada ganha uma versão pequena em WebP, servida com a mesma autorização da original, e apagar ou trocar a foto apaga as duas (#465) [Backend]
+- Adiciona ao login da landing a oferta de reativar a conta desativada: confirmando, a conta volta ao ar e a pessoa entra com o e-mail e a senha já digitados; desistindo, nada muda (#462) [Frontend]
+- Adiciona a reativação da conta desativada pela própria pessoa, que pede o e-mail e a senha de novo, devolve a conta ao ar e já responde o token de acesso, como o login; conta banida continua recusada (#460) [Backend]
+- Adiciona às descrições de denúncia, de item perdido e de carona a contagem do que já foi escrito sobre o limite, ao lado do erro quando há um; o leitor de tela anuncia a contagem por extenso quando a digitação para, sem interromper a cada tecla (#461) [Frontend]
+
+### Changed
+
+- Passa a declarar na política de privacidade o registro das ações de administração sobre uma conta, mantido mesmo após o encerramento dela (#491) [Frontend]
+- Passa a explicar os tipos de carona também no formulário de ofertar e editar, como o filtro já fazia: solidária é gratuita, e na igualitária os participantes dividem os custos (#489) [Frontend]
+- Passa a mostrar no cartão de carona a recorrência ao lado da data e da hora, que passam a ser as da próxima partida (#481) [Frontend]
+- Passa a citar a recorrência entre os dados da carona nos termos de uso e na política de privacidade (#481) [Frontend]
+- Passa a desabilitar no calendário da carona os feriados e, na recorrência em dias úteis, o fim de semana (#481) [Frontend]
+- Passa a recusar a carona que parta em feriado, inclusive a de uma vez só (#481) [Backend]
+- Passa a declarar na política de privacidade o bairro e a foto de perfil, que aparece junto do nome nos anúncios e é apagada quando removida, e o que quem administra a plataforma vê da conta para gerenciá-la (#482) [Frontend]
+- Passa a dizer nos termos que quem administra a plataforma pode corrigir o nome, o e-mail institucional e os contatos de uma conta e dar ou retirar dela o acesso de administração (#482) [Frontend]
+- Passa a manter a carona na listagem enquanto houver partida por vir, com a próxima partida como data, a ordem por ela e o filtro de período valendo para qualquer partida (#480) [Backend]
+- Passa a explicar, na lista vazia de achados e perdidos, o que aparece ali e como sair dela, ampliando a busca ou cadastrando um item, como caronas já faz (#472) [Frontend]
+- Passa a mostrar o desenho de desktop das telas a partir de 822px, em vez de 965px, que é onde a navegação do topo deixa de caber e decidia por todas as telas; o cabeçalho continua recolhendo a navegação no menu abaixo de 965px (#470) [Frontend]
+- Passa a declarar na política de privacidade que a foto do item e a imagem da denúncia são guardadas sem as informações que o aparelho grava no arquivo, como o local onde ele foi feito, em nova versão do documento (#466) [Frontend]
+- Passa a exibir a miniatura das fotos em achados e perdidos e nas duas telas de denúncia, em vez de baixar o arquivo inteiro da câmera; o botão de baixar a foto da denúncia busca a original no clique e avisa quando não consegue (#466) [Frontend]
+- Passa a guardar a foto enviada sem os metadados, inclusive a localização de onde foi tirada, e com a rotação do celular já aplicada; arquivo que não é imagem de verdade passa a ser recusado com 400, mesmo declarado como imagem (#465) [Backend]
+- Passa a deixar de fora das listagens de caronas e de achados e perdidos o que pertence a conta desativada ou banida; nada é apagado, e o registro volta a aparecer se a conta for reativada. As denúncias dessas contas continuam chegando a quem analisa (#463) [Backend]
+- Passa a avisar no login que a conta banida foi banida por infringir as regras da plataforma, sem oferecer ação, em vez do aviso genérico de erro (#462) [Frontend]
+- Passa a alinhar a frase dos diálogos de confirmação com o título, centralizada no desktop e à esquerda no celular; antes a da exclusão de carona e a de achados e perdidos centralizavam sempre, e a da gestão de denúncias ficava sempre à esquerda (#462) [Frontend]
+- Passa a recusar no login a conta banida, com 403 e com a senha certa ou errada, e a conta desativada, com 409 quando a senha confere, para quem chama poder oferecer a reativação; senha errada continua sendo 401 (#460) [Backend]
+- Passa a travar a digitação no limite dos nove campos de texto que têm um, em vez de recusar só ao enviar; a mensagem de máximo deixa de aparecer pela digitação, e a de mínimo continua (#461) [Frontend]
+- Passa a receber o telefone e o e-mail de contato direto no corpo do cadastro, um de cada por pessoa, em vez de uma lista: o formato antigo é recusado. Quem tinha mais de um contato fica com o mais antigo, que já era o exibido, e os demais se perdem (#456) [Backend]
+- Passa a enviar o telefone e o e-mail de contato direto no corpo do cadastro, no formato que a API passou a exigir: o front anterior deixa de conseguir criar conta. A tela e os campos não mudam (#457) [Frontend]
+
+### Removed
+
+- Remove a quantidade de vagas da carona: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A coluna é apagada, então as vagas das caronas já ofertadas se perdem (#478) [Backend]
+- Remove a quantidade de vagas do formulário de ofertar e editar carona e do cartão da lista; os termos e a política deixam de citar as vagas, e os termos passam a dizer que elas se combinam fora da plataforma, em nova versão dos dois documentos (#478) [Frontend]
+
+### Fixed
+
+- Corrige o seletor de data e hora, que não fechava ao escolher o minuto que já vinha marcado, como o 00 de uma hora redonda (#481) [Frontend]
+- Corrige na política de privacidade o que fica no navegador, que omitia o identificador da sessão de diagnóstico guardado pelo monitoramento de erros, e a forma como a senha é guardada, que ela dizia cifrada e é um hash sem volta; o documento ganha nova versão (#468) [Frontend]
+- Corrige nos termos a descrição do item de achados e perdidos, que aparecia como obrigatória: ela é opcional, como o cadastro do item sempre aceitou; o documento ganha nova versão (#468) [Frontend]
+
 ## [1.0.0] - 2026-09-21
 
 ### Added

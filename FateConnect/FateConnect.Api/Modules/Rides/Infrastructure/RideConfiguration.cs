@@ -10,9 +10,6 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
     {
         builder.HasKey(r => r.Id);
 
-        builder.Property(r => r.AvailableSeats)
-              .IsRequired();
-
         builder.Property(r => r.Destination)
               .HasMaxLength(100)
               .IsRequired();
@@ -42,5 +39,13 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
               .WithMany()
               .HasForeignKey(r => r.DriverId)
               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(r => r.Frequency)
+              .IsRequired();
+
+        builder.HasMany(r => r.Departures)
+              .WithOne()
+              .HasForeignKey(departure => departure.RideId)
+              .OnDelete(DeleteBehavior.Cascade);
     }
 }

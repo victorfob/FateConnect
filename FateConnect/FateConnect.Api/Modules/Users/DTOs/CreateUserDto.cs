@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.Validation;
-using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Modules.Users.DTOs;
@@ -21,7 +20,7 @@ public class CreateUserDto
     public string Password { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Informe o nome completo")]
-    [MaxLength(200)]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "O nome completo deve ter entre 3 e 200 caracteres.")]
     [DefaultValue("João da Silva")]
     public string FullName { get; set; } = string.Empty;
 
@@ -35,10 +34,16 @@ public class CreateUserDto
     [EnumDataType(typeof(EnumGender), ErrorMessage = "Gênero inválido")]
     required public EnumGender Gender { get; set; }
 
-    [Required]
-    [MinLength(1, ErrorMessage = "Informe ao menos um contato")]
-    required public List<CreateContactDto> Contacts { get; set; } =
-    [];
+    [Required(ErrorMessage = "Informe o telefone")]
+    [MaxLength(11)]
+    [DefaultValue("11999999999")]
+    public string Phone { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Informe o e-mail para contato")]
+    [EmailAddress(ErrorMessage = "E-mail inválido")]
+    [MaxLength(150)]
+    [DefaultValue("pedro.augusto@gmail.com")]
+    public string ContactEmail { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Informe o aceite dos documentos")]
     [MinLength(1, ErrorMessage = "Informe o aceite de ao menos um documento")]

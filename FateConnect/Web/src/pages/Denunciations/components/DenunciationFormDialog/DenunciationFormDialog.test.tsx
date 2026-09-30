@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw';
 
+import { PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
 import { server } from '@app/mocks/server';
 import { DENUNCIATION_CATEGORY_OPTIONS } from '@app/pages/Denunciations/helpers/denunciationCategory';
 import { DenunciationCategoryEnum } from '@app/services/denunciations/types';
@@ -10,7 +11,6 @@ import {
   DENUNCIATION_FORM,
   DENUNCIATION_FORM_LABELS,
   DENUNCIATION_FORM_MESSAGES,
-  PHOTO_FIELD_LABELS,
 } from './constants';
 import { DenunciationFormDialog, type DenunciationFormDialogProps } from '.';
 
@@ -33,8 +33,6 @@ const TYPED_DESCRIPTION = 'A pessoa dirigiu acima da velocidade no trajeto intei
 async function fieldsOf(request: Request): Promise<Record<string, FormDataEntryValue>> {
   return Object.fromEntries(await request.formData());
 }
-
-const PREVIEW_URL = 'blob:https://fateconnect.test/preview';
 
 const onClose = vi.fn();
 
@@ -59,12 +57,6 @@ async function fillTheForm() {
 }
 
 describe('DenunciationFormDialog', () => {
-  beforeEach(() => {
-    // jsdom não implementa a fábrica de URL de objeto, e é dela que sai a prévia.
-    URL.createObjectURL = vi.fn(() => PREVIEW_URL);
-    URL.revokeObjectURL = vi.fn();
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -77,6 +69,15 @@ describe('DenunciationFormDialog', () => {
     ).toBeInTheDocument();
     expect(descriptionField()).toHaveValue('');
     expect(confidentialToggle()).not.toBeChecked();
+  });
+
+  it('should hold the description to its limit and show how much of it is used', async () => {
+    renderComponent();
+
+    await userEvent.type(descriptionField(), TYPED_DESCRIPTION);
+
+    expect(descriptionField()).toHaveAttribute('maxlength', '500');
+    expect(screen.getByText('56/500', { ignore: '[role="status"]' })).toBeInTheDocument();
   });
 
   /**
@@ -160,13 +161,11 @@ describe('DenunciationFormDialog', () => {
     // Pelo `userEvent` o arquivo nem chega ao campo: o atributo `accept` o
     // descarta antes. Quem tem de barrá-lo é a validação, e é ela que este caso
     // exercita — o atributo é conveniência, não a regra.
-    fireEvent.change(screen.getByLabelText(PHOTO_FIELD_LABELS.field), {
+    fireEvent.change(screen.getByLabelText(DENUNCIATION_FORM_LABELS.photo), {
       target: { files: [new File(['conteúdo'], 'laudo.pdf', { type: 'application/pdf' })] },
     });
 
-    expect(
-      await screen.findByText(DENUNCIATION_FORM_MESSAGES.photoFormatInvalid),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(PHOTO_MESSAGES.formatInvalid)).toBeInTheDocument();
     expect(descriptionField()).toHaveValue(TYPED_DESCRIPTION);
   });
 

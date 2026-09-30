@@ -24,7 +24,7 @@ export const lightPalette: PaletteOptions = {
     light: colorVariants.secondaryLight,
     main: colorTokens.accent,
     dark: colorVariants.secondaryDark,
-    // Branco puro: o branco a 90% do produto ficava em 4.42:1, abaixo de AA.
+    // Branco puro: o branco a 90% do produto fica abaixo de AA.
     contrastText: colorTokens.surfaceWhite,
   },
   brandText: colorTokens.accent,
@@ -53,8 +53,8 @@ export const lightPalette: PaletteOptions = {
     hover: colorTokens.chromeHover,
   },
   /**
-   * Borda do campo de formulário. O padrão do MUI é mais claro que o do produto
-   * (23% contra 38%), o que deixaria todo formulário mais lavado que hoje.
+   * Borda do campo de formulário. O padrão do MUI é mais claro que o do produto,
+   * o que deixaria todo formulário mais lavado.
    */
   inputAutofill: colorTokens.inputAutofill,
   inputOutline: colorTokens.inputOutline,

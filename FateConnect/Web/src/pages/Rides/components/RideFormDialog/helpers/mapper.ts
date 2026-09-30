@@ -20,19 +20,24 @@ export function toFormValues(ride: Ride | undefined): RideFormInput {
     destination: ride.destination,
     departure: `${toDisplayDate(ride.departureDate)} ${time}`,
     rideType: ride.rideType,
-    seats: String(ride.availableSeats),
+    frequency: ride.frequency,
+    repeatUntil: toDisplayDate(ride.repeatUntil ?? ''),
     description: ride.description ?? '',
   };
 }
 
 /** A API guarda o dia e a hora em campos separados, e o schema entregou os dois juntos. */
 export function toRideInput(values: RideFormValues): RideInput {
-  return {
-    availableSeats: Number(values.seats),
+  const input: RideInput = {
     destination: values.destination,
     departureDate: toApiDate(values.departure),
     departureTime: format(values.departure, API_TIME_FORMAT),
     rideType: values.rideType,
+    frequency: values.frequency,
     description: values.description,
   };
+
+  if (!values.repeatUntil) return input;
+
+  return { ...input, repeatUntil: toApiDate(values.repeatUntil) };
 }

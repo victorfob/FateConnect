@@ -65,6 +65,7 @@ export const components: Components<Theme> = {
         const { color, variant } = ownerState;
 
         if (variant === 'soft') return { color: theme.palette.text.primary };
+        if (variant === 'destructive') return { color: theme.palette.brandText };
         // `color="inherit"` recebe a cor de quem envolve o botão, que este slot não lê.
         if (!color || color === 'inherit') return {};
         if (variant === 'contained') return { color: theme.palette[color].contrastText };
@@ -79,6 +80,16 @@ export const components: Components<Theme> = {
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: radius(radiusScale.component),
           color: theme.palette.text.primary,
+          padding: spacing(xs, md),
+        }),
+      },
+      {
+        // O vermelho da marca como texto: `secondary.main` é fundo de botão e como texto reprova.
+        props: { variant: 'destructive' },
+        style: ({ theme }) => ({
+          border: `1px solid ${theme.palette.brandText}`,
+          borderRadius: radius(radiusScale.component),
+          color: theme.palette.brandText,
           padding: spacing(xs, md),
         }),
       },
@@ -126,15 +137,14 @@ export const components: Components<Theme> = {
       root: {
         ...typographyTokens.formHelper,
         // O MUI afasta a mensagem em 3px e a alinha a 14px; o produto encosta
-        // no campo e alinha a 16px. Os 3px somavam altura em cada campo com erro.
+        // no campo e alinha a 16px. Os 3px somariam altura em cada campo com erro.
         margin: spacing(none, md),
       },
     },
   },
   /**
-   * Interruptor no desenho do iOS: trilho sólido do tamanho do polegar, sem o
-   * véu translúcido do Material — era ele que deixava o estado desligado em
-   * 2,68:1, abaixo do mínimo de 3:1 para não-texto.
+   * Interruptor no desenho do iOS: trilho sólido do tamanho do polegar, sem o véu
+   * translúcido do Material, que deixa o desligado abaixo do mínimo de 3:1.
    */
   MuiSwitch: {
     defaultProps: { disableRipple: true },
@@ -175,14 +185,9 @@ export const components: Components<Theme> = {
       label: { paddingLeft: spacing(xxs) },
     },
   },
-  // A opção do painel do `select` no produto tem 48px de altura e recuo só na
-  // horizontal; o padrão do MUI é mais baixo, o que encurtava todo dropdown do
-  // app — com 27 opções no estado, a diferença compõe.
-  //
-  // O valor precisa ser repetido dentro do breakpoint: o MUI declara os mesmos
-  // 48px e **desfaz** num `@media (min-width:600px)` com `minHeight: 'auto'`.
-  // Sobrescrever só a base deixa a linha encolher no desktop — e, sem o recuo
-  // vertical dele, ela colapsa na altura do texto.
+  // A opção do painel do `select` tem 48px de altura e recuo só na horizontal,
+  // como no produto. O MUI declara os mesmos 48px e **desfaz** num
+  // `@media (min-width:600px)`, então o valor se repete dentro do breakpoint.
   MuiMenuItem: {
     styleOverrides: {
       root: ({ theme }) => ({
@@ -197,9 +202,8 @@ export const components: Components<Theme> = {
       }),
     },
   },
-  // O `Paper` do MUI clareia a superfície por elevação no tema escuro: no
-  // diálogo isso levava `#1E1E1E` a `#434343`, e o contraste medido no token
-  // deixava de valer para o que a tela desenhava.
+  // O `Paper` do MUI clareia a superfície por elevação no tema escuro, e o
+  // contraste medido no token deixaria de valer para o que a tela desenha.
   MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
   MuiDialog: { styleOverrides: { paper: { borderRadius: radius(radiusScale.lg) } } },
   // O esqueleto pisca por gradiente, não pela opacidade do `pulse` padrão: a 40%

@@ -1,48 +1,36 @@
 ---
-description: Formulários no front React — react-hook-form, zod, campos do MUI, máscara e estados
+description: Formulários no front — campo e prop de erro, valor lido pelo consumidor, anúncio ao leitor de tela, seletor de data e hora, máscara e envio
 paths:
-  - "FateConnect/Web/**"
+  - "FateConnect/Web/src/pages/**/*Form*/**"
+  - "FateConnect/Web/src/pages/Signup/**"
+  - "FateConnect/Web/src/pages/Home/components/LandingLoginCard/**"
+  - "FateConnect/Web/design-system/components/Input/**"
+  - "FateConnect/Web/design-system/components/FormGrid/**"
+  - "FateConnect/Web/design-system/components/Dialog/DialogForm/**"
+  - "FateConnect/Web/src/hooks/useMaskedField.ts"
+  - "FateConnect/Web/src/utils/masks/**"
+  - "FateConnect/Web/src/**/schema/**"
 ---
 
 # Formulários
 
-Padrão estabelecido no cartão de login e válido para as telas de formulário (#54 em diante).
-
-## Composição
-
-- **`react-hook-form` + `zod`** via `@hookform/resolvers/zod`. O schema fica em `schema.ts`, ao lado do componente, junto das mensagens.
-- Mensagens de validação são **copy de produto**: em pt-BR, iguais às do front atual, exportadas do schema para o teste não duplicar texto.
-- `defaultValues` sempre declarado — evita campo alternando entre não-controlado e controlado.
-
 ## Campos
 
-- `TextField` do barrel, com `error={Boolean(errors.campo)}` e `helperText={errors.campo?.message}`.
-- Campo obrigatório recebe `required`, que rende o marcador `*` no rótulo — **isso muda o nome acessível** (`"E-mail *"`), então a consulta no teste usa expressão regular, não texto exato.
-- `autoComplete` coerente com o campo; em senha, alternar entre `current-password` e `off` conforme a visibilidade.
-- Ação dentro do campo vai em `InputAdornment` com `IconButton`, `aria-label` descrevendo a **ação** e `aria-pressed` comunicando o estado.
+- Schema em `schema/index.ts` na pasta do formulário; mensagens de validação são copy e saem de constante que o teste também importa.
+- ⛔ O mesmo campo em duas telas leva a mesma ajuda: o texto mora ao lado das opções do campo (`RIDE_TYPE_HELP` junto de `RIDE_TYPE_OPTIONS`, em `pages/Rides/helpers/rideType.ts`). Ao dar ajuda a um campo, procure pelas opções dele as outras telas que o montam.
+- Campo é o `Input` do barrel com `error={errors.campo?.message}`. `required` põe `*` no nome acessível (`"E-mail *"`): no teste, a consulta usa regex.
+- Ação dentro do campo é `IconButton` com `aria-label` da ação e `aria-pressed` do estado; o ícone mostra o estado atual (olho aberto com o texto visível). Senha alterna `autoComplete` entre `current-password` e `off`.
+- ⛔ Campo que ganha a primeira regra de validação ganha a prop de erro junto: sem ela o schema recusa e a tela fica muda. O teste de schema não vê isso; o caso é de componente.
+- ⛔ Quem lê o valor de campo registrado é o consumidor, por `useWatch`, e passa ao `Input` (`characterCount={description.length}`). O `Input` não relê o elemento: o `reset()` escreve sem evento, e a releitura pediria um efeito sem dependências que o lint reprova.
+- ⛔ `role="status"` é irmão do campo, nunca dentro da linha de apoio: ela é o `aria-describedby`, e o anúncio seria ouvido de novo a cada foco.
 
-⛔ **Campo que ganha a primeira regra de validação precisa ganhar a prop de erro junto.** Enquanto ele não tem regra, ninguém sente falta da ligação — e no dia em que a regra entra, o schema recusa e a **tela fica muda**: o envio trava e nada explica por quê.
+## Seletor de data e hora
 
-Aconteceu na #309, no `Complemento` do endereço. Ele era o único campo opcional e sem limite, então nasceu sem `error={errors.complement?.message}`. O limite de comprimento entrou e o formulário passou a recusar em silêncio. ⚠️ **O teste de schema não vê isso** — o schema estava certo; quem não exibia era o campo. Quem pegou foi a medição na aplicação, e o caso que protege agora é de componente, não de schema.
+- ⛔ O seletor do MUI só chama `onChange` quando o valor muda: clicar no valor já marcado não dispara nada. Comportamento que dependa desse clique escuta o clique no painel e reconhece a coluna pelo rótulo de `usePickerTranslations`, não pela posição.
+- O `onAccept` do seletor estático não é saída: só dispara com `closeOnSelect` (que ele não aceita) ou pela barra de ações (que o campo esconde).
 
-## Ícone reflete estado
+## Máscara e envio
 
-O ícone mostra a situação atual, não o destino do clique: olho aberto quando o texto está visível. O rótulo acessível continua descrevendo a ação.
-
-## Envio
-
-- `useMutation` para o envio; `isPending` alimenta a prop **`loading` do `Button`**, que já desabilita e desenha o indicador. Sem rótulo alternativo ("Enviando...") e sem `disabled` manual — o rótulo do botão não muda.
-- Erro tratado por status: o cliente HTTP normaliza a falha em `{ status, message }`, então o componente decide a mensagem a partir do `status`.
-- Sucesso e falha comunicam por notificação (`useNotification`), nunca por `console`.
-
-## Máscara
-
-- Função pura + hook, **sem biblioteca de máscara**.
-- Máscara de data precisa **preservar a posição do cursor** ao editar no meio do campo e ao colar. É requisito herdado do produto, não detalhe.
-- Máscara alternativa por comprimento (telefone fixo e celular) é resolvida na função pura.
-
-## Testes
-
-Cobrir, no mínimo: mensagens de campo obrigatório, formato inválido, alternância de visibilidade (inclusive o ícone), sucesso, cada ramo de erro por status, e o estado de carregamento.
-
-O caso de carregamento **segura a resposta numa promessa que o próprio teste resolve** — nunca `setTimeout`. Espera por tempo passa localmente e falha sob cobertura, quando a requisição termina antes da verificação. Com o botão em `loading`, o nome acessível continua o mesmo: asserir `toBeDisabled()` e o `progressbar` dentro dele. Schema tem teste próprio — ver `.claude/rules/web-testing-zod.md`.
+- Máscara de data preserva a posição do cursor ao editar no meio e ao colar; máscara alternativa por comprimento (fixo e celular) se resolve na função pura.
+- `isPending` vai na prop `loading` do `Button`, que já desabilita e desenha o indicador: sem rótulo alternativo e sem `disabled` manual. A mensagem de erro se decide pelo `status` que o cliente HTTP normaliza.
+- Teste de formulário cobre obrigatório, formato inválido, alternância de visibilidade (com o ícone), sucesso, cada ramo de erro por status e o carregamento. O carregamento segura a resposta numa promessa que o teste resolve, nunca `setTimeout`, e afirma `toBeDisabled()` e o `progressbar` dentro do botão.

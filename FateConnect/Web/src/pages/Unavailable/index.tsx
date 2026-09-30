@@ -1,6 +1,7 @@
 import { Link as RouterLink } from 'react-router';
 import { Button, PageMessage } from '@design-system';
 
+import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { RoutePathEnum } from '@app/routes/paths';
 
 import * as C from './constants';
@@ -12,7 +13,7 @@ export function Unavailable({ description }: UnavailableProps) {
   return (
     <PageMessage title={C.UNAVAILABLE_TITLE} description={description}>
       <Button component={RouterLink} to={RoutePathEnum.MENU} variant="contained" color="secondary">
-        {C.BACK_TO_MENU_LABEL}
+        {BACK_TO_MENU_LABEL}
       </Button>
     </PageMessage>
   );

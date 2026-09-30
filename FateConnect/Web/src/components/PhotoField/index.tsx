@@ -1,24 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef, type ChangeEvent } from 'react';
+import { useCallback, useMemo, useRef, type ChangeEvent } from 'react';
 import { HiddenField, Typography } from '@design-system';
-import { DeleteIcon, ImageIcon } from '@design-system/icons';
 
+import { useFilePreviewUrl } from '@app/hooks/useFilePreviewUrl';
+
+import { PhotoActionButtons } from './components/PhotoActionButtons';
+import { PHOTO_ACCEPT_ATTRIBUTE, PHOTO_FIELD_TEXTS } from './constants';
 import * as S from './styles';
-
-export type PhotoFieldLabels = Readonly<{
-  field: string;
-  hint: string;
-  pick: string;
-  replace: string;
-  remove: string;
-  previewAlt: string;
-}>;
 
 export type PhotoFieldPreview = Readonly<{ src: string; alt: string }>;
 
 export type PhotoFieldProps = Readonly<{
-  labels: PhotoFieldLabels;
-  /** Filtra o seletor do sistema; quem valida o formato é o schema de quem usa. */
-  accept: string;
+  label: string;
   value: File | null;
   onChange: (photo: File | null) => void;
   /** O que o registro já guarda; a escolha de agora o cobre. */
@@ -28,8 +20,7 @@ export type PhotoFieldProps = Readonly<{
 }>;
 
 export function PhotoField({
-  labels,
-  accept,
+  label,
   value,
   onChange,
   storedPreview = null,
@@ -38,24 +29,14 @@ export function PhotoField({
 }: PhotoFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const chosenPhotoUrl = useMemo(() => {
-    if (!value) return null;
-
-    return URL.createObjectURL(value);
-  }, [value]);
-
-  useEffect(() => {
-    if (!chosenPhotoUrl) return;
-
-    return () => URL.revokeObjectURL(chosenPhotoUrl);
-  }, [chosenPhotoUrl]);
+  const chosenPhotoUrl = useFilePreviewUrl(value);
 
   // A escolha de agora cobre a foto guardada; desfeita, a guardada volta a aparecer.
   const preview = useMemo(() => {
-    if (chosenPhotoUrl) return { src: chosenPhotoUrl, alt: labels.previewAlt };
+    if (chosenPhotoUrl) return { src: chosenPhotoUrl, alt: PHOTO_FIELD_TEXTS.previewAlt };
 
     return storedPreview;
-  }, [chosenPhotoUrl, labels.previewAlt, storedPreview]);
+  }, [chosenPhotoUrl, storedPreview]);
 
   const handlePick = useCallback(() => fileInputRef.current?.click(), []);
 
@@ -72,35 +53,27 @@ export function PhotoField({
   const handleRemove = useCallback(() => onChange(null), [onChange]);
 
   const pickLabel = useMemo(() => {
-    if (preview) return labels.replace;
+    if (preview) return PHOTO_FIELD_TEXTS.replace;
 
-    return labels.pick;
-  }, [preview, labels.pick, labels.replace]);
+    return PHOTO_FIELD_TEXTS.pick;
+  }, [preview]);
 
   return (
     <S.PhotoField>
-      <Typography variant="caption">{labels.field}</Typography>
+      <Typography variant="caption">{label}</Typography>
 
       <S.PhotoRow>
         {preview && <S.PhotoPreview component="img" src={preview.src} alt={preview.alt} />}
 
         <S.PhotoActions>
-          <S.PhotoActionButton variant="outlined" onClick={handlePick} disabled={disabled}>
-            <ImageIcon fontSize="small" />
-            <Typography variant="caption" color="inherit">
-              {pickLabel}
-            </Typography>
-          </S.PhotoActionButton>
-
           {/* Só a escolha de agora se desfaz: o que já está guardado se troca, não se apaga. */}
-          {value && (
-            <S.PhotoRemoveButton variant="outlined" onClick={handleRemove} disabled={disabled}>
-              <DeleteIcon fontSize="small" />
-              <Typography variant="caption" color="inherit">
-                {labels.remove}
-              </Typography>
-            </S.PhotoRemoveButton>
-          )}
+          <PhotoActionButtons
+            pickLabel={pickLabel}
+            onPick={handlePick}
+            canRemove={Boolean(value)}
+            onRemove={handleRemove}
+            disabled={disabled}
+          />
         </S.PhotoActions>
 
         {error && (
@@ -114,7 +87,7 @@ export function PhotoField({
         {!error && (
           <S.PhotoHint>
             <Typography variant="caption" color="inherit">
-              {labels.hint}
+              {PHOTO_FIELD_TEXTS.hint}
             </Typography>
           </S.PhotoHint>
         )}
@@ -124,8 +97,8 @@ export function PhotoField({
         component="input"
         ref={fileInputRef}
         type="file"
-        accept={accept}
-        aria-label={labels.field}
+        accept={PHOTO_ACCEPT_ATTRIBUTE}
+        aria-label={label}
         disabled={disabled}
         onChange={handleFileChange}
       />

@@ -1,4 +1,4 @@
-import { createRef, useState } from 'react';
+import { createRef, useState, type ChangeEvent } from 'react';
 
 import {
   act,
@@ -16,7 +16,9 @@ import {
   CLEAR_LABEL,
   INVERTED_RANGE_MESSAGE,
 } from './components/DateRangeField/constants';
+import { PASSWORD_TOGGLE_LABEL } from './components/PasswordField/constants';
 import {
+  characterCountAnnouncement,
   DATE_PICKER_LABEL,
   DATE_TIME_PICKER_LABEL,
   HELP_TRIGGER_LABEL_PREFIX,
@@ -46,6 +48,24 @@ describe('Input', () => {
 
     expect(screen.getByText('Informe o destino')).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Destino/ })).toBeInvalid();
+  });
+
+  it('should describe the field by the hint, without marking it invalid', () => {
+    renderComponent({ ...DEFAULT_PROPS, hint: 'O destino não pode ser alterado.' });
+
+    const field = screen.getByRole('textbox', { name: /Destino/ });
+
+    expect(field).toHaveAccessibleDescription('O destino não pode ser alterado.');
+    expect(field).toBeValid();
+  });
+
+  it('should put the error in place of the hint while there is one', () => {
+    renderComponent({ ...DEFAULT_PROPS, hint: 'Cidade de destino', error: 'Informe o destino' });
+
+    expect(screen.getByRole('textbox', { name: /Destino/ })).toHaveAccessibleDescription(
+      'Informe o destino',
+    );
+    expect(screen.queryByText('Cidade de destino')).not.toBeInTheDocument();
   });
 
   it('should hand the input element to the consumer ref, so it can be focused', () => {
@@ -107,6 +127,104 @@ describe('Input', () => {
     await userEvent.type(field, '01/01/2000999');
 
     expect(field).toHaveValue('01/01/2000');
+  });
+});
+
+const DESCRIPTION_LABEL = 'Descrição';
+const DESCRIPTION_LIMIT = 10;
+const DESCRIPTION_ERROR = 'Informe a descrição';
+const TYPING_PAUSE_MS = 1000;
+const VISIBLE_COUNT_ONLY = '[role="status"]';
+
+function CountedHarness({ error }: Readonly<{ error?: string }>) {
+  const [description, setDescription] = useState('');
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => setDescription(event.target.value);
+
+  return (
+    <Input
+      label={DESCRIPTION_LABEL}
+      multiline
+      value={description}
+      onChange={handleChange}
+      maxLength={DESCRIPTION_LIMIT}
+      characterCount={description.length}
+      error={error}
+    />
+  );
+}
+
+const descriptionField = () => screen.getByRole('textbox', { name: DESCRIPTION_LABEL });
+
+describe('Input character counter', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should follow what is typed, over the limit the field declares', async () => {
+    render(<CountedHarness />);
+    expect(screen.getByText('0/10', { ignore: VISIBLE_COUNT_ONLY })).toBeInTheDocument();
+
+    await userEvent.type(descriptionField(), 'carro');
+
+    expect(screen.getByText('5/10', { ignore: VISIBLE_COUNT_ONLY })).toBeInTheDocument();
+  });
+
+  it('should stop taking text once the field reaches the limit', async () => {
+    render(<CountedHarness />);
+
+    await userEvent.type(descriptionField(), 'a'.repeat(DESCRIPTION_LIMIT + 2));
+
+    expect(descriptionField()).toHaveValue('a'.repeat(DESCRIPTION_LIMIT));
+    expect(screen.getByText('10/10', { ignore: VISIBLE_COUNT_ONLY })).toBeInTheDocument();
+  });
+
+  it('should keep the error and the counter on the same line, the error first', () => {
+    render(<CountedHarness error={DESCRIPTION_ERROR} />);
+
+    const line = screen.getByText(DESCRIPTION_ERROR).parentElement as HTMLElement;
+
+    expect(line.firstElementChild).toHaveTextContent(DESCRIPTION_ERROR);
+    expect(within(line).getByText('0/10', { ignore: VISIBLE_COUNT_ONLY })).toBeInTheDocument();
+    expect(descriptionField()).toBeInvalid();
+  });
+
+  // `fireEvent` porque o `userEvent` espera por timers que o relógio falso segura.
+  it('should announce the count once the typing pauses, not at every key', () => {
+    vi.useFakeTimers();
+    render(<CountedHarness />);
+
+    fireEvent.change(descriptionField(), { target: { value: 'car' } });
+    act(() => vi.advanceTimersByTime(TYPING_PAUSE_MS - 1));
+    fireEvent.change(descriptionField(), { target: { value: 'carro' } });
+    act(() => vi.advanceTimersByTime(TYPING_PAUSE_MS - 1));
+    expect(screen.getByRole('status')).toHaveTextContent(
+      characterCountAnnouncement(0, DESCRIPTION_LIMIT),
+    );
+
+    act(() => vi.advanceTimersByTime(1));
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      characterCountAnnouncement(5, DESCRIPTION_LIMIT),
+    );
+  });
+
+  it('should describe the field by the error alone, keeping the count out of what focus reads', () => {
+    render(<CountedHarness error={DESCRIPTION_ERROR} />);
+
+    expect(descriptionField()).toHaveAccessibleDescription(DESCRIPTION_ERROR);
+  });
+
+  it('should leave the field without description while there is no error', () => {
+    render(<CountedHarness />);
+
+    expect(descriptionField()).toHaveAccessibleDescription('');
+  });
+
+  it('should keep the plain field without a counter', () => {
+    renderComponent({ ...DEFAULT_PROPS, maxLength: DESCRIPTION_LIMIT });
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });
 
@@ -218,6 +336,24 @@ describe('Input.Date', () => {
   it('should not offer a day after the max date', async () => {
     const pickedDay = new Date(2026, 7, 10);
     render(<Input.Date label="Data" value="10/08/2026" maxDate={pickedDay} onChange={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '10' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '11' })).toBeDisabled();
+  });
+
+  it('should not offer a day the consumer rules out', async () => {
+    const isTheEleventh = (day: Date) => day.getDate() === 11;
+    render(
+      <Input.Date
+        label="Data"
+        value="10/08/2026"
+        shouldDisableDate={isTheEleventh}
+        onChange={vi.fn()}
+      />,
+    );
 
     await userEvent.click(screen.getByRole('button', { name: DATE_PICKER_LABEL }));
 
@@ -536,6 +672,26 @@ describe('Input.DateTime', () => {
     expect(field).toHaveValue('22/05/2026 18:45');
   });
 
+  // O seletor não avisa nada quando o minuto escolhido é o que já estava lá: é a
+  // hora redonda de quem pega o dia e confirma o 00 que veio marcado.
+  it('should close on the minute already picked, but not on the hour', async () => {
+    render(<DateTimeHarness />);
+    const field = screen.getByRole('textbox', { name: /Data e hora/ });
+    await userEvent.type(field, '220520261830');
+    await openDateTimePicker();
+    await userEvent.click(
+      within(await screen.findByRole('grid')).getByRole('gridcell', { name: '23' }),
+    );
+    const [hours, minutes] = await screen.findAllByRole('listbox');
+
+    await userEvent.click(within(hours as HTMLElement).getByText('18'));
+    expect(screen.getAllByRole('listbox')).toHaveLength(2);
+
+    await userEvent.click(within(minutes as HTMLElement).getByText('30'));
+    await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+    expect(field).toHaveValue('23/05/2026 18:30');
+  });
+
   it('should leave the year out of the panel top, since the calendar already shows it', async () => {
     render(<Input.DateTime label="Data e hora" value={DEPARTURE} onChange={vi.fn()} />);
 
@@ -580,6 +736,24 @@ describe('Input.DateTime', () => {
     expect(calendar.getByRole('gridcell', { name: '21' })).toBeDisabled();
   });
 
+  it('should not offer a day the consumer rules out', async () => {
+    const isTheTwentyFirst = (day: Date) => day.getDate() === 21;
+    render(
+      <Input.DateTime
+        label="Data e hora"
+        value={DEPARTURE}
+        shouldDisableDate={isTheTwentyFirst}
+        onChange={vi.fn()}
+      />,
+    );
+
+    await openDateTimePicker();
+
+    const calendar = within(await screen.findByRole('grid'));
+    expect(calendar.getByRole('gridcell', { name: '22' })).toBeEnabled();
+    expect(calendar.getByRole('gridcell', { name: '21' })).toBeDisabled();
+  });
+
   it('should mask what is typed and stop at the minute', async () => {
     render(<DateTimeHarness />);
 
@@ -604,7 +778,7 @@ describe('Input.DateTime', () => {
 /**
  * A cor primária do tema claro **é** a cor de texto, então lá as duas coincidem
  * e nada distingue a sobrescrita da ausência dela. O defeito mora só no escuro,
- * onde a primária é a superfície do cromo e como texto fica em 4,11:1.
+ * onde a primária é a superfície do cromo e, como texto, reprova no contraste.
  */
 describe('Input.DateTime in the dark theme', () => {
   beforeEach(() => {
@@ -665,5 +839,40 @@ describe('Input.DateTime in the dark theme', () => {
     );
 
     expect(rangeField()).toHaveAccessibleDescription(CONSUMER_ERROR);
+  });
+});
+
+describe('Input.Password', () => {
+  it('should hide the password and offer the stored one while hidden', () => {
+    render(<Input.Password label="Senha" purpose="current" />);
+
+    const field = screen.getByLabelText('Senha');
+    expect(field).toHaveAttribute('type', 'password');
+    expect(field).toHaveAttribute('autocomplete', 'current-password');
+    expect(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
+  it('should ask the browser for a new password when that is the purpose', () => {
+    render(<Input.Password label="Nova senha" purpose="new" />);
+
+    expect(screen.getByLabelText('Nova senha')).toHaveAttribute('autocomplete', 'new-password');
+  });
+
+  it('should show the password, keep the browser out of it and reflect the state in the icon', async () => {
+    render(<Input.Password label="Senha" purpose="current" />);
+
+    await userEvent.click(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL }));
+
+    const field = screen.getByLabelText('Senha');
+    expect(field).toHaveAttribute('type', 'text');
+    expect(field).toHaveAttribute('autocomplete', 'off');
+    expect(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByTestId('VisibilityIcon')).toBeInTheDocument();
   });
 });

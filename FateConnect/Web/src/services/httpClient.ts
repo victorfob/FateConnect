@@ -9,7 +9,7 @@ import { tokenStorage } from './auth/tokenStorage';
  */
 export class ApiError extends Error {
   readonly status?: number;
-  /** Campo que a API aponta como causa — hoje só o conflito de cadastro manda. */
+  /** Campo que a API aponta como causa do erro. */
   readonly field?: string;
 
   constructor(message: string, status?: number, field?: string) {

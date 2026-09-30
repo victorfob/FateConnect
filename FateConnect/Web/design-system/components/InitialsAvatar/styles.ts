@@ -15,6 +15,7 @@ import type { InitialsAvatarSize } from './types';
 const DIAMETER_PX: Record<InitialsAvatarSize, number> = {
   small: spacingScale.xl,
   large: spacingScale.xxl,
+  portrait: 96,
 };
 
 /**
@@ -25,9 +26,11 @@ const DIAMETER_PX: Record<InitialsAvatarSize, number> = {
 export const InitialsCircle = styled(Avatar, {
   shouldForwardProp: (prop) => prop !== 'size',
 })<{ size: InitialsAvatarSize }>(({ theme, size }) => {
+  const { fontSize, fontWeight, lineHeight } = theme.typography.h2;
   const bodyBySize = {
     small: theme.typography.captionBold,
     large: theme.typography.subtitleBold,
+    portrait: { fontSize, fontWeight, lineHeight },
   };
 
   return {

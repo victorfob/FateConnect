@@ -6,8 +6,8 @@ const ADDRESS = 'Av. Eng. Carlos Reinaldo Mendes, 2015';
 
 /**
  * Quem identifica o campus é o trecho `data=`; sem ele o Maps cai nas
- * coordenadas e perde a ficha do lugar, medido em 11/09/2026. Os parâmetros
- * `entry` e `g_ep` da URL original saíram: são rastreio e carimbo de build.
+ * coordenadas e perde a ficha do lugar. `entry` e `g_ep` ficam de fora: são
+ * rastreio e carimbo de build.
  */
 const MAP_URL =
   'https://www.google.com/maps/place/Fatec+Sorocaba+-+Faculdade+de+Tecnologia+de+Sorocaba/@-23.4806626,-47.4265607,17z/data=!4m15!1m8!3m7!1s0x94cf6073acd0d3ef:0x71b427bcbe698ab5!2sAv.+Eng.+Carlos+Reinaldo+Mendes,+2015+-+Al%C3%A9m+Ponte,+Sorocaba+-+SP,+18013-280!3b1!8m2!3d-23.4806626!4d-47.4265607!16s%2Fg%2F11c16_8s_h!3m5!1s0x94cf606d86294f07:0xd78b8fde607352a4!8m2!3d-23.4805389!4d-47.4259652!16s%2Fg%2F120k19gp';

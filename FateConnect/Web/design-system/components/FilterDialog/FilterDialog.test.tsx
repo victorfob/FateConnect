@@ -1,16 +1,17 @@
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
-import { FILTER_TITLE_PLURAL, FILTER_TITLE_SINGULAR } from './constants';
+import {
+  FILTER_CLEAR_LABEL,
+  FILTER_SUBMIT_LABEL,
+  FILTER_TITLE_PLURAL,
+  FILTER_TITLE_SINGULAR,
+} from './constants';
 import { FilterDialog, type FilterDialogProps } from '.';
 
-const SUBMIT_LABEL = 'Filtrar';
-const CLEAR_LABEL = 'Limpar';
 const FIELD_LABEL = 'Nome';
 const SECOND_FIELD_LABEL = 'Local';
 
 const DEFAULT_PROPS: FilterDialogProps = {
-  submitLabel: SUBMIT_LABEL,
-  clearLabel: CLEAR_LABEL,
   onSubmit: vi.fn(),
   onClear: vi.fn(),
   /**
@@ -84,7 +85,7 @@ describe('FilterDialog', () => {
     renderComponent({ ...DEFAULT_PROPS, onSubmit });
 
     const dialog = await openDialog();
-    await userEvent.click(dialog.getByRole('button', { name: SUBMIT_LABEL }));
+    await userEvent.click(dialog.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
     expect(onSubmit).toHaveBeenCalledOnce();
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
@@ -104,11 +105,9 @@ describe('FilterDialog', () => {
   });
 
   /**
-   * O jsdom é o único ambiente que exercita isto: o painel do navegador não faz
-   * submissão implícita, medido com formulário mínimo de controle. Fechar por
-   * Enter faz o diálogo do MUI atualizar e suspender fora do `act` do teste, e o
-   * guardião de console reprovaria o caso — então o silêncio é por medida, e
-   * conferido: erro de qualquer outra natureza continua derrubando o teste.
+   * Só o jsdom exercita isto: o navegador não faz submissão implícita neste painel.
+   * Fechar por Enter faz o diálogo do MUI atualizar fora do `act`, e o guardião de
+   * console reprovaria o caso; erro de qualquer outra natureza continua derrubando.
    */
   it('should apply when Enter is pressed inside a field', async () => {
     const onSubmit = vi.fn();
@@ -132,8 +131,10 @@ describe('FilterDialog', () => {
 
     const withoutFilter = await openDialog();
 
-    expect(withoutFilter.queryByRole('button', { name: CLEAR_LABEL })).not.toBeInTheDocument();
-    expect(withoutFilter.getByRole('button', { name: SUBMIT_LABEL })).toBeInTheDocument();
+    expect(
+      withoutFilter.queryByRole('button', { name: FILTER_CLEAR_LABEL }),
+    ).not.toBeInTheDocument();
+    expect(withoutFilter.getByRole('button', { name: FILTER_SUBMIT_LABEL })).toBeInTheDocument();
   });
 
   it('should clear and close when the standing filter is dropped', async () => {
@@ -141,7 +142,7 @@ describe('FilterDialog', () => {
     renderComponent({ ...DEFAULT_PROPS, active: true, onClear });
 
     const dialog = await openDialog();
-    await userEvent.click(dialog.getByRole('button', { name: CLEAR_LABEL }));
+    await userEvent.click(dialog.getByRole('button', { name: FILTER_CLEAR_LABEL }));
 
     expect(onClear).toHaveBeenCalledOnce();
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());

@@ -2,9 +2,6 @@ import type { SelectOption } from '@design-system';
 
 import { DENUNCIATION_STATUS_OPTIONS } from '@app/services/denunciations/denunciationStatus';
 
-export const FILTER_SUBMIT_LABEL = 'Filtrar';
-export const FILTER_CLEAR_LABEL = 'Limpar';
-
 export const FILTER_LABELS = { status: 'Situação' };
 
 /** `ALL` é sentinela do formulário: não vai para a requisição. */

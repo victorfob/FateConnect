@@ -5,7 +5,7 @@ import { CONTACT_LABEL } from './constants';
 import { ContactButton } from '.';
 
 /**
- * Nome de cinco palavras e e-mail longo: é o caso que quebrava a linha. O
+ * Nome de cinco palavras e e-mail longo: é o caso que quebra a linha. O
  * telefone vem cru, como a API o devolve.
  */
 const CONTACT: UserContact = {

@@ -2,7 +2,7 @@ import { useCallback, useState, type ChangeEvent } from 'react';
 import { FilterDialog, Input } from '@design-system';
 
 import { isRideShift } from '@app/pages/Rides/helpers/rideShift';
-import { isRideType } from '@app/pages/Rides/helpers/rideType';
+import { isRideType, RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
 import type { RideFilter as RideFilterValues } from '@app/services/rides/types';
 import { toApiDateRange, toDisplayDateRange } from '@app/utils/apiDate';
 
@@ -87,13 +87,7 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
   }, [period, departureShift, searchTerm, rideType, owner, onApply]);
 
   return (
-    <FilterDialog
-      submitLabel={C.FILTER_SUBMIT_LABEL}
-      clearLabel={C.FILTER_CLEAR_LABEL}
-      active={isFiltered}
-      onSubmit={handleSubmit}
-      onClear={handleClear}
-    >
+    <FilterDialog active={isFiltered} onSubmit={handleSubmit} onClear={handleClear}>
       <FilterDialog.Field>
         <Input.DateRange label={C.FILTER_LABELS.period} value={period} onChange={setPeriod} />
       </FilterDialog.Field>
@@ -120,7 +114,7 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
       <FilterDialog.Field>
         <Input.Select
           label={C.FILTER_LABELS.rideType}
-          helpText={C.RIDE_TYPE_HELP}
+          helpText={RIDE_TYPE_HELP}
           options={C.RIDE_TYPE_FILTER_OPTIONS}
           value={rideType}
           onChange={handleRideTypeChange}

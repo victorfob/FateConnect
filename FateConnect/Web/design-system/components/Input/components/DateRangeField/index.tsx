@@ -6,11 +6,11 @@ import type { PickerDayProps } from '@mui/x-date-pickers';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 
 import { IconButton } from '@ds-root/components/IconButton';
+import { DATE_PICKER_LABEL } from '@ds-root/components/Input/constants';
+import { useMaskedPicker } from '@ds-root/components/Input/hooks/useMaskedPicker';
+import { InputField } from '@ds-root/components/Input/InputField';
 import { CalendarTodayIcon } from '@ds-root/icons';
 
-import { DATE_PICKER_LABEL } from '../../constants';
-import { useMaskedPicker } from '../../hooks/useMaskedPicker';
-import { InputField } from '../../InputField';
 import { formatDate } from '../DateField/helpers';
 import {
   formatDateRange,

@@ -1,25 +1,9 @@
 import { z } from 'zod';
 
+import { photoSchema } from '@app/components/PhotoField/schema';
 import { isDenunciationCategory } from '@app/pages/Denunciations/helpers/denunciationCategory';
 
-import {
-  ACCEPTED_PHOTO_TYPES,
-  DENUNCIATION_FORM_MESSAGES,
-  DENUNCIATION_LIMITS,
-  MAX_PHOTO_BYTES,
-} from '../constants';
-
-function isAcceptedPhotoFormat(photo: File | null): boolean {
-  if (!photo) return true;
-
-  return ACCEPTED_PHOTO_TYPES.has(photo.type);
-}
-
-function isWithinPhotoSize(photo: File | null): boolean {
-  if (!photo) return true;
-
-  return photo.size <= MAX_PHOTO_BYTES;
-}
+import { DENUNCIATION_FORM_MESSAGES, DENUNCIATION_LIMITS } from '../constants';
 
 export const denunciationFormSchema = z.object({
   category: z.string().refine(isDenunciationCategory, DENUNCIATION_FORM_MESSAGES.categoryRequired),
@@ -29,11 +13,7 @@ export const denunciationFormSchema = z.object({
     .min(DENUNCIATION_LIMITS.minDescription, DENUNCIATION_FORM_MESSAGES.descriptionTooShort)
     .max(DENUNCIATION_LIMITS.maxDescription, DENUNCIATION_FORM_MESSAGES.descriptionTooLong),
   isAnonymous: z.boolean(),
-  photo: z
-    .instanceof(File)
-    .nullable()
-    .refine(isAcceptedPhotoFormat, DENUNCIATION_FORM_MESSAGES.photoFormatInvalid)
-    .refine(isWithinPhotoSize, DENUNCIATION_FORM_MESSAGES.photoTooLarge),
+  photo: photoSchema,
 });
 
 export type DenunciationFormInput = z.input<typeof denunciationFormSchema>;

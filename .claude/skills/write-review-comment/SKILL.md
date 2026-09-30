@@ -1,10 +1,6 @@
 ---
 name: write-review-comment
-description: >-
-  Escreve comentário de review em PR deste repositório, ancorado na linha exata — defeito no formato
-  Problema/Solução proposta, e o que não está errado como sugestão. Use quando o usuário pedir para
-  comentar, revisar ou apontar problemas no PR de outra pessoa, ou para levar achados de um code
-  review para o PR. Para responder comentários que outros escreveram, use `resolve-pr-comments`.
+description: "Escreve comentário de review em PR deste repositório, ancorado na linha exata — defeito no formato Problema/Solução proposta, e o que não está errado como sugestão. Use quando o usuário pedir para comentar, revisar ou apontar problemas no PR de outra pessoa, ou para levar achados de um code review para o PR. Para responder comentários que outros escreveram, use `resolve-pr-comments`."
 ---
 
 # Escrever comentário de review
@@ -52,21 +48,11 @@ gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
 - **Problema num arquivo apagado: `side: LEFT`, no arquivo antigo.** É a melhor âncora para comportamento removido: o thread nasce em cima do código que some, e não numa linha vizinha parecida. Ancore na **declaração** — a classe, o método —, nunca na chave de fechamento.
 - Editar: `PATCH .../pulls/comments/<id>`. Apagar: `DELETE` no mesmo caminho.
 - ⛔ **O `POST` falhou com erro de rede? Conte os comentários antes de repetir.** Esta rede derruba escrita no GitHub mantendo a leitura boa, e o `EOF` aparece tanto quando o comentário não entrou quanto quando ele entrou e a resposta se perdeu. Repetir às cegas publica dois threads idênticos no PR de outra pessoa. Aconteceu duas vezes em 12/09/2026: `gh api .../pulls/<n>/comments --jq length` respondeu o número exato de antes, e aí a repetição foi segura.
+- ⛔ **O head que você revisou pode não ser o head em que vai publicar.** O autor empurra enquanto você redige, e o `headRefOid` do comando acima pega o novo sem avisar: a linha que você ancora e o código que o comentário descreve podem ter mudado. Antes do primeiro comentário, compare o head atual com o revisado; diferindo, leia o `git diff <revisado> <atual>`, confira cada âncora no arquivo do head novo e reveja os comentários que o diff alcança.
 
-⛔ **Bloco `suggestion` substitui exatamente as linhas ancoradas, e a faixa se decide na CRIAÇÃO.** O `PATCH` de um comentário de review aceita só o `body` — não há como alargar o intervalo depois. Comentário nascido de linha única fica preso a uma linha para sempre.
+  Aconteceu em 28/09/2026, no #482: revisei `1e21e040`, o autor empurrou dois commits, e publiquei o primeiro comentário em `0aeb8152` sem olhar. A linha ainda era a mesma por sorte, e um dos commits mexia no changelog, que outro comentário planejado citava pela linha.
 
-Faixa se pede com `start_line` e `start_side` junto do `line`:
-
-```bash
-gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
-  -f commit_id="$(gh pr view <n> --json headRefOid --jq .headRefOid)" \
-  -f path="<caminho>" -F start_line=61 -F line=62 \
-  -f side="RIGHT" -f start_side="RIGHT" -f body='...'
-```
-
-⚠️ **Então decida a faixa antes de publicar, mesmo quando ainda não vai sugerir.** Em 12/09/2026 os dois comentários que mereciam bloco tinham nascido de linha única, e a saída foi apagar e repostar — barato porque nenhum tinha resposta, e impossível se tivesse.
-
-⛔ **E a faixa cobre da primeira à última linha que o conserto toca, não a que ilustra o argumento.** A correção do `Update()` parecia ser uma linha; eram três — a chamada, a linha em branco e o `SaveChangesAsync` que a sugestão absorve. Substituir só as duas primeiras teria **duplicado** a chamada, com um clique.
+⛔ **Comentário que leva, ou pode vir a levar, um bloco ` ```suggestion `:** leia `references/suggestion-blocks.md` antes de publicar. A faixa de linhas só se escolhe na criação, e o bloco precisa compilar no head do PR.
 
 ⛔ **Quando o problema é ausência, não há âncora.** Arquivo que o PR *não* tocou não está no diff. Aí o apontamento não é comentário: vira issue, ou não é levantado. **Decida com o usuário** — foi assim que o contrato do front virou uma issue em vez de um thread.
 
@@ -105,33 +91,6 @@ Aconteceu **três vezes no mesmo PR**, o #186, sempre pelo mesmo gesto meu:
 
 **O que a medição precisa ser:** chamar o método real do commit, não reconstruir a consulta numa sonda. O controle que provou foi chamar `GetAllAsync` duas vezes — sem `Destination` a query chega a abrir conexão, com `Destination` estoura na tradução. Reconstruir teria medido o meu código, não o dele.
 
-### Bloco `suggestion` é aplicado em um clique — compile antes de publicar
-
-⛔ **O que vai dentro de um bloco ` ```suggestion ` entra na branch exatamente como está escrito, sem ninguém reler.** Sugestão que não compila é defeito entregue por quem revisa, e chega lá com a autoridade de quem apontou o problema.
-
-⛔ Aconteceu em 12/09/2026, no PR #391, e só não foi publicada porque o Victor cobrou antes: *"pra sugestões verifique se o código roda ou se não está sugerindo algo quebrado"*. Eu ia sugerir devolver uma chamada para dentro do `if`, restaurando o `[NotNullWhen(true)]` e dispensando um `!`. Medido, o bloco reprovava o build:
-
-```
-error S8969: Remove this null-forgiving operator; the compiler already
-             knows this expression is not null here.
-```
-
-⚠️ **A correção parcial é que quebra.** Eram **dois** `!`, e removendo só o que estava no meu recorte, o outro passa a ser redundante — e redundante é **erro** aqui, porque o `.csproj` liga `TreatWarningsAsErrors`. O bloco tinha de cobrir da primeira à última linha afetada, não só o trecho que ilustra o argumento.
-
-⚠️ E o erro era a prova do argumento: o compilador só reclama do segundo `!` porque voltou a saber que a expressão não é nula.
-
-**A bancada:** worktree no head do PR (`git fetch origin pull/<n>/head`), **build de linha de base primeiro** — sem ele, uma falha depois não distingue a sua sugestão de algo que já estava quebrado —, aplicar, confirmar com `cmp -s` que o arquivo de fato mudou, e construir. O corpo do comentário sai do arquivo que passou no build, não do que você digitou no rascunho.
-
-⚠️ **Diga em que ambiente compilou**, como o resto desta skill exige: aqui é o SDK que o `global.json` fixa, e `dotnet --version` responde `8.0.4xx`.
-
-### Compilar não cobre o que quebra na borda
-
-⛔ **Sugestão pode compilar e estourar no driver.** A `suggestion` do fuso trocava a construção de um `DateTime` gravado em Postgres, e o Npgsql recusa `Kind` incompatível com o tipo da coluna — a coluna era `timestamp without time zone`, que reprova `Kind=Utc`.
-
-**O que liberou não foi o build: foi comparar as duas formas na dimensão que o driver olha.** `ToDateTime(..., DateTimeKind.Utc)` e `ConvertTimeToUtc(...)` devolvem os dois `Kind=Utc` — idêntico ao que já grava hoje, logo sem risco novo. Se diferissem, o build continuaria verde e a gravação quebraria em produção.
-
-⚠️ **A pergunta é sempre a mesma:** o valor que a minha sugestão produz difere do atual em algo que outra camada inspeciona? Tipo, `Kind`, encoding, precisão, nulidade. Compilar responde pela sintaxe; isso responde pela borda.
-
 ## Meça antes de afirmar
 
 ⛔ **Afirmação sobre dado, contagem, extensão ou configuração de ambiente exige medição.** Escrevi que uma migração deixaria as caronas órfãs e que a tela ficaria vazia em produção — os bancos não tinham uma linha. No mesmo review, medir transformou um achado hipotético sobre `unaccent` no defeito mais grave da rodada: o filtro por destino já respondia 500 em produção.
@@ -145,6 +104,20 @@ O `global.json` fecha essa porta: ele fixa a banda `8.0.x`, e numa máquina com 
 O tempo verbal denuncia: *"vai ficar"*, *"responderia"*, *"em banco novo"*. Troque por passado medido.
 
 **Errou depois de publicar?** Edite o comentário para o texto correto e sem meta-narrativa — o histórico de edição do GitHub já registra. A explicação do erro vai para o usuário, não para o thread do autor.
+
+### A issue se cita pelo que ela escreve, não pelo que você deduziu
+
+⛔ **Atribuir à issue uma exigência que ela não escreve é afirmar sem medir, com um agravante: a issue é a autoridade que o autor não discute.** Antes de escrever "a #N pede", abra o corpo e ache a frase. Sem a frase, a exigência é sua, e se diz como sua.
+
+⛔ Aconteceu em 28/09/2026, no #482. A #108 pede que banir e rebaixar incrementem o `TokenVersion`, e que a promoção valha "no token emitido no login seguinte". Eu escrevi que ela pedia a promoção "sem derrubar a sessão", uma dedução minha publicada com a voz da issue. O autor perguntou se derrubar não fazia mais sentido, e fazia: o token antigo carrega `Operator`, que é menos poder do que o banco já dá, e os dois desenhos cumprem a frase da issue. O comentário foi apagado e refeito sobre o defeito real, que estava no fixture.
+
+**O tell é o verbo de exigência com a issue como sujeito:** "a #N pede", "a #N proíbe", "como a #N quer". Cada um é uma busca que você ainda não rodou:
+
+```bash
+gh issue view <n> --json body -q .body | grep -n -i "<o termo>"
+```
+
+⚠️ **E o que a issue não diz não é proibição.** Fica em aberto, e a escolha é de quem escreve ou de quem revisa, não um defeito do PR.
 
 ## O certo mora no consumidor e no módulo irmão
 
@@ -181,6 +154,10 @@ Cada achado termina num estado dito em voz alta: **comentado**, **virou issue**,
 Cobrado duas vezes no PR #186, com a mesma pergunta: *"nenhum achado novo nas novas alterações?"*. Da primeira vez o passe encontrou uma validação de enum que sumira junto com o que eu pedi para remover. Da segunda, um defeito pior que o original: a correção do escape trocou concatenação por interpolação, e a busca por destino passou a responder 500.
 
 ⛔ **O resumo abre com o número de achados, e cada um aparece nomeado.** Destacar os mais graves é certo; comprimir a cauda num parágrafo corrido não é — quem lê conta o que consegue ver. Na rodada do PR #186 eu apresentei 3 em destaque e os outros 12 numa frase só, e a pergunta que veio foi *"só foram 3 mesmo?"*. Uma tabela de três colunas — estado, quantos, quais — resolve, e é a mesma contagem que o `gh api` acima confere.
+
+⛔ **O número só vale depois de o diff inteiro ter sido lido.** Ferramenta de revisão tem teto de achados por rodada, e o teto se lê como total: a lista cheia parece completa. Antes de dizer quantos são, confira que cada arquivo do diff foi aberto, inclusive o que parece gerado ou acessório — o `.Designer.cs`, o snapshot, o fixture —, e cruze o PR contra as issues que ele fecha.
+
+Aconteceu em 28/09/2026, no #482, duas vezes seguidas. A primeira rodada entregou 10 achados porque 10 era o teto; a pergunta foi *"só tem 10 achados?"*. A segunda entregou 18 depois de cruzar com as issues, e a pergunta voltou: *"só 18? ou tem mais?"*. Só a terceira abriu o `.Designer.cs`, as claims do token e os helpers vizinhos, e fechou em 27.
 
 ## Quem corrige depois de você também passa por skill
 

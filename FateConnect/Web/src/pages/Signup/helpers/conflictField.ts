@@ -10,10 +10,7 @@ function isConflictField(value: string): value is SignupConflictFieldEnum {
   return CONFLICT_FIELDS.has(value);
 }
 
-/**
- * `null` cobre o 409 sem campo reconhecido — é o que a API responde antes de
- * publicar a versão que nomeia o campo, e aí o aviso solto ainda vale.
- */
+/** `null` cobre o 409 sem campo reconhecido, e aí vale o aviso solto. */
 export function conflictFieldOf(error: ApiError): SignupConflictFieldEnum | null {
   if (error.status !== CONFLICT) return null;
   if (!error.field) return null;

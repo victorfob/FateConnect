@@ -124,9 +124,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("AvailableSeats")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -148,8 +145,14 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("DriverId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Frequency")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<DateOnly?>("RepeatUntil")
+                        .HasColumnType("date");
 
                     b.Property<int>("RideType")
                         .HasColumnType("integer");
@@ -164,7 +167,20 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("Rides");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Contact", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.RideDeparture", b =>
+                {
+                    b.Property<Guid>("RideId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.HasKey("RideId", "Date");
+
+                    b.ToTable("RideDepartures");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.AdministrativeAction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -172,30 +188,23 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ContactEmail")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                    b.Property<int>("Action")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("character varying(11)");
+                    b.Property<int>("ActorId")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
+                    b.Property<DateTime>("PerformedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("TargetId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactEmail")
-                        .IsUnique();
+                    b.HasIndex("TargetId");
 
-                    b.HasIndex("Phone")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Contacts");
+                    b.ToTable("AdministrativeActions");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.DocumentAcceptance", b =>
@@ -248,6 +257,11 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -264,19 +278,29 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Neighborhood")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)");
+
                     b.Property<int>("ProfileType")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("ReceiveEmails")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("ReceiveNotifications")
-                        .HasColumnType("boolean");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<int>("TokenVersion")
                         .HasColumnType("integer");
@@ -286,7 +310,29 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ContactEmail")
+                        .IsUnique();
+
+                    b.HasIndex("Phone")
+                        .IsUnique();
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.UserPreferences", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("ReceiveEmails")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReceiveNotifications")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserPreferences");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Denunciations.Entities.Denunciation", b =>
@@ -322,15 +368,13 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Navigation("Driver");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.Contact", b =>
+            modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.RideDeparture", b =>
                 {
-                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
-                        .WithMany("Contacts")
-                        .HasForeignKey("UserId")
+                    b.HasOne("FateConnect.Api.Modules.Rides.Entities.Ride", null)
+                        .WithMany("Departures")
+                        .HasForeignKey("RideId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.DocumentAcceptance", b =>
@@ -344,11 +388,26 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.UserPreferences", b =>
+                {
+                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", null)
+                        .WithOne("Preferences")
+                        .HasForeignKey("FateConnect.Api.Modules.Users.Entities.UserPreferences", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.Ride", b =>
+                {
+                    b.Navigation("Departures");
+                });
+
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.User", b =>
                 {
-                    b.Navigation("Contacts");
-
                     b.Navigation("DocumentAcceptances");
+
+                    b.Navigation("Preferences")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

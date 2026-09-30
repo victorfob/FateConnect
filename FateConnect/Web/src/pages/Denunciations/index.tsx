@@ -1,17 +1,10 @@
 import { useCallback, useState } from 'react';
-import { NavLink } from 'react-router';
 import { CardsList, PageShell, Pagination } from '@design-system';
-import { ArrowBackIcon, FormatListBulletedIcon, SendIcon } from '@design-system/icons';
+import { FormatListBulletedIcon, SendIcon } from '@design-system/icons';
 
+import { BackToMenu } from '@app/components/BackToMenu';
 import { DenunciationCard } from '@app/components/DenunciationCard';
-import {
-  DOWNLOAD_LABEL,
-  photoAlt,
-  photoBaseName,
-} from '@app/components/DenunciationCard/constants';
-import { StoredPhoto } from '@app/components/StoredPhoto';
 import { usePagedSearch } from '@app/hooks/usePagedSearch';
-import { RoutePathEnum } from '@app/routes/paths';
 import { listMyDenunciations } from '@app/services/denunciations/denunciationsService';
 import { PAGE_SIZE } from '@app/utils/searchParams';
 
@@ -40,14 +33,7 @@ export function Denunciations() {
     <PageShell
       title={C.DENUNCIATIONS_TITLE}
       titleAction={<DenunciationFilter initialFilters={filters} onApply={applyFilters} />}
-      action={
-        <PageShell.Back
-          label={C.BACK_LABEL}
-          icon={<ArrowBackIcon fontSize="small" />}
-          component={NavLink}
-          to={RoutePathEnum.MENU}
-        />
-      }
+      action={<BackToMenu />}
       tabs={
         <>
           <PageShell.Tab
@@ -72,17 +58,7 @@ export function Denunciations() {
         pagination={<Pagination count={totalPages} page={currentPage} onChange={changePage} />}
       >
         {items.map((denunciation) => (
-          <DenunciationCard
-            key={denunciation.id}
-            denunciation={denunciation}
-            media={
-              <StoredPhoto
-                url={denunciation.imageUrl}
-                alt={photoAlt(denunciation)}
-                download={{ label: DOWNLOAD_LABEL, baseName: photoBaseName(denunciation) }}
-              />
-            }
-          />
+          <DenunciationCard key={denunciation.id} denunciation={denunciation} />
         ))}
       </CardsList>
 

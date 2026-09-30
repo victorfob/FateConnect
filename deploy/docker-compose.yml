@@ -9,6 +9,10 @@ services:
   api:
     build:
       context: ../FateConnect/FateConnect.Api
+      # O ImageSharp reprova o build de publicação sem licença. Ela entra como
+      # segredo do build, que não aparece no log nem chega à imagem que sobe.
+      secrets:
+        - sixlabors_license
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
@@ -34,3 +38,7 @@ services:
 
 volumes:
   api_uploads:
+
+secrets:
+  sixlabors_license:
+    environment: SIXLABORS_LICENSE

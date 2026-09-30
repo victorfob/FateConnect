@@ -3,11 +3,11 @@ import Popover from '@mui/material/Popover';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 
 import { IconButton } from '@ds-root/components/IconButton';
+import { DATE_PICKER_LABEL } from '@ds-root/components/Input/constants';
+import { useMaskedPicker } from '@ds-root/components/Input/hooks/useMaskedPicker';
+import { InputField } from '@ds-root/components/Input/InputField';
 import { CalendarTodayIcon } from '@ds-root/icons';
 
-import { DATE_PICKER_LABEL } from '../../constants';
-import { useMaskedPicker } from '../../hooks/useMaskedPicker';
-import { InputField } from '../../InputField';
 import { DATE_PLACEHOLDER, MASKED_DATE_LENGTH } from './constants';
 import { formatDate, maskDate, parseDate } from './helpers';
 
@@ -24,6 +24,8 @@ export type DateFieldProps = Readonly<{
   disabled?: boolean;
   minDate?: Date;
   maxDate?: Date;
+  /** Dia que o calendário não deixa escolher; digitado, quem recusa é a validação. */
+  shouldDisableDate?: (day: Date) => boolean;
 }>;
 
 /** Campo de data do produto: o calendário é auxiliar do texto mascarado. */
@@ -38,6 +40,7 @@ export function DateField({
   disabled,
   minDate,
   maxDate,
+  shouldDisableDate,
 }: DateFieldProps) {
   const { inputRef, anchor, handleChange, handleOpenPicker, handleClosePicker } = useMaskedPicker(
     maskDate,
@@ -96,6 +99,7 @@ export function DateField({
           onChange={handleDatePick}
           minDate={minDate}
           maxDate={maxDate}
+          shouldDisableDate={shouldDisableDate}
         />
       </Popover>
     </>

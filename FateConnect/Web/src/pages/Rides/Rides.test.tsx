@@ -1,10 +1,21 @@
-import { FILTER_TITLE_PLURAL, type SelectOption } from '@design-system';
+import {
+  FILTER_CLEAR_LABEL,
+  FILTER_SUBMIT_LABEL,
+  FILTER_TITLE_PLURAL,
+  type SelectOption,
+} from '@design-system';
 import { http, HttpResponse } from 'msw';
 
+import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
-import { RideShiftEnum, RideTypeEnum, type Ride } from '@app/services/rides/types';
+import {
+  RideFrequencyEnum,
+  RideShiftEnum,
+  RideTypeEnum,
+  type Ride,
+} from '@app/services/rides/types';
 import type { UserContact } from '@app/services/types';
 import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
@@ -13,19 +24,19 @@ import { PAGE_SIZE } from '@app/utils/searchParams';
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
 import {
-  FILTER_CLEAR_LABEL,
   FILTER_LABELS,
-  FILTER_SUBMIT_LABEL,
   RIDE_OWNER_FILTER_OPTIONS,
   RIDE_SHIFT_FILTER_OPTIONS,
   RIDE_TYPE_FILTER_OPTIONS,
   RideOwnerFilterEnum,
 } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
+import { rideRecurrenceLabel } from './helpers/rideFrequency';
 import * as C from './constants';
 import { Rides } from '.';
 
 const RIDES_URL = 'https://api.fateconnect.test/rides';
+const HOLIDAYS_URL = 'https://api.fateconnect.test/holidays';
 const SECOND_PAGE_LABEL = 'Ir para a página 2';
 
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
@@ -39,7 +50,6 @@ const DRIVER: UserContact = {
 
 const RIDE: Ride = {
   id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
-  availableSeats: 3,
   destination: 'Fatec Sorocaba',
   departureDate: '2026-05-22T00:00:00',
   departureTime: '07:30:00',
@@ -48,6 +58,8 @@ const RIDE: Ride = {
   description: 'Saída do centro, com parada no terminal.',
   driver: DRIVER,
   isOwner: false,
+  frequency: RideFrequencyEnum.ONCE,
+  repeatUntil: null,
 };
 
 /** A posse vem calculada pela API; o cartão só a lê. */
@@ -113,6 +125,7 @@ describe('Rides', () => {
 
   beforeEach(() => {
     listReturning([]);
+    server.use(http.get(HOLIDAYS_URL, () => HttpResponse.json([])));
     clipboardWrite = vi.fn(() => Promise.resolve());
     Object.defineProperty(navigator, 'clipboard', {
       value: { writeText: clipboardWrite },
@@ -127,8 +140,8 @@ describe('Rides', () => {
 
   /**
    * ⛔ Reservar menos do que a página traz faz o conteúdo crescer depois da
-   * primeira pintura, e o rodapé desce com ele — foi o defeito da #385. O que
-   * se afirma aqui é a ligação entre a reserva e o tamanho da página.
+   * primeira pintura, e o rodapé desce com ele. O que se afirma aqui é a ligação
+   * entre a reserva e o tamanho da página.
    */
   it('should reserve one ghost card for each ride the page will show', async () => {
     // Resposta que nunca chega: prende a tela no estado de carregamento.
@@ -145,7 +158,7 @@ describe('Rides', () => {
     renderComponent();
 
     expect(screen.getByRole('heading', { name: C.RIDES_TITLE })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: C.BACK_LABEL })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: BACK_TO_MENU_LABEL })).toHaveAttribute(
       'href',
       RoutePathEnum.MENU,
     );
@@ -201,10 +214,27 @@ describe('Rides', () => {
     renderComponent();
 
     expect(await screen.findByText(RIDE.destination)).toBeInTheDocument();
-    expect(screen.getByText('22/05/2026')).toBeInTheDocument();
-    expect(screen.getByText('07:30')).toBeInTheDocument();
-    expect(screen.getByText(C.seatsLabel(RIDE.availableSeats))).toBeInTheDocument();
+    expect(screen.getByText('22/05 às 07:30')).toBeInTheDocument();
     expect(screen.getAllByText('Solidária')).toHaveLength(1);
+  });
+
+  it('should show the recurrence of a ride that repeats', async () => {
+    const weekly: Ride = {
+      ...RIDE,
+      id: 'weekly-ride',
+      destination: 'Votorantim',
+      departureDate: '2026-10-12',
+      frequency: RideFrequencyEnum.WEEKLY,
+      repeatUntil: '2026-11-30',
+    };
+    listReturning([RIDE, weekly]);
+    renderComponent();
+
+    expect(await screen.findByText(weekly.destination)).toBeInTheDocument();
+    expect(screen.getByText('Próxima: 12/10 às 07:30')).toBeInTheDocument();
+    expect(
+      screen.getByText(rideRecurrenceLabel(weekly.frequency, weekly.departureDate) ?? ''),
+    ).toBeInTheDocument();
   });
 
   it('should tell the user when no ride matches', async () => {
@@ -227,8 +257,8 @@ describe('Rides', () => {
   });
 
   // Sem endereço de API a requisição cai no servidor de desenvolvimento, que
-  // responde o HTML da aplicação com status 200. Antes de validar o formato, a
-  // tela recebia texto no lugar da lista e quebrava no `map`.
+  // responde o HTML da aplicação com status 200. Sem validar o formato, a tela
+  // receberia texto no lugar da lista e quebraria no `map`.
   it('should notify instead of breaking when the api does not return a list', async () => {
     server.use(http.get(RIDES_URL, () => HttpResponse.text('<!doctype html><html></html>')));
 

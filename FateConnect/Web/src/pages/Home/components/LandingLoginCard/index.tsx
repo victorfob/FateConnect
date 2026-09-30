@@ -1,28 +1,31 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router';
-import { Button, IconButton, Input, Typography } from '@design-system';
-import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
+import { Button, Input, Typography } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
-import { login } from '@app/services/auth/authService';
+import { login, reactivate } from '@app/services/auth/authService';
+import type { LoginRequest } from '@app/services/auth/types';
 import type { ApiError } from '@app/services/httpClient';
 
+import { AccountReactivationDialog } from './components/AccountReactivationDialog';
 import { loginSchema, type LoginFormValues } from './schema';
 import * as C from './constants';
 import * as S from './styles';
 
 const UNAUTHORIZED = 401;
+const FORBIDDEN = 403;
+const CONFLICT = 409;
 
 export function LandingLoginCard() {
   const navigate = useNavigate();
   const { hash } = useLocation();
-  const { notifyError } = useNotification();
+  const { notifyError, notifySuccess } = useNotification();
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const [passwordHidden, setPasswordHidden] = useState(true);
+  const [credentialsToReactivate, setCredentialsToReactivate] = useState<LoginRequest | null>(null);
 
   const {
     register,
@@ -40,24 +43,58 @@ export function LandingLoginCard() {
     emailInputRef.current?.focus();
   }, [hash]);
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: login,
-    // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
-    meta: { notifiesErrorItself: true },
-    onSuccess: () => {
-      navigate(RoutePathEnum.MENU);
-    },
-    onError: (error: ApiError) => {
+  const notifyRefusal = useCallback(
+    (error: ApiError) => {
       if (error.status === UNAUTHORIZED) {
         notifyError(C.LOGIN_ERROR_MESSAGES.invalidCredentials);
         return;
       }
 
+      if (error.status === FORBIDDEN) {
+        notifyError(C.LOGIN_ERROR_MESSAGES.bannedAccount);
+        return;
+      }
+
       notifyError(C.LOGIN_ERROR_MESSAGES.generic);
+    },
+    [notifyError],
+  );
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: login,
+    // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
+    meta: { notifiesErrorItself: true },
+    onSuccess: () => {
+      void navigate(RoutePathEnum.MENU);
+    },
+    onError: (error: ApiError, credentials) => {
+      if (error.status === CONFLICT) {
+        setCredentialsToReactivate(credentials);
+        return;
+      }
+
+      notifyRefusal(error);
     },
   });
 
-  const handleTogglePassword = useCallback(() => setPasswordHidden((hidden) => !hidden), []);
+  const { mutate: mutateReactivation, isPending: isReactivating } = useMutation({
+    mutationFn: reactivate,
+    meta: { notifiesErrorItself: true },
+    onSuccess: () => {
+      notifySuccess(C.REACTIVATION_SUCCEEDED);
+      void navigate(RoutePathEnum.MENU);
+    },
+    onError: (error: ApiError) => {
+      setCredentialsToReactivate(null);
+      notifyRefusal(error);
+    },
+  });
+
+  const handleDismissReactivation = useCallback(() => setCredentialsToReactivate(null), []);
+
+  const handleConfirmReactivation = useCallback(() => {
+    if (credentialsToReactivate) mutateReactivation(credentialsToReactivate);
+  }, [credentialsToReactivate, mutateReactivation]);
 
   const onSubmit = handleSubmit(({ email, password }) => {
     mutate({ fatecEmail: email, password });
@@ -93,24 +130,12 @@ export function LandingLoginCard() {
           error={errors.email?.message}
         />
 
-        <Input
+        <Input.Password
           {...register('password')}
+          purpose="current"
           label={C.PASSWORD_LABEL}
           required
-          type={passwordHidden ? 'password' : 'text'}
-          autoComplete={passwordHidden ? 'current-password' : 'off'}
           error={errors.password?.message}
-          endAdornment={
-            <IconButton
-              type="button"
-              label={C.PASSWORD_TOGGLE_LABEL}
-              aria-pressed={!passwordHidden}
-              onClick={handleTogglePassword}
-            >
-              {/* O ícone mostra o estado atual: olho aberto = senha visível. */}
-              {passwordHidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
-            </IconButton>
-          }
         />
 
         <S.SubmitRow>
@@ -126,6 +151,13 @@ export function LandingLoginCard() {
           <Typography variant="captionBold">{C.SIGNUP_LINK_LABEL}</Typography>
         </RouterLink>
       </S.SignupRow>
+
+      <AccountReactivationDialog
+        open={credentialsToReactivate !== null}
+        reactivating={isReactivating}
+        onDismiss={handleDismissReactivation}
+        onConfirm={handleConfirmReactivation}
+      />
     </S.CardRoot>
   );
 }

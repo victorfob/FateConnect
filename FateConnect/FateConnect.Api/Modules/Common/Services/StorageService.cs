@@ -14,20 +14,22 @@ public partial class StorageService(IWebHostEnvironment env, ILogger<StorageServ
         string containerName = container.ToString().ToLowerInvariant();
 
         string uploadsFolder = Path.Combine(UploadsLocation.PhysicalRootOf(env), containerName);
+        string thumbnailsFolder = Path.Combine(uploadsFolder, UploadsLocation.ThumbnailsFolderName);
 
         string fileExtension = ImageContentTypes.ExtensionFor(file.ContentType);
-        string uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+        string storedPath = $"{UploadsLocation.FolderName}/{containerName}/{Guid.NewGuid()}{fileExtension}";
 
-        Directory.CreateDirectory(uploadsFolder);
+        Directory.CreateDirectory(thumbnailsFolder);
 
-        string physicalFilePath = Path.Combine(uploadsFolder, uniqueFileName);
+        await using Stream upload = file.OpenReadStream();
 
-        using (var stream = new FileStream(physicalFilePath, FileMode.Create))
-        {
-            await file.CopyToAsync(stream);
-        }
+        await ImageVariants.WriteAsync(
+            upload,
+            file.ContentType,
+            PhysicalPathOf(storedPath),
+            PhysicalPathOf(UploadsLocation.ThumbnailOf(storedPath)));
 
-        return $"{UploadsLocation.FolderName}/{containerName}/{uniqueFileName}";
+        return storedPath;
     }
 
     public Task DeleteImageAsync(string filePath)
@@ -37,9 +39,15 @@ public partial class StorageService(IWebHostEnvironment env, ILogger<StorageServ
 
         string relativePath = filePath.TrimStart('/');
 
-        string physicalFilePath = Path.Combine(
-            UploadsLocation.WebRootOf(env),
-            relativePath.Replace('/', Path.DirectorySeparatorChar));
+        DeleteStoredFile(filePath, relativePath);
+        DeleteStoredFile(filePath, UploadsLocation.ThumbnailOf(relativePath));
+
+        return Task.CompletedTask;
+    }
+
+    private void DeleteStoredFile(string requestedPath, string relativePath)
+    {
+        string physicalFilePath = PhysicalPathOf(relativePath);
 
         try
         {
@@ -48,9 +56,10 @@ public partial class StorageService(IWebHostEnvironment env, ILogger<StorageServ
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            LogImageDeletionFailed(logger, filePath, exception);
+            LogImageDeletionFailed(logger, requestedPath, exception);
         }
-
-        return Task.CompletedTask;
     }
+
+    private string PhysicalPathOf(string relativePath) =>
+        Path.Combine(UploadsLocation.WebRootOf(env), relativePath.Replace('/', Path.DirectorySeparatorChar));
 }

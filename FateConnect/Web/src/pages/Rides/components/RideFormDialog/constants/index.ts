@@ -2,7 +2,7 @@ import type { SelectOption } from '@design-system';
 import { AddIcon, SaveIcon } from '@design-system/icons';
 
 import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
-import { seatsLabel } from '@app/pages/Rides/constants';
+import { RIDE_FREQUENCY_OPTIONS } from '@app/pages/Rides/helpers/rideFrequency';
 import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
 
 import type { RideFormMode } from '../types';
@@ -14,13 +14,13 @@ import type { RideFormMode } from '../types';
  */
 export const PRODUCT_TIME_ZONE = 'America/Sao_Paulo';
 
-/** Limites do `CreateCaronaDto` e da entidade `Carona`, espelhados no front. */
+/** Limites do `CreateRideDto` e da entidade `Ride`, espelhados no front. */
 export const RIDE_LIMITS = {
   minDestination: 3,
   maxDestination: 100,
   maxDescription: 300,
-  minSeats: 1,
-  maxSeats: 7,
+  /** Teto da data final, contado da partida, como a API recusa. */
+  maxRecurrenceMonths: 6,
 };
 
 export const OFFER_MODE: RideFormMode = {
@@ -42,8 +42,10 @@ export const EDIT_MODE: RideFormMode = {
 export const RIDE_FORM_LABELS = {
   destination: 'Destino',
   departure: 'Data e hora',
+  recurrenceStart: 'Data e hora iniciais',
   rideType: 'Tipo',
-  seats: 'Vagas disponíveis',
+  frequency: 'Recorrência',
+  repeatUntil: 'Data final da recorrência',
   description: 'Descrição',
 };
 
@@ -54,6 +56,11 @@ export const RIDE_FORM_PLACEHOLDERS = {
 
 export const DESCRIPTION_ROWS = 3;
 
+/** Chave do cache dos feriados, um ano por entrada: eles não mudam dentro do ano. */
+export const HOLIDAYS_QUERY_KEY = 'holidays';
+
+export const HOLIDAYS_LOAD_FAILED = 'Erro ao carregar os feriados. Tente novamente.';
+
 const EMPTY_CHOICE: SelectOption = { value: '', label: SELECT_PLACEHOLDER };
 
 /** As escolhas do campo, já com a opção vazia na frente. */
@@ -62,19 +69,8 @@ export const RIDE_TYPE_SELECT_OPTIONS: readonly SelectOption[] = [
   ...RIDE_TYPE_OPTIONS,
 ];
 
-const INCLUSIVE_END = 1;
-
-export const SEAT_OPTIONS: readonly SelectOption[] = [
-  EMPTY_CHOICE,
-  ...Array.from(
-    { length: RIDE_LIMITS.maxSeats - RIDE_LIMITS.minSeats + INCLUSIVE_END },
-    (_value, index) => {
-      const seats = RIDE_LIMITS.minSeats + index;
-
-      return { value: String(seats), label: seatsLabel(seats) };
-    },
-  ),
-];
+/** Sem opção vazia: o campo abre em uma vez só, a carona de sempre. */
+export const RIDE_FREQUENCY_SELECT_OPTIONS: readonly SelectOption[] = RIDE_FREQUENCY_OPTIONS;
 
 export const RIDE_FORM_MESSAGES = {
   destinationTooShort: `O destino deve ter ao menos ${RIDE_LIMITS.minDestination} caracteres`,
@@ -83,6 +79,12 @@ export const RIDE_FORM_MESSAGES = {
   departureInvalid: 'Data e hora inválidas',
   departureInPast: 'A carona deve ser em data e hora futuras',
   rideTypeRequired: 'Selecione o tipo',
-  seatsRequired: 'Selecione a quantidade de vagas',
+  frequencyRequired: 'Selecione a recorrência',
+  departureOnWeekend: 'A recorrência em dias úteis começa num dia útil',
+  departureOnHoliday: 'Escolha um dia que não seja feriado',
+  repeatUntilRequired: 'Informe a data final da recorrência',
+  repeatUntilInvalid: 'Data inválida',
+  repeatUntilBeforeDeparture: 'A data final não pode ser anterior à partida',
+  repeatUntilTooFar: `A recorrência vai até no máximo ${RIDE_LIMITS.maxRecurrenceMonths} meses depois da partida`,
   descriptionTooLong: `A descrição pode ter no máximo ${RIDE_LIMITS.maxDescription} caracteres`,
 };

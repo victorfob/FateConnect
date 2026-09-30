@@ -4,9 +4,8 @@ description: >-
   Audita o site publicado com o Lighthouse — todas as categorias que a versão instalada oferecer, em
   desktop e celular, nas telas públicas e nas autenticadas — e transforma os apontamentos em issues.
   Use quando o usuário pedir para auditar, medir ou rodar o Lighthouse, checar desempenho,
-  acessibilidade, SEO, boas práticas ou navegação agêntica
-  do site no ar, ou refazer a linha de base depois de a aplicação ganhar telas. Cobre a matriz de
-  medição, como medir tela logada sem digitar senha, e o que **não** vira issue.
+  acessibilidade, SEO, boas práticas ou navegação agêntica do site no ar, refazer a linha de base
+  depois de a aplicação ganhar telas, ou medir o tamanho do pacote (bundle) do front.
 ---
 
 # Auditar o site publicado com o Lighthouse
@@ -14,6 +13,8 @@ description: >-
 A auditoria é **medição, não correção**. Ela termina entregando um relatório e abrindo issue para cada apontamento que exija código — nunca corrigindo de passagem.
 
 A primeira rodada foi a #361, em 12/09/2026, e os números dela estão no relatório daquela issue. Use-os como ponto de comparação; o que envelhece é o número, não o procedimento.
+
+Medir o tamanho do pacote do front, com ou sem auditoria: leia antes `references/bundle-size.md`.
 
 ## 1. Antes de medir: o mundo que você vai medir é o que vai ficar?
 

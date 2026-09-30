@@ -2,7 +2,12 @@ import { ptBR as corePtBR } from '@mui/material/locale';
 import { createTheme, type Theme } from '@mui/material/styles';
 import { ptBR as pickersPtBR } from '@mui/x-date-pickers/locales';
 
-import { DESKTOP_MIN_WIDTH_PX, fontFamily, typographyTokens } from '../tokens';
+import {
+  DESKTOP_MIN_WIDTH_PX,
+  fontFamily,
+  HEADER_NAV_MIN_WIDTH_PX,
+  typographyTokens,
+} from '../tokens';
 import { components } from './components';
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
@@ -10,13 +15,14 @@ import { darkPalette, lightPalette } from './palettes';
 import type { ChromeColors, NotificationVariant, StatusTagTone, SurfacePair } from './types';
 
 declare module '@mui/material/styles' {
+  interface BreakpointOverrides {
+    header: true;
+  }
+
   /**
-   * `space` e `radius` são chaves **nossas**, não API do MUI. Existem para o
-   * estilo ler o helper do tema em vez de importá-lo em cada `styles.ts`.
-   *
-   * ⛔ Não substituem o `spacing` do MUI, e é de propósito: os componentes dele
-   * chamam `theme.spacing(1..3)` esperando o multiplicador de 8px, e trocar a
-   * transformação encolheu as gutters do `Toolbar` de 24px para 3px.
+   * `space` e `radius` são chaves **nossas**, para o estilo ler o helper do tema.
+   * ⛔ Não substituem o `spacing` do MUI: os componentes dele chamam
+   * `theme.spacing(1..3)` esperando o multiplicador de 8px.
    */
   interface Theme {
     space: typeof spacing;
@@ -79,6 +85,7 @@ declare module '@mui/material/styles' {
 declare module '@mui/material/Button' {
   interface ButtonPropsVariantOverrides {
     soft: true;
+    destructive: true;
   }
 }
 
@@ -107,16 +114,25 @@ export function createAppTheme(mode: ThemeMode = 'light'): Theme {
   return createTheme(
     {
       components,
-      // Só o `md` muda: é o limite entre mobile e desktop do produto. Os demais
-      // ficam nos valores do MUI, porque `Toolbar` e `Dialog` leem o `sm`.
-      breakpoints: { values: { xs: 0, sm: 600, md: DESKTOP_MIN_WIDTH_PX, lg: 1200, xl: 1536 } },
+      // `md` é o limite das telas e `header` o da nav do topo. Os demais ficam
+      // nos valores do MUI, porque `Toolbar` e `Dialog` leem o `sm`.
+      breakpoints: {
+        values: {
+          xs: 0,
+          sm: 600,
+          md: DESKTOP_MIN_WIDTH_PX,
+          header: HEADER_NAV_MIN_WIDTH_PX,
+          lg: 1200,
+          xl: 1536,
+        },
+      },
       space: spacing,
       radius,
       palette: mode === 'dark' ? darkPalette : lightPalette,
       typography: {
         fontFamily,
-        // O ponto de virada é o do produto (768px), não o `sm` do MUI (600px):
-        // entre os dois o título ficava grande enquanto o produto já reduzia.
+        // O ponto de virada é o `md` das telas, não o `sm` do MUI (600px): entre os
+        // dois o título ficaria grande enquanto a tela já reduz.
         h1: {
           ...typographyTokens.h1,
           [MOBILE_MEDIA]: typographyTokens.h1Narrow,

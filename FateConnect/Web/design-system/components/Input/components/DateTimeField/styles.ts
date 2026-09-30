@@ -20,10 +20,9 @@ export const PickerPopover = styled(Popover)(({ theme }) => ({
   '& .MuiDateTimePickerToolbar-dateContainer .MuiTypography-root, & .MuiDateTimePickerToolbar-timeDigitsContainer .MuiTypography-root':
     typographyTokens.h2,
 
-  // Aba, dígito do topo e ação saem na cor primária, que no tema escuro é a
-  // superfície do cromo: como texto ela dá 4,11:1, abaixo dos 4,5:1 que a WCAG
-  // pede. O texto passa a ler a cor de texto, e o destaque sobrevive onde o
-  // limite é 3:1 — o traço da aba ativa e o dia escolhido.
+  // Aba, dígito do topo e ação saem na cor primária, que no escuro é o cromo e como
+  // texto fica abaixo dos 4,5:1 da WCAG. Eles passam à cor de texto, e o destaque
+  // fica onde o limite é 3:1: o traço da aba ativa e o dia escolhido.
   '& .MuiTab-root.Mui-selected, & .MuiPickersToolbar-root .MuiButton-root, & .MuiPickersLayout-actionBar .MuiButton-root':
     { color: theme.palette.text.primary },
 }));

@@ -18,7 +18,7 @@ export const CardRoot = styled(PolymorphicStack)(({ theme }) => ({
   gap: theme.space(md),
   padding: theme.space(lg),
   // Largura de verdade, e não `flex-basis`: a âncora entre o cartão e a faixa se
-  // mede pelo conteúdo, e a base de 360px chegava ao cartão como 300px.
+  // mede pelo conteúdo, e pela base o cartão não chega à largura pedida.
   width: `${CARD_WIDTH_PX}px`,
   maxWidth: '100%',
   background: theme.palette.background.paper,

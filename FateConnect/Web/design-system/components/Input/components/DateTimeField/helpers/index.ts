@@ -59,3 +59,12 @@ const PICKER_VIEW_NAMES: ReadonlySet<string> = new Set<string>(PICKER_VIEWS);
 export function isPickerView(view: string): view is DateOrTimeView {
   return PICKER_VIEW_NAMES.has(view);
 }
+
+/** O clique caiu numa opção da coluna que a biblioteca rotula assim. */
+export function isOptionOfColumn(target: EventTarget, columnLabel: string): boolean {
+  if (!(target instanceof Element)) return false;
+
+  const column = target.closest('[role="option"]')?.closest('[role="listbox"]');
+
+  return column?.getAttribute('aria-label') === columnLabel;
+}

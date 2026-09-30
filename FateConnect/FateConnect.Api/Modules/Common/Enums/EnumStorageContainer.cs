@@ -4,4 +4,5 @@ public enum EnumStorageContainer
 {
     LostAndFound = 1,
     Denunciation = 2,
+    User = 3,
 }

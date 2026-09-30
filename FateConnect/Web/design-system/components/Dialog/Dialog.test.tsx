@@ -40,6 +40,19 @@ describe('Dialog', () => {
     expect(screen.getByRole('button', { name: 'Confirmar' })).toBeInTheDocument();
   });
 
+  it('should render the message inside the body', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Body>
+          <Dialog.Message>Deseja continuar?</Dialog.Message>
+        </Dialog.Body>
+      ),
+    });
+
+    expect(screen.getByRole('dialog')).toHaveTextContent('Deseja continuar?');
+  });
+
   it('should close when the user presses escape', async () => {
     const onClose = vi.fn();
     renderComponent({ ...DEFAULT_PROPS, onClose });
@@ -68,5 +81,51 @@ describe('Dialog', () => {
     renderComponent({ ...DEFAULT_PROPS, open: false });
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('should submit the form from the submit slot, and leave validation to the screen', async () => {
+    const onSubmit = vi.fn((event: { preventDefault: VoidFunction }) => event.preventDefault());
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Form onSubmit={onSubmit}>
+          <Dialog.Body>
+            <Dialog.Fields>
+              <input aria-label="Nome" required />
+              <Dialog.Fields.Wide>
+                <input aria-label="Descrição" />
+              </Dialog.Fields.Wide>
+            </Dialog.Fields>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Dialog.Submit icon={null} label="Salvar alterações" />
+          </Dialog.Footer>
+        </Dialog.Form>
+      ),
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it('should hold the submit while it is loading', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Form onSubmit={vi.fn()}>
+          <Dialog.Body>
+            <Dialog.Fields layout="column">
+              <input aria-label="Nome" />
+            </Dialog.Fields>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Dialog.Submit icon={null} label="Enviar" loading />
+          </Dialog.Footer>
+        </Dialog.Form>
+      ),
+    });
+
+    expect(screen.getByRole('button', { name: 'Enviar' })).toBeDisabled();
   });
 });
