@@ -20,3 +20,5 @@ description: "Valida no app rodando uma mudança visual do front antes de dizer 
 6. **Copy nova:** meça a largura do texto no contêiner mais apertado que vai recebê-lo (método na mesma referência) e leve o número às candidatas da skill `ux-writing`.
 
 Com dois servidores de dev no ar, toda medição leva a porta lida da página (skill `parallel-work`).
+
+⛔ Validado contra stub, a entrega ao dono é o servidor da porta padrão falando com homologação, sem `VITE_API_URL` na linha de comando e com o stub derrubado: é ali que ele captura as evidências. O stub só volta a pedido.
