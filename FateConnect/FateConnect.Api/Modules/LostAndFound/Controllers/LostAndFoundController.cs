@@ -4,6 +4,8 @@ using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
+using FateConnect.Api.Modules.Users.Enums;
+using FateConnect.Api.Modules.Users.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 public class LostAndFoundController(ILostAndFoundService service) : ControllerBase
 {
     [HttpPost]
+    [RequiresContact(EnumPublication.LostAndFoundItem)]
     public async Task<ActionResult<ReadLostAndFoundDto>> CreateAsync([FromForm] CreateLostAndFoundDto dto)
     {
         var result = await service.CreateAsync(dto, User.GetUserId());

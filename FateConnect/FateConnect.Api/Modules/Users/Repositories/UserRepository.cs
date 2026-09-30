@@ -98,12 +98,12 @@ public class UserRepository : IUserRepository
                     @"\"
                 ) ||
                 EF.Functions.ILike(
-                    EF.Functions.Unaccent(u.ContactEmail),
+                    EF.Functions.Unaccent(u.ContactEmail!),
                     "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
                     @"\"
                 ) ||
                 EF.Functions.ILike(
-                    u.Phone,
+                    u.Phone!,
                     "%" + escapedSearchTerm + "%",
                     @"\"
                 ));

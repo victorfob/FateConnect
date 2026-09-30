@@ -175,6 +175,19 @@ public class UserProfileEndpointTests(ApiFactory factory) : IClassFixture<ApiFac
     }
 
     [Fact]
+    public async Task UpdateProfile_WithTheContactEmailOfAnotherAccount_IsAConflictOnThatField()
+    {
+        SignedInUser person = await SignedInAsync("Mauro Figueira Lopes");
+        SeededUser other = factory.SeedUser("Nádia Correia Brandão");
+
+        HttpResponseMessage response = await person.Client.PatchAsync("/Users/me", FormWith("ContactEmail", other.ContactEmail));
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        using JsonDocument body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("contactEmail", body.RootElement.GetProperty("field").GetString());
+    }
+
+    [Fact]
     public async Task UpdateProfile_WithAPhoto_AnswersAnAddressThatServesIt()
     {
         SignedInUser person = await SignedInAsync("Isabela Prado Martins");

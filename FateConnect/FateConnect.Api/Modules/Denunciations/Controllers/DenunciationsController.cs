@@ -8,6 +8,7 @@ using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Denunciations.DTOs;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
 using FateConnect.Api.Modules.Users.Enums;
+using FateConnect.Api.Modules.Users.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ public class DenunciationsController(IDenunciationService service, IWebHostEnvir
 {
     [HttpPost]
     [AuthorizeProfile(EnumProfileType.Operator)]
+    [RequiresContact(EnumPublication.IdentifiedDenunciation)]
     public async Task<ActionResult<ReadDenunciationDto>> CreateAsync([FromForm] CreateDenunciationDto dto)
     {
         var result = await service.CreateAsync(dto, User.GetUserId());
