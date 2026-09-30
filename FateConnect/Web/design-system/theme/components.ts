@@ -65,6 +65,7 @@ export const components: Components<Theme> = {
         const { color, variant } = ownerState;
 
         if (variant === 'soft') return { color: theme.palette.text.primary };
+        if (variant === 'destructive') return { color: theme.palette.brandText };
         // `color="inherit"` recebe a cor de quem envolve o botão, que este slot não lê.
         if (!color || color === 'inherit') return {};
         if (variant === 'contained') return { color: theme.palette[color].contrastText };
@@ -79,6 +80,16 @@ export const components: Components<Theme> = {
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: radius(radiusScale.component),
           color: theme.palette.text.primary,
+          padding: spacing(xs, md),
+        }),
+      },
+      {
+        // O vermelho da marca como texto: `secondary.main` é fundo de botão e como texto reprova.
+        props: { variant: 'destructive' },
+        style: ({ theme }) => ({
+          border: `1px solid ${theme.palette.brandText}`,
+          borderRadius: radius(radiusScale.component),
+          color: theme.palette.brandText,
           padding: spacing(xs, md),
         }),
       },

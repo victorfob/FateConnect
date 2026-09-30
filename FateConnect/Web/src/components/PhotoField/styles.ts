@@ -1,13 +1,5 @@
 import type { ImgHTMLAttributes } from 'react';
-import {
-  Box,
-  Button,
-  PolymorphicBox,
-  radiusScale,
-  spacingScale,
-  Stack,
-  styled,
-} from '@design-system';
+import { Box, PolymorphicBox, radiusScale, spacingScale, Stack, styled } from '@design-system';
 
 const { xxs, xs, sm } = spacingScale;
 
@@ -52,23 +44,6 @@ export const PhotoActions = styled(Stack)(({ theme }) => ({
  * borda igual à dos campos ao lado. A derivação do MUI, cor da paleta no rótulo
  * e ela a 50% na borda, reprova no contraste sobre a superfície.
  */
-export const PhotoActionButton = styled(Button)(({ theme }) => ({
-  gap: theme.space(xxs),
-  borderRadius: theme.radius(radiusScale.component),
-  color: theme.palette.text.primary,
-  borderColor: theme.palette.inputOutline,
-}));
-
-/**
- * Remover é destrutivo e por isso continua vermelho, no tom da marca **como
- * texto**: `secondary.main` é fundo de botão e como texto reprova. A borda vai
- * sem alpha, porque a do MUI, a 50%, some.
- */
-export const PhotoRemoveButton = styled(PhotoActionButton)(({ theme }) => ({
-  color: theme.palette.brandText,
-  borderColor: theme.palette.brandText,
-}));
-
 /** No estreito a foto e os botões seguem lado a lado, e o texto desce inteiro. */
 export const PhotoHint = styled(Box)(({ theme }) => ({
   flex: 1,

@@ -1,5 +1,6 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 
+import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { RoutePathEnum } from '@app/routes/paths';
 import { cleanup, render, screen, userEvent } from '@app/test/testing-library';
 
@@ -30,7 +31,7 @@ describe('Preferences', () => {
     renderComponent();
 
     expect(screen.getByRole('heading', { name: C.PREFERENCES_TITLE })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: C.BACK_LABEL })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: BACK_TO_MENU_LABEL })).toHaveAttribute(
       'href',
       RoutePathEnum.MENU,
     );

@@ -8,6 +8,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona a tela do próprio perfil, onde se editam os dados pessoais, o bairro e os contatos e se salva tudo de uma vez, com o aviso de alterações não salvas e a opção de descartá-las; o nome salvo passa a aparecer no topo (#487) [Frontend]
+- Adiciona ao perfil a confirmação antes de sair com alterações não salvas, por qualquer caminho: links, voltar do navegador ou do celular e saída da conta; fechar ou recarregar a aba mostra o aviso do próprio navegador (#487) [Frontend]
+- Adiciona a foto de perfil, escolhida, trocada e removida na tela do perfil, com o enquadramento ajustado por arraste e zoom antes de ser usada, e que aparece no avatar do topo no lugar das iniciais (#487) [Frontend]
+- Adiciona a troca de senha pela tela do perfil, que pede a senha atual e mantém a sessão aberta (#487) [Frontend]
+- Adiciona a desativação da própria conta pela tela do perfil, com uma confirmação que diz o que acontece e como voltar (#487) [Frontend]
 - Adiciona à gestão a lista das contas, onde a aba de usuários só avisava que a função viria: cada uma com o nome, os contatos e a situação, com busca por nome, e-mail ou telefone e filtro por situação e perfil (#486) [Frontend]
 - Adiciona à gestão a edição de uma conta pelo administrador: nome, e-mail institucional, contatos e o acesso de administração, que ele não retira de si mesmo (#486) [Frontend]
 - Adiciona à gestão o banimento de uma conta, com confirmação, e a reversão dele; o administrador não bane a própria conta (#486) [Frontend]

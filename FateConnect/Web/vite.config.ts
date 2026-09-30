@@ -112,6 +112,9 @@ export default defineConfig({
             // estaticamente e o `import()` não tira um byte da carga inicial.
             { name: 'sentry', test: /node_modules\/@sentry(-internal)?\/(?!replay)/ },
             { name: 'sentry-replay', test: /node_modules\/@sentry\/replay(-canvas)?\// },
+            // Só o ajuste da foto de perfil a usa: no `vendor`, que é pré-carregado,
+            // ela entraria na primeira carga de toda tela.
+            { name: 'photo-crop', test: /node_modules\/(react-easy-crop|normalize-wheel)\// },
             { name: 'vendor', test: /node_modules\// },
           ],
         },

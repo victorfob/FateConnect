@@ -69,8 +69,7 @@ export function DenunciationFormFields() {
       />
 
       <PhotoField
-        labels={C.PHOTO_FIELD_LABELS}
-        accept={C.PHOTO_ACCEPT_ATTRIBUTE}
+        label={C.DENUNCIATION_FORM_LABELS.photo}
         value={photo}
         onChange={handlePhotoChange}
         disabled={disabled}

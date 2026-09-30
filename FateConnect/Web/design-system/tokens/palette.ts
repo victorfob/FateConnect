@@ -80,6 +80,8 @@ export const colorTokens = {
 
 export const shadowTokens = {
   component: '0 2px 5px rgba(0, 0, 0, 0.08)',
+  /** O que flutua por cima dos cartões, fixo no pé da tela: a sombra sobe sobre o que fica atrás. */
+  floating: '0 -2px 6px rgba(0, 0, 0, 0.06)',
 };
 
 /**

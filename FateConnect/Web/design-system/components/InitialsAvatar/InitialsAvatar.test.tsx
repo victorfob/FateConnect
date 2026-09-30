@@ -39,4 +39,19 @@ describe('InitialsAvatar', () => {
 
     expect(screen.getByRole('img', { name: 'Maria Silva' })).not.toHaveAttribute('size');
   });
+
+  it('should show the photo in the circle when there is one, still announced by the name', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      photoSrc: 'blob:https://fateconnect.test/foto',
+      size: 'portrait',
+    });
+
+    const avatar = screen.getByRole('img', { name: 'Maria Silva' });
+    expect(avatar.querySelector('img')).toHaveAttribute(
+      'src',
+      'blob:https://fateconnect.test/foto',
+    );
+    expect(avatar).toHaveStyle({ width: '96px', height: '96px' });
+  });
 });

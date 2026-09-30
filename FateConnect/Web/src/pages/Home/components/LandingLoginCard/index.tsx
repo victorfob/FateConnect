@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router';
-import { Button, IconButton, Input, Typography } from '@design-system';
-import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
+import { Button, Input, Typography } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -26,7 +25,6 @@ export function LandingLoginCard() {
   const { hash } = useLocation();
   const { notifyError, notifySuccess } = useNotification();
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const [passwordHidden, setPasswordHidden] = useState(true);
   const [credentialsToReactivate, setCredentialsToReactivate] = useState<LoginRequest | null>(null);
 
   const {
@@ -98,8 +96,6 @@ export function LandingLoginCard() {
     if (credentialsToReactivate) mutateReactivation(credentialsToReactivate);
   }, [credentialsToReactivate, mutateReactivation]);
 
-  const handleTogglePassword = useCallback(() => setPasswordHidden((hidden) => !hidden), []);
-
   const onSubmit = handleSubmit(({ email, password }) => {
     mutate({ fatecEmail: email, password });
   });
@@ -134,24 +130,12 @@ export function LandingLoginCard() {
           error={errors.email?.message}
         />
 
-        <Input
+        <Input.Password
           {...register('password')}
+          purpose="current"
           label={C.PASSWORD_LABEL}
           required
-          type={passwordHidden ? 'password' : 'text'}
-          autoComplete={passwordHidden ? 'current-password' : 'off'}
           error={errors.password?.message}
-          endAdornment={
-            <IconButton
-              type="button"
-              label={C.PASSWORD_TOGGLE_LABEL}
-              aria-pressed={!passwordHidden}
-              onClick={handleTogglePassword}
-            >
-              {/* O ícone mostra o estado atual: olho aberto = senha visível. */}
-              {passwordHidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
-            </IconButton>
-          }
         />
 
         <S.SubmitRow>

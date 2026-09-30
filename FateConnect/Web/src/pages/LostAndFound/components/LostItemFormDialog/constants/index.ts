@@ -1,7 +1,6 @@
 import type { SelectOption } from '@design-system';
 import { AddIcon, SaveIcon } from '@design-system/icons';
 
-import type { PhotoFieldLabels } from '@app/components/PhotoField';
 import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { LOST_ITEM_KIND_OPTIONS } from '@app/pages/LostAndFound/helpers/lostItemKind';
 
@@ -13,21 +12,7 @@ export const LOST_ITEM_LIMITS = {
   minPlace: 3,
   maxPlace: 100,
   maxDescription: 300,
-  maxPhotoMegabytes: 5,
-  bytesPerMegabyte: 1_048_576,
 };
-
-export const MAX_PHOTO_BYTES =
-  LOST_ITEM_LIMITS.maxPhotoMegabytes * LOST_ITEM_LIMITS.bytesPerMegabyte;
-
-export const ACCEPTED_PHOTO_TYPES: ReadonlySet<string> = new Set([
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-]);
-
-/** Só filtra o seletor do sistema; quem valida o formato é o schema. */
-export const PHOTO_ACCEPT_ATTRIBUTE = [...ACCEPTED_PHOTO_TYPES].join(',');
 
 export const REGISTER_MODE: LostItemFormMode = {
   title: 'Cadastrar item',
@@ -62,15 +47,6 @@ export const LOST_ITEM_FORM_PLACEHOLDERS = {
 
 export const DESCRIPTION_ROWS = 3;
 
-export const PHOTO_FIELD_LABELS: PhotoFieldLabels = {
-  field: LOST_ITEM_FORM_LABELS.photo,
-  hint: `JPG, PNG ou WebP, até ${LOST_ITEM_LIMITS.maxPhotoMegabytes} MB.`,
-  pick: 'Escolher foto',
-  replace: 'Trocar foto',
-  remove: 'Remover foto',
-  previewAlt: 'Prévia da foto escolhida',
-};
-
 export const STORED_PHOTO_ALT = 'Foto do item';
 
 const EMPTY_CHOICE: SelectOption = { value: '', label: SELECT_PLACEHOLDER };
@@ -89,6 +65,4 @@ export const LOST_ITEM_FORM_MESSAGES = {
   occurredOnRequired: 'Informe a data do ocorrido',
   occurredOnInFuture: 'A data do ocorrido não pode ser futura',
   descriptionTooLong: `A descrição pode ter no máximo ${LOST_ITEM_LIMITS.maxDescription} caracteres`,
-  photoFormatInvalid: 'A foto deve ser JPG, PNG ou WebP',
-  photoTooLarge: `A foto deve ter no máximo ${LOST_ITEM_LIMITS.maxPhotoMegabytes} MB`,
 };

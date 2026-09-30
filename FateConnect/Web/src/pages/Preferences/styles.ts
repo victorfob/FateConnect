@@ -1,30 +1,6 @@
-import {
-  Box,
-  radiusScale,
-  shadowTokens,
-  spacingScale,
-  Stack,
-  styled,
-  Typography,
-} from '@design-system';
+import { Box, shadowTokens, spacingScale, Stack, styled, Typography } from '@design-system';
 
-const { xxs, xs, sm, md, lg } = spacingScale;
-
-export const SettingsCard = styled(Stack)(({ theme }) => ({
-  flexDirection: 'column',
-  gap: theme.space(md),
-  padding: theme.space(lg),
-  borderRadius: theme.radius(radiusScale.component),
-  backgroundColor: theme.palette.background.paper,
-  boxShadow: shadowTokens.component,
-  color: theme.palette.text.primary,
-}));
-
-export const SectionHeading = styled(Typography)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: theme.space(xs),
-}));
+const { xxs, sm } = spacingScale;
 
 export const SettingRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',

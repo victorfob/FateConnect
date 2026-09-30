@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { DateLocalizationProvider, NotificationProvider, ThemeProvider } from '@design-system';
 
+import { LeaveGuardProvider } from './LeaveGuardProvider';
 import { QueryProvider } from './QueryProvider';
 
 /** Composição única dos providers da aplicação, reusada também nos testes. */
@@ -9,7 +10,9 @@ export function AppProviders({ children }: Readonly<{ children: ReactNode }>) {
     <ThemeProvider>
       <NotificationProvider>
         <QueryProvider>
-          <DateLocalizationProvider>{children}</DateLocalizationProvider>
+          <DateLocalizationProvider>
+            <LeaveGuardProvider>{children}</LeaveGuardProvider>
+          </DateLocalizationProvider>
         </QueryProvider>
       </NotificationProvider>
     </ThemeProvider>

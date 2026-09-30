@@ -1,5 +1,4 @@
 export const LOST_AND_FOUND_TITLE = 'Achados & Perdidos';
-export const BACK_LABEL = 'Voltar ao menu';
 export const SEARCH_TAB_LABEL = 'Buscar item';
 export const REGISTER_TAB_LABEL = 'Cadastrar item';
 

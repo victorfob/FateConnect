@@ -7,6 +7,7 @@ import {
 } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
+import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONFIRMATION } from '@app/components/ConfirmAction/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
@@ -216,7 +217,7 @@ describe('LostAndFound', () => {
 
     const router = renderComponent();
 
-    await userEvent.click(screen.getByRole('link', { name: C.BACK_LABEL }));
+    await userEvent.click(screen.getByRole('link', { name: BACK_TO_MENU_LABEL }));
 
     expect(router.state.location.pathname).toBe(RoutePathEnum.MENU);
   });

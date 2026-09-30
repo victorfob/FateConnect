@@ -1,5 +1,5 @@
 import { useCallback, useState, type ReactNode } from 'react';
-import { Button, Dialog } from '@design-system';
+import { Button, Dialog, type ButtonProps } from '@design-system';
 
 import { CONFIRMATION } from './constants';
 import * as S from './styles';
@@ -13,8 +13,16 @@ export type ConfirmActionProps = Readonly<{
   messageSuffix?: string;
   subject: string;
   confirmLabel: string;
+  /** Pinta o gatilho de vermelho, para a ação que desfaz algo que não volta pela tela. */
+  destructive?: boolean;
   onConfirm: VoidFunction;
 }>;
+
+function triggerVariant(destructive: boolean): ButtonProps['variant'] {
+  if (destructive) return 'destructive';
+
+  return 'soft';
+}
 
 /** O botão de uma ação sem volta pela tela e a confirmação que ele abre. */
 function ConfirmAction({
@@ -25,6 +33,7 @@ function ConfirmAction({
   messageSuffix = CONFIRMATION.messageSuffix,
   subject,
   confirmLabel,
+  destructive = false,
   onConfirm,
 }: ConfirmActionProps) {
   const [confirming, setConfirming] = useState(false);
@@ -38,7 +47,7 @@ function ConfirmAction({
 
   return (
     <>
-      <Button type="button" variant="soft" onClick={handleAsk}>
+      <Button type="button" variant={triggerVariant(destructive)} onClick={handleAsk}>
         {icon}
         {label}
       </Button>

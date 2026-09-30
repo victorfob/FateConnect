@@ -1,4 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
+import { PASSWORD_TOGGLE_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import {
@@ -75,7 +76,7 @@ describe('LandingLoginCard', () => {
 
     expect(campoSenha).toHaveAttribute('type', 'password');
 
-    await userEvent.click(screen.getByRole('button', { name: C.PASSWORD_TOGGLE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL }));
 
     expect(campoSenha).toHaveAttribute('type', 'text');
   });
@@ -86,7 +87,7 @@ describe('LandingLoginCard', () => {
     // Senha oculta: olho cortado. O ícone mostra o estado, não a ação.
     expect(screen.getByTestId('VisibilityOffIcon')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: C.PASSWORD_TOGGLE_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL }));
 
     expect(screen.getByTestId('VisibilityIcon')).toBeInTheDocument();
   });

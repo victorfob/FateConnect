@@ -1,6 +1,7 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
+import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
@@ -37,7 +38,7 @@ describe('Management', () => {
     renderAt();
 
     expect(screen.getByRole('heading', { name: C.MANAGEMENT_TITLE })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: C.BACK_LABEL })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: BACK_TO_MENU_LABEL })).toHaveAttribute(
       'href',
       RoutePathEnum.MENU,
     );

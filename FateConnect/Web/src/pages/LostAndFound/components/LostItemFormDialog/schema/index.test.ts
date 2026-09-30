@@ -1,7 +1,8 @@
+import { MAX_PHOTO_BYTES, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
 import { LostItemKindEnum } from '@app/services/lostAndFound/types';
 import { toApiDate, toDisplayDate } from '@app/utils/apiDate';
 
-import { LOST_ITEM_FORM_MESSAGES, LOST_ITEM_LIMITS, MAX_PHOTO_BYTES } from '../constants';
+import { LOST_ITEM_FORM_MESSAGES, LOST_ITEM_LIMITS } from '../constants';
 import { lostItemFormSchema, type LostItemFormInput } from '.';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -105,16 +106,16 @@ describe('lostItemFormSchema', () => {
     expect(firstErrorOf({ photo: photoOf('image/png', MAX_PHOTO_BYTES) })).toBeUndefined();
     expect(firstErrorOf({ photo: photoOf('image/webp', MAX_PHOTO_BYTES) })).toBeUndefined();
     expect(firstErrorOf({ photo: photoOf('image/gif', MAX_PHOTO_BYTES) })).toBe(
-      LOST_ITEM_FORM_MESSAGES.photoFormatInvalid,
+      PHOTO_MESSAGES.formatInvalid,
     );
     expect(firstErrorOf({ photo: photoOf('application/pdf', MAX_PHOTO_BYTES) })).toBe(
-      LOST_ITEM_FORM_MESSAGES.photoFormatInvalid,
+      PHOTO_MESSAGES.formatInvalid,
     );
   });
 
   it('should refuse a photo heavier than the limit', () => {
     expect(firstErrorOf({ photo: photoOf('image/png', MAX_PHOTO_BYTES + 1) })).toBe(
-      LOST_ITEM_FORM_MESSAGES.photoTooLarge,
+      PHOTO_MESSAGES.tooLarge,
     );
   });
 });

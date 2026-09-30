@@ -31,6 +31,23 @@ describe('ConfirmAction', () => {
     expect(DEFAULT_PROPS.onConfirm).not.toHaveBeenCalled();
   });
 
+  it('should paint the trigger red only for a destructive action', () => {
+    renderComponent({ ...DEFAULT_PROPS, destructive: true });
+
+    // O vermelho da marca como texto, o mesmo par que o teste de contraste mede.
+    expect(screen.getByRole('button', { name: DEFAULT_PROPS.label })).toHaveStyle({
+      color: 'rgb(207, 46, 46)',
+    });
+  });
+
+  it('should keep the neutral trigger by default', () => {
+    renderComponent();
+
+    expect(screen.getByRole('button', { name: DEFAULT_PROPS.label })).not.toHaveStyle({
+      color: 'rgb(207, 46, 46)',
+    });
+  });
+
   it('should act only once confirmed', async () => {
     renderComponent();
 

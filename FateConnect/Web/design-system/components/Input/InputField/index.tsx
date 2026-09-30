@@ -19,6 +19,8 @@ type InputFieldOwnProps = {
   helpText?: string;
   /** A presença da mensagem **é** o estado de erro do campo. */
   error?: string;
+  /** Linha de apoio sob o campo, que o erro substitui enquanto existir. */
+  hint?: string;
   endAdornment?: ReactNode;
   /** Sobe o rótulo sem esperar o foco, para valor que chega de fora — o CEP. */
   shrinkLabel?: boolean;
@@ -46,6 +48,7 @@ export function InputField({
   label,
   helpText,
   error,
+  hint,
   endAdornment,
   shrinkLabel,
   maxLength,
@@ -86,7 +89,7 @@ export function InputField({
         error={Boolean(error)}
         helperText={
           characterCount === undefined ? (
-            error
+            (error ?? hint)
           ) : (
             <HelperTextWithCounter
               error={error}
