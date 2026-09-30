@@ -1,6 +1,7 @@
+import { MAX_PHOTO_BYTES, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
 import { DenunciationCategoryEnum } from '@app/services/denunciations/types';
 
-import { DENUNCIATION_FORM_MESSAGES, DENUNCIATION_LIMITS, MAX_PHOTO_BYTES } from '../constants';
+import { DENUNCIATION_FORM_MESSAGES, DENUNCIATION_LIMITS } from '../constants';
 import { denunciationFormSchema, type DenunciationFormInput } from '.';
 
 const ONE_CHARACTER = 1;
@@ -84,10 +85,10 @@ describe('denunciationFormSchema', () => {
 
   it('should reject a photo the API would refuse', () => {
     expect(firstErrorOf({ photo: photoOf('application/pdf', MAX_PHOTO_BYTES) })).toBe(
-      DENUNCIATION_FORM_MESSAGES.photoFormatInvalid,
+      PHOTO_MESSAGES.formatInvalid,
     );
     expect(firstErrorOf({ photo: photoOf('image/png', MAX_PHOTO_BYTES + ONE_BYTE) })).toBe(
-      DENUNCIATION_FORM_MESSAGES.photoTooLarge,
+      PHOTO_MESSAGES.tooLarge,
     );
   });
 });
