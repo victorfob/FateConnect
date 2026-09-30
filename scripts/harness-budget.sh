@@ -13,11 +13,13 @@ export LC_ALL=en_US.UTF-8
 chars_per_token=4
 
 frontmatter() {
-  awk 'NR == 1 && $0 == "---" { inside = 1; next } inside && $0 == "---" { exit } inside' "$1"
+  local file="$1"
+  awk 'NR == 1 && $0 == "---" { inside = 1; next } inside && $0 == "---" { exit } inside' "$file"
 }
 
 paths_of() {
-  frontmatter "$1" | awk '
+  local rule_file="$1"
+  frontmatter "$rule_file" | awk '
     /^paths:/ { listing = 1; next }
     listing && /^[[:space:]]*-/ { sub(/^[[:space:]]*-[[:space:]]*/, ""); gsub(/"/, ""); print; next }
     listing { exit }'
@@ -25,7 +27,8 @@ paths_of() {
 
 # O `**` vira marcador antes do `*` simples, senão a troca de um desfaz a do outro.
 glob_to_regex() {
-  printf '%s' "$1" | sed -E \
+  local glob="$1"
+  printf '%s' "$glob" | sed -E \
     -e 's/[.+?()|^$]/\\&/g' \
     -e 's#\*\*/#@ANYDIRS@#g' \
     -e 's#\*\*#@ANYTHING@#g' \

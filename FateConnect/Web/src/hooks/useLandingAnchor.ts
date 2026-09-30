@@ -19,7 +19,7 @@ export function useLandingAnchor(): (sectionId: string) => void {
   return useCallback(
     (sectionId: string) => {
       if (pathname !== RoutePathEnum.LANDING) {
-        navigate(`${RoutePathEnum.LANDING}#${sectionId}`);
+        void navigate(`${RoutePathEnum.LANDING}#${sectionId}`);
         return;
       }
 
