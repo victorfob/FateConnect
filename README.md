@@ -97,6 +97,7 @@ As skills de hoje: **`spec-issue`** (especificar uma issue e dividir em sub-issu
 
 ### Como mexer nela
 
+- **Meça o custo.** `./scripts/harness-budget.sh <arquivos que a tarefa abre>` mostra o que carrega; mudança que faz crescer o que carrega sempre leva o antes e o depois no PR.
 - **Escope a rule pelo `paths:`.** Sem ele a rule carrega em toda sessão e custa contexto para sempre, inclusive nas que não tocam aquela pasta.
 - **A rule anda junto com o código.** Padrão novo e a regra que o descreve entram no mesmo PR — separar os dois é como eles divergem.
 - **É conteúdo público.** Vale a mesma restrição do resto do repositório: nada de nome de empregador, repositório interno, pacote privado ou ferramenta corporativa. Quando a orientação vier de fonte interna, registre só a decisão e a justificativa.

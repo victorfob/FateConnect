@@ -24,7 +24,7 @@ Este é um repositório **público** de trabalho acadêmico. **Nenhum conteúdo 
 - `.claude/` é **versionada**: rule e skill passam por review como código e valem igual para quem clonar o repo; a restrição acima vale para elas.
 - Rule sem `paths` carrega sempre; com `paths`, quando o **`Read`** abre um arquivo que casa — `cat`, `grep` e `sed` não disparam nada. ⛔ Área nova na sessão ⇒ um `Read` de propósito num arquivo dela antes de editar.
 - Skills carregam pela `description` ou por `/<nome>`: `spec-issue`, `pr-creator`, `resolve-pr-comments`, `write-review-comment`, `write-commit`, `changelog-writer`, `create-release`, `lighthouse-audit`, `ux-writing`, `fateconnect-create-component`, `harness-evolution`, `parallel-work`, `prove-the-mechanism` e `visual-validation`.
-- Correção de padrão feita pelo usuário vira rule ou skill: termine a tarefa e proponha (skill `harness-evolution`).
+- Correção de padrão feita pelo usuário vira rule ou skill: termine a tarefa e proponha (skill `harness-evolution`, que tem a escada de destino e o orçamento de contexto).
 
 ## Fluxo de trabalho
 
