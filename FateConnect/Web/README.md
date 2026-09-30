@@ -114,7 +114,7 @@ Use o `render` de `@app/test/testing-library`, que já monta tema, rotas e cache
 
 ⚠️ O `pre-commit` carrega o Node do `.nvmrc` por conta própria, porque uma regra de lint usa `Set.prototype.union` e o ESLint quebra em qualquer Node anterior ao 22. Sem `nvm` na máquina ele não tem como trocar: aí reprova o commit dizendo qual versão está ativa.
 
-O `pre-push` usa `scripts/test-changed.sh`, que segue o grafo de imports com `vitest related`: mudar uma tela roda os testes que a alcançam, não a suíte inteira. Ele cai na suíte inteira quando a mudança sai de `src/` ou remove arquivo — nesses casos o grafo não alcança o efeito, e `vitest related vite.config.ts` sairia com sucesso sem rodar teste nenhum.
+O `pre-push` usa `scripts/test-changed.sh`, que segue o grafo de imports com `vitest related`: mudar uma tela roda os testes que a alcançam, e nunca a suíte inteira. O que o grafo não alcança — config, dependências, setup de teste, documento legal, arquivo removido — ele lista e deixa para o CI, que roda a suíte completa em todo PR. Os testes rodam com poucos workers e tempo maior que o padrão, para não esgotar a memória da máquina num recorte que alcança o tema ou os tipos compartilhados.
 
 Nenhum dos hooks mede cobertura: o limite é global e medi-lo sobre um recorte reprova código saudável. Quem mede é o CI, sobre a suíte inteira, contra o limite de **90%** que o Vitest aplica dentro do `test:ci` — o mesmo limite vale ao rodar o comando na máquina.
 
