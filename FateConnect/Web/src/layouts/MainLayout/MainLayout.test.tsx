@@ -55,11 +55,13 @@ describe('MainLayout', () => {
     expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES);
   });
 
-  it('should show the initials of the logged user', () => {
+  it('should show the initials of the logged user', async () => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
     renderLayout();
 
-    expect(screen.getByRole('img', { name: 'Maria da Silva' })).toHaveTextContent('MS');
+    await waitFor(() =>
+      expect(screen.getByRole('img', { name: 'Maria da Silva' })).toHaveTextContent('MS'),
+    );
   });
 
   it('should not show the avatar when no name comes in the token', () => {

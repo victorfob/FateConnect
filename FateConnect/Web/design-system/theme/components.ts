@@ -211,10 +211,8 @@ export const components: Components<Theme> = {
   MuiSkeleton: {
     defaultProps: { variant: 'rectangular', animation: 'wave' },
     styleOverrides: {
-      root: ({ theme }) => ({
-        backgroundColor: theme.palette.skeleton,
-        borderRadius: radius(radiusScale.sm),
-      }),
+      root: ({ theme }) => ({ backgroundColor: theme.palette.skeleton }),
+      rectangular: { borderRadius: radius(radiusScale.sm) },
     },
   },
   MuiAppBar: {

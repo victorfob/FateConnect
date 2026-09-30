@@ -4,11 +4,14 @@ import { fetchStoredImage } from '@app/services/uploads/uploadsService';
 
 export type StoredImage = { objectUrl: string; contentType: string };
 
-type LoadedImage = StoredImage & { url: string };
+export type StoredImageState = Readonly<{ image: StoredImage | null; loading: boolean }>;
+
+/** `image` nulo com a busca encerrada é a falha: o endereço fica, a foto não veio. */
+type SettledImage = { url: string; image: StoredImage | null };
 
 /** Endereço que o navegador possa exibir, buscado com o token e revogado ao sair. */
-export function useStoredImage(url: string | null): StoredImage | null {
-  const [loaded, setLoaded] = useState<LoadedImage | null>(null);
+export function useStoredImage(url: string | null): StoredImageState {
+  const [settled, setSettled] = useState<SettledImage | null>(null);
 
   useEffect(() => {
     if (!url) return;
@@ -27,10 +30,9 @@ export function useStoredImage(url: string | null): StoredImage | null {
           return;
         }
 
-        setLoaded({ url: imageUrl, objectUrl: created, contentType: image.type });
+        setSettled({ url: imageUrl, image: { objectUrl: created, contentType: image.type } });
       } catch {
-        // Sem a foto o cartão fica com o lugar dela, do mesmo tamanho.
-        setLoaded(null);
+        if (!cancelled) setSettled({ url: imageUrl, image: null });
       }
     }
 
@@ -42,11 +44,11 @@ export function useStoredImage(url: string | null): StoredImage | null {
     };
   }, [url]);
 
-  if (url === null || loaded === null) return null;
+  if (!url) return { image: null, loading: false };
 
   // O endereço guardado junto diz de qual item a foto é: trocando de item, a
   // anterior não pode aparecer no lugar da nova enquanto ela não chega.
-  if (loaded.url !== url) return null;
+  if (settled?.url !== url) return { image: null, loading: true };
 
-  return loaded;
+  return { image: settled.image, loading: false };
 }

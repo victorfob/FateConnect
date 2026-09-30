@@ -17,6 +17,7 @@ export type User = {
   contactEmail: string;
   neighborhood: string | null;
   imageUrl: string | null;
+  thumbnailUrl: string | null;
   profileType: ProfileTypeEnum;
   status: AccountStatusEnum;
   createdAt: string;

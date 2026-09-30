@@ -7,7 +7,12 @@ export type PagedResult<T> = {
 };
 
 /** Como a API descreve quem a tela precisa contatar, em qualquer módulo. */
-export type UserContact = { name: string; email: string; phone: string };
+export type UserContact = {
+  name: string;
+  email: string;
+  phone: string;
+  thumbnailUrl: string | null;
+};
 
 export type PageQuery = {
   page?: number;

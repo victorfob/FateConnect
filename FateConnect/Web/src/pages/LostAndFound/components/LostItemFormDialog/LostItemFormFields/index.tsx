@@ -20,7 +20,7 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
   const photo = useWatch({ control, name: 'photo' });
   const description = useWatch({ control, name: 'description' });
   const today = useMemo(() => new Date(), []);
-  const storedPhoto = useStoredImage(storedThumbnailUrl);
+  const { image: storedPhoto } = useStoredImage(storedThumbnailUrl);
 
   const storedPreview = useMemo(() => {
     if (!storedPhoto) return null;
