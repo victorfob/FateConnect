@@ -52,6 +52,8 @@ export { Pagination } from './components/Pagination';
 export type { PaginationProps } from './components/Pagination';
 export { UnderlinedLink } from './components/UnderlinedLink';
 export type { UnderlinedLinkProps } from './components/UnderlinedLink';
+export { SectionCard } from './components/SectionCard';
+export type { SectionCardProps } from './components/SectionCard';
 export { StatusTag } from './components/StatusTag';
 export type { StatusTagProps } from './components/StatusTag';
 export type { StatusTagTone } from './theme/types';

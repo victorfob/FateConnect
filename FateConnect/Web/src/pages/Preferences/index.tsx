@@ -1,4 +1,4 @@
-import { PageShell, Switch, Typography, useThemeMode } from '@design-system';
+import { PageShell, SectionCard, Switch, Typography, useThemeMode } from '@design-system';
 import { DarkModeIcon, LightModeIcon, SettingsIcon } from '@design-system/icons';
 
 import { BackToMenu } from '@app/components/BackToMenu';
@@ -11,12 +11,7 @@ export function Preferences() {
 
   return (
     <PageShell title={C.PREFERENCES_TITLE} action={<BackToMenu />}>
-      <S.SettingsCard>
-        <S.SectionHeading variant="h2">
-          <SettingsIcon fontSize="small" />
-          {C.APPEARANCE_SECTION_TITLE}
-        </S.SectionHeading>
-
+      <SectionCard title={C.APPEARANCE_SECTION_TITLE} icon={<SettingsIcon fontSize="small" />}>
         <S.SettingRow>
           <S.SettingText>
             <Typography variant="subtitleBold">{C.THEME_LABEL}</Typography>
@@ -39,7 +34,7 @@ export function Preferences() {
             }
           />
         </S.SettingRow>
-      </S.SettingsCard>
+      </SectionCard>
     </PageShell>
   );
 }
