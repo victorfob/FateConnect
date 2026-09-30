@@ -23,7 +23,11 @@ import {
 } from './components/AccountDataCard/constants';
 import { DEACTIVATE } from './components/DeactivateAccount/constants';
 import { PASSWORD_LABELS } from './components/PasswordFields/constants';
-import { FATEC_EMAIL_HINT, NEIGHBORHOOD_LABEL } from './components/PersonalDataFields/constants';
+import {
+  FATEC_EMAIL_HINT,
+  NEIGHBORHOOD_HELP,
+  NEIGHBORHOOD_LABEL,
+} from './components/PersonalDataFields/constants';
 import { PHOTO_LABEL } from './components/PhotoCard/constants';
 import { PHOTO_CROP_TEXTS } from './components/PhotoCropDialog/constants';
 import { cropPhoto } from './components/PhotoCropDialog/helpers/cropPhoto';
@@ -144,6 +148,14 @@ describe('Profile', () => {
     expect(fatecEmail).toHaveValue(PROFILE.fatecEmail);
     expect(fatecEmail).toBeDisabled();
     expect(fatecEmail).toHaveAccessibleDescription(FATEC_EMAIL_HINT);
+  });
+
+  it('should explain what the neighborhood is for', async () => {
+    await renderProfile();
+
+    await userEvent.click(screen.getByRole('button', { name: new RegExp(NEIGHBORHOOD_LABEL) }));
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(NEIGHBORHOOD_HELP);
   });
 
   it('should group the data and the access in two cards, each with its subsections', async () => {
