@@ -27,6 +27,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Passa a explicar os tipos de carona também no formulário de ofertar e editar, como o filtro já fazia: solidária é gratuita, e na igualitária os participantes dividem os custos (#489) [Frontend]
 - Passa a mostrar no cartão de carona a recorrência ao lado da data e da hora, que passam a ser as da próxima partida (#481) [Frontend]
 - Passa a citar a recorrência entre os dados da carona nos termos de uso e na política de privacidade (#481) [Frontend]
 - Passa a desabilitar no calendário da carona os feriados e, na recorrência em dias úteis, o fim de semana (#481) [Frontend]

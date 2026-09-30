@@ -13,9 +13,6 @@ export const FILTER_LABELS = {
 
 export const FILTER_PLACEHOLDERS = { searchTerm: 'Insira o destino ou parte da descrição' };
 
-export const RIDE_TYPE_HELP =
-  'Solidária: a carona é gratuita. Igualitária: os participantes dividem os custos.';
-
 /** `ALL` é sentinela do formulário: não vai para a requisição. */
 export enum RideTypeFilterEnum {
   ALL = '',

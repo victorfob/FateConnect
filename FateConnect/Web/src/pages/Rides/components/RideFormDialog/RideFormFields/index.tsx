@@ -3,6 +3,7 @@ import { Dialog, Input } from '@design-system';
 import { toZonedTime } from 'date-fns-tz';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
+import { RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
 import { RideFrequencyEnum } from '@app/services/rides/types';
 
 import { isRuledOutDeparture, repeatUntilRange } from '../helpers/recurrenceDays';
@@ -59,6 +60,7 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
           <Input.Select
             {...field}
             label={C.RIDE_FORM_LABELS.rideType}
+            helpText={RIDE_TYPE_HELP}
             options={C.RIDE_TYPE_SELECT_OPTIONS}
             required
             error={errors.rideType?.message}
