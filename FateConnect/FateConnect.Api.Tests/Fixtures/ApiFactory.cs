@@ -146,7 +146,10 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public static string UniqueContactEmail() => $"contato{Guid.NewGuid():N}@gmail.com";
 
-    public SeededUser SeedUser(string fullName, EnumProfileType profileType = EnumProfileType.Operator)
+    public SeededUser SeedUser(
+        string fullName,
+        EnumProfileType profileType = EnumProfileType.Operator,
+        string? imageUrl = null)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
@@ -163,6 +166,9 @@ public class ApiFactory : WebApplicationFactory<Program>
             contact: new UserContact(phone, contactEmail),
             createdAt: DateTime.UtcNow
         );
+
+        if (imageUrl is not null)
+            user.AttachImage(imageUrl);
 
         user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
 

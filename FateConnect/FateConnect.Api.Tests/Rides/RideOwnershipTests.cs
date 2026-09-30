@@ -17,7 +17,7 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
         _factory = factory;
     }
 
-    private sealed record RideDriver(string Name, string? Email, string? Phone);
+    private sealed record RideDriver(string Name, string? Email, string? Phone, string? ThumbnailUrl);
 
     private sealed record ReadRide(Guid Id, string Destination, RideDriver Driver, bool IsOwner);
 
@@ -71,6 +71,20 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
         Assert.True(asDriver.IsOwner);
         Assert.False(asOther.IsOwner);
         Assert.Equal("Ana Beatriz Nogueira", asOther.Driver.Name);
+    }
+
+    [Theory]
+    [InlineData("uploads/user/perfil.png", "uploads/user/thumbnails/perfil.webp")]
+    [InlineData(null, null)]
+    public async Task ReadRide_OfADriverWithOrWithoutAPhoto_AnswersTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
+    {
+        int driverId = _factory.SeedUser("Camila Rezende Prado", imageUrl: imageUrl).Id;
+        Guid rideId = _factory.SeedRide(driverId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)), new TimeOnly(8, 30));
+        HttpClient reader = _factory.CreateClientForNewUser("Davi Moreira Castro");
+
+        ReadRide ride = (await reader.GetFromJsonAsync<ReadRide>($"/Rides/{rideId}", JsonOptions))!;
+
+        Assert.Equal(thumbnailUrl, ride.Driver.ThumbnailUrl);
     }
 
     [Fact]

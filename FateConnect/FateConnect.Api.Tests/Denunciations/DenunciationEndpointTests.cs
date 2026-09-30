@@ -27,7 +27,7 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         _factory = factory;
     }
 
-    private sealed record Contact(string Name, string Email, string Phone);
+    private sealed record Contact(string Name, string Email, string Phone, string? ThumbnailUrl);
 
     private sealed record ReadDenunciation(
         Guid Id,
@@ -255,6 +255,21 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
 
         Assert.False(reviewed.IsAnonymous);
         Assert.Equal("Aline Bezerra Dutra", reviewed.User?.Name);
+    }
+
+    [Theory]
+    [InlineData("uploads/user/perfil.png", "uploads/user/thumbnails/perfil.webp")]
+    [InlineData(null, null)]
+    public async Task GetDenunciation_OfAReporterWithOrWithoutAPhoto_AnswersTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
+    {
+        int reporterId = _factory.SeedUser("Gisele Amaral Pontes", imageUrl: imageUrl).Id;
+        Guid denunciationId = _factory.SeedDenunciation(reporterId, ValidDescription, SeededDay);
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Henrique Salles Dorneles");
+
+        ReadDenunciation reviewed = (await moderation
+            .GetFromJsonAsync<ReadDenunciation>($"/Denunciations/{denunciationId}", JsonOptions))!;
+
+        Assert.Equal(thumbnailUrl, reviewed.User?.ThumbnailUrl);
     }
 
     [Theory]
