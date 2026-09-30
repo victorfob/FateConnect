@@ -16,6 +16,7 @@ import {
   CLEAR_LABEL,
   INVERTED_RANGE_MESSAGE,
 } from './components/DateRangeField/constants';
+import { PASSWORD_TOGGLE_LABEL } from './components/PasswordField/constants';
 import {
   characterCountAnnouncement,
   DATE_PICKER_LABEL,
@@ -820,5 +821,40 @@ describe('Input.DateTime in the dark theme', () => {
     );
 
     expect(rangeField()).toHaveAccessibleDescription(CONSUMER_ERROR);
+  });
+});
+
+describe('Input.Password', () => {
+  it('should hide the password and offer the stored one while hidden', () => {
+    render(<Input.Password label="Senha" purpose="current" />);
+
+    const field = screen.getByLabelText('Senha');
+    expect(field).toHaveAttribute('type', 'password');
+    expect(field).toHaveAttribute('autocomplete', 'current-password');
+    expect(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
+  it('should ask the browser for a new password when that is the purpose', () => {
+    render(<Input.Password label="Nova senha" purpose="new" />);
+
+    expect(screen.getByLabelText('Nova senha')).toHaveAttribute('autocomplete', 'new-password');
+  });
+
+  it('should show the password, keep the browser out of it and reflect the state in the icon', async () => {
+    render(<Input.Password label="Senha" purpose="current" />);
+
+    await userEvent.click(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL }));
+
+    const field = screen.getByLabelText('Senha');
+    expect(field).toHaveAttribute('type', 'text');
+    expect(field).toHaveAttribute('autocomplete', 'off');
+    expect(screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByTestId('VisibilityIcon')).toBeInTheDocument();
   });
 });

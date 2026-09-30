@@ -66,3 +66,4 @@ export { spacingScale, radiusScale, shadowTokens, iconSizeTokens } from './token
 
 export { caretAfterDigitCount, countDigits, onlyDigits } from './utils/text';
 export { DATE_PICKER_LABEL, DATE_TIME_PICKER_LABEL } from './components/Input/constants';
+export { PASSWORD_TOGGLE_LABEL } from './components/Input/components/PasswordField/constants';

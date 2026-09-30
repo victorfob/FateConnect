@@ -1,13 +1,11 @@
-import { useCallback, useState } from 'react';
-import { FormGrid, IconButton, Input } from '@design-system';
-import { VisibilityIcon, VisibilityOffIcon } from '@design-system/icons';
+import { FormGrid, Input } from '@design-system';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { FIELD_LABELS, FIELD_PLACEHOLDERS } from '@app/pages/Signup/constants';
 import { MAX_LENGTH, type SignupFormValues } from '@app/pages/Signup/schema';
 
 import { BirthDateField } from '../BirthDateField';
-import { GENDER_SELECT_OPTIONS, PASSWORD_TOGGLE_LABEL } from './constants';
+import { GENDER_SELECT_OPTIONS } from './constants';
 
 export function AccountSection() {
   const {
@@ -15,9 +13,6 @@ export function AccountSection() {
     register,
     formState: { errors },
   } = useFormContext<SignupFormValues>();
-  const [passwordHidden, setPasswordHidden] = useState(true);
-
-  const handleTogglePassword = useCallback(() => setPasswordHidden((hidden) => !hidden), []);
 
   return (
     <>
@@ -63,25 +58,13 @@ export function AccountSection() {
         error={errors.fatecEmail?.message}
       />
 
-      <Input
+      <Input.Password
         {...register('password')}
+        purpose="new"
         label={FIELD_LABELS.password}
         required
         fullWidth
-        type={passwordHidden ? 'password' : 'text'}
-        autoComplete={passwordHidden ? 'new-password' : 'off'}
         error={errors.password?.message}
-        endAdornment={
-          <IconButton
-            type="button"
-            label={PASSWORD_TOGGLE_LABEL}
-            aria-pressed={!passwordHidden}
-            onClick={handleTogglePassword}
-          >
-            {/* O ícone mostra o estado atual: olho aberto = senha visível. */}
-            {passwordHidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
-          </IconButton>
-        }
       />
     </>
   );

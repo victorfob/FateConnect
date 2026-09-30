@@ -1,5 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { DATE_PICKER_LABEL } from '@design-system';
+import { DATE_PICKER_LABEL, PASSWORD_TOGGLE_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import {
@@ -20,7 +20,6 @@ import { DocumentTypeEnum } from '@app/services/signup/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { SignupConflictFieldEnum } from './@types';
-import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
 import { SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
