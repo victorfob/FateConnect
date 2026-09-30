@@ -26,6 +26,7 @@ const USER: User = {
   contactEmail: 'maria@exemplo.test',
   neighborhood: null,
   imageUrl: null,
+  thumbnailUrl: null,
   profileType: ProfileTypeEnum.OPERATOR,
   status: AccountStatusEnum.ACTIVE,
   createdAt: '2026-09-01T12:00:00',
