@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-30
+
 ### Added
 
 - Adiciona o registro das ações de administração sobre uma conta: dar ou retirar o acesso de administração, banir e reverter o banimento gravam quem fez, sobre qual conta e quando; ação recusada ou que não muda nada não grava, e o registro fica mesmo se a conta for apagada (#491) [Backend]
