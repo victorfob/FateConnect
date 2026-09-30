@@ -11,11 +11,13 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a miniatura da foto de perfil ao contato de quem publica uma carona, um item ou uma denúncia identificada, ao perfil e à lista de contas da gestão; quem não tem foto vem sem miniatura (#510) [Backend]
 - Adiciona a foto de perfil de quem publicou ao contato de uma carona, de um item ou de uma denúncia, baixada só ao abrir o contato: o círculo pulsa enquanto ela chega, e sem foto ou se ela não carregar ficam as iniciais (#511) [Frontend]
 - Adiciona a foto de perfil de cada conta ao cartão da lista de usuários da gestão, com as iniciais para quem não tem foto (#511) [Frontend]
+- Adiciona a recusa de ofertar carona, cadastrar item e enviar denúncia sem sigilo para quem está sem contato, que continua entrando, consultando as listas e enviando denúncia sigilosa; a resposta diz qual ação foi barrada e traz um código próprio no corpo do erro (#515) [Backend]
 
 ### Changed
 
 - Passa o avatar do topo a baixar a versão reduzida da foto de perfil e a pulsar enquanto ela carrega, em vez de mostrar as iniciais até a foto chegar (#511) [Frontend]
 - Passa a declarar na política de privacidade que a foto de perfil continua visível no item encerrado e que a denúncia sigilosa também a esconde de quem analisa, em nova versão do documento (#511) [Frontend]
+- Passa a criar a conta sem telefone e e-mail de contato: o cadastro deixa de recebê-los, e quem ainda os envia não recebe erro, mas os perde. O contato entra só pelo perfil, com os dois juntos, e depois de cadastrado não se apaga (#515) [Backend]
 
 ## [1.1.1] - 2026-09-30
 
