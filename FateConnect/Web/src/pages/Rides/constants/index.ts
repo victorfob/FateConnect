@@ -1,5 +1,4 @@
 export const RIDES_TITLE = 'Caronas';
-export const BACK_LABEL = 'Voltar ao menu';
 export const SEARCH_TAB_LABEL = 'Buscar carona';
 export const OFFER_TAB_LABEL = 'Ofertar carona';
 

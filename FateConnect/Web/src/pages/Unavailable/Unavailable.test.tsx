@@ -1,5 +1,6 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 
+import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent } from '@app/test/testing-library';
 
@@ -39,7 +40,7 @@ describe('Unavailable', () => {
   it('should take the user back to the menu', async () => {
     const router = renderComponent();
 
-    await userEvent.click(screen.getByRole('link', { name: C.BACK_TO_MENU_LABEL }));
+    await userEvent.click(screen.getByRole('link', { name: BACK_TO_MENU_LABEL }));
 
     expect(router.state.location.pathname).toBe(RoutePathEnum.MENU);
   });

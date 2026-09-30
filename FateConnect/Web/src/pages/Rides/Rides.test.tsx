@@ -6,6 +6,7 @@ import {
 } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
+import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
@@ -157,7 +158,7 @@ describe('Rides', () => {
     renderComponent();
 
     expect(screen.getByRole('heading', { name: C.RIDES_TITLE })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: C.BACK_LABEL })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: BACK_TO_MENU_LABEL })).toHaveAttribute(
       'href',
       RoutePathEnum.MENU,
     );

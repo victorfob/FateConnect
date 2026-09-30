@@ -1,10 +1,9 @@
 import { useCallback, useState } from 'react';
-import { NavLink } from 'react-router';
 import { CardsList, PageShell, Pagination } from '@design-system';
-import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
+import { AddIcon, SearchIcon } from '@design-system/icons';
 
+import { BackToMenu } from '@app/components/BackToMenu';
 import { usePagedSearch } from '@app/hooks/usePagedSearch';
-import { RoutePathEnum } from '@app/routes/paths';
 import { listLostItems } from '@app/services/lostAndFound/lostAndFoundService';
 import type { LostItem } from '@app/services/lostAndFound/types';
 import { PAGE_SIZE } from '@app/utils/searchParams';
@@ -51,14 +50,7 @@ export function LostAndFound() {
     <PageShell
       title={C.LOST_AND_FOUND_TITLE}
       titleAction={<LostItemFilter initialFilters={filters} onApply={applyFilters} />}
-      action={
-        <PageShell.Back
-          label={C.BACK_LABEL}
-          icon={<ArrowBackIcon fontSize="small" />}
-          component={NavLink}
-          to={RoutePathEnum.MENU}
-        />
-      }
+      action={<BackToMenu />}
       tabs={
         <>
           <PageShell.Tab

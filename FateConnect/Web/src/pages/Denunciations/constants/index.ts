@@ -1,5 +1,4 @@
 export const DENUNCIATIONS_TITLE = 'Denúncias';
-export const BACK_LABEL = 'Voltar ao menu';
 
 /** Chave do cache da lista; enviar uma denúncia invalida por ela. */
 export const DENUNCIATIONS_QUERY_KEY = 'denunciations';
