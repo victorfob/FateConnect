@@ -23,10 +23,18 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
         string FullName,
         string Phone,
         string ContactEmail,
+        string? ImageUrl,
+        string? ThumbnailUrl,
         EnumProfileType ProfileType,
         EnumAccountStatus Status);
 
-    private sealed record UserSummary(int Id, string FullName, string ContactEmail, string? Phone, EnumAccountStatus Status);
+    private sealed record UserSummary(
+        int Id,
+        string FullName,
+        string ContactEmail,
+        string? Phone,
+        string? ThumbnailUrl,
+        EnumAccountStatus Status);
 
     private sealed record PagedUsers(List<UserSummary> Items, int Total);
 
@@ -87,6 +95,20 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
         Assert.Equal(matching.ContactEmail, found.ContactEmail);
     }
 
+    [Theory]
+    [InlineData("uploads/user/perfil.png", "uploads/user/thumbnails/perfil.webp")]
+    [InlineData(null, null)]
+    public async Task ListUsers_OfAPersonWithOrWithoutAPhoto_AnswersTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
+    {
+        SeededUser person = factory.SeedUser("Jussara Leme Antunes", imageUrl: imageUrl);
+        HttpClient administrator = factory.CreateClientForNewAdministrator("Karina Bueno Siqueira");
+
+        HttpResponseMessage response = await administrator.GetAsync($"/Users?Search={person.ContactEmail}");
+
+        UserSummary found = Assert.Single((await PageFrom(response)).Items);
+        Assert.Equal(thumbnailUrl, found.ThumbnailUrl);
+    }
+
     [Fact]
     public async Task ListUsers_FilteredByStatus_LeavesTheOtherStatusesOut()
     {
@@ -111,6 +133,21 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
         ReadUser body = await ReadUserFrom(response);
         Assert.Equal(person.Phone, body.Phone);
         Assert.Equal(person.ContactEmail, body.ContactEmail);
+    }
+
+    [Theory]
+    [InlineData("uploads/user/perfil.png", "uploads/user/thumbnails/perfil.webp")]
+    [InlineData(null, null)]
+    public async Task GetUser_WithOrWithoutAPhoto_AnswersTheOriginalAndTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
+    {
+        SeededUser person = factory.SeedUser("Lauro Pacheco Diniz", imageUrl: imageUrl);
+        HttpClient administrator = factory.CreateClientForNewAdministrator("Míriam Couto Esteves");
+
+        HttpResponseMessage response = await administrator.GetAsync($"/Users/{person.Id}");
+
+        ReadUser body = await ReadUserFrom(response);
+        Assert.Equal(imageUrl, body.ImageUrl);
+        Assert.Equal(thumbnailUrl, body.ThumbnailUrl);
     }
 
     [Fact]

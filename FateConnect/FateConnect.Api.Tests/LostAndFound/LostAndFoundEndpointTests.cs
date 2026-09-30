@@ -29,7 +29,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         _factory = factory;
     }
 
-    private sealed record Contact(string Name, string? Email, string? Phone);
+    private sealed record Contact(string Name, string? Email, string? Phone, string? ThumbnailUrl);
 
     private sealed record ReadItem(
         Guid Id,
@@ -139,6 +139,20 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Assert.True(asReporter.IsOwner);
         Assert.False(asOther.IsOwner);
         Assert.Equal("Ana Beatriz Nogueira", asOther.Contact.Name);
+    }
+
+    [Theory]
+    [InlineData("uploads/user/perfil.png", "uploads/user/thumbnails/perfil.webp")]
+    [InlineData(null, null)]
+    public async Task ReadItem_OfAReporterWithOrWithoutAPhoto_AnswersTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
+    {
+        int reporterId = _factory.SeedUser("Elaine Fonseca Brito", imageUrl: imageUrl).Id;
+        Guid itemId = _factory.SeedLostAndFoundRecord(reporterId);
+        HttpClient reader = _factory.CreateClientForNewUser("Fernando Gouveia Leal");
+
+        ReadItem item = (await reader.GetFromJsonAsync<ReadItem>($"/LostAndFound/{itemId}", JsonOptions))!;
+
+        Assert.Equal(thumbnailUrl, item.Contact.ThumbnailUrl);
     }
 
     [Fact]
