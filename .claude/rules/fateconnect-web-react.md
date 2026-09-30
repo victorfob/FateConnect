@@ -40,6 +40,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 - Caminhos em pt-BR; a landing é a raiz (`RoutePathEnum.LANDING = '/'`). Trocar segmento quebra link salvo: só com decisão de produto.
 - ⛔ Rota aposentada ganha 301 em `deploy/nginx/site.conf.template`, não `<Navigate>` (responde 200 e a URL antiga segue indexada).
 - ⛔ Tela com alterações não salvas segura toda saída: navegação pelo `useBlocker`, fechar a aba pelo `useBeforeUnload`, e o *Sair* pelo `LeaveGuardProvider` (a tela registra com `useLeaveInterceptor`). O `useBlocker` não alcança o *Sair*, que troca a árvore sem passar pelo roteador: item de menu novo que sai da conta chama `useSignOut`, nunca `logout` direto. Exemplo: `pages/Profile/hooks/useLeaveConfirmation.ts`.
+- ⛔ Link para a tela aberta é ação morta: some nela (`useMatch`), e o aviso que o leva fica.
 - Caronas é uma rota só: ofertar abre diálogo sobre a lista. Não recriar `/caronas/buscar` nem `/caronas/ofertar`.
 - Contato é seção da landing (`#contato`, `LandingSectionEnum.CONTACT`), atendida pelo rodapé; não há rota `/contato`. Ao mexer em `constants/navigation.ts` ou nas rotas, não restaurar rota nem item de menu.
 

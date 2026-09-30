@@ -15,6 +15,8 @@ Para mensagem de commit, use a skill `write-commit`. Depois do merge (fechar a i
    gh pr view <n> --json body -q .body > /tmp/corpo.md   # e edite ESTE arquivo
    ```
 
+   O corpo editado no site vem com `\r\n`: edite em bytes e confira que o `diff` contra o publicado mostra só a sua linha.
+
    Apagou mesmo assim? `userContentEdits` guarda cada versão inteira (o campo `diff` é o corpo completo, do mais novo para o mais antigo). Recupere **comparando linha a linha** contra o atual, não colando o que você lembra.
 
    ```bash
