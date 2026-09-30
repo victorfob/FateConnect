@@ -1,14 +1,10 @@
 import { isAfter, isValid, parse, startOfDay } from 'date-fns';
 import { z } from 'zod';
 
+import { photoSchema } from '@app/components/PhotoField/schema';
 import { isLostItemKind } from '@app/pages/LostAndFound/helpers/lostItemKind';
 
-import {
-  ACCEPTED_PHOTO_TYPES,
-  LOST_ITEM_FORM_MESSAGES,
-  LOST_ITEM_LIMITS,
-  MAX_PHOTO_BYTES,
-} from '../constants';
+import { LOST_ITEM_FORM_MESSAGES, LOST_ITEM_LIMITS } from '../constants';
 
 const REQUIRED = 1;
 /** O campo entrega o que a pessoa digitou, não o formato da API. */
@@ -22,18 +18,6 @@ function hasAlreadyHappened(value: string): boolean {
   if (!isValid(occurred)) return true;
 
   return !isAfter(startOfDay(occurred), startOfDay(new Date()));
-}
-
-function isAcceptedPhotoFormat(photo: File | null): boolean {
-  if (!photo) return true;
-
-  return ACCEPTED_PHOTO_TYPES.has(photo.type);
-}
-
-function isWithinPhotoSize(photo: File | null): boolean {
-  if (!photo) return true;
-
-  return photo.size <= MAX_PHOTO_BYTES;
 }
 
 export const lostItemFormSchema = z.object({
@@ -56,11 +40,7 @@ export const lostItemFormSchema = z.object({
     .string()
     .trim()
     .max(LOST_ITEM_LIMITS.maxDescription, LOST_ITEM_FORM_MESSAGES.descriptionTooLong),
-  photo: z
-    .instanceof(File)
-    .nullable()
-    .refine(isAcceptedPhotoFormat, LOST_ITEM_FORM_MESSAGES.photoFormatInvalid)
-    .refine(isWithinPhotoSize, LOST_ITEM_FORM_MESSAGES.photoTooLarge),
+  photo: photoSchema,
 });
 
 export type LostItemFormInput = z.input<typeof lostItemFormSchema>;

@@ -104,8 +104,7 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
 
       <Dialog.Fields.Wide>
         <PhotoField
-          labels={C.PHOTO_FIELD_LABELS}
-          accept={C.PHOTO_ACCEPT_ATTRIBUTE}
+          label={C.LOST_ITEM_FORM_LABELS.photo}
           value={photo}
           onChange={handlePhotoChange}
           disabled={disabled}

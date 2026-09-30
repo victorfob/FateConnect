@@ -1,6 +1,7 @@
 import { FILTER_CLEAR_LABEL, FILTER_SUBMIT_LABEL, FILTER_TITLE_SINGULAR } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
+import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import {
   DENUNCIATION_CARD_MARKERS,
   DESCRIPTION_TOGGLE_LABELS,
@@ -113,7 +114,7 @@ describe('Denunciations', () => {
       'true',
     );
     expect(screen.getByRole('tab', { name: C.SEND_TAB_LABEL })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: C.BACK_LABEL })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: BACK_TO_MENU_LABEL })).toBeInTheDocument();
   });
 
   it('should open the form from the tab, and explain the channel inside it', async () => {

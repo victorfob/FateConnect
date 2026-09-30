@@ -1,11 +1,10 @@
 import { useCallback, type ReactNode } from 'react';
-import { NavLink } from 'react-router';
 import { PageShell } from '@design-system';
-import { ArrowBackIcon, GroupsIcon, SecurityIcon } from '@design-system/icons';
+import { GroupsIcon, SecurityIcon } from '@design-system/icons';
 
+import { BackToMenu } from '@app/components/BackToMenu';
 import { useManagementTab } from '@app/pages/Management/hooks/useManagementTab';
 import { ManagementTabEnum } from '@app/pages/Management/types';
-import { RoutePathEnum } from '@app/routes/paths';
 
 import * as C from '../../constants';
 
@@ -34,14 +33,7 @@ export function ManagementShell({ titleAction, children }: ManagementShellProps)
     <PageShell
       title={C.MANAGEMENT_TITLE}
       titleAction={titleAction}
-      action={
-        <PageShell.Back
-          label={C.BACK_LABEL}
-          icon={<ArrowBackIcon fontSize="small" />}
-          component={NavLink}
-          to={RoutePathEnum.MENU}
-        />
-      }
+      action={<BackToMenu />}
       tabs={
         <>
           <PageShell.Tab

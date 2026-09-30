@@ -1,6 +1,7 @@
 import { DateField } from './components/DateField';
 import { DateRangeField } from './components/DateRangeField';
 import { DateTimeField } from './components/DateTimeField';
+import { PasswordField } from './components/PasswordField';
 import { SelectInput } from './components/SelectInput';
 import { InputField, type InputProps } from './InputField';
 
@@ -17,6 +18,7 @@ function Input(inputProps: InputProps) {
 Input.Date = DateField;
 Input.DateRange = DateRangeField;
 Input.DateTime = DateTimeField;
+Input.Password = PasswordField;
 Input.Select = SelectInput;
 
 export { Input };

@@ -1,12 +1,11 @@
 import { useCallback, useState } from 'react';
-import { NavLink } from 'react-router';
 import { CardsList, PageShell, Pagination } from '@design-system';
-import { AddIcon, ArrowBackIcon, SearchIcon } from '@design-system/icons';
+import { AddIcon, SearchIcon } from '@design-system/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { BackToMenu } from '@app/components/BackToMenu';
 import { useNotification } from '@app/hooks/useNotification';
 import { usePagedSearch } from '@app/hooks/usePagedSearch';
-import { RoutePathEnum } from '@app/routes/paths';
 import { deleteRide, listRides } from '@app/services/rides/ridesService';
 import type { Ride } from '@app/services/rides/types';
 import { PAGE_SIZE } from '@app/utils/searchParams';
@@ -73,14 +72,7 @@ export function Rides() {
     <PageShell
       title={C.RIDES_TITLE}
       titleAction={<RideFilter initialFilters={filters} onApply={applyFilters} />}
-      action={
-        <PageShell.Back
-          label={C.BACK_LABEL}
-          icon={<ArrowBackIcon fontSize="small" />}
-          component={NavLink}
-          to={RoutePathEnum.MENU}
-        />
-      }
+      action={<BackToMenu />}
       tabs={
         <>
           <PageShell.Tab

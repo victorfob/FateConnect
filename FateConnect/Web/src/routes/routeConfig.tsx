@@ -13,6 +13,7 @@ import { LostAndFound } from '@app/pages/LostAndFound';
 import { Management } from '@app/pages/Management';
 import { Menu } from '@app/pages/Menu';
 import { Preferences } from '@app/pages/Preferences';
+import { Profile } from '@app/pages/Profile';
 import { Rides } from '@app/pages/Rides';
 import { Signup } from '@app/pages/Signup';
 import { Unavailable } from '@app/pages/Unavailable';
@@ -49,7 +50,7 @@ export const routeConfig: RouteObject[] = [
               { path: RoutePathEnum.PREFERENCES, element: <Preferences /> },
               {
                 path: RoutePathEnum.PROFILE,
-                element: <Unavailable description={C.PROFILE_DESCRIPTION} />,
+                element: <Profile />,
               },
               { path: RoutePathEnum.DENUNCIATIONS, element: <Denunciations /> },
               {
