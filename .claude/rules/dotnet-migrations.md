@@ -50,6 +50,7 @@ dotnet ef migrations add _Drift && grep "migrationBuilder\." Infrastructure/Data
 - Saída vazia é o esperado.
 - ⛔ Apague os dois arquivos da sonda à mão e confira com `git status`: o `migrations remove` reconstrói o projeto, e a sonda não compila (o S1186 recusa o método vazio; renomear não resolve).
 - Leia o diff do `FateConnectDbContextModelSnapshot.cs` que a sonda reescreveu: mudança só de modelo (navegação que saiu) aparece ali, e se for legítima o `.Designer.cs` da sua migration precisa da mesma mudança.
+- ⛔ A sonda compara o modelo com o snapshot, não com o banco: o `DEFAULT` que uma `AlterColumn` com `defaultValue` deixou quando tornou a coluna obrigatória não aparece nela. Coluna que volta a aceitar nulo: confira `column_default` em `information_schema.columns` no banco de prova e tire o padrão no `Up()`.
 
 ## Duplicação
 
