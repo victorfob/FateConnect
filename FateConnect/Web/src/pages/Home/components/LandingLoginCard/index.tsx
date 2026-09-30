@@ -65,7 +65,7 @@ export function LandingLoginCard() {
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
     onSuccess: () => {
-      navigate(RoutePathEnum.MENU);
+      void navigate(RoutePathEnum.MENU);
     },
     onError: (error: ApiError, credentials) => {
       if (error.status === CONFLICT) {
@@ -82,7 +82,7 @@ export function LandingLoginCard() {
     meta: { notifiesErrorItself: true },
     onSuccess: () => {
       notifySuccess(C.REACTIVATION_SUCCEEDED);
-      navigate(RoutePathEnum.MENU);
+      void navigate(RoutePathEnum.MENU);
     },
     onError: (error: ApiError) => {
       setCredentialsToReactivate(null);

@@ -41,7 +41,7 @@ export function Signup() {
     meta: { notifiesErrorItself: true },
     onSuccess: () => {
       notifySuccess(C.SIGNUP_SUCCESS_MESSAGE);
-      navigate(RoutePathEnum.MENU);
+      void navigate(RoutePathEnum.MENU);
     },
   });
 
