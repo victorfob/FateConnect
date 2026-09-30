@@ -77,10 +77,9 @@ export default defineConfig({
       org: process.env.SENTRY_ORG,
       project: process.env.SENTRY_PROJECT,
       telemetry: false,
-      // A documentação do plugin diz que ele já reprova o build sozinho quando o
-      // upload falha. Medido nesta versão: **não reprova** — com token inválido
-      // o build sai `0` e publicaria um bundle sem mapa nenhum, verde. Não
-      // remova por parecer redundante.
+      // A documentação do plugin diz que ele reprova o build quando o upload falha,
+      // e nesta versão ele não reprova: com token inválido o build sai `0` e publica
+      // um bundle sem mapa, verde. Não remova por parecer redundante.
       errorHandler: (error) => {
         throw error;
       },
@@ -113,6 +112,9 @@ export default defineConfig({
             // estaticamente e o `import()` não tira um byte da carga inicial.
             { name: 'sentry', test: /node_modules\/@sentry(-internal)?\/(?!replay)/ },
             { name: 'sentry-replay', test: /node_modules\/@sentry\/replay(-canvas)?\// },
+            // Só o ajuste da foto de perfil a usa: no `vendor`, que é pré-carregado,
+            // ela entraria na primeira carga de toda tela.
+            { name: 'photo-crop', test: /node_modules\/(react-easy-crop|normalize-wheel)\// },
             { name: 'vendor', test: /node_modules\// },
           ],
         },

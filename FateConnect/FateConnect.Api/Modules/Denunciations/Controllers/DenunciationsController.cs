@@ -70,6 +70,19 @@ public class DenunciationsController(IDenunciationService service, IWebHostEnvir
         return this.ServeStoredImage(environment, EnumStorageContainer.Denunciation, storedImageName);
     }
 
+    [HttpGet("{id:guid}/image/thumbnail")]
+    [AuthorizeProfile(EnumProfileType.Operator)]
+    public async Task<ActionResult> GetThumbnailAsync(Guid id)
+    {
+        string? storedImageName = await service.GetStoredImageNameAsync(id, User.GetUserId(), User.IsAdministrator());
+
+        if (storedImageName is null)
+            return NotFound();
+
+        return this.ServeStoredImage(
+            environment, EnumStorageContainer.Denunciation, storedImageName, EnumStoredImageVariant.Thumbnail);
+    }
+
     [HttpPatch("{id:guid}/status")]
     [AuthorizeProfile(EnumProfileType.Administrator)]
     public async Task<ActionResult<ReadDenunciationDto>> UpdateStatusAsync(Guid id, [FromBody] UpdateDenunciationStatusDto dto)

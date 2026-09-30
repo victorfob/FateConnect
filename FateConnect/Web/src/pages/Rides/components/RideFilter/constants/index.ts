@@ -3,9 +3,6 @@ import type { SelectOption } from '@design-system';
 import { RIDE_SHIFT_OPTIONS } from '@app/pages/Rides/helpers/rideShift';
 import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
 
-export const FILTER_SUBMIT_LABEL = 'Filtrar';
-export const FILTER_CLEAR_LABEL = 'Limpar';
-
 export const FILTER_LABELS = {
   period: 'Período',
   departureShift: 'Turno',
@@ -15,9 +12,6 @@ export const FILTER_LABELS = {
 };
 
 export const FILTER_PLACEHOLDERS = { searchTerm: 'Insira o destino ou parte da descrição' };
-
-export const RIDE_TYPE_HELP =
-  'Solidária: a carona é gratuita. Igualitária: os participantes dividem os custos.';
 
 /** `ALL` é sentinela do formulário: não vai para a requisição. */
 export enum RideTypeFilterEnum {

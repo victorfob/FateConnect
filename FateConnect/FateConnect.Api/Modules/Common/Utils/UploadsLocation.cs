@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Hosting;
 public static class UploadsLocation
 {
     public const string FolderName = "uploads";
+    public const string ThumbnailsFolderName = "thumbnails";
+    public const string ThumbnailExtension = ".webp";
     private const string WebRootFolderName = "wwwroot";
 
     public static string WebRootOf(IWebHostEnvironment environment) =>
@@ -12,4 +14,12 @@ public static class UploadsLocation
 
     public static string PhysicalRootOf(IWebHostEnvironment environment) =>
         Path.Combine(WebRootOf(environment), FolderName);
+
+    public static string ThumbnailOf(string imagePath)
+    {
+        int lastSeparator = imagePath.LastIndexOf('/');
+        string folder = imagePath[..(lastSeparator + 1)];
+
+        return $"{folder}{ThumbnailsFolderName}/{Path.GetFileNameWithoutExtension(imagePath)}{ThumbnailExtension}";
+    }
 }

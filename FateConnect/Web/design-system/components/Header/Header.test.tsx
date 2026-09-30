@@ -32,8 +32,8 @@ function colourOf(label: string) {
   return getComputedStyle(screen.getByRole('button', { name: label })).color;
 }
 
-// O botão de menu só aparece abaixo de 768px, por CSS. O jsdom não avalia media
-// query, então ele fica com `display: none` e precisa ser buscado com `hidden`.
+// O botão de menu só aparece abaixo do limite do cabeçalho, por CSS. O jsdom não
+// avalia media query: ele fica com `display: none` e é buscado com `hidden`.
 describe('Header', () => {
   it('should render the logo and the navigation slots', () => {
     render(
@@ -50,10 +50,9 @@ describe('Header', () => {
   });
 
   /**
-   * ⛔ O branco a 90% do cromo sobre o vermelho de botão dá 4,41 — abaixo de AA.
-   * O par que a tela desenha nasce desta sobrescrita de CSS e não existe na
-   * paleta, então nenhum teste de contraste o alcança: quem o achou foi o
-   * Lighthouse renderizando a página.
+   * ⛔ O branco a 90% do cromo sobre o vermelho de botão reprova no contraste de
+   * texto. O par nasce desta sobrescrita de CSS e não existe na paleta, então
+   * nenhum teste de contraste o alcança: só este caso o guarda.
    */
   it('should leave the filled button out of the chrome colour, which fails AA over its own fill', () => {
     renderWithBothButtons();

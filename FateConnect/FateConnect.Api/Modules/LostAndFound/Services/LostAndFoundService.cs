@@ -11,6 +11,7 @@ using FateConnect.Api.Modules.Common.Enums;
 using Microsoft.Extensions.Logging;
 using FateConnect.Api.Modules.Users.Extensions;
 using FateConnect.Api.Modules.Common.Services;
+using FateConnect.Api.Modules.Common.Utils;
 
 public partial class LostAndFoundService(
     ILostAndFoundRepository repository,
@@ -164,10 +165,19 @@ public partial class LostAndFoundService(
             record.OcurredOn,
             record.Description,
             record.ImageUrl,
+            ThumbnailAddressOf(record),
             record.User.ToContactDto(),
             record.IsReportedBy(currentUserId),
             record.Status,
             record.DeletionReason,
             record.CreatedAt
         );
+
+    private static string? ThumbnailAddressOf(LostAndFoundRecord record)
+    {
+        if (record.ImageUrl is null)
+            return null;
+
+        return UploadsLocation.ThumbnailOf(record.ImageUrl);
+    }
 }

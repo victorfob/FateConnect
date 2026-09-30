@@ -8,7 +8,7 @@ import * as C from '@app/constants/appContact';
 import { useAppLinks } from '@app/hooks/useAppLinks';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
-import * as S from '../shell.styles';
+import { ShellContent, ShellRoot } from '../shell.styles';
 import { AccountMenu } from './components/AccountMenu';
 import { DrawerNavigation } from './components/DrawerNavigation';
 import { DrawerSignOut } from './components/DrawerSignOut';
@@ -25,7 +25,7 @@ export function MainLayout() {
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);
 
   return (
-    <S.ShellRoot>
+    <ShellRoot>
       <Header
         logo={<BrandLogo to={RoutePathEnum.MENU} />}
         actions={
@@ -58,9 +58,9 @@ export function MainLayout() {
         <DrawerNavigation onNavigate={handleDrawerClose} />
       </NavigationDrawer>
 
-      <S.ShellContent component="main">
+      <ShellContent component="main">
         <Outlet />
-      </S.ShellContent>
+      </ShellContent>
 
       <Footer
         anchorId={LandingSectionEnum.CONTACT}
@@ -69,6 +69,6 @@ export function MainLayout() {
         copyrightLines={C.FOOTER_COPYRIGHT_LINES}
         links={<LegalFooterLinks />}
       />
-    </S.ShellRoot>
+    </ShellRoot>
   );
 }

@@ -17,8 +17,7 @@ export type PageShellProps = Readonly<{
 
 /**
  * Cromo das telas internas: título, ação de voltar e a barra de abas. Existe um
- * só, e quem precisa dele monta os slots — foi o que evitou a segunda cópia
- * quando achados e perdidos pediu o mesmo cabeçalho de caronas.
+ * só, e quem precisa dele monta os slots.
  */
 function PageShell({ title, action, titleAction, tabs, children }: PageShellProps) {
   return (

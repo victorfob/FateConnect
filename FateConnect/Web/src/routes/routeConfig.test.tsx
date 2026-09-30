@@ -12,6 +12,7 @@ import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
 import { MANAGEMENT_TITLE } from '@app/pages/Management/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
 import { PREFERENCES_TITLE } from '@app/pages/Preferences/constants';
+import { PROFILE_TITLE } from '@app/pages/Profile/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
 import * as C from '@app/pages/Unavailable/constants';
@@ -33,13 +34,14 @@ function renderRoute(initialPath: string) {
 const NO_CONTENT = 204;
 
 describe('routeConfig', () => {
-  // Caronas, achados e perdidos e denúncias listam assim que montam.
+  // Caronas, achados e perdidos, denúncias e a gestão listam assim que montam.
   beforeEach(() => {
     server.use(
       http.get('https://api.fateconnect.test/rides', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/lostandfound', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/denunciations', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/denunciations/mine', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/users', () => HttpResponse.json([])),
     );
   });
 
@@ -66,6 +68,7 @@ describe('routeConfig', () => {
     [RoutePathEnum.RIDES, RIDES_TITLE],
     [RoutePathEnum.PREFERENCES, PREFERENCES_TITLE],
     [RoutePathEnum.DENUNCIATIONS, DENUNCIATIONS_TITLE],
+    [RoutePathEnum.PROFILE, PROFILE_TITLE],
   ])('should resolve %s with a session', async (path, title) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
 
@@ -74,16 +77,13 @@ describe('routeConfig', () => {
     await expectTitle(title);
   });
 
-  it.each([
-    [RoutePathEnum.PROFILE, C.PROFILE_DESCRIPTION],
-    [RoutePathEnum.NOTIFICATIONS, C.NOTIFICATIONS_DESCRIPTION],
-  ])('should resolve %s with the screen that has no owner yet', async (path, description) => {
+  it('should resolve the notifications with the screen that has no owner yet', async () => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
 
-    renderRoute(path);
+    renderRoute(RoutePathEnum.NOTIFICATIONS);
 
     await expectTitle(C.UNAVAILABLE_TITLE);
-    expect(screen.getByText(description)).toBeInTheDocument();
+    expect(screen.getByText(C.NOTIFICATIONS_DESCRIPTION)).toBeInTheDocument();
   });
 
   it.each([

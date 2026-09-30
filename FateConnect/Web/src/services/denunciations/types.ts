@@ -24,9 +24,8 @@ export type Denunciation = {
   id: string;
   category: DenunciationCategoryEnum;
   description: string;
-  /** Sempre nulo para quem denuncia: a API só entrega a foto a quem analisa. */
   imageUrl: string | null;
-  hasImage: boolean;
+  thumbnailUrl: string | null;
   status: DenunciationStatusEnum;
   /** Nulo quando a denúncia esconde de quem analisa o contato de quem a fez. */
   user: UserContact | null;

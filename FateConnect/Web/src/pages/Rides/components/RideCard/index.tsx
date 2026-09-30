@@ -1,18 +1,14 @@
 import { ListCard, StatusTag, Typography } from '@design-system';
-import { AccessTimeIcon, CalendarTodayIcon, GroupsIcon } from '@design-system/icons';
-import { format, parseISO } from 'date-fns';
+import { CalendarTodayIcon, EventRepeatIcon } from '@design-system/icons';
 
 import * as C from '@app/pages/Rides/constants';
+import { rideDepartureLabel } from '@app/pages/Rides/helpers/rideDeparture';
+import { rideRecurrenceLabel } from '@app/pages/Rides/helpers/rideFrequency';
 import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
 import type { Ride } from '@app/services/rides/types';
-import { firstCharacters } from '@app/utils/sequence';
 
 import { RideDriverContact } from './RideDriverContact';
 import { RideOwnerActions } from './RideOwnerActions';
-
-const DATE_FORMAT = 'dd/MM/yyyy';
-/** A API devolve `HH:mm:ss`; o cartão mostra só horas e minutos. */
-const TIME_LENGTH = 5;
 
 type RideCardProps = Readonly<{
   ride: Ride;
@@ -23,6 +19,8 @@ type RideCardProps = Readonly<{
 export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
   const typeLabel = rideTypeDisplayLabel(ride.rideType);
   const tone = rideTypeTone(ride.rideType);
+  const recurrence = rideRecurrenceLabel(ride.frequency, ride.departureDate);
+  const departure = rideDepartureLabel(ride.departureDate, ride.departureTime, ride.frequency);
 
   return (
     <ListCard own={ride.isOwner} ownLabel={C.OWN_RIDE_LABEL}>
@@ -44,23 +42,18 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
         <ListCard.InfoItem>
           <CalendarTodayIcon />
           <Typography variant="caption" color="inherit">
-            {format(parseISO(ride.departureDate), DATE_FORMAT)}
+            {departure}
           </Typography>
         </ListCard.InfoItem>
 
-        <ListCard.InfoItem>
-          <AccessTimeIcon />
-          <Typography variant="caption" color="inherit">
-            {firstCharacters(ride.departureTime, TIME_LENGTH)}
-          </Typography>
-        </ListCard.InfoItem>
-
-        <ListCard.InfoItem>
-          <GroupsIcon />
-          <Typography variant="caption" color="inherit">
-            {C.seatsLabel(ride.availableSeats)}
-          </Typography>
-        </ListCard.InfoItem>
+        {recurrence && (
+          <ListCard.InfoItem>
+            <EventRepeatIcon />
+            <Typography variant="caption" color="inherit">
+              {recurrence}
+            </Typography>
+          </ListCard.InfoItem>
+        )}
       </ListCard.InfoRow>
 
       <ListCard.Description>

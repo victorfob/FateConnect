@@ -1,24 +1,18 @@
 import { render, screen, userEvent } from '@app/test/testing-library';
 
+import { PHOTO_FIELD_TEXTS } from './constants';
 import { PhotoField, type PhotoFieldProps } from '.';
 
-const PREVIEW_URL = 'blob:https://fateconnect.test/preview';
+/** O arquivo de `photo` lido como `data:`: é assim que a prévia chega à tela. */
+const CHOSEN_PREVIEW = 'data:image/png;base64,Y29udGXDumRv';
 const STORED_URL = 'blob:https://fateconnect.test/guardada';
-
-const LABELS = {
-  field: 'Foto',
-  hint: 'JPG, PNG ou WebP, até 5 MB.',
-  pick: 'Escolher foto',
-  replace: 'Trocar foto',
-  remove: 'Remover foto',
-  previewAlt: 'Prévia da foto escolhida',
-};
+const FIELD_LABEL = 'Foto';
+const STORED_PREVIEW = { src: STORED_URL, alt: 'Foto do item' };
 
 const onChange = vi.fn();
 
 const DEFAULT_PROPS: PhotoFieldProps = {
-  labels: LABELS,
-  accept: 'image/png',
+  label: FIELD_LABEL,
   value: null,
   onChange,
 };
@@ -28,12 +22,6 @@ const renderComponent = (props = DEFAULT_PROPS) => render(<PhotoField {...props}
 const photo = new File(['conteúdo'], 'print.png', { type: 'image/png' });
 
 describe('PhotoField', () => {
-  beforeEach(() => {
-    // jsdom não implementa a fábrica de URL de objeto, e é dela que sai a prévia.
-    URL.createObjectURL = vi.fn(() => PREVIEW_URL);
-    URL.revokeObjectURL = vi.fn();
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -41,15 +29,15 @@ describe('PhotoField', () => {
   it('should offer picking a photo and say what it accepts', () => {
     renderComponent();
 
-    expect(screen.getByRole('button', { name: LABELS.pick })).toBeInTheDocument();
-    expect(screen.getByText(LABELS.hint)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeInTheDocument();
+    expect(screen.getByText(PHOTO_FIELD_TEXTS.hint)).toBeInTheDocument();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('should hand over the chosen file', async () => {
     renderComponent();
 
-    await userEvent.upload(screen.getByLabelText(LABELS.field), photo);
+    await userEvent.upload(screen.getByLabelText(FIELD_LABEL), photo);
 
     expect(onChange).toHaveBeenCalledWith(photo);
   });
@@ -57,34 +45,35 @@ describe('PhotoField', () => {
   it('should preview the choice, offer replacing it and undo it', async () => {
     renderComponent({ ...DEFAULT_PROPS, value: photo });
 
-    expect(screen.getByRole('img', { name: LABELS.previewAlt })).toHaveAttribute(
+    expect(await screen.findByRole('img', { name: PHOTO_FIELD_TEXTS.previewAlt })).toHaveAttribute(
       'src',
-      PREVIEW_URL,
+      CHOSEN_PREVIEW,
     );
-    expect(screen.getByRole('button', { name: LABELS.replace })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.replace })).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: LABELS.remove }));
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
 
     expect(onChange).toHaveBeenCalledWith(null);
   });
 
-  /** O que já está guardado se troca, não se apaga: não há o que desfazer. */
   it('should show what is already stored, with no way to remove it', () => {
-    renderComponent({
-      ...DEFAULT_PROPS,
-      storedPreview: { src: STORED_URL, alt: 'Foto do item' },
-    });
+    renderComponent({ ...DEFAULT_PROPS, storedPreview: STORED_PREVIEW });
 
-    expect(screen.getByRole('img', { name: 'Foto do item' })).toHaveAttribute('src', STORED_URL);
-    expect(screen.getByRole('button', { name: LABELS.replace })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: LABELS.remove })).not.toBeInTheDocument();
+    expect(screen.getByRole('img', { name: STORED_PREVIEW.alt })).toHaveAttribute(
+      'src',
+      STORED_URL,
+    );
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.replace })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: PHOTO_FIELD_TEXTS.remove }),
+    ).not.toBeInTheDocument();
   });
 
   it('should replace the hint with the error while there is one', () => {
     renderComponent({ ...DEFAULT_PROPS, error: 'A foto deve ser JPG, PNG ou WebP' });
 
     expect(screen.getByText('A foto deve ser JPG, PNG ou WebP')).toBeInTheDocument();
-    expect(screen.queryByText(LABELS.hint)).not.toBeInTheDocument();
+    expect(screen.queryByText(PHOTO_FIELD_TEXTS.hint)).not.toBeInTheDocument();
   });
 
   /** O botão é o alvo visível; quem abre o seletor do sistema é a entrada escondida. */
@@ -92,7 +81,7 @@ describe('PhotoField', () => {
     const openPicker = vi.spyOn(HTMLInputElement.prototype, 'click');
     renderComponent();
 
-    await userEvent.click(screen.getByRole('button', { name: LABELS.pick }));
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick }));
 
     expect(openPicker).toHaveBeenCalled();
     openPicker.mockRestore();
@@ -101,6 +90,6 @@ describe('PhotoField', () => {
   it('should refuse to pick while disabled', () => {
     renderComponent({ ...DEFAULT_PROPS, disabled: true });
 
-    expect(screen.getByRole('button', { name: LABELS.pick })).toBeDisabled();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeDisabled();
   });
 });

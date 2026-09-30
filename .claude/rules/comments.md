@@ -1,124 +1,59 @@
 ---
-description: Quando comentar — zero no back-end .NET; fora dele, renomear, extrair e simplificar antes de escrever, e o teste é impedir uma mudança errada
+description: Quando comentar no front, nos workflows, hooks e scripts — renomear, extrair e simplificar antes de escrever, só a decisão que o código não deixa deduzir sobrevive, até três linhas e nada de histórico
+paths:
+  - "FateConnect/Web/**"
+  - ".github/**"
+  - ".githooks/**"
+  - "scripts/**"
+  - "deploy/**"
 ---
 
 # Comentário
 
-## No back-end .NET, zero
+Em C# não há comentário: o `pre-commit` e o `check-api` reprovam `//` e `/* */` em `.cs`, fora dos arquivos gerados. Esta rule vale para TypeScript, YAML de workflow e shell.
 
-⛔ **Nenhum comentário em C#** — nem `//`, nem `///`, nem XML doc, em código de produção ou de teste. Não há exceção a pesar caso a caso: a regra é a ausência.
+## Reescrever vem antes de comentar
 
-Decidido pelo Victor em 2026-08-28, durante a reescrita da `fix/176`: *"vamos ajustar a regra de comentários, zero comentários no backend"*. Saíram **25 linhas de 5 arquivos** — a política de fallback, a guarda de migration, os XML docs da fábrica de teste, a explicação do segredo acentuado e o XML doc do `TimeOnlyJsonConverter` —, e nenhum teste caiu.
-
-⛔ **Ao apagar um comentário ou uma declaração, procure o nome dela em `.claude/`.** Rule e skill citam código por nome, e nada as avisa quando o código sai — o texto continua sintaticamente perfeito descrevendo algo que não existe.
-
-```bash
-grep -rn "<NomeDoSímbolo>" .claude/
-```
-
-Aconteceu nesta mesma rodada: apagado o XML doc do `TimeOnlyJsonConverter`, a `write-review-comment` continuou ensinando a ancorar o comentário de review "em cima do XML doc que explicava por que ele existia" — técnica que esta regra tinha acabado de proibir. Quem viu foi o Victor.
-
-**Onde a explicação passa a morar:** no nome do símbolo, no corpo do PR, ou na issue. Se um trecho de C# só se entende com texto ao lado, é o trecho que precisa mudar.
-
-⚠️ **A regra é do código, não do repositório.** YAML de workflow, script de shell, Markdown e o front seguem pela seção abaixo — lá o comentário existe, só é raro.
-
-## Fora do C#: reescrever vem antes de comentar
-
-⛔ **Comentário é sinal de que o código não se explicou sozinho.** A primeira reação a *"isso aqui merece um comentário"* é reescrever o trecho até ele não merecer mais.
-
-⛔ **Antes de escrever qualquer um, tentar nesta ordem:**
+⛔ **Comentário é sinal de que o código não se explicou sozinho.** Antes de escrever um, tente nesta ordem:
 
 1. **renomear** — variável, função ou tipo que revele a intenção;
 2. **extrair** — uma função nomeada no lugar do bloco que você ia comentar;
-3. **simplificar** — reduzir aninhamento, early return, condição composta virando função com nome.
+3. **simplificar** — early return, menos aninhamento, condição composta virando função com nome.
 
-Só o que sobrevive às três chega a ser candidato.
+```ts
+// ❌ o comentário narra o que a condição confere
+// só quem administra ou quem ofertou pode excluir a carona
+if ((profile === ProfileTypeEnum.ADMINISTRATOR || ride.isOwner) && ride.isActive) removeRide(ride);
 
-**E o candidato ainda passa por um teste:** este comentário impede alguém de fazer uma mudança errada? Se sim, fica. Se ele só conta o que o código já diz, sai.
+// ✅ o nome carrega a intenção, e não sobra o que comentar
+if (canRemove(profile, ride)) removeRide(ride);
+```
 
-⚠️ **A escada vem antes do teste porque o teste sozinho é permissivo.** Acabado de escrever, quase todo comentário parece impedir alguma mudança errada — quem o escreveu ainda tem na cabeça o contexto que o justifica. As três tentativas reduzem o volume porque removem a pergunta em vez de respondê-la.
+**Sobrevive a decisão que o código não deixa deduzir:** o porquê de uma escolha contraintuitiva, uma armadilha de fora (contrato de terceiro, defeito de biblioteca, limite de plataforma) ou o motivo de não ter sido feito do jeito óbvio. E o candidato passa por um teste: **ele impede alguém de fazer uma mudança errada?** A escada vem antes porque, recém-escrito, quase todo comentário parece passar no teste.
 
-Fica: `Concluido` viaja sem acento **porque o backend serializa assim** (sem isso alguém "corrige" o typo). O `Array.isArray` **porque sem endereço de API o dev server responde HTML com 200** (sem isso alguém apaga a guarda como código morto).
+Fica: o `Array.isArray` dos serviços, *porque sem endereço de API o dev server responde HTML com 200* (sem isso alguém apaga a guarda como código morto); o `copyToClipboard`, *porque a API do navegador só existe em contexto seguro*.
 
-Sai, sempre:
+## Sai, sempre
 
 - JSDoc que repete a assinatura ou o nome do símbolo — `/** A fileira de ações do cartão. */` sobre `LostItemActions`.
 - Narração do passo seguinte: `// monta os filtros`, `// abre o diálogo`.
-- Parágrafo de contexto que pertence ao corpo do PR ou à issue — por que a API ainda não guarda o arquivo, o que a #106 vai implementar.
+- Parágrafo de contexto que pertence ao PR ou à issue.
 - Comentário que repete a constante declarada logo acima.
+- ⛔ Histórico — data, número medido, o que foi investigado, a issue em que o defeito apareceu — vai para o commit e o PR. A restrição de fora fica e a derivação sai: *"texto pede 4,5:1 pela WCAG"* fica; *"como texto ela dá 4,11:1"* vira *"como texto ela reprova no contraste"*.
 
-⛔ **E essa lista vale também para o que já está escrito.** Ao editar um trecho, passe os comentários **vizinhos** pelo mesmo teste e apague os que só repetem o código — editar é o único momento em que alguém relê aquilo. Varredura dedicada é cara e acontece uma vez por ano; limpeza de passagem é grátis e contínua.
+⛔ **A lista vale para o que já está escrito.** Ao editar um trecho, passe os comentários vizinhos pelo mesmo teste e apague os que só repetem o código — só no trecho que o PR já toca, sem varredura.
 
-⚠️ **Não é licença para alargar o diff.** Sai o comentário que está **no trecho que o PR já toca**, pela mesma regra de boy-scout que vale para padrão legado: não incluir mais, e corrigir o que passou pela sua mão.
+## Teto: três linhas de texto
 
-### Teto: três linhas de texto
+⛔ Até três linhas de texto, sem contar os delimitadores; dentro do teto, siga o tamanho dos vizinhos. Estourou? Volte à escada; o que não couber vai para o PR, a issue ou uma rule — o comentário fica com a decisão, não com a derivação.
 
-⛔ **Comentário tem até três linhas — e conta-se o texto, não o arquivo.** Um `/** … */` gasta duas linhas só com os delimitadores, então medir linha de arquivo vira um teto de **uma** linha sem ninguém perceber. Foi o erro que quase matou esta seção: a primeira medição disse que o teto condenava 33% da base, e ela contava delimitador.
+## Forma
 
-**O estado do front hoje, 572 blocos em código de produção:**
+`/** … */` acima de declaração (`const`, `function`, `type`, `enum`, componente `styled`); `//` dentro de corpo (propriedade de objeto, ramo de `if`, passo de teste). Não há banner de arquivo: comentário no topo cola na primeira declaração.
 
-| Linhas de texto | Blocos | Acumulado |
-| --- | --- | --- |
-| 1 | 297 | 51% |
-| 2 | 130 | 74% |
-| 3 | 94 | **91%** |
-| 4 ou mais | 51 | 100% |
+## Comentário envelhece com o vizinho
 
-⚠️ **O teto é barato porque 91% já o cumprem.** Ele não corta o que existe — impede o comentário longo de nascer.
-
-⛔ **Estourou? A saída não é apagar, é mudar de lugar.** Volte à escada acima; o que ainda não couber é explicação que pertence ao **corpo do PR, à issue ou a uma rule** — onde alguém a relê quando o código mudar. O comentário fica com a **decisão**, não com a derivação dela.
-
-O caso que prova: `design-system/tokens/breakpoints.ts` carrega **14 linhas** derivando o limite a partir das larguras medidas do cabeçalho. Ninguém revisita aquilo ao mexer no tema, e nada avisa quando um dos números muda.
-
-⚠️ **Os 51 de hoje saem por boy-scout**, conforme alguém passe por eles. Não se abre varredura para isto.
-
-## Forma: JSDoc acima de declaração, `//` dentro de corpo
-
-O comentário que passou no teste acima ainda escolhe a forma errada. Acima de uma **declaração** — `const`, `function`, `type`, `enum`, componente `styled` — é `/** … */`, como `OWN_ITEM_LABEL`, `ErrorScreen` e `CardRoot` estão escritos. **Dentro** de um corpo — propriedade de objeto, ramo de `if`, passo de um teste — é `//`.
-
-⛔ Cobrado no PR #141: `// Instrumentado para a transação…` acima do `const router`, no `main.tsx`. *"Deveria ser jsDoc"*. O mesmo comentário, com o mesmo texto, estava certo — errada estava a forma.
-
-**E o topo do arquivo não é um terceiro caso.** Medido nesta base: **26 dos 398** arquivos do front começam com comentário, e em todos ele está **colado na primeira declaração** — o barrel, o enum de rotas, o bloco de tokens. Banner que descreve *o arquivo* em vez de uma declaração não existe aqui e não é para nascer: ele é, estruturalmente, o que a seção **Comentário órfão** descreve — JSDoc seguido de linha em branco.
-
-## Comentário que descreve o vizinho envelhece com ele
-
-O comentário que passou nos dois testes acima ainda mente com o tempo: ele foi escrito quando a regra nasceu, e a **regra ao lado mudou depois**. Ninguém releu.
-
-⛔ **Ao adicionar regra, seletor, ramo — ou outro comentário — perto de um comentário existente, releia o comentário vizinho.** É barato e é o único momento em que a divergência é visível.
-
-**Comentário ao lado de comentário é o caso mais fácil de pular**, porque o gesto não parece uma mudança de código: você está justamente escrevendo a explicação, então parece que a explicação já está sendo cuidada. Aconteceu em 2026-08-27 no `sonar-main.yml`: escrevi um bloco novo explicando por que a análise precisa declarar a versão, encostado num bloco que dizia que o run só fica vermelho *"quando algo escapou do gate do PR"* — a frase que acabara de se mostrar falsa, e a razão de eu ter procurado um culpado inexistente. Passei por cima dela para escrever ao lado. Quem apontou foi o Victor.
-
-Aconteceu três vezes no mesmo arquivo, em 2026-08-25, no `eslint.config.js` — e quem achou a primeira foi o Victor:
-
-- *"Valor em `vw`/`vh` e constante nomeada seguem passando"* — duas regras adicionadas depois passaram a pegar exatamente isso.
-- *"quem fala com eles é o tema, que está **fora deste recorte**"* — falso: a regra ficou valendo em todo lugar, e a exceção virou um `eslint-disable-next-line` no único ponto.
-- *"o `0` cru entrava em `theme.space(0, xs)`"* — verdadeiro mas incompleto: omitia o helper livre, que foi por onde dois escaparam.
-
-**O sinal de risco é a frase que descreve o que *não* é coberto** — "segue passando", "fica de fora", "não alcança". Ela é a primeira a envelhecer, porque descreve a ausência de uma regra que alguém vai acrescentar. Prefira descrever o que o código **faz** e por quê; quando precisar mesmo falar do que fica de fora, nomeie o lugar onde a exceção vive, para que ela apareça na busca.
-
-⛔ **Cobrança repetida do Victor**, a última em 2026-08-24 com os três PRs de achados e perdidos abertos: *"já falei um milhão de vezes, só colocar comentários quando for estritamente essencial… se o código precisa ser explicado é pq ele está mal escrito"*. A varredura tirou **90 linhas líquidas de comentário de 25 arquivos** nos três PRs, e nenhum teste caiu — nenhuma delas estava segurando nada.
-
-## Enxugar não muda o próximo arquivo que escrevo
-
-⛔ **Passar uma varredura de comentário não desliga o hábito.** O commit de limpeza mede o que já existe; o arquivo seguinte nasce do mesmo impulso de antes, e nasce denso.
-
-Aconteceu duas vezes no mesmo dia: enxuguei os sete workflows de 33% para 22% de comentário e, **dois commits depois**, escrevi um workflow novo com 33%. Quem viu foi o Victor: *"vc encheu o check-version de comentário de novo"*.
-
-**O gatilho é escrever arquivo novo logo após uma limpeza** — é ali que a régua ainda não pegou. Antes de commitar o arquivo novo, medir:
-
-```bash
-grep -c '^\s*#' <arquivo>   # comentários
-wc -l < <arquivo>            # linhas
-```
-
-Densidade acima da dos vizinhos é ordem de reler cada comentário pelo teste desta rule, não de aceitar porque "acabei de aprender a regra".
-
-## Comentário órfão: a declaração some e ele fica
-
-Caso irmão do anterior e mais difícil de ver: o comentário não passou a descrever o vizinho errado por desatenção — **a declaração que ele documentava foi deletada**. O JSDoc sobrevive, pula a linha em branco e se cola ao próximo símbolo, que ele nunca descreveu.
-
-⛔ **Ao deletar uma declaração, delete o JSDoc de cima junto.** É o mesmo gesto, e é o único momento em que a órfã é visível — nada a acusa depois. Comentário órfão é sintaticamente perfeito: `tsc`, ESLint e Prettier ficam verdes.
-
-**Na varredura, o sinal é JSDoc seguido de linha em branco.** JSDoc encosta na declaração que documenta; havendo um vazio entre os dois, ou ele perdeu o dono ou já está descrevendo o vizinho errado.
-
-Aconteceu em 2026-08-25, no `Header/styles.ts`: `/** Espaço horizontal entre os itens do topo… */` pairando sobre `HeaderBar`, porque a constante de vão que ele documentava saiu na normalização de espaçamento. Na mesma varredura, `PageShell/styles.ts` e `Menu/styles.ts` ainda diziam "recuo em unidades de viewport" sobre código que já lia `theme.space()` — os três mentiam por causa de trabalho da própria branch. Foram 688 comentários lidos e **63 linhas tiradas de 45 arquivos**, sem tocar em uma linha de código.
+- ⛔ Ao mexer perto de um comentário — regra, seletor, ramo ou outro comentário —, releia-o. Se a sua mudança o torna falso, ele é seu para corrigir no mesmo PR, mesmo em outro arquivo.
+- Desconfie da frase que descreve o que **não** é coberto ("segue passando", "fica de fora"): é a primeira a envelhecer. Quando precisar dela, nomeie o lugar onde a exceção vive.
+- ⛔ Ao deletar uma declaração, delete o JSDoc de cima junto. JSDoc seguido de linha em branco é órfão. Símbolo apagado também sai do harness (skill `harness-evolution`).
+- Arquivo novo logo depois de uma limpeza: compare a densidade de comentário com a dos vizinhos antes de commitar — a limpeza não muda o hábito do próximo arquivo.

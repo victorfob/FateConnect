@@ -1,10 +1,6 @@
 ---
 name: create-release
-description: >-
-  Corta uma release do FateConnect — escolhe a versão, sobe os bumps, fecha a seção do CHANGELOG
-  e abre o PR para a `main`. Use quando o usuário pedir para criar, cortar, publicar ou preparar
-  uma release, ou uma versão nova. Cobre as validações que o CI faz antes de você, o que a
-  automação faz sozinha depois do merge.
+description: "Corta uma release do FateConnect — escolhe a versão, sobe os bumps, fecha a seção do CHANGELOG e abre o PR para a `main`. Use quando o usuário pedir para criar, cortar, publicar ou preparar uma release, ou uma versão nova. Cobre as validações que o CI faz antes de você, o que a automação faz sozinha depois do merge."
 ---
 
 # Cortar uma release
@@ -119,7 +115,7 @@ Depois de tocar o `.csproj`, **confirme que o número chegou** e que o build pas
 
 ```bash
 dotnet msbuild <projeto>.csproj -getProperty:Version
-dotnet build -v q --nologo
+dotnet build --verbosity quiet --nologo
 ```
 
 ## 4. Cortar o CHANGELOG
@@ -139,6 +135,10 @@ Quando a branch de release levar correção junto — esteira, configuração �
 ## 5. Abrir o PR
 
 Branch `release/X.Y.Z` a partir da `develop`, PR **para a `main`** pela skill `pr-creator`.
+
+⛔ **Mudou a versão depois do PR aberto? A branch se renomeia, e o PR se refaz.** O nome dela não é efêmero: ele entra na mensagem do merge commit e fica na `main` para sempre — as seis últimas estão lá como `Merge pull request #401 from victorfob/release/0.10.0`. Uma `release/0.11.0` mergeada como 1.0.0 deixaria a mentira gravada no commit que **é** a release.
+
+Aconteceu em 21/09/2026: a 0.11.0 virou 1.0.0 por decisão do Victor com o PR já aberto e o CI rodando. Custou fechar o PR apontando para o novo e apagar a branch remota — barato porque ninguém tinha revisado, e impossível de desfazer depois do merge.
 
 Mudança feita na branch de release chega à `develop` pelo `back-merge` — é o caminho legítimo para o que é de escopo de release. Não é desculpa para levar feature junto.
 

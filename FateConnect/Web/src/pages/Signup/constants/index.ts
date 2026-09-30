@@ -30,7 +30,7 @@ export const SIGNUP_ERROR_MESSAGES = {
 };
 
 export const SIGNUP_CONFLICT_MESSAGES: Record<SignupConflictFieldEnum, string> = {
-  [SignupConflictFieldEnum.FATEC_EMAIL]: 'E-mail já cadastrado — entre com ele',
+  [SignupConflictFieldEnum.FATEC_EMAIL]: 'E-mail já cadastrado: entre com ele',
   [SignupConflictFieldEnum.PHONE]: 'Telefone já cadastrado',
   [SignupConflictFieldEnum.CONTACT_EMAIL]: 'E-mail já cadastrado',
 };

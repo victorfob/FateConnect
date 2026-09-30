@@ -1,4 +1,7 @@
+import { http, HttpResponse } from 'msw';
+
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { server } from '@app/mocks/server';
 import {
   DeletionReasonEnum,
   LostItemKindEnum,
@@ -6,8 +9,9 @@ import {
   type LostItem,
 } from '@app/services/lostAndFound/types';
 import type { UserContact } from '@app/services/types';
-import { render, screen, userEvent, within } from '@app/test/testing-library';
+import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
+import { photoAlt } from './constants';
 import { RESTORE_LABEL } from './LostItemStatusAction/constants';
 import { LostItemCard } from '.';
 
@@ -30,7 +34,7 @@ const LOST_ITEM: LostItem = {
   place: 'Biblioteca',
   ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos e cartões.',
-  imageUrl: null,
+  thumbnailUrl: null,
   contact: CONTACT,
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
@@ -89,6 +93,26 @@ describe('LostItemCard', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
+  });
+
+  it('should draw the thumbnail of the photo, never the original', async () => {
+    const thumbnailPath =
+      'uploads/lostandfound/thumbnails/6f0b8e3a-1c2d-4e5f-8a9b-0c1d2e3f4a5b.webp';
+    const asked: string[] = [];
+    URL.createObjectURL = vi.fn(() => 'blob:https://fateconnect.test/foto');
+    URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get(`https://api.fateconnect.test/${thumbnailPath}`, ({ request }) => {
+        asked.push(new URL(request.url).pathname);
+
+        return new HttpResponse('\x89PNG', { headers: { 'Content-Type': 'image/webp' } });
+      }),
+    );
+
+    renderComponent({ ...LOST_ITEM, thumbnailUrl: thumbnailPath });
+
+    expect(await screen.findByRole('img', { name: photoAlt(LOST_ITEM.name) })).toBeInTheDocument();
+    await waitFor(() => expect(asked).toEqual([`/${thumbnailPath}`]));
   });
 
   it('should show the contact of whoever registered an item of someone else', async () => {

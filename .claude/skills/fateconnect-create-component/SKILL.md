@@ -23,7 +23,10 @@ A pergunta é uma só: **ele conhece o domínio?**
 - Componente do design system é **prop-driven**: recebe conteúdo por propriedade ou slot e **não importa nada de `@app/*`**. Quem compõe fornece rota, texto e domínio.
 - A prop do design system fala em termos **visuais**, não de domínio: `tone="success"`, nunca `tipo="solidaria"`.
 - Só entra no barrel o que a aplicação pode usar direto. Matéria-prima do tema (paleta, fábrica do tema, largura crua de breakpoint) fica interna.
-- **Antes de criar, procure:** `Grep` pelo nome e por um componente parecido na mesma pasta. Copiar o vizinho é mais seguro que inventar estrutura.
+- **Antes de criar, procure pelo comportamento, não pelo nome:** os utils que ele vai chamar, o componente do design system que vai montar, o texto que vai exibir. `LostItemOwnerContact` nasceu cópia do `RideDriverContact` com outro nome; procurar `copyToClipboard`, `whatsappConversationUrl` ou `getInitials` achava o gêmeo no primeiro `Grep`.
+- Hook e util compartilhados moram em `src/hooks/` e `src/utils/`; com um consumidor só, na pasta dele. O destino se reavalia quando o número de consumidores muda — unificar dois em um tira o componente do design system.
+- **A biblioteca já parametriza?** Leia as props antes de recomputar: `siblingCount={0}` resolve a paginação que quebrava no celular; `import arte from './arte.svg?react'` (`vite-plugin-svgr`) resolve o `<svg>` cru sem afrouxar o lint.
+- **O precedente do vizinho vale até onde o contexto dele vale.** O tell é o seu caso ter um elemento que o vizinho não tem (a linha de contato tem ícone, o link legal não): liste os dois lados antes de herdar o recorte dele.
 
 ## 2. Estrutura de pasta
 
@@ -37,14 +40,14 @@ MeuComponente/
   @types/      constants/     helpers/     hooks/     components/
 ```
 
-**Um componente por arquivo.** Subcomponente vai numa pasta dentro do pai, com o seu próprio `index` (`ConfirmDialog/DialogMessage/`). Se ele faz sentido para quem consome, exponha por **composição** — `ConfirmDialog.Message` via `Object.assign` — em vez de repassar props do filho pelo pai.
+**Um componente por arquivo.** Subcomponente vai numa pasta dentro do pai, com o seu próprio `index` (`Dialog/DialogMessage/`). Se ele faz sentido para quem consome, exponha por **composição** — `Dialog.Message` via `Object.assign` — em vez de repassar props do filho pelo pai.
 
 ## 3. Imports
 
-- UI vem **só** de `@design-system` (componentes, `styled`, `css`, tokens) e `@design-system/icons` (ícones). Fora de `design-system/`, importar `@mui/*` **reprova no lint**.
+- UI vem **só** de `@design-system` (componentes, `styled`, `css`, tokens) e `@design-system/icons` (ícones). Em `src/`, `@mui/*`, `@emotion/*` e caminho interno do design system reprovam no lint.
 - Falta um componente no barrel? **Adicione ao barrel**, não importe por caminho interno.
-- Alias em vez de `../../../`: `@design-system`, `@app`.
-- Estilos como namespace (`import * as S from './styles'`). Constantes idem (`import * as C from './constants'`) **quando houver três ou mais**; abaixo disso, import nomeado.
+- Alias a partir de dois níveis: `@app` na aplicação, `@ds-root` dentro do design system.
+- Namespace só nas duas exceções da `web-react-patterns.md` (`./styles` e `./constants` da própria pasta); o resto é import nomeado.
 
 ## 4. Estilo
 
@@ -60,7 +63,7 @@ MeuComponente/
 - Props: `type` (não `interface`) e envelopadas em `Readonly<{ ... }>`.
 - Callback sem parâmetro é `VoidFunction`; com parâmetro, assinatura explícita.
 - Conjunto finito na **aplicação** é `enum` com sufixo `Enum` (`RideTypeEnum`). No **design system** é união de literais (`tone?: 'neutral' | 'success' | 'warning'`), para o consumidor escrever `tone="success"` sem importar nada.
-- Tipos em `@types/` ou `types.ts` — nunca dentro de `constants.ts`, que guarda só valores.
+- Tipos em `@types/` — nunca dentro de `constants/`, que guarda só valores.
 - Sem `as const`, sem cast `as X` no fim de expressão. Em teste, `as unknown as T` é liberado para fixture.
 - `?? undefined`, nunca `|| undefined`.
 
@@ -78,14 +81,14 @@ Arquivo `<Nome>.test.tsx` ao lado do `index.tsx`.
 - `const DEFAULT_PROPS: ComponentProps<typeof X> = { ... }` e um helper `renderComponent(props = DEFAULT_PROPS)`.
 - Sempre `screen.*` — nunca desestruturar o retorno do `render`, nunca `container`.
 - Consulta por papel de acessibilidade; descrição em inglês no padrão `should …`.
-- `render` vem de `@app/test/testing-library` (já monta tema, cache e notificação) — importar `@testing-library/react` direto reprova no lint.
+- `render` vem de `@app/test/testing-library` (já monta tema, cache e notificação). Em arquivo de teste o lint não barra o `@testing-library/react` direto: a regra é da `web-testing.md`.
 - Componente que navega: `createMemoryRouter` + `RouterProvider`.
 - Agrupe asserts do mesmo comportamento num `it` só.
 
 ## 8. Fechar
 
 ```bash
-cd FateConnect/Web && yarn typecheck && npx eslint <arquivos> && yarn test:ci
+cd FateConnect/Web && nvm use && yarn typecheck && yarn eslint <arquivos> && yarn test:ci
 ```
 
 **Erro** reprova; warning se ignora. Depois de renomear identificador, rode `prettier --write` e re-rode o ESLint — a linha pode ter estourado o `printWidth`.
@@ -94,13 +97,7 @@ Cor nova entra com o par correspondente no `contrast.test.ts` (mínimo AA, 4,5:1
 
 ## 9. Olhar, não só medir
 
-⛔ **Antes de dizer que está pronto, renderize a tela e compare o elemento novo com o vizinho.** O gate prova que o código é válido; ele não prova que a coisa ficou certa ao lado do que já existia.
-
-**A comparação é o passo que enxerga** — sozinho, o elemento novo quase sempre parece bem. Foi lado a lado que apareceram, no mesmo dia: um vão de **4px contra 8px** entre a caixa de seleção e o texto, porque o rótulo do `FormControlLabel` tem `padding-left` próprio e o meu não tinha; e um link de rodapé sem nada que o distinguisse do texto ao lado, porque herdava a mesma cor e não tinha sublinhado.
-
-Os dois estavam a **uma captura de tela** de distância, os dois passaram por ESLint, `tsc` e a suíte inteira, e quem viu foi o Victor.
-
-⚠️ **Medir só depois de olhar.** `getComputedStyle` responde a pergunta que você faz; se você não desconfia de nada, não faz pergunta nenhuma. A ordem certa é olhar, estranhar, e então medir para saber o número.
+⛔ Antes de dizer que está pronto, rode a skill `visual-validation`: renderizar a tela e comparar o elemento novo com o vizinho é o passo que o gate não faz.
 
 ## Confirmar API antes de implementar
 

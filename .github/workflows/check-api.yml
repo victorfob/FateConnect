@@ -65,6 +65,12 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           IS_DRAFT: ${{ github.event.pull_request.draft }}
 
+      # Varre todo `.cs`, e não só o do diff: o que já está na base também não
+      # pode ter comentário, e o mesmo script roda no `pre-commit`.
+      - name: C# comments
+        if: steps.changes.outputs.api == 'true'
+        run: ./scripts/check-csharp-comments.sh
+
       - uses: actions/setup-dotnet@v6
         if: steps.changes.outputs.api == 'true'
         with:

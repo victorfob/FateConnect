@@ -20,8 +20,8 @@ function renderLayout() {
   return router;
 }
 
-// O botão de menu só aparece abaixo de 768px, por CSS. O jsdom não avalia media
-// query, então ele fica com `display: none` e precisa ser buscado com `hidden`.
+// O botão de menu só aparece abaixo do limite do cabeçalho, por CSS. O jsdom não
+// avalia media query: ele fica com `display: none` e é buscado com `hidden`.
 describe('GuestLayout', () => {
   it('should render the guest header and the footer around the routed content', () => {
     renderLayout();

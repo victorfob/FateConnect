@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { http, HttpResponse } from 'msw';
 
+import { MAX_PHOTO_BYTES, PHOTO_FIELD_TEXTS } from '@app/components/PhotoField/constants';
 import { server } from '@app/mocks/server';
 import { lostItemKindLabel } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import { apiClient } from '@app/services/httpClient';
@@ -12,14 +13,7 @@ import {
 import { fireEvent, render, screen, userEvent, waitFor } from '@app/test/testing-library';
 import { toApiDate } from '@app/utils/apiDate';
 
-import {
-  EDIT_MODE,
-  LOST_ITEM_FORM_LABELS,
-  MAX_PHOTO_BYTES,
-  PHOTO_FIELD_LABELS,
-  REGISTER_MODE,
-  STORED_PHOTO_ALT,
-} from './constants';
+import { EDIT_MODE, LOST_ITEM_FORM_LABELS, REGISTER_MODE, STORED_PHOTO_ALT } from './constants';
 import { LostItemFormDialog, type LostItemFormDialogProps } from '.';
 
 const LOST_AND_FOUND_URL = 'https://api.fateconnect.test/lostandfound';
@@ -32,7 +26,7 @@ async function fieldsOf(request: Request): Promise<Record<string, FormDataEntryV
   return Object.fromEntries(await request.formData());
 }
 
-const PREVIEW_URL = 'blob:https://fateconnect.test/preview';
+const STORED_PHOTO_OBJECT_URL = 'blob:https://fateconnect.test/guardada';
 /** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
 const PNG_BYTES = '\x89PNG\r\n\x1a\n';
 
@@ -47,7 +41,7 @@ const LOST_ITEM: LostItem = {
   place: 'Biblioteca',
   ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos.',
-  imageUrl: null,
+  thumbnailUrl: null,
   contact: { name: 'Marina Duarte', email: 'marina.duarte@example.com', phone: '(15) 99999-0001' },
   status: LostItemStatusEnum.OPEN,
   deletionReason: null,
@@ -55,9 +49,10 @@ const LOST_ITEM: LostItem = {
   createdAt: '2026-08-12T00:00:00',
 };
 
-const STORED_PHOTO_PATH = 'uploads/lostandfound/6f0b8e3a-1c2d-4e5f-8a9b-0c1d2e3f4a5b.png';
+const STORED_PHOTO_PATH =
+  'uploads/lostandfound/thumbnails/6f0b8e3a-1c2d-4e5f-8a9b-0c1d2e3f4a5b.webp';
 
-const ITEM_WITH_PHOTO: LostItem = { ...LOST_ITEM, imageUrl: STORED_PHOTO_PATH };
+const ITEM_WITH_PHOTO: LostItem = { ...LOST_ITEM, thumbnailUrl: STORED_PHOTO_PATH };
 
 function storedPhotoServing() {
   server.use(
@@ -88,8 +83,8 @@ function photoOf(fileName: string, type: string, sizeInBytes?: number): File {
 
 describe('LostItemFormDialog', () => {
   beforeEach(() => {
-    // jsdom não implementa a fábrica de URL de objeto, e é dela que sai a prévia.
-    URL.createObjectURL = vi.fn(() => PREVIEW_URL);
+    // jsdom não implementa a fábrica de URL de objeto, e é dela que sai a foto guardada.
+    URL.createObjectURL = vi.fn(() => STORED_PHOTO_OBJECT_URL);
     URL.revokeObjectURL = vi.fn();
   });
 
@@ -117,6 +112,20 @@ describe('LostItemFormDialog', () => {
     expect(
       screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.description) }),
     ).toHaveValue(LOST_ITEM.description);
+  });
+
+  it('should hold each text field to its limit and count the stored description', async () => {
+    renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+
+    expect(nameField()).toHaveAttribute('maxlength', '100');
+    expect(
+      screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.place) }),
+    ).toHaveAttribute('maxlength', '100');
+    expect(
+      screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.description) }),
+    ).toHaveAttribute('maxlength', '300');
+    expect(screen.getByText('39/300', { ignore: '[role="status"]' })).toBeInTheDocument();
   });
 
   it('should refuse to submit an empty form and say what is missing', async () => {
@@ -237,18 +246,18 @@ describe('LostItemFormDialog', () => {
 
     await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
 
-    const preview = await screen.findByRole('img', { name: PHOTO_FIELD_LABELS.previewAlt });
-    expect(preview).toHaveAttribute('src', PREVIEW_URL);
-    expect(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.replace })).toBeInTheDocument();
+    const preview = await screen.findByRole('img', { name: PHOTO_FIELD_TEXTS.previewAlt });
+    expect(preview.getAttribute('src')).toMatch(/^data:image\/png;base64,/);
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.replace })).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.remove }));
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
 
     await waitFor(() =>
       expect(
-        screen.queryByRole('img', { name: PHOTO_FIELD_LABELS.previewAlt }),
+        screen.queryByRole('img', { name: PHOTO_FIELD_TEXTS.previewAlt }),
       ).not.toBeInTheDocument(),
     );
-    expect(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.pick })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeInTheDocument();
   });
 
   it('should bring the stored photo into the form when the item already has one', async () => {
@@ -257,10 +266,10 @@ describe('LostItemFormDialog', () => {
     await screen.findByRole('heading', { name: EDIT_MODE.title });
 
     expect(await screen.findByRole('img', { name: STORED_PHOTO_ALT })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.replace })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.replace })).toBeInTheDocument();
     // A API não apaga a foto guardada, só a troca: oferecer remover seria mentira.
     expect(
-      screen.queryByRole('button', { name: PHOTO_FIELD_LABELS.remove }),
+      screen.queryByRole('button', { name: PHOTO_FIELD_TEXTS.remove }),
     ).not.toBeInTheDocument();
   });
 
@@ -272,11 +281,11 @@ describe('LostItemFormDialog', () => {
     await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
 
     expect(
-      await screen.findByRole('img', { name: PHOTO_FIELD_LABELS.previewAlt }),
+      await screen.findByRole('img', { name: PHOTO_FIELD_TEXTS.previewAlt }),
     ).toBeInTheDocument();
     expect(screen.queryByRole('img', { name: STORED_PHOTO_ALT })).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_LABELS.remove }));
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
 
     expect(await screen.findByRole('img', { name: STORED_PHOTO_ALT })).toBeInTheDocument();
   });

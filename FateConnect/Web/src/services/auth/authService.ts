@@ -4,11 +4,19 @@ import type { LoginRequest, TokenResponse } from './types';
 
 const AUTH_PATH = '/auth';
 
-export async function login(payload: LoginRequest): Promise<TokenResponse> {
-  const { data } = await apiClient.post<TokenResponse>(`${AUTH_PATH}/login`, payload);
+async function authenticate(path: string, payload: LoginRequest): Promise<TokenResponse> {
+  const { data } = await apiClient.post<TokenResponse>(`${AUTH_PATH}/${path}`, payload);
   tokenStorage.save(data.token);
 
   return data;
+}
+
+export function login(payload: LoginRequest): Promise<TokenResponse> {
+  return authenticate('login', payload);
+}
+
+export function reactivate(payload: LoginRequest): Promise<TokenResponse> {
+  return authenticate('reactivate', payload);
 }
 
 /**

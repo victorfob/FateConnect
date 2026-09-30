@@ -1,5 +1,5 @@
 ---
-description: Como escrever C# novo aqui — o controller só orquestra, e condição que não se lê sozinha ganha nome antes do `if`
+description: Como escrever C# aqui — sem comentário, o analisador que roda no build, controller que só orquestra, condição com nome, idioma, DTO de entrada, e os gatilhos que levam às rules de teste, migration, copy e documento legal
 paths:
   - "FateConnect/FateConnect.Api/**"
   - "FateConnect/FateConnect.Api.Tests/**"
@@ -7,180 +7,64 @@ paths:
 
 # Escrita de C#
 
-## `if` de uma instrução não leva chaves
+## Gatilhos: o que a mudança leva junto
 
-Corpo com uma instrução só dispensa as chaves, e a instrução vai na linha seguinte, indentada. É o que o código já faz:
+- **Código novo sai com ≥90% de cobertura**, medida por `./scripts/coverage-changed.sh` rodado **depois de commitar**; se a contagem de arquivos não bate com o que você mexeu, a medida está errada. O portão do Sonar é mais baixo de propósito (detalhe na `dotnet-testing`, que carrega ao abrir `FateConnect.Api.Tests/`).
+- **Mudou entidade ou configuração do EF:** a migration gerada pode dropar em vez de renomear; leia o `Up()` antes de tudo (a `dotnet-migrations` carrega ao abrir `Infrastructure/Database/`).
+- **Mensagem em `Modules/*/Exceptions/*.cs`** é copy que a pessoa lê: passa pela régua da skill `ux-writing`, com o mesmo texto que a tela usa.
+- **Mudança em `Modules/*/Entities/**` que altera o dado coletado ou mostrado** reabre os termos e a política em `FateConnect/Web/legal/` (rule `legal-documents`).
+- ⛔ **C# não leva comentário** (fora do gerado pelo EF): o `./scripts/check-csharp-comments.sh` reprova no `pre-commit` e no `check-api`, e a explicação vai no nome, no PR ou na issue.
 
-```csharp
-if (areCredentialsInvalid)
-    throw new InvalidCredentialsException();
+## O analisador roda no build
 
-if (dtos is null or { Count: 0 })
-    return [];
-```
+- **Na API, achado do SonarAnalyzer é erro de build** (`TreatWarningsAsErrors`); no projeto de testes ele só avisa. Corrija; o improcedente se responde com `#pragma warning disable` + motivo, ou no corpo do PR.
+- ⛔ **S107 só a análise do PR acusa:** construtor ou método com mais de 7 parâmetros passa na build local. Conte antes de acrescentar; as saídas são um record (`UserContact`) ou um método chamado depois do construtor (`Ride.ChangeRepetition`).
+- `Program` não vira `static` para o S1118: o `WebApplicationFactory<Program>` precisa dele. O construtor privado resolve.
+- **A duplicação do Sonar conta identificador.** Módulo copiado do vizinho nomeia logs e parâmetros pelo domínio (`LogRideCreated`/`rideId`), não herda `LogRecordCreated`. O passo do Sonar roda depois dos testes: teste vermelho esconde o gate.
+- Regra `IDExxxx` só reprova com a severidade declarada no `FateConnect/.editorconfig` (`= true:warning`). Sem isso, ela roda e não barra nada.
+- **ImageSharp valida licença:** em Release a build exige `SIXLABORS_LICENSE` (o conteúdo inteiro do `.lic`, segredo do `.env` da VPS); localmente, `-p:SixLaborsLicenseFile=<caminho>`. O "License ID" sozinho não é a chave.
 
-## O controller só orquestra
+## Forma
 
-⛔ **Nada de método auxiliar no corpo do controller.** Ele recebe a requisição, chama o serviço e devolve o resultado. O que ele precisar além disso vira **extension** ou vai para o serviço.
-
-O sinal é um `private` dentro do controller. Quando o segundo controller precisar da mesma coisa, esse método é copiado — e a duplicação nasce antes de alguém notar.
-
-Cobrado no review do PR #201: o `RidesController` carregava um `private int GetCurrentUserId()` que lia o claim de identidade. Virou `ClaimsPrincipalExtensions.GetUserId()`, e as cinco chamadas passaram a ser `User.GetUserId()`.
-
-**A extension mora no módulo dono do conceito, não em `Common`.** `GetUserId` ficou em `Modules/Auth/Extensions/` porque é `Auth` quem escreve o claim, no `TokenService`, e quem declara a exceção que ela lança. Em `Common` ela faria o único módulo que não depende de ninguém passar a depender de `Auth`.
+- `if` de uma instrução não leva chaves; a instrução vai na linha seguinte, indentada.
+- ⛔ **O controller só orquestra.** Nada de `private` nele: o auxiliar vira extension no módulo dono do conceito (`Modules/Auth/Extensions/ClaimsPrincipalExtensions.cs`, `GetUserId`), não em `Common`.
+- ⛔ **Outra camada precisa de algo `private`? Exponha o método que responde, não o dado** (`DateTimeUtils.NowInProductTimeZone`, `ToUtcFromProductTimeZone`). O tell é tornar público um `private` para atender um consumidor; extrair para arquivo novo reabre essa decisão.
+- `[Route("[controller]")]`, daí `/Rides`, `/Users` e `/Auth` com maiúscula. Rota que vem de constante do domínio (`UploadsController`, `UploadsLocation.FolderName`) é a exceção.
 
 ## Condição que não se lê sozinha ganha nome
 
-⛔ **Condição que exige decifrar vira variável nomeada antes do `if`.** Vale principalmente para `TryParse` e parentes, em que o `out` no meio da expressão esconde o que está sendo testado.
+⛔ Expressão que esconde o teste vira variável antes do `if`, e o nome cobre **todos** os operandos, não o mais fácil. Condição que já se lê (`if (ride is null)`) fica como está.
 
-Assim:
+✅ O `TryParse` sai do `if`, e a disjunção inteira ganha o nome (❌ nomear só `phoneRepeatedInRequest` e deixar a consulta crua no `if`):
 
 ```csharp
 bool isValidUserId = int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId);
 
-if (!isValidUserId)
-    throw new UnidentifiedUserException();
-```
-
-Não assim:
-
-```csharp
-if (!int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId))
-    throw new UnidentifiedUserException();
-```
-
-⚠️ **Condição que já se lê não ganha linha.** `if (ride is null)` e `if (!isValidUserId)` ficam como estão — a regra é sobre expressão que esconde o teste, não sobre proibir condição no `if`.
-
-⛔ **Nomear metade da disjunção não cumpre esta regra — cumpre pela metade.** É o caso mais difícil de enxergar, porque o nome que já está ali faz o `if` parecer revisado.
-
-⛔ Cobrado no review do PR #284, no `EnsureContactsAreUniqueAsync`: o primeiro operando tinha nome e o segundo entrava cru.
-
-```csharp
-bool phoneRepeatedInRequest = !phonesInRequest.Add(dto.Phone);
-
-if (phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.Phone))
-    throw new ContactPhoneAlreadyRegisteredException(dto.Phone);
-```
-
-O que ficou:
-
-```csharp
 bool phoneRepeatedInRequest = !phonesInRequest.Add(dto.Phone);
 bool phoneIsTaken = phoneRepeatedInRequest || await _userRepository.ContactPhoneExistsAsync(dto.Phone);
-
-if (phoneIsTaken)
-    throw new ContactPhoneAlreadyRegisteredException(dto.Phone);
 ```
 
-**O nome cobre os dois operandos, não o mais fácil.** `phoneIsTaken` diz *este telefone não está disponível*; `phoneAlreadyRegistered` seria falso para metade da disjunção, porque contato repetido dentro da própria requisição ainda não está registrado em lugar nenhum. É a mesma exigência do `HasNotDeparted`, mais abaixo. E são **duas** variáveis de propósito: `phonesInRequest.Add` muda o conjunto, e colapsar as duas enterraria essa mutação dentro de uma condição.
+Subir o `||` para a atribuição não gasta consulta: o curto-circuito é do operador.
 
-⚠️ **Subir o `||` para a atribuição não gasta consulta a mais.** O curto-circuito é do operador, não do `if`: o segundo operando segue avaliado só quando o primeiro é falso. Sem isso dito, a mudança parece trocar legibilidade por uma ida ao banco.
+⛔ **Dentro de `IQueryable`, o nome é `Expression<Func<T, bool>>`**: variável `bool` no lambda não compila, e método `bool` comum quebra em runtime (`could not be translated`). Veja `HasAnUpcomingDeparture` no `RideRepository`. Nomeie o conceito inteiro, não as metades.
 
-## Rename atinge mais do que o identificador alvo
+## Rename mecânico acerta o que você não pediu
 
-⛔ **Substituição em lote acerta o que você não pediu, e nenhum gate reclama.** Depois de qualquer rename mecânico, procure separadamente as três formas de estrago — todas pagas na #222, todas com a build verde:
+Depois de qualquer substituição em lote, procure as três formas de estrago, que compilam verdes:
 
-**1. Colisão com símbolo importado.** `GerarHashDaSenha` só encaminhava para o `HashPassword` do BCrypt, que entra por `using static`. Renomeado para `HashPassword`, o método passou a chamar **a si mesmo** — recursão infinita que compila. Antes de renomear, procure o nome novo entre os símbolos que o arquivo importa: `using static` traz nome sem qualificador, e o método local vence a resolução.
+- o nome novo colidindo com símbolo de `using static` (o método passa a chamar a si mesmo);
+- o termo dentro de string literal (`git diff <base>..HEAD | grep -E "^\+" | grep -oE '"[^"]*<termo>[^"]*"'`);
+- o termo no meio de outra palavra: procure o termo minúsculo **precedido de letra minúscula**, fronteira que camelCase nunca produz.
 
-**2. Dentro de string literal.** `Senha` → `Password` transformou `"SenhaForte123!"` em `"PasswordForte123!"` em seis lugares, dois deles `[DefaultValue]` que o Swagger exibe.
+## DTO de entrada
 
-**3. No meio de outra palavra.** `cep` → `zipCode` transformou `IsAccepted` em `IsAczipCodeted` (`IsA` + `cep` + `ted`) em dois nomes de teste. ⛔ **Este é o pior**: compila, o xunit ignora o nome do método, e os 42 testes passaram verdes com o nome corrompido.
+- Tipo-valor cuja ausência é válida é `int?`, não `required`: o `required` passa no S6964 mas torna o campo obrigatório.
+- ⛔ Propriedade derivada leva `[BindNever]`, senão vira parâmetro no Swagger (como em `PagedFilterDto` e `DateRangeFilterDto`). Só aparece lendo o `swagger.json`.
+- ⛔ **String vazia chega como `null`**, e "limpar o campo" vira "não mexer". Campo que pode ser esvaziado de propósito leva `[DisplayFormat(ConvertEmptyStringToNull = false)]` (`UpdateLostAndFoundDto`, `UpdateUserDto`); campo obrigatório, não. O tell é a entidade decidir por `is not null`.
+- `[RegularExpression]` casa a string inteira: ancore `^…$`. Duas checagens com mensagens diferentes no mesmo campo viram um `ValidationAttribute` próprio (`Infrastructure/Validation/FatecEmailAttribute.cs`), e a ordem dos `if` decide a mensagem; trave-a com teste.
+- ⛔ Coluna que passa a aceitar nulo: procure antes os DTOs de leitura que a devolvem. Nunca feche o tipo com `?? string.Empty`.
 
-⚠️ **O risco se concentra na substituição minúscula e curta.** Trocar identificador **capitalizado** é quase seguro — `Cep` com maiúscula raramente cai no meio de uma palavra. Foi o que salvou os quatro PRs anteriores da mesma sequência.
+## Idioma
 
-**O detector precisa ser o certo, senão ninguém o usa duas vezes.** Procurar o termo "colado a letra dos dois lados" devolve dezenas de camelCase legítimo (`isZipCodeFilled`, `mappedAddresses`); procurar o termo **seguido** de minúscula acusa todo plural (`Users`, `Addresses`). O que discrimina é **termo minúsculo precedido de letra minúscula** — fronteira que camelCase nunca produz.
-
-```bash
-rtk proxy git diff <base>..HEAD | grep -E "^\+" | grep -oE '"[^"]*<termo-novo>[^"]*"'   # dentro de aspas
-```
-
-## A rota do controller vem do nome da classe
-
-⛔ **`[Route("[controller]")]`, nunca string literal.** É o que `RidesController`, `UsersController` e `AuthController` fazem, e é de onde saem `/Rides`, `/Users` e `/Auth`, com a inicial maiúscula.
-
-O roteamento do ASP.NET é case-insensitive, então `/users/signup` também resolve — o que muda é o endereço que o Swagger publica. Decidido em 30/08/2026, ao levar o controller de usuários para inglês: a issue tinha especificado `/users/signup` e ficou `/Users/signup`, pela simetria com `Rides`.
-
-## Exponha o comportamento, não o dado
-
-⛔ **Outra camada precisa de algo que está `private`? Exponha o método que responde à pergunta, não o campo.** Publicar o dado espalha o detalhe: quem consome passa a saber *como* a coisa é representada, e a conversão se repete em cada ponto que a usa.
-
-⛔ Cobrado na #172. O repositório precisava de "que horas são no fuso do produto" para descartar carona já partida, e o fuso era um `private static readonly TimeZoneInfo` na entidade `Ride`. Tornei o campo público — a saída de menor esforço, e a pior: o repositório passou a saber que existe um `TimeZoneInfo`, e a conversão ficou em dois lugares que se ignoram, cada um numa direção. A pergunta foi *"pq ProductTimeZone precisou se tornar público?"*.
-
-O fuso vive em `FateConnect/FateConnect.Api/Modules/Common/Utils/DateTimeUtils.cs`, `private`, e quem precisa dele pergunta em vez de converter:
-
-```csharp
-public static DateTime NowInProductTimeZone() =>
-    TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ProductTimeZone);
-
-public static DateTime ToUtcFromProductTimeZone(DateOnly date, TimeOnly time) =>
-    TimeZoneInfo.ConvertTimeToUtc(date.ToDateTime(time), ProductTimeZone);
-```
-
-⛔ **A segunda vez foi na #322, e quem a produziu foi a mudança de lugar.** Tirar o fuso da entidade estava certo — três chamadores passaram a existir —, mas no destino o campo nasceu `public` de novo, e a entidade voltou a converter por fora. O que fechou não foi trancar o campo: foi ver que faltava a **segunda** pergunta. `ToUtcFromProductTimeZone` nasceu aí, e a conversão sumiu dos chamadores.
-
-⚠️ **Extrair reabre a decisão de visibilidade, e ninguém a trata como decisão.** O modificador que o símbolo ganha no arquivo novo é escolha de quem extrai, feita no meio de um trabalho que parece mecânico — e o caminho de menor esforço é o mesmo `public` da primeira vez.
-
-**O tell é tornar público um `private` para atender um consumidor.** Antes de mudar o modificador, pergunte o que o consumidor realmente quer saber — quase sempre é uma resposta, não o dado bruto com que ela é calculada.
-
-## Predicado de consulta é `Expression`, não método
-
-⛔ **Dentro de `IQueryable`, condição composta que pede um nome vira `Expression<Func<T, bool>>`.** As duas formas naturais de dar nome não funcionam ali, e falham de maneiras diferentes:
-
-| Forma | O que acontece |
-| --- | --- |
-| variável `bool` dentro do lambda | **não compila** — expression tree não aceita corpo de bloco |
-| método `bool` comum | compila e **quebra em runtime**: `The LINQ expression could not be translated` |
-
-Medido na #172, com o provider do PostgreSQL. A forma correta gera SQL:
-
-```csharp
-private static Expression<Func<Ride, bool>> HasNotDeparted(DateOnly today, TimeOnly currentTime) =>
-    ride => ride.DepartureDate > today
-        || (ride.DepartureDate == today && ride.DepartureTime >= currentTime);
-```
-
-```sql
-WHERE r."DepartureDate" > @__today_0 OR (r."DepartureDate" = @__today_0 AND r."DepartureTime" >= @__currentTime_1)
-```
-
-E o `Where` passa a se ler sozinho: `.Where(HasNotDeparted(today, currentTime))`.
-
-⚠️ **Nomeie o conceito inteiro, não as metades.** `HasNotDeparted` diz o que a regra significa; quebrar em `isAfterToday || isTodayAndAfterNow` obriga quem lê a recompor o sentido a partir dos pedaços.
-
-✅ **O gate protege isto desde a #237.** A suíte roda contra PostgreSQL de verdade, então predicado que não traduz derruba teste: a mutação para método `bool` fez **20 testes** caírem. Antes, no provedor em memória, as duas formas passavam iguais.
-
-## DTO de entrada: opcional é nullable, derivado é `[BindNever]`, vazio não é ausente
-
-Três apontamentos diferentes que aparecem no mesmo tipo de DTO — o que o controller recebe com `[FromQuery]` ou `[FromForm]`.
-
-⛔ **Tipo-valor cuja ausência é válida precisa ser nullable.** `int Page` num DTO de entrada reprova o build com `S6964`: quem omite o campo recebe o `default` em silêncio. Quando a omissão é intencional — e num filtro paginado ela é, o padrão está no contrato —, `int?` é o que declara isso. `required` também satisfaz o analisador, mas mente: torna o campo obrigatório.
-
-⛔ **Propriedade derivada precisa de `[BindNever]`, ou vira parâmetro público.** O Swashbuckle lista as propriedades do DTO como parâmetros de query, e não distingue as que existem só para normalizar. Na #172, `EffectivePage`, `EffectivePageSize` e `ItemsToSkip` foram publicadas no Swagger junto com `Page` e `PageSize`.
-
-**Isso só aparece lendo o JSON gerado** — o build fica verde e a aplicação funciona:
-
-```csharp
-string json = await factory.CreateClient().GetStringAsync("/swagger/v1/swagger.json");
-```
-
-⛔ **String vazia chega como `null`, e aí "limpar o campo" fica indistinguível de "não mexer no campo".** O binder converte string vazia em `null` por padrão, então num DTO de edição parcial o `if (campo is not null)` da entidade engole os dois casos: quem manda `description=""` para apagar o texto recebe **200** e o texto antigo continua gravado. Não há erro em lugar nenhum — a resposta é de sucesso e traz o valor velho.
-
-Medido em 08/09/2026 no #322, e o teste é o que segura: `UpdateItem_WithAnEmptyDescription_IsAccepted` falha sem o atributo e passa com ele.
-
-```csharp
-[DisplayFormat(ConvertEmptyStringToNull = false)]
-[StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
-public string? Description { get; init; }
-```
-
-⚠️ **Só no campo que pode ser esvaziado de propósito.** Em campo obrigatório — nome, local — a conversão é o comportamento certo: ali string vazia não é valor, e deixá-la virar `null` faz a edição parcial ignorá-la em vez de gravar lixo.
-
-### Atributo de validação: dois limites que só aparecem ao compilar
-
-⛔ **`[RegularExpression]` casa a string INTEIRA, não um trecho.** O atributo roda `Regex.Match` e depois exige `Index == 0 && Length == value.Length`, então um padrão pensado para conferir só o fim — `@(aluno\.)?cps\.sp\.gov\.br$` — reprova tudo. Ancore os dois lados: `^.*@(aluno\.)?cps\.sp\.gov\.br$`.
-
-⛔ **E ele não empilha:** `AllowMultiple = false`. Duas expressões na mesma propriedade não compilam — `CS0579: Duplicate 'RegularExpression' attribute`. Precisando de **duas checagens com mensagens diferentes** no mesmo campo, a saída é um `ValidationAttribute` próprio em `Infrastructure/Validation/`, na forma do `MinimumAgeAttribute`: cada `if` devolve o seu `ValidationResult`, e a **ordem dos `if` decide qual mensagem sai**.
-
-Medido em 11/09/2026, na #354, ao separar a recusa do e-mail institucional em formato e domínio. ⚠️ A ordem é comportamento, não detalhe: invertê-la faz `nao-e-email` ouvir a mensagem da parte local. Ela se trava com teste.
-
-⚠️ **O tell é a entidade que decide por `is not null`.** Todo campo opcional de um `PATCH` passa por essa comparação; para cada um, pergunte se existe motivo de alguém querer apagá-lo — se existe, o atributo entra junto.
+- Identificador, namespace, pasta e arquivo em inglês. Enum com **prefixo** `Enum` (`EnumRideType`); no front é sufixo, e a divergência não se corrige (o CA1711 reprova o sufixo aqui).
+- ⛔ Mensagem que a pessoa lê (validação, exceção de domínio, erro do middleware) em pt-BR, com o mesmo texto da tela. `summary`/`description` do Swagger e template de `LoggerMessage` em inglês, e o log registra o tipo da exceção: nunca interpole a mensagem de produto nele.

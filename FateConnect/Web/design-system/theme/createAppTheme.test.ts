@@ -7,7 +7,7 @@ describe('createAppTheme', () => {
     const theme = createAppTheme();
 
     // O MUI chama theme.spacing(1..3) internamente — gutters do Toolbar, padding
-    // de Dialog e de Card. Sobrescrever isso encolhia as gutters de 24px para 3px.
+    // de Dialog e de Card —, e sobrescrever isso encolheria todos eles.
     expect(theme.spacing(1)).toBe('8px');
     expect(theme.spacing(3)).toBe('24px');
   });
@@ -28,16 +28,22 @@ describe('createAppTheme', () => {
     expect(typography.logo).toMatchObject(typographyTokens.logo);
   });
 
-  // A consulta precisa ser a do produto (768px). Com o `sm` do MUI (600px) o
-  // título ficava grande entre os dois pontos, e o teste antigo — que só
-  // procurava o tamanho reduzido em algum lugar do objeto — não acusava.
-  it('should shrink h1 at the product breakpoint keeping weight and line height', () => {
+  // A consulta precisa ser o `md` das telas: com o `sm` do MUI (600px) o título
+  // ficaria grande entre os dois pontos.
+  it('should shrink h1 at the screens breakpoint keeping weight and line height', () => {
     const theme = createAppTheme();
     const h1 = theme.typography.h1 as unknown as Record<string, TypographyToken>;
 
     expect(theme.typography.h1.fontSize).toBe(typographyTokens.h1.fontSize);
     // A consulta escrita à mão no tema precisa ser a mesma que o MUI gera.
     expect(h1[theme.breakpoints.down('md')]).toMatchObject(typographyTokens.h1Narrow);
+  });
+
+  it('should switch the header navigation at its own breakpoint, apart from the screens', () => {
+    const { breakpoints } = createAppTheme();
+
+    expect(breakpoints.down('md')).toBe('@media (max-width:821.95px)');
+    expect(breakpoints.down('header')).toBe('@media (max-width:964.95px)');
   });
 
   it('should apply the product palette', () => {

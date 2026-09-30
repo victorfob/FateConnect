@@ -35,7 +35,7 @@ export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: L
     <ListCard
       own={item.isOwner}
       ownLabel={C.OWN_ITEM_LABEL}
-      media={<StoredPhoto url={item.imageUrl} alt={C.photoAlt(item.name)} />}
+      media={<StoredPhoto url={item.thumbnailUrl} alt={C.photoAlt(item.name)} />}
     >
       <ListCard.Header>
         <Typography variant="subtitleBold">{item.name}</Typography>

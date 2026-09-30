@@ -1,8 +1,7 @@
-import { NavLink } from 'react-router';
-import { PageShell, Switch, Typography, useThemeMode } from '@design-system';
-import { ArrowBackIcon, DarkModeIcon, LightModeIcon, SettingsIcon } from '@design-system/icons';
+import { PageShell, SectionCard, Switch, Typography, useThemeMode } from '@design-system';
+import { DarkModeIcon, LightModeIcon, SettingsIcon } from '@design-system/icons';
 
-import { RoutePathEnum } from '@app/routes/paths';
+import { BackToMenu } from '@app/components/BackToMenu';
 
 import * as C from './constants';
 import * as S from './styles';
@@ -11,23 +10,8 @@ export function Preferences() {
   const { mode, toggleMode } = useThemeMode();
 
   return (
-    <PageShell
-      title={C.PREFERENCES_TITLE}
-      action={
-        <PageShell.Back
-          label={C.BACK_LABEL}
-          icon={<ArrowBackIcon fontSize="small" />}
-          component={NavLink}
-          to={RoutePathEnum.MENU}
-        />
-      }
-    >
-      <S.SettingsCard>
-        <S.SectionHeading variant="h2">
-          <SettingsIcon fontSize="small" />
-          {C.APPEARANCE_SECTION_TITLE}
-        </S.SectionHeading>
-
+    <PageShell title={C.PREFERENCES_TITLE} action={<BackToMenu />}>
+      <SectionCard title={C.APPEARANCE_SECTION_TITLE} icon={<SettingsIcon fontSize="small" />}>
         <S.SettingRow>
           <S.SettingText>
             <Typography variant="subtitleBold">{C.THEME_LABEL}</Typography>
@@ -50,7 +34,7 @@ export function Preferences() {
             }
           />
         </S.SettingRow>
-      </S.SettingsCard>
+      </SectionCard>
     </PageShell>
   );
 }

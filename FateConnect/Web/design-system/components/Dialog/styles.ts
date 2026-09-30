@@ -1,14 +1,15 @@
 import Stack from '@mui/material/Stack';
+import type { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 
-import { styled } from '@ds-root/styled';
+import { styled, type CSSObject } from '@ds-root/styled';
 import { spacingScale } from '@ds-root/tokens';
 
 const { sm, lg, xl } = spacingScale;
 
 /**
  * Recuo do botão mais a margem interna da arte do ícone. Sem descontar os dois,
- * o desenho do X fica 13px aquém da borda dos campos, e o olho acusa.
+ * o desenho do X fica aquém da borda dos campos, e o olho acusa.
  */
 const CLOSE_GLYPH_OFFSET_PX = 13;
 
@@ -43,9 +44,16 @@ export const CloseButtonSlot = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.down('md')]: { display: 'flex' },
 }));
 
+/** No estreito o título divide a linha com o fechar; o texto do diálogo o acompanha. */
+export function alignedWithTitle(theme: Theme): CSSObject {
+  return {
+    textAlign: 'center',
+
+    [theme.breakpoints.down('md')]: { textAlign: 'left' },
+  };
+}
+
 export const DialogTitleText = styled(Typography)(({ theme }) => ({
   flex: 1,
-  textAlign: 'center',
-
-  [theme.breakpoints.down('md')]: { textAlign: 'left' },
+  ...alignedWithTitle(theme),
 }));

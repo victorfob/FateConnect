@@ -3,7 +3,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 
 import { createRide, deleteRide, listRides, updateRide } from './ridesService';
-import { RideShiftEnum, RideTypeEnum, type RideInput } from './types';
+import { RideFrequencyEnum, RideShiftEnum, RideTypeEnum, type RideInput } from './types';
 
 const RIDES_URL = 'https://api.fateconnect.test/rides';
 const FIRST_PAGE = 1;
@@ -11,11 +11,11 @@ const SINGLE_PAGE = 1;
 const PAGE_SIZE = 10;
 
 const RIDE_INPUT: RideInput = {
-  availableSeats: 3,
   destination: 'Fatec Sorocaba',
   departureDate: '2026-05-22',
   departureTime: '07:30',
   rideType: RideTypeEnum.SOLIDARITY,
+  frequency: RideFrequencyEnum.ONCE,
   description: 'Saída do centro.',
 };
 

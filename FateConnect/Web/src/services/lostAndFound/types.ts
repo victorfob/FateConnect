@@ -24,7 +24,7 @@ export type LostItem = {
   place: string;
   ocurredOn: string;
   description: string | null;
-  imageUrl: string | null;
+  thumbnailUrl: string | null;
   contact: UserContact;
   status: LostItemStatusEnum;
   deletionReason: DeletionReasonEnum | null;

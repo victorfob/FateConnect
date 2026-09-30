@@ -1,5 +1,6 @@
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Interfaces;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Exceptions;
@@ -20,16 +21,22 @@ public class AuthService : IAuthService
 
     public async Task<TokenResponseDto> LoginAsync(LoginDto dto)
     {
-        User? user = await _userRepository.GetByEmailAsync(dto.FatecEmail);
+        User user = await AuthenticateAsync(dto);
 
-        bool areCredentialsInvalid = AreCredentialsInvalid(user, dto.Password);
+        if (user.Status is EnumAccountStatus.SelfDeactivated)
+            throw new DeactivatedAccountException();
 
-        if (areCredentialsInvalid)
-            throw new InvalidCredentialsException();
+        return IssueToken(user);
+    }
 
-        string generatedToken = _tokenService.GenerateJwtToken(user!);
+    public async Task<TokenResponseDto> ReactivateAsync(LoginDto dto)
+    {
+        User user = await AuthenticateAsync(dto);
 
-        return new TokenResponseDto { Token = generatedToken };
+        if (user.Status is EnumAccountStatus.SelfDeactivated)
+            await _userRepository.ReactivateAsync(user.Id);
+
+        return IssueToken(user);
     }
 
     public async Task LogoutAsync(int userId)
@@ -37,11 +44,24 @@ public class AuthService : IAuthService
         await _userRepository.IncrementTokenVersionAsync(userId);
     }
 
-    private static bool AreCredentialsInvalid(User? user, string providedPassword)
+    private async Task<User> AuthenticateAsync(LoginDto dto)
     {
-        if (user == null)
-            return true;
+        User? user = await _userRepository.GetByEmailAsync(dto.FatecEmail);
 
-        return !Verify(providedPassword, user.Password);
+        if (user is null)
+            throw new InvalidCredentialsException();
+
+        if (user.Status is EnumAccountStatus.Banned)
+            throw new BannedAccountException();
+
+        bool isPasswordWrong = !Verify(dto.Password, user.Password);
+
+        if (isPasswordWrong)
+            throw new InvalidCredentialsException();
+
+        return user;
     }
+
+    private TokenResponseDto IssueToken(User user) =>
+        new() { Token = _tokenService.GenerateJwtToken(user) };
 }

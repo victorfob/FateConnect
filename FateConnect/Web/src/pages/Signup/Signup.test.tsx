@@ -1,5 +1,5 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { DATE_PICKER_LABEL } from '@design-system';
+import { DATE_PICKER_LABEL, PASSWORD_TOGGLE_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
 import {
@@ -20,7 +20,6 @@ import { DocumentTypeEnum } from '@app/services/signup/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { SignupConflictFieldEnum } from './@types';
-import { PASSWORD_TOGGLE_LABEL } from './components/AccountSection/constants';
 import { SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
@@ -134,6 +133,17 @@ describe('Signup', () => {
     await submit();
 
     expect(await screen.findByText(SIGNUP_MESSAGES.phoneInvalid)).toBeInTheDocument();
+  });
+
+  it('should hold the name and both emails to the length the api accepts', () => {
+    renderSignup();
+
+    const textboxNamed = (label: string) =>
+      screen.getByRole('textbox', { name: new RegExp(label) });
+
+    expect(textboxNamed(C.FIELD_LABELS.fullName)).toHaveAttribute('maxlength', '200');
+    expect(textboxNamed(C.FIELD_LABELS.fatecEmail)).toHaveAttribute('maxlength', '150');
+    expect(textboxNamed(C.FIELD_LABELS.contactEmail)).toHaveAttribute('maxlength', '150');
   });
 
   it('should format the birth date while it is typed', async () => {
@@ -264,7 +274,8 @@ describe('Signup', () => {
       password: VALID_SIGNUP.password,
       gender: 'Female',
       birthDate: '1999-05-22T00:00:00Z',
-      contacts: [{ phone: '11912345678', contactEmail: VALID_SIGNUP.contactEmail }],
+      phone: '11912345678',
+      contactEmail: VALID_SIGNUP.contactEmail,
       acceptances: [
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
         { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },

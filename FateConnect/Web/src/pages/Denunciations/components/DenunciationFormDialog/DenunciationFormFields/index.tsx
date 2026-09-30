@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Input, Switch } from '@design-system';
+import { Dialog, Input, Switch } from '@design-system';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 import { PhotoField } from '@app/components/PhotoField';
@@ -17,6 +17,7 @@ export function DenunciationFormFields() {
   } = useFormContext<DenunciationFormInput, unknown, DenunciationFormValues>();
   const photo = useWatch({ control, name: 'photo' });
   const isAnonymous = useWatch({ control, name: 'isAnonymous' });
+  const description = useWatch({ control, name: 'description' });
 
   // Valida na escolha: o formato e o tamanho se sabem na hora, não no envio.
   const handlePhotoChange = useCallback(
@@ -25,7 +26,7 @@ export function DenunciationFormFields() {
   );
 
   return (
-    <S.FieldsColumn>
+    <Dialog.Fields layout="column">
       <S.ConfidentialGroup>
         <S.ConfidentialToggle
           control={<Switch {...register('isAnonymous')} disabled={disabled} />}
@@ -62,17 +63,18 @@ export function DenunciationFormFields() {
         multiline
         rows={C.DESCRIPTION_ROWS}
         placeholder={C.DENUNCIATION_FORM_PLACEHOLDERS.description}
+        maxLength={C.DENUNCIATION_LIMITS.maxDescription}
+        characterCount={description.length}
         error={errors.description?.message}
       />
 
       <PhotoField
-        labels={C.PHOTO_FIELD_LABELS}
-        accept={C.PHOTO_ACCEPT_ATTRIBUTE}
+        label={C.DENUNCIATION_FORM_LABELS.photo}
         value={photo}
         onChange={handlePhotoChange}
         disabled={disabled}
         error={errors.photo?.message}
       />
-    </S.FieldsColumn>
+    </Dialog.Fields>
   );
 }

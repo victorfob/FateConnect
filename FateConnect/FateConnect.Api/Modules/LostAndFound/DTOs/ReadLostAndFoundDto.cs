@@ -11,6 +11,7 @@ public record ReadLostAndFoundDto(
     DateOnly OcurredOn,
     string? Description,
     string? ImageUrl,
+    string? ThumbnailUrl,
     UserContactDto Contact,
     bool IsOwner,
     EnumStatusLostAndFound Status,

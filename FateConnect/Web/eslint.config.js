@@ -21,13 +21,12 @@ const styleConventions = [
   {
     selector: "CallExpression[callee.object.name='theme'][callee.property.name='spacing']",
     message:
-      'Use o helper `spacing()` do design system. O `theme.spacing` é do MUI e sobrescrevê-lo encolhe os componentes dele (as gutters do Toolbar viraram 3px).',
+      'Use `theme.space()` com o token de `spacingScale`. O `theme.spacing` é do MUI e sobrescrevê-lo encolhe os componentes dele (as gutters do Toolbar viraram 3px).',
   },
   {
     // Constante nomeada passa no `no-magic-numbers` e ainda assim não é o token:
     // aqui o valor tem de vir de `spacingScale`/`radiusScale`. Cobre as duas
-    // formas de chamada — a do tema e o helper livre do `theme/`, que foi por
-    // onde dois escaparam.
+    // formas de chamada — a do tema e o helper livre do `theme/`.
     selector:
       "CallExpression[callee.object.name='theme'][callee.property.name=/^(space|radius)$/] > Literal, " +
       'CallExpression[callee.name=/^(spacing|radius)$/] > Literal',
@@ -36,34 +35,33 @@ const styleConventions = [
   },
   {
     // `padding: 0` e `margin: 0` também são espaçamento: viram o token `none`,
-    // e não uma constante nomeada.
-    selector: String.raw`Property[key.name=/^(gap|rowGap|columnGap|padding|padding[A-Z]\w*|margin|margin[A-Z]\w*)$/] > Literal[raw=/^-?[0-9]/]`,
+    // e não uma constante nomeada. A string com medida (`'3px'`, `'0 8px'`) é o
+    // mesmo número cru com aspas.
+    selector: String.raw`Property[key.name=/^(gap|rowGap|columnGap|padding|padding[A-Z]\w*|margin|margin[A-Z]\w*)$/] > Literal[raw=/^['"]?-?[0-9]|[0-9]px/]`,
     message:
-      'Espaçamento nunca é número cru: use `theme.space()` com o token de `spacingScale` — `none` para zero.',
+      'Espaçamento nunca é número cru nem medida em string: use `theme.space()` com o token de `spacingScale` — `none` para zero.',
   },
   {
-    // Duas visões, um limite. `xs`, `sm`, `lg` e `xl` seguem nos valores do MUI
-    // e não são do produto. A regra vale em todo lugar: o único ponto que
+    // As telas têm duas visões e um limite, `md`; `header` é o da nav do topo.
+    // `xs`, `sm`, `lg` e `xl` seguem nos valores do MUI e não são do produto. A regra vale em todo lugar: o único ponto que
     // precisa falar `sm` é o override do `MuiMenuItem`, que desfaz um
     // `min-width:600px` do próprio MUI, e ali há um disable com o motivo.
     selector:
       "CallExpression[callee.object.property.name='breakpoints'] > Literal[value=/^(xs|sm|lg|xl)$/]",
     message:
-      "Só existem duas visões: use `md` — `theme.breakpoints.down('md')` para mobile e `up('md')` para desktop.",
+      "Só existem duas visões: use `md` — `theme.breakpoints.down('md')` para mobile e `up('md')` para desktop. O cabeçalho usa `header`.",
   },
   {
-    // Unidade de viewport em medida é goteira fluida disfarçada: ela reaparecia
-    // escondida numa constante nomeada, longe da propriedade que a usava.
-    // Nem para altura de tela: `html, body, #root` já são 100%, então
-    // `minHeight: '100%'` preenche a janela sem unidade de viewport — e sem o
-    // problema do `100vh` com a barra do navegador no celular.
+    // Unidade de viewport em medida é goteira fluida disfarçada, e se esconde numa
+    // constante longe da propriedade. Nem para altura de tela: `html, body, #root`
+    // já são 100%, e `minHeight: '100%'` preenche a janela sem o problema do `100vh`.
     selector: String.raw`Literal[value=/[0-9](\.[0-9]+)?v[wh]\b/]`,
     message:
       "Sem unidade de viewport em medida: use o token de `spacingScale` por `theme.space()`, com override em `theme.breakpoints.down('md')` quando mobile e desktop diferirem.",
   },
   {
-    // Consulta de largura escrita à mão volta a criar limite paralelo, que foi
-    // o que produziu a contradição de 768px entre o cabeçalho e o cadastro.
+    // Consulta de largura escrita à mão cria limite paralelo, e dois limites
+    // discordam justamente na fronteira.
     selector: 'Literal[value=/@media[^)]*width/]',
     message: "Sem media query à mão: use `theme.breakpoints.down('md')` ou `up('md')`.",
   },
@@ -73,13 +71,9 @@ const styleConventions = [
       'Sem tag HTML crua: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
   },
   {
-    // O seletor acima só olha a chamada de `styled`, e por isso deixou passar
-    // três `<li>` escritos direto no JSX da paginação — quem viu foi o Victor.
-    // Ênfase de texto fica de fora: `<strong>` no meio de uma frase é marcação
-    // semântica, não contêiner, e embrulhá-la num `styled` piora o que se lê.
-    // `title`, `meta` e `link` também: o React 19 as hasteia para o `<head>`,
-    // onde não há caixa para estilizar — e renderizá-las é o mecanismo dele,
-    // não uma alternativa a `styled`.
+    // O seletor acima só olha a chamada de `styled`; este pega a tag crua no JSX.
+    // Ficam de fora `<strong>`, que é ênfase no meio da frase, e `title`, `meta` e
+    // `link`, que o React 19 hasteia para o `<head>`, onde não há caixa a estilizar.
     selector:
       'JSXOpeningElement > JSXIdentifier[name=/^[a-z]/]:not([name=/^(strong|em|b|i|u|s|small|sub|sup|abbr|code|kbd|mark|br|wbr|title|meta|link)$/])',
     message:
@@ -87,10 +81,8 @@ const styleConventions = [
   },
   {
     // Os quatro nomes barrados são a diferença entre a união de cor do MUI e o
-    // que o produto usa: sobram `inherit`, `primary` e `secondary`. Sete botões
-    // pediam `error` só por ser vermelho, e o resultado eram dois vermelhos
-    // convivendo na mesma tela. Estado colorido não passa por esta prop — ele
-    // vem de `palette.statusTag` e `palette.notification`.
+    // que o produto usa: sobram `inherit`, `primary` e `secondary`. Estado colorido
+    // vem de `palette.statusTag` e `palette.notification`, e não desta prop.
     selector: "JSXAttribute[name.name='color'] > Literal[value=/^(error|success|info|warning)$/]",
     message:
       'A cor de ação é `secondary`. `error` fica reservado ao erro de verdade — validação de campo e mensagem —, e estado colorido vem de `palette.statusTag` ou `palette.notification`, não desta prop.',
@@ -108,6 +100,57 @@ const literalColors = [
     message: 'Sem cor literal. Leia de `theme.palette`; se falta um slot, declare-o na paleta.',
   },
 ];
+
+/**
+ * Peças do `no-restricted-imports`. A regra não soma entre blocos: o último bloco
+ * que casa com o arquivo substitui a lista inteira. Cada escopo abaixo monta a
+ * sua lista completa a partir destas constantes.
+ */
+const barrelOnlyPatterns = [
+  {
+    group: ['@mui/*'],
+    message:
+      'Importe pelo barrel: `@design-system`. Se o componente ainda não é exportado, adicione-o ao barrel.',
+  },
+  {
+    // `@design-system/icons` é o segundo barrel público; o resto continua interno.
+    group: ['@design-system/*', '!@design-system/icons'],
+    message:
+      'Importe do barrel `@design-system` (ou `@design-system/icons`), nunca de um caminho interno dele.',
+  },
+  {
+    group: ['@emotion/*'],
+    message: 'Use `styled`, `css` e keyframes do barrel `@design-system`.',
+  },
+];
+
+const colorTokensPath = {
+  name: '@design-system',
+  importNames: ['colorTokens', 'colorVariants', 'darkColorTokens'],
+  message:
+    'Token de cor alimenta a paleta; componente lê `theme.palette`. Se falta um slot, declare-o na paleta.',
+};
+
+const rawTestingLibraryPath = {
+  name: '@testing-library/react',
+  message: 'Use o render de `@app/test/testing-library`, que já monta os providers da aplicação.',
+};
+
+const themeHelpersPattern = {
+  group: ['**/theme/helpers/*'],
+  message:
+    'Espaçamento e raio saem do tema: `theme.space()` e `theme.radius()`. O helper livre é só do `theme/`, que roda antes de o tema existir.',
+};
+
+const appFromDesignSystemPattern = {
+  group: ['@app/*'],
+  message:
+    'O design system não importa da aplicação. Receba o que precisa por propriedade ou slot.',
+};
+
+const testFiles = ['src/test/**', 'src/**/*.test.{ts,tsx}', 'design-system/**/*.test.{ts,tsx}'];
+
+const restrictImports = ({ patterns = [], paths = [] }) => ['error', { patterns, paths }];
 
 export default defineConfig([
   { ignores: ['dist', 'coverage'] },
@@ -151,11 +194,8 @@ export default defineConfig([
       ecmaVersion: 2022,
       globals: { ...globals.browser, ...globals.node },
       // Informação de tipo: é o que permite ao lint enxergar `@deprecated`.
-      //
-      // `allowDefaultProject` cobre este próprio arquivo: ele é `.js`, fica fora
-      // do `include` do tsconfig, e sem isto o serviço de projeto reprova com
-      // "was not found by the project service" — que foi como a deprecação do
-      // `tseslint.config()` passou despercebida pelo lint.
+      // `allowDefaultProject` cobre este próprio arquivo, que é `.js` e fica fora do
+      // `include` do tsconfig; sem isto o serviço de projeto o recusa.
       parserOptions: {
         projectService: { allowDefaultProject: ['eslint.config.js'] },
         tsconfigRootDir: import.meta.dirname,
@@ -269,77 +309,11 @@ export default defineConfig([
     rules: { 'no-console': 'off' },
   },
 
-  // A aplicação fala com a UI por uma porta só: o barrel do design system.
-  {
-    files: ['src/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@mui/*'],
-              message:
-                'Importe pelo barrel: `@design-system`. Se o componente ainda não é exportado, adicione-o ao barrel.',
-            },
-            {
-              // `@design-system/icons` é o segundo barrel público; o resto continua interno.
-              group: ['@design-system/*', '!@design-system/icons'],
-              message:
-                'Importe do barrel `@design-system` (ou `@design-system/icons`), nunca de um caminho interno dele.',
-            },
-            {
-              group: ['@emotion/*'],
-              message: 'Use `styled`, `css` e keyframes do barrel `@design-system`.',
-            },
-          ],
-          paths: [
-            {
-              name: '@design-system',
-              importNames: ['colorTokens', 'colorVariants', 'darkColorTokens'],
-              message:
-                'Token de cor alimenta a paleta; componente lê `theme.palette`. Se falta um slot, declare-o na paleta.',
-            },
-            {
-              name: '@testing-library/react',
-              message:
-                'Use o render de `@app/test/testing-library`, que já monta os providers da aplicação.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-
-  // Dentro do design system o MUI é a fronteira, e o tema pode ler os tokens.
-  {
-    files: ['design-system/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: '@testing-library/react',
-              message: 'Use o render de `@app/test/testing-library`.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-
-  // O próprio test-utils e os testes de contexto precisam da biblioteca crua.
-  {
-    files: ['src/test/**', 'src/**/*.test.{ts,tsx}', 'design-system/**/*.test.{ts,tsx}'],
-    rules: { 'no-restricted-imports': 'off' },
-  },
-
   // Convenções de estilo aplicadas, não apenas documentadas.
   // Testes ficam de fora: eles precisam citar as APIs que o código de produção evita.
   {
     files: ['src/**/*.{ts,tsx}', 'design-system/**/*.{ts,tsx}'],
-    ignores: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'design-system/**/*.test.{ts,tsx}'],
+    ignores: testFiles,
     rules: {
       'react-hooks/exhaustive-deps': 'error',
       // Número solto no meio do código não diz o que mede. Vira constante nomeada.
@@ -361,27 +335,6 @@ export default defineConfig([
     },
   },
 
-  // O helper livre de espaçamento existe só para o tema, que é construído antes
-  // de o tema existir. Todo o resto lê `theme.space()` e `theme.radius()`.
-  {
-    files: ['design-system/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
-    ignores: ['design-system/theme/**'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['**/theme/helpers/*'],
-              message:
-                'Espaçamento e raio saem do tema: `theme.space()` e `theme.radius()`. O helper livre é só do `theme/`, que roda antes de o tema existir.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-
   {
     files: [
       'src/**/styles.ts',
@@ -398,24 +351,49 @@ export default defineConfig([
     },
   },
 
-  // O design system não conhece a aplicação — é o que o mantém extraível.
+  // Imports restritos: do escopo mais largo ao mais estreito, cada bloco com a lista
+  // inteira. A aplicação fala com a UI por uma porta só: o barrel do design system.
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': restrictImports({
+        patterns: [...barrelOnlyPatterns, themeHelpersPattern],
+        paths: [colorTokensPath, rawTestingLibraryPath],
+      }),
+    },
+  },
+  // Dentro do design system o MUI é a fronteira, e ele não conhece a aplicação —
+  // é o que o mantém extraível.
   {
     files: ['design-system/**/*.{ts,tsx}'],
-    ignores: ['design-system/**/*.test.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@app/*'],
-              message:
-                'O design system não importa da aplicação. Receba o que precisa por propriedade ou slot.',
-            },
-          ],
-        },
-      ],
+      'no-restricted-imports': restrictImports({
+        patterns: [themeHelpersPattern, appFromDesignSystemPattern],
+        paths: [rawTestingLibraryPath],
+      }),
     },
+  },
+  // O tema pode ler os tokens e o helper livre.
+  {
+    files: ['design-system/theme/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': restrictImports({
+        patterns: [appFromDesignSystemPattern],
+        paths: [rawTestingLibraryPath],
+      }),
+    },
+  },
+  // O próprio test-utils e os testes de contexto precisam da biblioteca crua, e o
+  // teste cita as APIs que o código de produção evita. Fica só o helper do tema.
+  {
+    files: testFiles,
+    rules: {
+      'no-restricted-imports': restrictImports({ patterns: [themeHelpersPattern] }),
+    },
+  },
+  {
+    files: ['design-system/theme/**/*.test.{ts,tsx}'],
+    rules: { 'no-restricted-imports': 'off' },
   },
 
   prettierRecommended,

@@ -1,10 +1,8 @@
 name: Warm front cache
 
 # ⛔ Escrita de cache num run de `pull_request` fica presa em
-# `refs/pull/N/merge`, e um PR não lê o do outro. Como os checks só disparam em
-# `pull_request`, nenhum `node-modules-*` chegava a existir numa branch — e a
-# primeira execução de todo PR instalava a frio, ~50s no caminho crítico.
-# Este job é quem grava na `develop`, que é o escopo que os PRs enxergam.
+# `refs/pull/N/merge`, e um PR não lê o do outro. Este job grava na `develop`,
+# que é o escopo que os PRs enxergam; sem ele todo PR instalaria a frio.
 on:
   push:
     branches: [develop]

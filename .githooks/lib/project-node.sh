@@ -2,12 +2,10 @@
 # Ativa, para o gate do front, a versão de Node que o `.nvmrc` declara.
 #
 # Os hooks herdam o Node do shell, e o do shell não é o do projeto: gate rodado
-# na versão errada responde verde sobre um mundo que ninguém vai mergear. Em
-# 08/09/2026 o `pre-push` aprovou um push cujos testes reprovavam na versão
-# declarada, porque `File` do jsdom deixou de passar na checagem do undici.
+# na versão errada responde verde sobre um mundo que ninguém vai mergear.
 #
-# A comparação é exata, não piso: "maior ou igual" volta a aceitar a versão que
-# produziu o falso verde.
+# A comparação é exata, não piso: "maior ou igual" aceitaria uma versão em que
+# a suíte passa enquanto a declarada reprova.
 use_project_node() {
   local web="$1" wanted active nvm_sh
 

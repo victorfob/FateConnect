@@ -1,10 +1,6 @@
 ---
 name: spec-issue
-description: >-
-  Escreve ou especifica uma issue do GitHub por sabatina — perguntas em blocos até fechar as
-  ambiguidades entre o que se quer e o que o código mostra, decisões registradas no corpo da issue e
-  divisão em sub-issues de um PR cada. Use quando o usuário pedir para **criar** ou **abrir** uma
-  issue, e também para especificar, detalhar, refinar, planejar ou quebrar uma que já existe.
+description: "Escreve ou especifica uma issue do GitHub por sabatina — perguntas em blocos até fechar as ambiguidades entre o que se quer e o que o código mostra, decisões registradas no corpo da issue e divisão em sub-issues de um PR cada. Use quando o usuário pedir para criar ou abrir uma issue, para especificar, detalhar, refinar, planejar ou quebrar uma que já existe, e depois do merge de um PR ou de uma sub-issue (fechar a issue e o pai, reler as irmãs)."
 ---
 
 # Especificar uma issue
@@ -37,7 +33,7 @@ Quatro na mesma rodada, ao especificar o menu da conta:
 
 | O protótipo dizia | O que valeu, e por quê |
 | --- | --- |
-| "Bem-vindo ao FateConnect" | **"Boas-vindas"**, que é o que o código diz — linguagem neutra, pela `product-copy.md` |
+| "Bem-vindo ao FateConnect" | **"Boas-vindas"**, que é o que o código diz — linguagem neutra, pela régua da skill `ux-writing` |
 | "Configurações" no item | **"Preferências"**, porque a seção que o abriga tem esse nome e dois nomes para um conceito é proibido |
 | nenhum nome no popover | **o nome entra**, porque ele era o rótulo acessível do gatilho e sairia de lá |
 | o botão de tema ausente do topo | **decisão de produto**, não detalhe de desenho — virou item de escopo |
@@ -123,6 +119,8 @@ Priorize o que trava decisão adiante: contrato e modelo de dados primeiro, depo
 ⛔ Aconteceu na #290. Recomendei lista de revogados por `jti` para o encerramento de sessão, e o Victor escolheu. O que eu não pesei: a **#114** tem *"troca de senha exigindo a senha atual"* no escopo, e a lista de revogados **não consegue** invalidar ali — ela guarda os tokens já revogados, não os que estão vivos, então na troca de senha não há o que revogar. A saída correta era versão de sessão, que derruba todos incrementando uma coluna. A troca custou reescrever a branch inteira.
 
 **A conferência é uma busca:** `gh issue list --state open --search "<o conceito>"` e a leitura do escopo das que aparecerem. Vale sobretudo quando o mecanismo guarda ou invalida estado — sessão, permissão, cache —, porque é aí que um item futuro muda a resposta.
+
+⛔ **Passo que roda uma vez por ambiente não paga automação:** ponha na mesa a versão manual, escrita onde alguém relê (ex.: o `UPDATE` em `deploy/DATABASE.md`). Paga automação o que roda a cada deploy ou quebra calado quando esquecido.
 
 ### A resposta em texto livre é a que muda o desenho
 
@@ -233,90 +231,9 @@ Uma passada por **cada** issue que a rodada criou ou editou. Cada achado termina
 
 ⚠️ **Nem toda suposição vira pergunta.** A que é decisão técnica derivada de regra do repo — a pasta de um componente com um consumidor só, o tamanho de página que as outras listas usam — vira decisão escrita, dizendo de qual regra ela sai. Pergunta é para o que só ele sabe.
 
-## 7. Cada merge envelhece as irmãs
+## 7. Depois do merge
 
-⛔ **Ao mergear uma sub-issue, releia as que sobraram.** Uma árvore de sub-issues é escrita de uma vez, com o repositório de um instante — e cada PR que entra invalida um pedaço do que as outras dizem. Nada avisa: o texto continua sintaticamente perfeito.
-
-Quatro vezes na árvore da #207:
-
-| O que ficou falso | Depois de |
-| --- | --- |
-| a #210 mandava renomear serviços e interfaces | a #209 já os ter renomeado no review |
-| a #211 mandava renomear `GerarHashDaSenha`, que deixou de existir | a #209 remover o wrapper |
-| a #212 tinha um checkbox aberto para uma decisão já tomada | o #221 unificar os `.editorconfig` |
-| a #213 escrevia a rota em minúscula e não citava um JSDoc já falso | o #222 publicar `/Users/signup` |
-
-⚠️ **A terceira foi o Victor quem pegou**, perguntando *"editorconfig já foi arrumado, tá lá ainda?"* — depois de eu ter editado aquela seção **antes** do merge e não ter voltado nela.
-
-**O gatilho é o merge, não o fim da árvore.** Ao fechar uma sub-issue, abra as irmãs abertas e procure: escopo que outro PR já entregou, símbolo que deixou de existir, e decisão que mudou. Item entregue vira `[x]` com a nota de onde saiu; item morto sai.
-
-### E a decisão revista com o PR aberto envelhece na hora
-
-⛔ **O gatilho não é só o merge.** Decisão trocada durante o review invalida o corpo das issues que a citam, e ali não há merge nenhum para lembrar você de reler.
-
-Em 14/09/2026 o campo `OnlyMine` saiu do contrato com o #410 aberto e verde. A issue de API mandava criá-lo; a de front mandava o serviço **sempre** enviá-lo. Texto velho nas duas, e o da segunda faria nascer código que manda um parâmetro que a API ignora. As duas foram corrigidas no mesmo turno em que o código mudou, junto do corpo do PR.
-
-**O tell é você reescrever o corpo de um PR aberto.** Se o que mudou foi decisão, e não redação, as issues que a decidiram mudaram junto.
-
-### O raio de um rename é o quadro, não a árvore
-
-⛔ **Rename de módulo, entidade ou método envelhece toda issue aberta que o cite, não só as irmãs da mesma árvore.** O gatilho acima é o merge de uma sub-issue; este é outro, e mais largo: o merge que **renomeia** algo.
-
-Em 09/09/2026, muito depois de a API passar para o inglês, seis issues abertas ainda falavam português — #108, #110, #114, #162, #164 e #193 —, e nenhuma delas era irmã de outra. Metade era nome morto, de quem daria `grep` e não acharia. A outra metade era pior: a #162 e a #164 mandavam **criar** entidade nova em português, contra a convenção que a #207 havia fixado para a API inteira. Texto velho engana quem lê; instrução velha faz nascer código errado.
-
-A conferência é mecânica, e são dois instrumentos, porque nenhum alcança o do outro — caminho e símbolo se citam de formas diferentes:
-
-```bash
-gh issue view <n> --json body -q .body                # o corpo publicado, um por issue aberta
-git ls-tree -r --name-only origin/develop             # todo caminho citado tem de casar
-git grep -q -w -- "<Símbolo>" origin/develop          # todo símbolo citado tem de existir
-```
-
-⚠️ **Derive o prefixo dos caminhos da própria árvore, não de uma lista sua.** A minha, escrita à mão, não tinha `FateConnect/Web/src/pages/`, e três caminhos vivos foram reportados como órfãos.
-
-⚠️ **Símbolo ausente não é defeito por si:** issue não implementada cita de propósito o que ainda vai nascer. O que se procura é o nome que **existia e mudou** — e a diferença se lê no que a issue promete, não no resultado do `grep`.
-
-## 8. Fechar o pai é manual, e ninguém avisa
-
-⛔ **Nada fecha sozinho aqui.** Duas mecânicas somadas deixam a árvore aberta com tudo entregue:
-
-- `Closes #N` só dispara quando o PR merge na **branch padrão**, e os nossos miram a `develop` — a skill `pr-creator` já registra isso para a issue do PR;
-- o relacionamento de **sub-issue** do GitHub **não propaga** o fechamento: fechar a última filha não toca no pai.
-
-Então, ao fechar a última sub-issue, feche o pai — e é só isso:
-
-```bash
-gh issue close <pai> --comment "As sub-issues foram entregues: #a, #b, #c."
-```
-
-**O card vai para `Done` sozinho**, e não há `gh project item-edit` a rodar aqui. Quem move é o `github-project-automation[bot]`, que reage ao fechamento: na #213 e na #207 o `project_v2_item_status_changed` dele saiu **um segundo** depois do `closed`. O mesmo bot adiciona a issue nova ao board e define o status inicial.
-
-⚠️ **Não generalize para as outras colunas:** o bot só reage a criar e a fechar. As duas do meio são manuais, e cada uma tem o seu gatilho:
-
-| Coluna | Quando mover |
-| --- | --- |
-| `In Progress` | ao criar a branch e começar o trabalho |
-| `In Review` | ao abrir o PR |
-
-⛔ **A do meio é a que escapa.** Na #226 e na #231 movi as duas para `In Progress` ao começar, abri os dois PRs e não movi nenhuma para `In Review` — quem viu foi o Victor. Mover ao abrir o PR é parte de abrir o PR, não um passo à parte.
-
-⛔ **O que escapa é fechar o pai, não mover o card.** O trabalho acontece nas filhas, então ninguém volta ao guarda-chuva. A #136 ficou dias entregue de fato e **aberta** no GitHub — e, estando aberta, o card seguia corretamente em `Todo`. Só apareceu porque o Victor perguntou.
-
-⚠️ **Card em `Done` não prova que o bot o moveu.** Quem responde "quem moveu" é a linha do tempo, não a contagem de cards:
-
-```bash
-gh api repos/<dono>/<repo>/issues/<n>/timeline --paginate \
-  --jq '.[] | select(.event | test("closed|project_v2")) | "\(.event) | \(.actor.login) | \(.created_at)"'
-```
-
-**A varredura que acha os esquecidos**, quando a suspeita surgir:
-
-```bash
-gh api graphql -f query='{repository(owner:"<dono>",name:"<repo>"){issues(first:100,states:OPEN){nodes{number title subIssues(first:30){nodes{state}}}}}}' \
-  --jq '.data.repository.issues.nodes[] | select((.subIssues.nodes|length)>0 and ([.subIssues.nodes[]|select(.state=="OPEN")]|length)==0) | "#\(.number) \(.title)"'
-```
-
-⚠️ Issue aberta com PR mergeado **não** é sinal de esquecimento: no nosso caso as três que apareceram eram de backend, citadas por PRs de front que só dependiam delas. Confirme o que a issue pede antes de fechar.
+⛔ **Mergeou um PR ou uma sub-issue, ou trocou uma decisão com o PR aberto: leia `references/after-merge.md`.** Fechar a issue e o pai é manual aqui (`Closes #N` não dispara na `develop`, e sub-issue não propaga o fechamento), e cada merge envelhece o texto das irmãs e das issues que citam o que mudou de nome.
 
 ## Armadilhas já pagas
 

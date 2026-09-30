@@ -3,12 +3,6 @@ import { CardsList, Pagination } from '@design-system';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { DenunciationCard } from '@app/components/DenunciationCard';
-import {
-  DOWNLOAD_LABEL,
-  photoAlt,
-  photoBaseName,
-} from '@app/components/DenunciationCard/constants';
-import { StoredPhoto } from '@app/components/StoredPhoto';
 import { useNotification } from '@app/hooks/useNotification';
 import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import {
@@ -75,16 +69,6 @@ export function DenunciationsTab() {
           <DenunciationCard
             key={denunciation.id}
             denunciation={denunciation}
-            media={
-              <StoredPhoto
-                url={denunciation.imageUrl}
-                alt={photoAlt(denunciation)}
-                download={{
-                  label: DOWNLOAD_LABEL,
-                  baseName: photoBaseName(denunciation),
-                }}
-              />
-            }
             reporterContact={<DenunciationReporterContact user={denunciation.user} />}
             actions={
               <DenunciationStatusAction

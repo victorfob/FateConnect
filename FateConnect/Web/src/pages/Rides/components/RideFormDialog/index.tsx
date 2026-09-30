@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react';
-import { Dialog, Typography } from '@design-system';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Dialog } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FormProvider, useForm } from 'react-hook-form';
+import { toZonedTime } from 'date-fns-tz';
+import { FormProvider, useForm, type Resolver } from 'react-hook-form';
 
 import { useNotification } from '@app/hooks/useNotification';
 import { RIDES_QUERY_KEY } from '@app/pages/Rides/constants';
@@ -10,10 +11,17 @@ import { createRide, updateRide } from '@app/services/rides/ridesService';
 import type { Ride, RideInput } from '@app/services/rides/types';
 
 import { toFormValues, toRideInput } from './helpers/mapper';
+import { useHolidayDays } from './hooks/useHolidayDays';
 import { RideFormFields } from './RideFormFields';
-import { EMPTY_RIDE_FORM, rideFormSchema, type RideFormInput, type RideFormValues } from './schema';
+import {
+  createRideFormSchema,
+  EMPTY_RIDE_FORM,
+  type RideFormInput,
+  type RideFormValues,
+} from './schema';
 import * as C from './constants';
-import * as S from './styles';
+
+const FOLLOWING_YEAR = 1;
 
 export type RideFormDialogProps = Readonly<{
   open: boolean;
@@ -49,12 +57,34 @@ export function RideFormDialog({ open, onClose, ride }: RideFormDialogProps) {
     meta: { errorMessage: mode.failed },
   });
 
+  // Este ano e o seguinte cobrem o calendário que a partida alcança na prática;
+  // uma partida além disso ainda é recusada pela API se cair em feriado.
+  const holidayYears = useMemo(() => {
+    const thisYear = toZonedTime(new Date(), C.PRODUCT_TIME_ZONE).getFullYear();
+
+    return [thisYear, thisYear + FOLLOWING_YEAR];
+  }, []);
+
+  // Os feriados chegam depois de o formulário nascer: a validação os lê na hora,
+  // em vez de no momento em que ele nasce.
+  const holidaysRef = useRef<ReadonlySet<string>>(new Set());
+  const resolver = useCallback<Resolver<RideFormInput, unknown, RideFormValues>>(
+    (values, context, options) =>
+      zodResolver(createRideFormSchema(holidaysRef.current))(values, context, options),
+    [],
+  );
+
   const form = useForm<RideFormInput, unknown, RideFormValues>({
-    resolver: zodResolver(rideFormSchema),
+    resolver,
     defaultValues: EMPTY_RIDE_FORM,
     disabled: isPending,
   });
   const { reset } = form;
+  const holidays = useHolidayDays(holidayYears, open);
+
+  useEffect(() => {
+    holidaysRef.current = holidays;
+  }, [holidays]);
 
   // Abrir mostra a carona de agora, não o que sobrou da vez anterior.
   useEffect(() => {
@@ -69,26 +99,19 @@ export function RideFormDialog({ open, onClose, ride }: RideFormDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} title={mode.title}>
       <FormProvider {...form}>
-        <S.RideForm component="form" onSubmit={handleSubmit} noValidate>
+        <Dialog.Form onSubmit={handleSubmit}>
           <Dialog.Body>
-            <RideFormFields />
+            <RideFormFields holidays={holidays} />
           </Dialog.Body>
 
           <Dialog.Footer>
-            <S.SubmitButton
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
+            <Dialog.Submit
+              icon={<SubmitIcon fontSize="small" />}
+              label={mode.submitLabel}
               loading={isPending}
-            >
-              <SubmitIcon fontSize="small" />
-              <Typography variant="subtitleBold" color="inherit">
-                {mode.submitLabel}
-              </Typography>
-            </S.SubmitButton>
+            />
           </Dialog.Footer>
-        </S.RideForm>
+        </Dialog.Form>
       </FormProvider>
     </Dialog>
   );

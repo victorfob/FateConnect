@@ -5,7 +5,6 @@ using FateConnect.Api.Modules.Rides.Enums;
 
 public record ReadRideDto(
     Guid Id,
-    int AvailableSeats,
     string Destination,
     DateOnly DepartureDate,
     TimeOnly DepartureTime,
@@ -13,5 +12,7 @@ public record ReadRideDto(
     EnumRideType RideType,
     string? Description,
     UserContactDto Driver,
-    bool IsOwner
+    bool IsOwner,
+    EnumRideFrequency Frequency,
+    DateOnly? RepeatUntil
 );
