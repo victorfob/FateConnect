@@ -218,6 +218,26 @@ public class ApiFactory : WebApplicationFactory<Program>
             .ExecuteUpdate(setters => setters.SetProperty(user => user.Status, status));
     }
 
+    public IReadOnlyList<AdministrativeAction> AdministrativeActionsOn(int targetId)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        return context.AdministrativeActions
+            .AsNoTracking()
+            .Where(action => action.TargetId == targetId)
+            .OrderBy(action => action.Id)
+            .ToList();
+    }
+
+    public void DeleteUser(int userId)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        context.Users.Where(user => user.Id == userId).ExecuteDelete();
+    }
+
     public Guid SeedRide(
         int driverId,
         DateOnly departureDate,
