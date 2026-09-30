@@ -22,6 +22,7 @@ paths:
 - `Criar conta`, não `Cadastre-se`; `Meu perfil`, não `Perfil`.
 - A busca diz tudo o que alcança: `Destino ou descrição` em caronas, `Nome ou descrição` em achados e perdidos, com `?busca=`. O `Destino` do formulário de ofertar é outro campo.
 - Valor de enum não é rótulo (`Solidarity` aparece como **Solidária**): procure o mapa em `helpers/` antes de escrever o valor em copy, URL ou issue.
+- A ajuda do campo (`helpText`) diz para que o campo serve, em frase curta com ponto final. Campo que existe para uma funcionalidade planejada descreve o uso final dela; a exceção vale só para a ajuda do campo, e a funcionalidade que falta fica registrada numa issue e no corpo do PR.
 
 ## Proibições
 

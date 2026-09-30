@@ -6,6 +6,7 @@ O build local mede outro mundo se o ambiente for diferente do publicado.
 - O controle é comparar com o publicado: `ls -l` dos `assets/*.js` no servidor contra a saída do build.
 - ⛔ **`import()` de um módulo que o código também importa estaticamente não separa nada**: resolve para a mesma instância e o bundler funde de volta. O alvo do `import()` é um módulo nosso alcançável só por ele, que importa o pesado — é o papel de `FateConnect/Web/src/observability/sessionReplay.ts`.
 - A ordem dos grupos do `codeSplitting` no `vite.config.ts` decide quem fica com os módulos compartilhados; o motivo está no comentário do grupo `sentry`.
+- ⛔ Dependência nova carregada só por `import()` cai no grupo `vendor`, que é pré-carregado, e o `lazy` não separa nada: ela precisa de um grupo próprio **antes** do `vendor` (como o `photo-crop`).
 - ⛔ **A conferência é quem está no `index.html`, não o tamanho do pedaço**: pedaço separado e pré-carregado não economiza nada.
 
   ```bash

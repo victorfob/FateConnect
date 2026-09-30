@@ -7,6 +7,7 @@ description: Conduta em qualquer tarefa — escolha feita no lugar do usuário s
 ## A decisão é do usuário
 
 - ⛔ Escolha que ninguém pediu se anuncia na mesma mensagem: *"troquei X por Y porque Z; reverte se não for isso"*. Escolher para seguir é certo; o que não pode é ficar invisível. A intenção de avisar depois é o tell, e a decisão dele sobre o item vizinho não aprova o seu.
+- ⛔ O que o usuário precisa **decidir** vai por `AskUserQuestion`, em blocos de até quatro perguntas: recomendação primeiro, o custo de cada alternativa na descrição, copy por extenso. O texto da mensagem fica com o que ele precisa **saber**. Resposta em texto livre pode mudar o desenho: reconcilie-a antes de seguir.
 - ⛔ Medição que derruba uma premissa já decidida vai a ele antes de você escolher o que fazer com ela. O tell é escrever código que compensa um fato que você ainda não contou.
 - ⛔ Contar não autoriza redesenhar: aplique só a correção que cabe no escopo pedido, ou nenhuma. O alarme é o diff tocar arquivo que o pedido não nomeia.
 - ⛔ Escolha de escopo, estrutura, destino ou comportamento de terceiro — reescrever o que uma biblioteca faz, afrouxar regra de lint do projeto — se propõe com o custo de cada caminho, e espera-se o sim. Leia antes as props da biblioteca e procure a ferramenta padrão do ecossistema: se nenhum caminho da sua tabela é "configurar o que já existe", falta procurar.

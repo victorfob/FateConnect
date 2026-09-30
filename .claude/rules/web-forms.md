@@ -17,6 +17,7 @@ paths:
 ## Campos
 
 - Schema em `schema/index.ts` na pasta do formulário; mensagens de validação são copy e saem de constante que o teste também importa.
+- ⛔ O mesmo campo em duas telas leva a mesma ajuda: o texto mora ao lado das opções do campo (`RIDE_TYPE_HELP` junto de `RIDE_TYPE_OPTIONS`, em `pages/Rides/helpers/rideType.ts`). Ao dar ajuda a um campo, procure pelas opções dele as outras telas que o montam.
 - Campo é o `Input` do barrel com `error={errors.campo?.message}`. `required` põe `*` no nome acessível (`"E-mail *"`): no teste, a consulta usa regex.
 - Ação dentro do campo é `IconButton` com `aria-label` da ação e `aria-pressed` do estado; o ícone mostra o estado atual (olho aberto com o texto visível). Senha alterna `autoComplete` entre `current-password` e `off`.
 - ⛔ Campo que ganha a primeira regra de validação ganha a prop de erro junto: sem ela o schema recusa e a tela fica muda. O teste de schema não vê isso; o caso é de componente.

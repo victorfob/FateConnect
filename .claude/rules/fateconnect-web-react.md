@@ -20,6 +20,11 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 
 - Ação secundária é `variant="soft"`. No rodapé de diálogo as duas ações são `contained` (`primary` na neutra, `secondary` na que confirma): o `soft` sai 6px mais alto e desalinha o par. Falta variante: declare no tema, não componha no ponto de uso.
 - Diálogo é sempre o `Dialog` do DS: `Dialog.Body`, `Dialog.Footer` e a frase em `Dialog.Message`. ⛔ No desktop sem X (decisão de produto: `Esc` e clique fora dispensam); no estreito, com X.
+- Diálogo de formulário monta `Dialog.Form` (envio pela validação da tela), `Dialog.Fields` (grade com folga para o rótulo flutuante; `layout="column"` põe um campo por linha) e `Dialog.Submit` (largura cheia, com `loading`).
+- ⛔ O `Dialog.Body` rola e corta o que sai da largura dele: controle com halo (o `Slider`) vai fora do `Dialog.Body`, direto no diálogo.
+- Formulário em grade é o `FormGrid` (`FormGrid.Wide` ocupa a linha); cartão com título e ícone é o `SectionCard`. Não escreva outro.
+- ⛔ Ação destrutiva usa a variante `destructive` (o `ConfirmAction` a liga com `destructive`). O *Banir* da gestão ainda está neutro: pergunte antes de migrá-lo.
+- Barra de ações no estreito: conteúdo centralizado e botões em largura cheia, um sob o outro, a ação principal por último.
 - Esconder visualmente sem tirar da acessibilidade é `HiddenField`.
 - Tipografia só por variante do tema. `ListItemText`, `MenuItem`, `Chip` e `Alert` aplicam a escala deles se ninguém disser nada: a variante entra por `slotProps` (`slotProps={{ primary: { variant: 'caption' } }}`).
 - `palette.text.*` e `contrastText` nunca como fundo.
@@ -34,6 +39,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 
 - Caminhos em pt-BR; a landing é a raiz (`RoutePathEnum.LANDING = '/'`). Trocar segmento quebra link salvo: só com decisão de produto.
 - ⛔ Rota aposentada ganha 301 em `deploy/nginx/site.conf.template`, não `<Navigate>` (responde 200 e a URL antiga segue indexada).
+- ⛔ Tela com alterações não salvas segura toda saída: navegação pelo `useBlocker`, fechar a aba pelo `useBeforeUnload`, e o *Sair* pelo `LeaveGuardProvider` (a tela registra com `useLeaveInterceptor`). O `useBlocker` não alcança o *Sair*, que troca a árvore sem passar pelo roteador: item de menu novo que sai da conta chama `useSignOut`, nunca `logout` direto. Exemplo: `pages/Profile/hooks/useLeaveConfirmation.ts`.
 - Caronas é uma rota só: ofertar abre diálogo sobre a lista. Não recriar `/caronas/buscar` nem `/caronas/ofertar`.
 - Contato é seção da landing (`#contato`, `LandingSectionEnum.CONTACT`), atendida pelo rodapé; não há rota `/contato`. Ao mexer em `constants/navigation.ts` ou nas rotas, não restaurar rota nem item de menu.
 
