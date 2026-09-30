@@ -218,6 +218,14 @@ Frase nominal curta dizendo o conteúdo, como o cadastro já faz: `Endereço` e 
 
 Complementa, não repete. A exceção é o **botão só de ícone**: ali o tooltip é o nome do botão e repete o rótulo acessível de propósito — sem ele, o ícone não diz nada. Primeira letra maiúscula, no máximo duas linhas.
 
+### A ajuda de campo diz para que ele serve, e descreve o uso final
+
+A ajuda do campo (`helpText` do `Input`) responde *para que serve isto*, na forma da ajuda do tipo de carona: frase curta, ponto final, sem `você` sobrando.
+
+⚠️ **Campo que existe para uma funcionalidade planejada descreve o uso que ela vai ter, não o estado de hoje.** Decidido pelo Victor em 30/09/2026, no bairro do perfil — ele vai servir à notificação de carona por destino, que ainda não existe: *"Já fica com o estado desejado pra gente não precisar voltar nele depois"*. A ajuda ficou `Serve para notificar quando surgir carona com destino ao seu bairro.`
+
+⛔ **A exceção cobre a ajuda do campo, não o resto da copy.** Aviso, botão e estado vazio continuam dizendo só o que o código faz. E a funcionalidade que falta fica registrada onde se relê — o corpo do PR que escreveu a frase, e uma issue para ela —, senão a frase passa a ser a única prova de uma promessa que ninguém está cumprindo.
+
 ## Nota ao lado de etiqueta
 
 Nota ao lado de uma etiqueta diz o que a etiqueta não diz. Repetir a palavra dela gasta a linha e sai duas vezes em leitor de tela — havendo só a repetição a dizer, a nota não existe.
@@ -279,6 +287,7 @@ Voltada ao fato: "Item excluído", não "Você excluiu o item". O `você` contin
 - Sempre dígito, nunca por extenso, com zero à esquerda: `05`, não `5`.
 - Data em `dd/MM/yyyy`; hora em 24h com dois pontos: `07:30`.
 - Intervalo com hífen espaçado: `07:00 - 09:00`.
+- ⚠️ **O cartão de carona mostra a data só com dia e mês** (`05/10 às 02:10`). O rótulo *Próxima* já diz que é a partida mais perto, e com o ano a fileira de 375px passa de 291px para 316px e a recorrência desce de linha; sem ele, o pior caso (*Próxima* com *Domingos*) fica em 280px. Decidido pelo Victor em 29/09/2026, no #481. O formato mora em `pages/Rides/helpers/rideDeparture.ts`.
 
 ## Copy que carrega dado tem largura
 

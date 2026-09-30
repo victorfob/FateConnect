@@ -86,7 +86,23 @@ Invertendo — `sentry` primeiro com `(?!replay)` no teste, depois o grupo do re
 grep -oE 'href="/assets/[^"]*\.js"' dist/index.html
 ```
 
+⛔ **Dependência nova carregada só por `import()` cai no grupo `vendor`, que é pré-carregado, e o `lazy` não separa nada.** Ela precisa de um grupo próprio **antes** do `vendor`. Medido no #487: a `react-easy-crop` ficou no `vendor` até ganhar o grupo `photo-crop` — 24,8 KB, 7,2 KB comprimido, fora do `index.html`.
+
 ⛔ **E procurar o pedaço ausente nessa lista responde zero por vacuidade** quando ele não foi criado. Confira as duas coisas: que o pedaço **existe** na saída do build, e que **não** está no `index.html`.
+
+## Saída com alterações não salvas
+
+A tela com formulário pendente segura **toda** saída — pedido do Victor em 29/09/2026: *"se ele tentar sair da tela por qualquer motivo"*. Cada caminho tem o seu mecanismo:
+
+| Saída | Quem segura |
+| --- | --- |
+| link, menu, seta do navegador, voltar do celular | `useBlocker`, do React Router |
+| *Sair* do menu da conta e da gaveta | o `LeaveGuardProvider`: a tela registra com `useLeaveInterceptor`, e o *Sair* chama `useSignOut` |
+| fechar ou recarregar a aba | `useBeforeUnload`, com o aviso nativo do navegador — texto nenhum nosso |
+
+⛔ **O `useBlocker` não alcança o *Sair*.** Ele só apaga o token; o guard troca a árvore, e a tela desmonta sem passar pelo roteador. Chamar `logout` direto num item novo de menu deixa a saída sem porteiro — use o `useSignOut`.
+
+⚠️ **Desativar a conta e a sessão expirar não perguntam**, porque nos dois casos não há sessão para onde voltar. O exemplo está em `pages/Profile/hooks/useLeaveConfirmation.ts`.
 
 ## Tela de módulo copia a casca do módulo vizinho
 
