@@ -14,8 +14,6 @@ const NAV_FONT_SIZE = '1rem';
 const NAV_FONT_WEIGHT = 500;
 const CTA_FONT_WEIGHT = 400;
 
-const MENU_BUTTON_WIDTH = '48px';
-
 const CURRENT_MARK_THICKNESS_PX = 2;
 
 export const HeaderBar = styled(AppBar)({
@@ -120,6 +118,5 @@ export const MenuButtonSlot = styled(PolymorphicStack)(({ theme }) => ({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: MENU_BUTTON_WIDTH,
   },
 }));
