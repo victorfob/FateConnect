@@ -3,6 +3,8 @@ import { http, HttpResponse } from 'msw';
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONTACT_FIELD_LABELS, CONTACT_MESSAGES } from '@app/components/ContactFields/constants';
 import { PHOTO_FIELD_TEXTS, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
+import { ContactBanner } from '@app/layouts/MainLayout/components/ContactBanner';
+import { CONTACT_BANNER_TEXT } from '@app/layouts/MainLayout/components/ContactBanner/constants';
 import { DrawerSignOut } from '@app/layouts/MainLayout/components/DrawerSignOut';
 import { SIGN_OUT_LABEL } from '@app/layouts/MainLayout/components/DrawerSignOut/constants';
 import { server } from '@app/mocks/server';
@@ -255,6 +257,30 @@ describe('Profile', () => {
     expect(username?.compareDocumentPosition(currentPassword)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
+  });
+
+  it('should take the contact warning away as soon as the contact is saved, with no new login', async () => {
+    const withoutContact = { ...PROFILE, phone: null, contactEmail: null };
+    serveProfile(withoutContact);
+    server.use(http.patch(PROFILE_URL, () => HttpResponse.json(PROFILE)));
+    renderAtRoute(
+      RoutePathEnum.PROFILE,
+      <>
+        <ContactBanner />
+        <Profile />
+      </>,
+    );
+    expect(await screen.findByText(CONTACT_BANNER_TEXT)).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText(CONTACT_FIELD_LABELS.phone), '15991234567');
+    await userEvent.type(
+      screen.getByLabelText(CONTACT_FIELD_LABELS.contactEmail),
+      'maria@exemplo.test',
+    );
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(PROFILE_MESSAGES.saved)).toBeInTheDocument();
+    expect(screen.queryByText(CONTACT_BANNER_TEXT)).not.toBeInTheDocument();
   });
 
   it('should ask for the email when only the phone is filled in', async () => {
