@@ -1,3 +1,4 @@
+import { AutocompleteField } from './components/AutocompleteField';
 import { DateField } from './components/DateField';
 import { DateRangeField } from './components/DateRangeField';
 import { DateTimeField } from './components/DateTimeField';
@@ -15,6 +16,7 @@ function Input(inputProps: InputProps) {
   return <InputField {...inputProps} />;
 }
 
+Input.Autocomplete = AutocompleteField;
 Input.Date = DateField;
 Input.DateRange = DateRangeField;
 Input.DateTime = DateTimeField;
