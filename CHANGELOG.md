@@ -35,6 +35,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a deixar desabilitado o salvar da edição de carona, de item e de conta da gestão até algum campo mudar, como já era em Meu perfil; desfeita a mudança, ele volta a desabilitar, e os cadastros seguem com o botão ativo (#530) [Frontend]
 - Passa a explicar no ícone de ajuda do e-mail Fatec, em Meu perfil, que ele identifica a conta e que a troca se pede à administração pelos contatos do rodapé, no lugar da frase fixa embaixo do campo (#529) [Frontend]
 - Passa a mostrar o rodapé mais baixo no celular, com o e-mail e o telefone na mesma linha, os termos de uso e a política de privacidade lado a lado e a frase de assinatura mais curta, em uma linha só (#531) [Frontend]
+- Passa a desenhar os botões em três alturas, iguais em qualquer variante e com os mesmos cantos arredondados: 36px na maioria, 32px nos de foto e nas ações dos cartões, 40px nos do topo e no Voltar ao menu (#532) [Frontend]
+- Passa a esticar o Desativar conta na largura do cartão do perfil, e no celular os botões de foto até a borda dos campos (#532) [Frontend]
 
 ### Fixed
 

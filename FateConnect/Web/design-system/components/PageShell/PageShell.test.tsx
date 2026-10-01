@@ -7,6 +7,7 @@ const BACK_LABEL = 'Voltar';
 const RESTING_TAB = 'Buscar';
 const ACTION_TAB = 'Cadastrar';
 const CONTENT = 'conteúdo da tela';
+const LARGE_BUTTON_HEIGHT = '40px';
 
 const DEFAULT_PROPS: PageShellProps = {
   title: TITLE,
@@ -62,6 +63,17 @@ describe('PageShell', () => {
     // media query não roda no jsdom, então o texto continua aqui e a consulta
     // por papel passaria sem ele — o atributo é o que resta para guardar.
     expect(back).toHaveAttribute('aria-label', BACK_LABEL);
+  });
+
+  it('should draw the back action as the large button of the theme', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      action: <PageShell.Back label={BACK_LABEL} icon={<span />} component="a" href="/menu" />,
+    });
+
+    expect(screen.getByRole('link', { name: BACK_LABEL })).toHaveStyle({
+      minHeight: LARGE_BUTTON_HEIGHT,
+    });
   });
 
   it('should keep the title action beside the title, not in the corner', () => {

@@ -54,7 +54,7 @@ export function UserCard({ user, isOwnAccount, onEdit, onStatusConfirm }: UserCa
           </StatusTag>
 
           <ListCard.ActionButtons>
-            <IconButton type="button" label={EDIT_LABEL} onClick={handleEdit}>
+            <IconButton type="button" size="small" label={EDIT_LABEL} onClick={handleEdit}>
               <EditIcon />
             </IconButton>
           </ListCard.ActionButtons>

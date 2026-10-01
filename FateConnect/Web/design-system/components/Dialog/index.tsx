@@ -62,7 +62,7 @@ function Dialog({ open, onClose, title, width = 'standard', children }: DialogPr
           </S.DialogTitleText>
 
           <S.CloseButtonSlot>
-            <IconButton label={CLOSE_LABEL} onClick={onClose}>
+            <IconButton size="large" label={CLOSE_LABEL} onClick={onClose}>
               <CloseIcon />
             </IconButton>
           </S.CloseButtonSlot>

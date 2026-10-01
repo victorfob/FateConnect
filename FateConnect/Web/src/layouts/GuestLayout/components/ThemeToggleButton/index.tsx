@@ -11,6 +11,7 @@ export function ThemeToggleButton() {
   return (
     <IconButton
       color="inherit"
+      size="large"
       label={isLightMode ? SWITCH_TO_DARK_LABEL : SWITCH_TO_LIGHT_LABEL}
       onClick={toggleMode}
     >
