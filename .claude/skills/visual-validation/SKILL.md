@@ -29,3 +29,5 @@ Com dois servidores de dev no ar, toda medição leva a porta lida da página (s
 - Estado que o painel não mostra (hover forçado, largura trocada sem recarregar) sai de um Chrome headless pelo protocolo de depuração, com `Page.captureScreenshot` (`references/measurement-pitfalls.md`).
 
 ⛔ Validado contra stub, a entrega ao dono é o servidor da porta padrão falando com homologação, sem `VITE_API_URL` na linha de comando e com o stub derrubado: é ali que ele captura as evidências. O stub só volta a pedido.
+
+⛔ Decisão que depende de como a tela fica (fonte, escala, densidade) vai ao dono junto com a porta padrão de pé, já com a mudança: ele decide vendo o app, e a captura ou a tabela de larguras só acompanham.
