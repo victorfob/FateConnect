@@ -28,6 +28,7 @@ export function PasswordField({ purpose, ...inputProps }: PasswordFieldProps) {
       endAdornment={
         <IconButton
           type="button"
+          size="large"
           label={PASSWORD_TOGGLE_LABEL}
           aria-pressed={!hidden}
           onClick={handleToggle}

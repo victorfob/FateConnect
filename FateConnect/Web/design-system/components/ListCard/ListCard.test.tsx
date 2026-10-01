@@ -23,14 +23,7 @@ const STATUS_LABEL = 'Aberto';
 const ACTION_LABEL = 'Editar';
 const TOUCH_TARGET = '32px';
 
-/** Os recuos são declarados em `rem`; o alvo de toque e o glifo, em `px`. */
-const REM_IN_PX = 16;
-
 const BEFORE = '::before';
-
-function toNumber(value: string): number {
-  return Number.parseFloat(value);
-}
 
 function styleOf(candidate: Element | null, what: string): CSSStyleDeclaration {
   if (!candidate) throw new Error(`Não renderizou ${what}.`);
@@ -190,7 +183,7 @@ describe('ListCard', () => {
             <StatusTag>{STATUS_LABEL}</StatusTag>
 
             <ListCard.ActionButtons>
-              <IconButton type="button" label={ACTION_LABEL}>
+              <IconButton type="button" size="small" label={ACTION_LABEL}>
                 <EditIcon />
               </IconButton>
             </ListCard.ActionButtons>
@@ -200,16 +193,11 @@ describe('ListCard', () => {
     });
 
     const button = screen.getByRole('button', { name: ACTION_LABEL });
-    const buttonStyle = getComputedStyle(button);
     const icon = styleOf(button.querySelector('svg'), 'o ícone da ação');
 
-    const verticalPadding =
-      (toNumber(buttonStyle.paddingTop) + toNumber(buttonStyle.paddingBottom)) * REM_IN_PX;
-
     expect(icon.fontSize).toBe(`${iconSizeTokens.md}px`);
-    expect(buttonStyle.height).toBe(TOUCH_TARGET);
-    // O glifo mais os dois recuos ocupam o botão inteiro: cresce mais e ele encosta.
-    expect(iconSizeTokens.md + verticalPadding).toBe(toNumber(TOUCH_TARGET));
+    expect(getComputedStyle(button).height).toBe(TOUCH_TARGET);
+    expect(iconSizeTokens.md).toBeLessThan(Number.parseFloat(TOUCH_TARGET));
   });
 
   it('should keep the own flag out of the markup', () => {

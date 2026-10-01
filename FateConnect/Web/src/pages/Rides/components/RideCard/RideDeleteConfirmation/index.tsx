@@ -28,7 +28,7 @@ export function RideDeleteConfirmation({ ride, onDelete }: RideDeleteConfirmatio
 
   return (
     <>
-      <IconButton type="button" label={RIDE_CARD_LABELS.delete} onClick={handleAsk}>
+      <IconButton type="button" size="small" label={RIDE_CARD_LABELS.delete} onClick={handleAsk}>
         <DeleteIcon />
       </IconButton>
 

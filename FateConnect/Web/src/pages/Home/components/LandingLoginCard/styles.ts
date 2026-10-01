@@ -11,7 +11,6 @@ import {
 const { xxs, xs, md, lg } = spacingScale;
 
 const CARD_WIDTH_PX = 360;
-const SUBMIT_HEIGHT_PX = 40;
 
 export const CardRoot = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'column',
@@ -41,11 +40,7 @@ export const Form = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>
 export const SubmitRow = styled(Box)(({ theme }) => ({
   marginTop: theme.space(xs),
 
-  '& .MuiButton-root': {
-    width: '100%',
-    height: `${SUBMIT_HEIGHT_PX}px`,
-    borderRadius: theme.radius(radiusScale.component),
-  },
+  '& .MuiButton-root': { width: '100%' },
 }));
 
 export const SignupRow = styled(PolymorphicStack)(({ theme }) => ({

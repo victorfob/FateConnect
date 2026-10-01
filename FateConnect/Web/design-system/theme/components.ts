@@ -1,6 +1,13 @@
 import type { Components, CSSObject, Theme } from '@mui/material/styles';
 
-import { radiusScale, shadowTokens, spacingScale, typographyTokens } from '../tokens';
+import {
+  buttonHeightTokens,
+  radiusScale,
+  shadowTokens,
+  spacingScale,
+  typographyTokens,
+  type ButtonSizeToken,
+} from '../tokens';
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
 
@@ -78,6 +85,10 @@ export const components: Components<Theme> = {
     },
     variants: [
       {
+        props: { variant: 'contained' },
+        style: { borderRadius: radius(radiusScale.component) },
+      },
+      {
         props: { variant: 'soft' },
         style: ({ theme }) => ({
           border: `1px solid ${theme.palette.divider}`,
@@ -96,7 +107,52 @@ export const components: Components<Theme> = {
           padding: spacing(xs, md),
         }),
       },
+      {
+        props: { size: 'medium' },
+        style: {
+          minHeight: `${buttonHeightTokens.medium}px`,
+          paddingTop: spacing(none),
+          paddingBottom: spacing(none),
+        },
+      },
+      {
+        props: { size: 'small' },
+        style: {
+          ...typographyTokens.caption,
+          minHeight: `${buttonHeightTokens.small}px`,
+          paddingTop: spacing(none),
+          paddingBottom: spacing(none),
+        },
+      },
+      {
+        props: { size: 'large' },
+        style: {
+          minHeight: `${buttonHeightTokens.large}px`,
+          paddingTop: spacing(none),
+          paddingBottom: spacing(none),
+        },
+      },
+      {
+        props: { variant: 'chrome' },
+        style: ({ theme }) => ({
+          borderRadius: radius(radiusScale.component),
+          color: theme.palette.chrome.contrastText,
+          backgroundColor: theme.palette.chrome.main,
+          boxShadow: shadowTokens.component,
+          padding: spacing(none, md),
+        }),
+      },
     ],
+  },
+  MuiIconButton: {
+    variants: (['small', 'medium', 'large'] satisfies ButtonSizeToken[]).map((size) => ({
+      props: { size },
+      style: {
+        width: `${buttonHeightTokens[size]}px`,
+        height: `${buttonHeightTokens[size]}px`,
+        padding: spacing(none),
+      },
+    })),
   },
   MuiCard: {
     styleOverrides: {

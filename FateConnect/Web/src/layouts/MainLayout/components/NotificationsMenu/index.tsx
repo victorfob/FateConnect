@@ -19,7 +19,7 @@ export function NotificationsMenu() {
 
   return (
     <>
-      <IconButton color="inherit" label={C.TRIGGER_LABEL} onClick={handleOpen}>
+      <IconButton color="inherit" size="large" label={C.TRIGGER_LABEL} onClick={handleOpen}>
         <NotificationsIcon />
       </IconButton>
 

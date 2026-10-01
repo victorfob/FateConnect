@@ -23,11 +23,21 @@ export function LostItemOwnerActions({ item, onEdit, onDelete }: LostItemOwnerAc
 
   return (
     <>
-      <IconButton type="button" label={C.LOST_ITEM_ACTION_LABELS.edit} onClick={handleEdit}>
+      <IconButton
+        type="button"
+        size="small"
+        label={C.LOST_ITEM_ACTION_LABELS.edit}
+        onClick={handleEdit}
+      >
         <EditIcon />
       </IconButton>
 
-      <IconButton type="button" label={C.LOST_ITEM_ACTION_LABELS.delete} onClick={handleDelete}>
+      <IconButton
+        type="button"
+        size="small"
+        label={C.LOST_ITEM_ACTION_LABELS.delete}
+        onClick={handleDelete}
+      >
         <DeleteIcon />
       </IconButton>
     </>
