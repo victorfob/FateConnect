@@ -3,6 +3,9 @@ import type { ReactNode } from 'react';
 import { HiddenField } from '@ds-root/components/HiddenField';
 
 import { ListCardActions } from './components/ListCardActions';
+import { ListCardHeader } from './components/ListCardHeader';
+import { ListCardInfoRow } from './components/ListCardInfoRow';
+import { BODY_ATTRIBUTE, MEDIA_ATTRIBUTE } from './constants';
 import * as S from './styles';
 
 export type ListCardProps = Readonly<{
@@ -26,17 +29,17 @@ function ListCard({ own = false, ownLabel, media, children }: ListCardProps) {
     <S.CardRoot component="article" own={own} hasMedia={media !== undefined}>
       {own && ownLabel && <HiddenField component="span">{ownLabel}</HiddenField>}
 
-      {media}
+      {media !== undefined && <S.MediaSlot {...{ [MEDIA_ATTRIBUTE]: '' }}>{media}</S.MediaSlot>}
 
-      <S.CardBody>{children}</S.CardBody>
+      <S.CardBody {...{ [BODY_ATTRIBUTE]: '' }}>{children}</S.CardBody>
     </S.CardRoot>
   );
 }
 
-ListCard.Header = S.HeaderRow;
+ListCard.Header = ListCardHeader;
 ListCard.Actions = ListCardActions;
 ListCard.ActionButtons = S.ActionButtons;
-ListCard.InfoRow = S.InfoRow;
+ListCard.InfoRow = ListCardInfoRow;
 ListCard.InfoItem = S.InfoItem;
 ListCard.Description = S.Description;
 
