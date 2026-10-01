@@ -1,6 +1,9 @@
 import { render, screen } from '@app/test/testing-library';
+import { narrowDeclarationsFor } from '@app/test/utils/styleSheetRules';
 
 import { Footer } from '.';
+
+const LINE_GAP_16PX_AND_CONTACT_GAP_8PX = 'gap:1rem0.5rem';
 
 const CONTACT = {
   email: {
@@ -66,6 +69,45 @@ describe('Footer', () => {
     expect(screen.getByRole('link', { name: CONTACT.phone.accessibleLabel })).not.toHaveAttribute(
       'target',
     );
+  });
+
+  it('should put the email and the phone side by side below md, wrapping when they do not fit', () => {
+    render(<Footer anchorId="contato" title="t" contact={CONTACT} copyrightLines={[]} />);
+
+    const mailAndPhoneRow = screen.getByRole('link', {
+      name: CONTACT.email.accessibleLabel,
+    }).parentElement;
+    const narrowDeclarations = narrowDeclarationsFor(mailAndPhoneRow);
+
+    expect(mailAndPhoneRow).toContainElement(
+      screen.getByRole('link', { name: CONTACT.phone.accessibleLabel }),
+    );
+    expect(narrowDeclarations).toContain('flex-direction:row');
+    expect(narrowDeclarations).toContain('flex-wrap:wrap');
+    expect(narrowDeclarations).toContain(LINE_GAP_16PX_AND_CONTACT_GAP_8PX);
+  });
+
+  it('should keep the address on its own line, outside the email and phone row', () => {
+    render(<Footer anchorId="contato" title="t" contact={CONTACT} copyrightLines={[]} />);
+
+    const mailAndPhoneRow = screen.getByRole('link', {
+      name: CONTACT.email.accessibleLabel,
+    }).parentElement;
+    const address = screen.getByRole('link', { name: CONTACT.address.accessibleLabel });
+
+    expect(mailAndPhoneRow?.nextElementSibling).toBe(address);
+    expect(mailAndPhoneRow).not.toContainElement(address);
+  });
+
+  it('should keep the contacts one per line from md up', () => {
+    render(<Footer anchorId="contato" title="t" contact={CONTACT} copyrightLines={[]} />);
+
+    const mailAndPhoneRow = screen.getByRole('link', {
+      name: CONTACT.email.accessibleLabel,
+    }).parentElement;
+    if (!mailAndPhoneRow) throw new Error('Não renderizou a linha do e-mail e do telefone.');
+
+    expect(getComputedStyle(mailAndPhoneRow).flexDirection).toBe('column');
   });
 
   it('should expose the anchor used by the navigation', () => {
