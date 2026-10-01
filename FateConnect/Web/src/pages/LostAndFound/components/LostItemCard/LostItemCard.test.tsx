@@ -119,6 +119,12 @@ describe('LostItemCard', () => {
     await waitFor(() => expect(asked).toEqual([`/${thumbnailPath}`]));
   });
 
+  it('should list the kind, the date and the place, from the shortest text', () => {
+    renderComponent();
+
+    expect(screen.getByRole('article')).toHaveTextContent(`Perdido11/08/2026${LOST_ITEM.place}`);
+  });
+
   it('should show the contact of whoever registered an item of someone else', async () => {
     renderComponent();
 

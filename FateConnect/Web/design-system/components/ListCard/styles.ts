@@ -54,6 +54,9 @@ export const CardBody = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   flexGrow: 1,
   minWidth: 0,
+  // Herdado por título, fileira e descrição: uma palavra ou um e-mail sem
+  // espaço passaria da borda do cartão e alargaria a página no celular.
+  overflowWrap: 'anywhere',
 
   // No estreito o cartão vira coluna, e aí o `flex-start` do topo encolheria o
   // corpo até o conteúdo: o cabeçalho pararia antes da borda, em lugar
@@ -68,10 +71,9 @@ export const HeaderRow = styled(Stack)(({ theme }) => ({
   gap: theme.space(sm),
   marginBottom: theme.space(sm),
 
-  // Sem os dois o título empurra a etiqueta e as ações para fora do cartão no
-  // estreito: o `minWidth` é o que deixa a caixa encolher, e a quebra é o que
-  // impede uma palavra sem espaço de correr por cima delas.
-  '& > :first-of-type': { minWidth: 0, overflowWrap: 'anywhere' },
+  // Sem ele o título empurra a etiqueta e as ações para fora do cartão no
+  // estreito: é o que deixa a caixa encolher até a quebra herdada do corpo.
+  '& > :first-of-type': { minWidth: 0 },
 }));
 
 export const ActionButtons = styled(Stack)(({ theme }) => ({
@@ -101,6 +103,10 @@ export const InfoRow = styled(Stack)(({ theme }) => ({
   // apaga a do primeiro item de cada linha — inclusive a da linha que quebrou.
   overflow: 'hidden',
   color: theme.palette.text.secondary,
+
+  // No estreito, um por linha: em linha a quebra dependeria do tamanho do
+  // texto, e o item que descesse sozinho pareceria solto.
+  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
 }));
 
 export const InfoItem = styled(Stack)(({ theme }) => ({
@@ -125,6 +131,8 @@ export const InfoItem = styled(Stack)(({ theme }) => ({
     color: theme.palette.brandText,
     fontSize: `${iconSizeTokens.sm}px`,
   },
+
+  [theme.breakpoints.down('md')]: { '&::before': { display: 'none' } },
 }));
 
 export const Description = styled(Box)(({ theme }) => ({

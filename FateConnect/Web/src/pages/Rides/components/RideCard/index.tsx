@@ -46,9 +46,13 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
 
       <ListCard.InfoRow>
         <ListCard.InfoItem>
-          <CalendarTodayIcon />
+          {ride.vehicleType === VehicleTypeEnum.MOTORCYCLE ? (
+            <TwoWheelerIcon />
+          ) : (
+            <DirectionsCarIcon />
+          )}
           <Typography variant="caption" color="inherit">
-            {departure}
+            {vehicleTypeLabel(ride.vehicleType)}
           </Typography>
         </ListCard.InfoItem>
 
@@ -62,13 +66,9 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
         )}
 
         <ListCard.InfoItem>
-          {ride.vehicleType === VehicleTypeEnum.MOTORCYCLE ? (
-            <TwoWheelerIcon />
-          ) : (
-            <DirectionsCarIcon />
-          )}
+          <CalendarTodayIcon />
           <Typography variant="caption" color="inherit">
-            {vehicleTypeLabel(ride.vehicleType)}
+            {departure}
           </Typography>
         </ListCard.InfoItem>
       </ListCard.InfoRow>
