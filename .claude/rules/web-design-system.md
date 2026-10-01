@@ -20,6 +20,7 @@ O consumo pela aplicação está em `fateconnect-web-react.md`; o lint guarda as
 - Teste do DS que usava como sonda o componente que saiu não pode importar de `@app`: a sonda vira outro componente do DS, ou nasce dentro do próprio teste.
 - ⛔ Estilo que sobe de uma tela para o tema: liste o que aquela tela dava por slot, ícone ou filho — isso não sobe junto, e o segundo consumidor nasce sem (o polegar do `MuiSwitch` saiu cinza porque o branco vinha da prop de ícone). O par de cor que nasce disso entra no teste de contraste.
 - Controle do topo que a gaveta repete some na mesma consulta em que o botão de menu aparece (o menu da conta); o que ela não repete (a campainha) fica em qualquer largura.
+- ⛔ Mudança que vale para toda uma família (todo botão, todo campo) começa pelo inventário do app rodando: `button`, `a[href]` e `[role]` em todas as telas, estados e menus, agrupados pelo papel. Pela classe (`.MuiButton-root`) escapam o link desenhado como botão e o botão de ícone.
 
 ## Cor
 
