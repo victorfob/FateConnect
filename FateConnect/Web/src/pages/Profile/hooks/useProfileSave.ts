@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import type { UseFormReturn } from 'react-hook-form';
 
 import { useNotification } from '@app/hooks/useNotification';
+import { SIGNUP_CONFLICT_MESSAGES } from '@app/pages/Signup/constants';
 import { ApiError } from '@app/services/httpClient';
 import {
   changePassword,
@@ -12,6 +13,7 @@ import {
 import type { PasswordChangeInput } from '@app/services/users/profileTypes';
 import type { User } from '@app/services/users/types';
 
+import { contactConflictFieldOf } from '../helpers/contactConflict';
 import { toProfileFormValues, toProfileInput } from '../helpers/mapper';
 import type { ProfileFormInput, ProfileFormValues } from '../schema';
 import * as C from '../constants';
@@ -57,6 +59,20 @@ export function useProfileSave({ form, profile, onSaved }: UseProfileSaveInput) 
     meta: { notifiesErrorItself: true },
   });
 
+  const reportDataFailure = useCallback(
+    (error: unknown) => {
+      const field = contactConflictFieldOf(error);
+
+      if (field) {
+        form.setError(field, { message: SIGNUP_CONFLICT_MESSAGES[field] }, { shouldFocus: true });
+        return;
+      }
+
+      notifyError(C.PROFILE_MESSAGES.saveFailed);
+    },
+    [form, notifyError],
+  );
+
   const reportPasswordFailure = useCallback(
     (error: unknown) => {
       // A API responde 400 a toda recusa de domínio, e as outras o formulário barra antes.
@@ -82,8 +98,8 @@ export function useProfileSave({ form, profile, onSaved }: UseProfileSaveInput) 
       if (savesData) {
         try {
           saved = await dataMutation.mutateAsync(values);
-        } catch {
-          notifyError(C.PROFILE_MESSAGES.saveFailed);
+        } catch (error) {
+          reportDataFailure(error);
           return;
         }
 
@@ -118,11 +134,11 @@ export function useProfileSave({ form, profile, onSaved }: UseProfileSaveInput) 
     [
       dataMutation,
       form,
-      notifyError,
       notifySuccess,
       onSaved,
       passwordMutation,
       profile,
+      reportDataFailure,
       reportPasswordFailure,
     ],
   );

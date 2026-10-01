@@ -9,6 +9,7 @@ import { tokenWithName } from '@app/test/token';
 
 import { useContactGate } from './useContactGate';
 import { useLacksContact } from './useLacksContact';
+import { useProfile } from './useProfile';
 
 const PROFILE_URL = 'https://api.fateconnect.test/users/me';
 
@@ -53,6 +54,33 @@ describe('useContactGate', () => {
 
     expect(result.current.gate.contactDialogOpen).toBe(true);
     expect(publish).not.toHaveBeenCalled();
+  });
+
+  it('should let the form open as soon as the profile saves a contact, with no new login', async () => {
+    let requests = 0;
+    server.use(
+      http.get(PROFILE_URL, () => {
+        requests += 1;
+
+        return HttpResponse.json({ ...PROFILE, phone: null, contactEmail: null });
+      }),
+    );
+    const publish = vi.fn();
+    const { result } = renderHook(
+      () => ({ gate: useContactGate(), profile: useProfile(), lacksContact: useLacksContact() }),
+      { wrapper: AppProviders },
+    );
+    await waitFor(() => expect(result.current.lacksContact).toBe(true));
+    act(() => result.current.gate.guard(publish));
+    expect(publish).not.toHaveBeenCalled();
+
+    // É o que a tela de perfil faz ao salvar.
+    act(() => result.current.profile.replaceProfile(PROFILE));
+    await waitFor(() => expect(result.current.lacksContact).toBe(false));
+    act(() => result.current.gate.guard(publish));
+
+    expect(publish).toHaveBeenCalledOnce();
+    expect(requests).toBe(1);
   });
 
   it('should open the notice and fetch the profile again when the api asks for a contact', async () => {

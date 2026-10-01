@@ -24,6 +24,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a enviar como sigilosa a denúncia de quem está sem contato, com a opção de sigilo ligada e travada e uma nota dizendo como liberá-la (#517) [Frontend]
 - Passa a declarar na política de privacidade e nos termos de uso que o contato é opcional, cadastrado pelo perfil com os dois juntos e sem poder ser apagado, e o que fica bloqueado sem ele, em nova versão dos termos (#517) [Frontend]
 
+### Fixed
+
+- Corrige o salvamento de Meu perfil com telefone ou e-mail para contato já usado por outra conta, que só avisava que não deu certo; agora o aviso aparece embaixo do campo certo, que recebe o foco (#519) [Frontend]
+
 ## [1.1.1] - 2026-09-30
 
 ### Security

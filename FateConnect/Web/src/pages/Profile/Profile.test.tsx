@@ -3,10 +3,13 @@ import { http, HttpResponse } from 'msw';
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONTACT_FIELD_LABELS, CONTACT_MESSAGES } from '@app/components/ContactFields/constants';
 import { PHOTO_FIELD_TEXTS, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
+import { ContactBanner } from '@app/layouts/MainLayout/components/ContactBanner';
+import { CONTACT_BANNER_TEXT } from '@app/layouts/MainLayout/components/ContactBanner/constants';
 import { DrawerSignOut } from '@app/layouts/MainLayout/components/DrawerSignOut';
 import { SIGN_OUT_LABEL } from '@app/layouts/MainLayout/components/DrawerSignOut/constants';
 import { server } from '@app/mocks/server';
-import { FIELD_LABELS } from '@app/pages/Signup/constants';
+import { SignupConflictFieldEnum } from '@app/pages/Signup/@types';
+import { FIELD_LABELS, SIGNUP_CONFLICT_MESSAGES } from '@app/pages/Signup/constants';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { PROFILE } from '@app/test/profile';
@@ -72,6 +75,7 @@ const NEW_TOKEN = tokenWithName('Maria da Silva');
 const NO_CONTENT = 204;
 const BAD_REQUEST = 400;
 const SERVER_ERROR = 500;
+const CONFLICT = 409;
 
 function serveProfile(profile = PROFILE) {
   server.use(http.get(PROFILE_URL, () => HttpResponse.json(profile)));
@@ -256,6 +260,57 @@ describe('Profile', () => {
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
   });
+
+  it('should take the contact warning away as soon as the contact is saved, with no new login', async () => {
+    const withoutContact = { ...PROFILE, phone: null, contactEmail: null };
+    serveProfile(withoutContact);
+    server.use(http.patch(PROFILE_URL, () => HttpResponse.json(PROFILE)));
+    renderAtRoute(
+      RoutePathEnum.PROFILE,
+      <>
+        <ContactBanner />
+        <Profile />
+      </>,
+    );
+    expect(await screen.findByText(CONTACT_BANNER_TEXT)).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText(CONTACT_FIELD_LABELS.phone), '15991234567');
+    await userEvent.type(
+      screen.getByLabelText(CONTACT_FIELD_LABELS.contactEmail),
+      'maria@exemplo.test',
+    );
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(PROFILE_MESSAGES.saved)).toBeInTheDocument();
+    expect(screen.queryByText(CONTACT_BANNER_TEXT)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['phone', SignupConflictFieldEnum.PHONE, CONTACT_FIELD_LABELS.phone],
+    ['e-mail', SignupConflictFieldEnum.CONTACT_EMAIL, CONTACT_FIELD_LABELS.contactEmail],
+  ])(
+    'should point at the contact %s the api says is already taken, and keep the change pending',
+    async (_, field, label) => {
+      server.use(
+        http.patch(PROFILE_URL, () =>
+          HttpResponse.json({ error: 'em uso', field, code: null }, { status: CONFLICT }),
+        ),
+      );
+      await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
+
+      await userEvent.type(screen.getByLabelText(CONTACT_FIELD_LABELS.phone), '15991234567');
+      await userEvent.type(
+        screen.getByLabelText(CONTACT_FIELD_LABELS.contactEmail),
+        'maria@exemplo.test',
+      );
+      await userEvent.click(saveButton());
+
+      expect(await screen.findByText(SIGNUP_CONFLICT_MESSAGES[field])).toBeInTheDocument();
+      expect(screen.getByLabelText(label)).toHaveFocus();
+      expect(screen.queryByText(PROFILE_MESSAGES.saveFailed)).not.toBeInTheDocument();
+      expect(saveButton()).toBeEnabled();
+    },
+  );
 
   it('should ask for the email when only the phone is filled in', async () => {
     await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
