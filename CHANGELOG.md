@@ -30,6 +30,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a declarar na política de privacidade e nos termos de uso que o contato é opcional, cadastrado pelo perfil com os dois juntos e sem poder ser apagado, e o que fica bloqueado sem ele, em nova versão dos termos (#517) [Frontend]
 - Passa a citar o veículo entre os dados da carona na política de privacidade e nos termos de uso, em nova versão dos dois documentos (#521) [Frontend]
 - Passa a mostrar no celular as informações dos cartões de carona, achados e perdidos, denúncias e usuários da gestão uma por linha, em vez de quebrarem conforme o tamanho do texto, e em ordem do texto mais curto ao mais longo, também no desktop (#523) [Frontend]
+- Passa a mostrar no celular, nos cartões com foto de achados e perdidos e de denúncias, a etiqueta e as ações no topo e o título e as informações ao lado da miniatura, que antes deixava uma faixa vazia à direita dela (#524) [Frontend]
 
 ### Fixed
 

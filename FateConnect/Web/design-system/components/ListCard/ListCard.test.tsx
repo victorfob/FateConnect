@@ -5,6 +5,7 @@ import { EditIcon } from '@ds-root/icons';
 import { createAppTheme } from '@ds-root/theme';
 import { iconSizeTokens } from '@ds-root/tokens';
 
+import { ACTIONS_ATTRIBUTE } from './constants';
 import { ListCard, type ListCardProps } from '.';
 
 const TITLE = 'Item de teste';
@@ -80,6 +81,46 @@ function renderInfoRow() {
   return { row, item };
 }
 
+function renderMediaCard(media?: ListCardProps['media']) {
+  render(
+    <ListCard media={media}>
+      <ListCard.Header>
+        <span>{TITLE}</span>
+        <ListCard.Actions>
+          <StatusTag>{STATUS_LABEL}</StatusTag>
+        </ListCard.Actions>
+      </ListCard.Header>
+
+      <ListCard.InfoRow>
+        <ListCard.InfoItem>{FIRST_INFO}</ListCard.InfoItem>
+      </ListCard.InfoRow>
+
+      <ListCard.Description>{DESCRIPTION}</ListCard.Description>
+    </ListCard>,
+  );
+
+  const title = screen.getByText(TITLE);
+  const header = title.parentElement;
+  const body = header?.parentElement;
+  if (!header || !body) throw new Error('Não renderizou o cabeçalho dentro do corpo.');
+
+  return {
+    card: screen.getByRole('article'),
+    body,
+    header,
+    title,
+    actions: screen.getByText(STATUS_LABEL).closest(`[${ACTIONS_ATTRIBUTE}]`),
+    infoRow: screen.getByText(FIRST_INFO).parentElement,
+    description: screen.getByText(DESCRIPTION),
+  };
+}
+
+function narrowDeclarationsFor(element: Element | null): string {
+  if (!element) throw new Error('Não renderizou a parte do cartão.');
+
+  return declarationsFor(narrowRules(), element);
+}
+
 const DEFAULT_PROPS: ListCardProps = { children: TITLE };
 
 const renderComponent = (props = DEFAULT_PROPS) => render(<ListCard {...props} />);
@@ -95,6 +136,35 @@ describe('ListCard', () => {
     renderComponent({ ...DEFAULT_PROPS, media: <span>{MEDIA_TEXT}</span> });
 
     expect(screen.getByText(MEDIA_TEXT)).toBeInTheDocument();
+  });
+
+  it('should put the actions on top and the title and info beside the media below md', () => {
+    const parts = renderMediaCard(<span>{MEDIA_TEXT}</span>);
+
+    expect(narrowDeclarationsFor(parts.card)).toContain('display:grid');
+    expect(narrowDeclarationsFor(parts.body)).toContain('display:contents');
+    expect(narrowDeclarationsFor(parts.header)).toContain('display:contents');
+    expect(narrowDeclarationsFor(parts.actions)).toContain('grid-area:actions');
+    expect(narrowDeclarationsFor(screen.getByText(MEDIA_TEXT).parentElement)).toContain(
+      'grid-area:media',
+    );
+    expect(narrowDeclarationsFor(parts.title)).toContain('grid-area:title');
+    expect(narrowDeclarationsFor(parts.infoRow)).toContain('grid-area:info');
+    expect(narrowDeclarationsFor(parts.description)).toContain('grid-column:1/-1');
+  });
+
+  it('should keep the card with media in a row from md up', () => {
+    const { card } = renderMediaCard(<span>{MEDIA_TEXT}</span>);
+
+    expect(getComputedStyle(card).display).toBe('flex');
+    expect(getComputedStyle(card).flexDirection).toBe('row');
+  });
+
+  it('should keep the card without media out of the grid below md', () => {
+    const { card } = renderMediaCard();
+
+    expect(narrowDeclarationsFor(card)).toContain('flex-direction:column');
+    expect(narrowDeclarationsFor(card)).not.toContain('display:grid');
   });
 
   it('should announce the own label only when the record belongs to the reader', () => {
