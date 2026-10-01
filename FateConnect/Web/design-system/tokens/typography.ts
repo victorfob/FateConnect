@@ -5,7 +5,7 @@ export type TypographyToken = {
   letterSpacing?: string;
 };
 
-export const fontFamily = "'Inter', 'Helvetica Neue', sans-serif";
+export const fontFamily = "'Helvetica Neue', sans-serif";
 
 export const typographyTokens = {
   h1: { fontSize: '2rem', fontWeight: 700, lineHeight: 1.2 },

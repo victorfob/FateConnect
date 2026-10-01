@@ -46,6 +46,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o botão de expandir a descrição da denúncia, que ficava decidido pela largura em que o cartão apareceu: ao girar o celular, o texto podia ficar cortado sem o botão, ou com um botão que não revelava nada (#526) [Frontend]
 - Corrige o botão vermelho preenchido que, no celular, continuava vermelho depois de desabilitar, com o texto apagado: o toque deixa o botão em hover, e o hover pintava o fundo mesmo desabilitado, como o Salvar alterações do perfil depois de salvar (#526) [Frontend]
 - Corrige o ícone de menu do topo, que no celular ficava mais para dentro que o conteúdo da página por causa da folga em volta do desenho; agora ele se alinha à borda do conteúdo, sem diminuir a área de toque (#528) [Frontend]
+- Corrige o texto que saía na fonte Inter só para quem a tinha instalada no computador, já que o app nunca a enviava; agora todo mundo vê a fonte do sistema, a mesma que o resto já via (#537) [Frontend]
 
 ## [1.1.1] - 2026-09-30
 
