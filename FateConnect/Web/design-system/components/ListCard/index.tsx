@@ -3,6 +3,9 @@ import type { ReactNode } from 'react';
 import { HiddenField } from '@ds-root/components/HiddenField';
 
 import { ListCardActions } from './components/ListCardActions';
+import { ListCardDescription } from './components/ListCardDescription';
+
+export type { ListCardDescriptionLabels } from './components/ListCardDescription';
 import { ListCardHeader } from './components/ListCardHeader';
 import { ListCardInfoRow } from './components/ListCardInfoRow';
 import { BODY_ATTRIBUTE, MEDIA_ATTRIBUTE } from './constants';
@@ -41,6 +44,6 @@ ListCard.Actions = ListCardActions;
 ListCard.ActionButtons = S.ActionButtons;
 ListCard.InfoRow = ListCardInfoRow;
 ListCard.InfoItem = S.InfoItem;
-ListCard.Description = S.Description;
+ListCard.Description = ListCardDescription;
 
 export { ListCard };

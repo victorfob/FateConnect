@@ -1,6 +1,11 @@
-import { spacingScale, Stack, styled, Typography } from '@design-system';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
-const { xxs } = spacingScale;
+import { styled } from '@ds-root/styled';
+import { spacingScale } from '@ds-root/tokens';
+
+const { xxs, sm } = spacingScale;
 
 const COLLAPSED_LINES = 2;
 
@@ -19,9 +24,14 @@ function visibleLines(isCollapsed: boolean): number {
   return EXPANDED_LINES;
 }
 
-export const Description = styled(Typography, {
+export const DescriptionRoot = styled(Box)(({ theme }) => ({
+  marginBottom: theme.space(sm),
+  color: theme.palette.text.secondary,
+}));
+
+export const DescriptionText = styled(Typography, {
   shouldForwardProp: (prop) => prop !== 'isCollapsed',
-})<{ isCollapsed: boolean }>(({ theme, isCollapsed }) => ({
+})<{ isCollapsed: boolean; component?: 'div' }>(({ theme, isCollapsed }) => ({
   display: '-webkit-box',
   WebkitBoxOrient: 'vertical',
   WebkitLineClamp: visibleLines(isCollapsed),

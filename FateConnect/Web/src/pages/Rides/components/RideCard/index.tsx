@@ -6,6 +6,7 @@ import {
   TwoWheelerIcon,
 } from '@design-system/icons';
 
+import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import * as C from '@app/pages/Rides/constants';
 import { rideDepartureLabel } from '@app/pages/Rides/helpers/rideDeparture';
 import { rideRecurrenceLabel } from '@app/pages/Rides/helpers/rideFrequency';
@@ -73,11 +74,11 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
         </ListCard.InfoItem>
       </ListCard.InfoRow>
 
-      <ListCard.Description>
-        <Typography variant="subtitle" color="inherit">
+      {ride.description && (
+        <ListCard.Description toggleLabels={DESCRIPTION_TOGGLE_LABELS}>
           {ride.description}
-        </Typography>
-      </ListCard.Description>
+        </ListCard.Description>
+      )}
     </ListCard>
   );
 }

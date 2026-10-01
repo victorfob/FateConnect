@@ -5,7 +5,7 @@ import { EditIcon } from '@ds-root/icons';
 import { createAppTheme } from '@ds-root/theme';
 import { iconSizeTokens } from '@ds-root/tokens';
 
-import { ACTIONS_ATTRIBUTE } from './constants';
+import { ACTIONS_ATTRIBUTE, BODY_ATTRIBUTE } from './constants';
 import { ListCard, type ListCardProps } from '.';
 
 const TITLE = 'Item de teste';
@@ -111,7 +111,7 @@ function renderMediaCard(media?: ListCardProps['media']) {
     title,
     actions: screen.getByText(STATUS_LABEL).closest(`[${ACTIONS_ATTRIBUTE}]`),
     infoRow: screen.getByText(FIRST_INFO).parentElement,
-    description: screen.getByText(DESCRIPTION),
+    description: screen.getByText(DESCRIPTION).parentElement,
   };
 }
 
@@ -209,7 +209,7 @@ describe('ListCard', () => {
   it('should break a word without spaces inside the card instead of overflowing it', () => {
     renderComponent({ children: <ListCard.Description>{DESCRIPTION}</ListCard.Description> });
 
-    const body = screen.getByText(DESCRIPTION).parentElement;
+    const body = screen.getByText(DESCRIPTION).closest(`[${BODY_ATTRIBUTE}]`);
 
     expect(styleOf(body, 'o corpo do cartão').overflowWrap).toBe('anywhere');
   });

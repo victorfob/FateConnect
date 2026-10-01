@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import { server } from '@app/mocks/server';
 import {
   DeletionReasonEnum,
@@ -10,6 +11,7 @@ import {
 } from '@app/services/lostAndFound/types';
 import type { UserContact } from '@app/services/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { forgeOverflow, restoreContentHeight } from '@app/test/utils/contentHeight';
 
 import { photoAlt } from './constants';
 import { RESTORE_LABEL } from './LostItemStatusAction/constants';
@@ -96,6 +98,7 @@ describe('LostItemCard', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    restoreContentHeight();
     Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
   });
 
@@ -123,6 +126,16 @@ describe('LostItemCard', () => {
     renderComponent();
 
     expect(screen.getByRole('article')).toHaveTextContent(`Perdido11/08/2026${LOST_ITEM.place}`);
+  });
+
+  it('should collapse a long description behind the expansion', () => {
+    forgeOverflow();
+    renderComponent();
+
+    expect(screen.getByText(LOST_ITEM.description ?? '')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: DESCRIPTION_TOGGLE_LABELS.expand }),
+    ).toBeInTheDocument();
   });
 
   it('should show the contact of whoever registered an item of someone else', async () => {

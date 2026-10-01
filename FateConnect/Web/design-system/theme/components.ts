@@ -51,13 +51,16 @@ export const components: Components<Theme> = {
           },
         };
 
-        // O MUI troca o fundo do botão preenchido pelo tom `dark` no hover, o
-        // que somado ao véu escurece o dobro do produto. Fixar o fundo na cor
-        // base deixa o véu ser o único escurecimento.
+        // O MUI troca o fundo do preenchido pelo tom `dark` no hover, o que somado
+        // ao véu escurece o dobro. Fixar a cor base deixa o véu como único realce;
+        // o desabilitado fica de fora porque, no toque, o hover segue preso ao botão.
         if (ownerState.variant !== 'contained') return veil;
         if (ownerState.color !== 'secondary' && ownerState.color !== 'error') return veil;
 
-        return { ...veil, '&:hover': { backgroundColor: theme.palette[ownerState.color].main } };
+        return {
+          ...veil,
+          '&:hover:not(.Mui-disabled)': { backgroundColor: theme.palette[ownerState.color].main },
+        };
       },
       // Herdar do botão não pinta o indicador: no carregamento centrado o MUI
       // deixa o rótulo `transparent`, então a cor do texto é nomeada de novo aqui.
