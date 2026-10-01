@@ -32,6 +32,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a mostrar no celular as informações dos cartões de carona, achados e perdidos, denúncias e usuários da gestão uma por linha, em vez de quebrarem conforme o tamanho do texto, e em ordem do texto mais curto ao mais longo, também no desktop (#523) [Frontend]
 - Passa a mostrar no celular, nos cartões com foto de achados e perdidos e de denúncias, a etiqueta e as ações no topo e o título e as informações ao lado da miniatura, que antes deixava uma faixa vazia à direita dela (#524) [Frontend]
 - Passa a recolher em duas linhas a descrição dos cartões de carona e de achados e perdidos, com o botão de expandir quando há mais texto, como já era na denúncia; a carona sem descrição deixa de reservar espaço para ela (#526) [Frontend]
+- Passa a deixar desabilitado o salvar da edição de carona, de item e de conta da gestão até algum campo mudar, como já era em Meu perfil; desfeita a mudança, ele volta a desabilitar, e os cadastros seguem com o botão ativo (#530) [Frontend]
 
 ### Fixed
 
