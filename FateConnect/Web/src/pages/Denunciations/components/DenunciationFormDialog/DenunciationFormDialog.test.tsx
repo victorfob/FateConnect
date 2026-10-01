@@ -81,6 +81,13 @@ describe('DenunciationFormDialog', () => {
     expect(confidentialToggle()).not.toBeChecked();
   });
 
+  it('should open with the submit released, since a new report has nothing to compare', async () => {
+    renderComponent();
+    await screen.findByRole('heading', { name: DENUNCIATION_FORM.title });
+
+    expect(submitButton()).toBeEnabled();
+  });
+
   it('should hold the description to its limit and show how much of it is used', async () => {
     renderComponent();
 
