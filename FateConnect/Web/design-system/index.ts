@@ -38,7 +38,7 @@ export type { SelectOption } from './components/Input/components/SelectInput/typ
 export { CardsList } from './components/CardsList';
 export type { CardsListProps } from './components/CardsList';
 export { ListCard } from './components/ListCard';
-export type { ListCardProps } from './components/ListCard';
+export type { ListCardDescriptionLabels, ListCardProps } from './components/ListCard';
 export { NotificationProvider } from './components/NotificationProvider';
 export {
   NotificationActions,
