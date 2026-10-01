@@ -272,13 +272,14 @@ public class ApiFactory : WebApplicationFactory<Program>
         DateOnly departureDate,
         TimeOnly departureTime,
         string destination = "Sorocaba centro",
-        string? description = null)
+        string? description = null,
+        EnumVehicleType vehicleType = EnumVehicleType.Car)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
         DateOnly acceptedDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
-        Ride ride = new(destination, acceptedDate, departureTime, EnumRideType.Solidarity, driverId, description);
+        Ride ride = new(destination, acceptedDate, departureTime, EnumRideType.Solidarity, vehicleType, driverId, description);
 
         context.Rides.Add(ride);
         context.Entry(ride).Property(entity => entity.DepartureDate).CurrentValue = departureDate;

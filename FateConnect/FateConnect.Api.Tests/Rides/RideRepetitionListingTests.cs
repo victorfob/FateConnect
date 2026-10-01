@@ -25,6 +25,7 @@ public class RideRepetitionListingTests
             ["departureDate"] = Iso(start),
             ["departureTime"] = $"{DepartureHour}:00:00",
             ["rideType"] = "Solidarity",
+            ["vehicleType"] = "Car",
             ["frequency"] = frequency,
             ["repeatUntil"] = repeatUntil is null ? null : Iso(repeatUntil.Value),
         });
@@ -121,6 +122,7 @@ public class RideRepetitionListingTests
         {
             departureDate = Iso(shorterMonthDeparture),
             description = "Sai do portão principal.",
+            vehicleType = "Car",
         });
         Assert.Equal(HttpStatusCode.OK, update.StatusCode);
         clock.Now = InProductTimeZone(shorterMonthDeparture.AddDays(1), DepartureHour);

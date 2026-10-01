@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Tests.Fixtures;
 
@@ -10,7 +11,7 @@ public class RideListingTests
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
-    private sealed record ReadRide(Guid Id, string Destination);
+    private sealed record ReadRide(Guid Id, string Destination, string VehicleType);
 
     private sealed record PagedRides(
         IReadOnlyList<ReadRide> Items,
@@ -328,6 +329,29 @@ public class RideListingTests
         Assert.Equal(0, egalitarian.Total);
     }
 
+    [Theory]
+    [InlineData("?VehicleType=Car", 2, "Car")]
+    [InlineData("?VehicleType=Motorcycle", 1, "Motorcycle")]
+    public async Task GetRides_FilteredByVehicle_KeepsOnlyTheRidesOfThatVehicle(
+        string query,
+        int expectedTotal,
+        string expectedVehicle)
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(7, 0), "Praça da Sé");
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 0), "Avenida Paulista");
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(9, 0), "Terminal Bandeira", vehicleType: EnumVehicleType.Motorcycle);
+
+        PagedRides filtered = await GetPageAsync(factory, driverId, query);
+        PagedRides unfiltered = await GetPageAsync(factory, driverId);
+
+        Assert.Equal(expectedTotal, filtered.Total);
+        Assert.All(filtered.Items, ride => Assert.Equal(expectedVehicle, ride.VehicleType));
+        Assert.Equal(3, unfiltered.Total);
+    }
+
     [Fact]
     public async Task GetRides_WithAFilter_CountsTheTotalAfterFilteringAndBeforePaging()
     {
@@ -415,7 +439,7 @@ public class RideListingTests
             factory,
             driverId,
             $"?SearchTerm=sorocaba&DateFrom={tomorrow:yyyy-MM-dd}&DateTo={tomorrow:yyyy-MM-dd}"
-                + "&DepartureTime=08:30:00&RideType=Solidarity");
+                + "&DepartureTime=08:30:00&RideType=Solidarity&VehicleType=Car");
 
         Assert.Equal(expected, Assert.Single(page.Items).Id);
     }

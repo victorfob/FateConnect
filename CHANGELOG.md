@@ -14,6 +14,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a recusa de ofertar carona, cadastrar item e enviar denúncia sem sigilo para quem está sem contato, que continua entrando, consultando as listas e enviando denúncia sigilosa; a resposta diz qual ação foi barrada e traz um código próprio no corpo do erro (#515) [Backend]
 - Adiciona a faixa no topo da área logada para quem está sem contato, com o caminho para o perfil; ela pode ser fechada e volta no próximo login (#517) [Frontend]
 - Adiciona o aviso de contatos pendentes ao ofertar carona ou cadastrar item sem contato, no lugar do formulário e também quando a API recusa, com o caminho para o perfil (#517) [Frontend]
+- Adiciona o tipo de veículo à carona, carro ou moto, obrigatório ao ofertar e ao editar e devolvido na leitura; as caronas já ofertadas ficam como carro, e a requisição sem o veículo passa a ser recusada (#520) [Backend]
+- Adiciona o filtro de caronas pelo tipo de veículo; sem ele, a listagem segue com todas (#520) [Backend]
 
 ### Changed
 

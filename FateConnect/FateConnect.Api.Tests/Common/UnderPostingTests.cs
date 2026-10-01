@@ -61,6 +61,7 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
             departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
             departureTime = "08:30:00",
             rideType = "Solidarity",
+            vehicleType = "Car",
         });
 
         string body = await response.Content.ReadAsStringAsync();

@@ -160,6 +160,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int>("VehicleType")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DriverId");
