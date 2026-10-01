@@ -3,13 +3,9 @@ import { Dialog, Input } from '@design-system';
 import { SaveIcon } from '@design-system/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 
-import {
-  CONTACT_FIELD_LABELS,
-  MAX_CONTACT_EMAIL_LENGTH,
-} from '@app/components/ContactFields/constants';
-import { useMaskedField } from '@app/hooks/useMaskedField';
+import { ContactFields } from '@app/components/ContactFields';
 import { useNotification } from '@app/hooks/useNotification';
 import * as C from '@app/pages/Management/components/UsersTab/components/UserFormDialog/constants';
 import {
@@ -28,8 +24,6 @@ import { MAX_LENGTH } from '@app/pages/Signup/schema';
 import { ApiError, SessionExpiredError } from '@app/services/httpClient';
 import type { User } from '@app/services/users/types';
 import { changeUserProfile, updateUser } from '@app/services/users/usersService';
-import { hasContact } from '@app/utils/contact';
-import { maskPhone } from '@app/utils/masks/phoneMask';
 
 const BAD_REQUEST = 400;
 
@@ -78,8 +72,6 @@ export function UserEditForm({ user, isOwnAccount, onClose }: UserEditFormProps)
     setError,
     formState: { errors, isDirty },
   } = form;
-  const phoneField = useMaskedField(register('phone'), maskPhone);
-  const contactIsRequired = hasContact(user);
 
   const reportFailure = useCallback(
     (error: unknown) => {
@@ -111,82 +103,67 @@ export function UserEditForm({ user, isOwnAccount, onClose }: UserEditFormProps)
   });
 
   return (
-    <Dialog.Form onSubmit={handleSubmit}>
-      <Dialog.Body>
-        <Dialog.Fields>
-          <Dialog.Fields.Wide>
-            <Input
-              {...register('fullName')}
-              label={FIELD_LABELS.fullName}
-              required
-              fullWidth
-              autoComplete="off"
-              maxLength={MAX_LENGTH.fullName}
-              error={errors.fullName?.message}
-            />
-          </Dialog.Fields.Wide>
+    <FormProvider {...form}>
+      <Dialog.Form onSubmit={handleSubmit}>
+        <Dialog.Body>
+          <Dialog.Fields>
+            <Dialog.Fields.Wide>
+              <Input
+                {...register('fullName')}
+                label={FIELD_LABELS.fullName}
+                required
+                fullWidth
+                autoComplete="off"
+                maxLength={MAX_LENGTH.fullName}
+                error={errors.fullName?.message}
+              />
+            </Dialog.Fields.Wide>
 
-          <Dialog.Fields.Wide>
-            <Input
-              {...register('fatecEmail')}
-              label={FIELD_LABELS.fatecEmail}
-              required
-              fullWidth
-              type="email"
-              autoComplete="off"
-              maxLength={MAX_LENGTH.fatecEmail}
-              error={errors.fatecEmail?.message}
-            />
-          </Dialog.Fields.Wide>
+            <Dialog.Fields.Wide>
+              <Input
+                {...register('fatecEmail')}
+                label={FIELD_LABELS.fatecEmail}
+                required
+                fullWidth
+                type="email"
+                autoComplete="off"
+                maxLength={MAX_LENGTH.fatecEmail}
+                error={errors.fatecEmail?.message}
+              />
+            </Dialog.Fields.Wide>
 
-          <Input
-            {...register('contactEmail')}
-            label={CONTACT_FIELD_LABELS.contactEmail}
-            required={contactIsRequired}
-            fullWidth
-            type="email"
-            autoComplete="off"
-            maxLength={MAX_CONTACT_EMAIL_LENGTH}
-            error={errors.contactEmail?.message}
+            <ContactFields
+              autoFill={false}
+              phoneCompanion={
+                !isOwnAccount && (
+                  <Controller
+                    name="profileType"
+                    control={control}
+                    render={({ field }) => (
+                      <Input.Select
+                        {...field}
+                        label={C.PROFILE_TYPE_LABEL}
+                        options={PROFILE_TYPE_OPTIONS}
+                        required
+                        error={errors.profileType?.message}
+                      />
+                    )}
+                  />
+                )
+              }
+            />
+          </Dialog.Fields>
+        </Dialog.Body>
+
+        <Dialog.Footer>
+          <Dialog.Submit
+            icon={<SaveIcon fontSize="small" />}
+            label={C.SUBMIT_LABEL}
+            loading={isPending}
+            disabled={!isDirty}
           />
-
-          <Input
-            {...phoneField}
-            label={CONTACT_FIELD_LABELS.phone}
-            required={contactIsRequired}
-            fullWidth
-            type="tel"
-            inputMode="tel"
-            autoComplete="off"
-            error={errors.phone?.message}
-          />
-
-          {!isOwnAccount && (
-            <Controller
-              name="profileType"
-              control={control}
-              render={({ field }) => (
-                <Input.Select
-                  {...field}
-                  label={C.PROFILE_TYPE_LABEL}
-                  options={PROFILE_TYPE_OPTIONS}
-                  required
-                  error={errors.profileType?.message}
-                />
-              )}
-            />
-          )}
-        </Dialog.Fields>
-      </Dialog.Body>
-
-      <Dialog.Footer>
-        <Dialog.Submit
-          icon={<SaveIcon fontSize="small" />}
-          label={C.SUBMIT_LABEL}
-          loading={isPending}
-          disabled={!isDirty}
-        />
-      </Dialog.Footer>
-    </Dialog.Form>
+        </Dialog.Footer>
+      </Dialog.Form>
+    </FormProvider>
   );
 }

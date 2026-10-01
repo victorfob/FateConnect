@@ -29,6 +29,15 @@ export function narrowRules(): CSSStyleRule[] {
   );
 }
 
+/** O jsdom recusa pseudo-elemento de fabricante (`::-moz-placeholder`) que a folha do MUI escreve. */
+function matchesSafely(element: Element, selector: string): boolean {
+  try {
+    return element.matches(selector);
+  } catch {
+    return false;
+  }
+}
+
 /**
  * O jsdom não aplica `@media`, estado nem pseudo-elemento no `getComputedStyle`:
  * a folha que o Emotion escreveu é lida direto. Com `state` (`:hover`, `::before`),
@@ -43,7 +52,7 @@ export function declarationsFor(
 
   return rules
     .filter((rule) => rule.selectorText.includes(state))
-    .filter((rule) => element.matches(rule.selectorText.replaceAll(state, '')))
+    .filter((rule) => matchesSafely(element, rule.selectorText.replaceAll(state, '')))
     .map((rule) => withoutSpaces(rule.style.cssText))
     .join(';');
 }
