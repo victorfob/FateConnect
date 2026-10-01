@@ -3,6 +3,7 @@ import { FilterDialog, Input } from '@design-system';
 
 import { isRideShift } from '@app/pages/Rides/helpers/rideShift';
 import { isRideType, RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
+import { isVehicleType } from '@app/pages/Rides/helpers/rideVehicle';
 import type { RideFilter as RideFilterValues } from '@app/services/rides/types';
 import { toApiDateRange, toDisplayDateRange } from '@app/utils/apiDate';
 
@@ -15,9 +16,12 @@ function hasAnyFilter({
   dateTo,
   departureShift,
   rideType,
+  vehicleType,
   onlyMine,
 }: RideFilterValues): boolean {
-  return Boolean(searchTerm || dateFrom || dateTo || departureShift || rideType || onlyMine);
+  return Boolean(
+    searchTerm || dateFrom || dateTo || departureShift || rideType || vehicleType || onlyMine,
+  );
 }
 
 type RideFilterProps = Readonly<{
@@ -35,6 +39,9 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
   const [searchTerm, setSearchTerm] = useState(initialFilters.searchTerm ?? '');
   const [rideType, setRideType] = useState<string>(
     initialFilters.rideType ?? C.RideTypeFilterEnum.ALL,
+  );
+  const [vehicleType, setVehicleType] = useState<string>(
+    initialFilters.vehicleType ?? C.VehicleTypeFilterEnum.ALL,
   );
   const [owner, setOwner] = useState<string>(() => {
     if (initialFilters.onlyMine) return C.RideOwnerFilterEnum.MINE;
@@ -55,6 +62,10 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
     (event: ChangeEvent<HTMLInputElement>) => setRideType(event.target.value),
     [],
   );
+  const handleVehicleTypeChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => setVehicleType(event.target.value),
+    [],
+  );
   const handleOwnerChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => setOwner(event.target.value),
     [],
@@ -66,6 +77,7 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
     setDepartureShift(C.RideShiftFilterEnum.ALL);
     setSearchTerm('');
     setRideType(C.RideTypeFilterEnum.ALL);
+    setVehicleType(C.VehicleTypeFilterEnum.ALL);
     setOwner(C.RideOwnerFilterEnum.ALL);
     setIsFiltered(false);
     onApply({});
@@ -80,11 +92,12 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
     if (isRideShift(departureShift)) filters.departureShift = departureShift;
     if (searchTerm.trim()) filters.searchTerm = searchTerm.trim();
     if (isRideType(rideType)) filters.rideType = rideType;
+    if (isVehicleType(vehicleType)) filters.vehicleType = vehicleType;
     if (owner === C.RideOwnerFilterEnum.MINE) filters.onlyMine = true;
 
     setIsFiltered(hasAnyFilter(filters));
     onApply(filters);
-  }, [period, departureShift, searchTerm, rideType, owner, onApply]);
+  }, [period, departureShift, searchTerm, rideType, vehicleType, owner, onApply]);
 
   return (
     <FilterDialog active={isFiltered} onSubmit={handleSubmit} onClear={handleClear}>
@@ -118,6 +131,15 @@ export function RideFilter({ initialFilters, onApply }: RideFilterProps) {
           options={C.RIDE_TYPE_FILTER_OPTIONS}
           value={rideType}
           onChange={handleRideTypeChange}
+        />
+      </FilterDialog.Field>
+
+      <FilterDialog.Field>
+        <Input.Select
+          label={C.FILTER_LABELS.vehicleType}
+          options={C.VEHICLE_TYPE_FILTER_OPTIONS}
+          value={vehicleType}
+          onChange={handleVehicleTypeChange}
         />
       </FilterDialog.Field>
 

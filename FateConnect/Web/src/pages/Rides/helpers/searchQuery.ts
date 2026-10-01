@@ -4,6 +4,7 @@ import { PAGE_SIZE, readPageParam, readParamValue, writePageParam } from '@app/u
 
 import { parseRideShift, rideShiftSlug } from './rideShift';
 import { parseRideType, rideTypeSlug } from './rideType';
+import { parseVehicleType, vehicleTypeSlug } from './rideVehicle';
 
 const MINE = 'sim';
 
@@ -13,6 +14,7 @@ enum SearchParamEnum {
   DATE_TO = 'ate',
   SHIFT = 'turno',
   RIDE_TYPE = 'tipo',
+  VEHICLE_TYPE = 'veiculo',
   ONLY_MINE = 'meus',
 }
 
@@ -37,6 +39,9 @@ function fromParams(params: URLSearchParams): RideFilter {
   const rideType = parseRideType(params.get(SearchParamEnum.RIDE_TYPE));
   if (rideType) filter.rideType = rideType;
 
+  const vehicleType = parseVehicleType(params.get(SearchParamEnum.VEHICLE_TYPE));
+  if (vehicleType) filter.vehicleType = vehicleType;
+
   if (params.get(SearchParamEnum.ONLY_MINE)?.trim().toLowerCase() === MINE) filter.onlyMine = true;
 
   return filter;
@@ -51,6 +56,8 @@ function toParams(filter: RideFilter): Record<string, string> {
   if (filter.dateTo) params[SearchParamEnum.DATE_TO] = filter.dateTo;
   if (filter.departureShift) params[SearchParamEnum.SHIFT] = rideShiftSlug(filter.departureShift);
   if (filter.rideType) params[SearchParamEnum.RIDE_TYPE] = rideTypeSlug(filter.rideType);
+  if (filter.vehicleType)
+    params[SearchParamEnum.VEHICLE_TYPE] = vehicleTypeSlug(filter.vehicleType);
   if (filter.onlyMine) params[SearchParamEnum.ONLY_MINE] = MINE;
 
   return params;

@@ -20,6 +20,7 @@ export function toFormValues(ride: Ride | undefined): RideFormInput {
     destination: ride.destination,
     departure: `${toDisplayDate(ride.departureDate)} ${time}`,
     rideType: ride.rideType,
+    vehicleType: ride.vehicleType,
     frequency: ride.frequency,
     repeatUntil: toDisplayDate(ride.repeatUntil ?? ''),
     description: ride.description ?? '',
@@ -33,6 +34,7 @@ export function toRideInput(values: RideFormValues): RideInput {
     departureDate: toApiDate(values.departure),
     departureTime: format(values.departure, API_TIME_FORMAT),
     rideType: values.rideType,
+    vehicleType: values.vehicleType,
     frequency: values.frequency,
     description: values.description,
   };
