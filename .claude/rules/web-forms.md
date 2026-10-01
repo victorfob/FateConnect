@@ -34,4 +34,5 @@ paths:
 
 - Máscara de data preserva a posição do cursor ao editar no meio e ao colar; máscara alternativa por comprimento (fixo e celular) se resolve na função pura.
 - `isPending` vai na prop `loading` do `Button`, que já desabilita e desenha o indicador: sem rótulo alternativo e sem `disabled` manual. A mensagem de erro se decide pelo `status` que o cliente HTTP normaliza.
+- ⛔ O 409 com `field` (e-mail ou telefone já em uso) se marca no campo, com foco, em todo formulário que envia o campo (`conflictFieldOf`); o aviso genérico fica para o resto. Campo que muda de tela leva esse tratamento junto.
 - Teste de formulário cobre obrigatório, formato inválido, alternância de visibilidade (com o ícone), sucesso, cada ramo de erro por status e o carregamento. O carregamento segura a resposta numa promessa que o teste resolve, nunca `setTimeout`, e afirma `toBeDisabled()` e o `progressbar` dentro do botão.

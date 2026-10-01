@@ -13,7 +13,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 - ⛔ Antes de criar arquivo novo (teste, `styles.ts`, `constants/`, `schema/`), abra com `Read` um vizinho do mesmo tipo: o `Write` não carrega a rule com `paths` daquela área.
 - Texto que a pessoa lê, novo ou alterado, passa pela skill `ux-writing` antes do commit, com as candidatas ao dono — sem esperar pedido.
 - Mudança visual passa pela skill `visual-validation` antes de dizer que está pronta.
-- Campo novo em formulário, dado de pessoa que passa a persistir, integração com terceiro (inclui telemetria), dado novo visível a outros ou funcionalidade nova: releia `FateConnect/Web/legal/termos.html` e `privacidade.html` e conserte o que ficou falso, no mesmo PR (`legal-documents.md`).
+- Campo novo em formulário, dado de pessoa que passa a persistir, integração com terceiro (inclui telemetria), dado novo visível a outros ou funcionalidade nova: releia `FateConnect/Web/legal/termos.html` e `privacidade.html` e conserte o que ficou falso ou faltando, no mesmo PR (`legal-documents.md`).
 - Medir tamanho de pacote: skill `lighthouse-audit`, referência `bundle-size.md`.
 
 ## Consumo do design system
@@ -28,6 +28,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 - Esconder visualmente sem tirar da acessibilidade é `HiddenField`.
 - Tipografia só por variante do tema. `ListItemText`, `MenuItem`, `Chip` e `Alert` aplicam a escala deles se ninguém disser nada: a variante entra por `slotProps` (`slotProps={{ primary: { variant: 'caption' } }}`).
 - `palette.text.*` e `contrastText` nunca como fundo.
+- Ícone ao lado de outros segue a família deles: preenchido junto de preenchido.
 - Linha de largura cheia com um controle na ponta: `FormControlLabel`, com o rótulo ocupando a sobra — a linha inteira é o alvo.
 
 ## Tela de módulo
