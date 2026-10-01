@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { ACTIONS_ATTRIBUTE } from '../constants';
+import { ACTIONS_ATTRIBUTE } from '@ds-root/components/ListCard/constants';
+
 import * as S from './styles';
 
 export type ListCardActionsProps = Readonly<{ children: ReactNode }>;

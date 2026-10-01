@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import { HiddenField } from '@ds-root/components/HiddenField';
 
-import { ListCardActions } from './ListCardActions';
+import { ListCardActions } from './components/ListCardActions';
 import * as S from './styles';
 
 export type ListCardProps = Readonly<{
