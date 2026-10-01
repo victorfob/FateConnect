@@ -78,4 +78,15 @@ describe('Header', () => {
 
     expect(onMenuClick).toHaveBeenCalledOnce();
   });
+
+  it('should pull the menu button over the bar padding, so the icon lines up with the content', () => {
+    render(
+      <Header logo={null} navigation={null} onMenuClick={vi.fn()} menuButtonLabel={MENU_LABEL} />,
+    );
+
+    const menuButton = screen.getByRole('button', { name: MENU_LABEL, hidden: true });
+
+    // A folga do botão em volta do desenho é o que deixava o ícone mais para dentro.
+    expect(Number.parseFloat(getComputedStyle(menuButton).marginRight)).toBeLessThan(0);
+  });
 });

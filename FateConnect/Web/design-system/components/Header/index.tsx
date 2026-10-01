@@ -32,7 +32,7 @@ export function Header({ logo, navigation, actions, onMenuClick, menuButtonLabel
           {actions}
 
           <S.MenuButtonSlot component="span">
-            <IconButton color="inherit" label={menuButtonLabel} onClick={onMenuClick}>
+            <IconButton color="inherit" edge="end" label={menuButtonLabel} onClick={onMenuClick}>
               <MenuIcon />
             </IconButton>
           </S.MenuButtonSlot>
