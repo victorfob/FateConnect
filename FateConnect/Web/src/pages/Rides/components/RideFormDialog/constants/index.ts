@@ -4,6 +4,7 @@ import { AddIcon, SaveIcon } from '@design-system/icons';
 import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { RIDE_FREQUENCY_OPTIONS } from '@app/pages/Rides/helpers/rideFrequency';
 import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
+import { VEHICLE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideVehicle';
 
 import type { RideFormMode } from '../types';
 
@@ -44,6 +45,7 @@ export const RIDE_FORM_LABELS = {
   departure: 'Data e hora',
   recurrenceStart: 'Data e hora iniciais',
   rideType: 'Tipo',
+  vehicleType: 'Veículo',
   frequency: 'Recorrência',
   repeatUntil: 'Data final da recorrência',
   description: 'Descrição',
@@ -69,6 +71,11 @@ export const RIDE_TYPE_SELECT_OPTIONS: readonly SelectOption[] = [
   ...RIDE_TYPE_OPTIONS,
 ];
 
+export const VEHICLE_TYPE_SELECT_OPTIONS: readonly SelectOption[] = [
+  EMPTY_CHOICE,
+  ...VEHICLE_TYPE_OPTIONS,
+];
+
 /** Sem opção vazia: o campo abre em uma vez só, a carona de sempre. */
 export const RIDE_FREQUENCY_SELECT_OPTIONS: readonly SelectOption[] = RIDE_FREQUENCY_OPTIONS;
 
@@ -79,6 +86,7 @@ export const RIDE_FORM_MESSAGES = {
   departureInvalid: 'Data e hora inválidas',
   departureInPast: 'A carona deve ser em data e hora futuras',
   rideTypeRequired: 'Selecione o tipo',
+  vehicleTypeRequired: 'Selecione o veículo',
   frequencyRequired: 'Selecione a recorrência',
   departureOnWeekend: 'A recorrência em dias úteis começa num dia útil',
   departureOnHoliday: 'Escolha um dia que não seja feriado',

@@ -21,6 +21,7 @@ import {
   RideFrequencyEnum,
   RideShiftEnum,
   RideTypeEnum,
+  VehicleTypeEnum,
   type Ride,
 } from '@app/services/rides/types';
 import type { UserContact } from '@app/services/types';
@@ -36,9 +37,11 @@ import {
   RIDE_SHIFT_FILTER_OPTIONS,
   RIDE_TYPE_FILTER_OPTIONS,
   RideOwnerFilterEnum,
+  VEHICLE_TYPE_FILTER_OPTIONS,
 } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
 import { rideRecurrenceLabel } from './helpers/rideFrequency';
+import { vehicleTypeLabel } from './helpers/rideVehicle';
 import * as C from './constants';
 import { Rides } from '.';
 
@@ -65,6 +68,7 @@ const RIDE: Ride = {
   departureTime: '07:30:00',
   createdAt: '2026-05-01T00:00:00',
   rideType: RideTypeEnum.SOLIDARITY,
+  vehicleType: VehicleTypeEnum.CAR,
   description: 'Saída do centro, com parada no terminal.',
   driver: DRIVER,
   isOwner: false,
@@ -250,6 +254,31 @@ describe('Rides', () => {
     expect(screen.getAllByText('Solidária')).toHaveLength(1);
   });
 
+  it('should show on each card whether the ride goes by car or by motorcycle', async () => {
+    const byMotorcycle: Ride = {
+      ...RIDE,
+      id: 'motorcycle-ride',
+      destination: 'Votorantim',
+      vehicleType: VehicleTypeEnum.MOTORCYCLE,
+    };
+    listReturning([RIDE, byMotorcycle]);
+    renderComponent();
+
+    const carCard = within(
+      (await screen.findByText(RIDE.destination)).closest('article') ?? document.body,
+    );
+    const motorcycleCard = within(
+      screen.getByText(byMotorcycle.destination).closest('article') ?? document.body,
+    );
+
+    expect(carCard.getByText(vehicleTypeLabel(VehicleTypeEnum.CAR))).toBeInTheDocument();
+    expect(
+      motorcycleCard.getByText(vehicleTypeLabel(VehicleTypeEnum.MOTORCYCLE)),
+    ).toBeInTheDocument();
+    expect(motorcycleCard.getByTestId('TwoWheelerIcon')).toBeInTheDocument();
+    expect(carCard.getByTestId('DirectionsCarIcon')).toBeInTheDocument();
+  });
+
   it('should show the recurrence of a ride that repeats', async () => {
     const weekly: Ride = {
       ...RIDE,
@@ -340,6 +369,10 @@ describe('Rides', () => {
       optionLabel(RIDE_TYPE_FILTER_OPTIONS, RideTypeEnum.EGALITARIAN),
     );
     await pickOption(
+      FILTER_LABELS.vehicleType,
+      optionLabel(VEHICLE_TYPE_FILTER_OPTIONS, VehicleTypeEnum.MOTORCYCLE),
+    );
+    await pickOption(
       FILTER_LABELS.owner,
       optionLabel(RIDE_OWNER_FILTER_OPTIONS, RideOwnerFilterEnum.MINE),
     );
@@ -352,6 +385,7 @@ describe('Rides', () => {
         dateTo: '2026-05-25',
         departureShift: RideShiftEnum.MORNING,
         rideType: RideTypeEnum.EGALITARIAN,
+        vehicleType: VehicleTypeEnum.MOTORCYCLE,
         onlyMine: 'true',
       }),
     );
@@ -564,7 +598,9 @@ describe('Rides', () => {
         asked = url;
       });
 
-      renderComponent('?busca=Sorocaba&de=2026-09-01&ate=2026-09-05&turno=noite&meus=sim');
+      renderComponent(
+        '?busca=Sorocaba&de=2026-09-01&ate=2026-09-05&turno=noite&veiculo=moto&meus=sim',
+      );
 
       await waitFor(() =>
         expect(Object.fromEntries(asked!.searchParams)).toMatchObject({
@@ -572,6 +608,7 @@ describe('Rides', () => {
           dateFrom: '2026-09-01',
           dateTo: '2026-09-05',
           departureShift: RideShiftEnum.NIGHT,
+          vehicleType: VehicleTypeEnum.MOTORCYCLE,
           onlyMine: 'true',
         }),
       );
@@ -584,13 +621,16 @@ describe('Rides', () => {
         screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.departureShift) }),
       ).toHaveTextContent(optionLabel(RIDE_SHIFT_FILTER_OPTIONS, RideShiftEnum.NIGHT));
       expect(
+        screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.vehicleType) }),
+      ).toHaveTextContent(optionLabel(VEHICLE_TYPE_FILTER_OPTIONS, VehicleTypeEnum.MOTORCYCLE));
+      expect(
         screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.owner) }),
       ).toHaveTextContent(optionLabel(RIDE_OWNER_FILTER_OPTIONS, RideOwnerFilterEnum.MINE));
     });
 
     // O ponto ao lado do título precisa acompanhar os campos novos: sem isso a
     // lista abre filtrada e nada avisa quem chegou pelo link.
-    it.each(['?de=2026-09-01', '?ate=2026-09-05', '?turno=noite', '?meus=sim'])(
+    it.each(['?de=2026-09-01', '?ate=2026-09-05', '?turno=noite', '?veiculo=moto', '?meus=sim'])(
       'should mark the filter as active when the url carries only %s',
       async (search) => {
         listReturning([RIDE]);
