@@ -5,9 +5,15 @@ import { PolymorphicStack } from '@ds-root/polymorphic';
 import { styled } from '@ds-root/styled';
 import { iconSizeTokens, radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
-import { ACTIONS_ATTRIBUTE } from './constants';
+import {
+  ACTIONS_ATTRIBUTE,
+  BODY_ATTRIBUTE,
+  HEADER_ATTRIBUTE,
+  INFO_ROW_ATTRIBUTE,
+  MEDIA_ATTRIBUTE,
+} from './constants';
 
-const { xxs, sm, md } = spacingScale;
+const { none, xxs, sm, md } = spacingScale;
 
 const OWN_STRIPE_PX = 4;
 const HAIRLINE = '1px';
@@ -37,18 +43,36 @@ export const CardRoot = styled(PolymorphicStack, {
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
 
-    // Com a mídia no topo, o cabeçalho desce com ela e a etiqueta sairia do
-    // canto. Tirá-la do fluxo é o que a mantém lá — e só há espaço para isso
-    // porque a mídia é uma miniatura, deixando a faixa à direita dela vazia.
+    // Com mídia, a etiqueta e as ações sobem para o topo e o título e a fileira
+    // ficam ao lado da miniatura, que deixaria a faixa à direita vazia. O corpo
+    // e o cabeçalho somem da caixa para os filhos entrarem direto na grade.
     ...(hasMedia && {
+      display: 'grid',
+      gridTemplateColumns: 'auto minmax(0, 1fr)',
+      gridTemplateRows: 'auto auto 1fr',
+      gridTemplateAreas: '"actions actions" "media title" "media info"',
+      rowGap: theme.space(none),
+
+      [`& [${BODY_ATTRIBUTE}], & [${HEADER_ATTRIBUTE}]`]: { display: 'contents' },
       [`& [${ACTIONS_ATTRIBUTE}]`]: {
-        position: 'absolute',
-        top: theme.space(md),
-        right: theme.space(md),
+        gridArea: 'actions',
+        justifyContent: 'space-between',
+        marginBottom: theme.space(sm),
+      },
+      [`& [${MEDIA_ATTRIBUTE}]`]: { gridArea: 'media', marginBottom: theme.space(sm) },
+      [`& [${HEADER_ATTRIBUTE}] > :not([${ACTIONS_ATTRIBUTE}])`]: {
+        gridArea: 'title',
+        marginBottom: theme.space(sm),
+      },
+      [`& [${INFO_ROW_ATTRIBUTE}]`]: { gridArea: 'info', alignSelf: 'start' },
+      [`& [${BODY_ATTRIBUTE}] > :not([${HEADER_ATTRIBUTE}], [${INFO_ROW_ATTRIBUTE}])`]: {
+        gridColumn: '1 / -1',
       },
     }),
   },
 }));
+
+export const MediaSlot = styled(Box)({ flexShrink: 0 });
 
 export const CardBody = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
@@ -62,18 +86,6 @@ export const CardBody = styled(Stack)(({ theme }) => ({
   // corpo até o conteúdo: o cabeçalho pararia antes da borda, em lugar
   // diferente a cada cartão.
   [theme.breakpoints.down('md')]: { width: '100%' },
-}));
-
-export const HeaderRow = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  gap: theme.space(sm),
-  marginBottom: theme.space(sm),
-
-  // Sem ele o título empurra a etiqueta e as ações para fora do cartão no
-  // estreito: é o que deixa a caixa encolher até a quebra herdada do corpo.
-  '& > :first-of-type': { minWidth: 0 },
 }));
 
 export const ActionButtons = styled(Stack)(({ theme }) => ({
@@ -91,22 +103,6 @@ export const ActionButtons = styled(Stack)(({ theme }) => ({
   '& .MuiIconButton-root svg': {
     fontSize: `${iconSizeTokens.md}px`,
   },
-}));
-
-export const InfoRow = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  columnGap: theme.space(md),
-  rowGap: theme.space(xxs),
-  marginBottom: theme.space(sm),
-  // Cada item desenha a barra à sua esquerda, dentro do vão. É este recorte que
-  // apaga a do primeiro item de cada linha — inclusive a da linha que quebrou.
-  overflow: 'hidden',
-  color: theme.palette.text.secondary,
-
-  // No estreito, um por linha: em linha a quebra dependeria do tamanho do
-  // texto, e o item que descesse sozinho pareceria solto.
-  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
 }));
 
 export const InfoItem = styled(Stack)(({ theme }) => ({
