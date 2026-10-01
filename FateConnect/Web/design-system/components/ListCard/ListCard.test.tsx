@@ -1,8 +1,13 @@
 import { render, screen } from '@app/test/testing-library';
+import {
+  declarationsFor,
+  narrowDeclarationsFor,
+  narrowRules,
+  sheetRules,
+} from '@app/test/utils/styleSheetRules';
 import { IconButton } from '@ds-root/components/IconButton';
 import { StatusTag } from '@ds-root/components/StatusTag';
 import { EditIcon } from '@ds-root/icons';
-import { createAppTheme } from '@ds-root/theme';
 import { iconSizeTokens } from '@ds-root/tokens';
 
 import { ACTIONS_ATTRIBUTE, BODY_ATTRIBUTE } from './constants';
@@ -21,7 +26,6 @@ const TOUCH_TARGET = '32px';
 /** Os recuos são declarados em `rem`; o alvo de toque e o glifo, em `px`. */
 const REM_IN_PX = 16;
 
-const NARROW_MEDIA = createAppTheme().breakpoints.down('md').replace('@media', '');
 const BEFORE = '::before';
 
 function toNumber(value: string): number {
@@ -32,36 +36,6 @@ function styleOf(candidate: Element | null, what: string): CSSStyleDeclaration {
   if (!candidate) throw new Error(`Não renderizou ${what}.`);
 
   return getComputedStyle(candidate);
-}
-
-function withoutSpaces(text: string): string {
-  return text.replaceAll(/\s/g, '');
-}
-
-function sheetRules(): CSSRule[] {
-  return Array.from(document.styleSheets).flatMap((sheet) => Array.from(sheet.cssRules));
-}
-
-function narrowRules(): CSSRule[] {
-  const narrowMedia = withoutSpaces(NARROW_MEDIA);
-
-  return sheetRules()
-    .filter((rule) => rule instanceof CSSMediaRule)
-    .filter((rule) => withoutSpaces(rule.media.mediaText) === narrowMedia)
-    .flatMap((rule) => Array.from(rule.cssRules));
-}
-
-/**
- * O jsdom não aplica `@media` nem calcula pseudo-elemento no `getComputedStyle`:
- * a folha que o Emotion escreveu é lida direto.
- */
-function declarationsFor(rules: CSSRule[], element: Element, pseudoElement = ''): string {
-  return rules
-    .filter((rule) => rule instanceof CSSStyleRule)
-    .filter((rule) => rule.selectorText.endsWith(pseudoElement))
-    .filter((rule) => element.matches(rule.selectorText.replace(BEFORE, '')))
-    .map((rule) => withoutSpaces(rule.style.cssText))
-    .join(';');
 }
 
 function renderInfoRow() {
@@ -113,12 +87,6 @@ function renderMediaCard(media?: ListCardProps['media']) {
     infoRow: screen.getByText(FIRST_INFO).parentElement,
     description: screen.getByText(DESCRIPTION).parentElement,
   };
-}
-
-function narrowDeclarationsFor(element: Element | null): string {
-  if (!element) throw new Error('Não renderizou a parte do cartão.');
-
-  return declarationsFor(narrowRules(), element);
 }
 
 const DEFAULT_PROPS: ListCardProps = { children: TITLE };

@@ -1,5 +1,6 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 
+import { FOOTER_COPYRIGHT_LINES } from '@app/constants/appContact';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, within } from '@app/test/testing-library';
 
@@ -29,6 +30,7 @@ describe('GuestLayout', () => {
     expect(screen.getByRole('button', { name: 'Entrar' })).toBeInTheDocument();
     expect(screen.getByText('landing')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Entre em contato' })).toBeInTheDocument();
+    FOOTER_COPYRIGHT_LINES.forEach((line) => expect(screen.getByText(line)).toBeInTheDocument());
   });
 
   it('should open the navigation drawer from the hamburger button', async () => {

@@ -1,22 +1,14 @@
 import Button from '@mui/material/Button';
 
 import { render, screen } from '@app/test/testing-library';
+import { declarationsFor, sheetRules } from '@app/test/utils/styleSheetRules';
 
 const SAVE_LABEL = 'Salvar alterações';
 const HOVER = ':hover';
+const BACKGROUND = 'background-color';
 
-/**
- * O jsdom não aplica `:hover`: a folha que o Emotion escreveu é lida direto, e
- * vale a regra de hover que, sem o estado, já casaria com o botão.
- */
-function hoverBackgroundsFor(element: Element): string[] {
-  return Array.from(document.styleSheets)
-    .flatMap((sheet) => Array.from(sheet.cssRules))
-    .filter((rule) => rule instanceof CSSStyleRule)
-    .filter((rule) => rule.selectorText.includes(HOVER))
-    .filter((rule) => element.matches(rule.selectorText.replaceAll(HOVER, '')))
-    .map((rule) => rule.style.backgroundColor)
-    .filter((background) => background !== '');
+function hoverDeclarationsFor(element: Element): string {
+  return declarationsFor(sheetRules(), element, HOVER);
 }
 
 describe('button theme', () => {
@@ -27,7 +19,9 @@ describe('button theme', () => {
       </Button>,
     );
 
-    expect(hoverBackgroundsFor(screen.getByRole('button', { name: SAVE_LABEL }))).not.toEqual([]);
+    expect(hoverDeclarationsFor(screen.getByRole('button', { name: SAVE_LABEL }))).toContain(
+      BACKGROUND,
+    );
   });
 
   it('should leave the disabled button out of the hover fill, which sticks after a tap', () => {
@@ -37,6 +31,8 @@ describe('button theme', () => {
       </Button>,
     );
 
-    expect(hoverBackgroundsFor(screen.getByRole('button', { name: SAVE_LABEL }))).toEqual([]);
+    expect(hoverDeclarationsFor(screen.getByRole('button', { name: SAVE_LABEL }))).not.toContain(
+      BACKGROUND,
+    );
   });
 });
