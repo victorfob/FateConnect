@@ -28,6 +28,7 @@ Reler confirma o que você já acredita. Cada afirmação se confere contra uma 
 | cada prazo de guarda | o que apaga de verdade |
 | o vocabulário | um documento contra o outro: a contradição entre os dois só aparece lendo os dois sobre o mesmo assunto |
 
+- ⛔ Mudou um documento: releia o outro sobre o mesmo assunto, atrás da frase que ficou falsa e da regra que falta nele. Nada falso não quer dizer nada a fazer.
 - Busca por ausência leva controle positivo (a mesma busca encontrando um termo que está lá).
 - O texto descreve o produto final: afirmação sobre funcionalidade planejada se confere contra a issue aberta que a entrega, não contra o código. O tell é a divergência cair num fluxo sem endpoint.
 
