@@ -1,6 +1,6 @@
 import { addDays, addMonths, format, nextMonday, nextSaturday } from 'date-fns';
 
-import { RideFrequencyEnum, RideTypeEnum } from '@app/services/rides/types';
+import { RideFrequencyEnum, RideTypeEnum, VehicleTypeEnum } from '@app/services/rides/types';
 
 import { PRODUCT_TIME_ZONE, RIDE_FORM_MESSAGES, RIDE_LIMITS } from '../constants';
 import { createRideFormSchema, type RideFormInput } from '.';
@@ -17,6 +17,7 @@ const VALID: RideFormInput = {
   destination: 'Fatec Sorocaba',
   departure: toFieldDeparture(new Date(Date.now() + DAYS_AHEAD * DAY_MS)),
   rideType: RideTypeEnum.SOLIDARITY,
+  vehicleType: VehicleTypeEnum.CAR,
   frequency: RideFrequencyEnum.ONCE,
   repeatUntil: '',
   description: 'Saída do centro.',
@@ -58,11 +59,12 @@ function firstErrorOf(overrides: Partial<RideFormInput>): string | undefined {
 }
 
 describe('createRideFormSchema', () => {
-  it('should accept a filled form and narrow the ride type', () => {
+  it('should accept a filled form and narrow the ride type and the vehicle', () => {
     const result = schema.safeParse(VALID);
 
     expect(result.success).toBe(true);
     expect(result.data?.rideType).toBe(RideTypeEnum.SOLIDARITY);
+    expect(result.data?.vehicleType).toBe(VehicleTypeEnum.CAR);
   });
 
   it('should trim the destination and the description', () => {
@@ -145,6 +147,11 @@ describe('createRideFormSchema', () => {
   it('should require a ride type from the api vocabulary', () => {
     expect(firstErrorOf({ rideType: '' })).toBe(RIDE_FORM_MESSAGES.rideTypeRequired);
     expect(firstErrorOf({ rideType: 'Gratuita' })).toBe(RIDE_FORM_MESSAGES.rideTypeRequired);
+  });
+
+  it('should require a vehicle from the api vocabulary', () => {
+    expect(firstErrorOf({ vehicleType: '' })).toBe(RIDE_FORM_MESSAGES.vehicleTypeRequired);
+    expect(firstErrorOf({ vehicleType: 'Bicicleta' })).toBe(RIDE_FORM_MESSAGES.vehicleTypeRequired);
   });
 
   describe('recurrence', () => {

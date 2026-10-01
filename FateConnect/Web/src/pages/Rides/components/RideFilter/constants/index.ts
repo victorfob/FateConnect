@@ -2,12 +2,14 @@ import type { SelectOption } from '@design-system';
 
 import { RIDE_SHIFT_OPTIONS } from '@app/pages/Rides/helpers/rideShift';
 import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
+import { VEHICLE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideVehicle';
 
 export const FILTER_LABELS = {
   period: 'Período',
   departureShift: 'Turno',
   searchTerm: 'Destino ou descrição',
   rideType: 'Tipo',
+  vehicleType: 'Veículo',
   owner: 'Quem ofertou',
 };
 
@@ -15,6 +17,11 @@ export const FILTER_PLACEHOLDERS = { searchTerm: 'Insira o destino ou parte da d
 
 /** `ALL` é sentinela do formulário: não vai para a requisição. */
 export enum RideTypeFilterEnum {
+  ALL = '',
+}
+
+/** `ALL` é sentinela do formulário: não vai para a requisição. */
+export enum VehicleTypeFilterEnum {
   ALL = '',
 }
 
@@ -33,6 +40,11 @@ export enum RideOwnerFilterEnum {
 export const RIDE_TYPE_FILTER_OPTIONS: readonly SelectOption[] = [
   { value: RideTypeFilterEnum.ALL, label: 'Todas' },
   ...RIDE_TYPE_OPTIONS,
+];
+
+export const VEHICLE_TYPE_FILTER_OPTIONS: readonly SelectOption[] = [
+  { value: VehicleTypeFilterEnum.ALL, label: 'Todos' },
+  ...VEHICLE_TYPE_OPTIONS,
 ];
 
 /** A sentinela na frente dos turnos que a API sabe resolver. */

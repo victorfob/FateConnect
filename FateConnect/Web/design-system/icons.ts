@@ -50,6 +50,7 @@ export { default as SearchIcon } from '@mui/icons-material/Search';
 export { default as SecurityIcon } from '@mui/icons-material/Security';
 export { default as SendIcon } from '@mui/icons-material/Send';
 export { default as SettingsIcon } from '@mui/icons-material/Settings';
+export { default as TwoWheelerIcon } from '@mui/icons-material/TwoWheeler';
 export { default as VisibilityIcon } from '@mui/icons-material/Visibility';
 export { default as VisibilityOffIcon } from '@mui/icons-material/VisibilityOff';
 

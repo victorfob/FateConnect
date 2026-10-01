@@ -1,4 +1,9 @@
-import { RideFrequencyEnum, RideTypeEnum, type Ride } from '@app/services/rides/types';
+import {
+  RideFrequencyEnum,
+  RideTypeEnum,
+  VehicleTypeEnum,
+  type Ride,
+} from '@app/services/rides/types';
 
 import { EMPTY_RIDE_FORM, type RideFormValues } from '../schema';
 import { toFormValues, toRideInput } from './mapper';
@@ -10,6 +15,7 @@ const RIDE: Ride = {
   departureTime: '07:30:00',
   createdAt: '2026-05-01T00:00:00',
   rideType: RideTypeEnum.EGALITARIAN,
+  vehicleType: VehicleTypeEnum.MOTORCYCLE,
   description: 'Saída do centro.',
   driver: {
     name: 'Ana Ofertante',
@@ -32,6 +38,7 @@ describe('toFormValues', () => {
 
     expect(values.departure).toBe('22/05/2026 07:30');
     expect(values.rideType).toBe(RideTypeEnum.EGALITARIAN);
+    expect(values.vehicleType).toBe(VehicleTypeEnum.MOTORCYCLE);
   });
 
   it('should turn a missing description into an empty field', () => {
@@ -45,6 +52,7 @@ describe('toRideInput', () => {
       destination: 'Fatec Sorocaba',
       departure: new Date(2026, 4, 22, 7, 30),
       rideType: RideTypeEnum.EGALITARIAN,
+      vehicleType: VehicleTypeEnum.MOTORCYCLE,
       frequency: RideFrequencyEnum.ONCE,
       repeatUntil: null,
       description: 'Saída do centro.',
@@ -55,6 +63,7 @@ describe('toRideInput', () => {
       departureDate: '2026-05-22',
       departureTime: '07:30',
       rideType: RideTypeEnum.EGALITARIAN,
+      vehicleType: VehicleTypeEnum.MOTORCYCLE,
       frequency: RideFrequencyEnum.ONCE,
       description: 'Saída do centro.',
     });
@@ -65,6 +74,7 @@ describe('toRideInput', () => {
       destination: 'Fatec Sorocaba',
       departure: new Date(2026, 4, 22, 7, 30),
       rideType: RideTypeEnum.EGALITARIAN,
+      vehicleType: VehicleTypeEnum.CAR,
       frequency: RideFrequencyEnum.WEEKLY,
       repeatUntil: new Date(2026, 5, 19),
       description: '',

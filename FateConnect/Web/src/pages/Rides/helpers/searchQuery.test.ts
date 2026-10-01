@@ -1,4 +1,4 @@
-import { RideShiftEnum, RideTypeEnum } from '@app/services/rides/types';
+import { RideShiftEnum, RideTypeEnum, VehicleTypeEnum } from '@app/services/rides/types';
 import { FIRST_PAGE, PAGE_SIZE } from '@app/utils/searchParams';
 
 import { rideSearchCodec } from './searchQuery';
@@ -14,7 +14,7 @@ describe('rideSearchCodec', () => {
     it('should read every filter the url carries', () => {
       expect(
         read(
-          'pagina=3&busca=Sorocaba&de=2026-09-01&ate=2026-09-05&turno=manha&tipo=solidaria&meus=sim',
+          'pagina=3&busca=Sorocaba&de=2026-09-01&ate=2026-09-05&turno=manha&tipo=solidaria&veiculo=moto&meus=sim',
         ),
       ).toEqual({
         page: 3,
@@ -24,6 +24,7 @@ describe('rideSearchCodec', () => {
         dateTo: '2026-09-05',
         departureShift: RideShiftEnum.MORNING,
         rideType: RideTypeEnum.SOLIDARITY,
+        vehicleType: VehicleTypeEnum.MOTORCYCLE,
         onlyMine: true,
       });
     });
@@ -44,14 +45,19 @@ describe('rideSearchCodec', () => {
       expect(read('tipo=voadora').rideType).toBeUndefined();
     });
 
+    it('should ignore a vehicle it does not recognise instead of breaking', () => {
+      expect(read('veiculo=bicicleta').vehicleType).toBeUndefined();
+    });
+
     it('should ignore a shift it does not recognise instead of breaking', () => {
       expect(read('turno=madrugada').departureShift).toBeUndefined();
     });
 
     it('should not care about the case of the words', () => {
-      expect(read('tipo=SOLIDARIA&turno=Noite')).toMatchObject({
+      expect(read('tipo=SOLIDARIA&turno=Noite&veiculo=CARRO')).toMatchObject({
         rideType: RideTypeEnum.SOLIDARITY,
         departureShift: RideShiftEnum.NIGHT,
+        vehicleType: VehicleTypeEnum.CAR,
       });
     });
 
@@ -86,6 +92,7 @@ describe('rideSearchCodec', () => {
         page: 2,
         pageSize: PAGE_SIZE,
         rideType: RideTypeEnum.EGALITARIAN,
+        vehicleType: VehicleTypeEnum.MOTORCYCLE,
         departureShift: RideShiftEnum.AFTERNOON,
         searchTerm: 'Sorocaba',
         onlyMine: true,
@@ -94,6 +101,7 @@ describe('rideSearchCodec', () => {
       expect(params).toEqual({
         pagina: '2',
         tipo: 'igualitaria',
+        veiculo: 'moto',
         turno: 'tarde',
         busca: 'Sorocaba',
         meus: 'sim',
@@ -109,6 +117,7 @@ describe('rideSearchCodec', () => {
         dateTo: '2026-09-12',
         departureShift: RideShiftEnum.NIGHT,
         rideType: RideTypeEnum.SOLIDARITY,
+        vehicleType: VehicleTypeEnum.CAR,
         onlyMine: true,
       };
 

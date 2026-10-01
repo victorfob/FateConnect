@@ -5,9 +5,11 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 import { RIDE_FREQUENCY_OPTIONS } from '@app/pages/Rides/helpers/rideFrequency';
 import { RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
+import { vehicleTypeLabel } from '@app/pages/Rides/helpers/rideVehicle';
 import {
   RideFrequencyEnum,
   RideTypeEnum,
+  VehicleTypeEnum,
   type Ride,
   type RideInput,
 } from '@app/services/rides/types';
@@ -35,6 +37,7 @@ const RIDE: Ride = {
   departureTime: '07:30:00',
   createdAt: '2026-05-01T00:00:00',
   rideType: RideTypeEnum.EGALITARIAN,
+  vehicleType: VehicleTypeEnum.MOTORCYCLE,
   description: 'Saída do centro, com parada no terminal.',
   driver: {
     name: 'Ana Ofertante',
@@ -82,13 +85,26 @@ async function chooseFrequency(frequency: RideFrequencyEnum) {
   await userEvent.click(await screen.findByRole('option', { name: frequencyLabel(frequency) }));
 }
 
-async function fillSingleRide() {
+const vehicleField = () =>
+  screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.vehicleType) });
+
+async function chooseVehicle(vehicleType: VehicleTypeEnum) {
+  await userEvent.click(vehicleField());
+  await userEvent.click(await screen.findByRole('option', { name: vehicleTypeLabel(vehicleType) }));
+}
+
+async function fillSingleRideWithoutVehicle() {
   await userEvent.type(destinationField(), 'Terminal Santo Antônio');
   await userEvent.type(departureField(), TYPED_DEPARTURE);
   await userEvent.click(
     screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.rideType) }),
   );
   await userEvent.click(await screen.findByRole('option', { name: 'Solidária' }));
+}
+
+async function fillSingleRide() {
+  await fillSingleRideWithoutVehicle();
+  await chooseVehicle(VehicleTypeEnum.CAR);
 }
 
 function holidaysAre(holidays: string[]) {
@@ -142,6 +158,7 @@ describe('RideFormDialog', () => {
     expect(
       screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.description) }),
     ).toHaveValue(RIDE.description);
+    expect(vehicleField()).toHaveTextContent(vehicleTypeLabel(VehicleTypeEnum.MOTORCYCLE));
   });
 
   it('should hold each text field to its limit and count the stored description', async () => {
@@ -172,6 +189,24 @@ describe('RideFormDialog', () => {
     expect(requested).toBe(false);
   });
 
+  it('should ask for the vehicle when everything else is filled in', async () => {
+    renderComponent();
+    await screen.findByRole('heading', { name: OFFER_MODE.title });
+    let requested = false;
+    server.use(
+      http.post(RIDES_URL, () => {
+        requested = true;
+        return HttpResponse.json({}, { status: 201 });
+      }),
+    );
+    await fillSingleRideWithoutVehicle();
+
+    await userEvent.click(screen.getByRole('button', { name: OFFER_MODE.submitLabel }));
+
+    expect(await screen.findByText(RIDE_FORM_MESSAGES.vehicleTypeRequired)).toBeInTheDocument();
+    expect(requested).toBe(false);
+  });
+
   it('should send the whole ride on update, so the description survives', async () => {
     let body: RideInput | null = null;
     server.use(
@@ -191,6 +226,7 @@ describe('RideFormDialog', () => {
       departureDate: RIDE.departureDate,
       departureTime: '07:30',
       rideType: RIDE.rideType,
+      vehicleType: RIDE.vehicleType,
       frequency: RideFrequencyEnum.ONCE,
       description: RIDE.description,
     });
@@ -242,6 +278,7 @@ describe('RideFormDialog', () => {
       screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.rideType) }),
     );
     await userEvent.click(await screen.findByRole('option', { name: 'Solidária' }));
+    await chooseVehicle(VehicleTypeEnum.MOTORCYCLE);
 
     await userEvent.click(screen.getByRole('button', { name: OFFER_MODE.submitLabel }));
 
@@ -251,6 +288,7 @@ describe('RideFormDialog', () => {
       departureDate: toApiDate(OFFERED_AT),
       departureTime: OFFERED_HOUR,
       rideType: RideTypeEnum.SOLIDARITY,
+      vehicleType: VehicleTypeEnum.MOTORCYCLE,
       frequency: RideFrequencyEnum.ONCE,
       description: '',
     });
@@ -314,6 +352,7 @@ describe('RideFormDialog', () => {
       departureDate: toApiDate(OFFERED_AT),
       departureTime: OFFERED_HOUR,
       rideType: RideTypeEnum.SOLIDARITY,
+      vehicleType: VehicleTypeEnum.CAR,
       frequency: RideFrequencyEnum.WEEKLY,
       repeatUntil: toApiDate(addDays(OFFERED_AT, 7)),
       description: '',
@@ -403,6 +442,7 @@ describe('RideFormDialog', () => {
       departureDate: monthly.departureDate,
       departureTime: '07:30',
       rideType: monthly.rideType,
+      vehicleType: monthly.vehicleType,
       frequency: RideFrequencyEnum.MONTHLY,
       repeatUntil: monthly.repeatUntil,
       description: monthly.description,
