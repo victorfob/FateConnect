@@ -4,10 +4,10 @@ import { http, HttpResponse } from 'msw';
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import {
   DENUNCIATION_CARD_MARKERS,
-  DESCRIPTION_TOGGLE_LABELS,
   DOWNLOAD_LABEL,
   photoAlt,
 } from '@app/components/DenunciationCard/constants';
+import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import {
@@ -16,6 +16,7 @@ import {
   type Denunciation,
 } from '@app/services/denunciations/types';
 import { screen, userEvent, waitFor } from '@app/test/testing-library';
+import { forgeOverflow, restoreContentHeight } from '@app/test/utils/contentHeight';
 import { pagedListHandler } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
@@ -63,24 +64,6 @@ function denunciationWith(overrides: Partial<Denunciation>): Denunciation {
   return { ...DENUNCIATION, ...overrides, id: `${DENUNCIATION.id}-${overrides.status ?? 'x'}` };
 }
 
-const OVERFLOWING_HEIGHT = 200;
-const VISIBLE_HEIGHT = 48;
-
-/**
- * O jsdom não faz layout: as duas alturas respondem zero, e o cartão conclui que
- * a descrição coube. Forjá-las é o que põe o gatilho de expansão na tela.
- */
-function stubOverflow() {
-  Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
-    configurable: true,
-    get: () => OVERFLOWING_HEIGHT,
-  });
-  Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
-    configurable: true,
-    get: () => VISIBLE_HEIGHT,
-  });
-}
-
 const renderScreen = () => renderAtRoute(RoutePathEnum.DENUNCIATIONS, <Denunciations />);
 
 function listing(all: Denunciation[], onRequest?: (url: URL) => void) {
@@ -98,11 +81,8 @@ describe('Denunciations', () => {
     URL.revokeObjectURL = vi.fn();
   });
 
-  // As alturas forjadas são do protótipo do elemento: sem devolvê-las, o caso
-  // seguinte mede um mundo em que todo texto transborda.
   afterEach(() => {
-    Reflect.deleteProperty(HTMLElement.prototype, 'scrollHeight');
-    Reflect.deleteProperty(HTMLElement.prototype, 'clientHeight');
+    restoreContentHeight();
   });
 
   it('should name the screen, offer the two tabs and the way back', () => {
@@ -329,7 +309,7 @@ describe('Denunciations', () => {
   });
 
   it('should offer the expansion only when the description does not fit', async () => {
-    stubOverflow();
+    forgeOverflow();
     listing([DENUNCIATION]);
     renderScreen();
     await screen.findByText(DENUNCIATION.description);

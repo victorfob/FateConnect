@@ -1,3 +1,4 @@
+import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import {
   RideFrequencyEnum,
   RideTypeEnum,
@@ -5,6 +6,7 @@ import {
   type Ride,
 } from '@app/services/rides/types';
 import { render, screen } from '@app/test/testing-library';
+import { forgeOverflow, restoreContentHeight } from '@app/test/utils/contentHeight';
 
 import { RideCard } from '.';
 
@@ -31,10 +33,42 @@ const RIDE: Ride = {
 const renderComponent = (ride = RIDE) =>
   render(<RideCard ride={ride} onEdit={vi.fn()} onDelete={vi.fn()} />);
 
+const DEPARTURE = 'Próxima: 28/10 às 23:45';
+
+/** O que vem depois da fileira de informações, que é o lugar da descrição. */
+function afterTheInfoRow() {
+  return screen.getByText(DEPARTURE).parentElement?.parentElement?.nextElementSibling ?? null;
+}
+
 describe('RideCard', () => {
+  afterEach(() => {
+    restoreContentHeight();
+  });
+
   it('should list the vehicle, the recurrence and the departure, from the shortest text', () => {
     renderComponent();
 
-    expect(screen.getByRole('article')).toHaveTextContent('MotoDias úteisPróxima: 28/10 às 23:45');
+    expect(screen.getByRole('article')).toHaveTextContent(`MotoDias úteis${DEPARTURE}`);
+  });
+
+  it('should collapse a long description behind the expansion', () => {
+    forgeOverflow();
+    renderComponent();
+
+    expect(screen.getByText(RIDE.description ?? '')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: DESCRIPTION_TOGGLE_LABELS.expand }),
+    ).toBeInTheDocument();
+  });
+
+  it('should leave nothing after the info row when the ride has no description', () => {
+    const { rerender } = renderComponent();
+    expect(afterTheInfoRow()).toHaveTextContent(RIDE.description ?? '');
+
+    rerender(
+      <RideCard ride={{ ...RIDE, description: null }} onEdit={vi.fn()} onDelete={vi.fn()} />,
+    );
+
+    expect(afterTheInfoRow()).toBeNull();
   });
 });
