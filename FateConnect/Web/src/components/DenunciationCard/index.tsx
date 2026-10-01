@@ -1,14 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { IconButton, ListCard, StatusTag, Typography } from '@design-system';
-import {
-  CalendarTodayIcon,
-  ExpandLessIcon,
-  ExpandMoreIcon,
-  IncognitoIcon,
-} from '@design-system/icons';
+import type { ReactNode } from 'react';
+import { ListCard, StatusTag, Typography } from '@design-system';
+import { CalendarTodayIcon, IncognitoIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
 import { StoredPhoto } from '@app/components/StoredPhoto';
+import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import { denunciationCategoryLabel } from '@app/pages/Denunciations/helpers/denunciationCategory';
 import {
   denunciationStatusLabel,
@@ -17,7 +13,6 @@ import {
 import type { Denunciation } from '@app/services/denunciations/types';
 
 import * as C from './constants';
-import * as S from './styles';
 
 const DATE_FORMAT = 'dd/MM/yyyy';
 
@@ -35,27 +30,6 @@ export function DenunciationCard({
   reporterContact,
   actions,
 }: DenunciationCardProps) {
-  const descriptionRef = useRef<HTMLParagraphElement>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isTruncated, setIsTruncated] = useState(false);
-
-  // Descrição que cabe nas duas linhas não ganha o gatilho: ele não teria o que
-  // revelar. A medição é do estado recolhido, que é como o cartão nasce.
-  useEffect(() => {
-    const element = descriptionRef.current;
-    if (!element) return;
-
-    setIsTruncated(element.scrollHeight > element.clientHeight);
-  }, [denunciation.description]);
-
-  const handleToggle = useCallback(() => setIsExpanded((expanded) => !expanded), []);
-
-  const toggleLabel = useMemo(() => {
-    if (isExpanded) return C.DESCRIPTION_TOGGLE_LABELS.collapse;
-
-    return C.DESCRIPTION_TOGGLE_LABELS.expand;
-  }, [isExpanded]);
-
   return (
     <ListCard
       media={
@@ -102,27 +76,8 @@ export function DenunciationCard({
         </ListCard.InfoItem>
       </ListCard.InfoRow>
 
-      <ListCard.Description>
-        <S.Description
-          ref={descriptionRef}
-          variant="subtitle"
-          color="inherit"
-          isCollapsed={!isExpanded}
-        >
-          {denunciation.description}
-        </S.Description>
-
-        {isTruncated && (
-          <S.DescriptionToggle>
-            <IconButton label={toggleLabel} size="small" onClick={handleToggle}>
-              {isExpanded ? (
-                <ExpandLessIcon fontSize="small" />
-              ) : (
-                <ExpandMoreIcon fontSize="small" />
-              )}
-            </IconButton>
-          </S.DescriptionToggle>
-        )}
+      <ListCard.Description toggleLabels={DESCRIPTION_TOGGLE_LABELS}>
+        {denunciation.description}
       </ListCard.Description>
 
       {actions}

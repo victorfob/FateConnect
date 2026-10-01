@@ -31,11 +31,14 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a citar o veículo entre os dados da carona na política de privacidade e nos termos de uso, em nova versão dos dois documentos (#521) [Frontend]
 - Passa a mostrar no celular as informações dos cartões de carona, achados e perdidos, denúncias e usuários da gestão uma por linha, em vez de quebrarem conforme o tamanho do texto, e em ordem do texto mais curto ao mais longo, também no desktop (#523) [Frontend]
 - Passa a mostrar no celular, nos cartões com foto de achados e perdidos e de denúncias, a etiqueta e as ações no topo e o título e as informações ao lado da miniatura, que antes deixava uma faixa vazia à direita dela (#524) [Frontend]
+- Passa a recolher em duas linhas a descrição dos cartões de carona e de achados e perdidos, com o botão de expandir quando há mais texto, como já era na denúncia; a carona sem descrição deixa de reservar espaço para ela (#526) [Frontend]
 
 ### Fixed
 
 - Corrige o salvamento de Meu perfil com telefone ou e-mail para contato já usado por outra conta, que só avisava que não deu certo; agora o aviso aparece embaixo do campo certo, que recebe o foco (#519) [Frontend]
 - Corrige a palavra ou o e-mail sem espaço no título, nas informações ou na descrição de um cartão de lista, que passava da borda do cartão e, no celular, alargava a página inteira; agora o texto quebra dentro do cartão (#523) [Frontend]
+- Corrige o botão de expandir a descrição da denúncia, que ficava decidido pela largura em que o cartão apareceu: ao girar o celular, o texto podia ficar cortado sem o botão, ou com um botão que não revelava nada (#526) [Frontend]
+- Corrige o botão vermelho preenchido que, no celular, continuava vermelho depois de desabilitar, com o texto apagado: o toque deixa o botão em hover, e o hover pintava o fundo mesmo desabilitado, como o Salvar alterações do perfil depois de salvar (#526) [Frontend]
 
 ## [1.1.1] - 2026-09-30
 

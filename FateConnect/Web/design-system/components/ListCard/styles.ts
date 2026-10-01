@@ -130,8 +130,3 @@ export const InfoItem = styled(Stack)(({ theme }) => ({
 
   [theme.breakpoints.down('md')]: { '&::before': { display: 'none' } },
 }));
-
-export const Description = styled(Box)(({ theme }) => ({
-  marginBottom: theme.space(sm),
-  color: theme.palette.text.secondary,
-}));

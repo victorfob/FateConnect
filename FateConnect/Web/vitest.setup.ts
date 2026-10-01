@@ -44,3 +44,13 @@ if (!Blob.prototype.stream) {
     });
   };
 }
+
+// jsdom não implementa `ResizeObserver`; quem precisa ver a largura mudar troca
+// por um que dispara à mão, com `vi.stubGlobal`.
+if (!window.ResizeObserver) {
+  window.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
