@@ -37,6 +37,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a mostrar o rodapé mais baixo no celular, com o e-mail e o telefone na mesma linha, os termos de uso e a política de privacidade lado a lado e a frase de assinatura mais curta, em uma linha só (#531) [Frontend]
 - Passa a desenhar os botões em três alturas, iguais em qualquer variante e com os mesmos cantos arredondados: 36px na maioria, 32px nos de foto e nas ações dos cartões, 40px nos do topo e no Voltar ao menu (#532) [Frontend]
 - Passa a esticar o Desativar conta na largura do cartão do perfil, e no celular os botões de foto até a borda dos campos (#532) [Frontend]
+- Passa a mostrar o e-mail para contato numa linha inteira e antes do telefone, em Meu perfil e na edição de conta da gestão, para um e-mail longo caber; na gestão, o telefone divide a linha com o perfil e ganha o exemplo de formato (#536) [Frontend]
 
 ### Fixed
 
