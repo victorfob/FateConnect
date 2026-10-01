@@ -71,20 +71,20 @@ export function UserCard({ user, isOwnAccount, onEdit, onStatusConfirm }: UserCa
           </ListCard.InfoItem>
         )}
 
-        {user.contactEmail && (
-          <ListCard.InfoItem>
-            <EmailIcon />
-            <Typography variant="caption" color="inherit">
-              {user.contactEmail}
-            </Typography>
-          </ListCard.InfoItem>
-        )}
-
         {displayPhone && (
           <ListCard.InfoItem>
             <PhoneIcon />
             <Typography variant="caption" color="inherit">
               {displayPhone}
+            </Typography>
+          </ListCard.InfoItem>
+        )}
+
+        {user.contactEmail && (
+          <ListCard.InfoItem>
+            <EmailIcon />
+            <Typography variant="caption" color="inherit">
+              {user.contactEmail}
             </Typography>
           </ListCard.InfoItem>
         )}

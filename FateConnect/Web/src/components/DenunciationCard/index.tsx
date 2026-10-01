@@ -85,13 +85,6 @@ export function DenunciationCard({
       </ListCard.Header>
 
       <ListCard.InfoRow>
-        <ListCard.InfoItem>
-          <CalendarTodayIcon />
-          <Typography variant="caption" color="inherit">
-            {format(parseISO(denunciation.createdAt), DATE_FORMAT)}
-          </Typography>
-        </ListCard.InfoItem>
-
         {denunciation.isAnonymous && (
           <ListCard.InfoItem>
             <IncognitoIcon />
@@ -100,6 +93,13 @@ export function DenunciationCard({
             </Typography>
           </ListCard.InfoItem>
         )}
+
+        <ListCard.InfoItem>
+          <CalendarTodayIcon />
+          <Typography variant="caption" color="inherit">
+            {format(parseISO(denunciation.createdAt), DATE_FORMAT)}
+          </Typography>
+        </ListCard.InfoItem>
       </ListCard.InfoRow>
 
       <ListCard.Description>

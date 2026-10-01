@@ -49,9 +49,9 @@ export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: L
 
       <ListCard.InfoRow>
         <ListCard.InfoItem>
-          <LocationOnIcon />
+          <LostItemKindIcon kind={item.lostAndFoundType} />
           <Typography variant="caption" color="inherit">
-            {item.place}
+            {lostItemKindLabel(item.lostAndFoundType)}
           </Typography>
         </ListCard.InfoItem>
 
@@ -63,9 +63,9 @@ export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: L
         </ListCard.InfoItem>
 
         <ListCard.InfoItem>
-          <LostItemKindIcon kind={item.lostAndFoundType} />
+          <LocationOnIcon />
           <Typography variant="caption" color="inherit">
-            {lostItemKindLabel(item.lostAndFoundType)}
+            {item.place}
           </Typography>
         </ListCard.InfoItem>
       </ListCard.InfoRow>
