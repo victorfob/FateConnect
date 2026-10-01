@@ -27,6 +27,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         DateOnly DepartureDate,
         string DepartureTime,
         EnumRideType RideType,
+        EnumVehicleType VehicleType,
         string? Description);
 
     private static object NewRidePayload() => new
@@ -35,6 +36,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
         departureTime = "08:30:00",
         rideType = "Solidarity",
+        vehicleType = "Car",
         description = "Vaga para quem sai do campus.",
     };
 
@@ -61,6 +63,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
             departureDate = newDate.ToString("yyyy-MM-dd"),
             departureTime = "19:45:00",
             rideType = "Egalitarian",
+            vehicleType = "Motorcycle",
             description = "Passa pelo terminal.",
         });
 
@@ -70,22 +73,76 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         Assert.Equal(newDate, updated.DepartureDate);
         Assert.Equal("19:45:00", updated.DepartureTime);
         Assert.Equal(EnumRideType.Egalitarian, updated.RideType);
+        Assert.Equal(EnumVehicleType.Motorcycle, updated.VehicleType);
         Assert.Equal("Passa pelo terminal.", updated.Description);
     }
 
     [Fact]
-    public async Task UpdateRide_WithOnlyTheTime_KeepsTheDateAndTheRest()
+    public async Task UpdateRide_WithOnlyTheTimeAndTheVehicle_KeepsTheDateAndTheRest()
     {
         (ReadRide ride, HttpClient driver) = await OfferRideAsync();
 
         HttpResponseMessage response = await driver
-            .PutAsJsonAsync($"/Rides/{ride.Id}", new { departureTime = "21:15:00" });
+            .PutAsJsonAsync($"/Rides/{ride.Id}", new { departureTime = "21:15:00", vehicleType = "Car" });
 
         ReadRide updated = (await response.Content.ReadFromJsonAsync<ReadRide>(JsonOptions))!;
         Assert.Equal("21:15:00", updated.DepartureTime);
         Assert.Equal(ride.DepartureDate, updated.DepartureDate);
         Assert.Equal(ride.Destination, updated.Destination);
         Assert.Equal(ride.Description, updated.Description);
+    }
+
+    [Fact]
+    public async Task CreateRide_WithAMotorcycle_AnswersTheVehicleWhenRead()
+    {
+        HttpClient driver = _factory.CreateClientForNewUser("Ana Beatriz Nogueira");
+
+        HttpResponseMessage response = await driver.PostAsJsonAsync("/Rides", new
+        {
+            destination = "Sorocaba centro",
+            departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
+            departureTime = "08:30:00",
+            rideType = "Solidarity",
+            vehicleType = "Motorcycle",
+        });
+        ReadRide created = (await response.Content.ReadFromJsonAsync<ReadRide>(JsonOptions))!;
+
+        ReadRide read = (await driver.GetFromJsonAsync<ReadRide>($"/Rides/{created.Id}", JsonOptions))!;
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal(EnumVehicleType.Motorcycle, read.VehicleType);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("Bicycle")]
+    public async Task CreateRide_WithoutAKnownVehicle_IsRejected(string? vehicleType)
+    {
+        HttpClient driver = _factory.CreateClientForNewUser("Ana Beatriz Nogueira");
+
+        HttpResponseMessage response = await driver.PostAsJsonAsync("/Rides", new
+        {
+            destination = "Sorocaba centro",
+            departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
+            departureTime = "08:30:00",
+            rideType = "Solidarity",
+            vehicleType,
+        });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateRide_WithoutTheVehicle_IsRejectedAndKeepsTheRide()
+    {
+        (ReadRide ride, HttpClient driver) = await OfferRideAsync();
+
+        HttpResponseMessage response = await driver
+            .PutAsJsonAsync($"/Rides/{ride.Id}", new { description = "Passa pelo terminal." });
+
+        ReadRide read = (await driver.GetFromJsonAsync<ReadRide>($"/Rides/{ride.Id}", JsonOptions))!;
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(ride.Description, read.Description);
+        Assert.Equal(EnumVehicleType.Car, read.VehicleType);
     }
 
     [Fact]
@@ -100,6 +157,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
             departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
             departureTime = "08:30:00",
             rideType = "Solidarity",
+            vehicleType = "Car",
         });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -113,7 +171,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
 
         HttpResponseMessage response = await driver.PutAsJsonAsync(
-            $"/Rides/{ride.Id}", new { departureDate = lastWeek.ToString("yyyy-MM-dd") });
+            $"/Rides/{ride.Id}", new { departureDate = lastWeek.ToString("yyyy-MM-dd"), vehicleType = "Car" });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -134,7 +192,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Bruno Carvalho Souza");
 
         HttpResponseMessage response = await client
-            .PutAsJsonAsync($"/Rides/{AbsentRideId}", new { description = "Sai do portão principal." });
+            .PutAsJsonAsync($"/Rides/{AbsentRideId}", new { description = "Sai do portão principal.", vehicleType = "Car" });
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
