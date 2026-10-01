@@ -14,6 +14,7 @@ import type { UserSummary } from '@app/services/users/managementTypes';
 import { AccountStatusEnum, type User } from '@app/services/users/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
+import { declarationsFor, sheetRules } from '@app/test/utils/styleSheetRules';
 
 import { EDIT_LABEL, NO_CONTACT_LABEL, OWN_ACCOUNT_LABEL } from './components/UserCard/constants';
 import {
@@ -43,6 +44,7 @@ const THUMBNAIL_PATH = 'uploads/user/thumbnails/maria.webp';
 const OBJECT_URL = 'blob:https://fateconnect.test/maria';
 /** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
 const WEBP_BYTES = 'RIFF\0\0\0\0WEBP';
+const WHOLE_LINE = 'grid-column:1/-1';
 
 const OWN_ACCOUNT: UserSummary = {
   id: ADMIN_ID,
@@ -164,6 +166,13 @@ async function openEditDialogOf(fullName: string) {
   await userEvent.click(card.getByRole('button', { name: EDIT_LABEL }));
 
   return within(await screen.findByRole('dialog', { name: EDIT_TITLE }));
+}
+
+function cellOf(field: HTMLElement): HTMLElement {
+  const cell = field.closest('.MuiFormControl-root')?.parentElement;
+  if (!cell) throw new Error('Não renderizou a célula do campo.');
+
+  return cell;
 }
 
 async function retype(field: HTMLElement, value: string) {
@@ -366,6 +375,31 @@ describe('UsersTab', () => {
     expect(
       own.queryByRole('combobox', { name: new RegExp(PROFILE_TYPE_LABEL) }),
     ).not.toBeInTheDocument();
+  });
+
+  it('should lay the contact out with the profile beside the phone, and the phone alone on the own account', async () => {
+    listServing([OWN_ACCOUNT, ACTIVE_USER]);
+    patchesRecorded(fullUser(ACTIVE_USER));
+    patchesRecorded(fullUser(OWN_ACCOUNT, ProfileTypeEnum.ADMINISTRATOR));
+
+    renderTab();
+    const other = await openEditDialogOf(ACTIVE_USER.fullName);
+    const contactEmail = other.getByRole('textbox', { name: CONTACT_FIELD_LABELS.contactEmail });
+    const phone = other.getByRole('textbox', { name: new RegExp(CONTACT_FIELD_LABELS.phone) });
+    const profile = other.getByRole('combobox', { name: new RegExp(PROFILE_TYPE_LABEL) });
+
+    expect(declarationsFor(sheetRules(), cellOf(contactEmail))).toContain(WHOLE_LINE);
+    expect(contactEmail.compareDocumentPosition(phone)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(cellOf(phone)).toBe(cellOf(profile));
+    expect(contactEmail).toHaveAttribute('autocomplete', 'off');
+    expect(phone).toHaveAttribute('autocomplete', 'off');
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    const own = await openEditDialogOf(OWN_ACCOUNT.fullName);
+    const ownPhone = own.getByRole('textbox', { name: new RegExp(CONTACT_FIELD_LABELS.phone) });
+
+    expect(declarationsFor(sheetRules(), cellOf(ownPhone))).toContain(WHOLE_LINE);
   });
 
   it('should save the data as the api reads it, and leave the profile alone when unchanged', async () => {
