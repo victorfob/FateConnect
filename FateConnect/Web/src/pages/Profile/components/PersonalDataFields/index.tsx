@@ -64,10 +64,10 @@ export function PersonalDataFields({ fatecEmail }: PersonalDataFieldsProps) {
       <FormGrid.Wide>
         <Input
           label={FIELD_LABELS.fatecEmail}
+          helpText={C.FATEC_EMAIL_HELP}
           value={fatecEmail}
           fullWidth
           disabled
-          hint={C.FATEC_EMAIL_HINT}
         />
       </FormGrid.Wide>
     </FormGrid>

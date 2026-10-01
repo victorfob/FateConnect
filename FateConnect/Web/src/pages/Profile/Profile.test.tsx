@@ -28,7 +28,7 @@ import {
 import { DEACTIVATE } from './components/DeactivateAccount/constants';
 import { PASSWORD_LABELS } from './components/PasswordFields/constants';
 import {
-  FATEC_EMAIL_HINT,
+  FATEC_EMAIL_HELP,
   NEIGHBORHOOD_HELP,
   NEIGHBORHOOD_LABEL,
 } from './components/PersonalDataFields/constants';
@@ -152,7 +152,21 @@ describe('Profile', () => {
     const fatecEmail = screen.getByRole('textbox', { name: FIELD_LABELS.fatecEmail });
     expect(fatecEmail).toHaveValue(PROFILE.fatecEmail);
     expect(fatecEmail).toBeDisabled();
-    expect(fatecEmail).toHaveAccessibleDescription(FATEC_EMAIL_HINT);
+  });
+
+  it('should explain behind the help icon how to change the locked Fatec e-mail', async () => {
+    await renderProfile();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: new RegExp(FIELD_LABELS.fatecEmail) }),
+    );
+
+    const tooltip = await screen.findByRole('tooltip');
+    expect(tooltip).toHaveTextContent(FATEC_EMAIL_HELP);
+    expect(screen.getByText(FATEC_EMAIL_HELP).closest('[role="tooltip"]')).toBe(tooltip);
+    expect(
+      screen.getByRole('textbox', { name: FIELD_LABELS.fatecEmail }),
+    ).not.toHaveAccessibleDescription();
   });
 
   it('should explain what the neighborhood is for', async () => {
