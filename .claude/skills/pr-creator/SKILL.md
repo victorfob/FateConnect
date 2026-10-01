@@ -54,9 +54,10 @@ Para mensagem de commit, use a skill `write-commit`. Depois do merge (fechar a i
 ## Abrir ou atualizar
 
 1. Push: `git push -u origin $(git branch --show-current)` na primeira vez, `git push` depois.
-2. Criar: `gh pr create --base <base> --title "<title>" --body "<body>" --assignee @me`. O `--assignee @me` é obrigatório; PR já aberto sem assignee se corrige com `gh pr edit <n> --add-assignee @me`.
-3. Ao abrir, mova o card da issue para `In Review` (o bot do board só reage a criar e a fechar issue).
-4. Sem GitHub CLI, pare e avise; não invente outro caminho.
+2. ⛔ Corpo escrito por heredoc vai com aspas (`<<'EOF'`): sem elas o shell executa o que está entre crases, e o caminho citado some do corpo publicado sem erro.
+3. Criar: `gh pr create --base <base> --title "<title>" --body "<body>" --assignee @me`. O `--assignee @me` é obrigatório; PR já aberto sem assignee se corrige com `gh pr edit <n> --add-assignee @me`.
+4. Ao abrir, mova o card da issue para `In Review` (o bot do board só reage a criar e a fechar issue).
+5. Sem GitHub CLI, pare e avise; não invente outro caminho.
 
 ⛔ **PR que aponta para a branch de outro PR, sem pilha nativa:** leia `references/stacked-pr.md` antes do primeiro rebase. Quando a base é mergeada por squash, `git rebase origin/develop` não resolve.
 

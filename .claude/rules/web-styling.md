@@ -26,11 +26,14 @@ O `yarn lint` reprova `sx`, tag HTML crua, cor literal, `theme.spacing`, número
 - Campo na primeira linha de contêiner com `overflow` precisa de `padding-top` `sm`: o rótulo encolhido do MUI sobe 9px acima da caixa e o contêiner o corta.
 - Critério de aceite com largura escreve 375px, a base do produto; abaixo é limite conhecido.
 - Duas visões: `md` para tela, cartão, diálogo e rodapé; `header` só para quem troca junto com a nav do topo. Em JS, `useMediaQuery(theme.breakpoints.up('md'))`, nunca `window.innerWidth`. Os valores e a derivação moram em `design-system/tokens/breakpoints.ts`.
+- ⛔ Texto que a pessoa digita (título, descrição, e-mail) quebra em qualquer ponto: uma palavra sem espaço passa da borda e alarga a página no celular. O `ListCard` herda `overflow-wrap: anywhere` do corpo; contêiner novo com texto da pessoa declara o seu.
 - ⛔ Antes de mover um limite, encolha o conteúdo, remeça e só então mova para o que sobrou: ele desloca a fronteira de toda tela. O limite é o primeiro valor limpo mais a barra de rolagem, medido de 1 em 1, não o último com defeito.
 
 ## O que compila e não pinta
 
 - ⛔ Seletor de componente do Emotion (`` `${OutroStyled}:hover &` ``) compila e não casa nada: o `@emotion/babel-plugin` não está ligado. O seletor casa no próprio elemento (`'&:hover, &:focus-within'`) ou numa classe ou atributo de dado.
+- ⛔ Sobrescrita de `:hover` exclui o desabilitado (`&:hover:not(.Mui-disabled)`): no toque o hover fica preso ao botão depois do clique, e com a mesma especificidade a regra vence a do MUI e pinta o desabilitado.
+- ⛔ O Emotion recusa `:first-child` (aviso no console, que reprova o teste), e `:first-of-type` casa por tag, pegando o vizinho de outra função. Para achar uma parte de slot, marque-a com atributo de dado e use `:not([atributo])`.
 - ⛔ Estado do MUI se sobrescreve repetindo a classe do componente: `& .MuiPaginationItem-root.Mui-selected`, não `& .Mui-selected`. O sintoma é parcial — só as propriedades que o MUI também declara voltam ao valor dele.
 - ⛔ Animação ou transição que nós declaramos leva `@media (prefers-reduced-motion: reduce)` ao lado, zerando o movimento. Não vale para a transição de dentro de um componente da biblioteca.
 - ⛔ Ícone ou texto sobre foto do usuário carrega o próprio fundo (disco sólido com um par da paleta já coberto pelo teste de contraste), em vez de véu sobre a imagem.

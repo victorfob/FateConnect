@@ -25,6 +25,8 @@ paths:
 
 - Geometria é zero: componente que mede `getBoundingClientRect`/`offsetWidth` sai pelo `if` de guarda. Forje com `vi.spyOn` e `Object.defineProperty`, desfeitos no `afterEach`.
 - ⛔ Não há `matchMedia`, e `useMediaQuery` responde o ramo estreito com a janela a 1024px: o caso do ramo largo passa medindo o estreito. Stub com `matches` e os três métodos de escuta, `vi.unstubAllGlobals()` no `afterEach` — exemplo em `FateConnect/Web/design-system/components/Pagination/Pagination.test.tsx`.
+- ⛔ O `getComputedStyle` ignora `@media` e não calcula pseudo-elemento: estilo de uma largura e o `::before` se afirmam lendo a folha do Emotion (`document.styleSheets`, a `CSSMediaRule` com a consulta do tema e `element.matches(selectorText)`), como em `design-system/components/ListCard/ListCard.test.tsx`.
+- Não há `ResizeObserver` (o `vitest.setup.ts` põe um vazio). O falso do teste dispara só o que passou por `observe`; o que dispara sempre deixa a mutação "tirar a observação" passar. Altura de texto recolhido se forja com `src/test/utils/contentHeight.ts`.
 - O `index.html` não é carregado, e o `<head>` do teste só tem o que o componente escreveu. Asserção que depende do `<head>` real lê o arquivo; asserção que pega "o primeiro" de algo é o sinal — conte antes.
 - `vitest.setup.ts` fixa `TZ` no fuso do produto, e `TZ=UTC` na linha de comando não vence. Para discriminar fuso, troque `process.env.TZ` dentro do caso e restaure.
 

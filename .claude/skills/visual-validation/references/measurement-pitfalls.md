@@ -25,6 +25,8 @@ Cada caso: o que o número responde, o que ele parece responder, e o controle.
 
 - Com largura emulada maior que o painel, a página é reduzida por transformação e `getBoundingClientRect` devolve pixel visual. `offsetWidth`/`offsetHeight` são de layout e não sofrem a transformação; o fator é `el.getBoundingClientRect().width / el.offsetWidth`, medido no **próprio** elemento (o `scale` inicial de um popover em transição dá 0,75 enquanto o `body` dá 1).
 - Painel oculto mede `window.innerWidth` 0 e geometria lixo. Emular o viewport com largura e altura explícitas devolve layout real; leia a largura junto de cada medição e devolva o preset `desktop` ao terminar.
+- ⛔ **Painel oculto não entrega `ResizeObserver` nem `requestAnimationFrame`** (`document.visibilityState` é `hidden`): o que depende deles parece quebrado, inclusive um observador seu, que não recebe nem a chamada inicial. Meça num Chrome `--headless=new` com `--remote-debugging-port`, pelo `WebSocket` do Node: `Emulation.setDeviceMetricsOverride` troca a largura sem recarregar, e o controle é o mesmo script com o mecanismo tirado do código.
+- Mover ou renomear pasta de módulo com o Vite de pé deixa todo servidor que lê a árvore com o grafo velho, inclusive o da porta padrão: a página sai em branco e o log diz `Failed to load url`. Reinicie os servidores depois do `mv`.
 
 ## Limite de tela
 
