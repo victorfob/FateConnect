@@ -11,6 +11,7 @@ const OWN_LABEL = 'Meu item';
 const MEDIA_TEXT = 'foto';
 const FIRST_INFO = 'Biblioteca';
 const SECOND_INFO = '11/08/2026';
+const DESCRIPTION = 'pneumoultramicroscopicossilicovulcanoconiótico';
 const STATUS_LABEL = 'Aberto';
 const ACTION_LABEL = 'Editar';
 const TOUCH_TARGET = '32px';
@@ -68,6 +69,14 @@ describe('ListCard', () => {
     });
 
     expect(screen.getByRole('article')).toHaveTextContent(`${FIRST_INFO}${SECOND_INFO}`);
+  });
+
+  it('should break a word without spaces inside the card instead of overflowing it', () => {
+    renderComponent({ children: <ListCard.Description>{DESCRIPTION}</ListCard.Description> });
+
+    const body = screen.getByText(DESCRIPTION).parentElement;
+
+    expect(styleOf(body, 'o corpo do cartão').overflowWrap).toBe('anywhere');
   });
 
   it('should draw the action icon at the design system size, inside the touch target', () => {
