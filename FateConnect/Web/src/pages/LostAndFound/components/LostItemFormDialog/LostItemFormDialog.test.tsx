@@ -70,7 +70,14 @@ function storedPhotoServing() {
 
 const onClose = vi.fn();
 
-const DEFAULT_PROPS: LostItemFormDialogProps = { open: true, onClose, item: undefined };
+const onContactRequired = vi.fn();
+
+const DEFAULT_PROPS: LostItemFormDialogProps = {
+  open: true,
+  onClose,
+  item: undefined,
+  onContactRequired,
+};
 
 const renderComponent = (props = DEFAULT_PROPS) => render(<LostItemFormDialog {...props} />);
 
@@ -84,6 +91,24 @@ function photoOf(fileName: string, type: string, sizeInBytes?: number): File {
   if (sizeInBytes !== undefined) Object.defineProperty(photo, 'size', { value: sizeInBytes });
 
   return photo;
+}
+
+async function fillNewItem() {
+  await userEvent.type(nameField(), 'Garrafa térmica');
+  await userEvent.click(
+    screen.getByRole('combobox', { name: new RegExp(LOST_ITEM_FORM_LABELS.kind) }),
+  );
+  await userEvent.click(
+    await screen.findByRole('option', { name: lostItemKindLabel(LostItemKindEnum.FOUND) }),
+  );
+  await userEvent.type(
+    screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.place) }),
+    'Bloco C',
+  );
+  await userEvent.type(
+    screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.occurredOn) }),
+    TYPED_DATE,
+  );
 }
 
 describe('LostItemFormDialog', () => {
@@ -188,6 +213,23 @@ describe('LostItemFormDialog', () => {
     expect(nameField()).toHaveValue(LOST_ITEM.name);
   });
 
+  it('should close and hand over to the contact notice when the api asks for a contact', async () => {
+    server.use(
+      http.post(LOST_AND_FOUND_URL, () =>
+        HttpResponse.json({ error: 'sem contato', code: 'ContactRequired' }, { status: 403 }),
+      ),
+    );
+    renderComponent();
+    await screen.findByRole('heading', { name: REGISTER_MODE.title });
+    await fillNewItem();
+
+    await userEvent.click(screen.getByRole('button', { name: REGISTER_MODE.submitLabel }));
+
+    await waitFor(() => expect(onContactRequired).toHaveBeenCalledOnce());
+    expect(onClose).toHaveBeenCalled();
+    expect(screen.queryByText(REGISTER_MODE.failed)).not.toBeInTheDocument();
+  });
+
   it('should register the item the form describes', async () => {
     let fields: Record<string, FormDataEntryValue> | null = null;
     server.use(
@@ -199,21 +241,7 @@ describe('LostItemFormDialog', () => {
     renderComponent();
     await screen.findByRole('heading', { name: REGISTER_MODE.title });
 
-    await userEvent.type(nameField(), 'Garrafa térmica');
-    await userEvent.click(
-      screen.getByRole('combobox', { name: new RegExp(LOST_ITEM_FORM_LABELS.kind) }),
-    );
-    await userEvent.click(
-      await screen.findByRole('option', { name: lostItemKindLabel(LostItemKindEnum.FOUND) }),
-    );
-    await userEvent.type(
-      screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.place) }),
-      'Bloco C',
-    );
-    await userEvent.type(
-      screen.getByRole('textbox', { name: new RegExp(LOST_ITEM_FORM_LABELS.occurredOn) }),
-      TYPED_DATE,
-    );
+    await fillNewItem();
 
     await userEvent.click(screen.getByRole('button', { name: REGISTER_MODE.submitLabel }));
 

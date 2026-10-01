@@ -4,6 +4,9 @@ import { AddIcon, SearchIcon } from '@design-system/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { BackToMenu } from '@app/components/BackToMenu';
+import { ContactRequiredDialog } from '@app/components/ContactRequiredDialog';
+import { ContactRequiredActionEnum } from '@app/components/ContactRequiredDialog/@types';
+import { useContactGate } from '@app/hooks/useContactGate';
 import { useNotification } from '@app/hooks/useNotification';
 import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import { deleteRide, listRides } from '@app/services/rides/ridesService';
@@ -23,6 +26,7 @@ export function Rides() {
   const { notifySuccess } = useNotification();
   const [editingRide, setEditingRide] = useState<Ride | undefined>(undefined);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const { contactDialogOpen, guard, showContactRequired, closeContactDialog } = useContactGate();
 
   const {
     filters,
@@ -50,10 +54,14 @@ export function Rides() {
 
   const handleDelete = useCallback((ride: Ride) => removeRide(ride), [removeRide]);
 
-  const handleOffer = useCallback(() => {
-    setEditingRide(undefined);
-    setIsFormOpen(true);
-  }, []);
+  const handleOffer = useCallback(
+    () =>
+      guard(() => {
+        setEditingRide(undefined);
+        setIsFormOpen(true);
+      }),
+    [guard],
+  );
 
   const handleEdit = useCallback((ride: Ride) => {
     setEditingRide(ride);
@@ -101,7 +109,18 @@ export function Rides() {
         ))}
       </CardsList>
 
-      <RideFormDialog open={isFormOpen} onClose={handleCloseForm} ride={editingRide} />
+      <RideFormDialog
+        open={isFormOpen}
+        onClose={handleCloseForm}
+        ride={editingRide}
+        onContactRequired={showContactRequired}
+      />
+
+      <ContactRequiredDialog
+        open={contactDialogOpen}
+        action={ContactRequiredActionEnum.OFFER_RIDE}
+        onClose={closeContactDialog}
+      />
     </PageShell>
   );
 }

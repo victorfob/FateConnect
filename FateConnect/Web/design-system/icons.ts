@@ -14,6 +14,7 @@ export { default as BlockIcon } from '@mui/icons-material/Block';
 export { default as CalendarTodayIcon } from '@mui/icons-material/CalendarToday';
 export { default as CheckCircleIcon } from '@mui/icons-material/CheckCircle';
 export { default as ChevronRightIcon } from '@mui/icons-material/ChevronRight';
+export { default as CloseIcon } from '@mui/icons-material/Close';
 export { default as ContactPageIcon } from '@mui/icons-material/ContactPage';
 export { default as DarkModeIcon } from '@mui/icons-material/DarkMode';
 export { default as DeleteIcon } from '@mui/icons-material/Delete';
@@ -40,6 +41,7 @@ export { default as NoBackpackOutlinedIcon } from '@mui/icons-material/NoBackpac
 export { default as NotificationsIcon } from '@mui/icons-material/Notifications';
 export { default as PersonIcon } from '@mui/icons-material/Person';
 export { default as PersonOffIcon } from '@mui/icons-material/PersonOff';
+export { default as PhoneDisabledIcon } from '@mui/icons-material/PhoneDisabled';
 export { default as PhoneIcon } from '@mui/icons-material/Phone';
 export { default as RestoreIcon } from '@mui/icons-material/Restore';
 export { default as ScheduleIcon } from '@mui/icons-material/Schedule';

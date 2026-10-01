@@ -49,7 +49,14 @@ const RIDE: Ride = {
 
 const onClose = vi.fn();
 
-const DEFAULT_PROPS: RideFormDialogProps = { open: true, onClose, ride: undefined };
+const onContactRequired = vi.fn();
+
+const DEFAULT_PROPS: RideFormDialogProps = {
+  open: true,
+  onClose,
+  ride: undefined,
+  onContactRequired,
+};
 
 const renderComponent = (props = DEFAULT_PROPS) => render(<RideFormDialog {...props} />);
 
@@ -187,6 +194,23 @@ describe('RideFormDialog', () => {
       frequency: RideFrequencyEnum.ONCE,
       description: RIDE.description,
     });
+  });
+
+  it('should close and hand over to the contact notice when the api asks for a contact', async () => {
+    server.use(
+      http.post(RIDES_URL, () =>
+        HttpResponse.json({ error: 'sem contato', code: 'ContactRequired' }, { status: 403 }),
+      ),
+    );
+    renderComponent();
+    await screen.findByRole('heading', { name: OFFER_MODE.title });
+    await fillSingleRide();
+
+    await userEvent.click(screen.getByRole('button', { name: OFFER_MODE.submitLabel }));
+
+    await waitFor(() => expect(onContactRequired).toHaveBeenCalledOnce());
+    expect(onClose).toHaveBeenCalled();
+    expect(screen.queryByText(OFFER_MODE.failed)).not.toBeInTheDocument();
   });
 
   it('should keep the dialog open when the api fails, with what was typed', async () => {

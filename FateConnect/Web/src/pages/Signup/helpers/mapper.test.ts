@@ -12,8 +12,6 @@ const FILLED: SignupFormValues = {
   password: 'segredo123',
   birthDate: '22/05/1999',
   gender: GenderValueEnum.FEMALE,
-  phone: '(15) 99999-9999',
-  contactEmail: 'maria@exemplo.com',
   acceptTerms: true,
 };
 
@@ -27,10 +25,11 @@ describe('toSignupRequest', () => {
     expect(request.gender).toBe(GenderValueEnum.FEMALE);
   });
 
-  it('should send the phone as digits', () => {
+  it('should send no contact, which is left for the profile', () => {
     const request = toSignupRequest(FILLED);
 
-    expect(request.phone).toBe('15999999999');
+    expect(request).not.toHaveProperty('phone');
+    expect(request).not.toHaveProperty('contactEmail');
   });
 
   // `toISOString()` sobre a data local move o instante e, a leste de
@@ -83,8 +82,6 @@ describe('toSignupRequest', () => {
       password: 'segredo123',
       birthDate: '1999-05-22T00:00:00Z',
       gender: GenderValueEnum.FEMALE,
-      phone: '15999999999',
-      contactEmail: 'maria@exemplo.com',
       acceptances: [
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
         { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },

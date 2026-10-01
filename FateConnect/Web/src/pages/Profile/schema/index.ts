@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { checkContact, contactFieldsSchema } from '@app/components/ContactFields/schema';
 import { photoSchema } from '@app/components/PhotoField/schema';
 import { maxLengthMessage, signupSchema } from '@app/pages/Signup/schema';
 
@@ -42,7 +43,8 @@ function checkPasswordChange(
 
 /** Os campos que o cadastro também pede seguem as mesmas regras dele. */
 export const profileSchema = signupSchema
-  .pick({ fullName: true, birthDate: true, gender: true, phone: true, contactEmail: true })
+  .pick({ fullName: true, birthDate: true, gender: true })
+  .extend(contactFieldsSchema.shape)
   .extend({
     neighborhood: z
       .string()
@@ -53,7 +55,10 @@ export const profileSchema = signupSchema
     currentPassword: z.string(),
     newPassword: z.string(),
   })
-  .superRefine(checkPasswordChange);
+  .superRefine((values, context) => {
+    checkPasswordChange(values, context);
+    checkContact(values, context);
+  });
 
 export type ProfileFormInput = z.input<typeof profileSchema>;
 export type ProfileFormValues = z.output<typeof profileSchema>;
