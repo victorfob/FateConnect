@@ -3,6 +3,7 @@ import { Dialog, Input } from '@design-system';
 import { toZonedTime } from 'date-fns-tz';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
+import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
 import { RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
 import { RideFrequencyEnum } from '@app/services/rides/types';
 
@@ -41,14 +42,20 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
   return (
     <Dialog.Fields>
       <Dialog.Fields.Wide>
-        <Input
-          {...register('destination')}
-          label={C.RIDE_FORM_LABELS.destination}
-          required
-          fullWidth
-          placeholder={C.RIDE_FORM_PLACEHOLDERS.destination}
-          maxLength={C.RIDE_LIMITS.maxDestination}
-          error={errors.destination?.message}
+        <Controller
+          name="destination"
+          control={control}
+          render={({ field }) => (
+            <Input.Autocomplete
+              {...field}
+              label={C.RIDE_FORM_LABELS.destination}
+              required
+              options={NEIGHBORHOOD_SUGGESTIONS}
+              placeholder={C.RIDE_FORM_PLACEHOLDERS.destination}
+              maxLength={C.RIDE_LIMITS.maxDestination}
+              error={errors.destination?.message}
+            />
+          )}
         />
       </Dialog.Fields.Wide>
 

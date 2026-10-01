@@ -3,6 +3,7 @@ import { http, HttpResponse } from 'msw';
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONTACT_FIELD_LABELS, CONTACT_MESSAGES } from '@app/components/ContactFields/constants';
 import { PHOTO_FIELD_TEXTS, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
+import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
 import { ContactBanner } from '@app/layouts/MainLayout/components/ContactBanner';
 import { CONTACT_BANNER_TEXT } from '@app/layouts/MainLayout/components/ContactBanner/constants';
 import { DrawerSignOut } from '@app/layouts/MainLayout/components/DrawerSignOut';
@@ -16,6 +17,7 @@ import { PROFILE } from '@app/test/profile';
 import { act, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
+import { ADDRESS_OFF_AUTOCOMPLETE } from '@ds-root/components/Input/components/AutocompleteField/constants';
 
 import {
   ACCOUNT_ACCESS_SUBSECTIONS,
@@ -144,7 +146,7 @@ describe('Profile', () => {
     const fullName = await renderProfile();
 
     expect(fullName).toHaveValue(PROFILE.fullName);
-    expect(screen.getByRole('textbox', { name: NEIGHBORHOOD_LABEL })).toHaveValue(
+    expect(screen.getByRole('combobox', { name: NEIGHBORHOOD_LABEL })).toHaveValue(
       PROFILE.neighborhood,
     );
     expect(screen.getByRole('textbox', { name: /Telefone/ })).toHaveValue('(15) 99123-4567');
@@ -177,6 +179,37 @@ describe('Profile', () => {
     expect(await screen.findByRole('tooltip')).toHaveTextContent(NEIGHBORHOOD_HELP);
   });
 
+  it('should keep the saved addresses of the browser off the neighborhood suggestions', async () => {
+    await renderProfile();
+
+    expect(screen.getByRole('combobox', { name: NEIGHBORHOOD_LABEL })).toHaveAttribute(
+      'autocomplete',
+      ADDRESS_OFF_AUTOCOMPLETE,
+    );
+  });
+
+  it('should suggest the neighborhood while it is typed, and save the one chosen', async () => {
+    const [suggestion = ''] = NEIGHBORHOOD_SUGGESTIONS;
+    let sentNeighborhood: FormDataEntryValue | null = null;
+    server.use(
+      http.patch(PROFILE_URL, async ({ request }) => {
+        sentNeighborhood = (await request.formData()).get('Neighborhood');
+
+        return HttpResponse.json({ ...PROFILE, neighborhood: suggestion });
+      }),
+    );
+    await renderProfile();
+    const neighborhood = screen.getByRole('combobox', { name: NEIGHBORHOOD_LABEL });
+
+    await userEvent.clear(neighborhood);
+    await userEvent.type(neighborhood, suggestion.slice(0, -1));
+    await userEvent.click(await screen.findByRole('option', { name: suggestion }));
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(PROFILE_MESSAGES.saved)).toBeInTheDocument();
+    expect(sentNeighborhood).toBe(suggestion);
+  });
+
   it('should group the data and the access in two cards, each with its subsections', async () => {
     await renderProfile();
 
@@ -194,7 +227,7 @@ describe('Profile', () => {
         .map((heading) => heading.textContent),
     ).toEqual([ACCOUNT_ACCESS_SUBSECTIONS.password, ACCOUNT_ACCESS_SUBSECTIONS.deactivation]);
     expect(within(access).getByLabelText(PASSWORD_LABELS.current)).toBeInTheDocument();
-    expect(within(data).getByRole('textbox', { name: NEIGHBORHOOD_LABEL })).toBeInTheDocument();
+    expect(within(data).getByRole('combobox', { name: NEIGHBORHOOD_LABEL })).toBeInTheDocument();
   });
 
   it('should keep the save off until something changes, and discard back to what is stored', async () => {

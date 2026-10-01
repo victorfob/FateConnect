@@ -2,6 +2,7 @@ import { DATE_TIME_PICKER_LABEL, onlyDigits } from '@design-system';
 import { addDays, format } from 'date-fns';
 import { http, HttpResponse } from 'msw';
 
+import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
 import { server } from '@app/mocks/server';
 import { RIDE_FREQUENCY_OPTIONS } from '@app/pages/Rides/helpers/rideFrequency';
 import { RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
@@ -65,7 +66,7 @@ const DEFAULT_PROPS: RideFormDialogProps = {
 const renderComponent = (props = DEFAULT_PROPS) => render(<RideFormDialog {...props} />);
 
 const destinationField = () =>
-  screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.destination) });
+  screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.destination) });
 
 const departureField = () =>
   screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.departure) });
@@ -298,6 +299,17 @@ describe('RideFormDialog', () => {
     expect(await screen.findByText(EDIT_MODE.failed)).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(destinationField()).toHaveValue(EDITED_DESTINATION);
+  });
+
+  it('should suggest a neighborhood as the destination and fill in the one chosen', async () => {
+    const [suggestion = ''] = NEIGHBORHOOD_SUGGESTIONS;
+    renderComponent();
+    await screen.findByRole('heading', { name: OFFER_MODE.title });
+
+    await userEvent.type(destinationField(), suggestion.slice(0, -1));
+    await userEvent.click(await screen.findByRole('option', { name: suggestion }));
+
+    expect(destinationField()).toHaveValue(suggestion);
   });
 
   it('should offer the ride the form describes', async () => {
