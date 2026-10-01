@@ -2,12 +2,14 @@ import { render, screen, userEvent } from '@app/test/testing-library';
 
 import { ContactDetails, type ContactDetailsProps } from '.';
 
+const PHONE = '(15) 90000-0000';
+
 const DEFAULT_PROPS: ContactDetailsProps = {
   name: 'Maria Silva',
   initials: 'MS',
   thumbnailUrl: null,
   email: 'maria@example.com',
-  phone: '(15) 90000-0000',
+  phone: PHONE,
   phoneHref: 'https://wa.me/5515900000000?text=Ol%C3%A1',
   onCopyEmail: vi.fn(),
 };
@@ -55,7 +57,7 @@ describe('ContactDetails', () => {
     renderComponent({ ...DEFAULT_PROPS, name: 'Mariana Aparecida de Souza Nogueira' });
 
     const identity = screen.getByText('Mariana Aparecida de Souza Nogueira').parentElement;
-    const channels = screen.getByRole('link', { name: DEFAULT_PROPS.phone }).parentElement;
+    const channels = screen.getByRole('link', { name: PHONE }).parentElement;
 
     expect(getComputedStyle(identity as HTMLElement).textAlign).toBe('center');
     expect(getComputedStyle(channels as HTMLElement).flexShrink).toBe('0');

@@ -92,6 +92,24 @@ describe('ContactButton', () => {
     );
   });
 
+  it('should show only the channel the contact has', async () => {
+    renderComponent({ ...DEFAULT_PROPS, contact: { ...CONTACT, phone: null } });
+
+    const dialog = await openDialog();
+
+    expect(dialog.getByRole('button', { name: `Copiar ${CONTACT.email}` })).toBeInTheDocument();
+    expect(dialog.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('should drop the email channel when there is no email', async () => {
+    renderComponent({ ...DEFAULT_PROPS, contact: { ...CONTACT, email: null } });
+
+    const dialog = await openDialog();
+
+    expect(dialog.getByRole('link', { name: '(15) 90000-0000' })).toBeInTheDocument();
+    expect(dialog.queryByRole('button', { name: /^Copiar/ })).not.toBeInTheDocument();
+  });
+
   it('should download the photo only once the contact is opened', async () => {
     let downloads = 0;
     thumbnailAnswering(() => {

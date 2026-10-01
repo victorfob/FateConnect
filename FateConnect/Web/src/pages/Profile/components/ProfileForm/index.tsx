@@ -43,7 +43,7 @@ export function ProfileForm({ profile, onSaved }: ProfileFormProps) {
             <AccountDataCard fatecEmail={profile.fatecEmail} />
           </S.CardArea>
           <S.CardArea area="access">
-            <AccountAccessCard />
+            <AccountAccessCard fatecEmail={profile.fatecEmail} />
           </S.CardArea>
         </S.CardsGrid>
 

@@ -32,8 +32,6 @@ const VALID_SIGNUP = {
   fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
   birthDate: '22051999',
   password: 'segredo123',
-  phone: '11912345678',
-  contactEmail: 'maria@exemplo.com',
 };
 
 function renderSignup() {
@@ -55,8 +53,6 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText(/E-mail Fatec/), VALID_SIGNUP.fatecEmail);
   await userEvent.type(screen.getByLabelText(/Data de nascimento/), VALID_SIGNUP.birthDate);
   await userEvent.type(screen.getByLabelText(/^Senha/), VALID_SIGNUP.password);
-  await userEvent.type(screen.getByLabelText(/Telefone/), VALID_SIGNUP.phone);
-  await userEvent.type(screen.getByLabelText(/E-mail para contato/), VALID_SIGNUP.contactEmail);
   await selectOption(C.FIELD_LABELS.gender, 'Feminino');
 
   await userEvent.click(screen.getByRole('checkbox', { name: /Termos de uso/ }));
@@ -89,8 +85,6 @@ describe('Signup', () => {
     expect(screen.getByText(SIGNUP_MESSAGES.birthDateRequired)).toBeInTheDocument();
     expect(screen.getByText(SIGNUP_MESSAGES.genderRequired)).toBeInTheDocument();
     expect(screen.getByText(SIGNUP_MESSAGES.passwordRequired)).toBeInTheDocument();
-    expect(screen.getByText(SIGNUP_MESSAGES.phoneRequired)).toBeInTheDocument();
-    expect(screen.getByText(SIGNUP_MESSAGES.contactEmailRequired)).toBeInTheDocument();
     expect(screen.getByText(SIGNUP_MESSAGES.termsRequired)).toBeInTheDocument();
   });
 
@@ -126,16 +120,15 @@ describe('Signup', () => {
     expect(await screen.findByText(FATEC_EMAIL_LOCAL_PART_MESSAGE)).toBeInTheDocument();
   });
 
-  it('should reject a phone number outside ten or eleven digits', async () => {
+  it('should leave the contact out, for the profile to take', () => {
     renderSignup();
-    await userEvent.type(screen.getByLabelText(/Telefone/), '119123');
 
-    await submit();
-
-    expect(await screen.findByText(SIGNUP_MESSAGES.phoneInvalid)).toBeInTheDocument();
+    expect(screen.getByLabelText(/E-mail Fatec/)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/Telefone/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/E-mail para contato/)).not.toBeInTheDocument();
   });
 
-  it('should hold the name and both emails to the length the api accepts', () => {
+  it('should hold the name and the email to the length the api accepts', () => {
     renderSignup();
 
     const textboxNamed = (label: string) =>
@@ -143,7 +136,6 @@ describe('Signup', () => {
 
     expect(textboxNamed(C.FIELD_LABELS.fullName)).toHaveAttribute('maxlength', '200');
     expect(textboxNamed(C.FIELD_LABELS.fatecEmail)).toHaveAttribute('maxlength', '150');
-    expect(textboxNamed(C.FIELD_LABELS.contactEmail)).toHaveAttribute('maxlength', '150');
   });
 
   it('should format the birth date while it is typed', async () => {
@@ -175,17 +167,6 @@ describe('Signup', () => {
     await submit();
 
     expect(await screen.findByText(SIGNUP_MESSAGES.birthDateInvalid)).toBeInTheDocument();
-  });
-
-  it('should format the phone number by its length', async () => {
-    renderSignup();
-    const phone = screen.getByLabelText(/Telefone/);
-
-    await userEvent.type(phone, '1123456789');
-    expect(phone).toHaveValue('(11) 2345-6789');
-
-    await userEvent.type(phone, '0');
-    expect(phone).toHaveValue('(11) 23456-7890');
   });
 
   it('should toggle the password visibility and show the current state in the icon', async () => {
@@ -274,8 +255,6 @@ describe('Signup', () => {
       password: VALID_SIGNUP.password,
       gender: 'Female',
       birthDate: '1999-05-22T00:00:00Z',
-      phone: '11912345678',
-      contactEmail: VALID_SIGNUP.contactEmail,
       acceptances: [
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
         { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },
@@ -300,11 +279,8 @@ describe('Signup', () => {
     expect(screen.getByRole('button', { name: C.SUBMIT_LABEL })).toBeEnabled();
   });
 
-  it.each([
-    [SignupConflictFieldEnum.FATEC_EMAIL, /E-mail Fatec/],
-    [SignupConflictFieldEnum.PHONE, /Telefone/],
-    [SignupConflictFieldEnum.CONTACT_EMAIL, /E-mail para contato/],
-  ])('should point the conflict of %s at its own field', async (field, label) => {
+  it('should point the conflict of the institutional email at its field', async () => {
+    const field = SignupConflictFieldEnum.FATEC_EMAIL;
     server.use(
       http.post(SIGNUP_URL, () =>
         HttpResponse.json({ error: 'já está em uso no sistema', field }, { status: 409 }),
@@ -316,7 +292,7 @@ describe('Signup', () => {
     await submit();
 
     expect(await screen.findByText(C.SIGNUP_CONFLICT_MESSAGES[field])).toBeInTheDocument();
-    expect(screen.getByLabelText(label)).toHaveFocus();
+    expect(screen.getByLabelText(/E-mail Fatec/)).toHaveFocus();
     expect(screen.queryByText(C.SIGNUP_ERROR_MESSAGES.emailTaken)).not.toBeInTheDocument();
   });
 

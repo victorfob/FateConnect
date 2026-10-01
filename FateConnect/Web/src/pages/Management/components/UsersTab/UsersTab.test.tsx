@@ -3,6 +3,7 @@ import { FILTER_CLEAR_LABEL, FILTER_SUBMIT_LABEL, FILTER_TITLE_PLURAL } from '@d
 import { http, HttpResponse } from 'msw';
 
 import { CONFIRMATION } from '@app/components/ConfirmAction/constants';
+import { CONTACT_FIELD_LABELS } from '@app/components/ContactFields/constants';
 import { server } from '@app/mocks/server';
 import { SignupConflictFieldEnum } from '@app/pages/Signup/@types';
 import { FIELD_LABELS } from '@app/pages/Signup/constants';
@@ -14,7 +15,7 @@ import { AccountStatusEnum, type User } from '@app/services/users/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
-import { EDIT_LABEL, OWN_ACCOUNT_LABEL } from './components/UserCard/constants';
+import { EDIT_LABEL, NO_CONTACT_LABEL, OWN_ACCOUNT_LABEL } from './components/UserCard/constants';
 import {
   EDIT_TITLE,
   PROFILE_TYPE_LABEL,
@@ -52,10 +53,12 @@ const OWN_ACCOUNT: UserSummary = {
   status: AccountStatusEnum.ACTIVE,
 };
 
+const ACTIVE_USER_EMAIL = 'maria@exemplo.test';
+
 const ACTIVE_USER: UserSummary = {
   id: 7,
   fullName: 'Maria da Silva',
-  contactEmail: 'maria@exemplo.test',
+  contactEmail: ACTIVE_USER_EMAIL,
   phone: '15999998888',
   thumbnailUrl: null,
   status: AccountStatusEnum.ACTIVE,
@@ -77,6 +80,15 @@ const DEACTIVATED_USER: UserSummary = {
   phone: '15988887777',
   thumbnailUrl: null,
   status: AccountStatusEnum.SELF_DEACTIVATED,
+};
+
+const NO_CONTACT_USER: UserSummary = {
+  id: 10,
+  fullName: 'Bruna Costa',
+  contactEmail: null,
+  phone: null,
+  thumbnailUrl: null,
+  status: AccountStatusEnum.ACTIVE,
 };
 
 function fullUser(summary: UserSummary, profileType = ProfileTypeEnum.OPERATOR): User {
@@ -164,11 +176,31 @@ describe('UsersTab', () => {
     renderTab();
 
     const active = await cardOf(ACTIVE_USER.fullName);
-    expect(active.getByText(ACTIVE_USER.contactEmail)).toBeInTheDocument();
+    expect(active.getByText(ACTIVE_USER_EMAIL)).toBeInTheDocument();
     expect(active.getByText('(15) 99999-8888')).toBeInTheDocument();
     expect(active.getByText('Ativa')).toBeInTheDocument();
     expect((await cardOf(BANNED_USER.fullName)).getByText('Banida')).toBeInTheDocument();
     expect((await cardOf(DEACTIVATED_USER.fullName)).getByText('Desativada')).toBeInTheDocument();
+  });
+
+  it('should say the account has no contact, in place of an empty e-mail', async () => {
+    listServing([ACTIVE_USER, NO_CONTACT_USER]);
+
+    renderTab();
+
+    const emailIconsOf = async (fullName: string) =>
+      (await screen.findByText(fullName))
+        .closest('article')
+        ?.querySelectorAll('[data-testid="EmailIcon"]');
+
+    const withoutContact = await cardOf(NO_CONTACT_USER.fullName);
+    expect(withoutContact.getByText(NO_CONTACT_LABEL)).toBeInTheDocument();
+    expect(await emailIconsOf(NO_CONTACT_USER.fullName)).toHaveLength(0);
+
+    const active = await cardOf(ACTIVE_USER.fullName);
+    expect(active.getByText(ACTIVE_USER_EMAIL)).toBeInTheDocument();
+    expect(await emailIconsOf(ACTIVE_USER.fullName)).toHaveLength(1);
+    expect(active.queryByText(NO_CONTACT_LABEL)).not.toBeInTheDocument();
   });
 
   it('should show the photo of whoever has one and the initials of whoever has not', async () => {
@@ -349,7 +381,7 @@ describe('UsersTab', () => {
             fullName: 'Maria Souza',
             fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
             phone: '15999998888',
-            contactEmail: ACTIVE_USER.contactEmail,
+            contactEmail: ACTIVE_USER_EMAIL,
           },
         },
       ]),
@@ -391,7 +423,7 @@ describe('UsersTab', () => {
     expect(
       await dialog.findByText(USER_CONFLICT_MESSAGES[SignupConflictFieldEnum.CONTACT_EMAIL]),
     ).toBeInTheDocument();
-    expect(dialog.getByLabelText(new RegExp(FIELD_LABELS.contactEmail))).toHaveAttribute(
+    expect(dialog.getByLabelText(new RegExp(CONTACT_FIELD_LABELS.contactEmail))).toHaveAttribute(
       'aria-invalid',
       'true',
     );

@@ -12,12 +12,17 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a foto de perfil de quem publicou ao contato de uma carona, de um item ou de uma denúncia, baixada só ao abrir o contato: o círculo pulsa enquanto ela chega, e sem foto ou se ela não carregar ficam as iniciais (#511) [Frontend]
 - Adiciona a foto de perfil de cada conta ao cartão da lista de usuários da gestão, com as iniciais para quem não tem foto (#511) [Frontend]
 - Adiciona a recusa de ofertar carona, cadastrar item e enviar denúncia sem sigilo para quem está sem contato, que continua entrando, consultando as listas e enviando denúncia sigilosa; a resposta diz qual ação foi barrada e traz um código próprio no corpo do erro (#515) [Backend]
+- Adiciona a faixa no topo da área logada para quem está sem contato, com o caminho para o perfil; ela pode ser fechada e volta no próximo login (#517) [Frontend]
+- Adiciona o aviso de contatos pendentes ao ofertar carona ou cadastrar item sem contato, no lugar do formulário e também quando a API recusa, com o caminho para o perfil (#517) [Frontend]
 
 ### Changed
 
 - Passa o avatar do topo a baixar a versão reduzida da foto de perfil e a pulsar enquanto ela carrega, em vez de mostrar as iniciais até a foto chegar (#511) [Frontend]
 - Passa a declarar na política de privacidade que a foto de perfil continua visível no item encerrado e que a denúncia sigilosa também a esconde de quem analisa, em nova versão do documento (#511) [Frontend]
 - Passa a criar a conta sem telefone e e-mail de contato: o cadastro deixa de recebê-los, e quem ainda os envia não recebe erro, mas os perde. O contato entra só pelo perfil, com os dois juntos, e depois de cadastrado não se apaga (#515) [Backend]
+- Passa a criar a conta sem pedir telefone e e-mail de contato: os dois entram juntos pelo perfil, opcionais até o primeiro cadastro e sem poder ser apagados depois, e a edição de contas da gestão segue a mesma regra (#517) [Frontend]
+- Passa a enviar como sigilosa a denúncia de quem está sem contato, com a opção de sigilo ligada e travada e uma nota dizendo como liberá-la (#517) [Frontend]
+- Passa a declarar na política de privacidade e nos termos de uso que o contato é opcional, cadastrado pelo perfil com os dois juntos e sem poder ser apagado, e o que fica bloqueado sem ele, em nova versão dos termos (#517) [Frontend]
 
 ## [1.1.1] - 2026-09-30
 

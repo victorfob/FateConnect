@@ -8,6 +8,13 @@ import { http, HttpResponse } from 'msw';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { ContactRequiredActionEnum } from '@app/components/ContactRequiredDialog/@types';
+import {
+  CONTACT_REQUIRED_MESSAGES,
+  CONTACT_REQUIRED_TITLE,
+  REGISTER_CONTACTS_LABEL,
+} from '@app/components/ContactRequiredDialog/constants';
+import { useLacksContact } from '@app/hooks/useLacksContact';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import {
@@ -42,10 +49,12 @@ const SECOND_PAGE_LABEL = 'Ir para a página 2';
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
 const RETRY_WINDOW_MS = 5000;
 
+const DRIVER_PHONE = '(15) 90000-0000';
+
 const DRIVER: UserContact = {
   name: 'Ana Ofertante',
   email: 'ana@example.com',
-  phone: '(15) 90000-0000',
+  phone: DRIVER_PHONE,
   thumbnailUrl: null,
 };
 
@@ -115,6 +124,10 @@ async function pickOption(fieldLabel: string, chosenLabel: string) {
 
 const periodField = () => screen.getByRole('textbox', { name: new RegExp(FILTER_LABELS.period) });
 
+vi.mock('@app/hooks/useLacksContact', () => ({ useLacksContact: vi.fn() }));
+
+const mockUseLacksContact = useLacksContact as Mock;
+
 function renderComponent(search = '') {
   return renderAtRoute(RoutePathEnum.RIDES, <Rides />, search);
 }
@@ -125,6 +138,7 @@ describe('Rides', () => {
   let clipboardWrite: Mock;
 
   beforeEach(() => {
+    mockUseLacksContact.mockReturnValue(false);
     listReturning([]);
     server.use(http.get(HOLIDAYS_URL, () => HttpResponse.json([])));
     clipboardWrite = vi.fn(() => Promise.resolve());
@@ -193,6 +207,23 @@ describe('Rides', () => {
       'true',
     );
     expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES);
+  });
+
+  it('should show the contact notice instead of the form to whoever has no contact', async () => {
+    mockUseLacksContact.mockReturnValue(true);
+    renderComponent();
+
+    await userEvent.click(screen.getByRole('tab', { name: C.OFFER_TAB_LABEL }));
+
+    const notice = within(await screen.findByRole('dialog', { name: CONTACT_REQUIRED_TITLE }));
+    expect(
+      notice.getByText(CONTACT_REQUIRED_MESSAGES[ContactRequiredActionEnum.OFFER_RIDE]),
+    ).toBeInTheDocument();
+    expect(notice.getByRole('link', { name: REGISTER_CONTACTS_LABEL })).toHaveAttribute(
+      'href',
+      RoutePathEnum.PROFILE,
+    );
+    expect(screen.queryByRole('heading', { name: OFFER_MODE.title })).not.toBeInTheDocument();
   });
 
   it('should hand the highlight back to the search tab when the dialog is dismissed', async () => {
@@ -448,7 +479,7 @@ describe('Rides', () => {
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
 
     const dialog = within(await screen.findByRole('dialog'));
-    const conversation = dialog.getByRole('link', { name: DRIVER.phone });
+    const conversation = dialog.getByRole('link', { name: DRIVER_PHONE });
 
     expect(conversation).toHaveAttribute(
       'href',

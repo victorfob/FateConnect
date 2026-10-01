@@ -9,6 +9,12 @@ import { http, HttpResponse } from 'msw';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONFIRMATION } from '@app/components/ConfirmAction/constants';
+import { ContactRequiredActionEnum } from '@app/components/ContactRequiredDialog/@types';
+import {
+  CONTACT_REQUIRED_MESSAGES,
+  CONTACT_REQUIRED_TITLE,
+} from '@app/components/ContactRequiredDialog/constants';
+import { useLacksContact } from '@app/hooks/useLacksContact';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import {
@@ -171,7 +177,15 @@ function renderComponent(search = '') {
   return renderAtRoute(RoutePathEnum.LOST_AND_FOUND, <LostAndFound />, search);
 }
 
+vi.mock('@app/hooks/useLacksContact', () => ({ useLacksContact: vi.fn() }));
+
+const mockUseLacksContact = useLacksContact as Mock;
+
 describe('LostAndFound', () => {
+  beforeEach(() => {
+    mockUseLacksContact.mockReturnValue(false);
+  });
+
   it('should render the title as the page heading and the item on the board', async () => {
     listReturning([LOST_ITEM]);
 
@@ -364,6 +378,20 @@ describe('LostAndFound', () => {
       'aria-selected',
       'false',
     );
+    expect(screen.queryByRole('heading', { name: REGISTER_MODE.title })).not.toBeInTheDocument();
+  });
+
+  it('should show the contact notice instead of the form to whoever has no contact', async () => {
+    mockUseLacksContact.mockReturnValue(true);
+    listReturning([]);
+    renderComponent();
+
+    await userEvent.click(screen.getByRole('tab', { name: C.REGISTER_TAB_LABEL }));
+
+    const notice = within(await screen.findByRole('dialog', { name: CONTACT_REQUIRED_TITLE }));
+    expect(
+      notice.getByText(CONTACT_REQUIRED_MESSAGES[ContactRequiredActionEnum.REGISTER_ITEM]),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: REGISTER_MODE.title })).not.toBeInTheDocument();
   });
 

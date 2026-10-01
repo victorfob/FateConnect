@@ -11,12 +11,15 @@ export class ApiError extends Error {
   readonly status?: number;
   /** Campo que a API aponta como causa do erro. */
   readonly field?: string;
+  /** Motivo que a API nomeia quando o mesmo status tem mais de um (`ContactRequired`). */
+  readonly code?: string;
 
-  constructor(message: string, status?: number, field?: string) {
+  constructor(message: string, status?: number, field?: string, code?: string) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.field = field;
+    this.code = code;
   }
 }
 
@@ -38,16 +41,13 @@ export const SESSION_EXPIRED_MESSAGE = 'Sessão expirada. Entre novamente para c
 
 const UNAUTHORIZED = 401;
 
-function hasField(body: unknown): body is { field: string } {
-  return (
-    typeof body === 'object' && body !== null && 'field' in body && typeof body.field === 'string'
-  );
-}
+function textPropertyOf(body: unknown, key: 'field' | 'code'): string | undefined {
+  if (typeof body !== 'object' || body === null) return undefined;
 
-function fieldOf(body: unknown): string | undefined {
-  if (!hasField(body)) return undefined;
+  const value: unknown = Reflect.get(body, key);
+  if (typeof value !== 'string') return undefined;
 
-  return body.field;
+  return value;
 }
 
 function withInterceptors(client: AxiosInstance): AxiosInstance {
@@ -82,7 +82,12 @@ function withInterceptors(client: AxiosInstance): AxiosInstance {
       }
 
       return Promise.reject(
-        new ApiError(GENERIC_ERROR_MESSAGE, error.response.status, fieldOf(error.response.data)),
+        new ApiError(
+          GENERIC_ERROR_MESSAGE,
+          error.response.status,
+          textPropertyOf(error.response.data, 'field'),
+          textPropertyOf(error.response.data, 'code'),
+        ),
       );
     },
   );

@@ -1,4 +1,3 @@
-import { onlyDigits } from '@design-system';
 import { z } from 'zod';
 
 import {
@@ -12,18 +11,14 @@ import { EARLIEST_BIRTH_DATE, latestBirthDate, parseBirthDate } from '../helpers
 
 const REQUIRED_MIN_LENGTH = 1;
 const MIN_PASSWORD_LENGTH = 8;
-const MIN_PHONE_DIGITS = 10;
-const MAX_PHONE_DIGITS = 11;
 
 /**
- * Comprimento máximo de cada campo, como o `CreateUserDto` e o
- * `CreateContactDto` os declaram. Sem eles a API recusa com o 400 genérico, que
- * não diz qual campo passou do limite.
+ * Comprimento máximo de cada campo, como o `CreateUserDto` os declara. Sem eles
+ * a API recusa com o 400 genérico, que não diz qual campo passou do limite.
  */
 export const MAX_LENGTH = {
   fullName: 200,
   fatecEmail: 150,
-  contactEmail: 150,
 };
 
 export function maxLengthMessage(max: number): string {
@@ -34,16 +29,12 @@ export function maxLengthMessage(max: number): string {
 export const SIGNUP_MESSAGES = {
   fullNameRequired: 'Informe o nome completo',
   fatecEmailRequired: 'Informe o e-mail Fatec',
-  emailInvalid: 'E-mail inválido',
   birthDateRequired: 'Informe a data de nascimento',
   birthDateInvalid: 'Data inválida',
   birthDateUnderage: 'É necessário ter pelo menos 18 anos',
   genderRequired: 'Selecione o gênero',
   passwordRequired: 'Informe a senha',
   passwordTooShort: 'Mínimo de 8 caracteres',
-  phoneRequired: 'Informe o telefone',
-  phoneInvalid: 'Telefone com DDD: 10 ou 11 dígitos',
-  contactEmailRequired: 'Informe o e-mail',
   termsRequired: 'É necessário aceitar os termos de uso e política de privacidade para continuar.',
 };
 
@@ -62,13 +53,6 @@ function isOldEnough(value: string): boolean {
   if (!parsed) return true;
 
   return parsed <= latestBirthDate();
-}
-
-function hasBrazilianPhoneLength(value: string): boolean {
-  const digits = onlyDigits(value);
-  if (digits === '') return true;
-
-  return digits.length >= MIN_PHONE_DIGITS && digits.length <= MAX_PHONE_DIGITS;
 }
 
 export const signupSchema = z.object({
@@ -92,15 +76,6 @@ export const signupSchema = z.object({
     .string()
     .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.passwordRequired)
     .min(MIN_PASSWORD_LENGTH, SIGNUP_MESSAGES.passwordTooShort),
-  phone: z
-    .string()
-    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.phoneRequired)
-    .refine(hasBrazilianPhoneLength, SIGNUP_MESSAGES.phoneInvalid),
-  contactEmail: z
-    .string()
-    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.contactEmailRequired)
-    .max(MAX_LENGTH.contactEmail, maxLengthMessage(MAX_LENGTH.contactEmail))
-    .pipe(z.email(SIGNUP_MESSAGES.emailInvalid)),
   acceptTerms: z.boolean().refine((accepted) => accepted, SIGNUP_MESSAGES.termsRequired),
   acceptMarketing: z.boolean(),
 });
@@ -113,8 +88,6 @@ export const SIGNUP_DEFAULT_VALUES: SignupFormValues = {
   birthDate: '',
   gender: '',
   password: '',
-  phone: '',
-  contactEmail: '',
   acceptTerms: false,
   acceptMarketing: false,
 };

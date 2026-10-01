@@ -5,6 +5,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 
+import {
+  CONTACT_FIELD_LABELS,
+  MAX_CONTACT_EMAIL_LENGTH,
+} from '@app/components/ContactFields/constants';
 import { useMaskedField } from '@app/hooks/useMaskedField';
 import { useNotification } from '@app/hooks/useNotification';
 import * as C from '@app/pages/Management/components/UsersTab/components/UserFormDialog/constants';
@@ -24,6 +28,7 @@ import { MAX_LENGTH } from '@app/pages/Signup/schema';
 import { ApiError, SessionExpiredError } from '@app/services/httpClient';
 import type { User } from '@app/services/users/types';
 import { changeUserProfile, updateUser } from '@app/services/users/usersService';
+import { hasContact } from '@app/utils/contact';
 import { maskPhone } from '@app/utils/masks/phoneMask';
 
 const BAD_REQUEST = 400;
@@ -74,6 +79,7 @@ export function UserEditForm({ user, isOwnAccount, onClose }: UserEditFormProps)
     formState: { errors },
   } = form;
   const phoneField = useMaskedField(register('phone'), maskPhone);
+  const contactIsRequired = hasContact(user);
 
   const reportFailure = useCallback(
     (error: unknown) => {
@@ -135,19 +141,19 @@ export function UserEditForm({ user, isOwnAccount, onClose }: UserEditFormProps)
 
           <Input
             {...register('contactEmail')}
-            label={FIELD_LABELS.contactEmail}
-            required
+            label={CONTACT_FIELD_LABELS.contactEmail}
+            required={contactIsRequired}
             fullWidth
             type="email"
             autoComplete="off"
-            maxLength={MAX_LENGTH.contactEmail}
+            maxLength={MAX_CONTACT_EMAIL_LENGTH}
             error={errors.contactEmail?.message}
           />
 
           <Input
             {...phoneField}
-            label={FIELD_LABELS.phone}
-            required
+            label={CONTACT_FIELD_LABELS.phone}
+            required={contactIsRequired}
             fullWidth
             type="tel"
             inputMode="tel"

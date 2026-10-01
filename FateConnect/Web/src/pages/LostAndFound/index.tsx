@@ -3,6 +3,9 @@ import { CardsList, PageShell, Pagination } from '@design-system';
 import { AddIcon, SearchIcon } from '@design-system/icons';
 
 import { BackToMenu } from '@app/components/BackToMenu';
+import { ContactRequiredDialog } from '@app/components/ContactRequiredDialog';
+import { ContactRequiredActionEnum } from '@app/components/ContactRequiredDialog/@types';
+import { useContactGate } from '@app/hooks/useContactGate';
 import { usePagedSearch } from '@app/hooks/usePagedSearch';
 import { listLostItems } from '@app/services/lostAndFound/lostAndFoundService';
 import type { LostItem } from '@app/services/lostAndFound/types';
@@ -20,6 +23,7 @@ const NO_ITEMS = 0;
 export function LostAndFound() {
   const [editingItem, setEditingItem] = useState<LostItem | undefined>(undefined);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const { contactDialogOpen, guard, showContactRequired, closeContactDialog } = useContactGate();
   const { resolveItem, deleteItem, restoreItem, isTransitioning } = useLostItemTransitions();
 
   const { filters, items, totalPages, currentPage, isPending, applyFilters, changePage } =
@@ -30,10 +34,14 @@ export function LostAndFound() {
       errorMessage: C.LOST_ITEM_LIST_MESSAGES.loadFailed,
     });
 
-  const handleRegister = useCallback(() => {
-    setEditingItem(undefined);
-    setIsFormOpen(true);
-  }, []);
+  const handleRegister = useCallback(
+    () =>
+      guard(() => {
+        setEditingItem(undefined);
+        setIsFormOpen(true);
+      }),
+    [guard],
+  );
 
   const handleEdit = useCallback((item: LostItem) => {
     setEditingItem(item);
@@ -86,7 +94,18 @@ export function LostAndFound() {
         ))}
       </CardsList>
 
-      <LostItemFormDialog open={isFormOpen} onClose={handleCloseForm} item={editingItem} />
+      <LostItemFormDialog
+        open={isFormOpen}
+        onClose={handleCloseForm}
+        item={editingItem}
+        onContactRequired={showContactRequired}
+      />
+
+      <ContactRequiredDialog
+        open={contactDialogOpen}
+        action={ContactRequiredActionEnum.REGISTER_ITEM}
+        onClose={closeContactDialog}
+      />
     </PageShell>
   );
 }

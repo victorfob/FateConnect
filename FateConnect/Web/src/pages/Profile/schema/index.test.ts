@@ -1,3 +1,4 @@
+import { CONTACT_MESSAGES } from '@app/components/ContactFields/constants';
 import { SIGNUP_MESSAGES } from '@app/pages/Signup/schema';
 
 import { PASSWORD_MESSAGES, profileSchema, type ProfileFormInput } from '.';
@@ -8,6 +9,7 @@ const VALID: ProfileFormInput = {
   gender: 'Female',
   phone: '(15) 99123-4567',
   contactEmail: 'maria.silva@gmail.com',
+  contactIsRequired: true,
   neighborhood: 'Jardim Vergueiro',
   photo: null,
   removeStoredPhoto: false,
@@ -25,6 +27,19 @@ function issuesOf(input: ProfileFormInput) {
 describe('profileSchema', () => {
   it('should accept the profile with both password fields blank', () => {
     expect(issuesOf(VALID)).toEqual([]);
+  });
+
+  it('should refuse clearing the contact of whoever already has one', () => {
+    expect(issuesOf({ ...VALID, phone: '', contactEmail: '' })).toEqual([
+      { path: 'phone', message: CONTACT_MESSAGES.phoneRequired },
+      { path: 'contactEmail', message: CONTACT_MESSAGES.contactEmailRequired },
+    ]);
+  });
+
+  it('should accept a profile still without contact', () => {
+    expect(issuesOf({ ...VALID, phone: '', contactEmail: '', contactIsRequired: false })).toEqual(
+      [],
+    );
   });
 
   it('should accept an empty neighborhood, which clears it', () => {

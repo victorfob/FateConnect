@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
+import { CONTACT_FIELD_LABELS, CONTACT_MESSAGES } from '@app/components/ContactFields/constants';
 import { PHOTO_FIELD_TEXTS, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
 import { DrawerSignOut } from '@app/layouts/MainLayout/components/DrawerSignOut';
 import { SIGN_OUT_LABEL } from '@app/layouts/MainLayout/components/DrawerSignOut/constants';
@@ -214,6 +215,55 @@ describe('Profile', () => {
     expect(sentName).toBe('Maria Rocha');
     expect(fullName).toHaveValue('Maria Rocha');
     expect(saveButton()).toBeDisabled();
+  });
+
+  it('should let whoever has no contact save without one, with the fields optional', async () => {
+    let sent: { phone: FormDataEntryValue | null; contactEmail: FormDataEntryValue | null } | null =
+      null;
+    const withoutContact = { ...PROFILE, phone: null, contactEmail: null };
+    server.use(
+      http.patch(PROFILE_URL, async ({ request }) => {
+        const body = await request.formData();
+        sent = { phone: body.get('Phone'), contactEmail: body.get('ContactEmail') };
+
+        return HttpResponse.json({ ...withoutContact, fullName: 'Maria Rocha' });
+      }),
+    );
+    const fullName = await renderProfile(withoutContact);
+
+    expect(screen.getByLabelText(CONTACT_FIELD_LABELS.phone)).not.toBeRequired();
+    await userEvent.clear(fullName);
+    await userEvent.type(fullName, 'Maria Rocha');
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(PROFILE_MESSAGES.saved)).toBeInTheDocument();
+    expect(sent).toEqual({ phone: '', contactEmail: '' });
+  });
+
+  it('should name the account to the password manager, so the empty contact is not taken for the login', async () => {
+    await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
+
+    const currentPassword = screen.getByLabelText(PASSWORD_LABELS.current);
+    const usernames = [
+      ...(currentPassword.closest('form')?.querySelectorAll('[autocomplete="username"]') ?? []),
+    ];
+
+    expect(usernames).toHaveLength(1);
+    const [username] = usernames;
+    expect(username).toHaveValue(PROFILE.fatecEmail);
+    expect(username).not.toBeVisible();
+    expect(username?.compareDocumentPosition(currentPassword)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it('should ask for the email when only the phone is filled in', async () => {
+    await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
+
+    await userEvent.type(screen.getByLabelText(CONTACT_FIELD_LABELS.phone), '15991234567');
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(CONTACT_MESSAGES.contactEmailRequired)).toBeInTheDocument();
   });
 
   it('should warn when the data is not saved', async () => {

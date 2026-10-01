@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { IconButton, InitialsAvatar, ListCard, StatusTag, Typography } from '@design-system';
-import { EditIcon, EmailIcon, PhoneIcon } from '@design-system/icons';
+import { EditIcon, EmailIcon, PhoneDisabledIcon, PhoneIcon } from '@design-system/icons';
 
 import { useStoredImage } from '@app/hooks/useStoredImage';
 import {
@@ -13,7 +13,7 @@ import { getInitials } from '@app/utils/initials';
 import { maskPhone } from '@app/utils/masks/phoneMask';
 
 import { UserStatusAction } from '../UserStatusAction';
-import { EDIT_LABEL, OWN_ACCOUNT_LABEL } from './constants';
+import { EDIT_LABEL, NO_CONTACT_LABEL, OWN_ACCOUNT_LABEL } from './constants';
 import * as S from './styles';
 
 type UserCardProps = Readonly<{
@@ -62,12 +62,23 @@ export function UserCard({ user, isOwnAccount, onEdit, onStatusConfirm }: UserCa
       </ListCard.Header>
 
       <ListCard.InfoRow>
-        <ListCard.InfoItem>
-          <EmailIcon />
-          <Typography variant="caption" color="inherit">
-            {user.contactEmail}
-          </Typography>
-        </ListCard.InfoItem>
+        {!user.contactEmail && !displayPhone && (
+          <ListCard.InfoItem>
+            <PhoneDisabledIcon />
+            <Typography variant="caption" color="inherit">
+              {NO_CONTACT_LABEL}
+            </Typography>
+          </ListCard.InfoItem>
+        )}
+
+        {user.contactEmail && (
+          <ListCard.InfoItem>
+            <EmailIcon />
+            <Typography variant="caption" color="inherit">
+              {user.contactEmail}
+            </Typography>
+          </ListCard.InfoItem>
+        )}
 
         {displayPhone && (
           <ListCard.InfoItem>

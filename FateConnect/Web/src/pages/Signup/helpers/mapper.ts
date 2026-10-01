@@ -1,5 +1,3 @@
-import { onlyDigits } from '@design-system';
-
 import { PRIVACY_VERSION, TERMS_VERSION } from '@app/constants/legalDocuments';
 import {
   DocumentTypeEnum,
@@ -36,8 +34,6 @@ export function toSignupRequest(values: SignupFormValues): SignupRequest {
     password: values.password,
     birthDate: toApiBirthDateOrEmpty(values.birthDate),
     gender: values.gender,
-    phone: onlyDigits(values.phone),
-    contactEmail: values.contactEmail,
     acceptances: acceptedDocuments(),
     // Uma caixa só decide as duas: a tela de preferências as separa depois.
     receiveEmails: values.acceptMarketing,

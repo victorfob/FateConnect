@@ -13,8 +13,8 @@ export type User = {
   fullName: string;
   birthDate: string;
   gender: string;
-  phone: string;
-  contactEmail: string;
+  phone: string | null;
+  contactEmail: string | null;
   neighborhood: string | null;
   imageUrl: string | null;
   thumbnailUrl: string | null;

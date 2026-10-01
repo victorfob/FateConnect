@@ -45,6 +45,29 @@ describe('httpClient', () => {
     );
   });
 
+  it('should carry the field and the code the api names in the error body', async () => {
+    server.use(
+      http.get(PING_URL, () =>
+        HttpResponse.json(
+          { error: 'sem contato', field: 'phone', code: 'ContactRequired' },
+          { status: 403 },
+        ),
+      ),
+    );
+
+    await expect(apiClient.get('/ping')).rejects.toThrow(
+      expect.objectContaining({ status: 403, field: 'phone', code: 'ContactRequired' }),
+    );
+  });
+
+  it('should leave the field and the code empty when the body has none', async () => {
+    server.use(http.get(PING_URL, () => HttpResponse.json({ error: 'falhou' }, { status: 400 })));
+
+    await expect(apiClient.get('/ping')).rejects.toThrow(
+      expect.objectContaining({ status: 400, field: undefined, code: undefined }),
+    );
+  });
+
   it('should normalize a network failure into an api error without status', async () => {
     server.use(http.get(PING_URL, () => HttpResponse.error()));
 

@@ -22,6 +22,8 @@ export function ContactButton({ contact, message }: ContactButtonProps) {
   const handleClose = useCallback(() => setShowingContact(false), []);
 
   const handleCopyEmail = useCallback(async () => {
+    if (!contact.email) return;
+
     const copied = await copyToClipboard(contact.email);
 
     if (!copied) {
@@ -35,11 +37,16 @@ export function ContactButton({ contact, message }: ContactButtonProps) {
   const initials = useMemo(() => getInitials(contact.name), [contact.name]);
   // A máscara é só de exibição: o endereço da conversa recebe o número como a
   // API o devolve, porque é o mesmo valor em dois papéis diferentes.
-  const displayPhone = useMemo(() => maskPhone(contact.phone), [contact.phone]);
-  const phoneHref = useMemo(
-    () => whatsappConversationUrl(contact.phone, message),
-    [contact.phone, message],
-  );
+  const displayPhone = useMemo(() => {
+    if (!contact.phone) return null;
+
+    return maskPhone(contact.phone);
+  }, [contact.phone]);
+  const phoneHref = useMemo(() => {
+    if (!contact.phone) return null;
+
+    return whatsappConversationUrl(contact.phone, message);
+  }, [contact.phone, message]);
 
   return (
     <>
