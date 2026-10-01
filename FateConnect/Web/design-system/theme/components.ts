@@ -78,6 +78,10 @@ export const components: Components<Theme> = {
     },
     variants: [
       {
+        props: { variant: 'contained' },
+        style: { borderRadius: radius(radiusScale.component) },
+      },
+      {
         props: { variant: 'soft' },
         style: ({ theme }) => ({
           border: `1px solid ${theme.palette.divider}`,
