@@ -1,16 +1,52 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { readFileSync } from 'node:fs';
+import { ThemeProvider } from '@design-system';
+import { useTheme } from '@mui/material/styles';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { PAGE_METADATA } from '@app/routes/pageMetadata';
 import { RoutePathEnum } from '@app/routes/paths';
-import { render, waitFor } from '@app/test/testing-library';
+import { render, renderHook, waitFor } from '@app/test/testing-library';
 
 import { PageMetadata } from '.';
 
 const UNKNOWN_PATH = '/rota-que-nao-existe';
 
 const RENDERED_ROUTES = Object.values(RoutePathEnum);
+
+const WEB_ROOT = resolve(import.meta.dirname, '../../..');
+
+const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const IHDR_TYPE_OFFSET = 12;
+const IHDR_WIDTH_OFFSET = 16;
+const IHDR_HEIGHT_OFFSET = 20;
+
+const MANIFEST_HREF = '/manifest.webmanifest';
+const APPLE_TOUCH_ICON_SIZE = '180x180';
+
+type ManifestIcon = Readonly<{ src: string; sizes: string; type: string; purpose: string }>;
+
+type ManifestScreenshot = Readonly<{
+  src: string;
+  sizes: string;
+  type: string;
+  form_factor: string;
+}>;
+
+type WebAppManifest = Readonly<{
+  id: string;
+  name: string;
+  short_name: string;
+  description: string;
+  lang: string;
+  start_url: string;
+  scope: string;
+  display: string;
+  theme_color: string;
+  background_color: string;
+  icons: ManifestIcon[];
+  screenshots: ManifestScreenshot[];
+}>;
 
 function renderAt(path: string) {
   const router = createMemoryRouter([{ path: '*', element: <PageMetadata /> }], {
@@ -29,7 +65,38 @@ function headContent(selector: string) {
 }
 
 function indexHtml() {
-  return readFileSync(resolve(import.meta.dirname, '../../../index.html'), 'utf8');
+  return readFileSync(resolve(WEB_ROOT, 'index.html'), 'utf8');
+}
+
+function indexHead() {
+  return new DOMParser().parseFromString(indexHtml(), 'text/html').head;
+}
+
+function headLink(rel: string) {
+  return indexHead().querySelector(`link[rel="${rel}"]`)?.getAttribute('href') ?? '';
+}
+
+function publicFileServedAt(href: string) {
+  return resolve(WEB_ROOT, 'public', href.replace(/^\//, ''));
+}
+
+function manifest(): WebAppManifest {
+  return JSON.parse(readFileSync(publicFileServedAt(MANIFEST_HREF), 'utf8'));
+}
+
+function pngSize(href: string) {
+  const bytes = readFileSync(publicFileServedAt(href));
+
+  expect(bytes.subarray(0, PNG_SIGNATURE.length)).toEqual(PNG_SIGNATURE);
+  expect(bytes.toString('ascii', IHDR_TYPE_OFFSET, IHDR_WIDTH_OFFSET)).toBe('IHDR');
+
+  return `${bytes.readUInt32BE(IHDR_WIDTH_OFFSET)}x${bytes.readUInt32BE(IHDR_HEIGHT_OFFSET)}`;
+}
+
+function iconSizes(purpose: string) {
+  return manifest()
+    .icons.filter((icon) => icon.purpose === purpose)
+    .map((icon) => icon.sizes);
 }
 
 describe('PageMetadata', () => {
@@ -120,5 +187,70 @@ describe('PageMetadata', () => {
    */
   it('should keep a static description out of index.html, which would outrank the route one', () => {
     expect(indexHtml()).not.toContain('name="description"');
+  });
+});
+
+describe('web app manifest', () => {
+  it('should link a manifest that exists in public', () => {
+    expect(headLink('manifest')).toBe(MANIFEST_HREF);
+    expect(existsSync(publicFileServedAt(MANIFEST_HREF))).toBe(true);
+  });
+
+  it('should declare what the browser requires to offer the install', () => {
+    expect(manifest()).toMatchObject({
+      id: RoutePathEnum.LANDING,
+      name: 'FateConnect',
+      short_name: 'FateConnect',
+      lang: 'pt-BR',
+      start_url: RoutePathEnum.LANDING,
+      scope: RoutePathEnum.LANDING,
+      display: 'standalone',
+    });
+    expect(iconSizes('any')).toEqual(expect.arrayContaining(['192x192', '512x512']));
+    expect(iconSizes('maskable')).toContain('512x512');
+  });
+
+  it('should describe the app with the landing description', () => {
+    expect(manifest().description).toBe(PAGE_METADATA[RoutePathEnum.LANDING].description);
+  });
+
+  it.each(manifest().icons.map((icon) => [icon.src, icon]))(
+    'should ship %s as a PNG of the declared size',
+    (_src, icon) => {
+      expect(icon.type).toBe('image/png');
+      expect(pngSize(icon.src)).toBe(icon.sizes);
+    },
+  );
+
+  it('should show the install with one wide and one narrow screenshot', () => {
+    expect(manifest().screenshots.map((screenshot) => screenshot.form_factor)).toEqual([
+      'wide',
+      'narrow',
+    ]);
+  });
+
+  it.each(manifest().screenshots.map((screenshot) => [screenshot.src, screenshot]))(
+    'should ship %s as a PNG of the declared size',
+    (_src, screenshot) => {
+      expect(screenshot.type).toBe('image/png');
+      expect(pngSize(screenshot.src)).toBe(screenshot.sizes);
+    },
+  );
+
+  // O Safari do iPhone prefere este ícone ao do manifesto e não aplica o `maskable`.
+  it('should link a square apple-touch-icon for the iPhone home screen', () => {
+    expect(pngSize(headLink('apple-touch-icon'))).toBe(APPLE_TOUCH_ICON_SIZE);
+  });
+
+  // O ícone tem o corpo branco do topo, que sumiria sobre o fundo claro da página.
+  it('should paint the browser and the splash with the light chrome', () => {
+    const { result } = renderHook(() => useTheme(), { wrapper: ThemeProvider });
+    const { palette } = result.current;
+
+    expect(manifest().theme_color).toBe(palette.chrome.main);
+    expect(indexHead().querySelector('meta[name="theme-color"]')?.getAttribute('content')).toBe(
+      palette.chrome.main,
+    );
+    expect(manifest().background_color).toBe(palette.chrome.main);
   });
 });
