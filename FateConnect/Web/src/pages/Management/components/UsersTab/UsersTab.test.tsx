@@ -54,6 +54,7 @@ const OWN_ACCOUNT: UserSummary = {
 };
 
 const ACTIVE_USER_EMAIL = 'maria@exemplo.test';
+const EDITED_FULL_NAME = 'Maria Souza';
 
 const ACTIVE_USER: UserSummary = {
   id: 7,
@@ -163,6 +164,11 @@ async function openEditDialogOf(fullName: string) {
   await userEvent.click(card.getByRole('button', { name: EDIT_LABEL }));
 
   return within(await screen.findByRole('dialog', { name: EDIT_TITLE }));
+}
+
+async function retype(field: HTMLElement, value: string) {
+  await userEvent.clear(field);
+  await userEvent.type(field, value);
 }
 
 describe('UsersTab', () => {
@@ -368,9 +374,7 @@ describe('UsersTab', () => {
 
     renderTab();
     const dialog = await openEditDialogOf(ACTIVE_USER.fullName);
-    const fullName = dialog.getByLabelText(new RegExp(FIELD_LABELS.fullName));
-    await userEvent.clear(fullName);
-    await userEvent.type(fullName, 'Maria Souza');
+    await retype(dialog.getByLabelText(new RegExp(FIELD_LABELS.fullName)), EDITED_FULL_NAME);
     await userEvent.click(dialog.getByRole('button', { name: SUBMIT_LABEL }));
 
     await waitFor(() =>
@@ -378,7 +382,7 @@ describe('UsersTab', () => {
         {
           path: `/users/${ACTIVE_USER.id}`,
           body: {
-            fullName: 'Maria Souza',
+            fullName: EDITED_FULL_NAME,
             fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
             phone: '15999998888',
             contactEmail: ACTIVE_USER_EMAIL,
@@ -387,6 +391,24 @@ describe('UsersTab', () => {
       ]),
     );
     expect(await screen.findByText(USER_FORM_MESSAGES.updated)).toBeInTheDocument();
+  });
+
+  it('should hold the save of an untouched account until a field changes, and again once undone', async () => {
+    listServing([ACTIVE_USER]);
+    patchesRecorded(fullUser(ACTIVE_USER));
+
+    renderTab();
+    const dialog = await openEditDialogOf(ACTIVE_USER.fullName);
+    const save = dialog.getByRole('button', { name: SUBMIT_LABEL });
+    const fullName = dialog.getByLabelText(new RegExp(FIELD_LABELS.fullName));
+
+    expect(save).toBeDisabled();
+
+    await retype(fullName, EDITED_FULL_NAME);
+    expect(save).toBeEnabled();
+
+    await retype(fullName, ACTIVE_USER.fullName);
+    expect(save).toBeDisabled();
   });
 
   it('should promote through the profile route', async () => {
@@ -418,6 +440,10 @@ describe('UsersTab', () => {
 
     renderTab();
     const dialog = await openEditDialogOf(ACTIVE_USER.fullName);
+    await retype(
+      dialog.getByLabelText(new RegExp(CONTACT_FIELD_LABELS.contactEmail)),
+      'maria.souza@exemplo.test',
+    );
     await userEvent.click(dialog.getByRole('button', { name: SUBMIT_LABEL }));
 
     expect(
@@ -459,6 +485,7 @@ describe('UsersTab', () => {
 
     renderTab();
     const dialog = await openEditDialogOf(ACTIVE_USER.fullName);
+    await retype(dialog.getByLabelText(new RegExp(FIELD_LABELS.fullName)), EDITED_FULL_NAME);
     await userEvent.click(dialog.getByRole('button', { name: SUBMIT_LABEL }));
 
     expect(await screen.findByText(message)).toBeInTheDocument();

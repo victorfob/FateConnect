@@ -43,6 +43,7 @@ export function LostItemFormDialog({
 
     return C.EDIT_MODE;
   }, [item]);
+  const isEditing = item !== undefined;
 
   const { mutate, isPending } = useMutation({
     mutationFn: (input: LostItemInput) => {
@@ -75,7 +76,10 @@ export function LostItemFormDialog({
     defaultValues: EMPTY_LOST_ITEM_FORM,
     disabled: isPending,
   });
-  const { reset } = form;
+  const {
+    reset,
+    formState: { isDirty },
+  } = form;
 
   useEffect(() => {
     if (!open) return;
@@ -99,6 +103,7 @@ export function LostItemFormDialog({
               icon={<SubmitIcon fontSize="small" />}
               label={mode.submitLabel}
               loading={isPending}
+              disabled={isEditing && !isDirty}
             />
           </Dialog.Footer>
         </Dialog.Form>

@@ -29,6 +29,7 @@ const OFFERED_AT = new Date(Date.now() + DAYS_AHEAD * DAY_MS);
 const OFFERED_HOUR = '18:30';
 /** O campo é mascarado: chegam só os dígitos, do dia ao minuto. */
 const TYPED_DEPARTURE = `${format(OFFERED_AT, 'ddMMyyyy')}${onlyDigits(OFFERED_HOUR)}`;
+const EDITED_DESTINATION = 'Rodoviária de Sorocaba';
 
 const RIDE: Ride = {
   id: 'b1b0f5b4-7a6f-4f1e-9d3a-2f5c8e4a1d70',
@@ -93,6 +94,11 @@ async function chooseVehicle(vehicleType: VehicleTypeEnum) {
   await userEvent.click(await screen.findByRole('option', { name: vehicleTypeLabel(vehicleType) }));
 }
 
+async function retypeDestination(destination: string) {
+  await userEvent.clear(destinationField());
+  await userEvent.type(destinationField(), destination);
+}
+
 async function fillSingleRideWithoutVehicle() {
   await userEvent.type(destinationField(), 'Terminal Santo Antônio');
   await userEvent.type(departureField(), TYPED_DEPARTURE);
@@ -135,6 +141,37 @@ describe('RideFormDialog', () => {
     expect(await screen.findByRole('heading', { name: OFFER_MODE.title })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: OFFER_MODE.submitLabel })).toBeInTheDocument();
     expect(destinationField()).toHaveValue('');
+  });
+
+  it('should open the offer with the submit released, since there is nothing to compare', async () => {
+    renderComponent();
+    await screen.findByRole('heading', { name: OFFER_MODE.title });
+
+    expect(screen.getByRole('button', { name: OFFER_MODE.submitLabel })).toBeEnabled();
+  });
+
+  it('should hold the save of an untouched ride and release it once a field changes', async () => {
+    renderComponent({ ...DEFAULT_PROPS, ride: RIDE });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+    const save = screen.getByRole('button', { name: EDIT_MODE.submitLabel });
+
+    expect(save).toBeDisabled();
+
+    await retypeDestination(EDITED_DESTINATION);
+
+    expect(save).toBeEnabled();
+  });
+
+  it('should hold the save again once the change is undone', async () => {
+    renderComponent({ ...DEFAULT_PROPS, ride: RIDE });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+    const save = screen.getByRole('button', { name: EDIT_MODE.submitLabel });
+    await retypeDestination(EDITED_DESTINATION);
+    expect(save).toBeEnabled();
+
+    await retypeDestination(RIDE.destination);
+
+    expect(save).toBeDisabled();
   });
 
   it('should explain the ride types beside the type field, as the filter does', async () => {
@@ -217,12 +254,13 @@ describe('RideFormDialog', () => {
     );
     renderComponent({ ...DEFAULT_PROPS, ride: RIDE });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
+    await retypeDestination(EDITED_DESTINATION);
 
     await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
-      destination: RIDE.destination,
+      destination: EDITED_DESTINATION,
       departureDate: RIDE.departureDate,
       departureTime: '07:30',
       rideType: RIDE.rideType,
@@ -253,12 +291,13 @@ describe('RideFormDialog', () => {
     server.use(http.put(`${RIDES_URL}/:id`, () => new HttpResponse(null, { status: 500 })));
     renderComponent({ ...DEFAULT_PROPS, ride: RIDE });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
+    await retypeDestination(EDITED_DESTINATION);
 
     await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
 
     expect(await screen.findByText(EDIT_MODE.failed)).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
-    expect(destinationField()).toHaveValue(RIDE.destination);
+    expect(destinationField()).toHaveValue(EDITED_DESTINATION);
   });
 
   it('should offer the ride the form describes', async () => {
@@ -433,12 +472,13 @@ describe('RideFormDialog', () => {
     };
     renderComponent({ ...DEFAULT_PROPS, ride: monthly });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
+    await retypeDestination(EDITED_DESTINATION);
 
     await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(body).toEqual({
-      destination: monthly.destination,
+      destination: EDITED_DESTINATION,
       departureDate: monthly.departureDate,
       departureTime: '07:30',
       rideType: monthly.rideType,

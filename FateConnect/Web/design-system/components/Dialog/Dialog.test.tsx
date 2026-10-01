@@ -1,6 +1,7 @@
-import { render, screen, userEvent } from '@app/test/testing-library';
+import { render, screen, userEvent, within } from '@app/test/testing-library';
 
 import { CLOSE_LABEL } from './constants';
+import type { DialogSubmitProps } from './DialogSubmit';
 import { Dialog, type DialogProps } from '.';
 
 const DEFAULT_PROPS: DialogProps = {
@@ -11,6 +12,14 @@ const DEFAULT_PROPS: DialogProps = {
 };
 
 const renderComponent = (props = DEFAULT_PROPS) => render(<Dialog {...props} />);
+
+const submitFormWith = (state: Pick<DialogSubmitProps, 'disabled' | 'loading'>) => (
+  <Dialog.Form onSubmit={vi.fn()}>
+    <Dialog.Footer>
+      <Dialog.Submit icon={null} label="Enviar" {...state} />
+    </Dialog.Footer>
+  </Dialog.Form>
+);
 
 // O botão de fechar só aparece abaixo do breakpoint mobile, por CSS. O jsdom não
 // avalia media query, então ele fica com `display: none` e precisa ser buscado
@@ -127,5 +136,30 @@ describe('Dialog', () => {
     });
 
     expect(screen.getByRole('button', { name: 'Enviar' })).toBeDisabled();
+  });
+
+  it('should hold the submit while it is disabled, without the loading indicator', () => {
+    renderComponent({ ...DEFAULT_PROPS, children: submitFormWith({ disabled: true }) });
+
+    const submit = screen.getByRole('button', { name: 'Enviar' });
+    expect(submit).toBeDisabled();
+    expect(within(submit).queryByRole('progressbar')).not.toBeInTheDocument();
+  });
+
+  it('should release the submit once it is no longer disabled', () => {
+    renderComponent({ ...DEFAULT_PROPS, children: submitFormWith({ disabled: false }) });
+
+    expect(screen.getByRole('button', { name: 'Enviar' })).toBeEnabled();
+  });
+
+  it('should show the loading indicator when it is disabled and loading at once', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: submitFormWith({ disabled: true, loading: true }),
+    });
+
+    const submit = screen.getByRole('button', { name: 'Enviar' });
+    expect(submit).toBeDisabled();
+    expect(within(submit).getByRole('progressbar')).toBeInTheDocument();
   });
 });

@@ -33,6 +33,7 @@ const PNG_BYTES = '\x89PNG\r\n\x1a\n';
 const OCCURRED_AT = new Date(2026, 7, 11);
 /** O seletor do MUI recebe a data seção a seção, na ordem de pt-BR. */
 const TYPED_DATE = format(OCCURRED_AT, 'ddMMyyyy');
+const EDITED_NAME = 'Carteira marrom';
 
 const LOST_ITEM: LostItem = {
   id: 'c4a1f0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
@@ -93,6 +94,11 @@ function photoOf(fileName: string, type: string, sizeInBytes?: number): File {
   return photo;
 }
 
+async function retypeName(name: string) {
+  await userEvent.clear(nameField());
+  await userEvent.type(nameField(), name);
+}
+
 async function fillNewItem() {
   await userEvent.type(nameField(), 'Garrafa térmica');
   await userEvent.click(
@@ -128,6 +134,51 @@ describe('LostItemFormDialog', () => {
     expect(await screen.findByRole('heading', { name: REGISTER_MODE.title })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: REGISTER_MODE.submitLabel })).toBeInTheDocument();
     expect(nameField()).toHaveValue('');
+  });
+
+  it('should open the registration with the submit released, since there is nothing to compare', async () => {
+    renderComponent();
+    await screen.findByRole('heading', { name: REGISTER_MODE.title });
+
+    expect(screen.getByRole('button', { name: REGISTER_MODE.submitLabel })).toBeEnabled();
+  });
+
+  it('should hold the save of an untouched item and release it once a field changes', async () => {
+    renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+    const save = screen.getByRole('button', { name: EDIT_MODE.submitLabel });
+
+    expect(save).toBeDisabled();
+
+    await retypeName(EDITED_NAME);
+
+    expect(save).toBeEnabled();
+  });
+
+  it('should hold the save again once the name goes back to the stored one', async () => {
+    renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+    const save = screen.getByRole('button', { name: EDIT_MODE.submitLabel });
+    await retypeName(EDITED_NAME);
+    expect(save).toBeEnabled();
+
+    await retypeName(LOST_ITEM.name);
+
+    expect(save).toBeDisabled();
+  });
+
+  it('should count a chosen photo as a change, and dropping it as undoing it', async () => {
+    renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
+    await screen.findByRole('heading', { name: EDIT_MODE.title });
+    const save = screen.getByRole('button', { name: EDIT_MODE.submitLabel });
+
+    await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
+
+    expect(save).toBeEnabled();
+
+    await userEvent.click(await screen.findByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
+
+    expect(save).toBeDisabled();
   });
 
   it('should edit the item it gets, already filled in', async () => {
@@ -186,12 +237,13 @@ describe('LostItemFormDialog', () => {
     );
     renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
+    await retypeName(EDITED_NAME);
 
     await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(fields).toEqual({
-      Name: LOST_ITEM.name,
+      Name: EDITED_NAME,
       LostAndFoundType: LOST_ITEM.lostAndFoundType,
       Place: LOST_ITEM.place,
       OcurredOn: '2026-08-11',
@@ -205,12 +257,13 @@ describe('LostItemFormDialog', () => {
     );
     renderComponent({ ...DEFAULT_PROPS, item: LOST_ITEM });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
+    await retypeName(EDITED_NAME);
 
     await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
 
     expect(await screen.findByText(EDIT_MODE.failed)).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
-    expect(nameField()).toHaveValue(LOST_ITEM.name);
+    expect(nameField()).toHaveValue(EDITED_NAME);
   });
 
   it('should close and hand over to the contact notice when the api asks for a contact', async () => {

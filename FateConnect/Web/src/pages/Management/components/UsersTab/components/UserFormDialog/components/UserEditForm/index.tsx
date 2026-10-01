@@ -76,7 +76,7 @@ export function UserEditForm({ user, isOwnAccount, onClose }: UserEditFormProps)
     control,
     register,
     setError,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = form;
   const phoneField = useMaskedField(register('phone'), maskPhone);
   const contactIsRequired = hasContact(user);
@@ -184,6 +184,7 @@ export function UserEditForm({ user, isOwnAccount, onClose }: UserEditFormProps)
           icon={<SaveIcon fontSize="small" />}
           label={C.SUBMIT_LABEL}
           loading={isPending}
+          disabled={!isDirty}
         />
       </Dialog.Footer>
     </Dialog.Form>

@@ -7,11 +7,19 @@ export type DialogSubmitProps = Readonly<{
   icon: ReactNode;
   label: string;
   loading?: boolean;
+  disabled?: boolean;
 }>;
 
-export function DialogSubmit({ icon, label, loading }: DialogSubmitProps) {
+export function DialogSubmit({ icon, label, loading, disabled }: DialogSubmitProps) {
   return (
-    <S.SubmitButton type="submit" variant="contained" color="secondary" fullWidth loading={loading}>
+    <S.SubmitButton
+      type="submit"
+      variant="contained"
+      color="secondary"
+      fullWidth
+      loading={loading}
+      disabled={disabled}
+    >
       {icon}
       <Typography variant="subtitleBold" color="inherit">
         {label}
