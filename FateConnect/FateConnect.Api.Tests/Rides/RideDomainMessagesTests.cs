@@ -14,8 +14,9 @@ public class RideDomainMessagesTests
         string destination = "Fatec Sorocaba",
         DateOnly? departureDate = null,
         EnumRideType rideType = EnumRideType.Solidarity,
+        EnumVehicleType vehicleType = EnumVehicleType.Car,
         int driverId = 1) =>
-        new(destination, departureDate ?? FutureDate, DepartureTime, rideType, driverId);
+        new(destination, departureDate ?? FutureDate, DepartureTime, rideType, vehicleType, driverId);
 
     [Fact]
     public void ARideInThePast_AnswersTheScheduleMessageInPortuguese()
@@ -44,6 +45,26 @@ public class RideDomainMessagesTests
             () => CreateRide(rideType: (EnumRideType)99));
 
         Assert.Equal("Tipo de carona inválido.", exception.Message);
+    }
+
+    [Fact]
+    public void ARideWithAnUndefinedVehicle_AnswersTheVehicleMessageInPortuguese()
+    {
+        InvalidVehicleTypeException exception = Assert.Throws<InvalidVehicleTypeException>(
+            () => CreateRide(vehicleType: (EnumVehicleType)99));
+
+        Assert.Equal("Veículo inválido.", exception.Message);
+    }
+
+    [Fact]
+    public void ARideEditedToAnUndefinedVehicle_IsRefusedAndKeepsItsVehicle()
+    {
+        Ride ride = CreateRide(vehicleType: EnumVehicleType.Motorcycle);
+
+        Assert.Throws<InvalidVehicleTypeException>(
+            () => ride.UpdateBasicAttributes(null, null, (EnumVehicleType)99, null));
+
+        Assert.Equal(EnumVehicleType.Motorcycle, ride.VehicleType);
     }
 
     [Fact]

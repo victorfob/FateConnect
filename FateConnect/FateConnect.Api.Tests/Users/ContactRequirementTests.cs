@@ -17,6 +17,7 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
         departureTime = "08:30:00",
         rideType = "Solidarity",
+        vehicleType = "Car",
         description = "Vaga para quem sai do campus.",
     };
 

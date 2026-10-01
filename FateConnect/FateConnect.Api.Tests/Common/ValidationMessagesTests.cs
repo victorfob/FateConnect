@@ -27,6 +27,14 @@ public class ValidationMessagesTests
     }
 
     [Fact]
+    public void AnUndefinedVehicle_IsRejectedInPortuguese()
+    {
+        List<ValidationResult> results = Validate(new FilterRideDto { VehicleType = (EnumVehicleType)99 });
+
+        Assert.Contains(results, result => result.ErrorMessage == "Veículo inválido");
+    }
+
+    [Fact]
     public void AnUndefinedGender_IsRejectedInPortuguese()
     {
         List<ValidationResult> results = Validate(new CreateUserDto
