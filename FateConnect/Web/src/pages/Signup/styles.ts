@@ -82,7 +82,6 @@ export const SubmitContainer = styled(Stack)(({ theme }) => ({
     maxWidth: `${SUBMIT_MAX_WIDTH_REM}rem`,
     alignSelf: 'center',
     height: `${SUBMIT_HEIGHT_PX}px`,
-    borderRadius: theme.radius(radiusScale.component),
   },
 }));
 

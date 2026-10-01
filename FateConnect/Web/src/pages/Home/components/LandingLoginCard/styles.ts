@@ -44,7 +44,6 @@ export const SubmitRow = styled(Box)(({ theme }) => ({
   '& .MuiButton-root': {
     width: '100%',
     height: `${SUBMIT_HEIGHT_PX}px`,
-    borderRadius: theme.radius(radiusScale.component),
   },
 }));
 
