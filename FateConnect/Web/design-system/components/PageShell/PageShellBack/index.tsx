@@ -17,9 +17,9 @@ export type PageShellBackProps = Readonly<{
 
 export function PageShellBack({ label, icon, ...rest }: PageShellBackProps) {
   return (
-    <S.BackAction {...rest} aria-label={label}>
+    <S.BackAction {...rest} variant="chrome" size="large" aria-label={label}>
       {icon}
-      <S.BackLabel variant="subtitleBold" color="inherit">
+      <S.BackLabel component="span" variant="inherit">
         {label}
       </S.BackLabel>
     </S.BackAction>

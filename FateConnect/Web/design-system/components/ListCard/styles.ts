@@ -18,7 +18,6 @@ const { none, xxs, sm, md } = spacingScale;
 const OWN_STRIPE_PX = 4;
 const HAIRLINE = '1px';
 /** Alvo de toque no mínimo aceitável: o glifo cresce dentro dele, ele não encolhe. */
-const ACTION_BUTTON_SIZE_PX = 32;
 
 const STYLE_ONLY_PROPS: ReadonlySet<string> = new Set(['own', 'hasMedia']);
 
@@ -92,14 +91,9 @@ export const ActionButtons = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
 
-  '& .MuiIconButton-root': {
-    width: `${ACTION_BUTTON_SIZE_PX}px`,
-    height: `${ACTION_BUTTON_SIZE_PX}px`,
-    padding: theme.space(xxs),
-    color: theme.palette.text.primary,
-  },
+  '& .MuiIconButton-root': { color: theme.palette.text.primary },
   // O glifo do MUI mede `1em`, então o token vai no `font-size`. Com 24px ele
-  // ocupa o botão inteiro menos o recuo, sem encostar na borda.
+  // cabe no botão `small` sem encostar na borda.
   '& .MuiIconButton-root svg': {
     fontSize: `${iconSizeTokens.md}px`,
   },

@@ -58,7 +58,7 @@ function FilterDialog({ active, onSubmit, onClear, children }: FilterDialogProps
   return (
     <>
       <S.TriggerBadge variant="dot" color="secondary" invisible={!active}>
-        <IconButton type="button" label={title} onClick={handleOpen}>
+        <IconButton type="button" size="large" label={title} onClick={handleOpen}>
           <FilterAltIcon />
         </IconButton>
       </S.TriggerBadge>

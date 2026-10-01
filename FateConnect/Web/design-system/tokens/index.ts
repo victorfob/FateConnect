@@ -1,6 +1,8 @@
 export { spacingScale } from './spacing';
 export type { SpacingToken } from './spacing';
 export { radiusScale } from './radius';
+export { buttonHeightTokens } from './button';
+export type { ButtonSizeToken } from './button';
 export type { RadiusToken } from './radius';
 export {
   colorTokens,

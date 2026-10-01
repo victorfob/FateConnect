@@ -50,7 +50,7 @@ export function AccountMenu() {
 
   return (
     <>
-      <S.AvatarTrigger color="inherit" label={C.TRIGGER_LABEL} onClick={handleOpen}>
+      <S.AvatarTrigger color="inherit" size="large" label={C.TRIGGER_LABEL} onClick={handleOpen}>
         <InitialsAvatar
           initials={initials}
           label={userName}
