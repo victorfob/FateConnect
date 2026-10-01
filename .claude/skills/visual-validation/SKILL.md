@@ -23,7 +23,7 @@ Com dois servidores de dev no ar, toda medição leva a porta lida da página (s
 
 ## Evidência
 
-⛔ **As capturas da validação são a evidência do PR, e a entrega é sua, sem pedido.** Tire em resolução cheia, salve numa pasta da issue com nome por tela, largura e tema, e, ao abrir o PR, mande o conjunto inteiro na ordem do PR (`SendUserFile`) e abra a pasta. Commit novo que muda o que se vê reenvia o conjunto inteiro, não só a captura nova.
+⛔ **As capturas da validação são a evidência do PR, e a entrega é sua, sem pedido.** Tire em resolução cheia, salve numa pasta da issue com nome por tela, largura e tema, e, ao abrir o PR, mande o conjunto inteiro na ordem do PR (`SendUserFile`) e abra a pasta. Commit novo depois de as capturas estarem no PR: na pasta e no envio ficam só as que mudaram, dizendo qual substitui qual.
 
 - A evidência mostra o estado atual do PR: a captura de antes da correção só sai a pedido.
 - Estado que o painel não mostra (hover forçado, largura trocada sem recarregar) sai de um Chrome headless pelo protocolo de depuração, com `Page.captureScreenshot` (`references/measurement-pitfalls.md`).
