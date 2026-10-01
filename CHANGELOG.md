@@ -16,6 +16,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona o aviso de contatos pendentes ao ofertar carona ou cadastrar item sem contato, no lugar do formulário e também quando a API recusa, com o caminho para o perfil (#517) [Frontend]
 - Adiciona o tipo de veículo à carona, carro ou moto, obrigatório ao ofertar e ao editar e devolvido na leitura; as caronas já ofertadas ficam como carro, e a requisição sem o veículo passa a ser recusada (#520) [Backend]
 - Adiciona o filtro de caronas pelo tipo de veículo; sem ele, a listagem segue com todas (#520) [Backend]
+- Adiciona a escolha do veículo, carro ou moto, ao ofertar e ao editar carona, obrigatória como a API passou a exigir (#521) [Frontend]
+- Adiciona ao cartão de carona se ela é de carro ou de moto, com ícone (#521) [Frontend]
+- Adiciona o filtro de caronas por veículo, com a escolha guardada no endereço (#521) [Frontend]
 
 ### Changed
 
@@ -25,6 +28,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a criar a conta sem pedir telefone e e-mail de contato: os dois entram juntos pelo perfil, opcionais até o primeiro cadastro e sem poder ser apagados depois, e a edição de contas da gestão segue a mesma regra (#517) [Frontend]
 - Passa a enviar como sigilosa a denúncia de quem está sem contato, com a opção de sigilo ligada e travada e uma nota dizendo como liberá-la (#517) [Frontend]
 - Passa a declarar na política de privacidade e nos termos de uso que o contato é opcional, cadastrado pelo perfil com os dois juntos e sem poder ser apagado, e o que fica bloqueado sem ele, em nova versão dos termos (#517) [Frontend]
+- Passa a citar o veículo entre os dados da carona na política de privacidade e nos termos de uso, em nova versão dos dois documentos (#521) [Frontend]
 
 ### Fixed
 
