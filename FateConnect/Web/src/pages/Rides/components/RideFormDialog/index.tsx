@@ -34,7 +34,10 @@ export type RideFormDialogProps = Readonly<{
   onContactRequired: VoidFunction;
 }>;
 
-/** Ofertar e editar são o mesmo formulário: só mudam os textos e o verbo HTTP. */
+/**
+ * Ofertar e editar são o mesmo formulário: mudam os textos, o verbo HTTP e, na
+ * edição, o envio que espera alguma mudança.
+ */
 export function RideFormDialog({ open, onClose, ride, onContactRequired }: RideFormDialogProps) {
   const queryClient = useQueryClient();
   const { notifySuccess, notifyError } = useNotification();
@@ -44,6 +47,7 @@ export function RideFormDialog({ open, onClose, ride, onContactRequired }: RideF
 
     return C.EDIT_MODE;
   }, [ride]);
+  const isEditing = ride !== undefined;
 
   const { mutate, isPending } = useMutation({
     mutationFn: (input: RideInput) => {
@@ -94,7 +98,10 @@ export function RideFormDialog({ open, onClose, ride, onContactRequired }: RideF
     defaultValues: EMPTY_RIDE_FORM,
     disabled: isPending,
   });
-  const { reset } = form;
+  const {
+    reset,
+    formState: { isDirty },
+  } = form;
   const holidays = useHolidayDays(holidayYears, open);
 
   useEffect(() => {
@@ -124,6 +131,7 @@ export function RideFormDialog({ open, onClose, ride, onContactRequired }: RideF
               icon={<SubmitIcon fontSize="small" />}
               label={mode.submitLabel}
               loading={isPending}
+              disabled={isEditing && !isDirty}
             />
           </Dialog.Footer>
         </Dialog.Form>
