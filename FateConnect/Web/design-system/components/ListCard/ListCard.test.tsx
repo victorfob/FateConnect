@@ -2,6 +2,7 @@ import { render, screen } from '@app/test/testing-library';
 import { IconButton } from '@ds-root/components/IconButton';
 import { StatusTag } from '@ds-root/components/StatusTag';
 import { EditIcon } from '@ds-root/icons';
+import { createAppTheme } from '@ds-root/theme';
 import { iconSizeTokens } from '@ds-root/tokens';
 
 import { ListCard, type ListCardProps } from '.';
@@ -19,6 +20,9 @@ const TOUCH_TARGET = '32px';
 /** Os recuos são declarados em `rem`; o alvo de toque e o glifo, em `px`. */
 const REM_IN_PX = 16;
 
+const NARROW_MEDIA = createAppTheme().breakpoints.down('md').replace('@media', '');
+const BEFORE = '::before';
+
 function toNumber(value: string): number {
   return Number.parseFloat(value);
 }
@@ -27,6 +31,53 @@ function styleOf(candidate: Element | null, what: string): CSSStyleDeclaration {
   if (!candidate) throw new Error(`Não renderizou ${what}.`);
 
   return getComputedStyle(candidate);
+}
+
+function withoutSpaces(text: string): string {
+  return text.replaceAll(/\s/g, '');
+}
+
+function sheetRules(): CSSRule[] {
+  return Array.from(document.styleSheets).flatMap((sheet) => Array.from(sheet.cssRules));
+}
+
+function narrowRules(): CSSRule[] {
+  const narrowMedia = withoutSpaces(NARROW_MEDIA);
+
+  return sheetRules()
+    .filter((rule) => rule instanceof CSSMediaRule)
+    .filter((rule) => withoutSpaces(rule.media.mediaText) === narrowMedia)
+    .flatMap((rule) => Array.from(rule.cssRules));
+}
+
+/**
+ * O jsdom não aplica `@media` nem calcula pseudo-elemento no `getComputedStyle`:
+ * a folha que o Emotion escreveu é lida direto.
+ */
+function declarationsFor(rules: CSSRule[], element: Element, pseudoElement = ''): string {
+  return rules
+    .filter((rule) => rule instanceof CSSStyleRule)
+    .filter((rule) => rule.selectorText.endsWith(pseudoElement))
+    .filter((rule) => element.matches(rule.selectorText.replace(BEFORE, '')))
+    .map((rule) => withoutSpaces(rule.style.cssText))
+    .join(';');
+}
+
+function renderInfoRow() {
+  render(
+    <ListCard>
+      <ListCard.InfoRow>
+        <ListCard.InfoItem>{FIRST_INFO}</ListCard.InfoItem>
+        <ListCard.InfoItem>{SECOND_INFO}</ListCard.InfoItem>
+      </ListCard.InfoRow>
+    </ListCard>,
+  );
+
+  const item = screen.getByText(FIRST_INFO);
+  const row = item.parentElement;
+  if (!row) throw new Error('Não renderizou a fileira.');
+
+  return { row, item };
 }
 
 const DEFAULT_PROPS: ListCardProps = { children: TITLE };
@@ -69,6 +120,20 @@ describe('ListCard', () => {
     });
 
     expect(screen.getByRole('article')).toHaveTextContent(`${FIRST_INFO}${SECOND_INFO}`);
+  });
+
+  it('should keep the info items in one line with dividers from md up', () => {
+    const { row, item } = renderInfoRow();
+
+    expect(getComputedStyle(row).flexDirection).toBe('row');
+    expect(declarationsFor(sheetRules(), item, BEFORE)).toContain('width:1px');
+  });
+
+  it('should stack the info items one per line without dividers below md', () => {
+    const { row, item } = renderInfoRow();
+
+    expect(declarationsFor(narrowRules(), row)).toContain('flex-direction:column');
+    expect(declarationsFor(narrowRules(), item, BEFORE)).toContain('display:none');
   });
 
   it('should break a word without spaces inside the card instead of overflowing it', () => {

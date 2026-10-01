@@ -103,6 +103,10 @@ export const InfoRow = styled(Stack)(({ theme }) => ({
   // apaga a do primeiro item de cada linha — inclusive a da linha que quebrou.
   overflow: 'hidden',
   color: theme.palette.text.secondary,
+
+  // No estreito, um por linha: em linha a quebra dependeria do tamanho do
+  // texto, e o item que descesse sozinho pareceria solto.
+  [theme.breakpoints.down('md')]: { flexDirection: 'column' },
 }));
 
 export const InfoItem = styled(Stack)(({ theme }) => ({
@@ -127,6 +131,8 @@ export const InfoItem = styled(Stack)(({ theme }) => ({
     color: theme.palette.brandText,
     fontSize: `${iconSizeTokens.sm}px`,
   },
+
+  [theme.breakpoints.down('md')]: { '&::before': { display: 'none' } },
 }));
 
 export const Description = styled(Box)(({ theme }) => ({
