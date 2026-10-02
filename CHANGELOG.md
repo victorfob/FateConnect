@@ -8,6 +8,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona a instalação do site na tela inicial do celular, como um app, com o ícone do FateConnect e abertura sem a barra do navegador; o app instalado continua dependendo da internet (#539) [Frontend]
 - Adiciona a miniatura da foto de perfil ao contato de quem publica uma carona, um item ou uma denúncia identificada, ao perfil e à lista de contas da gestão; quem não tem foto vem sem miniatura (#510) [Backend]
 - Adiciona a foto de perfil de quem publicou ao contato de uma carona, de um item ou de uma denúncia, baixada só ao abrir o contato: o círculo pulsa enquanto ela chega, e sem foto ou se ela não carregar ficam as iniciais (#511) [Frontend]
 - Adiciona a foto de perfil de cada conta ao cartão da lista de usuários da gestão, com as iniciais para quem não tem foto (#511) [Frontend]
