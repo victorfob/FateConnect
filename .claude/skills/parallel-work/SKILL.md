@@ -23,6 +23,7 @@ description: "Trabalho em paralelo com worktrees e subagentes. Use quando o pedi
 
 - **A worktree não tem `node_modules`:** symlink para o do checkout principal, senão não há ESLint, `tsc` nem Vitest.
 - `.claude/worktrees/` é ignorada pelo git; worktree de agente mora ali.
+- ⛔ **O prompt do agente nomeia quando ele para e reporta:** premissa da issue que a medição derruba, ou escolha que muda algo fora do escopo dela. Sem isso ele compensa no código a decisão que era do usuário.
 - **Agente que cai:** confira o que já foi commitado na branch dele e assuma a fatia; relançar às cegas refaz trabalho.
 - **A integração é sua:** cherry-pick da branch da worktree para a da tarefa, e os gates valem no **estado integrado** — o verde de cada worktree é sobre uma árvore que ninguém vai mergear.
 

@@ -25,6 +25,7 @@ public class RideRepetitionListingTests
             ["departureDate"] = Iso(start),
             ["departureTime"] = $"{DepartureHour}:00:00",
             ["rideType"] = "Solidarity",
+            ["vehicleType"] = "Car",
             ["frequency"] = frequency,
             ["repeatUntil"] = repeatUntil is null ? null : Iso(repeatUntil.Value),
         });
@@ -84,7 +85,8 @@ public class RideRepetitionListingTests
         using ApiFactory factory = new() { Clock = clock };
         HttpClient client = factory.CreateClientForNewUser("Ana Beatriz Nogueira");
         ReadRide weekly = await OfferAsync(client, "Weekly", day, day.AddDays(14));
-        ReadRide later = await OfferAsync(client, "Once", day.AddDays(3), null);
+        DateOnly laterDay = Enumerable.Range(2, 5).Select(day.AddDays).First(candidate => !IsHoliday(candidate));
+        ReadRide later = await OfferAsync(client, "Once", laterDay, null);
         clock.Now = InProductTimeZone(day.AddDays(1), DepartureHour);
 
         PagedRides page = (await client.GetFromJsonAsync<PagedRides>("/Rides"))!;
@@ -121,6 +123,7 @@ public class RideRepetitionListingTests
         {
             departureDate = Iso(shorterMonthDeparture),
             description = "Sai do portão principal.",
+            vehicleType = "Car",
         });
         Assert.Equal(HttpStatusCode.OK, update.StatusCode);
         clock.Now = InProductTimeZone(shorterMonthDeparture.AddDays(1), DepartureHour);

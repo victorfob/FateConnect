@@ -20,6 +20,7 @@ public class Ride
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
     public EnumRideType RideType { get; private set; }
+    public EnumVehicleType VehicleType { get; private set; }
     public string? Description { get; private set; }
     public bool IsActive { get; private set; }
     public int DriverId { get; private set; }
@@ -35,12 +36,14 @@ public class Ride
         DateOnly departureDate,
         TimeOnly departureTime,
         EnumRideType rideType,
+        EnumVehicleType vehicleType,
         int driverId,
         string? description = null)
     {
         ValidateDestination(destination);
         ValidateDepartureDateTime(departureDate, departureTime);
         ValidateRideType(rideType);
+        ValidateVehicleType(vehicleType);
         ValidateDriver(driverId);
 
         Id = Guid.NewGuid();
@@ -51,6 +54,7 @@ public class Ride
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
         RideType = rideType;
+        VehicleType = vehicleType;
         Description = description?.Trim();
         IsActive = true;
         Frequency = EnumRideFrequency.Once;
@@ -70,8 +74,12 @@ public class Ride
     public void UpdateBasicAttributes(
         string? destination,
         EnumRideType? rideType,
+        EnumVehicleType vehicleType,
         string? description)
     {
+        ValidateVehicleType(vehicleType);
+        VehicleType = vehicleType;
+
         if (destination is not null)
         {
             ValidateDestination(destination);
@@ -215,6 +223,12 @@ public class Ride
         if (isInvalidRideType)
             throw new InvalidRideTypeException();
 
+    }
+
+    private static void ValidateVehicleType(EnumVehicleType vehicleType)
+    {
+        if (!Enum.IsDefined(vehicleType))
+            throw new InvalidVehicleTypeException();
     }
 
     private static void ValidateDepartureDateTime(DateOnly date, TimeOnly time)

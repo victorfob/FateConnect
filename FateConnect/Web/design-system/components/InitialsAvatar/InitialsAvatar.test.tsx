@@ -54,4 +54,15 @@ describe('InitialsAvatar', () => {
     );
     expect(avatar).toHaveStyle({ width: '96px', height: '96px' });
   });
+
+  it('should pulse in place of the initials while the photo loads, in the same circle', () => {
+    renderComponent({ ...DEFAULT_PROPS, size: 'large', loading: true });
+
+    const avatar = screen.getByRole('img', { name: 'Maria Silva' });
+    expect(avatar).toHaveAttribute('aria-busy', 'true');
+    expect(avatar).toHaveStyle({ width: '48px', height: '48px', borderRadius: '50%' });
+    // A onda do tema passa o hover quase transparente sobre o cinza e some num círculo pequeno.
+    expect(avatar).toHaveClass('MuiSkeleton-pulse');
+    expect(avatar).not.toHaveTextContent('MS');
+  });
 });

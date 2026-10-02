@@ -9,11 +9,6 @@ export const DENUNCIATION_CARD_MARKERS = {
   confidential: 'Sigilosa',
 };
 
-export const DESCRIPTION_TOGGLE_LABELS = {
-  expand: 'Expandir descrição',
-  collapse: 'Recolher descrição',
-};
-
 export const DOWNLOAD_LABEL = 'Baixar a foto';
 
 /** A data no nome diz o que um GUID não diria na pasta de downloads. */

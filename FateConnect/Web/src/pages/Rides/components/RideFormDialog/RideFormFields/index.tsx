@@ -3,13 +3,14 @@ import { Dialog, Input } from '@design-system';
 import { toZonedTime } from 'date-fns-tz';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
+import { useProfile } from '@app/hooks/useProfile';
 import { RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
 import { RideFrequencyEnum } from '@app/services/rides/types';
 
+import { destinationShortcuts } from '../helpers/destinationShortcuts';
 import { isRuledOutDeparture, repeatUntilRange } from '../helpers/recurrenceDays';
 import type { RideFormInput, RideFormValues } from '../schema';
 import * as C from '../constants';
-import * as S from './styles';
 
 type RideFormFieldsProps = Readonly<{ holidays: ReadonlySet<string> }>;
 
@@ -20,6 +21,9 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
     setValue,
     formState: { errors },
   } = useFormContext<RideFormInput, unknown, RideFormValues>();
+  const { data: profile } = useProfile();
+  const neighborhood = profile?.neighborhood;
+  const shortcuts = useMemo(() => destinationShortcuts(neighborhood), [neighborhood]);
   const description = useWatch({ control, name: 'description' });
   const frequency = useWatch({ control, name: 'frequency' });
   const departure = useWatch({ control, name: 'departure' });
@@ -42,14 +46,21 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
   return (
     <Dialog.Fields>
       <Dialog.Fields.Wide>
-        <Input
-          {...register('destination')}
-          label={C.RIDE_FORM_LABELS.destination}
-          required
-          fullWidth
-          placeholder={C.RIDE_FORM_PLACEHOLDERS.destination}
-          maxLength={C.RIDE_LIMITS.maxDestination}
-          error={errors.destination?.message}
+        <Controller
+          name="destination"
+          control={control}
+          render={({ field }) => (
+            <Input.Autocomplete
+              {...field}
+              label={C.RIDE_FORM_LABELS.destination}
+              required
+              options={C.DESTINATION_SUGGESTIONS}
+              emptyInputSuggestions={shortcuts}
+              placeholder={C.RIDE_FORM_PLACEHOLDERS.destination}
+              maxLength={C.RIDE_LIMITS.maxDestination}
+              error={errors.destination?.message}
+            />
+          )}
         />
       </Dialog.Fields.Wide>
 
@@ -69,6 +80,20 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
       />
 
       <Controller
+        name="vehicleType"
+        control={control}
+        render={({ field }) => (
+          <Input.Select
+            {...field}
+            label={C.RIDE_FORM_LABELS.vehicleType}
+            options={C.VEHICLE_TYPE_SELECT_OPTIONS}
+            required
+            error={errors.vehicleType?.message}
+          />
+        )}
+      />
+
+      <Controller
         name="frequency"
         control={control}
         render={({ field }) => (
@@ -82,48 +107,48 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
         )}
       />
 
-      <S.DepartureCell isAlone={!hasRecurrence}>
-        <Controller
-          name="departure"
-          control={control}
-          render={({ field }) => (
-            <Input.DateTime
-              name={field.name}
-              label={
-                hasRecurrence ? C.RIDE_FORM_LABELS.recurrenceStart : C.RIDE_FORM_LABELS.departure
-              }
-              required
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              disabled={field.disabled}
-              minDate={today}
-              shouldDisableDate={isDepartureRuledOut}
-              error={errors.departure?.message}
-            />
-          )}
-        />
-      </S.DepartureCell>
+      <Controller
+        name="departure"
+        control={control}
+        render={({ field }) => (
+          <Input.DateTime
+            name={field.name}
+            label={
+              hasRecurrence ? C.RIDE_FORM_LABELS.recurrenceStart : C.RIDE_FORM_LABELS.departure
+            }
+            required
+            value={field.value}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            disabled={field.disabled}
+            minDate={today}
+            shouldDisableDate={isDepartureRuledOut}
+            error={errors.departure?.message}
+          />
+        )}
+      />
 
       {hasRecurrence && (
-        <Controller
-          name="repeatUntil"
-          control={control}
-          render={({ field }) => (
-            <Input.Date
-              name={field.name}
-              label={C.RIDE_FORM_LABELS.repeatUntil}
-              required
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              disabled={field.disabled}
-              minDate={repeatUntilLimits.minDate}
-              maxDate={repeatUntilLimits.maxDate}
-              error={errors.repeatUntil?.message}
-            />
-          )}
-        />
+        <Dialog.Fields.Wide>
+          <Controller
+            name="repeatUntil"
+            control={control}
+            render={({ field }) => (
+              <Input.Date
+                name={field.name}
+                label={C.RIDE_FORM_LABELS.repeatUntil}
+                required
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                disabled={field.disabled}
+                minDate={repeatUntilLimits.minDate}
+                maxDate={repeatUntilLimits.maxDate}
+                error={errors.repeatUntil?.message}
+              />
+            )}
+          />
+        </Dialog.Fields.Wide>
       )}
 
       <Dialog.Fields.Wide>

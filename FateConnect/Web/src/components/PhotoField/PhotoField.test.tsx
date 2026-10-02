@@ -1,4 +1,5 @@
 import { render, screen, userEvent } from '@app/test/testing-library';
+import { narrowDeclarationsFor } from '@app/test/utils/styleSheetRules';
 
 import { PHOTO_FIELD_TEXTS } from './constants';
 import { PhotoField, type PhotoFieldProps } from '.';
@@ -8,6 +9,7 @@ const CHOSEN_PREVIEW = 'data:image/png;base64,Y29udGXDumRv';
 const STORED_URL = 'blob:https://fateconnect.test/guardada';
 const FIELD_LABEL = 'Foto';
 const STORED_PREVIEW = { src: STORED_URL, alt: 'Foto do item' };
+const SMALL_BUTTON_HEIGHT = '32px';
 
 const onChange = vi.fn();
 
@@ -91,5 +93,28 @@ describe('PhotoField', () => {
     renderComponent({ ...DEFAULT_PROPS, disabled: true });
 
     expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeDisabled();
+  });
+
+  it('should draw both photo actions with the small button', async () => {
+    renderComponent({ ...DEFAULT_PROPS, value: photo });
+
+    expect(await screen.findByRole('button', { name: PHOTO_FIELD_TEXTS.replace })).toHaveStyle({
+      minHeight: SMALL_BUTTON_HEIGHT,
+    });
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.remove })).toHaveStyle({
+      minHeight: SMALL_BUTTON_HEIGHT,
+    });
+  });
+
+  it('should stretch the photo actions to the edge of the fields below md', async () => {
+    renderComponent({ ...DEFAULT_PROPS, value: photo });
+
+    const actions = (await screen.findByRole('button', { name: PHOTO_FIELD_TEXTS.replace }))
+      .parentElement;
+
+    expect(actions).toContainElement(
+      screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.remove }),
+    );
+    expect(narrowDeclarationsFor(actions)).toContain('flex:1');
   });
 });

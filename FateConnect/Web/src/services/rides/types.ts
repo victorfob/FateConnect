@@ -6,6 +6,11 @@ export enum RideTypeEnum {
   EGALITARIAN = 'Egalitarian',
 }
 
+export enum VehicleTypeEnum {
+  CAR = 'Car',
+  MOTORCYCLE = 'Motorcycle',
+}
+
 /** Como a carona se repete; `ONCE` é a carona de uma vez só, a de sempre. */
 export enum RideFrequencyEnum {
   ONCE = 'Once',
@@ -30,6 +35,7 @@ export type Ride = {
   departureTime: string;
   createdAt: string;
   rideType: RideTypeEnum;
+  vehicleType: VehicleTypeEnum;
   description: string | null;
   driver: UserContact;
   /**
@@ -61,6 +67,7 @@ export interface RideFilter extends PageQuery {
   dateTo?: string;
   departureShift?: RideShiftEnum;
   rideType?: RideTypeEnum;
+  vehicleType?: VehicleTypeEnum;
   /** Só as que a pessoa ofertou; o id de quem pergunta viaja fora da query. */
   onlyMine?: boolean;
 }

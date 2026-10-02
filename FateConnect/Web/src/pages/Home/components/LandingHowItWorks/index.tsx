@@ -31,7 +31,7 @@ export function LandingHowItWorks() {
                 <Typography variant="h2">{title}</Typography>
               </S.StepTitle>
               <S.StepDescription>
-                <Typography variant="subtitle">{description}</Typography>
+                <Typography variant="body">{description}</Typography>
               </S.StepDescription>
             </S.StepBody>
           </S.StepCard>

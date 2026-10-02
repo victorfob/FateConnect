@@ -17,7 +17,7 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
         _factory = factory;
     }
 
-    private sealed record RideDriver(string Name, string? Email, string? Phone);
+    private sealed record RideDriver(string Name, string? Email, string? Phone, string? ThumbnailUrl);
 
     private sealed record ReadRide(Guid Id, string Destination, RideDriver Driver, bool IsOwner);
 
@@ -27,6 +27,7 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
         departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
         departureTime = "08:30:00",
         rideType = "Solidarity",
+        vehicleType = "Car",
         description = "Vaga para quem sai do campus.",
     };
 
@@ -73,13 +74,27 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
         Assert.Equal("Ana Beatriz Nogueira", asOther.Driver.Name);
     }
 
+    [Theory]
+    [InlineData("uploads/user/perfil.png", "uploads/user/thumbnails/perfil.webp")]
+    [InlineData(null, null)]
+    public async Task ReadRide_OfADriverWithOrWithoutAPhoto_AnswersTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
+    {
+        int driverId = _factory.SeedUser("Camila Rezende Prado", imageUrl: imageUrl).Id;
+        Guid rideId = _factory.SeedRide(driverId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)), new TimeOnly(8, 30));
+        HttpClient reader = _factory.CreateClientForNewUser("Davi Moreira Castro");
+
+        ReadRide ride = (await reader.GetFromJsonAsync<ReadRide>($"/Rides/{rideId}", JsonOptions))!;
+
+        Assert.Equal(thumbnailUrl, ride.Driver.ThumbnailUrl);
+    }
+
     [Fact]
     public async Task UpdateRide_ByAnotherUser_IsForbidden()
     {
         (ReadRide ride, _, int otherUserId) = await OfferRideAsync("Itu");
 
         HttpResponseMessage response = await _factory.CreateClientFor(otherUserId)
-            .PutAsJsonAsync($"/Rides/{ride.Id}", new { description = "Sai do portão principal." });
+            .PutAsJsonAsync($"/Rides/{ride.Id}", new { description = "Sai do portão principal.", vehicleType = "Car" });
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -102,7 +117,7 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
         HttpClient driver = _factory.CreateClientFor(owner.Id);
 
         HttpResponseMessage update = await driver
-            .PutAsJsonAsync($"/Rides/{ride.Id}", new { description = "Sai do portão principal." });
+            .PutAsJsonAsync($"/Rides/{ride.Id}", new { description = "Sai do portão principal.", vehicleType = "Car" });
 
         HttpResponseMessage delete = await driver.DeleteAsync($"/Rides/{ride.Id}");
 

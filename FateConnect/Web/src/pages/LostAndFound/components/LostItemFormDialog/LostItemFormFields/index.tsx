@@ -20,7 +20,7 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
   const photo = useWatch({ control, name: 'photo' });
   const description = useWatch({ control, name: 'description' });
   const today = useMemo(() => new Date(), []);
-  const storedPhoto = useStoredImage(storedThumbnailUrl);
+  const { image: storedPhoto } = useStoredImage(storedThumbnailUrl);
 
   const storedPreview = useMemo(() => {
     if (!storedPhoto) return null;
@@ -30,7 +30,7 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
 
   // Valida na escolha: o formato e o tamanho se sabem na hora, não no envio.
   const handlePhotoChange = useCallback(
-    (chosen: File | null) => setValue('photo', chosen, { shouldValidate: true }),
+    (chosen: File | null) => setValue('photo', chosen, { shouldDirty: true, shouldValidate: true }),
     [setValue],
   );
 

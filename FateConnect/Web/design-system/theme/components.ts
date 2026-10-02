@@ -1,6 +1,14 @@
+import { autocompleteClasses } from '@mui/material/Autocomplete';
 import type { Components, CSSObject, Theme } from '@mui/material/styles';
 
-import { radiusScale, shadowTokens, spacingScale, typographyTokens } from '../tokens';
+import {
+  buttonHeightTokens,
+  radiusScale,
+  shadowTokens,
+  spacingScale,
+  typographyTokens,
+  type ButtonSizeToken,
+} from '../tokens';
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
 
@@ -9,12 +17,29 @@ const AUTOFILL_COVER_PX = 100;
 
 const { none, xxs, xs, md } = spacingScale;
 
-const SELECT_OPTION_MIN_HEIGHT_PX = 48;
+const PANEL_OPTION_MIN_HEIGHT_PX = 48;
+/** A elevação que o `Menu` do MUI dá ao painel do `select`. */
+const SELECT_PANEL_ELEVATION = 8;
 
 const SWITCH_WIDTH_PX = 48;
 const SWITCH_HEIGHT_PX = 30;
 const SWITCH_TRACK_RADIUS_PX = 15;
 const SWITCH_THUMB_TRAVEL_PX = 18;
+
+/**
+ * A opção dos painéis de escolha (o do `select` e o das sugestões) tem 48px de
+ * altura e recuo só na horizontal. O MUI declara os mesmos 48px e **desfaz** num
+ * `@media (min-width:600px)`, então o valor se repete dentro do breakpoint.
+ */
+function panelOption(theme: Theme): CSSObject {
+  return {
+    minHeight: `${PANEL_OPTION_MIN_HEIGHT_PX}px`,
+    padding: spacing(none, md),
+    // Aqui o `sm` é do MUI, não do produto: é o breakpoint em que ele encolhe a opção.
+    // eslint-disable-next-line no-restricted-syntax
+    [theme.breakpoints.up('sm')]: { minHeight: `${PANEL_OPTION_MIN_HEIGHT_PX}px` },
+  };
+}
 
 export const components: Components<Theme> = {
   MuiButton: {
@@ -51,13 +76,16 @@ export const components: Components<Theme> = {
           },
         };
 
-        // O MUI troca o fundo do botão preenchido pelo tom `dark` no hover, o
-        // que somado ao véu escurece o dobro do produto. Fixar o fundo na cor
-        // base deixa o véu ser o único escurecimento.
+        // O MUI troca o fundo do preenchido pelo tom `dark` no hover, o que somado
+        // ao véu escurece o dobro. Fixar a cor base deixa o véu como único realce;
+        // o desabilitado fica de fora porque, no toque, o hover segue preso ao botão.
         if (ownerState.variant !== 'contained') return veil;
         if (ownerState.color !== 'secondary' && ownerState.color !== 'error') return veil;
 
-        return { ...veil, '&:hover': { backgroundColor: theme.palette[ownerState.color].main } };
+        return {
+          ...veil,
+          '&:hover:not(.Mui-disabled)': { backgroundColor: theme.palette[ownerState.color].main },
+        };
       },
       // Herdar do botão não pinta o indicador: no carregamento centrado o MUI
       // deixa o rótulo `transparent`, então a cor do texto é nomeada de novo aqui.
@@ -74,6 +102,10 @@ export const components: Components<Theme> = {
       },
     },
     variants: [
+      {
+        props: { variant: 'contained' },
+        style: { borderRadius: radius(radiusScale.component) },
+      },
       {
         props: { variant: 'soft' },
         style: ({ theme }) => ({
@@ -93,7 +125,52 @@ export const components: Components<Theme> = {
           padding: spacing(xs, md),
         }),
       },
+      {
+        props: { size: 'medium' },
+        style: {
+          minHeight: `${buttonHeightTokens.medium}px`,
+          paddingTop: spacing(none),
+          paddingBottom: spacing(none),
+        },
+      },
+      {
+        props: { size: 'small' },
+        style: {
+          ...typographyTokens.caption,
+          minHeight: `${buttonHeightTokens.small}px`,
+          paddingTop: spacing(none),
+          paddingBottom: spacing(none),
+        },
+      },
+      {
+        props: { size: 'large' },
+        style: {
+          minHeight: `${buttonHeightTokens.large}px`,
+          paddingTop: spacing(none),
+          paddingBottom: spacing(none),
+        },
+      },
+      {
+        props: { variant: 'chrome' },
+        style: ({ theme }) => ({
+          borderRadius: radius(radiusScale.component),
+          color: theme.palette.chrome.contrastText,
+          backgroundColor: theme.palette.chrome.main,
+          boxShadow: shadowTokens.component,
+          padding: spacing(none, md),
+        }),
+      },
     ],
+  },
+  MuiIconButton: {
+    variants: (['small', 'medium', 'large'] satisfies ButtonSizeToken[]).map((size) => ({
+      props: { size },
+      style: {
+        width: `${buttonHeightTokens[size]}px`,
+        height: `${buttonHeightTokens[size]}px`,
+        padding: spacing(none),
+      },
+    })),
   },
   MuiCard: {
     styleOverrides: {
@@ -185,21 +262,11 @@ export const components: Components<Theme> = {
       label: { paddingLeft: spacing(xxs) },
     },
   },
-  // A opção do painel do `select` tem 48px de altura e recuo só na horizontal,
-  // como no produto. O MUI declara os mesmos 48px e **desfaz** num
-  // `@media (min-width:600px)`, então o valor se repete dentro do breakpoint.
-  MuiMenuItem: {
+  MuiMenuItem: { styleOverrides: { root: ({ theme }) => panelOption(theme) } },
+  MuiAutocomplete: {
+    defaultProps: { slotProps: { paper: { elevation: SELECT_PANEL_ELEVATION } } },
     styleOverrides: {
-      root: ({ theme }) => ({
-        minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
-        padding: spacing(none, md),
-        // Aqui o `sm` é do MUI, não do produto: esta linha desfaz o
-        // `min-width:600px` que o próprio MuiMenuItem aplica.
-        // eslint-disable-next-line no-restricted-syntax
-        [theme.breakpoints.up('sm')]: {
-          minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
-        },
-      }),
+      listbox: ({ theme }) => ({ [`& .${autocompleteClasses.option}`]: panelOption(theme) }),
     },
   },
   // O `Paper` do MUI clareia a superfície por elevação no tema escuro, e o
@@ -211,10 +278,8 @@ export const components: Components<Theme> = {
   MuiSkeleton: {
     defaultProps: { variant: 'rectangular', animation: 'wave' },
     styleOverrides: {
-      root: ({ theme }) => ({
-        backgroundColor: theme.palette.skeleton,
-        borderRadius: radius(radiusScale.sm),
-      }),
+      root: ({ theme }) => ({ backgroundColor: theme.palette.skeleton }),
+      rectangular: { borderRadius: radius(radiusScale.sm) },
     },
   },
   MuiAppBar: {

@@ -26,6 +26,9 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
         builder.Property(r => r.RideType)
               .IsRequired();
 
+        builder.Property(r => r.VehicleType)
+              .IsRequired();
+
         builder.Property(r => r.Description)
               .HasMaxLength(300);
 

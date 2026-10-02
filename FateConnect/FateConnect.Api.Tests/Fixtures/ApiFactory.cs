@@ -146,7 +146,10 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public static string UniqueContactEmail() => $"contato{Guid.NewGuid():N}@gmail.com";
 
-    public SeededUser SeedUser(string fullName, EnumProfileType profileType = EnumProfileType.Operator)
+    public SeededUser SeedUser(
+        string fullName,
+        EnumProfileType profileType = EnumProfileType.Operator,
+        string? imageUrl = null)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
@@ -164,6 +167,9 @@ public class ApiFactory : WebApplicationFactory<Program>
             createdAt: DateTime.UtcNow
         );
 
+        if (imageUrl is not null)
+            user.AttachImage(imageUrl);
+
         user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
 
         context.Users.Add(user);
@@ -175,6 +181,29 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.SaveChanges();
 
         return new SeededUser(user.Id, phone, contactEmail);
+    }
+
+    public int SeedUserWithoutContact(string fullName)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        User user = new User(
+            fatecEmail: $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+            passwordHash: "hash-sem-valor-fora-desta-suite",
+            fullName: fullName,
+            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            gender: EnumGender.Other,
+            contact: null,
+            createdAt: DateTime.UtcNow
+        );
+
+        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
+
+        context.Users.Add(user);
+        context.SaveChanges();
+
+        return user.Id;
     }
 
     public (int Id, string FatecEmail) SeedUserWithPassword(
@@ -243,13 +272,14 @@ public class ApiFactory : WebApplicationFactory<Program>
         DateOnly departureDate,
         TimeOnly departureTime,
         string destination = "Sorocaba centro",
-        string? description = null)
+        string? description = null,
+        EnumVehicleType vehicleType = EnumVehicleType.Car)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
         DateOnly acceptedDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
-        Ride ride = new(destination, acceptedDate, departureTime, EnumRideType.Solidarity, driverId, description);
+        Ride ride = new(destination, acceptedDate, departureTime, EnumRideType.Solidarity, vehicleType, driverId, description);
 
         context.Rides.Add(ride);
         context.Entry(ride).Property(entity => entity.DepartureDate).CurrentValue = departureDate;

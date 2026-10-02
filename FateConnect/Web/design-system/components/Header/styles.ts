@@ -11,10 +11,6 @@ const { none, xxs, xs, md, lg, giant } = spacingScale;
 export const HEADER_HEIGHT_PX = 64;
 
 const NAV_FONT_SIZE = '1rem';
-const NAV_FONT_WEIGHT = 500;
-const CTA_FONT_WEIGHT = 400;
-
-const MENU_BUTTON_WIDTH = '48px';
 
 const CURRENT_MARK_THICKNESS_PX = 2;
 
@@ -69,7 +65,6 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
   '& .MuiButton-root': {
     position: 'relative',
     fontSize: NAV_FONT_SIZE,
-    fontWeight: NAV_FONT_WEIGHT,
   },
   // ⛔ O preenchido fica de fora, como no realce de hover acima: ele traz o
   // próprio fundo, e o branco a 90% do cromo sobre o vermelho de botão dá 4,41.
@@ -90,9 +85,6 @@ export const DesktopNav = styled(PolymorphicStack)(({ theme }) => ({
     height: `${CURRENT_MARK_THICKNESS_PX}px`,
     backgroundColor: 'currentColor',
   },
-  // O destaque não recebe o peso reforçado, como no produto.
-  '& .MuiButton-contained': { fontWeight: CTA_FONT_WEIGHT },
-
   [theme.breakpoints.down('header')]: {
     display: 'none',
   },
@@ -120,6 +112,5 @@ export const MenuButtonSlot = styled(PolymorphicStack)(({ theme }) => ({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: MENU_BUTTON_WIDTH,
   },
 }));

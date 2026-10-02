@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { isRideFrequency } from '@app/pages/Rides/helpers/rideFrequency';
 import { isRideType } from '@app/pages/Rides/helpers/rideType';
+import { isVehicleType } from '@app/pages/Rides/helpers/rideVehicle';
 import { RideFrequencyEnum } from '@app/services/rides/types';
 import { toApiDate } from '@app/utils/apiDate';
 
@@ -93,6 +94,7 @@ export function createRideFormSchema(holidays: ReadonlySet<string>) {
       // O predicado estreita a saída: o formulário guarda texto, o schema entrega
       // `RideTypeEnum`, e o mapeamento para a requisição não precisa de conversão.
       rideType: z.string().refine(isRideType, RIDE_FORM_MESSAGES.rideTypeRequired),
+      vehicleType: z.string().refine(isVehicleType, RIDE_FORM_MESSAGES.vehicleTypeRequired),
       frequency: z.string().refine(isRideFrequency, RIDE_FORM_MESSAGES.frequencyRequired),
       repeatUntil: z.string(),
       description: z
@@ -128,6 +130,7 @@ export const EMPTY_RIDE_FORM: RideFormInput = {
   destination: '',
   departure: '',
   rideType: '',
+  vehicleType: '',
   frequency: RideFrequencyEnum.ONCE,
   repeatUntil: '',
   description: '',

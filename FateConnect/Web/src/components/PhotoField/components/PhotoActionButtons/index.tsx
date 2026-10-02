@@ -1,4 +1,3 @@
-import { Typography } from '@design-system';
 import { DeleteIcon, ImageIcon } from '@design-system/icons';
 
 import { PHOTO_FIELD_TEXTS } from '../../constants';
@@ -22,19 +21,20 @@ export function PhotoActionButtons({
 }: PhotoActionButtonsProps) {
   return (
     <>
-      <S.PhotoPickButton variant="soft" onClick={onPick} disabled={disabled}>
+      <S.PhotoPickButton variant="soft" size="small" onClick={onPick} disabled={disabled}>
         <ImageIcon fontSize="small" />
-        <Typography variant="caption" color="inherit">
-          {pickLabel}
-        </Typography>
+        {pickLabel}
       </S.PhotoPickButton>
 
       {canRemove && (
-        <S.PhotoRemoveButton variant="destructive" onClick={onRemove} disabled={disabled}>
+        <S.PhotoRemoveButton
+          variant="destructive"
+          size="small"
+          onClick={onRemove}
+          disabled={disabled}
+        >
           <DeleteIcon fontSize="small" />
-          <Typography variant="caption" color="inherit">
-            {PHOTO_FIELD_TEXTS.remove}
-          </Typography>
+          {PHOTO_FIELD_TEXTS.remove}
         </S.PhotoRemoveButton>
       )}
     </>

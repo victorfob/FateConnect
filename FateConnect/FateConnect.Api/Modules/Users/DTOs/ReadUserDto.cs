@@ -9,10 +9,11 @@ public record ReadUserDto(
     string FullName,
     DateTime BirthDate,
     EnumGender Gender,
-    string Phone,
-    string ContactEmail,
+    string? Phone,
+    string? ContactEmail,
     string? Neighborhood,
     string? ImageUrl,
+    string? ThumbnailUrl,
     EnumProfileType ProfileType,
     EnumAccountStatus Status,
     DateTime CreatedAt

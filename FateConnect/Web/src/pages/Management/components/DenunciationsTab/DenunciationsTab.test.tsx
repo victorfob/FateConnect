@@ -38,7 +38,12 @@ const OPEN_DENUNCIATION: Denunciation = {
   imageUrl: null,
   thumbnailUrl: null,
   status: DenunciationStatusEnum.OPEN,
-  user: { name: 'Maria da Silva', email: 'maria@aluno.test', phone: '15999998888' },
+  user: {
+    name: 'Maria da Silva',
+    email: 'maria@aluno.test',
+    phone: '15999998888',
+    thumbnailUrl: null,
+  },
   isAnonymous: false,
   createdAt: '2026-09-15T12:00:00',
 };

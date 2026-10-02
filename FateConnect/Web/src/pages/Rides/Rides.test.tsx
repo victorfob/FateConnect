@@ -8,12 +8,20 @@ import { http, HttpResponse } from 'msw';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { ContactRequiredActionEnum } from '@app/components/ContactRequiredDialog/@types';
+import {
+  CONTACT_REQUIRED_MESSAGES,
+  CONTACT_REQUIRED_TITLE,
+  REGISTER_CONTACTS_LABEL,
+} from '@app/components/ContactRequiredDialog/constants';
+import { useLacksContact } from '@app/hooks/useLacksContact';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import {
   RideFrequencyEnum,
   RideShiftEnum,
   RideTypeEnum,
+  VehicleTypeEnum,
   type Ride,
 } from '@app/services/rides/types';
 import type { UserContact } from '@app/services/types';
@@ -29,9 +37,11 @@ import {
   RIDE_SHIFT_FILTER_OPTIONS,
   RIDE_TYPE_FILTER_OPTIONS,
   RideOwnerFilterEnum,
+  VEHICLE_TYPE_FILTER_OPTIONS,
 } from './components/RideFilter/constants';
 import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS } from './components/RideFormDialog/constants';
 import { rideRecurrenceLabel } from './helpers/rideFrequency';
+import { vehicleTypeLabel } from './helpers/rideVehicle';
 import * as C from './constants';
 import { Rides } from '.';
 
@@ -42,10 +52,13 @@ const SECOND_PAGE_LABEL = 'Ir para a página 2';
 /** Cobre a tentativa inicial, os 2s de espera e a repetição. */
 const RETRY_WINDOW_MS = 5000;
 
+const DRIVER_PHONE = '(15) 90000-0000';
+
 const DRIVER: UserContact = {
   name: 'Ana Ofertante',
   email: 'ana@example.com',
-  phone: '(15) 90000-0000',
+  phone: DRIVER_PHONE,
+  thumbnailUrl: null,
 };
 
 const RIDE: Ride = {
@@ -55,6 +68,7 @@ const RIDE: Ride = {
   departureTime: '07:30:00',
   createdAt: '2026-05-01T00:00:00',
   rideType: RideTypeEnum.SOLIDARITY,
+  vehicleType: VehicleTypeEnum.CAR,
   description: 'Saída do centro, com parada no terminal.',
   driver: DRIVER,
   isOwner: false,
@@ -114,6 +128,10 @@ async function pickOption(fieldLabel: string, chosenLabel: string) {
 
 const periodField = () => screen.getByRole('textbox', { name: new RegExp(FILTER_LABELS.period) });
 
+vi.mock('@app/hooks/useLacksContact', () => ({ useLacksContact: vi.fn() }));
+
+const mockUseLacksContact = useLacksContact as Mock;
+
 function renderComponent(search = '') {
   return renderAtRoute(RoutePathEnum.RIDES, <Rides />, search);
 }
@@ -124,6 +142,7 @@ describe('Rides', () => {
   let clipboardWrite: Mock;
 
   beforeEach(() => {
+    mockUseLacksContact.mockReturnValue(false);
     listReturning([]);
     server.use(http.get(HOLIDAYS_URL, () => HttpResponse.json([])));
     clipboardWrite = vi.fn(() => Promise.resolve());
@@ -194,6 +213,23 @@ describe('Rides', () => {
     expect(router.state.location.pathname).toBe(RoutePathEnum.RIDES);
   });
 
+  it('should show the contact notice instead of the form to whoever has no contact', async () => {
+    mockUseLacksContact.mockReturnValue(true);
+    renderComponent();
+
+    await userEvent.click(screen.getByRole('tab', { name: C.OFFER_TAB_LABEL }));
+
+    const notice = within(await screen.findByRole('dialog', { name: CONTACT_REQUIRED_TITLE }));
+    expect(
+      notice.getByText(CONTACT_REQUIRED_MESSAGES[ContactRequiredActionEnum.OFFER_RIDE]),
+    ).toBeInTheDocument();
+    expect(notice.getByRole('link', { name: REGISTER_CONTACTS_LABEL })).toHaveAttribute(
+      'href',
+      RoutePathEnum.PROFILE,
+    );
+    expect(screen.queryByRole('heading', { name: OFFER_MODE.title })).not.toBeInTheDocument();
+  });
+
   it('should hand the highlight back to the search tab when the dialog is dismissed', async () => {
     renderComponent();
 
@@ -216,6 +252,31 @@ describe('Rides', () => {
     expect(await screen.findByText(RIDE.destination)).toBeInTheDocument();
     expect(screen.getByText('22/05 às 07:30')).toBeInTheDocument();
     expect(screen.getAllByText('Solidária')).toHaveLength(1);
+  });
+
+  it('should show on each card whether the ride goes by car or by motorcycle', async () => {
+    const byMotorcycle: Ride = {
+      ...RIDE,
+      id: 'motorcycle-ride',
+      destination: 'Votorantim',
+      vehicleType: VehicleTypeEnum.MOTORCYCLE,
+    };
+    listReturning([RIDE, byMotorcycle]);
+    renderComponent();
+
+    const carCard = within(
+      (await screen.findByText(RIDE.destination)).closest('article') ?? document.body,
+    );
+    const motorcycleCard = within(
+      screen.getByText(byMotorcycle.destination).closest('article') ?? document.body,
+    );
+
+    expect(carCard.getByText(vehicleTypeLabel(VehicleTypeEnum.CAR))).toBeInTheDocument();
+    expect(
+      motorcycleCard.getByText(vehicleTypeLabel(VehicleTypeEnum.MOTORCYCLE)),
+    ).toBeInTheDocument();
+    expect(motorcycleCard.getByTestId('TwoWheelerIcon')).toBeInTheDocument();
+    expect(carCard.getByTestId('DirectionsCarIcon')).toBeInTheDocument();
   });
 
   it('should show the recurrence of a ride that repeats', async () => {
@@ -308,6 +369,10 @@ describe('Rides', () => {
       optionLabel(RIDE_TYPE_FILTER_OPTIONS, RideTypeEnum.EGALITARIAN),
     );
     await pickOption(
+      FILTER_LABELS.vehicleType,
+      optionLabel(VEHICLE_TYPE_FILTER_OPTIONS, VehicleTypeEnum.MOTORCYCLE),
+    );
+    await pickOption(
       FILTER_LABELS.owner,
       optionLabel(RIDE_OWNER_FILTER_OPTIONS, RideOwnerFilterEnum.MINE),
     );
@@ -320,6 +385,7 @@ describe('Rides', () => {
         dateTo: '2026-05-25',
         departureShift: RideShiftEnum.MORNING,
         rideType: RideTypeEnum.EGALITARIAN,
+        vehicleType: VehicleTypeEnum.MOTORCYCLE,
         onlyMine: 'true',
       }),
     );
@@ -447,7 +513,7 @@ describe('Rides', () => {
     await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
 
     const dialog = within(await screen.findByRole('dialog'));
-    const conversation = dialog.getByRole('link', { name: DRIVER.phone });
+    const conversation = dialog.getByRole('link', { name: DRIVER_PHONE });
 
     expect(conversation).toHaveAttribute(
       'href',
@@ -517,7 +583,7 @@ describe('Rides', () => {
 
     expect(await screen.findByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
     expect(
-      screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.destination) }),
+      screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.destination) }),
     ).toHaveValue(RIDE.destination);
     expect(screen.getByRole('tab', { name: C.OFFER_TAB_LABEL, hidden: true })).toHaveAttribute(
       'aria-selected',
@@ -532,7 +598,9 @@ describe('Rides', () => {
         asked = url;
       });
 
-      renderComponent('?busca=Sorocaba&de=2026-09-01&ate=2026-09-05&turno=noite&meus=sim');
+      renderComponent(
+        '?busca=Sorocaba&de=2026-09-01&ate=2026-09-05&turno=noite&veiculo=moto&meus=sim',
+      );
 
       await waitFor(() =>
         expect(Object.fromEntries(asked!.searchParams)).toMatchObject({
@@ -540,6 +608,7 @@ describe('Rides', () => {
           dateFrom: '2026-09-01',
           dateTo: '2026-09-05',
           departureShift: RideShiftEnum.NIGHT,
+          vehicleType: VehicleTypeEnum.MOTORCYCLE,
           onlyMine: 'true',
         }),
       );
@@ -552,13 +621,16 @@ describe('Rides', () => {
         screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.departureShift) }),
       ).toHaveTextContent(optionLabel(RIDE_SHIFT_FILTER_OPTIONS, RideShiftEnum.NIGHT));
       expect(
+        screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.vehicleType) }),
+      ).toHaveTextContent(optionLabel(VEHICLE_TYPE_FILTER_OPTIONS, VehicleTypeEnum.MOTORCYCLE));
+      expect(
         screen.getByRole('combobox', { name: new RegExp(FILTER_LABELS.owner) }),
       ).toHaveTextContent(optionLabel(RIDE_OWNER_FILTER_OPTIONS, RideOwnerFilterEnum.MINE));
     });
 
     // O ponto ao lado do título precisa acompanhar os campos novos: sem isso a
     // lista abre filtrada e nada avisa quem chegou pelo link.
-    it.each(['?de=2026-09-01', '?ate=2026-09-05', '?turno=noite', '?meus=sim'])(
+    it.each(['?de=2026-09-01', '?ate=2026-09-05', '?turno=noite', '?veiculo=moto', '?meus=sim'])(
       'should mark the filter as active when the url carries only %s',
       async (search) => {
         listReturning([RIDE]);

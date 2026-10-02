@@ -1,7 +1,7 @@
 import { FormGrid, SectionCard } from '@design-system';
 import { PersonIcon } from '@design-system/icons';
 
-import { ContactSection } from '@app/pages/Signup/components/ContactSection';
+import { ContactFields } from '@app/components/ContactFields';
 
 import { CardSubsection } from '../CardSubsection';
 import { PersonalDataFields } from '../PersonalDataFields';
@@ -18,7 +18,7 @@ export function AccountDataCard({ fatecEmail }: AccountDataCardProps) {
 
       <CardSubsection title={C.ACCOUNT_DATA_SUBSECTIONS.contact}>
         <FormGrid>
-          <ContactSection />
+          <ContactFields />
         </FormGrid>
       </CardSubsection>
     </SectionCard>

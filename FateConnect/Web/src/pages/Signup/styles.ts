@@ -12,7 +12,6 @@ import {
 
 const { none, xxs, md, xl, xxl } = spacingScale;
 
-const SUBMIT_HEIGHT_PX = 40;
 const SUBMIT_MAX_WIDTH_REM = 20;
 const CARD_MAX_WIDTH_MOBILE = '90%';
 const CARD_MAX_WIDTH_DESKTOP = '80%';
@@ -81,8 +80,6 @@ export const SubmitContainer = styled(Stack)(({ theme }) => ({
     width: '100%',
     maxWidth: `${SUBMIT_MAX_WIDTH_REM}rem`,
     alignSelf: 'center',
-    height: `${SUBMIT_HEIGHT_PX}px`,
-    borderRadius: theme.radius(radiusScale.component),
   },
 }));
 

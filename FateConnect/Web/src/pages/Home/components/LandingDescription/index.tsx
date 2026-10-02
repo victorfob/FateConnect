@@ -11,7 +11,7 @@ export function LandingDescription() {
       </S.TitleContainer>
 
       <S.Lead component="p">
-        <Typography variant="subtitle">{C.DESCRIPTION_LEAD}</Typography>
+        <Typography variant="body">{C.DESCRIPTION_LEAD}</Typography>
       </S.Lead>
 
       <S.HighlightList component="ul" aria-label={C.HIGHLIGHT_LIST_LABEL}>

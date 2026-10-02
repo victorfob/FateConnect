@@ -1,9 +1,11 @@
 import type { SelectOption } from '@design-system';
 import { AddIcon, SaveIcon } from '@design-system/icons';
 
+import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
 import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { RIDE_FREQUENCY_OPTIONS } from '@app/pages/Rides/helpers/rideFrequency';
 import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
+import { VEHICLE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideVehicle';
 
 import type { RideFormMode } from '../types';
 
@@ -39,11 +41,17 @@ export const EDIT_MODE: RideFormMode = {
   failed: 'Erro ao atualizar a carona. Tente novamente.',
 };
 
+/** O destino mais comum, sugerido antes de qualquer letra e também na busca por texto. */
+export const CAMPUS_DESTINATION = 'Fatec Sorocaba';
+
+export const DESTINATION_SUGGESTIONS: string[] = [CAMPUS_DESTINATION, ...NEIGHBORHOOD_SUGGESTIONS];
+
 export const RIDE_FORM_LABELS = {
   destination: 'Destino',
   departure: 'Data e hora',
   recurrenceStart: 'Data e hora iniciais',
   rideType: 'Tipo',
+  vehicleType: 'Veículo',
   frequency: 'Recorrência',
   repeatUntil: 'Data final da recorrência',
   description: 'Descrição',
@@ -69,6 +77,11 @@ export const RIDE_TYPE_SELECT_OPTIONS: readonly SelectOption[] = [
   ...RIDE_TYPE_OPTIONS,
 ];
 
+export const VEHICLE_TYPE_SELECT_OPTIONS: readonly SelectOption[] = [
+  EMPTY_CHOICE,
+  ...VEHICLE_TYPE_OPTIONS,
+];
+
 /** Sem opção vazia: o campo abre em uma vez só, a carona de sempre. */
 export const RIDE_FREQUENCY_SELECT_OPTIONS: readonly SelectOption[] = RIDE_FREQUENCY_OPTIONS;
 
@@ -79,6 +92,7 @@ export const RIDE_FORM_MESSAGES = {
   departureInvalid: 'Data e hora inválidas',
   departureInPast: 'A carona deve ser em data e hora futuras',
   rideTypeRequired: 'Selecione o tipo',
+  vehicleTypeRequired: 'Selecione o veículo',
   frequencyRequired: 'Selecione a recorrência',
   departureOnWeekend: 'A recorrência em dias úteis começa num dia útil',
   departureOnHoliday: 'Escolha um dia que não seja feriado',

@@ -5,8 +5,9 @@ import type { AccountStatusEnum } from './types';
 export type UserSummary = {
   id: number;
   fullName: string;
-  contactEmail: string;
+  contactEmail: string | null;
   phone: string | null;
+  thumbnailUrl: string | null;
   status: AccountStatusEnum;
 };
 
@@ -19,6 +20,6 @@ export interface UserFilter extends PageQuery {
 export type UserUpdateInput = {
   fullName: string;
   fatecEmail: string;
-  phone: string;
-  contactEmail: string;
+  phone: string | null;
+  contactEmail: string | null;
 };

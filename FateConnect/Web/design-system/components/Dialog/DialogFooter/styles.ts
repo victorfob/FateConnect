@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack';
 
 import { styled } from '@ds-root/styled';
-import { radiusScale, spacingScale } from '@ds-root/tokens';
+import { spacingScale } from '@ds-root/tokens';
 
 const { xs } = spacingScale;
 
@@ -21,7 +21,6 @@ export const FooterRegion = styled(Stack)(({ theme }) => ({
   // causa do rótulo — "Excluir" ao lado de "Cancelar" não deve encolher.
   '& .MuiButton-root': {
     minWidth: `${ACTION_MIN_WIDTH_PX}px`,
-    borderRadius: theme.radius(radiusScale.component),
     letterSpacing: ACTION_LETTER_SPACING,
   },
 

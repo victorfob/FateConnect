@@ -25,7 +25,7 @@ export type StoredPhotoProps = Readonly<{
 }>;
 
 export function StoredPhoto({ url, alt, download }: StoredPhotoProps) {
-  const image = useStoredImage(url);
+  const { image } = useStoredImage(url);
   const { notifyError } = useNotification();
 
   const handleDownload = useCallback(() => {

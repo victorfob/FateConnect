@@ -11,6 +11,13 @@ describe('themeModeStorage', () => {
     expect(themeModeStorage.read()).toBe('dark');
   });
 
+  it('should forget the saved mode when cleared', () => {
+    themeModeStorage.save('dark');
+    themeModeStorage.clear();
+
+    expect(themeModeStorage.read()).toBeNull();
+  });
+
   it('should report no choice when nothing was saved', () => {
     expect(themeModeStorage.read()).toBeNull();
   });

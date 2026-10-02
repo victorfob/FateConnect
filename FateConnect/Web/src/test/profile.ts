@@ -11,6 +11,7 @@ export const PROFILE: User = {
   contactEmail: 'maria.silva@gmail.com',
   neighborhood: 'Jardim Vergueiro',
   imageUrl: null,
+  thumbnailUrl: null,
   profileType: ProfileTypeEnum.OPERATOR,
   status: AccountStatusEnum.ACTIVE,
   createdAt: '2026-08-02T13:45:00',

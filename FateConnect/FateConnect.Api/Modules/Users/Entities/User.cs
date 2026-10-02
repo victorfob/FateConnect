@@ -16,8 +16,8 @@ public class User
     public DateTime BirthDate { get; private set; }
     public EnumGender Gender { get; private set; }
 
-    public string Phone { get; private set; } = string.Empty;
-    public string ContactEmail { get; private set; } = string.Empty;
+    public string? Phone { get; private set; }
+    public string? ContactEmail { get; private set; }
     public string? Neighborhood { get; private set; }
     public string? ImageUrl { get; private set; }
 
@@ -28,6 +28,8 @@ public class User
     public int TokenVersion { get; private set; }
 
     public UserPreferences Preferences { get; private set; } = null!;
+
+    public bool HasContact => Phone is not null && ContactEmail is not null;
 
     private readonly List<DocumentAcceptance> _documentAcceptances = [];
     public IReadOnlyCollection<DocumentAcceptance> DocumentAcceptances => _documentAcceptances.AsReadOnly();
@@ -40,7 +42,7 @@ public class User
         string fullName,
         DateTime birthDate,
         EnumGender gender,
-        UserContact contact,
+        UserContact? contact,
         DateTime createdAt)
     {
         ValidateEmail(fatecEmail);
@@ -53,8 +55,7 @@ public class User
         BirthDate = birthDate;
         Gender = gender;
 
-        Phone = contact.Phone.Trim();
-        ContactEmail = contact.ContactEmail.Trim().ToLowerInvariant();
+        ReplaceContact(contact);
 
         ProfileType = EnumProfileType.Operator;
         Status = EnumAccountStatus.Active;
@@ -67,8 +68,7 @@ public class User
         string fullName,
         DateTime birthDate,
         EnumGender gender,
-        string phone,
-        string contactEmail,
+        UserContact? contact,
         string? neighborhood)
     {
         ValidateFullName(fullName);
@@ -78,8 +78,7 @@ public class User
         FullName = fullName.Trim();
         BirthDate = birthDate;
         Gender = gender;
-        Phone = phone.Trim();
-        ContactEmail = contactEmail.Trim().ToLowerInvariant();
+        ReplaceContact(contact);
         Neighborhood = neighborhood.NormalizeOptionalText();
 
         RegisterUpdate();
@@ -116,16 +115,14 @@ public class User
     public void UpdateByAdmin(
         string fullName,
         string fatecEmail,
-        string phone,
-        string contactEmail)
+        UserContact? contact)
     {
         ValidateFullName(fullName);
         ValidateEmail(fatecEmail);
 
         FullName = fullName.Trim();
         FatecEmail = fatecEmail.Trim().ToLowerInvariant();
-        Phone = phone.Trim();
-        ContactEmail = contactEmail.Trim().ToLowerInvariant();
+        ReplaceContact(contact);
 
         RegisterUpdate();
     }
@@ -176,6 +173,15 @@ public class User
     {
         ArgumentNullException.ThrowIfNull(acceptance);
         _documentAcceptances.Add(acceptance);
+    }
+
+    private void ReplaceContact(UserContact? contact)
+    {
+        if (contact is null)
+            return;
+
+        Phone = contact.Phone.Trim();
+        ContactEmail = contact.ContactEmail.Trim().ToLowerInvariant();
     }
 
     private void IncrementTokenVersion()

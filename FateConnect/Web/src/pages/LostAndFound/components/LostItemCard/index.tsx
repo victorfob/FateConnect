@@ -3,6 +3,7 @@ import { CalendarTodayIcon, LocationOnIcon } from '@design-system/icons';
 import { format, parseISO } from 'date-fns';
 
 import { StoredPhoto } from '@app/components/StoredPhoto';
+import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import { lostItemKindLabel } from '@app/pages/LostAndFound/helpers/lostItemKind';
 import {
   lostItemStatusLabel,
@@ -49,9 +50,9 @@ export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: L
 
       <ListCard.InfoRow>
         <ListCard.InfoItem>
-          <LocationOnIcon />
+          <LostItemKindIcon kind={item.lostAndFoundType} />
           <Typography variant="caption" color="inherit">
-            {item.place}
+            {lostItemKindLabel(item.lostAndFoundType)}
           </Typography>
         </ListCard.InfoItem>
 
@@ -63,18 +64,16 @@ export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: L
         </ListCard.InfoItem>
 
         <ListCard.InfoItem>
-          <LostItemKindIcon kind={item.lostAndFoundType} />
+          <LocationOnIcon />
           <Typography variant="caption" color="inherit">
-            {lostItemKindLabel(item.lostAndFoundType)}
+            {item.place}
           </Typography>
         </ListCard.InfoItem>
       </ListCard.InfoRow>
 
       {item.description && (
-        <ListCard.Description>
-          <Typography variant="subtitle" color="inherit">
-            {item.description}
-          </Typography>
+        <ListCard.Description toggleLabels={DESCRIPTION_TOGGLE_LABELS}>
+          {item.description}
         </ListCard.Description>
       )}
 

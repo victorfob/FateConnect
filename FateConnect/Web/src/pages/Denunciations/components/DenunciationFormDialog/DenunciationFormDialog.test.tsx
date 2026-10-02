@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
 import { PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
+import { useLacksContact } from '@app/hooks/useLacksContact';
 import { server } from '@app/mocks/server';
 import { DENUNCIATION_CATEGORY_OPTIONS } from '@app/pages/Denunciations/helpers/denunciationCategory';
 import { DenunciationCategoryEnum } from '@app/services/denunciations/types';
@@ -11,6 +12,7 @@ import {
   DENUNCIATION_FORM,
   DENUNCIATION_FORM_LABELS,
   DENUNCIATION_FORM_MESSAGES,
+  FORCED_SECRECY_NOTE,
 } from './constants';
 import { DenunciationFormDialog, type DenunciationFormDialogProps } from '.';
 
@@ -33,6 +35,10 @@ const TYPED_DESCRIPTION = 'A pessoa dirigiu acima da velocidade no trajeto intei
 async function fieldsOf(request: Request): Promise<Record<string, FormDataEntryValue>> {
   return Object.fromEntries(await request.formData());
 }
+
+vi.mock('@app/hooks/useLacksContact', () => ({ useLacksContact: vi.fn() }));
+
+const mockUseLacksContact = useLacksContact as Mock;
 
 const onClose = vi.fn();
 
@@ -57,6 +63,10 @@ async function fillTheForm() {
 }
 
 describe('DenunciationFormDialog', () => {
+  beforeEach(() => {
+    mockUseLacksContact.mockReturnValue(false);
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -69,6 +79,13 @@ describe('DenunciationFormDialog', () => {
     ).toBeInTheDocument();
     expect(descriptionField()).toHaveValue('');
     expect(confidentialToggle()).not.toBeChecked();
+  });
+
+  it('should open with the submit released, since a new report has nothing to compare', async () => {
+    renderComponent();
+    await screen.findByRole('heading', { name: DENUNCIATION_FORM.title });
+
+    expect(submitButton()).toBeEnabled();
   });
 
   it('should hold the description to its limit and show how much of it is used', async () => {
@@ -137,6 +154,49 @@ describe('DenunciationFormDialog', () => {
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(fields).toMatchObject({ IsAnonymous: 'true' });
+  });
+
+  it('should lock the secrecy on for whoever has no contact, and say why in a single note', async () => {
+    mockUseLacksContact.mockReturnValue(true);
+    renderComponent();
+    await screen.findByRole('heading', { name: DENUNCIATION_FORM.title });
+
+    expect(confidentialToggle()).toBeChecked();
+    // O `input` marcado não basta: é o `Mui-checked` que desenha o interruptor ligado.
+    expect(confidentialToggle().closest('.MuiSwitch-switchBase')).toHaveClass('Mui-checked');
+    expect(confidentialToggle()).toBeDisabled();
+    const forcedNote = screen.getByText(FORCED_SECRECY_NOTE);
+    expect(forcedNote.nextElementSibling).toBeNull();
+    expect(screen.queryByText(CONFIDENTIAL_HINT)).not.toBeInTheDocument();
+  });
+
+  it('should send the denunciation of whoever has no contact as a secret one', async () => {
+    mockUseLacksContact.mockReturnValue(true);
+    let fields: Record<string, FormDataEntryValue> | null = null;
+    server.use(
+      http.post(DENUNCIATIONS_URL, async ({ request }) => {
+        fields = await fieldsOf(request);
+
+        return HttpResponse.json({ id: 'nova' }, { status: CREATED });
+      }),
+    );
+    renderComponent();
+    await screen.findByRole('heading', { name: DENUNCIATION_FORM.title });
+
+    await fillTheForm();
+    await userEvent.click(submitButton());
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(fields).toMatchObject({ IsAnonymous: 'true' });
+  });
+
+  it('should leave the secrecy free and without the note for whoever has a contact', async () => {
+    renderComponent();
+    await screen.findByRole('heading', { name: DENUNCIATION_FORM.title });
+
+    expect(confidentialToggle()).not.toBeChecked();
+    expect(confidentialToggle()).toBeEnabled();
+    expect(screen.queryByText(FORCED_SECRECY_NOTE)).not.toBeInTheDocument();
   });
 
   it('should refuse a description shorter than the entity accepts', async () => {

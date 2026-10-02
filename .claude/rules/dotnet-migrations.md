@@ -1,5 +1,5 @@
 ---
-description: Migration do EF que renomeia ou move dado entre tabelas — o `dotnet ef` gera dropar e recriar, que apaga produção; como reescrever, provar que os dados sobrevivem, conferir o drift, e a chave da relação 1:1
+description: Migration do EF que renomeia ou move dado entre tabelas — o `dotnet ef` gera dropar e recriar, que apaga produção; como reescrever, provar que os dados sobrevivem, conferir o drift, a coluna obrigatória nova e a chave da relação 1:1
 paths:
   - "FateConnect/FateConnect.Api/Infrastructure/Database/**"
   - "FateConnect/FateConnect.Api/Modules/*/Infrastructure/**"
@@ -50,6 +50,11 @@ dotnet ef migrations add _Drift && grep "migrationBuilder\." Infrastructure/Data
 - Saída vazia é o esperado.
 - ⛔ Apague os dois arquivos da sonda à mão e confira com `git status`: o `migrations remove` reconstrói o projeto, e a sonda não compila (o S1186 recusa o método vazio; renomear não resolve).
 - Leia o diff do `FateConnectDbContextModelSnapshot.cs` que a sonda reescreveu: mudança só de modelo (navegação que saiu) aparece ali, e se for legítima o `.Designer.cs` da sua migration precisa da mesma mudança.
+- ⛔ A sonda compara o modelo com o snapshot, não com o banco: o `DEFAULT` que uma `AlterColumn` com `defaultValue` deixou quando tornou a coluna obrigatória não aparece nela. Coluna que volta a aceitar nulo: confira `column_default` em `information_schema.columns` no banco de prova e tire o padrão no `Up()`.
+
+## Coluna obrigatória nova
+
+⛔ O gerador preenche a coluna `NOT NULL` nova das linhas existentes com o zero do tipo (`defaultValue: 0`), que num enum começado em 1 é valor inválido. Preencha com o valor de negócio, numa constante da própria migration (o enum do domínio muda depois, a migration não), e tire o padrão logo em seguida com `ALTER COLUMN ... DROP DEFAULT`, para o banco não aceitar inserção sem o campo.
 
 ## Duplicação
 

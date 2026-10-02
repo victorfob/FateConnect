@@ -8,6 +8,7 @@ import {
 } from '@app/pages/Signup/helpers/birthDate';
 import type { ProfileInput } from '@app/services/users/profileTypes';
 import type { User } from '@app/services/users/types';
+import { hasContact } from '@app/utils/contact';
 import { maskPhone } from '@app/utils/masks/phoneMask';
 
 import type { ProfileFormInput, ProfileFormValues } from '../schema';
@@ -25,8 +26,9 @@ export function toProfileFormValues(profile: User): ProfileFormInput {
     fullName: profile.fullName,
     birthDate: formatBirthDate(parseISO(profile.birthDate)),
     gender: profile.gender,
-    phone: maskPhone(profile.phone),
-    contactEmail: profile.contactEmail,
+    phone: maskPhone(profile.phone ?? ''),
+    contactEmail: profile.contactEmail ?? '',
+    contactIsRequired: hasContact(profile),
     neighborhood: profile.neighborhood ?? '',
     photo: null,
     removeStoredPhoto: false,
