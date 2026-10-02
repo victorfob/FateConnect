@@ -21,6 +21,8 @@ paths:
 - Campo é o `Input` do barrel com `error={errors.campo?.message}`. `required` põe `*` no nome acessível (`"E-mail *"`): no teste, a consulta usa regex.
 - Ação dentro do campo é `IconButton` com `aria-label` da ação e `aria-pressed` do estado; o ícone mostra o estado atual (olho aberto com o texto visível). Senha alterna `autoComplete` entre `current-password` e `off`.
 - ⛔ Formulário com senha tem um campo `autocomplete="username"`, oculto quando o login não se edita: o Chrome ignora campo desabilitado e preenche com o login o campo anterior à senha ao abrir a tela.
+- ⛔ Com esse campo, o gerenciador preenche a senha atual ao abrir a tela. Ela sozinha não é alteração nem cobra a nova: quem pede a troca é a nova senha (`pages/Profile/helpers/pendingChanges.ts`).
+- ⛔ Campo com sugestão (`Input.Autocomplete`) tem dois painéis do Chrome por cima: o histórico do campo, que o `off` padrão desliga, e os endereços salvos, que ignoram o `off` em campo que o Chrome toma por endereço (o *Bairro*). Ali vai `addressLike`, um valor que ele não reconhece e que devolve o histórico: nenhum valor desliga os dois.
 - ⛔ Campo que ganha a primeira regra de validação ganha a prop de erro junto: sem ela o schema recusa e a tela fica muda. O teste de schema não vê isso; o caso é de componente.
 - ⛔ Quem lê o valor de campo registrado é o consumidor, por `useWatch`, e passa ao `Input` (`characterCount={description.length}`). O `Input` não relê o elemento: o `reset()` escreve sem evento, e a releitura pediria um efeito sem dependências que o lint reprova.
 - ⛔ `role="status"` é irmão do campo, nunca dentro da linha de apoio: ela é o `aria-describedby`, e o anúncio seria ouvido de novo a cada foco.
