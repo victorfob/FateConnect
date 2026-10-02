@@ -1,6 +1,7 @@
 import type { SelectOption } from '@design-system';
 import { AddIcon, SaveIcon } from '@design-system/icons';
 
+import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
 import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { RIDE_FREQUENCY_OPTIONS } from '@app/pages/Rides/helpers/rideFrequency';
 import { RIDE_TYPE_OPTIONS } from '@app/pages/Rides/helpers/rideType';
@@ -39,6 +40,11 @@ export const EDIT_MODE: RideFormMode = {
   succeeded: 'Carona atualizada.',
   failed: 'Erro ao atualizar a carona. Tente novamente.',
 };
+
+/** O destino mais comum, sugerido antes de qualquer letra e também na busca por texto. */
+export const CAMPUS_DESTINATION = 'Fatec Sorocaba';
+
+export const DESTINATION_SUGGESTIONS: string[] = [CAMPUS_DESTINATION, ...NEIGHBORHOOD_SUGGESTIONS];
 
 export const RIDE_FORM_LABELS = {
   destination: 'Destino',

@@ -1,6 +1,7 @@
 import { FormGrid, Input } from '@design-system';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
 import {
   MAX_NEIGHBORHOOD_LENGTH,
   type ProfileFormInput,
@@ -51,14 +52,20 @@ export function PersonalDataFields({ fatecEmail }: PersonalDataFieldsProps) {
         )}
       />
 
-      <Input
-        {...register('neighborhood')}
-        label={C.NEIGHBORHOOD_LABEL}
-        helpText={C.NEIGHBORHOOD_HELP}
-        fullWidth
-        autoComplete="address-level3"
-        maxLength={MAX_NEIGHBORHOOD_LENGTH}
-        error={errors.neighborhood?.message}
+      <Controller
+        name="neighborhood"
+        control={control}
+        render={({ field }) => (
+          <Input.Autocomplete
+            {...field}
+            addressLike
+            label={C.NEIGHBORHOOD_LABEL}
+            helpText={C.NEIGHBORHOOD_HELP}
+            options={NEIGHBORHOOD_SUGGESTIONS}
+            maxLength={MAX_NEIGHBORHOOD_LENGTH}
+            error={errors.neighborhood?.message}
+          />
+        )}
       />
 
       <FormGrid.Wide>

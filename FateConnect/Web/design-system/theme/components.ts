@@ -1,3 +1,4 @@
+import { autocompleteClasses } from '@mui/material/Autocomplete';
 import type { Components, CSSObject, Theme } from '@mui/material/styles';
 
 import {
@@ -16,12 +17,29 @@ const AUTOFILL_COVER_PX = 100;
 
 const { none, xxs, xs, md } = spacingScale;
 
-const SELECT_OPTION_MIN_HEIGHT_PX = 48;
+const PANEL_OPTION_MIN_HEIGHT_PX = 48;
+/** A elevação que o `Menu` do MUI dá ao painel do `select`. */
+const SELECT_PANEL_ELEVATION = 8;
 
 const SWITCH_WIDTH_PX = 48;
 const SWITCH_HEIGHT_PX = 30;
 const SWITCH_TRACK_RADIUS_PX = 15;
 const SWITCH_THUMB_TRAVEL_PX = 18;
+
+/**
+ * A opção dos painéis de escolha (o do `select` e o das sugestões) tem 48px de
+ * altura e recuo só na horizontal. O MUI declara os mesmos 48px e **desfaz** num
+ * `@media (min-width:600px)`, então o valor se repete dentro do breakpoint.
+ */
+function panelOption(theme: Theme): CSSObject {
+  return {
+    minHeight: `${PANEL_OPTION_MIN_HEIGHT_PX}px`,
+    padding: spacing(none, md),
+    // Aqui o `sm` é do MUI, não do produto: é o breakpoint em que ele encolhe a opção.
+    // eslint-disable-next-line no-restricted-syntax
+    [theme.breakpoints.up('sm')]: { minHeight: `${PANEL_OPTION_MIN_HEIGHT_PX}px` },
+  };
+}
 
 export const components: Components<Theme> = {
   MuiButton: {
@@ -244,21 +262,11 @@ export const components: Components<Theme> = {
       label: { paddingLeft: spacing(xxs) },
     },
   },
-  // A opção do painel do `select` tem 48px de altura e recuo só na horizontal,
-  // como no produto. O MUI declara os mesmos 48px e **desfaz** num
-  // `@media (min-width:600px)`, então o valor se repete dentro do breakpoint.
-  MuiMenuItem: {
+  MuiMenuItem: { styleOverrides: { root: ({ theme }) => panelOption(theme) } },
+  MuiAutocomplete: {
+    defaultProps: { slotProps: { paper: { elevation: SELECT_PANEL_ELEVATION } } },
     styleOverrides: {
-      root: ({ theme }) => ({
-        minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
-        padding: spacing(none, md),
-        // Aqui o `sm` é do MUI, não do produto: esta linha desfaz o
-        // `min-width:600px` que o próprio MuiMenuItem aplica.
-        // eslint-disable-next-line no-restricted-syntax
-        [theme.breakpoints.up('sm')]: {
-          minHeight: `${SELECT_OPTION_MIN_HEIGHT_PX}px`,
-        },
-      }),
+      listbox: ({ theme }) => ({ [`& .${autocompleteClasses.option}`]: panelOption(theme) }),
     },
   },
   // O `Paper` do MUI clareia a superfície por elevação no tema escuro, e o

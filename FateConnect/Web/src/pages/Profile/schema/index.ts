@@ -7,18 +7,18 @@ import { maxLengthMessage, signupSchema } from '@app/pages/Signup/schema';
 /** O limite do `UpdateUserDto`. */
 export const MAX_NEIGHBORHOOD_LENGTH = 100;
 
-export const PASSWORD_MESSAGES = {
-  currentRequired: 'Informe a senha atual',
-  newRequired: 'Informe a nova senha',
-};
+export const PASSWORD_MESSAGES = { currentRequired: 'Informe a senha atual' };
 
-/** Com um dos dois preenchidos a troca foi pedida, e aí os dois valem; em branco, a senha fica. */
+/**
+ * Quem pede a troca é a nova senha. A atual sozinha é a que o navegador preenche
+ * ao abrir a tela, e não cobra nada.
+ */
 function checkPasswordChange(
   values: { currentPassword: string; newPassword: string },
   context: z.RefinementCtx,
 ) {
   const { currentPassword, newPassword } = values;
-  if (currentPassword === '' && newPassword === '') return;
+  if (newPassword === '') return;
 
   if (currentPassword === '')
     context.addIssue({
@@ -26,15 +26,6 @@ function checkPasswordChange(
       path: ['currentPassword'],
       message: PASSWORD_MESSAGES.currentRequired,
     });
-
-  if (newPassword === '') {
-    context.addIssue({
-      code: 'custom',
-      path: ['newPassword'],
-      message: PASSWORD_MESSAGES.newRequired,
-    });
-    return;
-  }
 
   const [newPasswordIssue] = signupSchema.shape.password.safeParse(newPassword).error?.issues ?? [];
   if (newPasswordIssue)

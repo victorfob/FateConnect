@@ -583,7 +583,7 @@ describe('Rides', () => {
 
     expect(await screen.findByRole('heading', { name: EDIT_MODE.title })).toBeInTheDocument();
     expect(
-      screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.destination) }),
+      screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.destination) }),
     ).toHaveValue(RIDE.destination);
     expect(screen.getByRole('tab', { name: C.OFFER_TAB_LABEL, hidden: true })).toHaveAttribute(
       'aria-selected',
