@@ -52,10 +52,8 @@ describe('profileSchema', () => {
     ]);
   });
 
-  it('should ask for the new password once the current one is typed', () => {
-    expect(issuesOf({ ...VALID, currentPassword: 'SenhaAtual123' })).toEqual([
-      { path: 'newPassword', message: PASSWORD_MESSAGES.newRequired },
-    ]);
+  it('should ignore the current password alone, which the browser fills in by itself', () => {
+    expect(issuesOf({ ...VALID, currentPassword: 'SenhaAtual123' })).toEqual([]);
   });
 
   it('should hold the new password to the signup rule', () => {

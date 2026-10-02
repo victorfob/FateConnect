@@ -20,6 +20,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a escolha do veículo, carro ou moto, ao ofertar e ao editar carona, obrigatória como a API passou a exigir (#521) [Frontend]
 - Adiciona ao cartão de carona se ela é de carro ou de moto, com ícone (#521) [Frontend]
 - Adiciona o filtro de caronas por veículo, com a escolha guardada no endereço (#521) [Frontend]
+- Adiciona a sugestão de bairros de Sorocaba e das cidades vizinhas, cada um com a cidade, ao bairro do perfil e ao destino da carona enquanto se digita; o texto fora da lista continua aceito (#538) [Frontend]
+- Adiciona ao destino da carona, ao tocar no campo ainda vazio, a sugestão do bairro cadastrado no perfil e da Fatec Sorocaba, que também aparece ao digitar (#538) [Frontend]
 
 ### Changed
 
@@ -48,6 +50,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrige o botão vermelho preenchido que, no celular, continuava vermelho depois de desabilitar, com o texto apagado: o toque deixa o botão em hover, e o hover pintava o fundo mesmo desabilitado, como o Salvar alterações do perfil depois de salvar (#526) [Frontend]
 - Corrige o ícone de menu do topo, que no celular ficava mais para dentro que o conteúdo da página por causa da folga em volta do desenho; agora ele se alinha à borda do conteúdo, sem diminuir a área de toque (#528) [Frontend]
 - Corrige o texto que saía na fonte Inter só para quem a tinha instalada no computador, já que o app nunca a enviava; agora todo mundo vê a fonte do sistema, a mesma que o resto já via (#537) [Frontend]
+- Corrige Meu perfil quando o navegador preenche sozinho a senha atual: a tela já abria com alterações não salvas e cobrava a nova senha para salvar qualquer dado. A senha atual sozinha passa a não contar, e só a nova senha pede a troca (#538) [Frontend]
 
 ## [1.1.1] - 2026-09-30
 

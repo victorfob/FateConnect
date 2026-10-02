@@ -2,10 +2,12 @@ import { DATE_TIME_PICKER_LABEL, onlyDigits } from '@design-system';
 import { addDays, format } from 'date-fns';
 import { http, HttpResponse } from 'msw';
 
+import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
 import { server } from '@app/mocks/server';
 import { RIDE_FREQUENCY_OPTIONS } from '@app/pages/Rides/helpers/rideFrequency';
 import { RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
 import { vehicleTypeLabel } from '@app/pages/Rides/helpers/rideVehicle';
+import { tokenStorage } from '@app/services/auth/tokenStorage';
 import {
   RideFrequencyEnum,
   RideTypeEnum,
@@ -13,13 +15,22 @@ import {
   type Ride,
   type RideInput,
 } from '@app/services/rides/types';
+import { PROFILE } from '@app/test/profile';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { tokenWithName } from '@app/test/token';
 import { toApiDate, toDisplayDate } from '@app/utils/apiDate';
 
-import { EDIT_MODE, OFFER_MODE, RIDE_FORM_LABELS, RIDE_FORM_MESSAGES } from './constants';
+import {
+  CAMPUS_DESTINATION,
+  EDIT_MODE,
+  OFFER_MODE,
+  RIDE_FORM_LABELS,
+  RIDE_FORM_MESSAGES,
+} from './constants';
 import { RideFormDialog, type RideFormDialogProps } from '.';
 
 const RIDES_URL = 'https://api.fateconnect.test/rides';
+const PROFILE_URL = 'https://api.fateconnect.test/users/me';
 const HOLIDAYS_URL = 'https://api.fateconnect.test/holidays';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -65,7 +76,7 @@ const DEFAULT_PROPS: RideFormDialogProps = {
 const renderComponent = (props = DEFAULT_PROPS) => render(<RideFormDialog {...props} />);
 
 const destinationField = () =>
-  screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.destination) });
+  screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.destination) });
 
 const departureField = () =>
   screen.getByRole('textbox', { name: new RegExp(RIDE_FORM_LABELS.departure) });
@@ -298,6 +309,52 @@ describe('RideFormDialog', () => {
     expect(await screen.findByText(EDIT_MODE.failed)).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(destinationField()).toHaveValue(EDITED_DESTINATION);
+  });
+
+  it('should suggest a neighborhood as the destination and fill in the one chosen', async () => {
+    const [suggestion = ''] = NEIGHBORHOOD_SUGGESTIONS;
+    renderComponent();
+    await screen.findByRole('heading', { name: OFFER_MODE.title });
+
+    await userEvent.type(destinationField(), suggestion.slice(0, -1));
+    await userEvent.click(await screen.findByRole('option', { name: suggestion }));
+
+    expect(destinationField()).toHaveValue(suggestion);
+  });
+
+  it('should suggest the stored neighborhood and the Fatec as soon as the destination gets the focus', async () => {
+    tokenStorage.save(tokenWithName(PROFILE.fullName));
+    renderComponent();
+    await screen.findByRole('heading', { name: OFFER_MODE.title });
+
+    await userEvent.click(destinationField());
+
+    await screen.findByRole('option', { name: CAMPUS_DESTINATION });
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      PROFILE.neighborhood,
+      CAMPUS_DESTINATION,
+    ]);
+  });
+
+  it('should suggest only the Fatec on focus to whoever has no neighborhood in the profile', async () => {
+    tokenStorage.save(tokenWithName(PROFILE.fullName));
+    server.use(http.get(PROFILE_URL, () => HttpResponse.json({ ...PROFILE, neighborhood: null })));
+    renderComponent();
+    await screen.findByRole('heading', { name: OFFER_MODE.title });
+
+    await userEvent.click(destinationField());
+
+    await screen.findByRole('option', { name: CAMPUS_DESTINATION });
+    expect(screen.getAllByRole('option')).toHaveLength(1);
+  });
+
+  it('should find the Fatec among the destinations while it is typed', async () => {
+    renderComponent();
+    await screen.findByRole('heading', { name: OFFER_MODE.title });
+
+    await userEvent.type(destinationField(), CAMPUS_DESTINATION.slice(0, -1));
+
+    expect(await screen.findByRole('option', { name: CAMPUS_DESTINATION })).toBeInTheDocument();
   });
 
   it('should offer the ride the form describes', async () => {
