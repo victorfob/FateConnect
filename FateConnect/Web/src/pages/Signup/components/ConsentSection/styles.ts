@@ -1,7 +1,7 @@
-import type { AnchorHTMLAttributes, LabelHTMLAttributes } from 'react';
+import type { LabelHTMLAttributes } from 'react';
 import { PolymorphicBox, spacingScale, Stack, styled } from '@design-system';
 
-const { none, xxs, md } = spacingScale;
+const { xxs, md } = spacingScale;
 
 /**
  * Área de toque da caixa de seleção: 24px no mobile e 32px no desktop, como no
@@ -47,22 +47,6 @@ export const TermsText = styled(PolymorphicBox)(({ theme }) => ({
 export const TermsLabel = styled(PolymorphicBox)<LabelHTMLAttributes<HTMLLabelElement>>({
   cursor: 'pointer',
 });
-
-export const InlineLink = styled(PolymorphicBox)<AnchorHTMLAttributes<HTMLAnchorElement>>(
-  ({ theme }) => ({
-    display: 'inline',
-    font: 'inherit',
-    textDecoration: 'none',
-    padding: theme.space(none),
-    color: theme.palette.brandText,
-    cursor: 'pointer',
-
-    '&:hover': {
-      textDecoration: 'underline',
-      textDecorationColor: theme.palette.brandText,
-    },
-  }),
-);
 
 /** O produto pinta este aviso com o vermelho de destaque, não com o de erro. */
 export const ConsentError = styled(PolymorphicBox)(({ theme }) => ({
