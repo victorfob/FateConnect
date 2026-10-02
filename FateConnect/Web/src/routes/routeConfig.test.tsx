@@ -34,7 +34,8 @@ function renderRoute(initialPath: string) {
 const NO_CONTENT = 204;
 
 describe('routeConfig', () => {
-  // Caronas, achados e perdidos, denúncias e a gestão listam assim que montam.
+  // Caronas, achados e perdidos, denúncias e a gestão listam assim que montam,
+  // e as preferências leem as escolhas de comunicação.
   beforeEach(() => {
     server.use(
       http.get('https://api.fateconnect.test/rides', () => HttpResponse.json([])),
@@ -42,6 +43,9 @@ describe('routeConfig', () => {
       http.get('https://api.fateconnect.test/denunciations', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/denunciations/mine', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/users', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/users/me/preferences', () =>
+        HttpResponse.json({ receiveEmails: false, receiveNotifications: false }),
+      ),
     );
   });
 
