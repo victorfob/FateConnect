@@ -19,6 +19,14 @@ ignorados=(
 
 raizes=$(git ls-files | cut -d/ -f1 | sort -u | sed 's/\./\\./' | tr '\n' '|' | sed 's/|$//')
 
+# As rules do front citam a partir de `src/` ou de dentro dele (`pages/Profile/...`).
+bases_do_front=("FateConnect/Web/src" "FateConnect/Web")
+relativas=$(
+  for base in "${bases_do_front[@]}"; do
+    git ls-files "$base" | sed "s|^$base/||" | grep / | cut -d/ -f1
+  done | sort -u | tr '\n' '|' | sed 's/|$//'
+)
+
 conhecidos=$(mktemp)
 # Todos os ancestrais, e não só o pai imediato: um texto pode citar
 # `FateConnect/Web/src/pages`, que é diretório sem arquivo próprio.
@@ -34,6 +42,11 @@ while IFS=: read -r arquivo linha citado; do
   [[ -z "${citado:-}" ]] && continue
   citado="${citado%/}"
   grep -qxF "$citado" "$conhecidos" && continue
+  existe_no_front=false
+  for base in "${bases_do_front[@]}"; do
+    grep -qxF "$base/$citado" "$conhecidos" && existe_no_front=true
+  done
+  $existe_no_front && continue
   echo "  $arquivo:$linha  →  $citado"
   encontrados=$((encontrados + 1))
 done < <(
@@ -41,8 +54,12 @@ done < <(
   # noutra branch, e o que ela cita é problema daquela branch. A lista de
   # `ignorados` acima não resolve isto — ela diz quais caminhos CITADOS podem
   # faltar, e não onde parar de procurar.
-  grep -rnoE --include="*.md" --exclude-dir="worktrees" "($raizes)/[A-Za-z0-9_./-]+" .claude/ |
-    sed -E 's/[.,;:)]+$//' | sort -u
+  {
+    grep -rnoE --include="*.md" --exclude-dir="worktrees" "($raizes)/[A-Za-z0-9_./-]+" .claude/
+    # Só o início de caminho: o meio de um caminho já entrou acima, e depois de `@` é alias de import.
+    grep -rnoE --include="*.md" --exclude-dir="worktrees" "(^|[^A-Za-z0-9_./@-])($relativas)/[A-Za-z0-9_./-]+" .claude/ |
+      sed -E 's/^([^:]+:[0-9]+:)[^A-Za-z0-9_.]/\1/'
+  } | sed -E 's/[.,;:)]+$//' | sort -u
 )
 
 rm -f "$conhecidos"
