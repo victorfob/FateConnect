@@ -10,7 +10,7 @@ const { xxs, sm } = spacingScale;
 const COLLAPSED_LINES = 2;
 
 /**
- * A entrelinha da variante `subtitle`. Em `em`, o recorte acompanha a fonte do
+ * A entrelinha da variante `body`. Em `em`, o recorte acompanha a fonte do
  * próprio texto em vez de depender de um pixel medido uma vez.
  */
 const LINE_HEIGHT_EM = 1.5;
