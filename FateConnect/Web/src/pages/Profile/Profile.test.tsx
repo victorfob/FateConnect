@@ -247,6 +247,31 @@ describe('Profile', () => {
     expect(saveButton()).toBeDisabled();
   });
 
+  it('should take the current password alone, as the browser fills it in, for no change', async () => {
+    let passwordRequests = 0;
+    server.use(
+      http.patch(`${PROFILE_URL}/password`, () => {
+        passwordRequests += 1;
+
+        return HttpResponse.json({ token: NEW_TOKEN });
+      }),
+      http.patch(PROFILE_URL, () => HttpResponse.json({ ...PROFILE, fullName: 'Maria Rocha' })),
+    );
+    const fullName = await renderProfile();
+
+    await userEvent.type(screen.getByLabelText(PASSWORD_LABELS.current), 'SenhaAtual123');
+
+    expect(saveButton()).toBeDisabled();
+    expect(unloadIsHeldBack()).toBe(false);
+
+    await userEvent.clear(fullName);
+    await userEvent.type(fullName, 'Maria Rocha');
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(PROFILE_MESSAGES.saved)).toBeInTheDocument();
+    expect(passwordRequests).toBe(0);
+  });
+
   it('should save the data and show the new name as the saved one', async () => {
     let sentName: FormDataEntryValue | null = null;
     server.use(
