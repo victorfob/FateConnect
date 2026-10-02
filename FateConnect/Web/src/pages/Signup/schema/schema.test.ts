@@ -11,7 +11,7 @@ const ONE_DAY_MS = 86_400_000;
 const ONE_CHARACTER = 1;
 
 /** Os campos de texto que a API corta por comprimento. */
-type TextField = 'fullName' | 'fatecEmail' | 'contactEmail';
+type TextField = 'fullName' | 'fatecEmail';
 
 function textOfLength(total: number, suffix: string): string {
   return 'a'.repeat(total - suffix.length) + suffix;
@@ -24,8 +24,6 @@ const VALID: SignupFormValues = {
   birthDate: '22/05/1999',
   gender: GenderValueEnum.FEMALE,
   password: 'segredo123',
-  phone: '(11) 91234-5678',
-  contactEmail: 'maria@exemplo.com',
   acceptTerms: true,
 };
 
@@ -62,8 +60,6 @@ describe('signupSchema', () => {
     ['birthDate', { birthDate: '' }],
     ['gender', { gender: '' }],
     ['password', { password: '' }],
-    ['phone', { phone: '' }],
-    ['contactEmail', { contactEmail: '' }],
   ])('should require %s', (field, overrides) => {
     const result = parse(overrides);
 
@@ -103,17 +99,6 @@ describe('signupSchema', () => {
     expect(parse({ password: '12345678' }).success).toBe(true);
   });
 
-  it.each([
-    ['ten digits', '(11) 2345-6789'],
-    ['eleven digits', '(11) 91234-5678'],
-  ])('should accept a phone number with %s', (_, phone) => {
-    expect(parse({ phone }).success).toBe(true);
-  });
-
-  it('should reject a phone number outside that range', () => {
-    expect(firstIssuePath(parse({ phone: '(11) 2345-678' }))).toEqual(['phone']);
-  });
-
   it('should reject a date that does not exist in the calendar', () => {
     expect(firstIssuePath(parse({ birthDate: '31/02/1999' }))).toEqual(['birthDate']);
   });
@@ -141,7 +126,6 @@ describe('signupSchema', () => {
   const MAX_LENGTHS: [TextField, number, string][] = [
     ['fullName', 200, ''],
     ['fatecEmail', 150, '@aluno.cps.sp.gov.br'],
-    ['contactEmail', 150, '@exemplo.com'],
   ];
 
   it.each(MAX_LENGTHS)('should hold %s to the length the api accepts', (field, max, suffix) => {

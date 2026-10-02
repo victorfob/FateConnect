@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import { server } from '@app/mocks/server';
 import {
   DeletionReasonEnum,
@@ -10,21 +11,26 @@ import {
 } from '@app/services/lostAndFound/types';
 import type { UserContact } from '@app/services/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { forgeOverflow, restoreContentHeight } from '@app/test/utils/contentHeight';
 
 import { photoAlt } from './constants';
 import { RESTORE_LABEL } from './LostItemStatusAction/constants';
 import { LostItemCard } from '.';
 
+const CONTACT_PHONE = '(15) 99999-0001';
+
 const CONTACT: UserContact = {
   name: 'Marina Duarte',
   email: 'marina.duarte@example.com',
-  phone: '(15) 99999-0001',
+  phone: CONTACT_PHONE,
+  thumbnailUrl: null,
 };
 
 const OTHER_CONTACT: UserContact = {
   name: 'Rafael Nunes',
   email: 'rafael.nunes@example.com',
   phone: '(15) 99999-0002',
+  thumbnailUrl: null,
 };
 
 const LOST_ITEM: LostItem = {
@@ -92,6 +98,7 @@ describe('LostItemCard', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    restoreContentHeight();
     Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
   });
 
@@ -115,6 +122,22 @@ describe('LostItemCard', () => {
     await waitFor(() => expect(asked).toEqual([`/${thumbnailPath}`]));
   });
 
+  it('should list the kind, the date and the place, from the shortest text', () => {
+    renderComponent();
+
+    expect(screen.getByRole('article')).toHaveTextContent(`Perdido11/08/2026${LOST_ITEM.place}`);
+  });
+
+  it('should collapse a long description behind the expansion', () => {
+    forgeOverflow();
+    renderComponent();
+
+    expect(screen.getByText(LOST_ITEM.description ?? '')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: DESCRIPTION_TOGGLE_LABELS.expand }),
+    ).toBeInTheDocument();
+  });
+
   it('should show the contact of whoever registered an item of someone else', async () => {
     renderComponent();
 
@@ -122,7 +145,7 @@ describe('LostItemCard', () => {
 
     expect(dialog.getByText(CONTACT.name)).toBeInTheDocument();
     expect(dialog.getByRole('button', { name: COPY_EMAIL_LABEL })).toBeInTheDocument();
-    expect(dialog.getByRole('link', { name: CONTACT.phone })).toBeInTheDocument();
+    expect(dialog.getByRole('link', { name: CONTACT_PHONE })).toBeInTheDocument();
   });
 
   it('should take the contact from the item, not from a fixed one', async () => {
@@ -153,7 +176,7 @@ describe('LostItemCard', () => {
 
     const dialog = await openContact();
 
-    expect(dialog.getByRole('link', { name: CONTACT.phone })).toHaveAttribute(
+    expect(dialog.getByRole('link', { name: CONTACT_PHONE })).toHaveAttribute(
       'href',
       expect.stringContaining(encodeURIComponent(LOST_ITEM.name)),
     );

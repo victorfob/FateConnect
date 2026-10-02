@@ -10,6 +10,7 @@ import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 import { ShellContent, ShellRoot } from '../shell.styles';
 import { AccountMenu } from './components/AccountMenu';
+import { ContactBanner } from './components/ContactBanner';
 import { DrawerNavigation } from './components/DrawerNavigation';
 import { DrawerSignOut } from './components/DrawerSignOut';
 import { NotificationsMenu } from './components/NotificationsMenu';
@@ -57,6 +58,8 @@ export function MainLayout() {
       >
         <DrawerNavigation onNavigate={handleDrawerClose} />
       </NavigationDrawer>
+
+      <ContactBanner />
 
       <ShellContent component="main">
         <Outlet />

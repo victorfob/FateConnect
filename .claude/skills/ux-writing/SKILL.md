@@ -7,7 +7,7 @@ description: "Escreve e revisa o texto de interface do FateConnect — rótulo, 
 
 ## Paradas
 
-1. ⛔ **O gatilho é a copy existir, não alguém pedir.** Texto novo ou alterado no meio de outra tarefa passa por aqui antes do commit, mesmo quando parece óbvio por seguir as vizinhas — é aí que ele entra sem ninguém decidir.
+1. ⛔ **O gatilho é a copy existir, não alguém pedir.** Texto novo ou alterado no meio de outra tarefa passa por aqui antes do commit, mesmo quando parece óbvio por seguir as vizinhas — é aí que ele entra sem ninguém decidir. Vale para a frase que o dono propõe: a tabela da régua vai à vista sobre ela também.
 2. ⛔ **Havendo mais de uma candidata defensável, ofereça as frases inteiras e deixe a escolha ao dono.** Medição não substitui a oferta; quanto mais medição, mais a escolha parece decidida pelos números. Se ele não recusou uma alternativa, a escolha é sua e se anuncia como sua — nunca "pela skill".
 
 Postura: direta e construtiva, parceira de quem escreve o produto, não validadora. Quem lê o produto: estudante da faculdade, no celular ou no laptop, com pressa e no meio de outra coisa.

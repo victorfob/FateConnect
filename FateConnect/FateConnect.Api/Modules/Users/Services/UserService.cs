@@ -7,6 +7,7 @@ using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Enums;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Services;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
@@ -31,7 +32,6 @@ public partial class UserService(
     public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto, RequestOrigin origin)
     {
         await EnsureEmailIsUniqueAsync(dto.FatecEmail);
-        await EnsureContactIsUniqueAsync(dto.Phone, dto.ContactEmail);
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
         string hashedPassword = HashPassword(dto.Password);
@@ -42,7 +42,7 @@ public partial class UserService(
             dto.FullName,
             dto.BirthDate,
             dto.Gender,
-            new UserContact(dto.Phone, dto.ContactEmail),
+            contact: null,
             now
         );
 
@@ -110,27 +110,14 @@ public partial class UserService(
             return null;
         }
 
-        string newPhone = dto.Phone?.Trim() ?? user.Phone;
-        string newContactEmail = dto.ContactEmail?.Trim().ToLowerInvariant() ?? user.ContactEmail;
-
-        bool isPhoneDuplicated = newPhone != user.Phone &&
-            await userRepository.ContactPhoneExistsAsync(newPhone, excludeUserId: currentUserId);
-
-        if (isPhoneDuplicated)
-            throw new ContactPhoneAlreadyRegisteredException(newPhone);
-
-        bool isContactEmailDuplicated = newContactEmail != user.ContactEmail &&
-            await userRepository.ContactEmailExistsAsync(newContactEmail, excludeUserId: currentUserId);
-
-        if (isContactEmailDuplicated)
-            throw new ContactEmailAlreadyRegisteredException(newContactEmail);
+        UserContact? newContact = ResolveContact(user, dto.Phone, dto.ContactEmail);
+        await EnsureChangedContactIsUniqueAsync(user, newContact);
 
         user.UpdatePersonalData(
             dto.FullName ?? user.FullName,
             dto.BirthDate ?? user.BirthDate,
             dto.Gender ?? user.Gender,
-            newPhone,
-            newContactEmail,
+            newContact,
             dto.Neighborhood ?? user.Neighborhood
         );
 
@@ -247,7 +234,8 @@ public partial class UserService(
                 u.Id,
                 u.FullName,
                 u.ContactEmail,
-                string.IsNullOrEmpty(u.Phone) ? null : u.Phone,
+                u.Phone,
+                UploadsLocation.ThumbnailOrNullOf(u.ImageUrl),
                 u.Status
             )
         );
@@ -285,8 +273,7 @@ public partial class UserService(
         }
 
         string newFatecEmail = dto.FatecEmail?.Trim().ToLowerInvariant() ?? user.FatecEmail;
-        string newPhone = dto.Phone?.Trim() ?? user.Phone;
-        string newContactEmail = dto.ContactEmail?.Trim().ToLowerInvariant() ?? user.ContactEmail;
+        UserContact? newContact = ResolveContact(user, dto.Phone, dto.ContactEmail);
 
         bool isFatecEmailDuplicated = newFatecEmail != user.FatecEmail &&
             await userRepository.EmailExistsAsync(newFatecEmail, excludeUserId: id);
@@ -294,23 +281,12 @@ public partial class UserService(
         if (isFatecEmailDuplicated)
             throw new EmailAlreadyRegisteredException(newFatecEmail);
 
-        bool isPhoneDuplicated = newPhone != user.Phone &&
-            await userRepository.ContactPhoneExistsAsync(newPhone, excludeUserId: id);
-
-        if (isPhoneDuplicated)
-            throw new ContactPhoneAlreadyRegisteredException(newPhone);
-
-        bool isContactEmailDuplicated = newContactEmail != user.ContactEmail &&
-            await userRepository.ContactEmailExistsAsync(newContactEmail, excludeUserId: id);
-
-        if (isContactEmailDuplicated)
-            throw new ContactEmailAlreadyRegisteredException(newContactEmail);
+        await EnsureChangedContactIsUniqueAsync(user, newContact);
 
         user.UpdateByAdmin(
             dto.FullName ?? user.FullName,
             newFatecEmail,
-            newPhone,
-            newContactEmail
+            newContact
         );
 
         await userRepository.SaveChangesAsync();
@@ -414,13 +390,27 @@ public partial class UserService(
             throw new EmailAlreadyRegisteredException(email);
     }
 
-    private async Task EnsureContactIsUniqueAsync(string phone, string contactEmail, int? excludeUserId = null)
-    {
-        if (await userRepository.ContactPhoneExistsAsync(phone, excludeUserId))
-            throw new ContactPhoneAlreadyRegisteredException(phone);
+    private static UserContact? ResolveContact(User user, string? phone, string? contactEmail) =>
+        UserContact.FromOptional(
+            phone?.Trim() ?? user.Phone,
+            contactEmail?.Trim().ToLowerInvariant() ?? user.ContactEmail);
 
-        if (await userRepository.ContactEmailExistsAsync(contactEmail, excludeUserId))
-            throw new ContactEmailAlreadyRegisteredException(contactEmail);
+    private async Task EnsureChangedContactIsUniqueAsync(User user, UserContact? newContact)
+    {
+        if (newContact is null)
+            return;
+
+        bool isPhoneDuplicated = newContact.Phone != user.Phone &&
+            await userRepository.ContactPhoneExistsAsync(newContact.Phone, excludeUserId: user.Id);
+
+        if (isPhoneDuplicated)
+            throw new ContactPhoneAlreadyRegisteredException(newContact.Phone);
+
+        bool isContactEmailDuplicated = newContact.ContactEmail != user.ContactEmail &&
+            await userRepository.ContactEmailExistsAsync(newContact.ContactEmail, excludeUserId: user.Id);
+
+        if (isContactEmailDuplicated)
+            throw new ContactEmailAlreadyRegisteredException(newContact.ContactEmail);
     }
 
     private static ReadUserDto MapToReadDto(User record) =>
@@ -434,6 +424,7 @@ public partial class UserService(
             ContactEmail: record.ContactEmail,
             Neighborhood: record.Neighborhood,
             ImageUrl: record.ImageUrl,
+            ThumbnailUrl: UploadsLocation.ThumbnailOrNullOf(record.ImageUrl),
             ProfileType: record.ProfileType,
             Status: record.Status,
             CreatedAt: record.CreatedAt

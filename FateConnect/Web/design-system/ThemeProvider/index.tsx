@@ -1,36 +1,35 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { GlobalStyles } from '../GlobalStyles';
-import { createAppTheme, type ThemeMode } from '../theme';
+import { createAppTheme } from '../theme';
+import type { ThemePreference } from './@types/themePreference';
 import { ThemeModeContext } from './context/ThemeModeContext';
-import { themeModeStorage } from './storage/themeModeStorage';
+import { paintBrowserBars, rememberPreference, resolvedMode, storedPreference } from './helpers';
 
-type ThemeProviderProps = Readonly<{
-  children: ReactNode;
-  defaultMode?: ThemeMode;
-}>;
+const SYSTEM_DARK_QUERY = '(prefers-color-scheme: dark)';
 
-function oppositeMode(mode: ThemeMode): ThemeMode {
-  if (mode === 'light') return 'dark';
-  return 'light';
-}
+type ThemeProviderProps = Readonly<{ children: ReactNode }>;
 
-export function ThemeProvider({ children, defaultMode = 'light' }: ThemeProviderProps) {
-  const [mode, setMode] = useState<ThemeMode>(() => themeModeStorage.read() ?? defaultMode);
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const [preference, setPreference] = useState<ThemePreference>(storedPreference);
+  const systemPrefersDark = useMediaQuery(SYSTEM_DARK_QUERY, { noSsr: true });
+  const mode = resolvedMode(preference, systemPrefersDark);
 
-  const toggleMode = useCallback(() => {
-    setMode((current) => {
-      const chosen = oppositeMode(current);
-      themeModeStorage.save(chosen);
-
-      return chosen;
-    });
+  const choosePreference = useCallback((chosen: ThemePreference) => {
+    rememberPreference(chosen);
+    setPreference(chosen);
   }, []);
 
   const theme = useMemo(() => createAppTheme(mode), [mode]);
-  const themeMode = useMemo(() => ({ mode, toggleMode }), [mode, toggleMode]);
+  const themeMode = useMemo(
+    () => ({ mode, preference, choosePreference }),
+    [mode, preference, choosePreference],
+  );
+
+  useEffect(() => paintBrowserBars(theme.palette.chrome.main), [theme]);
 
   return (
     <ThemeModeContext.Provider value={themeMode}>

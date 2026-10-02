@@ -8,6 +8,7 @@ const VALID: UserFormValues = {
   fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
   phone: '(15) 99999-8888',
   contactEmail: 'maria@exemplo.test',
+  contactIsRequired: true,
   profileType: ProfileTypeEnum.OPERATOR,
 };
 
@@ -31,6 +32,18 @@ describe('userFormSchema', () => {
     const result = userFormSchema.safeParse({ ...VALID, phone: '99999-8888' });
 
     expect(result.error?.issues[0]?.path).toEqual(['phone']);
+  });
+
+  it('should refuse clearing the contact of an account that has one', () => {
+    const result = userFormSchema.safeParse({ ...VALID, phone: '', contactEmail: '' });
+
+    expect(result.error?.issues.map(({ path }) => path)).toEqual([['phone'], ['contactEmail']]);
+  });
+
+  it('should accept an account still without contact', () => {
+    const withoutContact = { ...VALID, phone: '', contactEmail: '', contactIsRequired: false };
+
+    expect(userFormSchema.safeParse(withoutContact).success).toBe(true);
   });
 
   it('should refuse a profile the api does not know', () => {

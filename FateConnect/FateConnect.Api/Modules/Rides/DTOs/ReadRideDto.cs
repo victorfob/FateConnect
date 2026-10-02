@@ -10,6 +10,7 @@ public record ReadRideDto(
     TimeOnly DepartureTime,
     DateTime CreatedAt,
     EnumRideType RideType,
+    EnumVehicleType VehicleType,
     string? Description,
     UserContactDto Driver,
     bool IsOwner,

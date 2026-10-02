@@ -6,9 +6,5 @@ export const LinksRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   gap: theme.space(md),
 
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: theme.space(xs),
-  },
+  [theme.breakpoints.down('md')]: { gap: theme.space(xs) },
 }));

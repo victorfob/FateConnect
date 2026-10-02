@@ -14,5 +14,8 @@ public record FilterRideDto : DateRangeFilterDto
     [EnumDataType(typeof(EnumRideType), ErrorMessage = "Tipo de carona inválido")]
     public EnumRideType? RideType { get; init; }
 
+    [EnumDataType(typeof(EnumVehicleType), ErrorMessage = "Veículo inválido")]
+    public EnumVehicleType? VehicleType { get; init; }
+
     public bool? OnlyMine { get; init; }
 }

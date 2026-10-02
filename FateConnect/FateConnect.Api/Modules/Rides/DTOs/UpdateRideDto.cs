@@ -14,6 +14,8 @@ public record UpdateRideDto
 
     public EnumRideType? RideType { get; init; }
 
+    public required EnumVehicleType VehicleType { get; init; }
+
     [StringLength(300)]
     public string? Description { get; init; }
 

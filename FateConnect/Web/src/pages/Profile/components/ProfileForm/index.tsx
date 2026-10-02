@@ -5,6 +5,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import type { User } from '@app/services/users/types';
 
 import { toProfileFormValues } from '../../helpers/mapper';
+import { hasPendingChanges } from '../../helpers/pendingChanges';
 import { useLeaveConfirmation } from '../../hooks/useLeaveConfirmation';
 import { useProfileSave } from '../../hooks/useProfileSave';
 import { profileSchema, type ProfileFormInput, type ProfileFormValues } from '../../schema';
@@ -26,8 +27,8 @@ export function ProfileForm({ profile, onSaved }: ProfileFormProps) {
     defaultValues: toProfileFormValues(profile),
   });
   const { save, isSaving } = useProfileSave({ form, profile, onSaved });
-  const { isDirty } = form.formState;
-  const { confirming, confirmLeave, cancelLeave } = useLeaveConfirmation(isDirty);
+  const hasChanges = hasPendingChanges(form.formState.dirtyFields);
+  const { confirming, confirmLeave, cancelLeave } = useLeaveConfirmation(hasChanges);
 
   const handleSubmit = form.handleSubmit(save);
   const handleDiscard = useCallback(() => form.reset(), [form]);
@@ -43,11 +44,11 @@ export function ProfileForm({ profile, onSaved }: ProfileFormProps) {
             <AccountDataCard fatecEmail={profile.fatecEmail} />
           </S.CardArea>
           <S.CardArea area="access">
-            <AccountAccessCard />
+            <AccountAccessCard fatecEmail={profile.fatecEmail} />
           </S.CardArea>
         </S.CardsGrid>
 
-        <SaveBar hasChanges={isDirty} saving={isSaving} onDiscard={handleDiscard} />
+        <SaveBar hasChanges={hasChanges} saving={isSaving} onDiscard={handleDiscard} />
         <UnsavedChangesDialog open={confirming} onCancel={cancelLeave} onDiscard={confirmLeave} />
       </S.ProfileFormRoot>
     </FormProvider>

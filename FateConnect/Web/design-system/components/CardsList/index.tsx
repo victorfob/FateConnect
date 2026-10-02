@@ -40,7 +40,7 @@ export function CardsList({
   // cartão, a mesma que separa um cartão do outro.
   return (
     <S.CardsColumn>
-      {isEmpty && <Typography variant="subtitle">{emptyMessage}</Typography>}
+      {isEmpty && <Typography variant="body">{emptyMessage}</Typography>}
       {!isEmpty && children}
       {pagination && <S.PaginationRow>{pagination}</S.PaginationRow>}
     </S.CardsColumn>

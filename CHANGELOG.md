@@ -6,6 +6,56 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-02
+
+### Added
+
+- Adiciona a instalação do site na tela inicial do celular, como um app, com o ícone do FateConnect e abertura sem a barra do navegador; o app instalado continua dependendo da internet (#539) [Frontend]
+- Adiciona a miniatura da foto de perfil ao contato de quem publica uma carona, um item ou uma denúncia identificada, ao perfil e à lista de contas da gestão; quem não tem foto vem sem miniatura (#510) [Backend]
+- Adiciona a foto de perfil de quem publicou ao contato de uma carona, de um item ou de uma denúncia, baixada só ao abrir o contato: o círculo pulsa enquanto ela chega, e sem foto ou se ela não carregar ficam as iniciais (#511) [Frontend]
+- Adiciona a foto de perfil de cada conta ao cartão da lista de usuários da gestão, com as iniciais para quem não tem foto (#511) [Frontend]
+- Adiciona a recusa de ofertar carona, cadastrar item e enviar denúncia sem sigilo para quem está sem contato, que continua entrando, consultando as listas e enviando denúncia sigilosa; a resposta diz qual ação foi barrada e traz um código próprio no corpo do erro (#515) [Backend]
+- Adiciona a faixa no topo da área logada para quem está sem contato, com o caminho para o perfil; ela pode ser fechada e volta no próximo login (#517) [Frontend]
+- Adiciona o aviso de contatos pendentes ao ofertar carona ou cadastrar item sem contato, no lugar do formulário e também quando a API recusa, com o caminho para o perfil (#517) [Frontend]
+- Adiciona o tipo de veículo à carona, carro ou moto, obrigatório ao ofertar e ao editar e devolvido na leitura; as caronas já ofertadas ficam como carro, e a requisição sem o veículo passa a ser recusada (#520) [Backend]
+- Adiciona o filtro de caronas pelo tipo de veículo; sem ele, a listagem segue com todas (#520) [Backend]
+- Adiciona a escolha do veículo, carro ou moto, ao ofertar e ao editar carona, obrigatória como a API passou a exigir (#521) [Frontend]
+- Adiciona ao cartão de carona se ela é de carro ou de moto, com ícone (#521) [Frontend]
+- Adiciona o filtro de caronas por veículo, com a escolha guardada no endereço (#521) [Frontend]
+- Adiciona a sugestão de bairros de Sorocaba e das cidades vizinhas, cada um com a cidade, ao bairro do perfil e ao destino da carona enquanto se digita; o texto fora da lista continua aceito (#538) [Frontend]
+- Adiciona ao destino da carona, ao tocar no campo ainda vazio, a sugestão do bairro cadastrado no perfil e da Fatec Sorocaba, que também aparece ao digitar (#538) [Frontend]
+- Adiciona o tema automático, que segue o do aparelho e muda junto com ele, escolhido num menu com Automático, Claro e Escuro nas Preferências e no topo da landing. Sem escolha guardada, o app abre no tema do aparelho, e quem já escolheu claro ou escuro continua com a escolha (#543) [Frontend]
+
+### Changed
+
+- Passa o avatar do topo a baixar a versão reduzida da foto de perfil e a pulsar enquanto ela carrega, em vez de mostrar as iniciais até a foto chegar (#511) [Frontend]
+- Passa a declarar na política de privacidade que a foto de perfil continua visível no item encerrado e que a denúncia sigilosa também a esconde de quem analisa, em nova versão do documento (#511) [Frontend]
+- Passa a criar a conta sem telefone e e-mail de contato: o cadastro deixa de recebê-los, e quem ainda os envia não recebe erro, mas os perde. O contato entra só pelo perfil, com os dois juntos, e depois de cadastrado não se apaga (#515) [Backend]
+- Passa a criar a conta sem pedir telefone e e-mail de contato: os dois entram juntos pelo perfil, opcionais até o primeiro cadastro e sem poder ser apagados depois, e a edição de contas da gestão segue a mesma regra (#517) [Frontend]
+- Passa a enviar como sigilosa a denúncia de quem está sem contato, com a opção de sigilo ligada e travada e uma nota dizendo como liberá-la (#517) [Frontend]
+- Passa a declarar na política de privacidade e nos termos de uso que o contato é opcional, cadastrado pelo perfil com os dois juntos e sem poder ser apagado, e o que fica bloqueado sem ele, em nova versão dos termos (#517) [Frontend]
+- Passa a citar o veículo entre os dados da carona na política de privacidade e nos termos de uso, em nova versão dos dois documentos (#521) [Frontend]
+- Passa a mostrar no celular as informações dos cartões de carona, achados e perdidos, denúncias e usuários da gestão uma por linha, em vez de quebrarem conforme o tamanho do texto, e em ordem do texto mais curto ao mais longo, também no desktop (#523) [Frontend]
+- Passa a mostrar no celular, nos cartões com foto de achados e perdidos e de denúncias, a etiqueta e as ações no topo e o título e as informações ao lado da miniatura, que antes deixava uma faixa vazia à direita dela (#524) [Frontend]
+- Passa a recolher em duas linhas a descrição dos cartões de carona e de achados e perdidos, com o botão de expandir quando há mais texto, como já era na denúncia; a carona sem descrição deixa de reservar espaço para ela (#526) [Frontend]
+- Passa a deixar desabilitado o salvar da edição de carona, de item e de conta da gestão até algum campo mudar, como já era em Meu perfil; desfeita a mudança, ele volta a desabilitar, e os cadastros seguem com o botão ativo (#530) [Frontend]
+- Passa a explicar no ícone de ajuda do e-mail Fatec, em Meu perfil, que ele identifica a conta e que a troca se pede à administração pelos contatos do rodapé, no lugar da frase fixa embaixo do campo (#529) [Frontend]
+- Passa a mostrar o rodapé mais baixo no celular, com o e-mail e o telefone na mesma linha, os termos de uso e a política de privacidade lado a lado e a frase de assinatura mais curta, em uma linha só (#531) [Frontend]
+- Passa a desenhar os botões em três alturas, iguais em qualquer variante e com os mesmos cantos arredondados: 36px na maioria, 32px nos de foto e nas ações dos cartões, 40px nos do topo e no Voltar ao menu (#532) [Frontend]
+- Passa a esticar o Desativar conta na largura do cartão do perfil, e no celular os botões de foto até a borda dos campos (#532) [Frontend]
+- Passa a mostrar o e-mail para contato numa linha inteira e antes do telefone, em Meu perfil e na edição de conta da gestão, para um e-mail longo caber; na gestão, o telefone divide a linha com o perfil e ganha o exemplo de formato (#536) [Frontend]
+- Passa a enviar a fonte do site junto com o app, para o texto sair com a mesma letra em todo aparelho: antes só o Mac e o iPhone mostravam a Helvetica Neue, e no Android cada fabricante usava a sua. Enquanto ela carrega, vale a fonte do sistema (#541) [Frontend]
+
+### Fixed
+
+- Corrige o salvamento de Meu perfil com telefone ou e-mail para contato já usado por outra conta, que só avisava que não deu certo; agora o aviso aparece embaixo do campo certo, que recebe o foco (#519) [Frontend]
+- Corrige a palavra ou o e-mail sem espaço no título, nas informações ou na descrição de um cartão de lista, que passava da borda do cartão e, no celular, alargava a página inteira; agora o texto quebra dentro do cartão (#523) [Frontend]
+- Corrige o botão de expandir a descrição da denúncia, que ficava decidido pela largura em que o cartão apareceu: ao girar o celular, o texto podia ficar cortado sem o botão, ou com um botão que não revelava nada (#526) [Frontend]
+- Corrige o botão vermelho preenchido que, no celular, continuava vermelho depois de desabilitar, com o texto apagado: o toque deixa o botão em hover, e o hover pintava o fundo mesmo desabilitado, como o Salvar alterações do perfil depois de salvar (#526) [Frontend]
+- Corrige o ícone de menu do topo, que no celular ficava mais para dentro que o conteúdo da página por causa da folga em volta do desenho; agora ele se alinha à borda do conteúdo, sem diminuir a área de toque (#528) [Frontend]
+- Corrige o texto que saía na fonte Inter só para quem a tinha instalada no computador, já que o app nunca a enviava; agora todo mundo vê a fonte do sistema, a mesma que o resto já via (#537) [Frontend]
+- Corrige Meu perfil quando o navegador preenche sozinho a senha atual: a tela já abria com alterações não salvas e cobrava a nova senha para salvar qualquer dado. A senha atual sozinha passa a não contar, e só a nova senha pede a troca (#538) [Frontend]
+
 ## [1.1.1] - 2026-09-30
 
 ### Security

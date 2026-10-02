@@ -25,6 +25,14 @@ Cada caso: o que o número responde, o que ele parece responder, e o controle.
 
 - Com largura emulada maior que o painel, a página é reduzida por transformação e `getBoundingClientRect` devolve pixel visual. `offsetWidth`/`offsetHeight` são de layout e não sofrem a transformação; o fator é `el.getBoundingClientRect().width / el.offsetWidth`, medido no **próprio** elemento (o `scale` inicial de um popover em transição dá 0,75 enquanto o `body` dá 1).
 - Painel oculto mede `window.innerWidth` 0 e geometria lixo. Emular o viewport com largura e altura explícitas devolve layout real; leia a largura junto de cada medição e devolva o preset `desktop` ao terminar.
+- ⛔ **Painel oculto não entrega `ResizeObserver` nem `requestAnimationFrame`** (`document.visibilityState` é `hidden`): o que depende deles parece quebrado, inclusive um observador seu, que não recebe nem a chamada inicial. Meça num Chrome `--headless=new` com `--remote-debugging-port`, pelo `WebSocket` do Node: `Emulation.setDeviceMetricsOverride` troca a largura sem recarregar, e o controle é o mesmo script com o mecanismo tirado do código.
+- Mover ou renomear pasta de módulo com o Vite de pé deixa todo servidor que lê a árvore com o grafo velho, inclusive o da porta padrão: a página sai em branco e o log diz `Failed to load url`. Reinicie os servidores depois do `mv`.
+
+## Tema e dado da captura
+
+- A chave `theme_mode` do `localStorage` vence o `prefers-color-scheme` emulado; sem ela vale o emulado (o *Automático*). Grave ou apague a chave antes de navegar: captura escura idêntica à clara é o sinal.
+- No Chrome sem janela, `elemento.focus()` por script não dá estado de foco: o rótulo flutuante não sobe, o painel que abre no foco não abre, e a captura mostra uma tela que ninguém vê. Clique por `Input.dispatchMouseEvent`, com `Emulation.setFocusEmulationEnabled` ligado.
+- Stub com o tipo pela metade muda o comportamento: campo ausente no registro faz o formulário nascer alterado (`isDirty`), e o salvar desabilitado parece quebrado. Antes de culpar o código, confira o stub contra o tipo do serviço (`services/**/types.ts`).
 
 ## Limite de tela
 
@@ -38,6 +46,8 @@ O rótulo encolhido do campo do MUI fica 9px acima da caixa (`translate(14px, -9
 ## Largura de texto
 
 - Largura útil = `getBoundingClientRect` do contêiner menos o `padding` computado. Texto por `measureText` num `canvas` com a fonte real, depois de `document.fonts.ready`.
+- ⛔ Fonte declarada não é fonte carregada: antes de dizer com qual fonte mediu, leia `[...document.fonts]`. Vazio é a fonte do sistema, seja qual for o `font-family` do tema, e a largura muda de aparelho para aparelho.
 - Meça no contêiner mais apertado que vai receber o texto, a 375px.
+- Trocar fonte ou peso muda largura: remeça a 375px as larguras decididas por tamanho (e-mail e telefone lado a lado no rodapé).
 - A largura só decide quando separa as candidatas: se todas cabem ou nenhuma cabe, a escolha volta a ser por precisão.
 - Estourar custa diferente por lugar: título e `helperText` quebram linha (barato); o rodapé de diálogo empilha as ações e a fileira de informações do cartão desce um item (caro).

@@ -1,3 +1,4 @@
+import { CONTACT_MESSAGES } from '@app/components/ContactFields/constants';
 import { SIGNUP_MESSAGES } from '@app/pages/Signup/schema';
 
 import { PASSWORD_MESSAGES, profileSchema, type ProfileFormInput } from '.';
@@ -8,6 +9,7 @@ const VALID: ProfileFormInput = {
   gender: 'Female',
   phone: '(15) 99123-4567',
   contactEmail: 'maria.silva@gmail.com',
+  contactIsRequired: true,
   neighborhood: 'Jardim Vergueiro',
   photo: null,
   removeStoredPhoto: false,
@@ -27,6 +29,19 @@ describe('profileSchema', () => {
     expect(issuesOf(VALID)).toEqual([]);
   });
 
+  it('should refuse clearing the contact of whoever already has one', () => {
+    expect(issuesOf({ ...VALID, phone: '', contactEmail: '' })).toEqual([
+      { path: 'phone', message: CONTACT_MESSAGES.phoneRequired },
+      { path: 'contactEmail', message: CONTACT_MESSAGES.contactEmailRequired },
+    ]);
+  });
+
+  it('should accept a profile still without contact', () => {
+    expect(issuesOf({ ...VALID, phone: '', contactEmail: '', contactIsRequired: false })).toEqual(
+      [],
+    );
+  });
+
   it('should accept an empty neighborhood, which clears it', () => {
     expect(issuesOf({ ...VALID, neighborhood: '' })).toEqual([]);
   });
@@ -37,10 +52,8 @@ describe('profileSchema', () => {
     ]);
   });
 
-  it('should ask for the new password once the current one is typed', () => {
-    expect(issuesOf({ ...VALID, currentPassword: 'SenhaAtual123' })).toEqual([
-      { path: 'newPassword', message: PASSWORD_MESSAGES.newRequired },
-    ]);
+  it('should ignore the current password alone, which the browser fills in by itself', () => {
+    expect(issuesOf({ ...VALID, currentPassword: 'SenhaAtual123' })).toEqual([]);
   });
 
   it('should hold the new password to the signup rule', () => {

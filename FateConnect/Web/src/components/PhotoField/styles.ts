@@ -34,16 +34,14 @@ export const PhotoPreview = styled(PolymorphicBox)<
   borderRadius: theme.radius(radiusScale.md),
 }));
 
+/** No estreito os botões vão até a borda dos campos; no largo a dica divide a linha com eles. */
 export const PhotoActions = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.space(xs),
+
+  [theme.breakpoints.down('md')]: { flex: 1 },
 }));
 
-/**
- * Escolher a foto é um controle do formulário: rótulo no texto de conteúdo e
- * borda igual à dos campos ao lado. A derivação do MUI, cor da paleta no rótulo
- * e ela a 50% na borda, reprova no contraste sobre a superfície.
- */
 /** No estreito a foto e os botões seguem lado a lado, e o texto desce inteiro. */
 export const PhotoHint = styled(Box)(({ theme }) => ({
   flex: 1,

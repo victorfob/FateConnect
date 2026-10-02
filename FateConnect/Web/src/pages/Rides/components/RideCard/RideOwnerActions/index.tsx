@@ -25,7 +25,7 @@ export function RideOwnerActions({ ride, onEdit, onDelete }: RideOwnerActionsPro
 
   return (
     <>
-      <IconButton type="button" label={RIDE_CARD_LABELS.edit} onClick={handleEdit}>
+      <IconButton type="button" size="small" label={RIDE_CARD_LABELS.edit} onClick={handleEdit}>
         <EditIcon />
       </IconButton>
 

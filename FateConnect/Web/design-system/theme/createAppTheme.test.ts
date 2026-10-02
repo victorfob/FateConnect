@@ -21,7 +21,7 @@ describe('createAppTheme', () => {
     const { typography } = createAppTheme();
 
     expect(typography.h2).toMatchObject(typographyTokens.h2);
-    expect(typography.subtitle).toMatchObject(typographyTokens.subtitle);
+    expect(typography.body).toMatchObject(typographyTokens.body);
     expect(typography.subtitleBold).toMatchObject(typographyTokens.subtitleBold);
     expect(typography.caption).toMatchObject(typographyTokens.caption);
     expect(typography.captionBold).toMatchObject(typographyTokens.captionBold);

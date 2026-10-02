@@ -14,8 +14,6 @@ const PAYLOAD: SignupRequest = {
   fullName: 'Fulano de Tal',
   birthDate: '2000-01-01T00:00:00Z',
   gender: 'Female',
-  phone: '15999999999',
-  contactEmail: 'fulano.tal@gmail.com',
   acceptances: [{ document: DocumentTypeEnum.TERMS_OF_USE, version: '2026-01-15' }],
   receiveEmails: false,
   receiveNotifications: false,

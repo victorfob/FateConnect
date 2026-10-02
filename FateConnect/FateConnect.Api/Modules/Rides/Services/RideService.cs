@@ -24,6 +24,7 @@ public partial class RideService(
             dto.DepartureDate,
             dto.DepartureTime,
             dto.RideType,
+            dto.VehicleType,
             currentUserId,
             dto.Description
         );
@@ -84,6 +85,7 @@ public partial class RideService(
         ride.UpdateBasicAttributes(
             dto.Destination,
             dto.RideType,
+            dto.VehicleType,
             dto.Description
         );
 
@@ -143,6 +145,7 @@ public partial class RideService(
             ride.DepartureTime,
             ride.CreatedAt,
             ride.RideType,
+            ride.VehicleType,
             ride.Description,
             ride.Driver.ToContactDto(),
             ride.IsDrivenBy(currentUserId),

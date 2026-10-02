@@ -1,17 +1,23 @@
 import { http, HttpResponse } from 'msw';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
+import { CONTACT_FIELD_LABELS, CONTACT_MESSAGES } from '@app/components/ContactFields/constants';
 import { PHOTO_FIELD_TEXTS, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
+import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
+import { ContactBanner } from '@app/layouts/MainLayout/components/ContactBanner';
+import { CONTACT_BANNER_TEXT } from '@app/layouts/MainLayout/components/ContactBanner/constants';
 import { DrawerSignOut } from '@app/layouts/MainLayout/components/DrawerSignOut';
 import { SIGN_OUT_LABEL } from '@app/layouts/MainLayout/components/DrawerSignOut/constants';
 import { server } from '@app/mocks/server';
-import { FIELD_LABELS } from '@app/pages/Signup/constants';
+import { SignupConflictFieldEnum } from '@app/pages/Signup/@types';
+import { FIELD_LABELS, SIGNUP_CONFLICT_MESSAGES } from '@app/pages/Signup/constants';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { PROFILE } from '@app/test/profile';
 import { act, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
+import { ADDRESS_OFF_AUTOCOMPLETE } from '@ds-root/components/Input/components/AutocompleteField/constants';
 
 import {
   ACCOUNT_ACCESS_SUBSECTIONS,
@@ -24,7 +30,7 @@ import {
 import { DEACTIVATE } from './components/DeactivateAccount/constants';
 import { PASSWORD_LABELS } from './components/PasswordFields/constants';
 import {
-  FATEC_EMAIL_HINT,
+  FATEC_EMAIL_HELP,
   NEIGHBORHOOD_HELP,
   NEIGHBORHOOD_LABEL,
 } from './components/PersonalDataFields/constants';
@@ -71,6 +77,7 @@ const NEW_TOKEN = tokenWithName('Maria da Silva');
 const NO_CONTENT = 204;
 const BAD_REQUEST = 400;
 const SERVER_ERROR = 500;
+const CONFLICT = 409;
 
 function serveProfile(profile = PROFILE) {
   server.use(http.get(PROFILE_URL, () => HttpResponse.json(profile)));
@@ -139,7 +146,7 @@ describe('Profile', () => {
     const fullName = await renderProfile();
 
     expect(fullName).toHaveValue(PROFILE.fullName);
-    expect(screen.getByRole('textbox', { name: NEIGHBORHOOD_LABEL })).toHaveValue(
+    expect(screen.getByRole('combobox', { name: NEIGHBORHOOD_LABEL })).toHaveValue(
       PROFILE.neighborhood,
     );
     expect(screen.getByRole('textbox', { name: /Telefone/ })).toHaveValue('(15) 99123-4567');
@@ -147,7 +154,21 @@ describe('Profile', () => {
     const fatecEmail = screen.getByRole('textbox', { name: FIELD_LABELS.fatecEmail });
     expect(fatecEmail).toHaveValue(PROFILE.fatecEmail);
     expect(fatecEmail).toBeDisabled();
-    expect(fatecEmail).toHaveAccessibleDescription(FATEC_EMAIL_HINT);
+  });
+
+  it('should explain behind the help icon how to change the locked Fatec e-mail', async () => {
+    await renderProfile();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: new RegExp(FIELD_LABELS.fatecEmail) }),
+    );
+
+    const tooltip = await screen.findByRole('tooltip');
+    expect(tooltip).toHaveTextContent(FATEC_EMAIL_HELP);
+    expect(screen.getByText(FATEC_EMAIL_HELP).closest('[role="tooltip"]')).toBe(tooltip);
+    expect(
+      screen.getByRole('textbox', { name: FIELD_LABELS.fatecEmail }),
+    ).not.toHaveAccessibleDescription();
   });
 
   it('should explain what the neighborhood is for', async () => {
@@ -156,6 +177,37 @@ describe('Profile', () => {
     await userEvent.click(screen.getByRole('button', { name: new RegExp(NEIGHBORHOOD_LABEL) }));
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent(NEIGHBORHOOD_HELP);
+  });
+
+  it('should keep the saved addresses of the browser off the neighborhood suggestions', async () => {
+    await renderProfile();
+
+    expect(screen.getByRole('combobox', { name: NEIGHBORHOOD_LABEL })).toHaveAttribute(
+      'autocomplete',
+      ADDRESS_OFF_AUTOCOMPLETE,
+    );
+  });
+
+  it('should suggest the neighborhood while it is typed, and save the one chosen', async () => {
+    const [suggestion = ''] = NEIGHBORHOOD_SUGGESTIONS;
+    let sentNeighborhood: FormDataEntryValue | null = null;
+    server.use(
+      http.patch(PROFILE_URL, async ({ request }) => {
+        sentNeighborhood = (await request.formData()).get('Neighborhood');
+
+        return HttpResponse.json({ ...PROFILE, neighborhood: suggestion });
+      }),
+    );
+    await renderProfile();
+    const neighborhood = screen.getByRole('combobox', { name: NEIGHBORHOOD_LABEL });
+
+    await userEvent.clear(neighborhood);
+    await userEvent.type(neighborhood, suggestion.slice(0, -1));
+    await userEvent.click(await screen.findByRole('option', { name: suggestion }));
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(PROFILE_MESSAGES.saved)).toBeInTheDocument();
+    expect(sentNeighborhood).toBe(suggestion);
   });
 
   it('should group the data and the access in two cards, each with its subsections', async () => {
@@ -175,7 +227,7 @@ describe('Profile', () => {
         .map((heading) => heading.textContent),
     ).toEqual([ACCOUNT_ACCESS_SUBSECTIONS.password, ACCOUNT_ACCESS_SUBSECTIONS.deactivation]);
     expect(within(access).getByLabelText(PASSWORD_LABELS.current)).toBeInTheDocument();
-    expect(within(data).getByRole('textbox', { name: NEIGHBORHOOD_LABEL })).toBeInTheDocument();
+    expect(within(data).getByRole('combobox', { name: NEIGHBORHOOD_LABEL })).toBeInTheDocument();
   });
 
   it('should keep the save off until something changes, and discard back to what is stored', async () => {
@@ -193,6 +245,31 @@ describe('Profile', () => {
 
     expect(fullName).toHaveValue(PROFILE.fullName);
     expect(saveButton()).toBeDisabled();
+  });
+
+  it('should take the current password alone, as the browser fills it in, for no change', async () => {
+    let passwordRequests = 0;
+    server.use(
+      http.patch(`${PROFILE_URL}/password`, () => {
+        passwordRequests += 1;
+
+        return HttpResponse.json({ token: NEW_TOKEN });
+      }),
+      http.patch(PROFILE_URL, () => HttpResponse.json({ ...PROFILE, fullName: 'Maria Rocha' })),
+    );
+    const fullName = await renderProfile();
+
+    await userEvent.type(screen.getByLabelText(PASSWORD_LABELS.current), 'SenhaAtual123');
+
+    expect(saveButton()).toBeDisabled();
+    expect(unloadIsHeldBack()).toBe(false);
+
+    await userEvent.clear(fullName);
+    await userEvent.type(fullName, 'Maria Rocha');
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(PROFILE_MESSAGES.saved)).toBeInTheDocument();
+    expect(passwordRequests).toBe(0);
   });
 
   it('should save the data and show the new name as the saved one', async () => {
@@ -214,6 +291,106 @@ describe('Profile', () => {
     expect(sentName).toBe('Maria Rocha');
     expect(fullName).toHaveValue('Maria Rocha');
     expect(saveButton()).toBeDisabled();
+  });
+
+  it('should let whoever has no contact save without one, with the fields optional', async () => {
+    let sent: { phone: FormDataEntryValue | null; contactEmail: FormDataEntryValue | null } | null =
+      null;
+    const withoutContact = { ...PROFILE, phone: null, contactEmail: null };
+    server.use(
+      http.patch(PROFILE_URL, async ({ request }) => {
+        const body = await request.formData();
+        sent = { phone: body.get('Phone'), contactEmail: body.get('ContactEmail') };
+
+        return HttpResponse.json({ ...withoutContact, fullName: 'Maria Rocha' });
+      }),
+    );
+    const fullName = await renderProfile(withoutContact);
+
+    expect(screen.getByLabelText(CONTACT_FIELD_LABELS.phone)).not.toBeRequired();
+    await userEvent.clear(fullName);
+    await userEvent.type(fullName, 'Maria Rocha');
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(PROFILE_MESSAGES.saved)).toBeInTheDocument();
+    expect(sent).toEqual({ phone: '', contactEmail: '' });
+  });
+
+  it('should name the account to the password manager, so the empty contact is not taken for the login', async () => {
+    await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
+
+    const currentPassword = screen.getByLabelText(PASSWORD_LABELS.current);
+    const usernames = [
+      ...(currentPassword.closest('form')?.querySelectorAll('[autocomplete="username"]') ?? []),
+    ];
+
+    expect(usernames).toHaveLength(1);
+    const [username] = usernames;
+    expect(username).toHaveValue(PROFILE.fatecEmail);
+    expect(username).not.toBeVisible();
+    expect(username?.compareDocumentPosition(currentPassword)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it('should take the contact warning away as soon as the contact is saved, with no new login', async () => {
+    const withoutContact = { ...PROFILE, phone: null, contactEmail: null };
+    serveProfile(withoutContact);
+    server.use(http.patch(PROFILE_URL, () => HttpResponse.json(PROFILE)));
+    renderAtRoute(
+      RoutePathEnum.PROFILE,
+      <>
+        <ContactBanner />
+        <Profile />
+      </>,
+    );
+    expect(await screen.findByText(CONTACT_BANNER_TEXT)).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText(CONTACT_FIELD_LABELS.phone), '15991234567');
+    await userEvent.type(
+      screen.getByLabelText(CONTACT_FIELD_LABELS.contactEmail),
+      'maria@exemplo.test',
+    );
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(PROFILE_MESSAGES.saved)).toBeInTheDocument();
+    expect(screen.queryByText(CONTACT_BANNER_TEXT)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['phone', SignupConflictFieldEnum.PHONE, CONTACT_FIELD_LABELS.phone],
+    ['e-mail', SignupConflictFieldEnum.CONTACT_EMAIL, CONTACT_FIELD_LABELS.contactEmail],
+  ])(
+    'should point at the contact %s the api says is already taken, and keep the change pending',
+    async (_, field, label) => {
+      server.use(
+        http.patch(PROFILE_URL, () =>
+          HttpResponse.json({ error: 'em uso', field, code: null }, { status: CONFLICT }),
+        ),
+      );
+      await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
+
+      await userEvent.type(screen.getByLabelText(CONTACT_FIELD_LABELS.phone), '15991234567');
+      await userEvent.type(
+        screen.getByLabelText(CONTACT_FIELD_LABELS.contactEmail),
+        'maria@exemplo.test',
+      );
+      await userEvent.click(saveButton());
+
+      expect(await screen.findByText(SIGNUP_CONFLICT_MESSAGES[field])).toBeInTheDocument();
+      expect(screen.getByLabelText(label)).toHaveFocus();
+      expect(screen.queryByText(PROFILE_MESSAGES.saveFailed)).not.toBeInTheDocument();
+      expect(saveButton()).toBeEnabled();
+    },
+  );
+
+  it('should ask for the email when only the phone is filled in', async () => {
+    await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
+
+    await userEvent.type(screen.getByLabelText(CONTACT_FIELD_LABELS.phone), '15991234567');
+    await userEvent.click(saveButton());
+
+    expect(await screen.findByText(CONTACT_MESSAGES.contactEmailRequired)).toBeInTheDocument();
   });
 
   it('should warn when the data is not saved', async () => {

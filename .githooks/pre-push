@@ -4,8 +4,8 @@
 # Habilitar neste clone: git config core.hooksPath .githooks
 #
 # `scripts/test-changed.sh` segue o grafo de imports com `vitest related`, então
-# mudar uma tela roda os testes que a alcançam, não a suíte inteira. A suíte
-# completa com cobertura fica no CI.
+# mudar uma tela roda os testes que a alcançam, e nunca a suíte inteira: o que o
+# grafo não alcança fica para o CI, que roda a suíte completa com cobertura.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"

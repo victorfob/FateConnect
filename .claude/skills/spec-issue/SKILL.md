@@ -205,7 +205,7 @@ gh issue create --title "<pt-BR>" --body-file <arquivo> --assignee <login> --lab
 gh api graphql -f query='mutation { addSubIssue(input: {issueId: "<id-pai>", subIssueId: "<id-filha>"}) { subIssue { number } } }'
 ```
 
-Os `id` saem de `gh api graphql -f query='{repository(owner:"...",name:"..."){issue(number:N){id}}}'`. O board adota a issue nova sozinho, em `Todo` — conferir, não supor:
+Os `id` saem de `gh api graphql -f query='{repository(owner:"...",name:"..."){issue(number:N){id}}}'`. ⛔ Filha nova numa pai já escrita: a lista de filhas e a contagem do critério de aceite da pai ("as seis sub-issues fechadas") sobem na mesma rodada. O board adota a issue nova sozinho, em `Todo` — conferir, não supor:
 
 ```bash
 gh project item-list 1 --owner <owner> --format json --limit 300

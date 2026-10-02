@@ -10,9 +10,9 @@ import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { ApiError } from '@app/services/httpClient';
 import { signup } from '@app/services/signup/signupService';
 
+import { SignupConflictFieldEnum } from './@types';
 import { AccountSection } from './components/AccountSection';
 import { ConsentSection } from './components/ConsentSection';
-import { ContactSection } from './components/ContactSection';
 import { conflictFieldOf } from './helpers/conflictField';
 import { toSignupRequest } from './helpers/mapper';
 import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from './schema';
@@ -58,10 +58,12 @@ export function Signup() {
         return;
       }
 
-      const field = conflictFieldOf(error);
-
-      if (field) {
-        form.setError(field, { message: C.SIGNUP_CONFLICT_MESSAGES[field] }, { shouldFocus: true });
+      if (conflictFieldOf(error) === SignupConflictFieldEnum.FATEC_EMAIL) {
+        form.setError(
+          'fatecEmail',
+          { message: C.SIGNUP_CONFLICT_MESSAGES[SignupConflictFieldEnum.FATEC_EMAIL] },
+          { shouldFocus: true },
+        );
         return;
       }
 
@@ -90,14 +92,6 @@ export function Signup() {
             <S.SectionFields>
               <FormGrid>
                 <AccountSection />
-              </FormGrid>
-            </S.SectionFields>
-
-            <S.SectionDivider />
-            <S.SectionTitle variant="subtitleBold">{C.CONTACT_SECTION_TITLE}</S.SectionTitle>
-            <S.SectionFields>
-              <FormGrid>
-                <ContactSection />
               </FormGrid>
             </S.SectionFields>
 

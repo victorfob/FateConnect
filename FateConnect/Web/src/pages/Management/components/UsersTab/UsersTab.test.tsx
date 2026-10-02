@@ -3,6 +3,7 @@ import { FILTER_CLEAR_LABEL, FILTER_SUBMIT_LABEL, FILTER_TITLE_PLURAL } from '@d
 import { http, HttpResponse } from 'msw';
 
 import { CONFIRMATION } from '@app/components/ConfirmAction/constants';
+import { CONTACT_FIELD_LABELS } from '@app/components/ContactFields/constants';
 import { server } from '@app/mocks/server';
 import { SignupConflictFieldEnum } from '@app/pages/Signup/@types';
 import { FIELD_LABELS } from '@app/pages/Signup/constants';
@@ -13,8 +14,9 @@ import type { UserSummary } from '@app/services/users/managementTypes';
 import { AccountStatusEnum, type User } from '@app/services/users/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
+import { declarationsFor, sheetRules } from '@app/test/utils/styleSheetRules';
 
-import { EDIT_LABEL, OWN_ACCOUNT_LABEL } from './components/UserCard/constants';
+import { EDIT_LABEL, NO_CONTACT_LABEL, OWN_ACCOUNT_LABEL } from './components/UserCard/constants';
 import {
   EDIT_TITLE,
   PROFILE_TYPE_LABEL,
@@ -38,19 +40,30 @@ const CONFLICT = 409;
 const BAD_REQUEST = 400;
 const SERVER_ERROR = 500;
 
+const THUMBNAIL_PATH = 'uploads/user/thumbnails/maria.webp';
+const OBJECT_URL = 'blob:https://fateconnect.test/maria';
+/** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
+const WEBP_BYTES = 'RIFF\0\0\0\0WEBP';
+const WHOLE_LINE = 'grid-column:1/-1';
+
 const OWN_ACCOUNT: UserSummary = {
   id: ADMIN_ID,
   fullName: 'Ana Administradora',
   contactEmail: 'ana@exemplo.test',
   phone: '1533334444',
+  thumbnailUrl: null,
   status: AccountStatusEnum.ACTIVE,
 };
+
+const ACTIVE_USER_EMAIL = 'maria@exemplo.test';
+const EDITED_FULL_NAME = 'Maria Souza';
 
 const ACTIVE_USER: UserSummary = {
   id: 7,
   fullName: 'Maria da Silva',
-  contactEmail: 'maria@exemplo.test',
+  contactEmail: ACTIVE_USER_EMAIL,
   phone: '15999998888',
+  thumbnailUrl: null,
   status: AccountStatusEnum.ACTIVE,
 };
 
@@ -59,6 +72,7 @@ const BANNED_USER: UserSummary = {
   fullName: 'João Souza',
   contactEmail: 'joao@exemplo.test',
   phone: null,
+  thumbnailUrl: null,
   status: AccountStatusEnum.BANNED,
 };
 
@@ -67,7 +81,17 @@ const DEACTIVATED_USER: UserSummary = {
   fullName: 'Carla Lima',
   contactEmail: 'carla@exemplo.test',
   phone: '15988887777',
+  thumbnailUrl: null,
   status: AccountStatusEnum.SELF_DEACTIVATED,
+};
+
+const NO_CONTACT_USER: UserSummary = {
+  id: 10,
+  fullName: 'Bruna Costa',
+  contactEmail: null,
+  phone: null,
+  thumbnailUrl: null,
+  status: AccountStatusEnum.ACTIVE,
 };
 
 function fullUser(summary: UserSummary, profileType = ProfileTypeEnum.OPERATOR): User {
@@ -81,6 +105,7 @@ function fullUser(summary: UserSummary, profileType = ProfileTypeEnum.OPERATOR):
     contactEmail: summary.contactEmail,
     neighborhood: null,
     imageUrl: null,
+    thumbnailUrl: null,
     profileType,
     status: summary.status,
     createdAt: '2026-09-01T12:00:00',
@@ -143,6 +168,18 @@ async function openEditDialogOf(fullName: string) {
   return within(await screen.findByRole('dialog', { name: EDIT_TITLE }));
 }
 
+function cellOf(field: HTMLElement): HTMLElement {
+  const cell = field.closest('.MuiFormControl-root')?.parentElement;
+  if (!cell) throw new Error('Não renderizou a célula do campo.');
+
+  return cell;
+}
+
+async function retype(field: HTMLElement, value: string) {
+  await userEvent.clear(field);
+  await userEvent.type(field, value);
+}
+
 describe('UsersTab', () => {
   beforeEach(() => {
     tokenStorage.save(tokenWithName('Ana Administradora', ProfileTypeEnum.ADMINISTRATOR, ADMIN_ID));
@@ -154,11 +191,55 @@ describe('UsersTab', () => {
     renderTab();
 
     const active = await cardOf(ACTIVE_USER.fullName);
-    expect(active.getByText(ACTIVE_USER.contactEmail)).toBeInTheDocument();
+    expect(active.getByText(ACTIVE_USER_EMAIL)).toBeInTheDocument();
     expect(active.getByText('(15) 99999-8888')).toBeInTheDocument();
     expect(active.getByText('Ativa')).toBeInTheDocument();
     expect((await cardOf(BANNED_USER.fullName)).getByText('Banida')).toBeInTheDocument();
     expect((await cardOf(DEACTIVATED_USER.fullName)).getByText('Desativada')).toBeInTheDocument();
+  });
+
+  it('should say the account has no contact, in place of an empty e-mail', async () => {
+    listServing([ACTIVE_USER, NO_CONTACT_USER]);
+
+    renderTab();
+
+    const emailIconsOf = async (fullName: string) =>
+      (await screen.findByText(fullName))
+        .closest('article')
+        ?.querySelectorAll('[data-testid="EmailIcon"]');
+
+    const withoutContact = await cardOf(NO_CONTACT_USER.fullName);
+    expect(withoutContact.getByText(NO_CONTACT_LABEL)).toBeInTheDocument();
+    expect(await emailIconsOf(NO_CONTACT_USER.fullName)).toHaveLength(0);
+
+    const active = await cardOf(ACTIVE_USER.fullName);
+    expect(active.getByText(ACTIVE_USER_EMAIL)).toBeInTheDocument();
+    expect(await emailIconsOf(ACTIVE_USER.fullName)).toHaveLength(1);
+    expect(active.queryByText(NO_CONTACT_LABEL)).not.toBeInTheDocument();
+  });
+
+  it('should show the photo of whoever has one and the initials of whoever has not', async () => {
+    URL.createObjectURL = vi.fn(() => OBJECT_URL);
+    URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get(
+        `https://api.fateconnect.test/${THUMBNAIL_PATH}`,
+        () => new HttpResponse(WEBP_BYTES, { headers: { 'Content-Type': 'image/webp' } }),
+      ),
+    );
+    listServing([{ ...ACTIVE_USER, thumbnailUrl: THUMBNAIL_PATH }, BANNED_USER]);
+
+    renderTab();
+
+    const withPhoto = await cardOf(ACTIVE_USER.fullName);
+    await waitFor(() =>
+      expect(
+        withPhoto.getByRole('img', { name: ACTIVE_USER.fullName }).querySelector('img'),
+      ).toHaveAttribute('src', OBJECT_URL),
+    );
+    expect(
+      (await cardOf(BANNED_USER.fullName)).getByRole('img', { name: BANNED_USER.fullName }),
+    ).toHaveTextContent('JS');
   });
 
   it('should build the request from every field the address names', async () => {
@@ -296,15 +377,38 @@ describe('UsersTab', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('should lay the contact out with the profile beside the phone, and the phone alone on the own account', async () => {
+    listServing([OWN_ACCOUNT, ACTIVE_USER]);
+    patchesRecorded(fullUser(ACTIVE_USER));
+    patchesRecorded(fullUser(OWN_ACCOUNT, ProfileTypeEnum.ADMINISTRATOR));
+
+    renderTab();
+    const other = await openEditDialogOf(ACTIVE_USER.fullName);
+    const contactEmail = other.getByRole('textbox', { name: CONTACT_FIELD_LABELS.contactEmail });
+    const phone = other.getByRole('textbox', { name: new RegExp(CONTACT_FIELD_LABELS.phone) });
+    const profile = other.getByRole('combobox', { name: new RegExp(PROFILE_TYPE_LABEL) });
+
+    expect(declarationsFor(sheetRules(), cellOf(contactEmail))).toContain(WHOLE_LINE);
+    expect(contactEmail.compareDocumentPosition(phone)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(cellOf(phone)).toBe(cellOf(profile));
+    expect(contactEmail).toHaveAttribute('autocomplete', 'off');
+    expect(phone).toHaveAttribute('autocomplete', 'off');
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    const own = await openEditDialogOf(OWN_ACCOUNT.fullName);
+    const ownPhone = own.getByRole('textbox', { name: new RegExp(CONTACT_FIELD_LABELS.phone) });
+
+    expect(declarationsFor(sheetRules(), cellOf(ownPhone))).toContain(WHOLE_LINE);
+  });
+
   it('should save the data as the api reads it, and leave the profile alone when unchanged', async () => {
     listServing([ACTIVE_USER]);
     const received = patchesRecorded(fullUser(ACTIVE_USER));
 
     renderTab();
     const dialog = await openEditDialogOf(ACTIVE_USER.fullName);
-    const fullName = dialog.getByLabelText(new RegExp(FIELD_LABELS.fullName));
-    await userEvent.clear(fullName);
-    await userEvent.type(fullName, 'Maria Souza');
+    await retype(dialog.getByLabelText(new RegExp(FIELD_LABELS.fullName)), EDITED_FULL_NAME);
     await userEvent.click(dialog.getByRole('button', { name: SUBMIT_LABEL }));
 
     await waitFor(() =>
@@ -312,15 +416,33 @@ describe('UsersTab', () => {
         {
           path: `/users/${ACTIVE_USER.id}`,
           body: {
-            fullName: 'Maria Souza',
+            fullName: EDITED_FULL_NAME,
             fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
             phone: '15999998888',
-            contactEmail: ACTIVE_USER.contactEmail,
+            contactEmail: ACTIVE_USER_EMAIL,
           },
         },
       ]),
     );
     expect(await screen.findByText(USER_FORM_MESSAGES.updated)).toBeInTheDocument();
+  });
+
+  it('should hold the save of an untouched account until a field changes, and again once undone', async () => {
+    listServing([ACTIVE_USER]);
+    patchesRecorded(fullUser(ACTIVE_USER));
+
+    renderTab();
+    const dialog = await openEditDialogOf(ACTIVE_USER.fullName);
+    const save = dialog.getByRole('button', { name: SUBMIT_LABEL });
+    const fullName = dialog.getByLabelText(new RegExp(FIELD_LABELS.fullName));
+
+    expect(save).toBeDisabled();
+
+    await retype(fullName, EDITED_FULL_NAME);
+    expect(save).toBeEnabled();
+
+    await retype(fullName, ACTIVE_USER.fullName);
+    expect(save).toBeDisabled();
   });
 
   it('should promote through the profile route', async () => {
@@ -352,12 +474,16 @@ describe('UsersTab', () => {
 
     renderTab();
     const dialog = await openEditDialogOf(ACTIVE_USER.fullName);
+    await retype(
+      dialog.getByLabelText(new RegExp(CONTACT_FIELD_LABELS.contactEmail)),
+      'maria.souza@exemplo.test',
+    );
     await userEvent.click(dialog.getByRole('button', { name: SUBMIT_LABEL }));
 
     expect(
       await dialog.findByText(USER_CONFLICT_MESSAGES[SignupConflictFieldEnum.CONTACT_EMAIL]),
     ).toBeInTheDocument();
-    expect(dialog.getByLabelText(new RegExp(FIELD_LABELS.contactEmail))).toHaveAttribute(
+    expect(dialog.getByLabelText(new RegExp(CONTACT_FIELD_LABELS.contactEmail))).toHaveAttribute(
       'aria-invalid',
       'true',
     );
@@ -393,6 +519,7 @@ describe('UsersTab', () => {
 
     renderTab();
     const dialog = await openEditDialogOf(ACTIVE_USER.fullName);
+    await retype(dialog.getByLabelText(new RegExp(FIELD_LABELS.fullName)), EDITED_FULL_NAME);
     await userEvent.click(dialog.getByRole('button', { name: SUBMIT_LABEL }));
 
     expect(await screen.findByText(message)).toBeInTheDocument();

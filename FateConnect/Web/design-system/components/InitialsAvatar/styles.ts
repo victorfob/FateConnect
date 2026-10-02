@@ -1,4 +1,5 @@
 import Avatar from '@mui/material/Avatar';
+import Skeleton from '@mui/material/Skeleton';
 
 import { styled } from '@ds-root/styled';
 import { spacingScale } from '@ds-root/tokens';
@@ -41,3 +42,13 @@ export const InitialsCircle = styled(Avatar, {
     ...bodyBySize[size],
   };
 });
+
+export const LoadingCircle = styled(Skeleton, {
+  shouldForwardProp: (prop) => prop !== 'size',
+})<{ size: InitialsAvatarSize }>(({ size }) => ({
+  width: `${DIAMETER_PX[size]}px`,
+  height: `${DIAMETER_PX[size]}px`,
+  flexShrink: 0,
+
+  '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+}));

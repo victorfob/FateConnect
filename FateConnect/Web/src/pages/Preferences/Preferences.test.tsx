@@ -1,6 +1,7 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
+import { THEME_LABEL, THEME_OPTIONS, triggerLabel } from '@app/components/ThemeMenu/constants';
 import { RoutePathEnum } from '@app/routes/paths';
 import { cleanup, render, screen, userEvent } from '@app/test/testing-library';
 
@@ -22,8 +23,14 @@ function documentBackground() {
   return getComputedStyle(document.body).backgroundColor;
 }
 
-function themeSwitch() {
-  return screen.getByRole('switch', { name: C.THEME_SWITCH_LABEL });
+const themeTrigger = (optionLabel: string) =>
+  screen.getByRole('button', { name: triggerLabel(optionLabel) });
+
+const [AUTOMATIC = '', , DARK = ''] = THEME_OPTIONS.map((option) => option.label);
+
+async function chooseTheme(from: string, to: string) {
+  await userEvent.click(themeTrigger(from));
+  await userEvent.click(await screen.findByRole('button', { name: to }));
 }
 
 describe('Preferences', () => {
@@ -41,29 +48,27 @@ describe('Preferences', () => {
     renderComponent();
 
     expect(screen.getByRole('heading', { name: C.APPEARANCE_SECTION_TITLE })).toBeInTheDocument();
-    expect(screen.getByText(C.THEME_LABEL)).toBeInTheDocument();
+    expect(screen.getByText(THEME_LABEL)).toBeInTheDocument();
     expect(screen.getByText(C.THEME_DESCRIPTION)).toBeInTheDocument();
   });
 
-  it('should start unchecked in the light theme and turn the theme dark when switched', async () => {
+  it('should start following the device and turn the theme dark when it is chosen', async () => {
     renderComponent();
     const lightBackground = documentBackground();
 
-    expect(themeSwitch()).not.toBeChecked();
+    await chooseTheme(AUTOMATIC, DARK);
 
-    await userEvent.click(themeSwitch());
-
-    expect(themeSwitch()).toBeChecked();
+    expect(themeTrigger(DARK)).toBeInTheDocument();
     expect(documentBackground()).not.toBe(lightBackground);
   });
 
-  it('should keep the chosen mode when the screen is mounted again', async () => {
+  it('should keep the chosen theme when the screen is mounted again', async () => {
     renderComponent();
-    await userEvent.click(themeSwitch());
+    await chooseTheme(AUTOMATIC, DARK);
 
     cleanup();
     renderComponent();
 
-    expect(themeSwitch()).toBeChecked();
+    expect(themeTrigger(DARK)).toBeInTheDocument();
   });
 });

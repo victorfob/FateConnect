@@ -15,6 +15,8 @@ Para mensagem de commit, use a skill `write-commit`. Depois do merge (fechar a i
    gh pr view <n> --json body -q .body > /tmp/corpo.md   # e edite ESTE arquivo
    ```
 
+   O corpo editado no site vem com `\r\n`: edite em bytes e confira que o `diff` contra o publicado mostra só a sua linha.
+
    Apagou mesmo assim? `userContentEdits` guarda cada versão inteira (o campo `diff` é o corpo completo, do mais novo para o mais antigo). Recupere **comparando linha a linha** contra o atual, não colando o que você lembra.
 
    ```bash
@@ -23,6 +25,7 @@ Para mensagem de commit, use a skill `write-commit`. Depois do merge (fechar a i
    ```
 
 2. ⛔ **PR que toca `.claude/`:** antes de criar, rode a varredura de fechamento da skill `harness-evolution` (cada correção do usuário na conversa, coberta ou descartada). Com o PR aberto, o item esquecido custa outro PR.
+3. ⛔ **PR com issue → leia o corpo inteiro dela, sem `grep`, e cruze escopo e critério de aceite item por item** numa tabela no corpo do PR: cada item com o arquivo, teste ou medição que o prova. Item sem prova é pendência dita, nunca "coberto"; o filtro perde a seção que não casa o padrão.
 
 ## Contexto
 

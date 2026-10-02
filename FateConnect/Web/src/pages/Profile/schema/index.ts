@@ -1,23 +1,24 @@
 import { z } from 'zod';
 
+import { checkContact, contactFieldsSchema } from '@app/components/ContactFields/schema';
 import { photoSchema } from '@app/components/PhotoField/schema';
 import { maxLengthMessage, signupSchema } from '@app/pages/Signup/schema';
 
 /** O limite do `UpdateUserDto`. */
 export const MAX_NEIGHBORHOOD_LENGTH = 100;
 
-export const PASSWORD_MESSAGES = {
-  currentRequired: 'Informe a senha atual',
-  newRequired: 'Informe a nova senha',
-};
+export const PASSWORD_MESSAGES = { currentRequired: 'Informe a senha atual' };
 
-/** Com um dos dois preenchidos a troca foi pedida, e aí os dois valem; em branco, a senha fica. */
+/**
+ * Quem pede a troca é a nova senha. A atual sozinha é a que o navegador preenche
+ * ao abrir a tela, e não cobra nada.
+ */
 function checkPasswordChange(
   values: { currentPassword: string; newPassword: string },
   context: z.RefinementCtx,
 ) {
   const { currentPassword, newPassword } = values;
-  if (currentPassword === '' && newPassword === '') return;
+  if (newPassword === '') return;
 
   if (currentPassword === '')
     context.addIssue({
@@ -26,15 +27,6 @@ function checkPasswordChange(
       message: PASSWORD_MESSAGES.currentRequired,
     });
 
-  if (newPassword === '') {
-    context.addIssue({
-      code: 'custom',
-      path: ['newPassword'],
-      message: PASSWORD_MESSAGES.newRequired,
-    });
-    return;
-  }
-
   const [newPasswordIssue] = signupSchema.shape.password.safeParse(newPassword).error?.issues ?? [];
   if (newPasswordIssue)
     context.addIssue({ code: 'custom', path: ['newPassword'], message: newPasswordIssue.message });
@@ -42,7 +34,8 @@ function checkPasswordChange(
 
 /** Os campos que o cadastro também pede seguem as mesmas regras dele. */
 export const profileSchema = signupSchema
-  .pick({ fullName: true, birthDate: true, gender: true, phone: true, contactEmail: true })
+  .pick({ fullName: true, birthDate: true, gender: true })
+  .extend(contactFieldsSchema.shape)
   .extend({
     neighborhood: z
       .string()
@@ -53,7 +46,10 @@ export const profileSchema = signupSchema
     currentPassword: z.string(),
     newPassword: z.string(),
   })
-  .superRefine(checkPasswordChange);
+  .superRefine((values, context) => {
+    checkPasswordChange(values, context);
+    checkContact(values, context);
+  });
 
 export type ProfileFormInput = z.input<typeof profileSchema>;
 export type ProfileFormValues = z.output<typeof profileSchema>;

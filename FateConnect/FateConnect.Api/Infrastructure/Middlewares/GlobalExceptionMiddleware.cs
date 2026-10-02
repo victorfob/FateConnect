@@ -31,6 +31,7 @@ public partial class GlobalExceptionMiddleware(
         var statusCode = HttpStatusCode.InternalServerError;
         var errorMessage = "Algo deu errado. Tente novamente.";
         string? conflictingField = null;
+        string? errorCode = null;
 
         switch (exception)
         {
@@ -50,6 +51,12 @@ public partial class GlobalExceptionMiddleware(
             case RideNotDrivenByUserException:
                 statusCode = HttpStatusCode.Forbidden;
                 errorMessage = exception.Message;
+                break;
+
+            case ContactRequiredException:
+                statusCode = HttpStatusCode.Forbidden;
+                errorMessage = exception.Message;
+                errorCode = ContactRequiredException.ErrorCode;
                 break;
 
             case DeactivatedAccountException:
@@ -85,7 +92,7 @@ public partial class GlobalExceptionMiddleware(
         context.Response.StatusCode = (int)statusCode;
 
         await context.Response.WriteAsJsonAsync(
-            new ErrorResponseDto { Error = errorMessage, Field = conflictingField },
+            new ErrorResponseDto { Error = errorMessage, Field = conflictingField, Code = errorCode },
             context.RequestAborted);
     }
 

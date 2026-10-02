@@ -31,7 +31,7 @@ export function notificationStyles(theme: Theme) {
 
   return {
     '.notistack-MuiContent': {
-      fontSize: typographyTokens.subtitle.fontSize,
+      fontSize: typographyTokens.body.fontSize,
       fontWeight: typographyTokens.caption.fontWeight,
       lineHeight: 'normal',
       padding: theme.space(none, xs, none, none),

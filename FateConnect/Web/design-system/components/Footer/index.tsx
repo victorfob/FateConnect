@@ -31,21 +31,23 @@ export function Footer({ anchorId, title, contact, copyrightLines, links }: Foot
       <S.ContactsContainer id={anchorId}>
         <Typography variant="h2">{title}</Typography>
 
-        <UnderlinedLink
-          href={contact.email.href}
-          accessibleLabel={contact.email.accessibleLabel}
-          icon={<EmailIcon fontSize="small" />}
-        >
-          <Typography variant="caption">{contact.email.label}</Typography>
-        </UnderlinedLink>
+        <S.MailAndPhoneRow>
+          <UnderlinedLink
+            href={contact.email.href}
+            accessibleLabel={contact.email.accessibleLabel}
+            icon={<EmailIcon fontSize="small" />}
+          >
+            <Typography variant="caption">{contact.email.label}</Typography>
+          </UnderlinedLink>
 
-        <UnderlinedLink
-          href={contact.phone.href}
-          accessibleLabel={contact.phone.accessibleLabel}
-          icon={<PhoneIcon fontSize="small" />}
-        >
-          <Typography variant="caption">{contact.phone.label}</Typography>
-        </UnderlinedLink>
+          <UnderlinedLink
+            href={contact.phone.href}
+            accessibleLabel={contact.phone.accessibleLabel}
+            icon={<PhoneIcon fontSize="small" />}
+          >
+            <Typography variant="caption">{contact.phone.label}</Typography>
+          </UnderlinedLink>
+        </S.MailAndPhoneRow>
 
         <UnderlinedLink
           href={contact.address.href}

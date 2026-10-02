@@ -20,6 +20,9 @@ paths:
 - ⛔ O mesmo campo em duas telas leva a mesma ajuda: o texto mora ao lado das opções do campo (`RIDE_TYPE_HELP` junto de `RIDE_TYPE_OPTIONS`, em `pages/Rides/helpers/rideType.ts`). Ao dar ajuda a um campo, procure pelas opções dele as outras telas que o montam.
 - Campo é o `Input` do barrel com `error={errors.campo?.message}`. `required` põe `*` no nome acessível (`"E-mail *"`): no teste, a consulta usa regex.
 - Ação dentro do campo é `IconButton` com `aria-label` da ação e `aria-pressed` do estado; o ícone mostra o estado atual (olho aberto com o texto visível). Senha alterna `autoComplete` entre `current-password` e `off`.
+- ⛔ Formulário com senha tem um campo `autocomplete="username"`, oculto quando o login não se edita: o Chrome ignora campo desabilitado e preenche com o login o campo anterior à senha ao abrir a tela.
+- ⛔ Com esse campo, o gerenciador preenche a senha atual ao abrir a tela. Ela sozinha não é alteração nem cobra a nova: quem pede a troca é a nova senha (`pages/Profile/helpers/pendingChanges.ts`).
+- ⛔ No `Input.Autocomplete`, o `off` padrão tira o histórico do Chrome; em campo que ele toma por endereço (o *Bairro*), os endereços salvos ignoram o `off`, e vai `addressLike`, que os tira e devolve o histórico.
 - ⛔ Campo que ganha a primeira regra de validação ganha a prop de erro junto: sem ela o schema recusa e a tela fica muda. O teste de schema não vê isso; o caso é de componente.
 - ⛔ Quem lê o valor de campo registrado é o consumidor, por `useWatch`, e passa ao `Input` (`characterCount={description.length}`). O `Input` não relê o elemento: o `reset()` escreve sem evento, e a releitura pediria um efeito sem dependências que o lint reprova.
 - ⛔ `role="status"` é irmão do campo, nunca dentro da linha de apoio: ela é o `aria-describedby`, e o anúncio seria ouvido de novo a cada foco.
@@ -33,4 +36,5 @@ paths:
 
 - Máscara de data preserva a posição do cursor ao editar no meio e ao colar; máscara alternativa por comprimento (fixo e celular) se resolve na função pura.
 - `isPending` vai na prop `loading` do `Button`, que já desabilita e desenha o indicador: sem rótulo alternativo e sem `disabled` manual. A mensagem de erro se decide pelo `status` que o cliente HTTP normaliza.
+- ⛔ O 409 com `field` (e-mail ou telefone já em uso) se marca no campo, com foco, em todo formulário que envia o campo (`conflictFieldOf`); o aviso genérico fica para o resto. Campo que muda de tela leva esse tratamento junto.
 - Teste de formulário cobre obrigatório, formato inválido, alternância de visibilidade (com o ícone), sucesso, cada ramo de erro por status e o carregamento. O carregamento segura a resposta numa promessa que o teste resolve, nunca `setTimeout`, e afirma `toBeDisabled()` e o `progressbar` dentro do botão.

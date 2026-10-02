@@ -62,6 +62,9 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
         if (filter.RideType.HasValue)
             query = query.Where(r => r.RideType == filter.RideType.Value);
 
+        if (filter.VehicleType.HasValue)
+            query = query.Where(r => r.VehicleType == filter.VehicleType.Value);
+
         int total = await query.CountAsync();
 
         List<Ride> items = await query

@@ -2,9 +2,13 @@ import { createContext, useContext } from 'react';
 
 import type { ThemeMode } from '@ds-root/theme';
 
+import type { ThemePreference } from '../@types/themePreference';
+
 type ThemeModeContextValue = {
+  /** O tema que está valendo, já resolvido o automático. */
   mode: ThemeMode;
-  toggleMode: VoidFunction;
+  preference: ThemePreference;
+  choosePreference: (preference: ThemePreference) => void;
 };
 
 export const ThemeModeContext = createContext<ThemeModeContextValue | null>(null);

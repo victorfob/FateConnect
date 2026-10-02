@@ -29,8 +29,8 @@ const ITEM_TEXT: ListItemTextProps['slotProps'] = { primary: { variant: 'caption
  */
 export function AccountMenu() {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const { data: profile } = useProfile();
-  const photo = useStoredImage(profile?.imageUrl ?? null);
+  const { data: profile, isPending: profilePending } = useProfile();
+  const photo = useStoredImage(profile?.thumbnailUrl ?? null);
   // A edição não devolve token novo: o nome gravado vence o do token, que fica de reserva.
   const userName = profile?.fullName ?? loggedUserName() ?? '';
   const initials = useMemo(() => getInitials(userName), [userName]);
@@ -50,8 +50,13 @@ export function AccountMenu() {
 
   return (
     <>
-      <S.AvatarTrigger color="inherit" label={C.TRIGGER_LABEL} onClick={handleOpen}>
-        <InitialsAvatar initials={initials} label={userName} photoSrc={photo?.objectUrl} />
+      <S.AvatarTrigger color="inherit" size="large" label={C.TRIGGER_LABEL} onClick={handleOpen}>
+        <InitialsAvatar
+          initials={initials}
+          label={userName}
+          photoSrc={photo.image?.objectUrl}
+          loading={profilePending || photo.loading}
+        />
       </S.AvatarTrigger>
 
       <AnchoredPopover

@@ -1,11 +1,18 @@
 import { ListCard, StatusTag, Typography } from '@design-system';
-import { CalendarTodayIcon, EventRepeatIcon } from '@design-system/icons';
+import {
+  CalendarTodayIcon,
+  DirectionsCarIcon,
+  EventRepeatIcon,
+  TwoWheelerIcon,
+} from '@design-system/icons';
 
+import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import * as C from '@app/pages/Rides/constants';
 import { rideDepartureLabel } from '@app/pages/Rides/helpers/rideDeparture';
 import { rideRecurrenceLabel } from '@app/pages/Rides/helpers/rideFrequency';
 import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rideType';
-import type { Ride } from '@app/services/rides/types';
+import { vehicleTypeLabel } from '@app/pages/Rides/helpers/rideVehicle';
+import { VehicleTypeEnum, type Ride } from '@app/services/rides/types';
 
 import { RideDriverContact } from './RideDriverContact';
 import { RideOwnerActions } from './RideOwnerActions';
@@ -40,9 +47,13 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
 
       <ListCard.InfoRow>
         <ListCard.InfoItem>
-          <CalendarTodayIcon />
+          {ride.vehicleType === VehicleTypeEnum.MOTORCYCLE ? (
+            <TwoWheelerIcon />
+          ) : (
+            <DirectionsCarIcon />
+          )}
           <Typography variant="caption" color="inherit">
-            {departure}
+            {vehicleTypeLabel(ride.vehicleType)}
           </Typography>
         </ListCard.InfoItem>
 
@@ -54,13 +65,20 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
             </Typography>
           </ListCard.InfoItem>
         )}
+
+        <ListCard.InfoItem>
+          <CalendarTodayIcon />
+          <Typography variant="caption" color="inherit">
+            {departure}
+          </Typography>
+        </ListCard.InfoItem>
       </ListCard.InfoRow>
 
-      <ListCard.Description>
-        <Typography variant="subtitle" color="inherit">
+      {ride.description && (
+        <ListCard.Description toggleLabels={DESCRIPTION_TOGGLE_LABELS}>
           {ride.description}
-        </Typography>
-      </ListCard.Description>
+        </ListCard.Description>
+      )}
     </ListCard>
   );
 }

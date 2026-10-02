@@ -16,10 +16,16 @@ O consumo pela aplicação está em `fateconnect-web-react.md`; o lint guarda as
 
 ## Quem mora aqui
 
-- Conte os consumidores nos dois sentidos antes de criar ou mover. Um consumidor na aplicação ⇒ o componente mora na pasta dela (foi o `ThemeToggleButton` para o `GuestLayout`). Um consumidor dentro do DS ⇒ desce para o `components/` dele e sai do barrel (`ListCardSkeleton` dentro do `CardsList`).
+- Conte os consumidores nos dois sentidos antes de criar ou mover. Consumidor só na aplicação ⇒ o componente mora nela, na pasta do consumidor ou em `src/components` se forem vários (o menu de tema, `ThemeMenu`, das Preferências e da landing). Um consumidor dentro do DS ⇒ desce para o `components/` dele e sai do barrel (`ListCardSkeleton` dentro do `CardsList`).
 - Teste do DS que usava como sonda o componente que saiu não pode importar de `@app`: a sonda vira outro componente do DS, ou nasce dentro do próprio teste.
 - ⛔ Estilo que sobe de uma tela para o tema: liste o que aquela tela dava por slot, ícone ou filho — isso não sobe junto, e o segundo consumidor nasce sem (o polegar do `MuiSwitch` saiu cinza porque o branco vinha da prop de ícone). O par de cor que nasce disso entra no teste de contraste.
 - Controle do topo que a gaveta repete some na mesma consulta em que o botão de menu aparece (o menu da conta); o que ela não repete (a campainha) fica em qualquer largura.
+- ⛔ Mudança que vale para toda uma família (todo botão, todo campo) começa pelo inventário do app rodando: `button`, `a[href]` e `[role]` em todas as telas, estados e menus, agrupados pelo papel. Pela classe (`.MuiButton-root`) escapam o link desenhado como botão e o botão de ícone.
+
+## Tipografia
+
+- A fonte vai junto com o app (`design-system/fonts/`, *FateConnect Heros*, 400 e 700). Fonte nova só de licença livre (a Helvetica Neue, comercial, não entra), renomeada e com a licença ao lado; trocá-la muda largura (`visual-validation`).
+- ⛔ Mudar o valor de um token pode igualá-lo a outro da família (um peso que desce a 400 iguala o `body`): compare a família e dobre o par num nome só, com os consumidores.
 
 ## Cor
 
