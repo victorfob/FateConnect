@@ -25,4 +25,8 @@ export const themeModeStorage = {
   save(mode: ThemeMode): void {
     window.localStorage.setItem(THEME_MODE_KEY, mode);
   },
+
+  clear(): void {
+    window.localStorage.removeItem(THEME_MODE_KEY);
+  },
 };
