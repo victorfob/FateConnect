@@ -16,7 +16,7 @@ O consumo pela aplicação está em `fateconnect-web-react.md`; o lint guarda as
 
 ## Quem mora aqui
 
-- Conte os consumidores nos dois sentidos antes de criar ou mover. Um consumidor na aplicação ⇒ o componente mora na pasta dela (foi o `ThemeToggleButton` para o `GuestLayout`). Um consumidor dentro do DS ⇒ desce para o `components/` dele e sai do barrel (`ListCardSkeleton` dentro do `CardsList`).
+- Conte os consumidores nos dois sentidos antes de criar ou mover. Consumidor só na aplicação ⇒ o componente mora nela, na pasta do consumidor ou em `src/components` se forem vários (o menu de tema, `ThemeMenu`, das Preferências e da landing). Um consumidor dentro do DS ⇒ desce para o `components/` dele e sai do barrel (`ListCardSkeleton` dentro do `CardsList`).
 - Teste do DS que usava como sonda o componente que saiu não pode importar de `@app`: a sonda vira outro componente do DS, ou nasce dentro do próprio teste.
 - ⛔ Estilo que sobe de uma tela para o tema: liste o que aquela tela dava por slot, ícone ou filho — isso não sobe junto, e o segundo consumidor nasce sem (o polegar do `MuiSwitch` saiu cinza porque o branco vinha da prop de ícone). O par de cor que nasce disso entra no teste de contraste.
 - Controle do topo que a gaveta repete some na mesma consulta em que o botão de menu aparece (o menu da conta); o que ela não repete (a campainha) fica em qualquer largura.
