@@ -27,6 +27,7 @@ O `yarn lint` reprova `sx`, tag HTML crua, cor literal, `theme.spacing`, número
 - Critério de aceite com largura escreve 375px, a base do produto; abaixo é limite conhecido.
 - Duas visões: `md` para tela, cartão, diálogo e rodapé; `header` só para quem troca junto com a nav do topo. Em JS, `useMediaQuery(theme.breakpoints.up('md'))`, nunca `window.innerWidth`. Os valores e a derivação moram em `design-system/tokens/breakpoints.ts`.
 - ⛔ Texto que a pessoa digita (título, descrição, e-mail) quebra em qualquer ponto: uma palavra sem espaço passa da borda e alarga a página no celular. O `ListCard` herda `overflow-wrap: anywhere` do corpo; contêiner novo com texto da pessoa declara o seu.
+- ⛔ Botão que divide a linha com texto que quebra leva `flexShrink: 0`: o flex o espreme abaixo do conteúdo e corta ícone e seta nas bordas (o seletor de tema das Preferências a 375px).
 - ⛔ Antes de mover um limite, encolha o conteúdo, remeça e só então mova para o que sobrou: ele desloca a fronteira de toda tela. O limite é o primeiro valor limpo mais a barra de rolagem, medido de 1 em 1, não o último com defeito.
 
 ## O que compila e não pinta
