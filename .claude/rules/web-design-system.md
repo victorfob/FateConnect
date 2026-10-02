@@ -22,6 +22,11 @@ O consumo pela aplicação está em `fateconnect-web-react.md`; o lint guarda as
 - Controle do topo que a gaveta repete some na mesma consulta em que o botão de menu aparece (o menu da conta); o que ela não repete (a campainha) fica em qualquer largura.
 - ⛔ Mudança que vale para toda uma família (todo botão, todo campo) começa pelo inventário do app rodando: `button`, `a[href]` e `[role]` em todas as telas, estados e menus, agrupados pelo papel. Pela classe (`.MuiButton-root`) escapam o link desenhado como botão e o botão de ícone.
 
+## Tipografia
+
+- A fonte vai junto com o app (`design-system/fonts/`, *FateConnect Heros*, 400 e 700): a instalada muda de aparelho para aparelho. Fonte nova só de licença livre; comercial (a Helvetica Neue) não entra num repositório público, e a obra derivada vai renomeada, com a licença ao lado.
+- Trocar fonte ou peso muda largura: meça a 375px as larguras decididas por tamanho (e-mail e telefone lado a lado no rodapé), com `document.fonts` mostrando a fonte carregada.
+
 ## Cor
 
 - ⛔ Cor que varia entre os temas é chave da paleta, nunca `if (palette.mode === 'dark')`: tipo em `theme/types.ts`, augmentation de `Palette`/`PaletteOptions` em `createAppTheme.ts`, valor nas duas paletas de `theme/palettes.ts`.
