@@ -2,7 +2,7 @@
 
 ## Pseudo-classe que não se força
 
-`CSS.forcePseudoState` cobre `:hover`, `:focus`, `:active`, `:visited`, `:focus-within` e `:focus-visible`, e **não** cobre `:-webkit-autofill` (e credencial não se digita). Leia a cascata em vez do pixel: percorra `document.styleSheets` juntando as regras cujo `cssText` cita a pseudo-classe; a ordem de aplicação é a resposta. Relate como "qual regra vence", não como "medi o preenchimento".
+`CSS.forcePseudoState` cobre `:hover`, `:focus`, `:active`, `:visited`, `:focus-within` e `:focus-visible`, e só pega depois de `DOM.getDocument`: sem ele o nó pedido não é rastreado e o estado não aplica, calado (confira com `elemento.matches(':hover')`). **Não** cobre `:-webkit-autofill` (e credencial não se digita). Leia a cascata em vez do pixel: percorra `document.styleSheets` juntando as regras cujo `cssText` cita a pseudo-classe; a ordem de aplicação é a resposta. Relate como "qual regra vence", não como "medi o preenchimento".
 
 ## Requisição que não aconteceu
 

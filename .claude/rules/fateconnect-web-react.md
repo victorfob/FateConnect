@@ -18,7 +18,8 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 
 ## Consumo do design system
 
-- Ação secundária é `variant="soft"`. No rodapé de diálogo as duas ações são `contained` (`primary` na neutra, `secondary` na que confirma): o `soft` sai 6px mais alto e desalinha o par. Falta variante: declare no tema, não componha no ponto de uso.
+- Ação secundária é `variant="soft"`. No rodapé de diálogo as duas ações são `contained` (`primary` na neutra, `secondary` na que confirma). Falta variante: declare no tema, não componha no ponto de uso.
+- ⛔ A altura do botão é a do `size` no tema (`buttonHeightTokens`), igual em toda variante: botão menor é `size="small"`, nunca `height` fixo nem rótulo trocado por `caption` no ponto de uso.
 - Diálogo é sempre o `Dialog` do DS: `Dialog.Body`, `Dialog.Footer` e a frase em `Dialog.Message`. ⛔ No desktop sem X (decisão de produto: `Esc` e clique fora dispensam); no estreito, com X.
 - Diálogo de formulário monta `Dialog.Form` (envio pela validação da tela), `Dialog.Fields` (grade com folga para o rótulo flutuante; `layout="column"` põe um campo por linha) e `Dialog.Submit` (largura cheia, com `loading`).
 - ⛔ O `Dialog.Body` rola e corta o que sai da largura dele: controle com halo (o `Slider`) vai fora do `Dialog.Body`, direto no diálogo.
