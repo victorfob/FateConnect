@@ -3,6 +3,8 @@ import { http, HttpResponse } from 'msw';
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONTACT_FIELD_LABELS, CONTACT_MESSAGES } from '@app/components/ContactFields/constants';
 import { PHOTO_FIELD_TEXTS, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
+import { SAVE_BAR_TEXTS } from '@app/components/SaveBar/constants';
+import { UNSAVED_CHANGES } from '@app/components/UnsavedChangesDialog/constants';
 import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
 import { ContactBanner } from '@app/layouts/MainLayout/components/ContactBanner';
 import { CONTACT_BANNER_TEXT } from '@app/layouts/MainLayout/components/ContactBanner/constants';
@@ -37,9 +39,7 @@ import {
 import { PHOTO_LABEL } from './components/PhotoCard/constants';
 import { PHOTO_CROP_TEXTS } from './components/PhotoCropDialog/constants';
 import { cropPhoto } from './components/PhotoCropDialog/helpers/cropPhoto';
-import { SAVE_BAR_TEXTS } from './components/SaveBar/constants';
-import { UNSAVED_CHANGES } from './components/UnsavedChangesDialog/constants';
-import { PROFILE_MESSAGES } from './constants';
+import { PROFILE_MESSAGES, PROFILE_UNSAVED_CHANGES_MESSAGE } from './constants';
 import { PASSWORD_MESSAGES } from './schema';
 import { Profile } from '.';
 
@@ -586,7 +586,7 @@ describe('Profile', () => {
     await userEvent.click(screen.getByRole('link', { name: BACK_TO_MENU_LABEL }));
     const dialog = screen.getByRole('dialog', { name: UNSAVED_CHANGES.title });
 
-    expect(within(dialog).getByText(UNSAVED_CHANGES.message)).toBeInTheDocument();
+    expect(within(dialog).getByText(PROFILE_UNSAVED_CHANGES_MESSAGE)).toBeInTheDocument();
 
     await userEvent.click(within(dialog).getByRole('button', { name: UNSAVED_CHANGES.cancel }));
 
