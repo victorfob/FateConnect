@@ -22,6 +22,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona o filtro de caronas por veículo, com a escolha guardada no endereço (#521) [Frontend]
 - Adiciona a sugestão de bairros de Sorocaba e das cidades vizinhas, cada um com a cidade, ao bairro do perfil e ao destino da carona enquanto se digita; o texto fora da lista continua aceito (#538) [Frontend]
 - Adiciona ao destino da carona, ao tocar no campo ainda vazio, a sugestão do bairro cadastrado no perfil e da Fatec Sorocaba, que também aparece ao digitar (#538) [Frontend]
+- Adiciona o tema automático, que segue o do aparelho e muda junto com ele, escolhido num menu com Automático, Claro e Escuro nas Preferências e no topo da landing. Sem escolha guardada, o app abre no tema do aparelho, e quem já escolheu claro ou escuro continua com a escolha (#543) [Frontend]
 
 ### Changed
 
