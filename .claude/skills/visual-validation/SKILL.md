@@ -21,4 +21,13 @@ description: "Valida no app rodando uma mudança visual do front antes de dizer 
 
 Com dois servidores de dev no ar, toda medição leva a porta lida da página (skill `parallel-work`).
 
+## Evidência
+
+⛔ **As capturas da validação são a evidência do PR, e a entrega é sua, sem pedido.** Tire em resolução cheia, salve numa pasta da issue com nome numerado na ordem do envio, por tela, largura e tema (`01-perfil-375-claro.png`), e, ao abrir o PR, mande o conjunto inteiro na ordem do PR (`SendUserFile`) e abra a pasta. Commit novo depois de as capturas estarem no PR: na pasta e no envio ficam só as que mudaram, dizendo qual substitui qual.
+
+- A evidência mostra o estado atual do PR: a captura de antes da correção só sai a pedido.
+- Estado que o painel não mostra (hover forçado, largura trocada sem recarregar) sai de um Chrome headless pelo protocolo de depuração, com `Page.captureScreenshot` (`references/measurement-pitfalls.md`).
+
 ⛔ Validado contra stub, a entrega ao dono é o servidor da porta padrão falando com homologação, sem `VITE_API_URL` na linha de comando e com o stub derrubado: é ali que ele captura as evidências. O stub só volta a pedido.
+
+⛔ Decisão que depende de como a tela fica (fonte, escala, densidade) vai ao dono junto com a porta padrão de pé, já com a mudança: ele decide vendo o app, e a captura ou a tabela de larguras só acompanham.
