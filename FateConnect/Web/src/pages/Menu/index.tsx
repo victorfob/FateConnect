@@ -25,7 +25,7 @@ export function Menu() {
       <Typography variant="h1">{C.MENU_TITLE}</Typography>
 
       <S.MenuIntro>
-        <Typography variant="subtitle" color="inherit">
+        <Typography variant="body" color="inherit">
           {C.MENU_INTRO}
         </Typography>
       </S.MenuIntro>

@@ -34,7 +34,7 @@ export function ListCardDescription({ children, toggleLabels }: ListCardDescript
       <S.DescriptionText
         ref={textRef}
         component="div"
-        variant="subtitle"
+        variant="body"
         color="inherit"
         isCollapsed={isCollapsed}
       >

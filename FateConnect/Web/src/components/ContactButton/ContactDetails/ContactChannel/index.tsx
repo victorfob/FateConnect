@@ -38,7 +38,7 @@ export function ContactChannel(props: ContactChannelProps) {
     return (
       <S.ChannelRow component="a" href={props.href} target="_blank" rel="noopener noreferrer">
         {props.icon}
-        <S.ChannelText variant="subtitle" color="inherit">
+        <S.ChannelText variant="body" color="inherit">
           {props.children}
         </S.ChannelText>
       </S.ChannelRow>
@@ -48,7 +48,7 @@ export function ContactChannel(props: ContactChannelProps) {
   return (
     <S.ChannelRow component="button" type="button" onClick={props.onClick} aria-label={props.label}>
       {props.icon}
-      <S.ChannelText variant="subtitle" color="inherit">
+      <S.ChannelText variant="body" color="inherit">
         {props.children}
       </S.ChannelText>
     </S.ChannelRow>

@@ -19,7 +19,7 @@ export function PageMessage({ title, description, children }: PageMessageProps) 
     <S.PageMessageRoot>
       <S.MessageContent>
         <Typography variant="h1">{title}</Typography>
-        <Typography variant="subtitle">{description}</Typography>
+        <Typography variant="body">{description}</Typography>
 
         {children}
       </S.MessageContent>

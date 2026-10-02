@@ -30,7 +30,7 @@ export function LandingServices() {
               <Typography variant="h2">{title}</Typography>
             </S.CardTitle>
             <S.CardBody>
-              <Typography variant="subtitle">{description}</Typography>
+              <Typography variant="body">{description}</Typography>
             </S.CardBody>
           </S.ServiceCardRoot>
         ))}
