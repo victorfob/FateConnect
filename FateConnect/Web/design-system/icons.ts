@@ -55,3 +55,5 @@ export { default as VisibilityIcon } from '@mui/icons-material/Visibility';
 export { default as VisibilityOffIcon } from '@mui/icons-material/VisibilityOff';
 
 export type { SvgIconComponent } from '@mui/icons-material';
+export { default as CheckIcon } from '@mui/icons-material/Check';
+export { default as ContrastIcon } from '@mui/icons-material/Contrast';

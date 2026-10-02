@@ -11,8 +11,9 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <!-- Sem o par por `prefers-color-scheme`: o tema escuro se escolhe no app, não no sistema. -->
-    <meta name="theme-color" content="#43545C" />
+    <!-- O par vale até o app abrir: aí o tema escolhido nele repinta as duas tags. -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#43545C" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1E1E1E" />
     <!-- Título padrão, para a primeira passada do rastreador: cada rota declara
          o seu em `routes/pageMetadata.ts`, e o React 19 insere o dela ANTES
          deste, que é o que faz a da rota valer. Um teste reprova se este texto

@@ -1,12 +1,11 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { ThemeProvider } from '@design-system';
-import { useTheme } from '@mui/material/styles';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { PAGE_METADATA } from '@app/routes/pageMetadata';
 import { RoutePathEnum } from '@app/routes/paths';
-import { render, renderHook, waitFor } from '@app/test/testing-library';
+import { render, waitFor } from '@app/test/testing-library';
+import { createAppTheme } from '@ds-root/theme';
 
 import { PageMetadata } from '.';
 
@@ -22,6 +21,8 @@ const IHDR_WIDTH_OFFSET = 16;
 const IHDR_HEIGHT_OFFSET = 20;
 
 const MANIFEST_HREF = '/manifest.webmanifest';
+const LIGHT_CHROME = createAppTheme('light').palette.chrome.main;
+const DARK_CHROME = createAppTheme('dark').palette.chrome.main;
 const APPLE_TOUCH_ICON_SIZE = '180x180';
 
 type ManifestIcon = Readonly<{ src: string; sizes: string; type: string; purpose: string }>;
@@ -91,6 +92,12 @@ function pngSize(href: string) {
   expect(bytes.toString('ascii', IHDR_TYPE_OFFSET, IHDR_WIDTH_OFFSET)).toBe('IHDR');
 
   return `${bytes.readUInt32BE(IHDR_WIDTH_OFFSET)}x${bytes.readUInt32BE(IHDR_HEIGHT_OFFSET)}`;
+}
+
+function themeColorFor(scheme: 'light' | 'dark') {
+  return indexHead()
+    .querySelector(`meta[name="theme-color"][media="(prefers-color-scheme: ${scheme})"]`)
+    ?.getAttribute('content');
 }
 
 function iconSizes(purpose: string) {
@@ -243,14 +250,13 @@ describe('web app manifest', () => {
   });
 
   // O ícone tem o corpo branco do topo, que sumiria sobre o fundo claro da página.
-  it('should paint the browser and the splash with the light chrome', () => {
-    const { result } = renderHook(() => useTheme(), { wrapper: ThemeProvider });
-    const { palette } = result.current;
+  it('should open the installed app on the light chrome, whatever the theme', () => {
+    expect(manifest().theme_color).toBe(LIGHT_CHROME);
+    expect(manifest().background_color).toBe(LIGHT_CHROME);
+  });
 
-    expect(manifest().theme_color).toBe(palette.chrome.main);
-    expect(indexHead().querySelector('meta[name="theme-color"]')?.getAttribute('content')).toBe(
-      palette.chrome.main,
-    );
-    expect(manifest().background_color).toBe(palette.chrome.main);
+  it('should paint the browser bar with the chrome of the device scheme until the app opens', () => {
+    expect(themeColorFor('light')).toBe(LIGHT_CHROME);
+    expect(themeColorFor('dark')).toBe(DARK_CHROME);
   });
 });
