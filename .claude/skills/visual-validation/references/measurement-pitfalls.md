@@ -30,7 +30,7 @@ Cada caso: o que o número responde, o que ele parece responder, e o controle.
 
 ## Tema e dado da captura
 
-- O app escolhe o tema pela chave `theme_mode` do `localStorage`, que vence o `prefers-color-scheme` emulado: grave a chave antes de navegar. Captura escura idêntica à clara é o sinal.
+- A chave `theme_mode` do `localStorage` vence o `prefers-color-scheme` emulado; sem ela vale o emulado (o *Automático*). Grave ou apague a chave antes de navegar: captura escura idêntica à clara é o sinal.
 - No Chrome sem janela, `elemento.focus()` por script não dá estado de foco: o rótulo flutuante não sobe, o painel que abre no foco não abre, e a captura mostra uma tela que ninguém vê. Clique por `Input.dispatchMouseEvent`, com `Emulation.setFocusEmulationEnabled` ligado.
 - Stub com o tipo pela metade muda o comportamento: campo ausente no registro faz o formulário nascer alterado (`isDirty`), e o salvar desabilitado parece quebrado. Antes de culpar o código, confira o stub contra o tipo do serviço (`services/**/types.ts`).
 
@@ -48,5 +48,6 @@ O rótulo encolhido do campo do MUI fica 9px acima da caixa (`translate(14px, -9
 - Largura útil = `getBoundingClientRect` do contêiner menos o `padding` computado. Texto por `measureText` num `canvas` com a fonte real, depois de `document.fonts.ready`.
 - ⛔ Fonte declarada não é fonte carregada: antes de dizer com qual fonte mediu, leia `[...document.fonts]`. Vazio é a fonte do sistema, seja qual for o `font-family` do tema, e a largura muda de aparelho para aparelho.
 - Meça no contêiner mais apertado que vai receber o texto, a 375px.
+- Trocar fonte ou peso muda largura: remeça a 375px as larguras decididas por tamanho (e-mail e telefone lado a lado no rodapé).
 - A largura só decide quando separa as candidatas: se todas cabem ou nenhuma cabe, a escolha volta a ser por precisão.
 - Estourar custa diferente por lugar: título e `helperText` quebram linha (barato); o rodapé de diálogo empilha as ações e a fileira de informações do cartão desce um item (caro).

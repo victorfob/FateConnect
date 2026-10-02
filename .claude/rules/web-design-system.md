@@ -24,9 +24,8 @@ O consumo pela aplicação está em `fateconnect-web-react.md`; o lint guarda as
 
 ## Tipografia
 
-- A fonte vai junto com o app (`design-system/fonts/`, *FateConnect Heros*, 400 e 700): a instalada muda de aparelho para aparelho. Fonte nova só de licença livre; comercial (a Helvetica Neue) não entra num repositório público, e a obra derivada vai renomeada, com a licença ao lado.
-- Trocar fonte ou peso muda largura: meça a 375px as larguras decididas por tamanho (e-mail e telefone lado a lado no rodapé), com `document.fonts` mostrando a fonte carregada.
-- ⛔ Mudar o valor de um token pode deixá-lo igual a outro (o `subtitle` virou o `body` quando o 500 foi a 400): compare a família inteira depois da troca e dobre o par num nome só, com os consumidores.
+- A fonte vai junto com o app (`design-system/fonts/`, *FateConnect Heros*, 400 e 700). Fonte nova só de licença livre (a Helvetica Neue, comercial, não entra), renomeada e com a licença ao lado; trocá-la muda largura (`visual-validation`).
+- ⛔ Mudar o valor de um token pode igualá-lo a outro da família (um peso que desce a 400 iguala o `body`): compare a família e dobre o par num nome só, com os consumidores.
 
 ## Cor
 
