@@ -6,13 +6,13 @@ import { BrandLogo } from '@app/components/BrandLogo';
 import { DrawerSectionItem } from '@app/components/DrawerSectionItem';
 import { LandingNavButton } from '@app/components/LandingNavButton';
 import { LegalFooterLinks } from '@app/components/LegalFooterLinks';
+import { ThemeMenu } from '@app/components/ThemeMenu';
 import * as C from '@app/constants/appContact';
 import { LANDING_LINKS } from '@app/constants/navigation';
 import { useLandingAnchor } from '@app/hooks/useLandingAnchor';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 
 import { ShellContent, ShellRoot } from '../shell.styles';
-import { ThemeToggleButton } from './components/ThemeToggleButton';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
@@ -34,7 +34,7 @@ export function GuestLayout() {
     <ShellRoot>
       <Header
         logo={<BrandLogo to={RoutePathEnum.LANDING} />}
-        actions={<ThemeToggleButton />}
+        actions={<ThemeMenu iconOnly />}
         menuButtonLabel={MENU_BUTTON_LABEL}
         onMenuClick={handleMenuClick}
         navigation={LANDING_LINKS.map(({ section, label, highlighted }) => (
