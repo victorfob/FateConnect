@@ -4,15 +4,22 @@ import { UNSAVED_CHANGES } from './constants';
 
 export type UnsavedChangesDialogProps = Readonly<{
   open: boolean;
+  /** Diz o que se perde ao sair, com o nome da tela. */
+  message: string;
   onCancel: VoidFunction;
   onDiscard: VoidFunction;
 }>;
 
-export function UnsavedChangesDialog({ open, onCancel, onDiscard }: UnsavedChangesDialogProps) {
+export function UnsavedChangesDialog({
+  open,
+  message,
+  onCancel,
+  onDiscard,
+}: UnsavedChangesDialogProps) {
   return (
     <Dialog open={open} onClose={onCancel} title={UNSAVED_CHANGES.title}>
       <Dialog.Body>
-        <Dialog.Message>{UNSAVED_CHANGES.message}</Dialog.Message>
+        <Dialog.Message>{message}</Dialog.Message>
       </Dialog.Body>
 
       <Dialog.Footer>

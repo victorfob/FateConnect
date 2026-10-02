@@ -1,6 +1,7 @@
 import { Checkbox, FormControlLabel } from '@design-system';
 import { useFormContext } from 'react-hook-form';
 
+import { InlineLink } from '@app/components/InlineLink';
 import { PRIVACY_URL, TERMS_URL } from '@app/constants/legalDocuments';
 import type { SignupFormValues } from '@app/pages/Signup/schema';
 
@@ -33,18 +34,14 @@ export function ConsentSection() {
             {C.CONSENT_TERMS_PREFIX}{' '}
           </S.TermsLabel>
 
-          <S.InlineLink component="a" href={TERMS_URL} target="_blank" rel="noreferrer">
-            {C.CONSENT_TERMS_LINK}
-          </S.InlineLink>
+          <InlineLink href={TERMS_URL}>{C.CONSENT_TERMS_LINK}</InlineLink>
 
           <S.TermsLabel component="label" htmlFor={C.CONSENT_TERMS_FIELD_ID}>
             {' '}
             {C.CONSENT_TERMS_SEPARATOR}{' '}
           </S.TermsLabel>
 
-          <S.InlineLink component="a" href={PRIVACY_URL} target="_blank" rel="noreferrer">
-            {C.CONSENT_PRIVACY_LINK}
-          </S.InlineLink>
+          <InlineLink href={PRIVACY_URL}>{C.CONSENT_PRIVACY_LINK}</InlineLink>
         </S.TermsText>
       </S.TermsRow>
 
