@@ -3,10 +3,11 @@ import { Dialog, Input } from '@design-system';
 import { toZonedTime } from 'date-fns-tz';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
-import { NEIGHBORHOOD_SUGGESTIONS } from '@app/constants/neighborhoods';
+import { useProfile } from '@app/hooks/useProfile';
 import { RIDE_TYPE_HELP } from '@app/pages/Rides/helpers/rideType';
 import { RideFrequencyEnum } from '@app/services/rides/types';
 
+import { destinationShortcuts } from '../helpers/destinationShortcuts';
 import { isRuledOutDeparture, repeatUntilRange } from '../helpers/recurrenceDays';
 import type { RideFormInput, RideFormValues } from '../schema';
 import * as C from '../constants';
@@ -20,6 +21,9 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
     setValue,
     formState: { errors },
   } = useFormContext<RideFormInput, unknown, RideFormValues>();
+  const { data: profile } = useProfile();
+  const neighborhood = profile?.neighborhood;
+  const shortcuts = useMemo(() => destinationShortcuts(neighborhood), [neighborhood]);
   const description = useWatch({ control, name: 'description' });
   const frequency = useWatch({ control, name: 'frequency' });
   const departure = useWatch({ control, name: 'departure' });
@@ -50,7 +54,8 @@ export function RideFormFields({ holidays }: RideFormFieldsProps) {
               {...field}
               label={C.RIDE_FORM_LABELS.destination}
               required
-              options={NEIGHBORHOOD_SUGGESTIONS}
+              options={C.DESTINATION_SUGGESTIONS}
+              emptyInputSuggestions={shortcuts}
               placeholder={C.RIDE_FORM_PLACEHOLDERS.destination}
               maxLength={C.RIDE_LIMITS.maxDestination}
               error={errors.destination?.message}
