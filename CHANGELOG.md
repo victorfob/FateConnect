@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-02
+
 ### Added
 
 - Adiciona a instalação do site na tela inicial do celular, como um app, com o ícone do FateConnect e abertura sem a barra do navegador; o app instalado continua dependendo da internet (#539) [Frontend]
