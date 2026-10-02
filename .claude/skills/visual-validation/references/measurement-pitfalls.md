@@ -31,6 +31,7 @@ Cada caso: o que o número responde, o que ele parece responder, e o controle.
 ## Tema e dado da captura
 
 - O app escolhe o tema pela chave `theme_mode` do `localStorage`, que vence o `prefers-color-scheme` emulado: grave a chave antes de navegar. Captura escura idêntica à clara é o sinal.
+- No Chrome sem janela, `elemento.focus()` por script não dá estado de foco: o rótulo flutuante não sobe, o painel que abre no foco não abre, e a captura mostra uma tela que ninguém vê. Clique por `Input.dispatchMouseEvent`, com `Emulation.setFocusEmulationEnabled` ligado.
 - Stub com o tipo pela metade muda o comportamento: campo ausente no registro faz o formulário nascer alterado (`isDirty`), e o salvar desabilitado parece quebrado. Antes de culpar o código, confira o stub contra o tipo do serviço (`services/**/types.ts`).
 
 ## Limite de tela
