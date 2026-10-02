@@ -67,7 +67,6 @@ declare module '@mui/material/styles' {
 
   interface TypographyVariants {
     body: React.CSSProperties;
-    subtitle: React.CSSProperties;
     subtitleBold: React.CSSProperties;
     captionBold: React.CSSProperties;
     logo: React.CSSProperties;
@@ -75,7 +74,6 @@ declare module '@mui/material/styles' {
 
   interface TypographyVariantsOptions {
     body?: React.CSSProperties;
-    subtitle?: React.CSSProperties;
     subtitleBold?: React.CSSProperties;
     captionBold?: React.CSSProperties;
     logo?: React.CSSProperties;
@@ -93,7 +91,6 @@ declare module '@mui/material/Button' {
 declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     body: true;
-    subtitle: true;
     subtitleBold: true;
     captionBold: true;
     logo: true;
@@ -140,7 +137,6 @@ export function createAppTheme(mode: ThemeMode = 'light'): Theme {
         },
         h2: typographyTokens.h2,
         body: typographyTokens.body,
-        subtitle: typographyTokens.subtitle,
         subtitleBold: typographyTokens.subtitleBold,
         caption: typographyTokens.caption,
         captionBold: typographyTokens.captionBold,
