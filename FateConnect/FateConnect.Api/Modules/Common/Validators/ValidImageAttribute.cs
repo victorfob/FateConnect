@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.Common.Validators;
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Common.Utils;
 using Microsoft.AspNetCore.Http;
 
@@ -22,7 +23,7 @@ public class ValidImageAttribute : ValidationAttribute
             return new ValidationResult($"O tamanho da imagem não pode ultrapassar {NumberOfMegabytes}MB.");
 
         if (!ImageContentTypes.IsSupported(image.ContentType))
-            return new ValidationResult(ImageContentTypes.UnsupportedMessage);
+            return new ValidationResult(new UnsupportedImageFormatException().Message);
 
         return ValidationResult.Success;
     }

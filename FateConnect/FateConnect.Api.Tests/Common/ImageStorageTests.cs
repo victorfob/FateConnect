@@ -114,7 +114,7 @@ public sealed class ImageStorageTests : IDisposable
         InvalidImageException exception =
             Assert.Throws<InvalidImageException>(() => ImageContentTypes.ExtensionFor(contentType));
 
-        Assert.Equal(ImageContentTypes.UnsupportedMessage, exception.Message);
+        Assert.Equal(new UnsupportedImageFormatException().Message, exception.Message);
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public sealed class ImageStorageTests : IDisposable
     {
         ValidationResult? result = Validate(FileOf("text/html", fileName: "payload.html"));
 
-        Assert.Equal(ImageContentTypes.UnsupportedMessage, result?.ErrorMessage);
+        Assert.Equal(new UnsupportedImageFormatException().Message, result?.ErrorMessage);
     }
 
     [Fact]
@@ -227,10 +227,11 @@ public sealed class ImageStorageTests : IDisposable
     {
         StorageService service = ServiceOn(_webRoot);
 
-        InvalidImageException exception = await Assert.ThrowsAsync<InvalidImageException>(
+        CorruptedImageException exception = await Assert.ThrowsAsync<CorruptedImageException>(
             () => service.UploadImageAsync(FileOfSize("image/png", 12), EnumStorageContainer.LostAndFound));
 
-        Assert.Equal(ImageVariants.CorruptedMessage, exception.Message);
+        Assert.Equal(new CorruptedImageException().Message, exception.Message);
+
         Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "lostandfound"), "*", SearchOption.AllDirectories));
     }
 

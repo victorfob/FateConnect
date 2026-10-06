@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Common.Services;
+namespace FateConnect.Api.Modules.Storage.Services;
 
 using Microsoft.Extensions.Logging;
 
