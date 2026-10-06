@@ -22,6 +22,17 @@ services:
       JWT_EXPIRATION_HOURS: ${JWT_EXPIRATION_HOURS}
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
+      
+      # Comunicação e E-mail
+      PUBLIC_URL: ${PUBLIC_URL}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_SENDER: ${EMAIL_SENDER}
+      
+      # Configurações do RabbitMQ
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+            
       # Numa máquina apertada o coletor padrão reserva muito mais heap do que
       # esta API usa. O modo estação de trabalho a mantém dentro do limite.
       DOTNET_gcServer: '0'

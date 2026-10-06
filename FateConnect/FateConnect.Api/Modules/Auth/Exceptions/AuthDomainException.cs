@@ -24,3 +24,12 @@ public class UnidentifiedTokenException()
 
 public class UnidentifiedUserException()
     : UnauthorizedAccessException("Sessão expirada. Entre novamente para continuar.");
+
+public class InvalidConfirmationTokenException()
+    : AuthDomainException("O link de confirmação é inválido ou não foi encontrado.");
+
+public class EmailAlreadyConfirmedException()
+    : AuthDomainException("Este e-mail já foi confirmado anteriormente.");
+
+public class ExpiredConfirmationTokenException()
+    : AuthDomainException("O link de confirmação expirou. Por favor, solicite um novo.");

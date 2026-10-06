@@ -31,10 +31,15 @@ using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Common.Interfaces;
-using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
 using FateConnect.Api.Modules.Denunciations.Services;
 using FateConnect.Api.Modules.Denunciations.Repositories;
+using MassTransit;
+using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Communications.Consumers;
+using Resend;
+using FateConnect.Api.Modules.Communications.Interfaces;
+using FateConnect.Api.Modules.Communications.Services;
 
 public class Program
 {
@@ -109,6 +114,8 @@ public class Program
 
         builder.Services.AddScoped<IDenunciationRepository, DenunciationRepository>();
         builder.Services.AddScoped<IDenunciationService, DenunciationService>();
+
+        builder.Services.AddScoped<IEmailService, EmailService>();
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -199,6 +206,31 @@ public class Program
 
         builder.Services.AddDbContext<FateConnectDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        builder.Services.AddMassTransit(x =>
+        {
+            x.AddConsumer<UserRegisteredEventConsumer>();
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                string rabbitHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
+                string rabbitUser = Environment.GetEnvironmentVariable("RABBITMQ_USER") ?? "guest";
+                string rabbitPass = Environment.GetEnvironmentVariable("RABBITMQ_PASS") ?? "guest";
+
+                cfg.Host(rabbitHost, "/", h =>
+                {
+                    h.Username(rabbitUser);
+                    h.Password(rabbitPass);
+                });
+
+                cfg.ConfigureEndpoints(context);
+            });
+        });
+
+        builder.Services.AddResend(options =>
+        {
+            options.ApiToken = Environment.GetEnvironmentVariable("RESEND_API_KEY") ?? string.Empty;
+        });
 
         WebApplication app = builder.Build();
 

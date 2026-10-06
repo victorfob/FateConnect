@@ -4,6 +4,7 @@ using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Enums;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Common.Utils;
@@ -12,6 +13,7 @@ using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
 using FateConnect.Api.Modules.Users.Interfaces;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,7 @@ public partial class UserService(
     ITokenService tokenService,
     TimeProvider timeProvider,
     IStorageService baseStorageService,
+    IPublishEndpoint publishEndpoint,
     ILogger<UserService> logger
 ) : BaseFileService(baseStorageService), IUserService
 {
@@ -34,7 +37,7 @@ public partial class UserService(
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
         string hashedPassword = HashPassword(dto.Password);
 
-        User newUser = new User(
+        User newUser = new(
             dto.FatecEmail,
             hashedPassword,
             dto.FullName,
@@ -44,16 +47,38 @@ public partial class UserService(
             now
         );
 
-        UserPreferences newPreferences = new UserPreferences(
+        ConfigurePreferences(newUser, dto);
+        AddAcceptances(newUser, dto, origin, now);
+
+        var emailToken = AddEmailConfirmationToken(newUser, now);
+
+        await userRepository.AddAsync(newUser);
+
+        LogUserCreated(logger, newUser.Id);
+
+        await publishEndpoint.Publish(new UserRegisteredEvent(
+            UserId: newUser.Id,
+            FullName: newUser.FullName,
+            FatecEmail: newUser.FatecEmail,
+            ConfirmationToken: emailToken.Token
+        ));
+    }
+
+    private static void ConfigurePreferences(User user, CreateUserDto dto)
+    {
+        var preferences = new UserPreferences(
             dto.ReceiveEmails ?? false,
             dto.ReceiveNotifications ?? false
         );
 
-        newUser.SetPreferences(newPreferences);
+        user.SetPreferences(preferences);
+    }
 
+    private static void AddAcceptances(User user, CreateUserDto dto, RequestOrigin origin, DateTime now)
+    {
         foreach (var acceptanceDto in dto.Acceptances)
         {
-            newUser.AddDocumentAcceptance(new DocumentAcceptance(
+            user.AddDocumentAcceptance(new DocumentAcceptance(
                 documentType: acceptanceDto.Document,
                 version: acceptanceDto.Version,
                 acceptedAt: now,
@@ -61,10 +86,23 @@ public partial class UserService(
                 userAgent: origin.UserAgent
             ));
         }
+    }
 
-        await userRepository.AddAsync(newUser);
+    private static UserToken AddEmailConfirmationToken(User user, DateTime now)
+    {
+        var tokenString = Guid.NewGuid().ToString("N");
 
-        LogUserCreated(logger, newUser.Id);
+        var token = new UserToken(
+            userId: 0,
+            token: tokenString,
+            type: EnumTokenType.EmailConfirmation,
+            createdAt: now,
+            expiresAt: now.AddHours(24)
+        );
+
+        user.AddToken(token);
+
+        return token;
     }
 
     public async Task<ReadUserDto?> GetProfileAsync(int currentUserId)
