@@ -21,5 +21,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(e => e.Phone).IsUnique();
         builder.HasIndex(e => e.ContactEmail).IsUnique();
+
+        builder.Property(e => e.IsEmailConfirmed).IsRequired().HasDefaultValue(false);
+        builder.Metadata.FindNavigation(nameof(User.Tokens))?.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

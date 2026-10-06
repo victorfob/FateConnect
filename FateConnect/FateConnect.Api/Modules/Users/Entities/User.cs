@@ -27,6 +27,11 @@ public class User
     public EnumAccountStatus Status { get; private set; }
     public int TokenVersion { get; private set; }
 
+    public bool IsEmailConfirmed { get; private set; }
+
+    private readonly List<UserToken> _tokens = [];
+    public IReadOnlyCollection<UserToken> Tokens => _tokens.AsReadOnly();
+
     public UserPreferences Preferences { get; private set; } = null!;
 
     public bool HasContact => Phone is not null && ContactEmail is not null;
@@ -60,6 +65,7 @@ public class User
         ProfileType = EnumProfileType.Operator;
         Status = EnumAccountStatus.Active;
         TokenVersion = 0;
+        IsEmailConfirmed = false;
         CreatedAt = createdAt;
         UpdatedAt = null;
     }
@@ -233,5 +239,20 @@ public class User
 
         if (isTooLong)
             throw new InvalidNeighborhoodException();
+    }
+
+    public void ConfirmEmail()
+    {
+        if (IsEmailConfirmed)
+            return;
+
+        IsEmailConfirmed = true;
+        RegisterUpdate();
+    }
+
+    public void AddToken(UserToken token)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        _tokens.Add(token);
     }
 }
