@@ -21,14 +21,14 @@ public class UsersController(IUserService service) : ControllerBase
     [HttpPost("signup")]
     [AllowAnonymous]
     [Consumes("application/json")]
-    [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<TokenResponseDto>> SignUpAsync([FromBody] CreateUserDto dto)
     {
-        var result = await service.SignUpAsync(dto, HttpContext.GetRequestOrigin());
+        await service.SignUpAsync(dto, HttpContext.GetRequestOrigin());
 
-        return StatusCode(StatusCodes.Status201Created, result);
+        return StatusCode(StatusCodes.Status201Created);
     }
 
     [HttpGet("me")]

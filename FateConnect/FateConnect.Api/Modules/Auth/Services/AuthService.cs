@@ -59,6 +59,9 @@ public class AuthService : IAuthService
         if (isPasswordWrong)
             throw new InvalidCredentialsException();
 
+        if (!user.IsEmailConfirmed)
+            throw new EmailNotConfirmedException();
+
         return user;
     }
 

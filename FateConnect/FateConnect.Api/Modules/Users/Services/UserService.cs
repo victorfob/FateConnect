@@ -27,7 +27,7 @@ public partial class UserService(
 ) : BaseFileService(baseStorageService), IUserService
 {
 
-    public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto, RequestOrigin origin)
+    public async Task SignUpAsync(CreateUserDto dto, RequestOrigin origin)
     {
         await EnsureEmailIsUniqueAsync(dto.FatecEmail);
 
@@ -65,8 +65,6 @@ public partial class UserService(
         await userRepository.AddAsync(newUser);
 
         LogUserCreated(logger, newUser.Id);
-
-        return new TokenResponseDto { Token = tokenService.GenerateJwtToken(newUser) };
     }
 
     public async Task<ReadUserDto?> GetProfileAsync(int currentUserId)
