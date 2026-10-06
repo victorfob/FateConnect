@@ -35,17 +35,15 @@ public partial class GlobalExceptionMiddleware(
 
         switch (exception)
         {
-            case UserDomainException:
-            case InvalidUserIdentifierException:
-            case DenunciationDomainException:
-            case InvalidImageException:
-            case LostAndFoundDomainException:
-            case RideDomainException:
-                statusCode = HttpStatusCode.BadRequest;
+            case UnidentifiedTokenException:
+            case InvalidCredentialsException:
+            case UnidentifiedUserException:
+                statusCode = HttpStatusCode.Unauthorized;
                 errorMessage = exception.Message;
                 break;
 
             case BannedAccountException:
+            case EmailNotConfirmedException:
             case DenunciationNotReportedByUserException:
             case LostAndFoundNotReportedByUserException:
             case RideNotDrivenByUserException:
@@ -70,16 +68,15 @@ public partial class GlobalExceptionMiddleware(
                 conflictingField = ex.Field;
                 break;
 
-            case UnidentifiedTokenException:
-            case InvalidCredentialsException:
-            case UnidentifiedUserException:
-                statusCode = HttpStatusCode.Unauthorized;
+            case UserDomainException:
+            case AuthDomainException:
+            case InvalidUserIdentifierException:
+            case DenunciationDomainException:
+            case InvalidImageException:
+            case LostAndFoundDomainException:
+            case RideDomainException:
+                statusCode = HttpStatusCode.BadRequest;
                 errorMessage = exception.Message;
-                break;
-
-            case JwtNotConfiguredException ex:
-                statusCode = HttpStatusCode.InternalServerError;
-                errorMessage = ex.Message;
                 break;
         }
 
