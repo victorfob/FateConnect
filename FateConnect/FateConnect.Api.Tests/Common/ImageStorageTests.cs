@@ -15,6 +15,7 @@ using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Services;
+using FateConnect.Api.Modules.Storage.Services;
 using FateConnect.Api.Tests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
