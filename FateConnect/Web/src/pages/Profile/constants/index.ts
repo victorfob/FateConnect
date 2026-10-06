@@ -7,3 +7,6 @@ export const PROFILE_MESSAGES = {
   passwordFailed: 'Erro ao alterar a senha. Tente novamente.',
   currentPasswordWrong: 'Senha atual incorreta',
 };
+
+export const PROFILE_UNSAVED_CHANGES_MESSAGE =
+  'Tem certeza que deseja sair? As alterações feitas no perfil serão descartadas.';
