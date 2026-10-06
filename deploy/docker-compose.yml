@@ -1,9 +1,9 @@
 # A API de um ambiente. Sobe duas vezes, com arquivos de configuração
 # diferentes: ./deploy.sh hml e ./deploy.sh prod.
 #
-# Não há contêiner de banco nem de servidor web: a VPS já tem PostgreSQL e
-# nginx, e duplicá-los numa máquina de 1 GB gastaria memória que não existe. O
-# banco é alcançado pelo host; o front é servido pelo nginx do host.
+# Não há contêiner de banco nem de servidor web: PostgreSQL e nginx rodam no
+# host, uma cópia só para os dois ambientes. O banco é alcançado pelo host; o
+# front é servido pelo nginx do host.
 
 services:
   api:

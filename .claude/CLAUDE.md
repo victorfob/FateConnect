@@ -15,6 +15,7 @@ Este é um repositório **público** de trabalho acadêmico. **Nenhum conteúdo 
 ## Idioma
 
 - Interface, URLs e copy de produto: **pt-BR**.
+- Conversa com quem pede, perguntas e tabelas incluídas: **pt-BR**.
 - **Fluxo git:** mensagem de commit, nome de branch e **título** de PR em **inglês**; a **descrição** do PR é o único texto do fluxo em pt-BR.
 - Issues do GitHub: **pt-BR**.
 - Código e estrutura (identificadores, arquivos, pastas): **inglês**.
@@ -43,9 +44,11 @@ Front (`FateConnect/Web`, Node do `.nvmrc` + Yarn 1.x):
 
 ```bash
 cd FateConnect/Web && nvm use && yarn && yarn dev
-cd FateConnect/Web && yarn test:ci      # suíte inteira com cobertura
+git diff --name-only origin/develop... | xargs FateConnect/Web/scripts/test-changed.sh   # testes que a mudança alcança
 cd FateConnect/Web && yarn lint && yarn typecheck
 ```
+
+⛔ A suíte inteira do front (`yarn test:ci`) é do CI: rodada aqui ela trava a máquina, com qualquer número de workers.
 
 API (.NET 8):
 

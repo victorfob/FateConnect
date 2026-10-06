@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useSyncExternalStore } from 'react';
+import { useCallback } from 'react';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { useSessionQueryKey } from '@app/hooks/useSessionQueryKey';
 import { getProfile } from '@app/services/users/profileService';
 import type { User } from '@app/services/users/types';
 
@@ -19,16 +19,14 @@ function previousProfilePlaceholder(keepsPreviousProfile: boolean) {
   return undefined;
 }
 
-/** A chave leva o token: quem entra depois na mesma aba não herda o perfil de quem saiu. */
 export function useProfile({ keepsPreviousProfile = false }: UseProfileOptions = {}) {
   const queryClient = useQueryClient();
-  const token = useSyncExternalStore(tokenStorage.subscribe, tokenStorage.getToken);
-  const queryKey = useMemo(() => [PROFILE_QUERY_KEY, token], [token]);
+  const { queryKey, signedIn } = useSessionQueryKey(PROFILE_QUERY_KEY);
 
   const query = useQuery({
     queryKey,
     queryFn: getProfile,
-    enabled: token !== null,
+    enabled: signedIn,
     placeholderData: previousProfilePlaceholder(keepsPreviousProfile),
     meta: { errorMessage: PROFILE_LOAD_FAILED },
   });

@@ -3,14 +3,14 @@
 #
 #   sudo ./vps-setup.sh
 #
-# Faz quatro coisas, todas conferíveis antes de executar:
-#   1. instala o Docker;
-#   2. fecha a porta do banco para a internet com firewall;
-#   3. permite que os contêineres alcancem o Postgres do host;
-#   4. cria um banco e um usuário por ambiente.
+# Faz cinco coisas, todas conferíveis antes de executar:
+#   1. instala PostgreSQL, nginx, certbot e fail2ban;
+#   2. instala o Docker;
+#   3. fecha a porta do banco para a internet com firewall;
+#   4. permite que os contêineres alcancem o Postgres do host;
+#   5. cria um banco e um usuário por ambiente.
 #
-# Não desliga nenhum serviço por conta própria — o que sai é escolha sua, e
-# está listado no final como sugestão.
+# Não desliga nenhum serviço que já estava na máquina.
 set -euo pipefail
 
 if [[ "$(id -u)" -ne 0 ]]; then
@@ -19,17 +19,20 @@ if [[ "$(id -u)" -ne 0 ]]; then
 fi
 
 TARGET_USER="${SUDO_USER:-$(logname 2>/dev/null || echo root)}"
-PG_HBA=/etc/postgresql/17/main/pg_hba.conf
+PG_CONF_DIR=/etc/postgresql/17/main
+PG_HBA="$PG_CONF_DIR/pg_hba.conf"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
-echo "==> 1/5 Ferramentas básicas"
+echo "==> 1/5 Pacotes do host"
 apt-get update -qq
 # O git entra aqui e não antes por um motivo prático: sem ele não há como
 # clonar o repositório que contém este script, então ele chega por outro meio
 # e instala o próprio pré-requisito.
 # O rsync é como a pipeline entrega o front construído no runner.
-apt-get install -y -qq git curl ca-certificates rsync
-echo "    git $(git --version | awk '{print $3}')"
+# O PostgreSQL é o 17 do Debian 13, e o caminho de PG_CONF_DIR depende disso.
+apt-get install -y -qq git curl ca-certificates rsync \
+  postgresql nginx certbot python3-certbot-nginx fail2ban
+echo "    git $(git --version | awk '{print $3}'), $(psql --version), $(nginx -v 2>&1)"
 
 echo "==> 2/5 Docker"
 if command -v docker >/dev/null 2>&1; then
@@ -69,8 +72,13 @@ for range in 172.16.0.0/12 192.168.0.0/16 10.0.0.0/8; do
     echo "host    all    all    $range    scram-sha-256" >> "$PG_HBA"
   fi
 done
-systemctl reload postgresql
-echo "    pg_hba.conf ajustado (backup em $PG_HBA.bak-$TIMESTAMP)"
+# O contêiner chega pelo gateway do docker0, que não é localhost para o
+# Postgres: escutando só em localhost, as APIs sobem e não conectam.
+PG_CONF="$PG_CONF_DIR/postgresql.conf"
+cp -a "$PG_CONF" "$PG_CONF.bak-$TIMESTAMP"
+sed -i "s/^#\?listen_addresses = .*/listen_addresses = '*'/" "$PG_CONF"
+systemctl restart postgresql
+echo "    pg_hba.conf e listen_addresses ajustados (backups com sufixo .bak-$TIMESTAMP)"
 
 echo "==> 5/5 Bancos dos dois ambientes"
 for environment in hml prod; do
@@ -95,9 +103,4 @@ done
 
 echo
 echo "Pronto. Confira o firewall com:  sudo ufw status numbered"
-echo
-echo "Sugestão de memória — NÃO foi feito por este script, decida você:"
-echo "  GlassFish ocupa ~197 MB. Para desligar:"
-echo "    sudo systemctl disable --now glassfish"
-echo "  Para voltar atrás:"
-echo "    sudo systemctl enable --now glassfish"
+echo "E o banco escutando para os contêineres:  ss -tlnp | grep 5432"

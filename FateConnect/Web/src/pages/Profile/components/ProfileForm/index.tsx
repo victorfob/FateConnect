@@ -2,18 +2,19 @@ import { useCallback } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { SaveBar } from '@app/components/SaveBar';
+import { UnsavedChangesDialog } from '@app/components/UnsavedChangesDialog';
+import { useLeaveConfirmation } from '@app/hooks/useLeaveConfirmation';
 import type { User } from '@app/services/users/types';
 
+import { PROFILE_UNSAVED_CHANGES_MESSAGE } from '../../constants';
 import { toProfileFormValues } from '../../helpers/mapper';
 import { hasPendingChanges } from '../../helpers/pendingChanges';
-import { useLeaveConfirmation } from '../../hooks/useLeaveConfirmation';
 import { useProfileSave } from '../../hooks/useProfileSave';
 import { profileSchema, type ProfileFormInput, type ProfileFormValues } from '../../schema';
 import { AccountAccessCard } from '../AccountAccessCard';
 import { AccountDataCard } from '../AccountDataCard';
 import { PhotoCard } from '../PhotoCard';
-import { SaveBar } from '../SaveBar';
-import { UnsavedChangesDialog } from '../UnsavedChangesDialog';
 import * as S from './styles';
 
 export type ProfileFormProps = Readonly<{
@@ -49,7 +50,12 @@ export function ProfileForm({ profile, onSaved }: ProfileFormProps) {
         </S.CardsGrid>
 
         <SaveBar hasChanges={hasChanges} saving={isSaving} onDiscard={handleDiscard} />
-        <UnsavedChangesDialog open={confirming} onCancel={cancelLeave} onDiscard={confirmLeave} />
+        <UnsavedChangesDialog
+          open={confirming}
+          message={PROFILE_UNSAVED_CHANGES_MESSAGE}
+          onCancel={cancelLeave}
+          onDiscard={confirmLeave}
+        />
       </S.ProfileFormRoot>
     </FormProvider>
   );

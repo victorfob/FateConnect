@@ -1,6 +1,6 @@
-import { spacingScale, Stack, styled, Typography } from '@design-system';
+import { spacingScale, Stack, styled } from '@design-system';
 
-const { xxs, sm } = spacingScale;
+const { sm, lg } = spacingScale;
 
 export const SettingRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
@@ -9,11 +9,7 @@ export const SettingRow = styled(Stack)(({ theme }) => ({
   gap: theme.space(sm),
 }));
 
-export const SettingText = styled(Stack)(({ theme }) => ({
+export const PreferencesSections = styled(Stack)(({ theme }) => ({
   flexDirection: 'column',
-  gap: theme.space(xxs),
-}));
-
-export const SettingDescription = styled(Typography)(({ theme }) => ({
-  color: theme.palette.text.secondary,
+  gap: theme.space(lg),
 }));
