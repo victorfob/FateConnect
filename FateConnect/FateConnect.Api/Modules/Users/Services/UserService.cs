@@ -1,7 +1,6 @@
 namespace FateConnect.Api.Modules.Users.Services;
 
 using FateConnect.Api.Modules.Auth.DTOs;
-using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Enums;
@@ -16,7 +15,6 @@ using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using static BCrypt.Net.BCrypt;
 

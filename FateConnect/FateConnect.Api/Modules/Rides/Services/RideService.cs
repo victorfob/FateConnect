@@ -6,7 +6,6 @@ using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Rides.Interfaces;
-using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Extensions;
 using Microsoft.Extensions.Logging;
 
