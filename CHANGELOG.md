@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-06
+
 ### Added
 
 - Adiciona às Preferências a escolha de receber os avisos de caronas, achados e perdidos e denúncias no aplicativo, no e-mail para contato, nos dois ou em nenhum, que antes só se fazia no cadastro; a escolha fica guardada até o envio existir (#546) [Frontend]
