@@ -22,15 +22,17 @@ services:
       JWT_EXPIRATION_HOURS: ${JWT_EXPIRATION_HOURS}
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
-      # Numa máquina apertada o coletor padrão reserva muito mais heap do que
-      # esta API usa. O modo estação de trabalho a mantém dentro do limite.
+      # O coletor de servidor reserva heap por núcleo, muito acima do que esta
+      # API usa. O modo estação de trabalho a mantém dentro do mem_limit.
       DOTNET_gcServer: '0'
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     ports:
       # Só em 127.0.0.1: quem fala com a internet é o nginx do host.
       - '127.0.0.1:${API_PORT}:8080'
-    mem_limit: 220m
+    # Teto por ambiente: a API que vazar memória cai sozinha, sem levar a
+    # máquina. Na subida ela passa de 170 MB.
+    mem_limit: 512m
     # As imagens enviadas vivem em volume: sem ele, todo deploy recria o
     # contêiner e leva junto o que foi carregado.
     volumes:
