@@ -71,10 +71,11 @@ systemctl reload nginx
 
 # O passo acima sobrescreve o arquivo inteiro, e o template só descreve a porta
 # 80 — então o bloco 443 que o certbot escreveu some a cada execução. Reaplicar
-# não reemite certificado: só devolve o TLS ao arquivo recém-gerado.
+# não reemite certificado: só devolve o TLS ao arquivo recém-gerado. Sem o -d,
+# o certificado de produção, que também cobre hml, vai parar no site de hml.
 if [[ -d "/etc/letsencrypt/live/$DOMAIN" ]]; then
   echo "==> Devolvendo o HTTPS à configuração recém-gerada"
-  certbot install --nginx --cert-name "$DOMAIN"
+  certbot install --nginx --cert-name "$DOMAIN" -d "$DOMAIN"
   nginx -t
   systemctl reload nginx
 fi
