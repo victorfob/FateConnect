@@ -115,10 +115,9 @@ Depois construa o front e suba a API:
 ./build-front.sh prod && ./deploy.sh prod
 ```
 
-⚠️ **Num servidor de 1 GB o `build-front.sh` não conclui.** O Vite precisa de
-mais de 500 MB de heap e o Node aborta com `JavaScript heap out of memory`,
-sem gerar nada. Nesse caso construa o front em outra máquina e envie o
-resultado — que é exatamente o que a pipeline faz:
+A pipeline não usa o `build-front.sh`: ela constrói o front no runner, por
+causa dos source maps do Sentry (seção abaixo). Para fazer o mesmo à mão,
+construa em outra máquina e envie o resultado:
 
 ```bash
 # na sua máquina, dentro de FateConnect/Web
