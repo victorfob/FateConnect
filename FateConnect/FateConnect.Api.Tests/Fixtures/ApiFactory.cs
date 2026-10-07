@@ -22,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using static BCrypt.Net.BCrypt;
@@ -112,7 +113,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         if (tokenVersion != user.TokenVersion)
             typeof(User).GetProperty(nameof(User.TokenVersion))?.SetValue(user, tokenVersion);
 
-        return new TokenService(Options.Create(options)).GenerateJwtToken(user);
+        return new TokenService(Options.Create(options), NullLogger<TokenService>.Instance).GenerateJwtToken(user);
     }
 
     public static string IssueTokenWithoutVersion(int userId = 1)
