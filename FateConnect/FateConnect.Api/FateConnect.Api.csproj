@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit" Version="9.2.3" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="9.2.3" />
+    <PackageReference Include="MassTransit" Version="8.3.3" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.3" />
     <PackageReference Include="Resend" Version="0.22.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="4.1.2" />
     <PackageReference Include="SonarAnalyzer.CSharp" Version="10.33.0.1635">
