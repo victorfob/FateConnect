@@ -4,15 +4,15 @@ using Microsoft.Extensions.Logging;
 
 public partial class AuthService
 {
-    [LoggerMessage(Level = LogLevel.Information, Message = "O usuário de ID {UserId} confirmou o e-mail com sucesso.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "User ID {UserId} successfully confirmed their email.")]
     private static partial void LogEmailConfirmed(ILogger logger, int userId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "O usuário de ID {UserId} iniciou uma nova sessão com sucesso.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "User ID {UserId} successfully started a new session.")]
     private static partial void LogUserLoggedIn(ILogger logger, int userId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "O usuário de ID {UserId} encerrou a sessão (Logout).")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "User ID {UserId} logged out.")]
     private static partial void LogUserLoggedOut(ILogger logger, int userId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "O usuário de ID {UserId} reativou a conta e iniciou a sessão.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "User ID {UserId} reactivated their account and logged in.")]
     private static partial void LogUserReactivated(ILogger logger, int userId);
 }

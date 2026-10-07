@@ -5,6 +5,6 @@ using System;
 
 public partial class TokenService
 {
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Token JWT emitido internamente para o usuário de ID {UserId}. Expiração: {ExpirationDate} UTC.")]
+    [LoggerMessage(Level = LogLevel.Debug, Message = "JWT token internally issued for user ID {UserId}. Expiration: {ExpirationDate} UTC.")]
     private static partial void LogJwtTokenGenerated(ILogger logger, int userId, DateTime expirationDate);
 }
