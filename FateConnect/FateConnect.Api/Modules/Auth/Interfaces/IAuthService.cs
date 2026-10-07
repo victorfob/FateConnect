@@ -4,7 +4,7 @@ namespace FateConnect.Api.Modules.Auth.Interfaces;
 
 public interface IAuthService
 {
-    Task ConfirmEmailAsync(ConfirmEmailDto dto);
+    Task<TokenResponseDto> ConfirmEmailAsync(ConfirmEmailDto dto);
     Task<TokenResponseDto> LoginAsync(LoginDto dto);
     Task<TokenResponseDto> ReactivateAsync(LoginDto dto);
     Task LogoutAsync(int userId);

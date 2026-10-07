@@ -74,7 +74,7 @@ public partial class AuthService(
     private TokenResponseDto IssueToken(User user) =>
         new() { Token = tokenService.GenerateJwtToken(user) };
 
-    public async Task ConfirmEmailAsync(ConfirmEmailDto dto)
+    public async Task<TokenResponseDto> ConfirmEmailAsync(ConfirmEmailDto dto)
     {
         User? user = await userRepository.GetByConfirmationTokenAsync(dto.Token);
 
@@ -99,5 +99,7 @@ public partial class AuthService(
         await userRepository.SaveChangesAsync();
 
         LogEmailConfirmed(logger, user.Id);
+
+        return IssueToken(user);
     }
 }

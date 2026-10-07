@@ -66,10 +66,9 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ConfirmEmailAsync([FromBody] ConfirmEmailDto dto)
+    public async Task<ActionResult<TokenResponseDto>> ConfirmEmail([FromBody] ConfirmEmailDto dto)
     {
-        await _authService.ConfirmEmailAsync(dto);
-
-        return NoContent();
+        var tokenResponse = await _authService.ConfirmEmailAsync(dto);
+        return Ok(tokenResponse);
     }
 }
