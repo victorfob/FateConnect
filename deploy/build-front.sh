@@ -44,6 +44,6 @@ docker run --rm \
   -e "VITE_API_URL=$PUBLIC_URL/api" \
   -e "VITE_SENTRY_DSN=${VITE_SENTRY_DSN:-}" \
   "node:$NODE_VERSION-alpine" \
-  sh -c 'yarn install --frozen-lockfile && yarn build && rm -rf /saida/* && cp -r dist/. /saida/'
+  sh -c 'corepack enable && yarn install --immutable && yarn build && rm -rf /saida/* && cp -r dist/. /saida/'
 
 echo "==> Pronto: $TARGET"

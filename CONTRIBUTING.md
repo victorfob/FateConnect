@@ -12,9 +12,10 @@ Issues são escritas em **pt-BR**: elas são documento de planejamento, não có
 
 ## Ambiente
 
-O front vive em `FateConnect/Web` e usa a versão do Node declarada no `.nvmrc`, com Yarn 1.x:
+O front vive em `FateConnect/Web` e usa a versão do Node declarada no `.nvmrc`, com o Yarn 4. Quem entrega o Yarn é o Corepack, na versão do `packageManager`; o Yarn 1 instalado na máquina recusa o projeto. Habilite uma vez:
 
 ```bash
+corepack enable
 cd FateConnect/Web && nvm use && yarn && yarn dev
 ```
 
