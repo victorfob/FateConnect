@@ -29,7 +29,7 @@ describe('lostItemStatusTone', () => {
   it('should give each situation its own colour', () => {
     expect(lostItemStatusTone(LostItemStatusEnum.OPEN)).toBe('warning');
     expect(lostItemStatusTone(LostItemStatusEnum.RESOLVED)).toBe('success');
-    expect(lostItemStatusTone(LostItemStatusEnum.DELETED)).toBe('neutral');
+    expect(lostItemStatusTone(LostItemStatusEnum.DELETED)).toBe('muted');
   });
 
   it('should leave the unknown status without a box', () => {
