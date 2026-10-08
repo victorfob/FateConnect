@@ -164,12 +164,10 @@ public class UserRepository : IUserRepository
                 .SetProperty(user => user.UpdatedAt, DateTime.UtcNow));
     }
 
-    public async Task<User?> GetByConfirmationTokenAsync(string token)
+    public async Task<User?> GetByTokenAsync(string token)
     {
         return await _context.Users
             .Include(u => u.Tokens)
-            .FirstOrDefaultAsync(u => u.Tokens.Any(t =>
-                t.Token == token &&
-                t.Type == EnumTokenType.EmailConfirmation));
+            .FirstOrDefaultAsync(u => u.Tokens.Any(t => t.Token == token));
     }
 }

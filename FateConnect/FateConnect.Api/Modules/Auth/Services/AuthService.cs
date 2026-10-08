@@ -79,7 +79,7 @@ public partial class AuthService(
 
     public async Task<TokenResponseDto> ConfirmEmailAsync(ConfirmEmailDto dto)
     {
-        User? user = await userRepository.GetByConfirmationTokenAsync(dto.Token);
+        User? user = await userRepository.GetByTokenAsync(dto.Token);
 
         if (user is null)
             throw new InvalidConfirmationTokenException();
@@ -199,7 +199,7 @@ public partial class AuthService(
 
     public async Task<User> VerifyResetTokenAsync(string token)
     {
-        User? user = await userRepository.GetByConfirmationTokenAsync(token);
+        User? user = await userRepository.GetByTokenAsync(token);
 
         if (user is null)
             throw new InvalidPasswordResetTokenException();
