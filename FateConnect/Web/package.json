@@ -8,15 +8,15 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "./scripts/check-node.sh && tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings=0",
+    "typecheck": "./scripts/check-node.sh && tsc --noEmit",
+    "lint": "./scripts/check-node.sh && eslint . --report-unused-disable-directives --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"{src,design-system}/**/*.{ts,tsx}\"",
-    "test": "vitest",
-    "test:ci": "vitest run --coverage",
-    "test:coverage": "vitest run --coverage"
+    "test": "./scripts/check-node.sh && vitest",
+    "test:ci": "./scripts/check-node.sh && vitest run --coverage",
+    "test:coverage": "./scripts/check-node.sh && vitest run --coverage"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
