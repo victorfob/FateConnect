@@ -7,7 +7,7 @@ Estrutura do repositório, fluxo de trabalho, integração contínua e a versão
 ## Requisitos
 
 - **Node** na versão do `.nvmrc` (`nvm use` na pasta resolve)
-- **Yarn** 1.x
+- **Yarn** 4, entregue pelo Corepack: `corepack enable` uma vez por máquina
 
 O projeto **não roda em Node 20**: as ferramentas de teste exigem 22 ou superior.
 

@@ -53,4 +53,4 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 
 ## Gate
 
-⛔ Gate só pelo `yarn` (`yarn lint`, `yarn typecheck`, `yarn test:ci`), de dentro de `FateConnect/Web` depois do `nvm use`: o binário de `node_modules/.bin` roda em qualquer Node e responde verde; só o `yarn` cobra o `engines`. O que o CI roda está em `.github/workflows/check-front.yml`.
+⛔ Gate só pelo `yarn` (`yarn lint`, `yarn typecheck`, `yarn test:ci`), de dentro de `FateConnect/Web` depois do `nvm use`: o binário de `node_modules/.bin` roda em qualquer Node e responde verde. O Yarn 4 não cobra o `engines`: quem recusa o Node errado é o `scripts/check-node.sh`, na frente de cada script de gate do `package.json`. O que o CI roda está em `.github/workflows/check-front.yml`.
