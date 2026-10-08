@@ -1,1 +1,1 @@
-export type PasswordPurpose = 'current' | 'new';
+export type PasswordPurpose = 'current' | 'reauthentication' | 'new';
