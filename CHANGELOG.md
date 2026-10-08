@@ -10,7 +10,17 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona a infraestrutura de mensageria assíncrona com RabbitMQ e MassTransit para orquestrar o envio de e-mails em segundo plano, sem bloquear o tempo de resposta da API (#553) [Backend]
+- Adiciona a confirmação de e-mail obrigatória para novos cadastros, enviando um link de validação para a caixa de entrada e emitindo o passe de acesso (JWT) imediatamente no momento do clique (#553) [Backend]
+- Adiciona o fluxo de reenvio de e-mail de confirmação para recuperar usuários com tokens expirados, invalidando os envios anteriores e gerando um novo link (#553) [Backend]
+- Adiciona a tabela `UserToken` ao banco de dados para o rastreio de tokens temporários e a coluna `IsEmailConfirmed` aos usuários, com a respectiva migration (#553) [Backend]
 - Adiciona às Preferências a escolha de receber os avisos de caronas, achados e perdidos e denúncias no aplicativo, no e-mail para contato, nos dois ou em nenhum, que antes só se fazia no cadastro; a escolha fica guardada até o envio existir (#546) [Frontend]
+
+### Changed
+
+- Passa a recusar o login de contas que ainda não confirmaram o e-mail institucional, exigindo a validação da caixa de entrada primeiro (#553) [Backend]
+- Passa a realizar o login automático apenas após o usuário clicar no link de confirmação do e-mail, em vez de logá-lo imediatamente após o preenchimento da tela de cadastro (#553) [Backend]
+- Passa a organizar de forma mais coesa a estrutura de arquivos do módulo de Storage, além de limpar as importações (`usings`) não utilizadas em toda a API (#553) [Backend]
 
 ## [1.2.0] - 2026-10-02
 
