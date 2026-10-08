@@ -14,6 +14,7 @@ const VALID: LostItemFormInput = {
   occurredOn: toDisplayDate(toApiDate(new Date())),
   description: 'Garrafa azul, com adesivos na tampa.',
   photo: null,
+  removeStoredPhoto: false,
 };
 
 /** O tamanho é declarado, não ocupado: alocar 5 MB só para reprovar é desperdício. */

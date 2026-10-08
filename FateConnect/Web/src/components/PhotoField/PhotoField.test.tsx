@@ -58,7 +58,41 @@ describe('PhotoField', () => {
     expect(onChange).toHaveBeenCalledWith(null);
   });
 
-  it('should show what is already stored, with no way to remove it', () => {
+  it('should drop what is shown, the stored photo included, when the screen allows it', async () => {
+    const onRemoveStored = vi.fn();
+    renderComponent({
+      ...DEFAULT_PROPS,
+      value: photo,
+      storedPreview: STORED_PREVIEW,
+      onRemoveStored,
+    });
+
+    await userEvent.click(await screen.findByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
+
+    expect(onChange).toHaveBeenCalledWith(null);
+    expect(onRemoveStored).toHaveBeenCalledOnce();
+  });
+
+  it('should offer removing the stored photo alone when the screen allows it', async () => {
+    const onRemoveStored = vi.fn();
+    renderComponent({ ...DEFAULT_PROPS, storedPreview: STORED_PREVIEW, onRemoveStored });
+
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
+
+    expect(onRemoveStored).toHaveBeenCalledOnce();
+  });
+
+  it('should leave the stored photo alone when only the new choice is dropped', async () => {
+    const onRemoveStored = vi.fn();
+    renderComponent({ ...DEFAULT_PROPS, value: photo, onRemoveStored });
+
+    await userEvent.click(await screen.findByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
+
+    expect(onChange).toHaveBeenCalledWith(null);
+    expect(onRemoveStored).not.toHaveBeenCalled();
+  });
+
+  it('should show what is already stored, with no way to remove it unless the screen allows it', () => {
     renderComponent({ ...DEFAULT_PROPS, storedPreview: STORED_PREVIEW });
 
     expect(screen.getByRole('img', { name: STORED_PREVIEW.alt })).toHaveAttribute(
