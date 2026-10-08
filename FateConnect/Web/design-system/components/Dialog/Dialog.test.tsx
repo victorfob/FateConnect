@@ -1,4 +1,5 @@
 import { cleanup, render, screen, userEvent, within } from '@app/test/testing-library';
+import { narrowDeclarationsFor } from '@app/test/utils/styleSheetRules';
 
 import { CLOSE_LABEL } from './constants';
 import type { DialogSubmitProps } from './DialogSubmit';
@@ -117,6 +118,28 @@ describe('Dialog', () => {
     for (const closeButton of closeButtons) await userEvent.click(closeButton);
 
     expect(onClose).toHaveBeenCalledTimes(2);
+  });
+
+  it('should split the footer between its buttons on the phone, with or without a form', () => {
+    renderComponent({ ...DEFAULT_PROPS, children: submitFormWith({}) });
+    expect(narrowDeclarationsFor(screen.getByRole('button', { name: 'Enviar' }))).toContain(
+      'flex:1',
+    );
+
+    cleanup();
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Footer>
+          <button type="button" className="MuiButton-root">
+            Confirmar
+          </button>
+        </Dialog.Footer>
+      ),
+    });
+    expect(narrowDeclarationsFor(screen.getByRole('button', { name: 'Confirmar' }))).toContain(
+      'flex:1',
+    );
   });
 
   it('should stay out of the page while it is closed', () => {

@@ -27,12 +27,10 @@ export const DialogSurface = styled(Stack)(({ theme }) => ({
     flexGrow: 1,
     padding: theme.space(md),
 
-    // Sem formulário, o conteúdo é curto: ele vai para o meio da tela e os botões
-    // dividem a largura. O formulário fica no topo, longe do teclado.
-    '&:not(:has(form))': {
-      '& [data-dialog-body]': { justifyContent: 'safe center' },
-      '& [data-dialog-footer] .MuiButton-root': { flex: 1 },
-    },
+    // Os botões dividem a largura. Sem formulário, o conteúdo é curto e vai para
+    // o meio da tela; o formulário fica no topo, longe do teclado.
+    '& [data-dialog-footer] .MuiButton-root': { flex: 1 },
+    '&:not(:has(form)) [data-dialog-body]': { justifyContent: 'safe center' },
 
     '&:has(form) [data-close-footer], &:has([data-dialog-footer]:not([data-close-footer] *)) [data-close-footer]':
       { display: 'none' },
