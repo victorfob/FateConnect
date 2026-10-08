@@ -73,9 +73,38 @@ public class AuthController : ControllerBase
 
     [HttpPost("resend-confirmation-email")]
     [AllowAnonymous]
-    public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailDto dto)
+    public async Task<IActionResult> ResendConfirmationEmail([FromBody] EmailRequestDto dto)
     {
         await _authService.ResendConfirmationEmailAsync(dto);
         return NoContent();
+    }
+
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ForgotPassword([FromBody] EmailRequestDto dto)
+    {
+        await _authService.ForgotPasswordAsync(dto);
+        return NoContent();
+    }
+
+    [HttpGet("verify-reset-token")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> VerifyResetToken([FromQuery] string token)
+    {
+        await _authService.VerifyResetTokenAsync(token);
+        return NoContent();
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<TokenResponseDto>> ResetPassword([FromBody] ResetPasswordDto dto)
+    {
+        var tokenResponse = await _authService.ResetPasswordAsync(dto);
+        return Ok(tokenResponse);
     }
 }

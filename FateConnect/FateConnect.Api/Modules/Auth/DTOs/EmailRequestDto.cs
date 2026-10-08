@@ -4,7 +4,7 @@ using FateConnect.Api.Infrastructure.Validation;
 
 namespace FateConnect.Api.Modules.Auth.DTOs;
 
-public class ResendConfirmationEmailDto
+public class EmailRequestDto
 {
     [Required(ErrorMessage = "O e-mail institucional é obrigatório.")]
     [EmailAddress(ErrorMessage = "O formato do e-mail é inválido.")]

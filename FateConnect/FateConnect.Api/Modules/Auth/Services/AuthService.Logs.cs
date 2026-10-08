@@ -18,4 +18,10 @@ public partial class AuthService
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Confirmation email resent for User ID {UserId}.")]
     private static partial void LogConfirmationEmailResent(ILogger logger, int userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "User ID {UserId} requested a password reset link.")]
+    private static partial void LogPasswordResetRequested(ILogger logger, int userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "User ID {UserId} successfully reset their password.")]
+    private static partial void LogPasswordResetSuccessfully(ILogger logger, int userId);
 }

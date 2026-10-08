@@ -106,7 +106,7 @@ public partial class AuthService(
         return IssueToken(user);
     }
 
-    public async Task ResendConfirmationEmailAsync(ResendConfirmationEmailDto dto)
+    public async Task ResendConfirmationEmailAsync(EmailRequestDto dto)
     {
         User? user = await userRepository.GetByEmailAsync(dto.FatecEmail);
 
@@ -151,5 +151,94 @@ public partial class AuthService(
         ));
 
         LogConfirmationEmailResent(logger, user.Id);
+    }
+
+    public async Task ForgotPasswordAsync(EmailRequestDto dto)
+    {
+        User? user = await userRepository.GetByEmailAsync(dto.FatecEmail);
+
+        if (user is null)
+            return;
+
+        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+
+        var activeTokens = user.Tokens.Where(t =>
+            t.Type == EnumTokenType.PasswordReset &&
+            !t.IsConsumed &&
+            t.ExpiresAt > now);
+
+        foreach (var oldToken in activeTokens)
+        {
+            oldToken.Consume(now);
+        }
+
+        string newRawToken = Guid.NewGuid().ToString("N");
+        DateTime expiration = now.AddMinutes(30);
+
+        var token = new UserToken(
+            userId: user.Id,
+            token: newRawToken,
+            type: EnumTokenType.PasswordReset,
+            createdAt: now,
+            expiresAt: expiration
+        );
+
+        user.AddToken(token);
+
+        await userRepository.SaveChangesAsync();
+
+        await publishEndpoint.Publish(new PasswordResetRequestedEvent(
+            UserId: user.Id,
+            FullName: user.FullName,
+            FatecEmail: user.FatecEmail,
+            ResetToken: newRawToken
+        ));
+
+        LogPasswordResetRequested(logger, user.Id);
+    }
+
+    public async Task<User> VerifyResetTokenAsync(string token)
+    {
+        User? user = await userRepository.GetByConfirmationTokenAsync(token);
+
+        if (user is null)
+            throw new InvalidPasswordResetTokenException();
+
+        UserToken? resetToken = user.Tokens.FirstOrDefault(t =>
+            t.Token == token &&
+            t.Type == EnumTokenType.PasswordReset);
+
+        if (resetToken is null)
+            throw new InvalidPasswordResetTokenException();
+
+        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+
+        if (resetToken.IsConsumed)
+            throw new PasswordResetTokenConsumedException();
+
+        if (resetToken.ExpiresAt < now)
+            throw new ExpiredPasswordResetTokenException();
+
+        return user;
+    }
+
+    public async Task<TokenResponseDto> ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        User user = await VerifyResetTokenAsync(dto.Token);
+
+        UserToken resetToken = user.Tokens.First(t => t.Token == dto.Token && t.Type == EnumTokenType.PasswordReset);
+
+        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+
+        string newPasswordHash = HashPassword(dto.NewPassword);
+        user.ChangePassword(newPasswordHash);
+
+        resetToken.Consume(now);
+
+        await userRepository.SaveChangesAsync();
+
+        LogPasswordResetSuccessfully(logger, user.Id);
+
+        return IssueToken(user);
     }
 }

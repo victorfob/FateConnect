@@ -210,6 +210,7 @@ public class Program
         builder.Services.AddMassTransit(x =>
         {
             x.AddConsumer<UserRegisteredEventConsumer>();
+            x.AddConsumer<PasswordResetRequestedEventConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {

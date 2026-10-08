@@ -35,4 +35,23 @@ public partial class EmailService(
 
         LogResendAccepted(logger, toEmail);
     }
+
+    public async Task SendPasswordResetEmailAsync(string toEmail, string fullName, string resetLink)
+    {
+        var subject = "Redefinição de Senha - FateConnect";
+
+        var message = new EmailMessage
+        {
+            From = _senderEmail,
+            To = toEmail,
+            Subject = subject,
+            HtmlBody = PasswordResetEmailTemplate.Build(fullName, resetLink)
+        };
+
+        LogResendPayloadSent(logger, toEmail, subject);
+
+        await resend.EmailSendAsync(message);
+
+        LogResendAccepted(logger, toEmail);
+    }
 }
