@@ -5,9 +5,8 @@ separadas e HTTPS válido nas duas.
 
 ## O que sobe, e o que já existe
 
-O servidor já tem **PostgreSQL** e **nginx**. Numa máquina de 1 GB, subir
-cópias dos dois em contêiner gastaria memória que não sobra — então eles são
-reaproveitados:
+**PostgreSQL** e **nginx** rodam no host, uma cópia só para os dois ambientes;
+o `vps-setup.sh` os instala. Só a API vai em contêiner:
 
 | Peça | Onde roda |
 | --- | --- |
@@ -66,12 +65,16 @@ cd FateConnect/deploy
 sudo ./vps-setup.sh
 ```
 
-Ele instala o Docker, fecha a porta do banco para a internet com firewall,
-permite que os contêineres alcancem o PostgreSQL do host, e cria um banco e um
-usuário por ambiente — gravando cada senha em `/root/password-<banco>.txt`.
+Ele instala PostgreSQL 17, nginx, certbot, fail2ban e Docker, fecha a porta do
+banco para a internet com firewall, permite que os contêineres alcancem o
+PostgreSQL do host, e cria um banco e um usuário por ambiente — gravando cada
+senha em `/root/password-<banco>.txt`.
 
-O script **não desliga nada** por conta própria. Ao final ele sugere o que dá
-para liberar de memória, e a decisão é sua.
+⚠️ **O PostgreSQL escuta em todas as interfaces de propósito**
+(`listen_addresses = '*'`): o contêiner chega pelo gateway do Docker, que não é
+`localhost` para o banco. Quem impede o acesso de fora é o firewall, que só
+libera a 5432 para a faixa dos contêineres. Voltar para `localhost` derruba as
+duas APIs.
 
 Saia e entre de novo no SSH para o grupo `docker` valer.
 
@@ -112,10 +115,9 @@ Depois construa o front e suba a API:
 ./build-front.sh prod && ./deploy.sh prod
 ```
 
-⚠️ **Num servidor de 1 GB o `build-front.sh` não conclui.** O Vite precisa de
-mais de 500 MB de heap e o Node aborta com `JavaScript heap out of memory`,
-sem gerar nada. Nesse caso construa o front em outra máquina e envie o
-resultado — que é exatamente o que a pipeline faz:
+A pipeline não usa o `build-front.sh`: ela constrói o front no runner, por
+causa dos source maps do Sentry (seção abaixo). Para fazer o mesmo à mão,
+construa em outra máquina e envie o resultado:
 
 ```bash
 # na sua máquina, dentro de FateConnect/Web
@@ -140,7 +142,6 @@ Confira os dois endereços em `http://`.
 Com os domínios respondendo:
 
 ```bash
-sudo apt-get install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d fateconnect.com.br
 sudo certbot --nginx -d hml.fateconnect.com.br
 ```
@@ -304,6 +305,32 @@ sudo -u postgres pg_dump fateconnect_prod > backup-$(date +%F).sql
 
 Guarde o arquivo fora da VPS. Não há backup automático configurado.
 
+### Trocar de VPS
+
+A máquina nova sobe pelas seções 2 a 5, com a antiga ainda no ar. O que vem da
+antiga, nesta ordem:
+
+1. **Os dois `.env`**, copiados como estão. Depois, iguale a senha de cada
+   usuário do banco novo à do `.env` (`ALTER USER ... WITH PASSWORD`) e
+   atualize `/root/password-<banco>.txt`.
+2. **Os bancos**, com `pg_dump -Fc --no-owner --no-acl` na antiga e
+   `pg_restore --no-owner --no-acl --role=fateconnect_<ambiente>` na nova, para
+   as tabelas ficarem com o usuário do ambiente. Compare a contagem de linhas
+   de cada tabela nos dois lados.
+3. **As fotos**, que moram no volume `fateconnect-<ambiente>_api_uploads`:
+   `tar` de um contêiner na antiga para um na nova, com o volume criado antes
+   com as etiquetas do Compose.
+4. **O front publicado** em `/var/www/fateconnect/`, que é o mesmo bundle cujos
+   source maps estão no Sentry.
+5. **Os certificados**: `/etc/letsencrypt` inteiro, e então o
+   `install-site.sh` de cada ambiente devolve o HTTPS. Assim a virada não passa
+   nenhum minuto sem HTTPS.
+6. **O DNS**: troque os dois registros A. O que for gravado na antiga entre a
+   cópia dos bancos e o fim do cache do DNS (1 hora) se perde; para não perder,
+   pare as APIs da antiga antes de copiar.
+7. **Os segredos `DEPLOY_*`** do GitHub, com a chave e a identidade do servidor
+   novo (seção "Publicar pela pipeline").
+
 ## Quando algo dá errado
 
 **O site responde 502.** A API daquele ambiente está fora. Veja com
@@ -323,6 +350,4 @@ direto na VPS. Veja com `git status` e descarte se não houver nada a salvar.
 
 ## O que ainda não existe
 
-- **Achados e perdidos não funciona no ar.** O front chama `/achado` e a API
-  não implementa esse caminho ainda. As telas vão dar erro até ele existir.
 - **Backup do banco é manual.**
