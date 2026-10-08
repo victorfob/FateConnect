@@ -5,5 +5,5 @@ import * as S from './styles';
 export type DialogFooterProps = Readonly<{ children: ReactNode }>;
 
 export function DialogFooter({ children }: DialogFooterProps) {
-  return <S.FooterRegion>{children}</S.FooterRegion>;
+  return <S.FooterRegion data-dialog-footer>{children}</S.FooterRegion>;
 }
