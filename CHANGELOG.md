@@ -10,6 +10,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona o fluxo de "Esqueci a Senha", enviando um link seguro e de uso único (com validade de 30 minutos) para o e-mail institucional do usuário criar uma nova senha (#553) [Backend]
 - Adiciona a infraestrutura de mensageria assíncrona com RabbitMQ e MassTransit para orquestrar o envio de e-mails em segundo plano, sem bloquear o tempo de resposta da API (#553) [Backend]
 - Adiciona a confirmação de e-mail obrigatória para novos cadastros, enviando um link de validação para a caixa de entrada e emitindo o passe de acesso (JWT) imediatamente no momento do clique (#553) [Backend]
 - Adiciona o fluxo de reenvio de e-mail de confirmação para recuperar usuários com tokens expirados, invalidando os envios anteriores e gerando um novo link (#553) [Backend]
@@ -18,6 +19,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Passa a invalidar todas as sessões ativas da conta no momento em que a senha é redefinida, impedindo que acessos indevidos continuem ativos (#553) [Backend]
+- Passa a emitir um novo passe de acesso (JWT) e logar o usuário automaticamente após o salvamento da nova senha no fluxo de redefinição (#553) [Backend]
+- Passa a omitir se um e-mail existe ou não no sistema durante o pedido de redefinição de senha, devolvendo sucesso silencioso para evitar exposição de dados (anti-enumeration) (#553) [Backend]
 - Passa a recusar o login de contas que ainda não confirmaram o e-mail institucional, exigindo a validação da caixa de entrada primeiro (#553) [Backend]
 - Passa a realizar o login automático apenas após o usuário clicar no link de confirmação do e-mail, em vez de logá-lo imediatamente após o preenchimento da tela de cadastro (#553) [Backend]
 - Passa a organizar de forma mais coesa a estrutura de arquivos do módulo de Storage, além de limpar as importações (`usings`) não utilizadas em toda a API (#553) [Backend]
