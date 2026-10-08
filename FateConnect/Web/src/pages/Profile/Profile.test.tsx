@@ -316,6 +316,16 @@ describe('Profile', () => {
     expect(sent).toEqual({ phone: '', contactEmail: '' });
   });
 
+  it('should keep the browser from filling the current password when the screen opens', async () => {
+    await renderProfile();
+
+    expect(screen.getByLabelText(PASSWORD_LABELS.current)).toHaveAttribute('autocomplete', 'off');
+    expect(screen.getByLabelText(PASSWORD_LABELS.new)).toHaveAttribute(
+      'autocomplete',
+      'new-password',
+    );
+  });
+
   it('should name the account to the password manager, so the empty contact is not taken for the login', async () => {
     await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
 

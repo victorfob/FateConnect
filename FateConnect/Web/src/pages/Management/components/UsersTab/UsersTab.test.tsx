@@ -51,6 +51,7 @@ const OWN_ACCOUNT: UserSummary = {
   fullName: 'Ana Administradora',
   contactEmail: 'ana@exemplo.test',
   phone: '1533334444',
+  imageUrl: null,
   thumbnailUrl: null,
   status: AccountStatusEnum.ACTIVE,
 };
@@ -63,6 +64,7 @@ const ACTIVE_USER: UserSummary = {
   fullName: 'Maria da Silva',
   contactEmail: ACTIVE_USER_EMAIL,
   phone: '15999998888',
+  imageUrl: null,
   thumbnailUrl: null,
   status: AccountStatusEnum.ACTIVE,
 };
@@ -72,6 +74,7 @@ const BANNED_USER: UserSummary = {
   fullName: 'João Souza',
   contactEmail: 'joao@exemplo.test',
   phone: null,
+  imageUrl: null,
   thumbnailUrl: null,
   status: AccountStatusEnum.BANNED,
 };
@@ -81,6 +84,7 @@ const DEACTIVATED_USER: UserSummary = {
   fullName: 'Carla Lima',
   contactEmail: 'carla@exemplo.test',
   phone: '15988887777',
+  imageUrl: null,
   thumbnailUrl: null,
   status: AccountStatusEnum.SELF_DEACTIVATED,
 };
@@ -90,6 +94,7 @@ const NO_CONTACT_USER: UserSummary = {
   fullName: 'Bruna Costa',
   contactEmail: null,
   phone: null,
+  imageUrl: null,
   thumbnailUrl: null,
   status: AccountStatusEnum.ACTIVE,
 };

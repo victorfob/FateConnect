@@ -1,7 +1,8 @@
 import { lazy, Suspense, useCallback, useMemo, useRef, useState, type ChangeEvent } from 'react';
-import { HiddenField, InitialsAvatar, SectionCard, Typography } from '@design-system';
+import { HiddenField, SectionCard, Typography } from '@design-system';
 import { useFormContext, useWatch } from 'react-hook-form';
 
+import { AvatarPhoto } from '@app/components/AvatarPhoto';
 import { PhotoActionButtons } from '@app/components/PhotoField/components/PhotoActionButtons';
 import { PHOTO_ACCEPT_ATTRIBUTE, PHOTO_FIELD_TEXTS } from '@app/components/PhotoField/constants';
 import { photoSchema } from '@app/components/PhotoField/schema';
@@ -47,6 +48,13 @@ export function PhotoCard({ storedPhotoUrl }: PhotoCardProps) {
 
     return storedPhoto?.objectUrl;
   }, [chosenPhotoUrl, removeStoredPhoto, storedPhoto]);
+
+  const originalPhoto = useMemo(() => {
+    if (chosenPhotoUrl) return { localUrl: chosenPhotoUrl };
+    if (removeStoredPhoto || !storedPhotoUrl) return null;
+
+    return { storedUrl: storedPhotoUrl };
+  }, [chosenPhotoUrl, removeStoredPhoto, storedPhotoUrl]);
 
   const pickLabel = useMemo(() => {
     if (shownPhotoUrl) return PHOTO_FIELD_TEXTS.replace;
@@ -95,11 +103,12 @@ export function PhotoCard({ storedPhotoUrl }: PhotoCardProps) {
   return (
     <SectionCard grow>
       <S.PhotoCardContent>
-        <InitialsAvatar
+        <AvatarPhoto
           initials={initials}
           label={fullName}
           size="portrait"
           photoSrc={shownPhotoUrl}
+          source={originalPhoto}
         />
         <Typography variant="subtitleBold">{fullName}</Typography>
 

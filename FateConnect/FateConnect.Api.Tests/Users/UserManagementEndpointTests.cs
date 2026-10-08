@@ -33,6 +33,7 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
         string FullName,
         string ContactEmail,
         string? Phone,
+        string? ImageUrl,
         string? ThumbnailUrl,
         EnumAccountStatus Status);
 
@@ -98,7 +99,7 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
     [Theory]
     [InlineData("uploads/user/perfil.png", "uploads/user/thumbnails/perfil.webp")]
     [InlineData(null, null)]
-    public async Task ListUsers_OfAPersonWithOrWithoutAPhoto_AnswersTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
+    public async Task ListUsers_OfAPersonWithOrWithoutAPhoto_AnswersTheOriginalAndTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
     {
         SeededUser person = factory.SeedUser("Jussara Leme Antunes", imageUrl: imageUrl);
         HttpClient administrator = factory.CreateClientForNewAdministrator("Karina Bueno Siqueira");
@@ -106,6 +107,7 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
         HttpResponseMessage response = await administrator.GetAsync($"/Users?Search={person.ContactEmail}");
 
         UserSummary found = Assert.Single((await PageFrom(response)).Items);
+        Assert.Equal(imageUrl, found.ImageUrl);
         Assert.Equal(thumbnailUrl, found.ThumbnailUrl);
     }
 

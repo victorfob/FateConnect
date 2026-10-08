@@ -26,7 +26,7 @@ export function PasswordFields({ fatecEmail }: PasswordFieldsProps) {
 
       <Input.Password
         {...register('currentPassword')}
-        purpose="current"
+        purpose="reauthentication"
         label={C.PASSWORD_LABELS.current}
         fullWidth
         error={errors.currentPassword?.message}

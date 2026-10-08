@@ -10,7 +10,10 @@ import type { PasswordPurpose } from './types';
 
 export type PasswordFieldProps = Readonly<
   Omit<InputProps, 'type' | 'autoComplete' | 'endAdornment' | 'maxLength' | 'characterCount'> & {
-    /** Diz ao navegador se ele oferece a senha guardada ou sugere uma nova. */
+    /**
+     * Diz ao navegador se ele preenche a senha guardada (`current`), se espera a
+     * pessoa digitá-la (`reauthentication`) ou se sugere uma nova (`new`).
+     */
     purpose: PasswordPurpose;
   }
 >;

@@ -6,6 +6,22 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Adiciona a foto original à lista de contas da gestão, ao lado da miniatura (#561) [Backend]
+
+### Changed
+
+- Passa a abrir os diálogos em tela cheia no celular, com os botões presos no pé da tela e o conteúdo rolando acima deles; no computador eles seguem como antes (#561) [Frontend]
+- Passa a centralizar no celular o conteúdo dos diálogos sem formulário, com os botões dividindo a largura, e a pôr um botão Fechar no pé dos que não têm rodapé (#561) [Frontend]
+- Passa a abrir a foto original num diálogo ao tocar na miniatura das denúncias, de achados e perdidos, de Meu perfil e das contas na gestão, no lugar do botão de baixar das denúncias; salvar a foto fica com o próprio navegador (#561) [Frontend]
+- Passa a mostrar maior a foto no contato de quem publicou (#561) [Frontend]
+
+### Fixed
+
+- Corrige Meu perfil, onde o navegador preenchia sozinho a senha atual ao abrir a tela; o login continua preenchido pelo navegador (#561) [Frontend]
+- Corrige as etiquetas Em análise, das denúncias, e Arquivado, de achados e perdidos, que apareciam como texto solto ao lado das outras (#561) [Frontend]
+
 ## [1.3.0] - 2026-10-06
 
 ### Added

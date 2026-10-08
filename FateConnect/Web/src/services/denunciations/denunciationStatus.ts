@@ -24,7 +24,7 @@ const STATUS_SLUG: Readonly<Record<DenunciationStatusEnum, string>> = {
 
 const STATUS_TONE: Readonly<Record<DenunciationStatusEnum, StatusTagTone>> = {
   [DenunciationStatusEnum.OPEN]: 'warning',
-  [DenunciationStatusEnum.IN_REVIEW]: 'neutral',
+  [DenunciationStatusEnum.IN_REVIEW]: 'muted',
   [DenunciationStatusEnum.RESOLVED]: 'success',
   [DenunciationStatusEnum.DISMISSED]: 'danger',
 };

@@ -272,7 +272,12 @@ export const components: Components<Theme> = {
   // O `Paper` do MUI clareia a superfície por elevação no tema escuro, e o
   // contraste medido no token deixaria de valer para o que a tela desenha.
   MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
-  MuiDialog: { styleOverrides: { paper: { borderRadius: radius(radiusScale.lg) } } },
+  MuiDialog: {
+    styleOverrides: {
+      paper: { borderRadius: radius(radiusScale.lg) },
+      paperFullScreen: { borderRadius: 0 },
+    },
+  },
   // O esqueleto pisca por gradiente, não pela opacidade do `pulse` padrão: a 40%
   // de opacidade a cor pintada deixa de ser a que `contrast.test.ts` mede.
   MuiSkeleton: {
