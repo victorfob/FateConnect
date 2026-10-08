@@ -29,6 +29,10 @@ jobs:
         with:
           node-version-file: FateConnect/Web/.nvmrc
 
+      # O Yarn do projeto vem pelo Corepack: o Yarn 1 do runner recusa instalar.
+      - name: Enable Corepack
+        run: corepack enable
+
       # A chave e o prefixo são os mesmos do `check-front.yml`: chave diferente
       # aqui grava um cache que os PRs não acham, e o workflow inteiro vira ruído.
       - uses: actions/cache@v4
@@ -37,8 +41,8 @@ jobs:
           key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
           restore-keys: node-modules-
 
-      # Instalar dependência não deve executar código: sem `--ignore-scripts` o
+      # Instalar dependência não deve executar código: sem `--mode=skip-build` o
       # `postinstall` de qualquer pacote da árvore roda com os segredos do job
       # ao alcance.
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --immutable --mode=skip-build
