@@ -10,6 +10,7 @@ namespace FateConnect.Api.Modules.Auth.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
+[ApiConventionType(typeof(DefaultApiConventions))]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -49,7 +50,6 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> LogoutAsync()
     {
         await _authService.LogoutAsync(User.GetUserId());
-
         return NoContent();
     }
 
@@ -64,11 +64,18 @@ public class AuthController : ControllerBase
 
     [HttpPost("confirm-email")]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<TokenResponseDto>> ConfirmEmail([FromBody] ConfirmEmailDto dto)
     {
         var tokenResponse = await _authService.ConfirmEmailAsync(dto);
         return Ok(tokenResponse);
+    }
+
+    [HttpPost("resend-confirmation-email")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailDto dto)
+    {
+        await _authService.ResendConfirmationEmailAsync(dto);
+        return NoContent();
     }
 }

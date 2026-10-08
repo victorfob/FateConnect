@@ -11,11 +11,14 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using static BCrypt.Net.BCrypt;
+using MassTransit;
+using FateConnect.Api.Modules.Common.Events;
 
 public partial class AuthService(
     IUserRepository userRepository,
     ITokenService tokenService,
     TimeProvider timeProvider,
+    IPublishEndpoint publishEndpoint,
     ILogger<AuthService> logger
 ) : IAuthService
 {
@@ -101,5 +104,52 @@ public partial class AuthService(
         LogEmailConfirmed(logger, user.Id);
 
         return IssueToken(user);
+    }
+
+    public async Task ResendConfirmationEmailAsync(ResendConfirmationEmailDto dto)
+    {
+        User? user = await userRepository.GetByEmailAsync(dto.FatecEmail);
+
+        if (user is null)
+            return;
+
+        if (user.IsEmailConfirmed)
+            throw new EmailAlreadyConfirmedException();
+
+        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+
+        var activeTokens = user.Tokens.Where(t =>
+            t.Type == EnumTokenType.EmailConfirmation &&
+            !t.IsConsumed &&
+            t.ExpiresAt > now);
+
+        foreach (var oldToken in activeTokens)
+        {
+            oldToken.Consume(now);
+        }
+
+        string newRawToken = Guid.NewGuid().ToString("N");
+        DateTime expiration = now.AddHours(24);
+
+        var token = new UserToken(
+            userId: user.Id,
+            token: newRawToken,
+            type: EnumTokenType.EmailConfirmation,
+            createdAt: now,
+            expiresAt: expiration
+        );
+
+        user.AddToken(token);
+
+        await userRepository.SaveChangesAsync();
+
+        await publishEndpoint.Publish(new UserRegisteredEvent(
+            UserId: user.Id,
+            FullName: user.FullName,
+            FatecEmail: user.FatecEmail,
+            ConfirmationToken: newRawToken
+        ));
+
+        LogConfirmationEmailResent(logger, user.Id);
     }
 }

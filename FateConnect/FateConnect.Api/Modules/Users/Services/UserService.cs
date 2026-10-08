@@ -91,13 +91,14 @@ public partial class UserService(
     private static UserToken AddEmailConfirmationToken(User user, DateTime now)
     {
         var tokenString = Guid.NewGuid().ToString("N");
+        DateTime expiration = now.AddHours(24);
 
         var token = new UserToken(
             userId: 0,
             token: tokenString,
             type: EnumTokenType.EmailConfirmation,
             createdAt: now,
-            expiresAt: now.AddHours(24)
+            expiresAt: expiration
         );
 
         user.AddToken(token);

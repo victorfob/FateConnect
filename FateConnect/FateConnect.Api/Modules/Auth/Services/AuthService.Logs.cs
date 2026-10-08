@@ -15,4 +15,7 @@ public partial class AuthService
 
     [LoggerMessage(Level = LogLevel.Information, Message = "User ID {UserId} reactivated their account and logged in.")]
     private static partial void LogUserReactivated(ILogger logger, int userId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Confirmation email resent for User ID {UserId}.")]
+    private static partial void LogConfirmationEmailResent(ILogger logger, int userId);
 }
