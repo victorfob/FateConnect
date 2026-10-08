@@ -97,6 +97,10 @@ jobs:
         with:
           node-version-file: FateConnect/Web/.nvmrc
 
+      # O Yarn do projeto vem pelo Corepack: o Yarn 1 do runner recusa instalar.
+      - name: Enable Corepack
+        run: corepack enable
+
       # O pacote comprimido volta muito mais rápido que um `yarn install` a frio. O
       # prefixo solto deixa a árvore anterior ser restaurada quando o lockfile muda,
       # e aí o yarn reconcilia só a diferença.
@@ -106,11 +110,11 @@ jobs:
           key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
           restore-keys: node-modules-
 
-      # Instalar dependência não deve executar código: sem `--ignore-scripts` o
+      # Instalar dependência não deve executar código: sem `--mode=skip-build` o
       # `postinstall` de qualquer pacote da árvore roda com os segredos do job
       # ao alcance.
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --immutable --mode=skip-build
 
       # O `blob` sozinho não imprime nada: shard reprovado saía só com o código
       # de saída, e o relatório dele não chega a subir. O `default` põe no log
@@ -152,6 +156,9 @@ jobs:
         with:
           node-version-file: FateConnect/Web/.nvmrc
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: actions/cache@v4
         with:
           path: FateConnect/Web/node_modules
@@ -159,7 +166,7 @@ jobs:
           restore-keys: node-modules-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --immutable --mode=skip-build
 
       - name: Types
         run: yarn typecheck
@@ -217,6 +224,10 @@ jobs:
         with:
           node-version-file: FateConnect/Web/.nvmrc
 
+      - name: Enable Corepack
+        if: needs.changes.outputs.web == 'true'
+        run: corepack enable
+
       - uses: actions/cache@v4
         if: needs.changes.outputs.web == 'true'
         with:
@@ -226,7 +237,7 @@ jobs:
 
       - name: Install dependencies
         if: needs.changes.outputs.web == 'true'
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --immutable --mode=skip-build
 
       - name: Download the shard reports
         if: needs.changes.outputs.web == 'true'
