@@ -41,6 +41,7 @@ export const lostItemFormSchema = z.object({
     .trim()
     .max(LOST_ITEM_LIMITS.maxDescription, LOST_ITEM_FORM_MESSAGES.descriptionTooLong),
   photo: photoSchema,
+  removeStoredPhoto: z.boolean(),
 });
 
 export type LostItemFormInput = z.input<typeof lostItemFormSchema>;
@@ -53,4 +54,5 @@ export const EMPTY_LOST_ITEM_FORM: LostItemFormInput = {
   occurredOn: '',
   description: '',
   photo: null,
+  removeStoredPhoto: false,
 };

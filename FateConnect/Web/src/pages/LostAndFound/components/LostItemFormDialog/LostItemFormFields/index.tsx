@@ -17,20 +17,26 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
     setValue,
     formState: { errors, disabled },
   } = useFormContext<LostItemFormInput, unknown, LostItemFormValues>();
-  const photo = useWatch({ control, name: 'photo' });
+  const [photo, removeStoredPhoto] = useWatch({ control, name: ['photo', 'removeStoredPhoto'] });
   const description = useWatch({ control, name: 'description' });
   const today = useMemo(() => new Date(), []);
   const { image: storedPhoto } = useStoredImage(storedThumbnailUrl);
 
   const storedPreview = useMemo(() => {
-    if (!storedPhoto) return null;
+    if (!storedPhoto || removeStoredPhoto) return null;
 
     return { src: storedPhoto.objectUrl, alt: C.STORED_PHOTO_ALT };
-  }, [storedPhoto]);
+  }, [removeStoredPhoto, storedPhoto]);
 
   // Valida na escolha: o formato e o tamanho se sabem na hora, não no envio.
   const handlePhotoChange = useCallback(
     (chosen: File | null) => setValue('photo', chosen, { shouldDirty: true, shouldValidate: true }),
+    [setValue],
+  );
+
+  // A foto guardada só sai ao salvar.
+  const handleRemoveStoredPhoto = useCallback(
+    () => setValue('removeStoredPhoto', true, { shouldDirty: true }),
     [setValue],
   );
 
@@ -109,6 +115,7 @@ export function LostItemFormFields({ storedThumbnailUrl }: LostItemFormFieldsPro
           onChange={handlePhotoChange}
           disabled={disabled}
           storedPreview={storedPreview}
+          onRemoveStored={handleRemoveStoredPhoto}
           error={errors.photo?.message}
         />
       </Dialog.Fields.Wide>

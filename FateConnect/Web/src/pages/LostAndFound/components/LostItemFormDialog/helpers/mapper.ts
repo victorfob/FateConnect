@@ -14,6 +14,7 @@ export function toFormValues(item: LostItem | undefined): LostItemFormInput {
     description: item.description ?? '',
     // O campo só lida com arquivo escolhido agora, não com a URL guardada.
     photo: null,
+    removeStoredPhoto: false,
   };
 }
 
@@ -25,5 +26,6 @@ export function toLostItemInput(values: LostItemFormValues): LostItemInput {
     ocurredOn: toApiDateText(values.occurredOn),
     description: values.description,
     image: values.photo,
+    removeImage: values.removeStoredPhoto && !values.photo,
   };
 }

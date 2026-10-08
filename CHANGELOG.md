@@ -9,6 +9,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Adiciona a foto original à lista de contas da gestão, ao lado da miniatura (#561) [Backend]
+- Adiciona a remoção da foto ao editar um item de achados e perdidos, como em Meu perfil: a foto sai ao salvar, e o arquivo é apagado na hora (#563) [Frontend]
+- Adiciona à edição de um item de achados e perdidos o pedido de tirar a foto, que apaga o arquivo; com uma foto nova no mesmo pedido, fica a nova (#563) [Backend]
 
 ### Changed
 
@@ -16,6 +18,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a centralizar no celular o conteúdo dos diálogos sem formulário, com os botões dividindo a largura, e a pôr um botão Fechar no pé dos que não têm rodapé (#561) [Frontend]
 - Passa a abrir a foto original num diálogo ao tocar na miniatura das denúncias, de achados e perdidos, de Meu perfil e das contas na gestão, no lugar do botão de baixar das denúncias; salvar a foto fica com o próprio navegador (#561) [Frontend]
 - Passa a mostrar maior a foto no contato de quem publicou (#561) [Frontend]
+- Passa a abrir o aplicativo de e-mail ao tocar no e-mail do contato de quem publicou, como no rodapé, no lugar de copiar o endereço (#563) [Frontend]
+- Passa a dividir a largura do rodapé entre os botões no celular também nos diálogos com formulário, como os filtros (#563) [Frontend]
+- Passa a declarar na política de privacidade que quem cadastrou um item pode trocar ou tirar a foto ao editá-lo, e que a anterior é apagada na hora, em nova versão do documento (#563) [Frontend]
 
 ### Fixed
 

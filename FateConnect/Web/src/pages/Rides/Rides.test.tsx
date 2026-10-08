@@ -7,7 +7,8 @@ import {
 import { http, HttpResponse } from 'msw';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
-import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { sendEmailLabel } from '@app/components/ContactButton/ContactDetails/constants';
 import { ContactRequiredActionEnum } from '@app/components/ContactRequiredDialog/@types';
 import {
   CONTACT_REQUIRED_MESSAGES,
@@ -54,9 +55,11 @@ const RETRY_WINDOW_MS = 5000;
 
 const DRIVER_PHONE = '(15) 90000-0000';
 
+const DRIVER_EMAIL = 'ana@example.com';
+
 const DRIVER: UserContact = {
   name: 'Ana Ofertante',
-  email: 'ana@example.com',
+  email: DRIVER_EMAIL,
   phone: DRIVER_PHONE,
   thumbnailUrl: null,
 };
@@ -137,24 +140,14 @@ function renderComponent(search = '') {
 }
 
 describe('Rides', () => {
-  // O jsdom não implementa a área de transferência; os casos de cópia observam
-  // esta escrita, e a instância nasce a cada caso para a rejeição não vazar.
-  let clipboardWrite: Mock;
-
   beforeEach(() => {
     mockUseLacksContact.mockReturnValue(false);
     listReturning([]);
     server.use(http.get(HOLIDAYS_URL, () => HttpResponse.json([])));
-    clipboardWrite = vi.fn(() => Promise.resolve());
-    Object.defineProperty(navigator, 'clipboard', {
-      value: { writeText: clipboardWrite },
-      configurable: true,
-    });
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-    Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
   });
 
   /**
@@ -475,34 +468,7 @@ describe('Rides', () => {
 
     const dialog = within(await screen.findByRole('dialog'));
     expect(dialog.getByText(DRIVER.name)).toBeInTheDocument();
-    expect(dialog.getByRole('button', { name: `Copiar ${DRIVER.email}` })).toBeInTheDocument();
-  });
-
-  it('should copy the email and say so', async () => {
-    listReturning([RIDE]);
-    renderComponent();
-    await screen.findByText(RIDE.destination);
-
-    await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
-    const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: `Copiar ${DRIVER.email}` }));
-
-    expect(await screen.findByText(CONTACT_DIALOG.emailCopied)).toBeInTheDocument();
-    expect(clipboardWrite).toHaveBeenCalledWith(DRIVER.email);
-  });
-
-  it('should report a refused copy instead of claiming success', async () => {
-    // O navegador nega a escrita fora de contexto seguro ou sem permissão.
-    clipboardWrite.mockRejectedValueOnce(new Error('denied'));
-    listReturning([RIDE]);
-    renderComponent();
-    await screen.findByText(RIDE.destination);
-
-    await userEvent.click(screen.getByRole('button', { name: CONTACT_LABEL }));
-    const dialog = within(await screen.findByRole('dialog'));
-    await userEvent.click(dialog.getByRole('button', { name: `Copiar ${DRIVER.email}` }));
-
-    expect(await screen.findByText(CONTACT_DIALOG.emailCopyFailed)).toBeInTheDocument();
+    expect(dialog.getByRole('link', { name: sendEmailLabel(DRIVER_EMAIL) })).toBeInTheDocument();
   });
 
   it('should open the conversation already mentioning the destination of the ride', async () => {

@@ -2,9 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Dialog, IconButton } from '@design-system';
 import { ContactPageIcon } from '@design-system/icons';
 
-import { useNotification } from '@app/hooks/useNotification';
 import type { UserContact } from '@app/services/types';
-import { copyToClipboard } from '@app/utils/clipboard';
 import { getInitials } from '@app/utils/initials';
 import { maskPhone } from '@app/utils/masks/phoneMask';
 import { whatsappConversationUrl } from '@app/utils/whatsapp';
@@ -16,23 +14,9 @@ type ContactButtonProps = Readonly<{ contact: UserContact; message: string }>;
 
 export function ContactButton({ contact, message }: ContactButtonProps) {
   const [showingContact, setShowingContact] = useState(false);
-  const { notifySuccess, notifyError } = useNotification();
 
   const handleOpen = useCallback(() => setShowingContact(true), []);
   const handleClose = useCallback(() => setShowingContact(false), []);
-
-  const handleCopyEmail = useCallback(async () => {
-    if (!contact.email) return;
-
-    const copied = await copyToClipboard(contact.email);
-
-    if (!copied) {
-      notifyError(C.CONTACT_DIALOG.emailCopyFailed);
-      return;
-    }
-
-    notifySuccess(C.CONTACT_DIALOG.emailCopied);
-  }, [contact.email, notifyError, notifySuccess]);
 
   const initials = useMemo(() => getInitials(contact.name), [contact.name]);
   // A máscara é só de exibição: o endereço da conversa recebe o número como a
@@ -63,7 +47,6 @@ export function ContactButton({ contact, message }: ContactButtonProps) {
             email={contact.email}
             phone={displayPhone}
             phoneHref={phoneHref}
-            onCopyEmail={handleCopyEmail}
           />
         </Dialog.Body>
       </Dialog>
