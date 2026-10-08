@@ -2250,7 +2250,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/utils@npm:4.1.11":
+"@vitest/utils@npm:4.1.11, @vitest/utils@npm:^4.1.11":
   version: 4.1.11
   resolution: "@vitest/utils@npm:4.1.11"
   dependencies:
@@ -3747,6 +3747,7 @@ __metadata:
     "@hookform/resolvers": "npm:^5.9.1"
     "@mui/icons-material": "npm:^9.3.1"
     "@mui/material": "npm:^9.3.1"
+    "@mui/system": "npm:^9.3.0"
     "@mui/x-date-pickers": "npm:^9.11.0"
     "@sentry/react": "npm:^10.71.0"
     "@sentry/vite-plugin": "npm:^5.4.0"
@@ -3760,6 +3761,7 @@ __metadata:
     "@types/react-dom": "npm:^19.2.4"
     "@vitejs/plugin-react": "npm:^6.0.5"
     "@vitest/coverage-v8": "npm:^4.1.11"
+    "@vitest/utils": "npm:^4.1.11"
     axios: "npm:^1.20.0"
     date-fns: "npm:^4.4.0"
     date-fns-tz: "npm:^3.2.0"
