@@ -7,7 +7,7 @@ public static class PasswordResetEmailTemplate // criei um esboço, mas precisar
         var body = $@"
             <h2 style='color: #333; margin-top: 0;'>Olá, {fullName}!</h2>
             <p>Recebemos um pedido para redefinir a senha da sua conta no FateConnect.</p>
-            <p>Se foi você, clique no botão abaixo para criar uma nova senha. <strong>Este link é válido por 30 minutos.</strong></p>
+            <p>Se foi você, clique no botão abaixo para criar uma nova senha. <br/> <strong>Este link é válido por 30 minutos.</strong></p>
 
             <div style='text-align: center; margin: 35px 0;'>
                 <a href='{resetLink}' style='display: inline-block; padding: 14px 28px; background-color: #E2080F; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;'>
