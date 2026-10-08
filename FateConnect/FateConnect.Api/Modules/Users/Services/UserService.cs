@@ -91,7 +91,7 @@ public partial class UserService(
     private static UserToken AddEmailConfirmationToken(User user, DateTime now)
     {
         var tokenString = Guid.NewGuid().ToString("N");
-        DateTime expiration = now.AddHours(24);
+        DateTime expiration = now.AddHours(8);
 
         var token = new UserToken(
             userId: 0,

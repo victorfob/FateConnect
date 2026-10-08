@@ -129,7 +129,7 @@ public partial class AuthService(
         }
 
         string newRawToken = Guid.NewGuid().ToString("N");
-        DateTime expiration = now.AddHours(24);
+        DateTime expiration = now.AddHours(8);
 
         var token = new UserToken(
             userId: user.Id,
