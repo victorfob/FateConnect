@@ -31,7 +31,7 @@ if (canRemove(profile, ride)) removeRide(ride);
 
 **Sobrevive a decisão que o código não deixa deduzir:** o porquê de uma escolha contraintuitiva, uma armadilha de fora (contrato de terceiro, defeito de biblioteca, limite de plataforma) ou o motivo de não ter sido feito do jeito óbvio. E o candidato passa por um teste: **ele impede alguém de fazer uma mudança errada?** A escada vem antes porque, recém-escrito, quase todo comentário parece passar no teste.
 
-Fica: o `Array.isArray` dos serviços, *porque sem endereço de API o dev server responde HTML com 200* (sem isso alguém apaga a guarda como código morto); o `copyToClipboard`, *porque a API do navegador só existe em contexto seguro*.
+Fica: o `Array.isArray` dos serviços, *porque sem endereço de API o dev server responde HTML com 200* (sem isso alguém apaga a guarda como código morto); o `event.target.value = ''` do `PhotoField`, *porque o navegador não dispara a troca ao escolher o mesmo arquivo de novo*.
 
 ## Sai, sempre
 

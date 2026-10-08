@@ -25,4 +25,6 @@ public record UpdateLostAndFoundDto
 
     [ValidImage]
     public IFormFile? Image { get; init; }
+
+    public bool? RemoveImage { get; init; }
 }

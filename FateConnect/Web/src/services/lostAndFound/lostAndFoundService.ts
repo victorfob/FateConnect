@@ -22,6 +22,7 @@ function toFormData(input: LostItemInput): FormData {
   body.append('OcurredOn', input.ocurredOn);
   body.append('Description', input.description);
   if (input.image) body.append('Image', input.image);
+  if (input.removeImage) body.append('RemoveImage', String(input.removeImage));
 
   return body;
 }

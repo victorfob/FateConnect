@@ -1,5 +1,6 @@
-import { render, screen, userEvent } from '@app/test/testing-library';
+import { render, screen } from '@app/test/testing-library';
 
+import { sendEmailLabel } from './constants';
 import { ContactDetails, type ContactDetailsProps } from '.';
 
 const PHONE = '(15) 90000-0000';
@@ -11,7 +12,6 @@ const DEFAULT_PROPS: ContactDetailsProps = {
   email: 'maria@example.com',
   phone: PHONE,
   phoneHref: 'https://wa.me/5515900000000?text=Ol%C3%A1',
-  onCopyEmail: vi.fn(),
 };
 
 const renderComponent = (props = DEFAULT_PROPS) => render(<ContactDetails {...props} />);
@@ -24,23 +24,14 @@ describe('ContactDetails', () => {
     expect(screen.getByRole('img', { name: 'Maria Silva' })).toHaveTextContent('MS');
   });
 
-  it('should offer the email as an action that says what it does', () => {
+  it('should hand the email to the mail app, in the same tab', () => {
     renderComponent();
 
-    // O texto visível é o e-mail; o nome acessível conta o que o clique faz e
-    // contém esse texto, como a diretriz de rótulo no nome exige.
-    expect(screen.getByRole('button', { name: 'Copiar maria@example.com' })).toHaveTextContent(
-      'maria@example.com',
-    );
-  });
+    const emailLink = screen.getByRole('link', { name: sendEmailLabel('maria@example.com') });
 
-  it('should hand the email action back to whoever composed it', async () => {
-    const onCopyEmail = vi.fn();
-    renderComponent({ ...DEFAULT_PROPS, onCopyEmail });
-
-    await userEvent.click(screen.getByRole('button', { name: 'Copiar maria@example.com' }));
-
-    expect(onCopyEmail).toHaveBeenCalledOnce();
+    expect(emailLink).toHaveTextContent('maria@example.com');
+    expect(emailLink).toHaveAttribute('href', 'mailto:maria@example.com');
+    expect(emailLink).not.toHaveAttribute('target');
   });
 
   it('should send the phone to the conversation it was given, in another tab', () => {

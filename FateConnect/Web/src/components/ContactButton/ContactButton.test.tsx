@@ -5,7 +5,10 @@ import type { UserContact } from '@app/services/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { CONTACT_LABEL } from './constants';
+import { sendEmailLabel } from './ContactDetails/constants';
 import { ContactButton } from '.';
+
+const EMAIL = 'mariana.nogueira.souza@example.com';
 
 /**
  * Nome de cinco palavras e e-mail longo: é o caso que quebra a linha. O
@@ -13,7 +16,7 @@ import { ContactButton } from '.';
  */
 const CONTACT: UserContact = {
   name: 'Mariana Aparecida de Souza Nogueira',
-  email: 'mariana.nogueira.souza@example.com',
+  email: EMAIL,
   phone: '15900000000',
   thumbnailUrl: null,
 };
@@ -97,8 +100,8 @@ describe('ContactButton', () => {
 
     const dialog = await openDialog();
 
-    expect(dialog.getByRole('button', { name: `Copiar ${CONTACT.email}` })).toBeInTheDocument();
-    expect(dialog.queryByRole('link')).not.toBeInTheDocument();
+    expect(dialog.getByRole('link', { name: sendEmailLabel(EMAIL) })).toBeInTheDocument();
+    expect(dialog.getAllByRole('link')).toHaveLength(1);
   });
 
   it('should drop the email channel when there is no email', async () => {
@@ -107,7 +110,7 @@ describe('ContactButton', () => {
     const dialog = await openDialog();
 
     expect(dialog.getByRole('link', { name: '(15) 90000-0000' })).toBeInTheDocument();
-    expect(dialog.queryByRole('button', { name: /^Copiar/ })).not.toBeInTheDocument();
+    expect(dialog.getAllByRole('link')).toHaveLength(1);
   });
 
   it('should download the photo only once the contact is opened', async () => {

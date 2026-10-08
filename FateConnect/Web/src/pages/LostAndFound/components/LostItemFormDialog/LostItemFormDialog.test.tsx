@@ -61,6 +61,16 @@ const STORED_PHOTO_PATH =
 
 const ITEM_WITH_PHOTO: LostItem = { ...LOST_ITEM, thumbnailUrl: STORED_PHOTO_PATH };
 
+/** O item inteiro, como o salvar manda, sem `Image`: a remoção vai num campo próprio. */
+const STORED_PHOTO_REMOVAL = {
+  Name: LOST_ITEM.name,
+  LostAndFoundType: LOST_ITEM.lostAndFoundType,
+  Place: LOST_ITEM.place,
+  OcurredOn: '2026-08-11',
+  Description: LOST_ITEM.description,
+  RemoveImage: 'true',
+};
+
 function storedPhotoServing() {
   server.use(
     http.get(
@@ -347,34 +357,68 @@ describe('LostItemFormDialog', () => {
     expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeInTheDocument();
   });
 
-  it('should bring the stored photo into the form when the item already has one', async () => {
+  it('should bring the stored photo into the form, ready to be replaced or removed', async () => {
     storedPhotoServing();
     renderComponent({ ...DEFAULT_PROPS, item: ITEM_WITH_PHOTO });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
 
     expect(await screen.findByRole('img', { name: STORED_PHOTO_ALT })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.replace })).toBeInTheDocument();
-    // A API não apaga a foto guardada, só a troca: oferecer remover seria mentira.
-    expect(
-      screen.queryByRole('button', { name: PHOTO_FIELD_TEXTS.remove }),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.remove })).toBeInTheDocument();
   });
 
-  it('should put the stored photo back when the newly chosen one is dropped', async () => {
+  it('should drop the stored photo only once the edit is saved', async () => {
+    let fields: Record<string, FormDataEntryValue> | null = null;
+    server.use(
+      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, async ({ request }) => {
+        fields = await fieldsOf(request);
+        return HttpResponse.json({ id: LOST_ITEM.id });
+      }),
+    );
     storedPhotoServing();
     renderComponent({ ...DEFAULT_PROPS, item: ITEM_WITH_PHOTO });
     await screen.findByRole('img', { name: STORED_PHOTO_ALT });
 
-    await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
+    await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
 
-    expect(
-      await screen.findByRole('img', { name: PHOTO_FIELD_TEXTS.previewAlt }),
-    ).toBeInTheDocument();
     expect(screen.queryByRole('img', { name: STORED_PHOTO_ALT })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeInTheDocument();
+    expect(fields).toBeNull();
+
+    await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(fields).toEqual(STORED_PHOTO_REMOVAL);
+  });
+
+  it('should drop the newly chosen photo and the stored one in a single removal', async () => {
+    let fields: Record<string, FormDataEntryValue> | null = null;
+    server.use(
+      http.patch(`${LOST_AND_FOUND_URL}/:itemId`, async ({ request }) => {
+        fields = await fieldsOf(request);
+        return HttpResponse.json({ id: LOST_ITEM.id });
+      }),
+    );
+    storedPhotoServing();
+    renderComponent({ ...DEFAULT_PROPS, item: ITEM_WITH_PHOTO });
+    await screen.findByRole('img', { name: STORED_PHOTO_ALT });
+    await userEvent.upload(photoInput(), photoOf('achado.png', 'image/png'));
+    await screen.findByRole('img', { name: PHOTO_FIELD_TEXTS.previewAlt });
 
     await userEvent.click(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.remove }));
 
-    expect(await screen.findByRole('img', { name: STORED_PHOTO_ALT })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('img', { name: PHOTO_FIELD_TEXTS.previewAlt }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: STORED_PHOTO_ALT })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: EDIT_MODE.submitLabel }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(fields).toEqual(STORED_PHOTO_REMOVAL);
   });
 
   it('should refuse a photo in a format the server will not take', async () => {
