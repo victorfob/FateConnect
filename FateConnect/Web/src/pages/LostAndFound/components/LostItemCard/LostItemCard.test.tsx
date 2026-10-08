@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
 import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { VIEW_PHOTO_LABEL } from '@app/components/PhotoViewer/constants';
 import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import { server } from '@app/mocks/server';
 import {
@@ -40,6 +41,7 @@ const LOST_ITEM: LostItem = {
   place: 'Biblioteca',
   ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos e cartões.',
+  imageUrl: null,
   thumbnailUrl: null,
   contact: CONTACT,
   status: LostItemStatusEnum.OPEN,
@@ -120,6 +122,34 @@ describe('LostItemCard', () => {
 
     expect(await screen.findByRole('img', { name: photoAlt(LOST_ITEM.name) })).toBeInTheDocument();
     await waitFor(() => expect(asked).toEqual([`/${thumbnailPath}`]));
+  });
+
+  it('should open the original photo in a dialog named after the item', async () => {
+    const thumbnailPath = 'uploads/lostandfound/thumbnails/carteira.webp';
+    const originalPath = 'uploads/lostandfound/carteira.png';
+    const asked: string[] = [];
+    URL.createObjectURL = vi.fn(() => 'blob:https://fateconnect.test/foto');
+    URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get(`https://api.fateconnect.test/${thumbnailPath}`, () => {
+        return new HttpResponse('\x89PNG', { headers: { 'Content-Type': 'image/webp' } });
+      }),
+      http.get(`https://api.fateconnect.test/${originalPath}`, ({ request }) => {
+        asked.push(new URL(request.url).pathname);
+
+        return new HttpResponse('\x89PNG', { headers: { 'Content-Type': 'image/png' } });
+      }),
+    );
+    renderComponent({ ...LOST_ITEM, thumbnailUrl: thumbnailPath, imageUrl: originalPath });
+    await screen.findByRole('img', { name: photoAlt(LOST_ITEM.name) });
+
+    await userEvent.click(screen.getByRole('button', { name: VIEW_PHOTO_LABEL }));
+
+    const dialog = screen.getByRole('dialog', { name: LOST_ITEM.name });
+    expect(
+      await within(dialog).findByRole('img', { name: photoAlt(LOST_ITEM.name) }),
+    ).toBeInTheDocument();
+    expect(asked).toEqual([`/${originalPath}`]);
   });
 
   it('should list the kind, the date and the place, from the shortest text', () => {
