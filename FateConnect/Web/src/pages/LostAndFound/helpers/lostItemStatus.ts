@@ -18,7 +18,7 @@ const STATUS_SLUG: Readonly<Record<LostItemStatusEnum, string>> = {
 const STATUS_TONE: Readonly<Record<LostItemStatusEnum, StatusTagTone>> = {
   [LostItemStatusEnum.OPEN]: 'warning',
   [LostItemStatusEnum.RESOLVED]: 'success',
-  [LostItemStatusEnum.DELETED]: 'neutral',
+  [LostItemStatusEnum.DELETED]: 'muted',
 };
 
 const STATUS_VALUES: ReadonlySet<string> = new Set(Object.values(LostItemStatusEnum));

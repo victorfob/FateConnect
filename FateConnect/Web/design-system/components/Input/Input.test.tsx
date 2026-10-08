@@ -855,6 +855,14 @@ describe('Input.Password', () => {
     );
   });
 
+  it('should leave the password to be typed when it confirms a change', () => {
+    render(<Input.Password label="Senha atual" purpose="reauthentication" />);
+
+    const field = screen.getByLabelText('Senha atual');
+    expect(field).toHaveAttribute('type', 'password');
+    expect(field).toHaveAttribute('autocomplete', 'off');
+  });
+
   it('should ask the browser for a new password when that is the purpose', () => {
     render(<Input.Password label="Nova senha" purpose="new" />);
 

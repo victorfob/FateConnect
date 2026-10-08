@@ -42,6 +42,7 @@ const LOST_ITEM: LostItem = {
   place: 'Biblioteca',
   ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos.',
+  imageUrl: null,
   thumbnailUrl: null,
   contact: {
     name: 'Marina Duarte',
