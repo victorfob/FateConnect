@@ -17,7 +17,7 @@ public static class AccountLockedEmailTemplate
                 </a>
             </div>
 
-            <p style='font-size: 14px; color: #555;'>Se o botão não funcionar, copie e cole este link no seu navegador: <br/> <a href='{unlockLink}' style='color: #E2080F; word-break: break-all;'>{unlockLink}</a></p>
+            <p style='font-size: 14px; color: #555;'>Se o botão não funcionar, copie e cole este link no seu navegador: <br/> <a href='{unlockLink}' style='color: #CF2E2E; word-break: break-all;'>{unlockLink}</a></p>
 
             <p style='margin-bottom: 0; font-size: 14px; color: #555; margin-top: 15px;'>Caso não tenha sido você, recomendamos que faça a redefinição de senha na página de login o quanto antes.</p>";
 

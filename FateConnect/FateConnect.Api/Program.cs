@@ -211,6 +211,7 @@ public class Program
         {
             x.AddConsumer<UserRegisteredEventConsumer>();
             x.AddConsumer<PasswordResetRequestedEventConsumer>();
+            x.AddConsumer<AccountLockedEventConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {
