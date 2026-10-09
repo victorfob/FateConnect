@@ -29,6 +29,12 @@ gh run view <run-id> --json jobs --jq '.jobs[].steps[] | "\(.conclusion)\t\(.nam
 
 `skipped` depois de `failure` é passo que ninguém mediu.
 
+## A suíte que o CI não rodou
+
+- Job verde também se lê pelos passos: o filtro de caminhos pula build e testes e o job responde `success`. Sem um passo de teste `success` no head, nada se afirma sobre a suíte.
+- Rode-a localmente no head, com a `develop` como controle: o que falha ou trava só no head é do PR.
+- No macOS não há `timeout`. Suíte .NET que pode travar roda com `--blame-hang-timeout 3m` e `--logger trx`; quem não terminou é a diferença entre `dotnet test --list-tests` e os `testName` do `.trx`.
+
 ## Artefato entre jobs
 
 - `actions/upload-artifact` nasce com `if-no-files-found: warn`: caminho errado sobe zero arquivo e o job fica verde, e quem quebra é o consumidor, longe da causa. Arquivo oculto (`.vitest-reports`) é ignorado sem `include-hidden-files: true`.

@@ -33,6 +33,7 @@ O `yarn lint` reprova `sx`, tag HTML crua, cor literal, `theme.spacing`, número
 ## O que compila e não pinta
 
 - ⛔ Seletor de componente do Emotion (`` `${OutroStyled}:hover &` ``) compila e não casa nada: o `@emotion/babel-plugin` não está ligado. O seletor casa no próprio elemento (`'&:hover, &:focus-within'`) ou numa classe ou atributo de dado.
+- ⛔ `:has()` que depende do pai, escrito no estilo do filho, prende o `&` ao próprio filho e não casa. A regra mora no estilo do pai, alcançando o filho por atributo de dado (`'&:has(form) [data-close-footer]'` na `DialogSurface`).
 - ⛔ Sobrescrita de `:hover` exclui o desabilitado (`&:hover:not(.Mui-disabled)`): no toque o hover fica preso ao botão depois do clique, e com a mesma especificidade a regra vence a do MUI e pinta o desabilitado.
 - ⛔ O Emotion recusa `:first-child` (aviso no console, que reprova o teste), e `:first-of-type` casa por tag, pegando o vizinho de outra função. Para achar uma parte de slot, marque-a com atributo de dado e use `:not([atributo])`.
 - ⛔ Estado do MUI se sobrescreve repetindo a classe do componente: `& .MuiPaginationItem-root.Mui-selected`, não `& .Mui-selected`. O sintoma é parcial — só as propriedades que o MUI também declara voltam ao valor dele.

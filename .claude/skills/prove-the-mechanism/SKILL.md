@@ -10,7 +10,7 @@ A regra está na `conduct.md` (seção "Prove o mecanismo") e vale no fechamento
 | Vai concluir a partir de | Abra |
 | --- | --- |
 | `grep`, `git diff`, contagem, saída de comando | `references/busca-e-saida.md` |
-| `gh pr checks`, `gh run view`, artefato de CI | `references/ci-e-checks.md` |
+| `gh pr checks`, `gh run view`, artefato de CI, suíte que o CI pulou | `references/ci-e-checks.md` |
 | script que reescreve arquivo, tabela de substituição, `UPDATE`, mutação | `references/transformacao.md` |
 | `git branch -d`, "está tudo na `main`", diff entre branches | `references/git-contencao.md` |
 | controle que passou, efeito atribuído à mudança, contorno a remover, troca de token | `references/controle-e-atribuicao.md` |
