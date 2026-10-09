@@ -8,12 +8,28 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona o bloqueio temporário de 30 minutos da conta após três tentativas consecutivas de login com a senha incorreta (#553) [Backend]
+- Adiciona o envio de e-mail automático de alerta de segurança com um link de uso único para o desbloqueio imediato da conta (#553) [Backend]
+- Adiciona as colunas `FailedLoginAttempts` e `LockedUntil` à tabela de usuários no banco de dados para o controle do estado do bloqueio, com a respectiva migration (#553) [Backend]
+- Adiciona o fluxo de "Esqueci a Senha", enviando um link seguro e de uso único, com validade de 30 minutos, para o e-mail institucional do usuário criar uma nova senha (#553) [Backend]
+- Adiciona a infraestrutura de mensageria assíncrona com RabbitMQ e MassTransit para orquestrar o envio de e-mails em segundo plano, sem bloquear o tempo de resposta da API (#553) [Backend]
+- Adiciona a confirmação de e-mail obrigatória para novos cadastros, enviando um link de validação para a caixa de entrada e emitindo o passe de acesso (JWT) imediatamente no momento do clique (#553) [Backend]
+- Adiciona o fluxo de reenvio de e-mail de confirmação para recuperar usuários com tokens expirados, invalidando os envios anteriores e gerando um novo link (#553) [Backend]
+- Adiciona a tabela `UserToken` ao banco de dados para o rastreio de tokens temporários e a coluna `IsEmailConfirmed` aos usuários, com a respectiva migration (#553) [Backend]
 - Adiciona a foto original à lista de contas da gestão, ao lado da miniatura (#561) [Backend]
 - Adiciona a remoção da foto ao editar um item de achados e perdidos, como em Meu perfil: a foto sai ao salvar, e o arquivo é apagado na hora (#563) [Frontend]
 - Adiciona à edição de um item de achados e perdidos o pedido de tirar a foto, que apaga o arquivo; com uma foto nova no mesmo pedido, fica a nova (#563) [Backend]
 
 ### Changed
 
+- Passa a contabilizar os erros de senha nos fluxos de login e reativação, retornando o status HTTP 429 (Too Many Requests) com a contagem de minutos restantes caso a conta seja bloqueada (#553) [Backend]
+- Passa a recusar o acesso de contas temporariamente bloqueadas mesmo mediante a inserção da senha correta, obrigando a espera do tempo de segurança ou o desbloqueio via e-mail (#553) [Backend]
+- Passa a invalidar todas as sessões ativas da conta no momento em que a senha é redefinida, impedindo que acessos indevidos continuem ativos (#553) [Backend]
+- Passa a emitir um novo passe de acesso (JWT) e logar o usuário automaticamente após o salvamento da nova senha no fluxo de redefinição (#553) [Backend]
+- Passa a omitir se um e-mail existe ou não no sistema durante o pedido de redefinição de senha, devolvendo sucesso silencioso para evitar exposição de dados (anti-enumeration) (#553) [Backend]
+- Passa a recusar o login de contas que ainda não confirmaram o e-mail institucional, exigindo a validação da caixa de entrada primeiro (#553) [Backend]
+- Passa a realizar o login automático apenas após o usuário clicar no link de confirmação do e-mail, em vez de logá-lo imediatamente após o preenchimento da tela de cadastro (#553) [Backend]
+- Passa a organizar de forma mais coesa a estrutura de arquivos do módulo de Storage, além de limpar as importações (`usings`) não utilizadas em toda a API (#553) [Backend]
 - Passa a abrir os diálogos em tela cheia no celular, com os botões presos no pé da tela e o conteúdo rolando acima deles; no computador eles seguem como antes (#561) [Frontend]
 - Passa a centralizar no celular o conteúdo dos diálogos sem formulário, com os botões dividindo a largura, e a pôr um botão Fechar no pé dos que não têm rodapé (#561) [Frontend]
 - Passa a abrir a foto original num diálogo ao tocar na miniatura das denúncias, de achados e perdidos, de Meu perfil e das contas na gestão, no lugar do botão de baixar das denúncias; salvar a foto fica com o próprio navegador (#561) [Frontend]
@@ -31,21 +47,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- Adiciona o fluxo de "Esqueci a Senha", enviando um link seguro e de uso único (com validade de 30 minutos) para o e-mail institucional do usuário criar uma nova senha (#553) [Backend]
-- Adiciona a infraestrutura de mensageria assíncrona com RabbitMQ e MassTransit para orquestrar o envio de e-mails em segundo plano, sem bloquear o tempo de resposta da API (#553) [Backend]
-- Adiciona a confirmação de e-mail obrigatória para novos cadastros, enviando um link de validação para a caixa de entrada e emitindo o passe de acesso (JWT) imediatamente no momento do clique (#553) [Backend]
-- Adiciona o fluxo de reenvio de e-mail de confirmação para recuperar usuários com tokens expirados, invalidando os envios anteriores e gerando um novo link (#553) [Backend]
-- Adiciona a tabela `UserToken` ao banco de dados para o rastreio de tokens temporários e a coluna `IsEmailConfirmed` aos usuários, com a respectiva migration (#553) [Backend]
 - Adiciona às Preferências a escolha de receber os avisos de caronas, achados e perdidos e denúncias no aplicativo, no e-mail para contato, nos dois ou em nenhum, que antes só se fazia no cadastro; a escolha fica guardada até o envio existir (#546) [Frontend]
-
-### Changed
-
-- Passa a invalidar todas as sessões ativas da conta no momento em que a senha é redefinida, impedindo que acessos indevidos continuem ativos (#553) [Backend]
-- Passa a emitir um novo passe de acesso (JWT) e logar o usuário automaticamente após o salvamento da nova senha no fluxo de redefinição (#553) [Backend]
-- Passa a omitir se um e-mail existe ou não no sistema durante o pedido de redefinição de senha, devolvendo sucesso silencioso para evitar exposição de dados (anti-enumeration) (#553) [Backend]
-- Passa a recusar o login de contas que ainda não confirmaram o e-mail institucional, exigindo a validação da caixa de entrada primeiro (#553) [Backend]
-- Passa a realizar o login automático apenas após o usuário clicar no link de confirmação do e-mail, em vez de logá-lo imediatamente após o preenchimento da tela de cadastro (#553) [Backend]
-- Passa a organizar de forma mais coesa a estrutura de arquivos do módulo de Storage, além de limpar as importações (`usings`) não utilizadas em toda a API (#553) [Backend]
 
 ## [1.2.0] - 2026-10-02
 
