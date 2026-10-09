@@ -14,4 +14,7 @@ public class ErrorResponseDto
 
     [DefaultValue(null)]
     public string? Code { get; set; }
+
+    [DefaultValue(null)]
+    public int? MinutesRemaining { get; set; }
 }

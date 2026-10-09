@@ -32,6 +32,7 @@ public partial class GlobalExceptionMiddleware(
         var errorMessage = "Algo deu errado. Tente novamente.";
         string? conflictingField = null;
         string? errorCode = null;
+        int? minutesRemaining = null;
 
         switch (exception)
         {
@@ -68,6 +69,13 @@ public partial class GlobalExceptionMiddleware(
                 conflictingField = ex.Field;
                 break;
 
+            case AccountLockedException lockedEx:
+                statusCode = HttpStatusCode.TooManyRequests;
+                errorMessage = lockedEx.Message;
+                errorCode = AccountLockedException.ErrorCode;
+                minutesRemaining = lockedEx.MinutesRemaining;
+                break;
+
             case UserDomainException:
             case AuthDomainException:
             case InvalidUserIdentifierException:
@@ -89,7 +97,13 @@ public partial class GlobalExceptionMiddleware(
         context.Response.StatusCode = (int)statusCode;
 
         await context.Response.WriteAsJsonAsync(
-            new ErrorResponseDto { Error = errorMessage, Field = conflictingField, Code = errorCode },
+            new ErrorResponseDto
+            {
+                Error = errorMessage,
+                Field = conflictingField,
+                Code = errorCode,
+                MinutesRemaining = minutesRemaining
+            },
             context.RequestAborted);
     }
 

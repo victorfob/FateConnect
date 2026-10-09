@@ -107,4 +107,14 @@ public class AuthController : ControllerBase
         var tokenResponse = await _authService.ResetPasswordAsync(dto);
         return Ok(tokenResponse);
     }
+
+    [HttpPost("unlock")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UnlockAccount([FromBody] UnlockAccountDto dto)
+    {
+        await _authService.UnlockAccountAsync(dto);
+        return NoContent();
+    }
 }

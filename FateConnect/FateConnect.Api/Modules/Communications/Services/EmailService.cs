@@ -54,4 +54,23 @@ public partial class EmailService(
 
         LogResendAccepted(logger, toEmail);
     }
+
+    public async Task SendAccountLockedEmailAsync(string toEmail, string fullName, string unlockLink)
+    {
+        var subject = "Sua conta foi bloqueada - FateConnect";
+
+        var message = new EmailMessage
+        {
+            From = _senderEmail,
+            To = toEmail,
+            Subject = subject,
+            HtmlBody = AccountLockedEmailTemplate.Build(fullName, unlockLink)
+        };
+
+        LogResendPayloadSent(logger, toEmail, subject);
+
+        await resend.EmailSendAsync(message);
+
+        LogResendAccepted(logger, toEmail);
+    }
 }

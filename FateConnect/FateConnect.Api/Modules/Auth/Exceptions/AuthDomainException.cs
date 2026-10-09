@@ -42,3 +42,28 @@ public class PasswordResetTokenConsumedException()
 
 public class ExpiredPasswordResetTokenException()
     : AuthDomainException("O link de redefinição expirou. Por favor, solicite um novo.");
+
+public class AccountLockedException : AuthDomainException
+{
+    public int MinutesRemaining { get; }
+    public const string ErrorCode = "AccountLocked";
+
+    public AccountLockedException(int minutesRemaining)
+        : base(BuildMessage(minutesRemaining))
+    {
+        MinutesRemaining = minutesRemaining;
+    }
+
+    private static string BuildMessage(int minutes)
+    {
+        string tempo = minutes == 1 ? "1 minuto" : $"{minutes} minutos";
+
+        return $"Conta bloqueada por excesso de tentativas. Aguarde {tempo} para tentar de novo ou acesse seu e-mail institucional para desbloqueá-la imediatamente.";
+    }
+}
+
+public class InvalidUnlockTokenException()
+    : AuthDomainException("O link de desbloqueio é inválido ou não foi encontrado.");
+
+public class ExpiredUnlockTokenException()
+    : AuthDomainException("Este link expirou. O tempo de segurança já passou e você já pode fazer login normalmente com a sua senha.");

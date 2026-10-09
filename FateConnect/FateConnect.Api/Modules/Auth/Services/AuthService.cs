@@ -63,15 +63,94 @@ public partial class AuthService(
         if (user.Status is EnumAccountStatus.Banned)
             throw new BannedAccountException();
 
+        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+
+        if (user.IsLocked(now))
+        {
+            int minutesRemaining = (int)Math.Ceiling((user.LockedUntil!.Value - now).TotalMinutes);
+            throw new AccountLockedException(minutesRemaining);
+        }
+
         bool isPasswordWrong = !Verify(dto.Password, user.Password);
 
         if (isPasswordWrong)
-            throw new InvalidCredentialsException();
+        {
+            await HandleFailedAttemptAsync(user, now);
+        }
+
+        user.ResetFailedLoginAttempts();
+        await userRepository.SaveChangesAsync();
 
         if (!user.IsEmailConfirmed)
             throw new EmailNotConfirmedException();
 
         return user;
+    }
+
+    private async Task HandleFailedAttemptAsync(User user, DateTime now)
+    {
+        user.RegisterFailedLoginAttempt(now);
+
+        if (!user.IsLocked(now))
+        {
+            await userRepository.SaveChangesAsync();
+            throw new InvalidCredentialsException();
+        }
+
+        string newRawToken = Guid.NewGuid().ToString("N");
+        DateTime expiration = now.AddMinutes(30);
+
+        var token = new UserToken(
+            userId: user.Id,
+            token: newRawToken,
+            type: EnumTokenType.AccountUnlock,
+            createdAt: now,
+            expiresAt: expiration
+        );
+
+        user.AddToken(token);
+        await userRepository.SaveChangesAsync();
+
+        await publishEndpoint.Publish(new AccountLockedEvent(
+            UserId: user.Id,
+            FullName: user.FullName,
+            FatecEmail: user.FatecEmail,
+            UnlockToken: newRawToken
+        ));
+
+        LogUserLockedOut(logger, user.Id);
+
+        throw new AccountLockedException(30);
+    }
+
+    public async Task UnlockAccountAsync(UnlockAccountDto dto)
+    {
+        User? user = await userRepository.GetByTokenAsync(dto.Token);
+
+        if (user is null)
+            throw new InvalidUnlockTokenException();
+
+        UserToken? unlockToken = user.Tokens.FirstOrDefault(t =>
+            t.Token == dto.Token &&
+            t.Type == EnumTokenType.AccountUnlock);
+
+        if (unlockToken is null)
+            throw new InvalidUnlockTokenException();
+
+        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+
+        if (unlockToken.IsConsumed)
+            throw new InvalidUnlockTokenException();
+
+        if (unlockToken.ExpiresAt < now)
+            throw new ExpiredUnlockTokenException();
+
+        user.ResetFailedLoginAttempts();
+        unlockToken.Consume(now);
+
+        await userRepository.SaveChangesAsync();
+
+        LogUserUnlocked(logger, user.Id);
     }
 
     private TokenResponseDto IssueToken(User user) =>

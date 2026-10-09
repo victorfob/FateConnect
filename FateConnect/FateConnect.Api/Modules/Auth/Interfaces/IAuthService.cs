@@ -13,4 +13,5 @@ public interface IAuthService
     Task ForgotPasswordAsync(EmailRequestDto dto);
     Task<User> VerifyResetTokenAsync(string token);
     Task<TokenResponseDto> ResetPasswordAsync(ResetPasswordDto dto);
+    Task UnlockAccountAsync(UnlockAccountDto dto);
 }

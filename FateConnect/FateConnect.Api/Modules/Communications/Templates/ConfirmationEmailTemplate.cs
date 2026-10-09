@@ -15,6 +15,8 @@ public static class ConfirmationEmailTemplate // criei um esboço, mas precisar�
                 </a>
             </div>
 
+            <p style='font-size: 14px; color: #555;'>Se o botão não funcionar, copie e cole este link no seu navegador: <br/> <a href='{confirmationLink}' style='color: #E2080F; word-break: break-all;'>{confirmationLink}</a></p>
+
             <p style='margin-bottom: 0; font-size: 14px; color: #555;'>Se você não solicitou este cadastro, pode ignorar este e-mail com segurança.</p>";
 
         return EmailLayout.Header("Confirme sua conta no FateConnect") + body + EmailLayout.Footer();

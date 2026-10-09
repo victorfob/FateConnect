@@ -3,5 +3,6 @@ namespace FateConnect.Api.Modules.Users.Enums;
 public enum EnumTokenType
 {
     EmailConfirmation = 1,
-    PasswordReset = 2
+    PasswordReset = 2,
+    AccountUnlock = 3
 }

@@ -26,6 +26,8 @@ public class User
     public EnumProfileType ProfileType { get; private set; }
     public EnumAccountStatus Status { get; private set; }
     public int TokenVersion { get; private set; }
+    public int FailedLoginAttempts { get; private set; }
+    public DateTime? LockedUntil { get; private set; }
 
     public bool IsEmailConfirmed { get; private set; }
 
@@ -68,6 +70,8 @@ public class User
         IsEmailConfirmed = false;
         CreatedAt = createdAt;
         UpdatedAt = null;
+        FailedLoginAttempts = 0;
+        LockedUntil = null;
     }
 
     public void UpdatePersonalData(
@@ -254,5 +258,30 @@ public class User
     {
         ArgumentNullException.ThrowIfNull(token);
         _tokens.Add(token);
+    }
+
+    public bool IsLocked(DateTime now) => LockedUntil.HasValue && LockedUntil.Value > now;
+
+    public void RegisterFailedLoginAttempt(DateTime now)
+    {
+        FailedLoginAttempts++;
+
+        if (FailedLoginAttempts >= 3)
+        {
+            LockedUntil = now.AddMinutes(30);
+        }
+
+        RegisterUpdate();
+    }
+
+    public void ResetFailedLoginAttempts()
+    {
+        if (FailedLoginAttempts == 0 && LockedUntil is null)
+            return;
+
+        FailedLoginAttempts = 0;
+        LockedUntil = null;
+
+        RegisterUpdate();
     }
 }
