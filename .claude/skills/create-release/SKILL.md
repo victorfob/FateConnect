@@ -153,7 +153,7 @@ E confira que a `develop` recebeu o back-merge: `git rev-list --count origin/dev
 
 ## PR de segurança do Dependabot
 
-Ele mira a `main` sem subir versão, então cai no `Version`, e no Sonar por não ter o `SONAR_TOKEN`; o job dele "falha" quando um pacote não resolve, mesmo abrindo PR com os outros. Feche o PR e faça `hotfix/X.Y.Z` a partir da `main`, com as correções num commit e o bump e o changelog noutro. Correção transitiva que cabe na faixa sai apagando as entradas do `yarn.lock` e reinstalando, sem `resolutions`. Os alertas fecham no merge na `main`.
+Ele mira a `main` sem subir versão, então cai no `Version`, e no Sonar por não ter o `SONAR_TOKEN`; o job dele "falha" quando um pacote não resolve, mesmo abrindo PR com os outros. Feche o PR e faça `hotfix/X.Y.Z` a partir da `main`, com as correções num commit e o bump e o changelog noutro. Correção transitiva que cabe na faixa sai por `yarn up -R <pacote>`, sem `resolutions`. Os alertas fecham no merge na `main`.
 
 ## Armadilhas já pagas
 

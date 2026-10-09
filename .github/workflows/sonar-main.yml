@@ -36,14 +36,22 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: FateConnect/Web/.nvmrc
-          cache: yarn
-          cache-dependency-path: FateConnect/Web/yarn.lock
 
-      # Instalar dependência não deve executar código: sem `--ignore-scripts` o
+      # O Yarn do projeto vem pelo Corepack: o Yarn 1 do runner recusa instalar.
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/cache@v4
+        with:
+          path: FateConnect/Web/node_modules
+          key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
+          restore-keys: node-modules-
+
+      # Instalar dependência não deve executar código: sem `--mode=skip-build` o
       # `postinstall` de qualquer pacote da árvore roda com os segredos do job
       # ao alcance.
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --immutable --mode=skip-build
 
       # O scan consome o lcov e o `sonar-report.xml` que esta suíte produz — sem
       # rodá-la, `sonar.testExecutionReportPaths` aponta para um arquivo que não

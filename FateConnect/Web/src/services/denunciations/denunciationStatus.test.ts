@@ -14,7 +14,7 @@ const UNKNOWN_LABEL = '—';
 describe('denunciationStatus', () => {
   it.each([
     [DenunciationStatusEnum.OPEN, 'Aberta', 'warning'],
-    [DenunciationStatusEnum.IN_REVIEW, 'Em análise', 'neutral'],
+    [DenunciationStatusEnum.IN_REVIEW, 'Em análise', 'muted'],
     [DenunciationStatusEnum.RESOLVED, 'Resolvida', 'success'],
     [DenunciationStatusEnum.DISMISSED, 'Descartada', 'danger'],
   ])('should name and tone %s', (status, label, tone) => {

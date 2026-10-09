@@ -3,11 +3,10 @@ import { FILTER_CLEAR_LABEL, FILTER_SUBMIT_LABEL, FILTER_TITLE_PLURAL } from '@d
 import { http, HttpResponse } from 'msw';
 
 import { CONTACT_LABEL } from '@app/components/ContactButton/constants';
-import {
-  DENUNCIATION_CARD_MARKERS,
-  DOWNLOAD_LABEL,
-} from '@app/components/DenunciationCard/constants';
+import { DENUNCIATION_CARD_MARKERS } from '@app/components/DenunciationCard/constants';
+import { VIEW_PHOTO_LABEL } from '@app/components/PhotoViewer/constants';
 import { server } from '@app/mocks/server';
+import { denunciationCategoryLabel } from '@app/pages/Denunciations/helpers/denunciationCategory';
 import { RoutePathEnum } from '@app/routes/paths';
 import { denunciationStatusLabel } from '@app/services/denunciations/denunciationStatus';
 import {
@@ -15,7 +14,7 @@ import {
   DenunciationStatusEnum,
   type Denunciation,
 } from '@app/services/denunciations/types';
-import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
+import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { FILTER_LABELS } from './components/DenunciationsFilter/constants';
 import {
@@ -124,7 +123,7 @@ describe('DenunciationsTab', () => {
     expect(await screen.findByRole('img')).toBeInTheDocument();
   });
 
-  it('should download the original, not the thumbnail on the card', async () => {
+  it('should open the original, not the thumbnail on the card', async () => {
     const asked: string[] = [];
     URL.createObjectURL = vi.fn(() => 'blob:https://fateconnect.test/foto');
     URL.revokeObjectURL = vi.fn();
@@ -140,7 +139,6 @@ describe('DenunciationsTab', () => {
         return new HttpResponse('\x89PNG', { headers: { 'Content-Type': 'image/jpeg' } });
       }),
     );
-    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
     listServing([
       {
         ...OPEN_DENUNCIATION,
@@ -151,9 +149,13 @@ describe('DenunciationsTab', () => {
 
     renderTab();
     await screen.findByRole('img');
-    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: VIEW_PHOTO_LABEL }));
 
-    await waitFor(() => expect(asked).toEqual(['miniatura', 'original']));
+    const dialog = screen.getByRole('dialog', {
+      name: denunciationCategoryLabel(OPEN_DENUNCIATION.category),
+    });
+    expect(await within(dialog).findByRole('img')).toBeInTheDocument();
+    expect(asked).toEqual(['miniatura', 'original']);
   });
 
   it('should offer only what the api accepts from the current status', async () => {

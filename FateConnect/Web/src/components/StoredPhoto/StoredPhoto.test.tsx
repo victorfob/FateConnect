@@ -1,11 +1,15 @@
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 
+import {
+  LOAD_FAILED_MESSAGE,
+  LOADING_LABEL,
+} from '@app/components/PhotoViewer/components/PhotoViewerDialog/OriginalPhoto/constants';
+import { VIEW_PHOTO_LABEL } from '@app/components/PhotoViewer/constants';
 import { server } from '@app/mocks/server';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
-import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
+import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
-import { DOWNLOAD_FAILED_MESSAGE } from './constants';
 import { StoredPhoto, type StoredPhotoProps } from '.';
 
 const PHOTO_ALT = 'Foto de Carteira preta';
@@ -20,7 +24,7 @@ const SERVER_ERROR = 500;
 const ORIGINAL_PATH = 'Denunciations/a1f0/image';
 const ORIGINAL_URL = `https://api.fateconnect.test/${ORIGINAL_PATH}`;
 
-const DOWNLOAD = { label: 'Baixar a foto', baseName: 'denuncia', originalUrl: ORIGINAL_PATH };
+const VIEWER = { title: 'Spam ou propaganda', originalUrl: ORIGINAL_PATH };
 
 const DEFAULT_PROPS: StoredPhotoProps = { url: STORED_PATH, alt: PHOTO_ALT };
 
@@ -38,25 +42,14 @@ function storedImageServing(onRequest?: (request: Request) => void, contentType 
   );
 }
 
-function originalServing(onRequest?: VoidFunction, contentType = 'image/png') {
+function originalServing(onRequest?: VoidFunction) {
   server.use(
     http.get(ORIGINAL_URL, () => {
       onRequest?.();
 
-      return new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': contentType } });
+      return new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': 'image/png' } });
     }),
   );
-}
-
-function downloadsCaptured(): { href: string; download: string }[] {
-  const clicked: { href: string; download: string }[] = [];
-  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
-    this: HTMLAnchorElement,
-  ) {
-    clicked.push({ href: this.href, download: this.download });
-  });
-
-  return clicked;
 }
 
 describe('StoredPhoto', () => {
@@ -135,72 +128,83 @@ describe('StoredPhoto', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith(OBJECT_URL);
   });
 
-  it('should offer no trigger when no download is asked for', async () => {
+  it('should offer no trigger when no viewer is asked for', async () => {
     storedImageServing();
 
     renderComponent();
 
     await waitFor(() => expect(photo()).toBeInTheDocument());
-    expect(screen.queryByRole('button', { name: DOWNLOAD.label })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: VIEW_PHOTO_LABEL })).not.toBeInTheDocument();
   });
 
-  it('should fetch the original only when the trigger is used, and hand it to the browser', async () => {
+  it('should offer no trigger when there is no original to open', async () => {
+    storedImageServing();
+
+    renderComponent({ ...DEFAULT_PROPS, viewer: { ...VIEWER, originalUrl: null } });
+
+    await waitFor(() => expect(photo()).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: VIEW_PHOTO_LABEL })).not.toBeInTheDocument();
+  });
+
+  it('should fetch the original only when the dialog opens, and show it there', async () => {
     storedImageServing();
     let originalRequests = 0;
     originalServing(() => {
       originalRequests += 1;
     });
-    const clicked = downloadsCaptured();
 
-    renderComponent({ ...DEFAULT_PROPS, download: DOWNLOAD });
+    renderComponent({ ...DEFAULT_PROPS, viewer: VIEWER });
     await waitFor(() => expect(photo()).toBeInTheDocument());
 
     expect(originalRequests).toBe(0);
 
-    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD.label }));
+    await userEvent.click(screen.getByRole('button', { name: VIEW_PHOTO_LABEL }));
 
-    await waitFor(() => expect(clicked).toEqual([{ href: OBJECT_URL, download: 'denuncia.png' }]));
+    const dialog = screen.getByRole('dialog', { name: VIEWER.title });
+    expect(await within(dialog).findByRole('img', { name: PHOTO_ALT })).toBeInTheDocument();
     expect(originalRequests).toBe(1);
   });
 
-  // O endereço da foto de denúncia termina em `/image`, sem sufixo nenhum: quem
-  // diz o formato é a resposta, e o nome baixado precisa segui-la.
-  it('should take the downloaded extension from the served content type', async () => {
+  it('should show the loading indicator while the original is on its way', async () => {
     storedImageServing();
-    originalServing(undefined, 'image/webp');
-    const clicked = downloadsCaptured();
+    server.use(http.get(ORIGINAL_URL, () => delay('infinite')));
 
-    renderComponent({ ...DEFAULT_PROPS, download: DOWNLOAD });
+    renderComponent({ ...DEFAULT_PROPS, viewer: VIEWER });
     await waitFor(() => expect(photo()).toBeInTheDocument());
-    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD.label }));
+    await userEvent.click(screen.getByRole('button', { name: VIEW_PHOTO_LABEL }));
 
-    await waitFor(() => expect(clicked).toEqual([{ href: OBJECT_URL, download: 'denuncia.webp' }]));
+    const dialog = screen.getByRole('dialog', { name: VIEWER.title });
+    expect(within(dialog).getByRole('progressbar', { name: LOADING_LABEL })).toBeInTheDocument();
+    expect(within(dialog).queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('should download without extension when the served type is unknown', async () => {
+  it('should give the original back when the dialog closes', async () => {
     storedImageServing();
-    originalServing(undefined, 'application/octet-stream');
-    const clicked = downloadsCaptured();
+    originalServing();
 
-    renderComponent({ ...DEFAULT_PROPS, download: DOWNLOAD });
+    renderComponent({ ...DEFAULT_PROPS, viewer: VIEWER });
     await waitFor(() => expect(photo()).toBeInTheDocument());
-    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD.label }));
+    await userEvent.click(screen.getByRole('button', { name: VIEW_PHOTO_LABEL }));
+    const dialog = screen.getByRole('dialog', { name: VIEWER.title });
+    await within(dialog).findByRole('img', { name: PHOTO_ALT });
 
-    await waitFor(() =>
-      expect(clicked).toEqual([{ href: OBJECT_URL, download: DOWNLOAD.baseName }]),
-    );
+    await userEvent.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(URL.revokeObjectURL).toHaveBeenCalledOnce();
+    expect(photo()).toBeInTheDocument();
   });
 
-  it('should say so when the original cannot be fetched, handing nothing to the browser', async () => {
+  it('should say so in the dialog when the original cannot be fetched', async () => {
     storedImageServing();
     server.use(http.get(ORIGINAL_URL, () => new HttpResponse(null, { status: SERVER_ERROR })));
-    const clicked = downloadsCaptured();
 
-    renderComponent({ ...DEFAULT_PROPS, download: DOWNLOAD });
+    renderComponent({ ...DEFAULT_PROPS, viewer: VIEWER });
     await waitFor(() => expect(photo()).toBeInTheDocument());
-    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD.label }));
+    await userEvent.click(screen.getByRole('button', { name: VIEW_PHOTO_LABEL }));
 
-    expect(await screen.findByText(DOWNLOAD_FAILED_MESSAGE)).toBeInTheDocument();
-    expect(clicked).toEqual([]);
+    const dialog = screen.getByRole('dialog', { name: VIEWER.title });
+    expect(await within(dialog).findByText(LOAD_FAILED_MESSAGE)).toBeInTheDocument();
+    expect(within(dialog).queryByRole('img')).not.toBeInTheDocument();
   });
 });

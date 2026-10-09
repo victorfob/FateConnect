@@ -99,20 +99,27 @@ public partial class LostAndFoundService(
             dto.Status
         );
 
-        string? replacedImageUrl = null;
+        string? discardedImageUrl = null;
         string? storedImageUrl = null;
+        bool removesImage = dto.Image is null && dto.RemoveImage == true;
 
         if (dto.Image is not null)
         {
-            replacedImageUrl = record.ImageUrl;
+            discardedImageUrl = record.ImageUrl;
             storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
             record.AttachImage(storedImageUrl);
         }
 
+        if (removesImage)
+        {
+            discardedImageUrl = record.ImageUrl;
+            record.DetachImage();
+        }
+
         await PersistOrDropImageAsync(repository.SaveChangesAsync, storedImageUrl);
 
-        if (!string.IsNullOrWhiteSpace(replacedImageUrl))
-            await StorageService.DeleteImageAsync(replacedImageUrl);
+        if (!string.IsNullOrWhiteSpace(discardedImageUrl))
+            await StorageService.DeleteImageAsync(discardedImageUrl);
 
         LogRecordUpdated(logger, id);
 

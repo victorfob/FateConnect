@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw';
 
-import { CONTACT_DIALOG, CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { CONTACT_LABEL } from '@app/components/ContactButton/constants';
+import { sendEmailLabel } from '@app/components/ContactButton/ContactDetails/constants';
+import { VIEW_PHOTO_LABEL } from '@app/components/PhotoViewer/constants';
 import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import { server } from '@app/mocks/server';
 import {
@@ -19,9 +21,11 @@ import { LostItemCard } from '.';
 
 const CONTACT_PHONE = '(15) 99999-0001';
 
+const CONTACT_EMAIL = 'marina.duarte@example.com';
+
 const CONTACT: UserContact = {
   name: 'Marina Duarte',
-  email: 'marina.duarte@example.com',
+  email: CONTACT_EMAIL,
   phone: CONTACT_PHONE,
   thumbnailUrl: null,
 };
@@ -40,6 +44,7 @@ const LOST_ITEM: LostItem = {
   place: 'Biblioteca',
   ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos e cartões.',
+  imageUrl: null,
   thumbnailUrl: null,
   contact: CONTACT,
   status: LostItemStatusEnum.OPEN,
@@ -47,8 +52,6 @@ const LOST_ITEM: LostItem = {
   isOwner: false,
   createdAt: '2026-08-12T00:00:00',
 };
-
-const COPY_EMAIL_LABEL = `Copiar ${CONTACT.email}`;
 
 const DELETION_NOTE = {
   manual: 'Arquivado manualmente.',
@@ -84,22 +87,9 @@ async function openContact() {
 }
 
 describe('LostItemCard', () => {
-  // O jsdom não implementa a área de transferência; os casos de cópia observam
-  // esta escrita, e a instância nasce a cada caso para a rejeição não vazar.
-  let clipboardWrite: Mock;
-
-  beforeEach(() => {
-    clipboardWrite = vi.fn(() => Promise.resolve());
-    Object.defineProperty(navigator, 'clipboard', {
-      value: { writeText: clipboardWrite },
-      configurable: true,
-    });
-  });
-
   afterEach(() => {
     vi.restoreAllMocks();
     restoreContentHeight();
-    Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
   });
 
   it('should draw the thumbnail of the photo, never the original', async () => {
@@ -120,6 +110,34 @@ describe('LostItemCard', () => {
 
     expect(await screen.findByRole('img', { name: photoAlt(LOST_ITEM.name) })).toBeInTheDocument();
     await waitFor(() => expect(asked).toEqual([`/${thumbnailPath}`]));
+  });
+
+  it('should open the original photo in a dialog named after the item', async () => {
+    const thumbnailPath = 'uploads/lostandfound/thumbnails/carteira.webp';
+    const originalPath = 'uploads/lostandfound/carteira.png';
+    const asked: string[] = [];
+    URL.createObjectURL = vi.fn(() => 'blob:https://fateconnect.test/foto');
+    URL.revokeObjectURL = vi.fn();
+    server.use(
+      http.get(`https://api.fateconnect.test/${thumbnailPath}`, () => {
+        return new HttpResponse('\x89PNG', { headers: { 'Content-Type': 'image/webp' } });
+      }),
+      http.get(`https://api.fateconnect.test/${originalPath}`, ({ request }) => {
+        asked.push(new URL(request.url).pathname);
+
+        return new HttpResponse('\x89PNG', { headers: { 'Content-Type': 'image/png' } });
+      }),
+    );
+    renderComponent({ ...LOST_ITEM, thumbnailUrl: thumbnailPath, imageUrl: originalPath });
+    await screen.findByRole('img', { name: photoAlt(LOST_ITEM.name) });
+
+    await userEvent.click(screen.getByRole('button', { name: VIEW_PHOTO_LABEL }));
+
+    const dialog = screen.getByRole('dialog', { name: LOST_ITEM.name });
+    expect(
+      await within(dialog).findByRole('img', { name: photoAlt(LOST_ITEM.name) }),
+    ).toBeInTheDocument();
+    expect(asked).toEqual([`/${originalPath}`]);
   });
 
   it('should list the kind, the date and the place, from the shortest text', () => {
@@ -144,7 +162,7 @@ describe('LostItemCard', () => {
     const dialog = await openContact();
 
     expect(dialog.getByText(CONTACT.name)).toBeInTheDocument();
-    expect(dialog.getByRole('button', { name: COPY_EMAIL_LABEL })).toBeInTheDocument();
+    expect(dialog.getByRole('link', { name: sendEmailLabel(CONTACT_EMAIL) })).toBeInTheDocument();
     expect(dialog.getByRole('link', { name: CONTACT_PHONE })).toBeInTheDocument();
   });
 
@@ -180,26 +198,6 @@ describe('LostItemCard', () => {
       'href',
       expect.stringContaining(encodeURIComponent(LOST_ITEM.name)),
     );
-  });
-
-  it('should copy the email and say so', async () => {
-    renderComponent();
-    const dialog = await openContact();
-
-    await userEvent.click(dialog.getByRole('button', { name: COPY_EMAIL_LABEL }));
-
-    expect(await screen.findByText(CONTACT_DIALOG.emailCopied)).toBeInTheDocument();
-    expect(clipboardWrite).toHaveBeenCalledWith(CONTACT.email);
-  });
-
-  it('should report a refused copy instead of claiming success', async () => {
-    clipboardWrite.mockRejectedValueOnce(new Error('denied'));
-    renderComponent();
-    const dialog = await openContact();
-
-    await userEvent.click(dialog.getByRole('button', { name: COPY_EMAIL_LABEL }));
-
-    expect(await screen.findByText(CONTACT_DIALOG.emailCopyFailed)).toBeInTheDocument();
   });
 
   it('should tell apart the hand that deleted the item from the routine that did', () => {

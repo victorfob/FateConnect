@@ -2,11 +2,8 @@ import { FILTER_CLEAR_LABEL, FILTER_SUBMIT_LABEL, FILTER_TITLE_SINGULAR } from '
 import { http, HttpResponse } from 'msw';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
-import {
-  DENUNCIATION_CARD_MARKERS,
-  DOWNLOAD_LABEL,
-  photoAlt,
-} from '@app/components/DenunciationCard/constants';
+import { DENUNCIATION_CARD_MARKERS, photoAlt } from '@app/components/DenunciationCard/constants';
+import { VIEW_PHOTO_LABEL } from '@app/components/PhotoViewer/constants';
 import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
@@ -15,7 +12,7 @@ import {
   DenunciationStatusEnum,
   type Denunciation,
 } from '@app/services/denunciations/types';
-import { screen, userEvent, waitFor } from '@app/test/testing-library';
+import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { forgeOverflow, restoreContentHeight } from '@app/test/utils/contentHeight';
 import { pagedListHandler } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
@@ -25,6 +22,7 @@ import {
   FILTER_LABELS,
 } from './components/DenunciationFilter/constants';
 import { CHANNEL_NOTE, DENUNCIATION_FORM } from './components/DenunciationFormDialog/constants';
+import { denunciationCategoryLabel } from './helpers/denunciationCategory';
 import * as C from './constants';
 import { Denunciations } from '.';
 
@@ -171,7 +169,7 @@ describe('Denunciations', () => {
     );
   });
 
-  it('should show the thumbnail and download the original', async () => {
+  it('should show the thumbnail and open the original in a dialog', async () => {
     const asked: string[] = [];
     listing([denunciationWith({ imageUrl: PHOTO_PATH, thumbnailUrl: THUMBNAIL_PATH })]);
     server.use(
@@ -186,15 +184,20 @@ describe('Denunciations', () => {
         return new HttpResponse(PNG_BYTES, { headers: { 'Content-Type': 'image/jpeg' } });
       }),
     );
-    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
     renderScreen();
     await screen.findByRole('img', { name: photoAlt(DENUNCIATION) });
 
     expect(asked).toEqual([`/${THUMBNAIL_PATH}`]);
 
-    await userEvent.click(screen.getByRole('button', { name: DOWNLOAD_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: VIEW_PHOTO_LABEL }));
 
-    await waitFor(() => expect(asked).toEqual([`/${THUMBNAIL_PATH}`, `/${PHOTO_PATH}`]));
+    const dialog = screen.getByRole('dialog', {
+      name: denunciationCategoryLabel(DENUNCIATION.category),
+    });
+    expect(
+      await within(dialog).findByRole('img', { name: photoAlt(DENUNCIATION) }),
+    ).toBeInTheDocument();
+    expect(asked).toEqual([`/${THUMBNAIL_PATH}`, `/${PHOTO_PATH}`]);
   });
 
   it('should leave the confidential marker out of a denunciation that is not confidential', async () => {

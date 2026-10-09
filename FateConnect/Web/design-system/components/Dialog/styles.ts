@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import { styled, type CSSObject } from '@ds-root/styled';
 import { spacingScale } from '@ds-root/tokens';
 
-const { sm, lg, xl } = spacingScale;
+const { sm, md, lg, xl } = spacingScale;
 
 /**
  * Recuo do botão mais a margem interna da arte do ícone. Sem descontar os dois,
@@ -21,6 +21,30 @@ export const DialogSurface = styled(Stack)(({ theme }) => ({
   // diálogo rolaria junto e o título sairia de vista.
   minHeight: 0,
   overflow: 'hidden',
+
+  // Em tela cheia a superfície ocupa a altura toda, e o rodapé desce ao pé dela.
+  [theme.breakpoints.down('md')]: {
+    flexGrow: 1,
+    padding: theme.space(md),
+
+    // Os botões dividem a largura. Sem formulário, o conteúdo é curto e vai para
+    // o meio da tela; o formulário fica no topo, longe do teclado.
+    '& [data-dialog-footer] .MuiButton-root': { flex: 1 },
+    '&:not(:has(form)) [data-dialog-body]': { justifyContent: 'safe center' },
+
+    '&:has(form) [data-close-footer], &:has([data-dialog-footer]:not([data-close-footer] *)) [data-close-footer]':
+      { display: 'none' },
+  },
+}));
+
+/**
+ * O "Fechar" do pé só existe no estreito, e a superfície o esconde quando o
+ * diálogo traz rodapé ou formulário: sem ele, o X seria a única saída da tela.
+ */
+export const CloseFooterSlot = styled(Stack)(({ theme }) => ({
+  display: 'none',
+
+  [theme.breakpoints.down('md')]: { display: 'flex' },
 }));
 
 /** Título e o fechar dividem a linha; o título ocupa o resto dela. */
@@ -31,9 +55,9 @@ export const TitleRow = styled(Stack)(({ theme }) => ({
 }));
 
 /**
- * Só existe abaixo do breakpoint mobile, onde a faixa clicável em volta do
- * diálogo é alvo pequeno demais para o toque. O `display: none` da base é o que
- * o mantém fora do desktop, que segue sem botão de fechar.
+ * Só existe abaixo do breakpoint mobile, onde o diálogo ocupa a tela inteira e
+ * não sobra onde tocar fora dele. O `display: none` da base é o que o mantém
+ * fora do desktop, que segue sem botão de fechar.
  */
 export const CloseButtonSlot = styled(Stack)(({ theme }) => ({
   display: 'none',

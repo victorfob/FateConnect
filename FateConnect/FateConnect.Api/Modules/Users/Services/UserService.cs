@@ -270,6 +270,7 @@ public partial class UserService(
                 u.FullName,
                 u.ContactEmail,
                 u.Phone,
+                u.ImageUrl,
                 UploadsLocation.ThumbnailOrNullOf(u.ImageUrl),
                 u.Status
             )

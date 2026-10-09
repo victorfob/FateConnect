@@ -24,6 +24,7 @@ export type LostItem = {
   place: string;
   ocurredOn: string;
   description: string | null;
+  imageUrl: string | null;
   thumbnailUrl: string | null;
   contact: UserContact;
   status: LostItemStatusEnum;
@@ -36,6 +37,8 @@ export type LostItemInput = Pick<LostItem, 'name' | 'lostAndFoundType' | 'place'
   /** String vazia limpa a descrição guardada; omitir o campo a deixaria como está. */
   description: string;
   image: File | null;
+  /** Tira a foto guardada; com `image`, a API fica com a nova. */
+  removeImage: boolean;
 };
 
 /** Filtros da listagem, com os mesmos nomes que a API recebe na query. */

@@ -14,6 +14,7 @@ const LOST_ITEM: LostItem = {
   place: 'Biblioteca',
   ocurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta.',
+  imageUrl: 'uploads/lostandfound/carteira.png',
   thumbnailUrl: 'uploads/lostandfound/thumbnails/carteira.webp',
   contact: {
     name: 'Marina Duarte',
@@ -60,6 +61,7 @@ describe('toLostItemInput', () => {
       occurredOn: '11/08/2026',
       description: 'Carteira de couro preta.',
       photo,
+      removeStoredPhoto: false,
     };
 
     expect(toLostItemInput(values)).toEqual({
@@ -69,6 +71,23 @@ describe('toLostItemInput', () => {
       ocurredOn: '2026-08-11',
       description: 'Carteira de couro preta.',
       image: photo,
+      removeImage: false,
     });
+  });
+
+  it('should ask to drop the stored photo only while no new one was chosen', () => {
+    const photo = new File(['foto'], 'carteira.png', { type: 'image/png' });
+    const removed: LostItemFormValues = {
+      name: 'Carteira preta',
+      kind: LostItemKindEnum.LOST,
+      place: 'Biblioteca',
+      occurredOn: '11/08/2026',
+      description: '',
+      photo: null,
+      removeStoredPhoto: true,
+    };
+
+    expect(toLostItemInput(removed).removeImage).toBe(true);
+    expect(toLostItemInput({ ...removed, photo }).removeImage).toBe(false);
   });
 });

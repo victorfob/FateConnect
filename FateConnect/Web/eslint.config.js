@@ -155,6 +155,15 @@ const restrictImports = ({ patterns = [], paths = [] }) => ['error', { patterns,
 export default defineConfig([
   { ignores: ['dist', 'coverage'] },
   js.configs.recommended,
+  {
+    // O recomendado do `@eslint/js` 10 liga estas três, e o do 9 não. Ficam aqui
+    // até o projeto subir para o ESLint 10, quando voltam a vir dele.
+    rules: {
+      'no-unassigned-vars': 'error',
+      'no-useless-assignment': 'error',
+      'preserve-caught-error': ['error', { requireCatchParameter: false }],
+    },
+  },
   ...tseslint.configs.recommended,
   // As mesmas regras que o Sonar aplica no PR. Sem elas o gate local aprova
   // código que a análise reprova depois, com o PR já aberto.

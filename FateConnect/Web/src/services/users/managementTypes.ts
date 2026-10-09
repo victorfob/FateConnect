@@ -7,6 +7,7 @@ export type UserSummary = {
   fullName: string;
   contactEmail: string | null;
   phone: string | null;
+  imageUrl: string | null;
   thumbnailUrl: string | null;
   status: AccountStatusEnum;
 };

@@ -1,4 +1,5 @@
-import { render, screen, userEvent, within } from '@app/test/testing-library';
+import { cleanup, render, screen, userEvent, within } from '@app/test/testing-library';
+import { narrowDeclarationsFor } from '@app/test/utils/styleSheetRules';
 
 import { CLOSE_LABEL } from './constants';
 import type { DialogSubmitProps } from './DialogSubmit';
@@ -21,10 +22,39 @@ const submitFormWith = (state: Pick<DialogSubmitProps, 'disabled' | 'loading'>) 
   </Dialog.Form>
 );
 
+/**
+ * O jsdom não avalia media query, e sem stub ele responde sempre o estreito.
+ * O desktop só se exercita forjando a resposta que o `useMediaQuery` lê.
+ */
+function stubDesktopViewport() {
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: true,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}
+
 // O botão de fechar só aparece abaixo do breakpoint mobile, por CSS. O jsdom não
 // avalia media query, então ele fica com `display: none` e precisa ser buscado
 // com `hidden`.
 describe('Dialog', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('should fill the screen on the phone and float on the desktop', () => {
+    renderComponent();
+    expect(screen.getByRole('dialog')).toHaveClass('MuiDialog-paperFullScreen');
+
+    cleanup();
+    stubDesktopViewport();
+    renderComponent();
+    expect(screen.getByRole('dialog')).not.toHaveClass('MuiDialog-paperFullScreen');
+  });
+
   it('should name itself by the title it was given', () => {
     renderComponent();
 
@@ -77,13 +107,39 @@ describe('Dialog', () => {
     expect(screen.queryByRole('button', { name: CLOSE_LABEL })).not.toBeInTheDocument();
   });
 
-  it('should close when the user activates the close button', async () => {
+  // Os dois só aparecem no estreito, e o do pé some quando o diálogo traz rodapé:
+  // as duas regras são de CSS, que o jsdom não avalia.
+  it('should close from the X at the top and from the button at the foot', async () => {
     const onClose = vi.fn();
     renderComponent({ ...DEFAULT_PROPS, onClose });
 
-    await userEvent.click(screen.getByRole('button', { name: CLOSE_LABEL, hidden: true }));
+    const closeButtons = screen.getAllByRole('button', { name: CLOSE_LABEL, hidden: true });
+    expect(closeButtons).toHaveLength(2);
+    for (const closeButton of closeButtons) await userEvent.click(closeButton);
 
-    expect(onClose).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledTimes(2);
+  });
+
+  it('should split the footer between its buttons on the phone, with or without a form', () => {
+    renderComponent({ ...DEFAULT_PROPS, children: submitFormWith({}) });
+    expect(narrowDeclarationsFor(screen.getByRole('button', { name: 'Enviar' }))).toContain(
+      'flex:1',
+    );
+
+    cleanup();
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Footer>
+          <button type="button" className="MuiButton-root">
+            Confirmar
+          </button>
+        </Dialog.Footer>
+      ),
+    });
+    expect(narrowDeclarationsFor(screen.getByRole('button', { name: 'Confirmar' }))).toContain(
+      'flex:1',
+    );
   });
 
   it('should stay out of the page while it is closed', () => {

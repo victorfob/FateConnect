@@ -15,6 +15,8 @@ export type PhotoFieldProps = Readonly<{
   onChange: (photo: File | null) => void;
   /** O que o registro já guarda; a escolha de agora o cobre. */
   storedPreview?: PhotoFieldPreview | null;
+  /** Sem ela, a foto guardada só se troca: o remover desfaz só a escolha de agora. */
+  onRemoveStored?: VoidFunction;
   error?: string;
   disabled?: boolean;
 }>;
@@ -24,6 +26,7 @@ export function PhotoField({
   value,
   onChange,
   storedPreview = null,
+  onRemoveStored,
   error,
   disabled = false,
 }: PhotoFieldProps) {
@@ -50,7 +53,13 @@ export function PhotoField({
     [onChange],
   );
 
-  const handleRemove = useCallback(() => onChange(null), [onChange]);
+  const canRemove = Boolean(value) || Boolean(storedPreview && onRemoveStored);
+
+  // Tira o que aparece: a escolha de agora e, quando a tela deixa, a guardada.
+  const handleRemove = useCallback(() => {
+    onChange(null);
+    if (storedPreview) onRemoveStored?.();
+  }, [onChange, onRemoveStored, storedPreview]);
 
   const pickLabel = useMemo(() => {
     if (preview) return PHOTO_FIELD_TEXTS.replace;
@@ -66,11 +75,10 @@ export function PhotoField({
         {preview && <S.PhotoPreview component="img" src={preview.src} alt={preview.alt} />}
 
         <S.PhotoActions>
-          {/* Só a escolha de agora se desfaz: o que já está guardado se troca, não se apaga. */}
           <PhotoActionButtons
             pickLabel={pickLabel}
             onPick={handlePick}
-            canRemove={Boolean(value)}
+            canRemove={canRemove}
             onRemove={handleRemove}
             disabled={disabled}
           />
