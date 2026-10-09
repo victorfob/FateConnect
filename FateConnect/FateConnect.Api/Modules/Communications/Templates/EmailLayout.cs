@@ -2,7 +2,7 @@ namespace FateConnect.Api.Modules.Communications.Templates;
 
 using System;
 
-public static class EmailLayout // melhorar todos os tamplates. Separar variáveis de cor. Ajustar para manter o padrão visual existente na aplicação.
+public static class EmailLayout // melhorar todos os tamplates. Separar variáveis de cor. Ajustar para manter o padrão visual existente na aplicação. Ver possibilidade de adicionar o logotipo.
 {
     public static string Header(string title) => $@"
         <!DOCTYPE html>
