@@ -19,8 +19,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 nullable: false,
                 defaultValue: false);
 
-            migrationBuilder.Sql("UPDATE \"Users\" SET \"IsEmailConfirmed\" = true;");
-
             migrationBuilder.CreateTable(
                 name: "UserTokens",
                 columns: table => new

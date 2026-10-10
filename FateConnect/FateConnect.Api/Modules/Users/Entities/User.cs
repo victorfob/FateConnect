@@ -264,6 +264,12 @@ public class User
 
     public void RegisterFailedLoginAttempt(DateTime now)
     {
+        if (LockedUntil.HasValue && LockedUntil.Value <= now)
+        {
+            FailedLoginAttempts = 0;
+            LockedUntil = null;
+        }
+
         FailedLoginAttempts++;
 
         if (FailedLoginAttempts >= 3)

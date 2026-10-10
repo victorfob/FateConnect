@@ -26,7 +26,9 @@ public partial class AccountLockedEventConsumer(
             string frontendUrl = configuration["PUBLIC_URL"]
                 ?? throw new MissingCommunicationConfigurationException("PUBLIC_URL");
 
-            string unlockLink = $"{frontendUrl.TrimEnd('/')}/desbloquear-conta?token={evento.UnlockToken}&email={evento.FatecEmail}";
+            string safeEmail = Uri.EscapeDataString(evento.FatecEmail);
+
+            string unlockLink = $"{frontendUrl.TrimEnd('/')}/desbloquear-conta?token={evento.UnlockToken}&email={safeEmail}";
 
             await emailService.SendAccountLockedEmailAsync(evento.FatecEmail, evento.FullName, unlockLink);
 

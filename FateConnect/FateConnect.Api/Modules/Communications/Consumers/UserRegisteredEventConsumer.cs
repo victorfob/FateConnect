@@ -26,7 +26,9 @@ public sealed partial class UserRegisteredEventConsumer(
             string frontendUrl = configuration["PUBLIC_URL"]
                 ?? throw new MissingCommunicationConfigurationException("PUBLIC_URL");
 
-            string confirmationLink = $"{frontendUrl.TrimEnd('/')}/confirmar-email?token={evento.ConfirmationToken}&email={evento.FatecEmail}";
+            string safeEmail = Uri.EscapeDataString(evento.FatecEmail);
+
+            string confirmationLink = $"{frontendUrl.TrimEnd('/')}/confirmar-email?token={evento.ConfirmationToken}&email={safeEmail}";
 
             await emailService.SendConfirmationEmailAsync(evento.FatecEmail, evento.FullName, confirmationLink);
 

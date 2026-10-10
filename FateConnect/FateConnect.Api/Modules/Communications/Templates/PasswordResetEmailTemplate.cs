@@ -1,11 +1,15 @@
+using System.Net;
+
 namespace FateConnect.Api.Modules.Communications.Templates;
 
 public static class PasswordResetEmailTemplate
 {
     public static string Build(string fullName, string resetLink)
     {
+        string safeName = WebUtility.HtmlEncode(fullName);
+
         var body = $@"
-            <h2 style='color: #333; margin-top: 0;'>Olá, {fullName}!</h2>
+            <h2 style='color: #333; margin-top: 0;'>Olá, {safeName}!</h2>
             <p>Recebemos um pedido para redefinir a senha da sua conta no FateConnect.</p>
             <p>Se foi você quem fez o pedido, clique no botão abaixo para escolher sua nova senha. Por segurança, este link expira em 30 minutos.</p>
 

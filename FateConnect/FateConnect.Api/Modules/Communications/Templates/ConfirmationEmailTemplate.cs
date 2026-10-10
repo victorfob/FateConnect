@@ -1,11 +1,15 @@
+using System.Net;
+
 namespace FateConnect.Api.Modules.Communications.Templates;
 
 public static class ConfirmationEmailTemplate
 {
     public static string Build(string fullName, string confirmationLink)
     {
+        string safeName = WebUtility.HtmlEncode(fullName);
+
         var body = $@"
-            <h2 style='color: #333; margin-top: 0;'>Bem-vindo(a), {fullName}!</h2>
+            <h2 style='color: #333; margin-top: 0;'>Bem-vindo(a), {safeName}!</h2>
             <p>Falta pouco para você acessar a plataforma FateConnect.</p>
             <p>Clique no botão abaixo para confirmar sua conta de forma segura:</p>
 

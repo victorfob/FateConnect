@@ -1,12 +1,16 @@
+using System.Net;
+
 namespace FateConnect.Api.Modules.Communications.Templates;
 
 public static class AccountLockedEmailTemplate
 {
     public static string Build(string fullName, string unlockLink)
     {
+        string safeName = WebUtility.HtmlEncode(fullName);
+
         var body = $@"
             <h2 style='color: #CF2E2E; margin-top: 0;'>Aviso de Segurança</h2>
-            <p>Olá, {fullName},</p>
+            <p>Olá, {safeName},</p>
             <p>A sua conta foi bloqueada temporariamente devido a várias tentativas de acesso com a senha incorreta. Para garantir a segurança dos seus dados, o login ficará suspenso por <strong>30 minutos</strong>.</p>
             <p>Você pode aguardar esse tempo para tentar de novo ou <strong>desbloqueá-la imediatamente</strong> clicando no botão abaixo:</p>
 
