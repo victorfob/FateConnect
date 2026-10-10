@@ -8,28 +8,19 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- Adiciona o bloqueio temporário de 30 minutos da conta após três tentativas consecutivas de login com a senha incorreta (#553) [Backend]
-- Adiciona o envio de e-mail automático de alerta de segurança com um link de uso único para o desbloqueio imediato da conta (#553) [Backend]
-- Adiciona as colunas `FailedLoginAttempts` e `LockedUntil` à tabela de usuários no banco de dados para o controle do estado do bloqueio, com a respectiva migration (#553) [Backend]
-- Adiciona o fluxo de "Esqueci a Senha", enviando um link seguro e de uso único, com validade de 30 minutos, para o e-mail institucional do usuário criar uma nova senha (#553) [Backend]
-- Adiciona a infraestrutura de mensageria assíncrona com RabbitMQ e MassTransit para orquestrar o envio de e-mails em segundo plano, sem bloquear o tempo de resposta da API (#553) [Backend]
-- Adiciona a confirmação de e-mail obrigatória para novos cadastros, enviando um link de validação para a caixa de entrada e emitindo o passe de acesso (JWT) imediatamente no momento do clique (#553) [Backend]
-- Adiciona o fluxo de reenvio de e-mail de confirmação para recuperar usuários com tokens expirados, invalidando os envios anteriores e gerando um novo link (#553) [Backend]
-- Adiciona a tabela `UserToken` ao banco de dados para o rastreio de tokens temporários e a coluna `IsEmailConfirmed` aos usuários, com a respectiva migration (#553) [Backend]
+- Adiciona a confirmação do e-mail Fatec: o cadastro envia um link de uso único que vale por 8 horas, e o login de quem não confirmou é recusado, inclusive nas contas que já existiam (#553) [Backend]
+- Adiciona o reenvio do link de confirmação pelo e-mail Fatec, no máximo um por minuto, que invalida o link anterior (#553) [Backend]
+- Adiciona a redefinição da senha esquecida: o pedido pelo e-mail Fatec envia um link de uso único que vale por 30 minutos, e a senha nova derruba as sessões abertas e já entra; e-mail sem conta é avisado, e conta banida não redefine (#553) [Backend]
+- Adiciona o bloqueio da conta por 30 minutos depois de 3 senhas erradas seguidas, no login ou na reativação, que recusa até a senha certa e diz quantos minutos faltam (#553) [Backend]
+- Adiciona o e-mail de desbloqueio, um por bloqueio, com um link de uso único que destrava a conta antes dos 30 minutos (#553) [Backend]
 - Adiciona a foto original à lista de contas da gestão, ao lado da miniatura (#561) [Backend]
 - Adiciona a remoção da foto ao editar um item de achados e perdidos, como em Meu perfil: a foto sai ao salvar, e o arquivo é apagado na hora (#563) [Frontend]
 - Adiciona à edição de um item de achados e perdidos o pedido de tirar a foto, que apaga o arquivo; com uma foto nova no mesmo pedido, fica a nova (#563) [Backend]
 
 ### Changed
 
-- Passa a contabilizar os erros de senha nos fluxos de login e reativação, retornando o status HTTP 429 (Too Many Requests) com a contagem de minutos restantes caso a conta seja bloqueada (#553) [Backend]
-- Passa a recusar o acesso de contas temporariamente bloqueadas mesmo mediante a inserção da senha correta, obrigando a espera do tempo de segurança ou o desbloqueio via e-mail (#553) [Backend]
-- Passa a invalidar todas as sessões ativas da conta no momento em que a senha é redefinida, impedindo que acessos indevidos continuem ativos (#553) [Backend]
-- Passa a emitir um novo passe de acesso (JWT) e logar o usuário automaticamente após o salvamento da nova senha no fluxo de redefinição (#553) [Backend]
-- Passa a responder explicitamente quando não há conta cadastrada para o e-mail informado no pedido de redefinição de senha, de acordo com o desenho de UX para orientar o usuário na tela (#553) [Backend]
-- Passa a recusar o login de contas que ainda não confirmaram o e-mail institucional, exigindo a validação da caixa de entrada primeiro (#553) [Backend]
-- Passa a realizar o login automático apenas após o usuário clicar no link de confirmação do e-mail, em vez de logá-lo imediatamente após o preenchimento da tela de cadastro (#553) [Backend]
-- Passa a organizar de forma mais coesa a estrutura de arquivos do módulo de Storage, além de limpar as importações (`usings`) não utilizadas em toda a API (#553) [Backend]
+- Passa a criar a conta sem entrar logado: a sessão só abre quando o link de confirmação do e-mail é aberto (#553) [Backend]
+- Passa a declarar nos termos de uso a confirmação do e-mail e o bloqueio por senhas erradas, e na política de privacidade o serviço de envio de e-mail, os links enviados e a contagem de senhas erradas, em nova versão dos termos (#553) [Frontend]
 - Passa a abrir os diálogos em tela cheia no celular, com os botões presos no pé da tela e o conteúdo rolando acima deles; no computador eles seguem como antes (#561) [Frontend]
 - Passa a centralizar no celular o conteúdo dos diálogos sem formulário, com os botões dividindo a largura, e a pôr um botão Fechar no pé dos que não têm rodapé (#561) [Frontend]
 - Passa a abrir a foto original num diálogo ao tocar na miniatura das denúncias, de achados e perdidos, de Meu perfil e das contas na gestão, no lugar do botão de baixar das denúncias; salvar a foto fica com o próprio navegador (#561) [Frontend]
