@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.Auth.Exceptions;
 
 using System;
+using FateConnect.Api.Modules.Auth.Constants;
 
 public abstract class AuthDomainException(string message) : Exception(message);
 
@@ -59,9 +60,9 @@ public class AccountLockedException : AuthDomainException
 
     private static string BuildMessage(int minutes)
     {
-        string tempo = minutes == 1 ? "1 minuto" : $"{minutes} minutos";
+        string waitingTime = minutes == 1 ? "1 minuto" : $"{minutes} minutos";
 
-        return $"Conta bloqueada por excesso de tentativas. Aguarde {tempo} para tentar de novo ou acesse seu e-mail institucional para desbloqueá-la imediatamente.";
+        return $"Conta bloqueada por {AuthConstants.MaxFailedLoginAttempts} senhas erradas. Use o link enviado ao e-mail Fatec ou tente de novo daqui a {waitingTime}.";
     }
 }
 

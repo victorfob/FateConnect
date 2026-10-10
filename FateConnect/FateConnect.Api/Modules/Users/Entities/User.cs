@@ -274,7 +274,7 @@ public class User
 
         FailedLoginAttempts++;
 
-        if (FailedLoginAttempts >= 3)
+        if (FailedLoginAttempts >= AuthConstants.MaxFailedLoginAttempts)
         {
             LockedUntil = now.AddMinutes(AuthConstants.LockoutMinutes);
         }
