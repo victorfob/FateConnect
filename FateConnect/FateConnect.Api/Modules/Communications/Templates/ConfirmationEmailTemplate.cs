@@ -11,7 +11,7 @@ public static class ConfirmationEmailTemplate
 
             <div style='text-align: center; margin: 35px 0;'>
                 <a href='{confirmationLink}' style='display: inline-block; padding: 14px 28px; background-color: #CF2E2E; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;'>
-                    Confirmar meu E-mail
+                    Confirmar meu e-mail
                 </a>
             </div>
 

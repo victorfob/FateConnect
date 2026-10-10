@@ -209,6 +209,12 @@ public class Program
 
         builder.Services.AddMassTransit(x =>
         {
+            x.AddEntityFrameworkOutbox<FateConnectDbContext>(o =>
+            {
+                o.UsePostgres();
+                o.UseBusOutbox();
+            });
+
             x.AddConsumer<UserRegisteredEventConsumer>();
             x.AddConsumer<PasswordResetRequestedEventConsumer>();
             x.AddConsumer<AccountLockedEventConsumer>();
@@ -225,7 +231,25 @@ public class Program
                     h.Password(rabbitPass);
                 });
 
-                cfg.ConfigureEndpoints(context);
+                cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+
+                cfg.ReceiveEndpoint("user-registered-event", e =>
+                {
+                    e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+                    e.ConfigureConsumer<UserRegisteredEventConsumer>(context);
+                });
+
+                cfg.ReceiveEndpoint("password-reset-requested-event", e =>
+                {
+                    e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+                    e.ConfigureConsumer<PasswordResetRequestedEventConsumer>(context);
+                });
+
+                cfg.ReceiveEndpoint("account-locked-event", e =>
+                {
+                    e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+                    e.ConfigureConsumer<AccountLockedEventConsumer>(context);
+                });
             });
         });
 

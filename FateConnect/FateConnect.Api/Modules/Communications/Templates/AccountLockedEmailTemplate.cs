@@ -7,8 +7,7 @@ public static class AccountLockedEmailTemplate
         var body = $@"
             <h2 style='color: #CF2E2E; margin-top: 0;'>Aviso de Segurança</h2>
             <p>Olá, {fullName},</p>
-            <p>A sua conta foi bloqueada por excesso de tentativas de login.</p>
-            <p>Por medida de segurança, o acesso ficará suspenso por <strong>30 minutos</strong>.</p>
+            <p>A sua conta foi bloqueada temporariamente devido a várias tentativas de acesso com a senha incorreta. Para garantir a segurança dos seus dados, o login ficará suspenso por <strong>30 minutos</strong>.</p>
             <p>Você pode aguardar esse tempo para tentar de novo ou <strong>desbloqueá-la imediatamente</strong> clicando no botão abaixo:</p>
 
             <div style='text-align: center; margin: 35px 0;'>

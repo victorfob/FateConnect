@@ -26,7 +26,7 @@ public partial class PasswordResetRequestedEventConsumer(
             string frontendUrl = configuration["PUBLIC_URL"]
                 ?? throw new MissingCommunicationConfigurationException("PUBLIC_URL");
 
-            string resetLink = $"{frontendUrl.TrimEnd('/')}/reset-password?token={evento.ResetToken}&email={evento.FatecEmail}";
+            string resetLink = $"{frontendUrl.TrimEnd('/')}/redefinir-senha?token={evento.ResetToken}&email={evento.FatecEmail}";
 
             await emailService.SendPasswordResetEmailAsync(evento.FatecEmail, evento.FullName, resetLink);
 

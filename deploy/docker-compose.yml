@@ -14,6 +14,8 @@ services:
       secrets:
         - sixlabors_license
     restart: unless-stopped
+    depends_on:
+      - rabbitmq
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       DB_CONNECTION: Host=host.docker.internal;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
@@ -29,7 +31,7 @@ services:
       EMAIL_SENDER: ${EMAIL_SENDER}
       
       # Configurações do RabbitMQ
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_HOST: rabbitmq
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASS: ${RABBITMQ_PASS}
             
@@ -48,6 +50,18 @@ services:
     # contêiner e leva junto o que foi carregado.
     volumes:
       - api_uploads:/app/wwwroot/uploads
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: fateconnect_rabbitmq_${API_PORT} # Nomeia pelo ambiente para evitar colisão entre hml/prod
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    ports:
+      - '127.0.0.1:${RABBITMQ_PORT}:5672'
+      - '127.0.0.1:${RABBITMQ_UI_PORT}:15672'
+    mem_limit: 512m
 
 volumes:
   api_uploads:

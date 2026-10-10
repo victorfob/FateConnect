@@ -52,16 +52,16 @@ public partial class UserService(
 
         var emailToken = AddEmailConfirmationToken(newUser, now);
 
-        await userRepository.AddAsync(newUser);
-
-        LogUserCreated(logger, newUser.Id);
-
         await publishEndpoint.Publish(new UserRegisteredEvent(
             UserId: newUser.Id,
             FullName: newUser.FullName,
             FatecEmail: newUser.FatecEmail,
             ConfirmationToken: emailToken.Token
         ));
+
+        await userRepository.AddAsync(newUser);
+
+        LogUserCreated(logger, newUser.Id);
     }
 
     private static void ConfigurePreferences(User user, CreateUserDto dto)

@@ -109,7 +109,6 @@ public partial class AuthService(
         );
 
         user.AddToken(token);
-        await userRepository.SaveChangesAsync();
 
         await publishEndpoint.Publish(new AccountLockedEvent(
             UserId: user.Id,
@@ -117,6 +116,9 @@ public partial class AuthService(
             FatecEmail: user.FatecEmail,
             UnlockToken: newRawToken
         ));
+
+        await userRepository.SaveChangesAsync();
+
 
         LogUserLockedOut(logger, user.Id);
 
@@ -220,14 +222,15 @@ public partial class AuthService(
 
         user.AddToken(token);
 
-        await userRepository.SaveChangesAsync();
-
         await publishEndpoint.Publish(new UserRegisteredEvent(
             UserId: user.Id,
             FullName: user.FullName,
             FatecEmail: user.FatecEmail,
             ConfirmationToken: newRawToken
         ));
+
+        await userRepository.SaveChangesAsync();
+
 
         LogConfirmationEmailResent(logger, user.Id);
     }
@@ -264,14 +267,15 @@ public partial class AuthService(
 
         user.AddToken(token);
 
-        await userRepository.SaveChangesAsync();
-
         await publishEndpoint.Publish(new PasswordResetRequestedEvent(
             UserId: user.Id,
             FullName: user.FullName,
             FatecEmail: user.FatecEmail,
             ResetToken: newRawToken
         ));
+
+        await userRepository.SaveChangesAsync();
+
 
         LogPasswordResetRequested(logger, user.Id);
     }
