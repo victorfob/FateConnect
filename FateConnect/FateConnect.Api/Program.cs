@@ -248,7 +248,7 @@ public class Program
                     h.Password(rabbitPass);
                 });
 
-                cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+                cfg.UseMessageRetry(r => r.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5)));
 
                 cfg.ReceiveEndpoint("user-registered-event", e =>
                 {

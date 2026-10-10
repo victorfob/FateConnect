@@ -1,7 +1,7 @@
-using FateConnect.Api.Modules.Auth.DTOs;
-using FateConnect.Api.Modules.Users.Entities;
-
 namespace FateConnect.Api.Modules.Auth.Interfaces;
+
+using FateConnect.Api.Modules.Auth.DTOs;
+using System.Threading.Tasks;
 
 public interface IAuthService
 {
@@ -11,7 +11,7 @@ public interface IAuthService
     Task<TokenResponseDto> ReactivateAsync(LoginDto dto);
     Task LogoutAsync(int userId);
     Task ForgotPasswordAsync(EmailRequestDto dto);
-    Task<UserToken> VerifyResetTokenAsync(string rawToken);
+    Task VerifyResetTokenAsync(string rawToken);
     Task<TokenResponseDto> ResetPasswordAsync(ResetPasswordDto dto);
     Task UnlockAccountAsync(UnlockAccountDto dto);
 }

@@ -19,13 +19,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.Status).IsRequired();
         builder.Property(e => e.ImageUrl).HasMaxLength(500);
 
-        builder.Property(e => e.FailedLoginAttempts).IsRequired().HasDefaultValue(0);
+        builder.Property(e => e.FailedLoginAttempts).IsRequired();
         builder.Property(e => e.LockedUntil);
 
         builder.HasIndex(e => e.Phone).IsUnique();
         builder.HasIndex(e => e.ContactEmail).IsUnique();
 
-        builder.Property(e => e.IsEmailConfirmed).IsRequired().HasDefaultValue(false);
+        builder.Property(e => e.IsEmailConfirmed).IsRequired();
         builder.Metadata.FindNavigation(nameof(User.Tokens))?.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

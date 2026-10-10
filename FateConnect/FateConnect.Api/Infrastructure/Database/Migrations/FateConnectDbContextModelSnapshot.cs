@@ -268,9 +268,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("FailedLoginAttempts")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
+                        .HasColumnType("integer");
 
                     b.Property<string>("FatecEmail")
                         .IsRequired()
@@ -290,9 +288,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("character varying(500)");
 
                     b.Property<bool>("IsEmailConfirmed")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LockedUntil")
                         .HasColumnType("timestamp without time zone");

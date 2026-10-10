@@ -10,7 +10,6 @@ namespace FateConnect.Api.Modules.Auth.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-[ApiConventionType(typeof(DefaultApiConventions))]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -23,9 +22,11 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
     {
         var response = await _authService.LoginAsync(dto);
@@ -35,8 +36,10 @@ public class AuthController : ControllerBase
     [HttpPost("reactivate")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> ReactivateAsync([FromBody] LoginDto dto)
     {
         var response = await _authService.ReactivateAsync(dto);
@@ -56,7 +59,7 @@ public class AuthController : ControllerBase
     [HttpGet("session")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     public IActionResult GetSession()
     {
         return NoContent();
@@ -65,7 +68,8 @@ public class AuthController : ControllerBase
     [HttpPost("confirm-email")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<TokenResponseDto>> ConfirmEmail([FromBody] ConfirmEmailDto dto)
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
     {
         var tokenResponse = await _authService.ConfirmEmailAsync(dto);
         return Ok(tokenResponse);
@@ -73,6 +77,8 @@ public class AuthController : ControllerBase
 
     [HttpPost("resend-confirmation-email")]
     [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResendConfirmationEmail([FromBody] EmailRequestDto dto)
     {
         await _authService.ResendConfirmationEmailAsync(dto);
@@ -82,6 +88,7 @@ public class AuthController : ControllerBase
     [HttpPost("forgot-password")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ForgotPassword([FromBody] EmailRequestDto dto)
     {
         await _authService.ForgotPasswordAsync(dto);
@@ -102,7 +109,7 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<TokenResponseDto>> ResetPassword([FromBody] ResetPasswordDto dto)
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
     {
         var tokenResponse = await _authService.ResetPasswordAsync(dto);
         return Ok(tokenResponse);

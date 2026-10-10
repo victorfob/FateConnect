@@ -7,11 +7,31 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FateConnect.Api.Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMassTransitOutbox : Migration
+    public partial class AddAuthenticationSecurityAndMessaging : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<int>(
+                name: "FailedLoginAttempts",
+                table: "Users",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<bool>(
+                name: "IsEmailConfirmed",
+                table: "Users",
+                type: "boolean",
+                nullable: false,
+                defaultValue: false);
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "LockedUntil",
+                table: "Users",
+                type: "timestamp without time zone",
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "InboxState",
                 columns: table => new
@@ -49,6 +69,30 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OutboxState", x => x.OutboxId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Token = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ConsumedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -124,6 +168,17 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 name: "IX_OutboxState_Created",
                 table: "OutboxState",
                 column: "Created");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserTokens_Token",
+                table: "UserTokens",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserTokens_UserId",
+                table: "UserTokens",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -133,10 +188,25 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 name: "OutboxMessage");
 
             migrationBuilder.DropTable(
+                name: "UserTokens");
+
+            migrationBuilder.DropTable(
                 name: "InboxState");
 
             migrationBuilder.DropTable(
                 name: "OutboxState");
+
+            migrationBuilder.DropColumn(
+                name: "FailedLoginAttempts",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "IsEmailConfirmed",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "LockedUntil",
+                table: "Users");
         }
     }
 }

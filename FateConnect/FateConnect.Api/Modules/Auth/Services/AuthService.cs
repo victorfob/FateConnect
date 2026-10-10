@@ -264,7 +264,12 @@ public partial class AuthService(
         LogPasswordResetRequested(logger, user.Id);
     }
 
-    public async Task<UserToken> VerifyResetTokenAsync(string rawToken)
+    public async Task VerifyResetTokenAsync(string rawToken)
+    {
+        await GetValidResetTokenAsync(rawToken);
+    }
+
+    private async Task<UserToken> GetValidResetTokenAsync(string rawToken)
     {
         string tokenHash = TokenHelper.HashToken(rawToken);
 
@@ -284,7 +289,7 @@ public partial class AuthService(
 
     public async Task<TokenResponseDto> ResetPasswordAsync(ResetPasswordDto dto)
     {
-        UserToken resetToken = await VerifyResetTokenAsync(dto.Token);
+        UserToken resetToken = await GetValidResetTokenAsync(dto.Token);
         User user = resetToken.User;
 
         if (user.Status is EnumAccountStatus.Banned)

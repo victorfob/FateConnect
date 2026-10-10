@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 
 [ApiController]
 [Route("[controller]")]
-[ApiConventionType(typeof(DefaultApiConventions))]
 public class UsersController(IUserService service) : ControllerBase
 {
     [HttpPost("signup")]
@@ -24,7 +23,7 @@ public class UsersController(IUserService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<TokenResponseDto>> SignUpAsync([FromBody] CreateUserDto dto)
+    public async Task<IActionResult> SignUpAsync([FromBody] CreateUserDto dto)
     {
         await service.SignUpAsync(dto, HttpContext.GetRequestOrigin());
 

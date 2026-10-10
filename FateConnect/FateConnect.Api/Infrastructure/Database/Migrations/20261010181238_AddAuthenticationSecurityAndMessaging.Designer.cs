@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FateConnect.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(FateConnectDbContext))]
-    [Migration("20261010003010_AddMassTransitOutbox")]
-    partial class AddMassTransitOutbox
+    [Migration("20261010181238_AddAuthenticationSecurityAndMessaging")]
+    partial class AddAuthenticationSecurityAndMessaging
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -271,9 +271,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("FailedLoginAttempts")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
+                        .HasColumnType("integer");
 
                     b.Property<string>("FatecEmail")
                         .IsRequired()
@@ -293,9 +291,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("character varying(500)");
 
                     b.Property<bool>("IsEmailConfirmed")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LockedUntil")
                         .HasColumnType("timestamp without time zone");
@@ -381,6 +377,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
