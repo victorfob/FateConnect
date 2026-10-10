@@ -265,6 +265,14 @@ public class ApiFactory : WebApplicationFactory<Program>
             .ExecuteUpdate(setters => setters.SetProperty(user => user.Status, status));
     }
 
+    public int TokenCountOf(string fatecEmail, EnumTokenType type)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        return context.UserTokens.Count(token => token.User.FatecEmail == fatecEmail && token.Type == type);
+    }
+
     public IReadOnlyList<AdministrativeAction> AdministrativeActionsOn(int targetId)
     {
         using IServiceScope scope = Services.CreateScope();

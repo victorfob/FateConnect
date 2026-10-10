@@ -2,8 +2,12 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.DTOs;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Tests.Fixtures;
+using MassTransit.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FateConnect.Api.Tests.Users;
 
@@ -122,6 +126,26 @@ public class SignupTests : IClassFixture<ApiFactory>
         Assert.Equal(HttpStatusCode.Created, signup.StatusCode);
         Assert.Equal(JsonValueKind.Null, profile.GetProperty("phone").ValueKind);
         Assert.Equal(JsonValueKind.Null, profile.GetProperty("contactEmail").ValueKind);
+    }
+
+    [Fact]
+    public async Task Signup_PublishesTheRegistrationWithTheIdOfTheNewAccount()
+    {
+        string fatecEmail = NewFatecEmail();
+        ITestHarness harness = _factory.Services.GetRequiredService<ITestHarness>();
+
+        await _factory.CreateClient().PostAsJsonAsync("/Users/signup", SignupPayload(fatecEmail: fatecEmail));
+        await _factory.Emails.WaitForAsync(fatecEmail, SentEmailKind.Confirmation);
+
+        UserRegisteredEvent registration = harness.Published
+            .Select<UserRegisteredEvent>(published => published.Context.Message.FatecEmail == fatecEmail)
+            .Single().Context.Message;
+
+        using IServiceScope scope = _factory.Services.CreateScope();
+        int accountId = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>()
+            .Users.Single(user => user.FatecEmail == fatecEmail).Id;
+
+        Assert.Equal(accountId, registration.UserId);
     }
 
     [Fact]
