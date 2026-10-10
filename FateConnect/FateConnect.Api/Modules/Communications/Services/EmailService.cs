@@ -29,11 +29,11 @@ public partial class EmailService(
             HtmlBody = ConfirmationEmailTemplate.Build(fullName, confirmationLink)
         };
 
-        LogResendPayloadSent(logger, toEmail, subject);
+        LogResendPayloadSent(logger, subject);
 
         await resend.EmailSendAsync(message);
 
-        LogResendAccepted(logger, toEmail);
+        LogResendAccepted(logger, subject);
     }
 
     public async Task SendPasswordResetEmailAsync(string toEmail, string fullName, string resetLink)
@@ -48,11 +48,11 @@ public partial class EmailService(
             HtmlBody = PasswordResetEmailTemplate.Build(fullName, resetLink)
         };
 
-        LogResendPayloadSent(logger, toEmail, subject);
+        LogResendPayloadSent(logger, subject);
 
         await resend.EmailSendAsync(message);
 
-        LogResendAccepted(logger, toEmail);
+        LogResendAccepted(logger, subject);
     }
 
     public async Task SendAccountLockedEmailAsync(string toEmail, string fullName, string unlockLink)
@@ -67,10 +67,10 @@ public partial class EmailService(
             HtmlBody = AccountLockedEmailTemplate.Build(fullName, unlockLink)
         };
 
-        LogResendPayloadSent(logger, toEmail, subject);
+        LogResendPayloadSent(logger, subject);
 
         await resend.EmailSendAsync(message);
 
-        LogResendAccepted(logger, toEmail);
+        LogResendAccepted(logger, subject);
     }
 }
