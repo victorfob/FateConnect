@@ -60,6 +60,7 @@ public class EmailServiceTests
 
         EmailMessage message = Assert.Single(recorder.Sent);
 
+        Assert.NotNull(message.From);
         Assert.Equal(Sender, message.From.Email);
         Assert.Equal(Recipient, Assert.Single(message.To).Email);
         Assert.Equal(subject, message.Subject);
