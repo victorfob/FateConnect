@@ -5,6 +5,7 @@ using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Users.Entities;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options) : DbContext(options)
@@ -13,6 +14,7 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
     public DbSet<UserPreferences> UserPreferences => Set<UserPreferences>();
     public DbSet<DocumentAcceptance> DocumentAcceptances => Set<DocumentAcceptance>();
     public DbSet<AdministrativeAction> AdministrativeActions => Set<AdministrativeAction>();
+    public DbSet<UserToken> UserTokens => Set<UserToken>();
     public DbSet<Ride> Rides => Set<Ride>();
     public DbSet<RideDeparture> RideDepartures => Set<RideDeparture>();
     public DbSet<LostAndFoundRecord> LostAndFoundRecords => Set<LostAndFoundRecord>();
@@ -23,6 +25,10 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.HasPostgresExtension("unaccent");
+
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(FateConnectDbContext).Assembly);
     }

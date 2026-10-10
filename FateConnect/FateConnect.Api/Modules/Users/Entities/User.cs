@@ -1,5 +1,7 @@
 namespace FateConnect.Api.Modules.Users.Entities;
 
+using FateConnect.Api.Modules.Auth.Constants;
+using FateConnect.Api.Modules.Auth.Utils;
 using FateConnect.Api.Modules.Common.Constants;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.Enums;
@@ -26,6 +28,13 @@ public class User
     public EnumProfileType ProfileType { get; private set; }
     public EnumAccountStatus Status { get; private set; }
     public int TokenVersion { get; private set; }
+    public int FailedLoginAttempts { get; private set; }
+    public DateTime? LockedUntil { get; private set; }
+
+    public bool IsEmailConfirmed { get; private set; }
+
+    private readonly List<UserToken> _tokens = [];
+    public IReadOnlyCollection<UserToken> Tokens => _tokens.AsReadOnly();
 
     public UserPreferences Preferences { get; private set; } = null!;
 
@@ -60,8 +69,11 @@ public class User
         ProfileType = EnumProfileType.Operator;
         Status = EnumAccountStatus.Active;
         TokenVersion = 0;
+        IsEmailConfirmed = false;
         CreatedAt = createdAt;
         UpdatedAt = null;
+        FailedLoginAttempts = 0;
+        LockedUntil = null;
     }
 
     public void UpdatePersonalData(
@@ -233,5 +245,63 @@ public class User
 
         if (isTooLong)
             throw new InvalidNeighborhoodException();
+    }
+
+    public void ConfirmEmail()
+    {
+        if (IsEmailConfirmed)
+            return;
+
+        IsEmailConfirmed = true;
+        RegisterUpdate();
+    }
+
+    public bool IsLocked(DateTime now) => LockedUntil.HasValue && LockedUntil.Value > now;
+
+    public void RegisterFailedLoginAttempt(DateTime now)
+    {
+        if (LockedUntil.HasValue && LockedUntil.Value <= now)
+        {
+            FailedLoginAttempts = 0;
+            LockedUntil = null;
+        }
+
+        FailedLoginAttempts++;
+
+        if (FailedLoginAttempts >= AuthConstants.MaxFailedLoginAttempts)
+        {
+            LockedUntil = now.AddMinutes(AuthConstants.LockoutMinutes);
+        }
+
+        RegisterUpdate();
+    }
+
+    public void ResetFailedLoginAttempts()
+    {
+        if (FailedLoginAttempts == 0 && LockedUntil is null)
+            return;
+
+        FailedLoginAttempts = 0;
+        LockedUntil = null;
+
+        RegisterUpdate();
+    }
+
+    public string IssueToken(EnumTokenType type, DateTime now, TimeSpan lifetime)
+    {
+        string rawToken = TokenHelper.GenerateRawToken();
+        string tokenHash = TokenHelper.HashToken(rawToken);
+
+        var token = new UserToken(
+            userId: Id,
+            token: tokenHash,
+            type: type,
+            createdAt: now,
+            expiresAt: now.Add(lifetime)
+        );
+
+        _tokens.Add(token);
+
+        return rawToken;
     }
 }

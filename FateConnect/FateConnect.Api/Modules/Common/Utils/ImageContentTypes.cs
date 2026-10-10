@@ -5,8 +5,6 @@ using FateConnect.Api.Modules.Common.Exceptions;
 
 public static class ImageContentTypes
 {
-    public const string UnsupportedMessage = "Formato de imagem não suportado. Apenas JPG, PNG ou WEBP são permitidos.";
-
     private static readonly Dictionary<string, string> ExtensionByContentType =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -45,7 +43,7 @@ public static class ImageContentTypes
     public static string ExtensionFor(string contentType)
     {
         if (!ExtensionByContentType.TryGetValue(contentType, out string? fileExtension))
-            throw new InvalidImageException(UnsupportedMessage);
+            throw new UnsupportedImageFormatException();
 
         return fileExtension;
     }

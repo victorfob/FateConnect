@@ -3,6 +3,7 @@ namespace FateConnect.Api.Modules.Users.Interfaces;
 using System.Linq.Expressions;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
 
 public interface IUserRepository
 {
@@ -11,7 +12,9 @@ public interface IUserRepository
     Task<bool> ContactEmailExistsAsync(string contactEmail, int? excludeUserId = null);
 
     Task<User?> GetByEmailAsync(string email);
+    Task<User?> GetByEmailWithTokensAsync(string email, EnumTokenType tokenType);
     Task<User?> GetByIdAsync(int id, bool includePreferences = false, bool asNoTracking = false);
+    Task<UserToken?> GetTokenAsync(string tokenHash);
     Task<UserPreferences?> GetPreferencesByUserIdAsync(int userId);
     Task<(IReadOnlyList<TResult> Items, int Total)> GetAllAsync<TResult>(
         UserFilterDto filter,
@@ -21,6 +24,7 @@ public interface IUserRepository
     Task AddAsync(User user);
     void AddAdministrativeAction(AdministrativeAction action);
     Task SaveChangesAsync();
+    Task InTransactionAsync(Func<Task> work);
 
     Task<int?> GetTokenVersionAsync(int userId);
     Task IncrementTokenVersionAsync(int userId);
