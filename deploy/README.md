@@ -6,13 +6,14 @@ separadas e HTTPS válido nas duas.
 ## O que sobe, e o que já existe
 
 **PostgreSQL** e **nginx** rodam no host, uma cópia só para os dois ambientes;
-o `vps-setup.sh` os instala. Só a API vai em contêiner:
+o `vps-setup.sh` os instala. A API e a fila de e-mail vão em contêiner:
 
 | Peça | Onde roda |
 | --- | --- |
 | Banco | PostgreSQL do host, com **um banco por ambiente** |
 | Front | arquivos estáticos servidos pelo nginx do host |
 | API | um contêiner por ambiente, escutando só em `127.0.0.1` |
+| Fila de e-mail | um RabbitMQ por ambiente, ao lado da API, também só em `127.0.0.1` e com teto de 512 MB |
 
 O que separa os ambientes é banco, segredo, domínio e porta local. Derrubar um
 não afeta o outro.
@@ -95,6 +96,23 @@ simples: a API gera a miniatura das fotos com o ImageSharp, e o build da imagem 
 sem a licença. Ela entra como segredo do build: não aparece no log do deploy nem chega à
 imagem que sobe. O arquivo
 nunca vai para o repositório: o `.gitignore` e o `.dockerignore` o recusam.
+
+O envio de e-mail pede quatro variáveis, e **a API não sobe sem as três primeiras**:
+
+| Variável | Conteúdo |
+| --- | --- |
+| `PUBLIC_URL` | o mesmo endereço do ambiente; os links dos e-mails partem dele |
+| `EMAIL_SENDER` | o remetente, num domínio verificado no Resend |
+| `RESEND_API_KEY` | a chave do Resend daquele ambiente |
+| `RABBITMQ_USER`, `RABBITMQ_PASS` | o usuário da fila; troque o `guest` do exemplo por uma senha gerada com `openssl rand -base64 32` |
+
+As portas da fila seguem a faixa da API: `RABBITMQ_PORT` e `RABBITMQ_UI_PORT` em
+8102 e 8103 na homologação, 8202 e 8203 na produção.
+
+⚠️ **Sem envio, ninguém entra.** O login recusa a conta que não confirmou o
+e-mail, inclusive as que já existiam antes da confirmação, e a de quem administra.
+Preencha as variáveis e confira que um e-mail de teste chega **antes** de
+publicar a versão que passou a exigir a confirmação.
 
 Nenhum desses arquivos é versionado — eles têm senha dentro, e o repositório é
 público.
@@ -344,6 +362,12 @@ memória: o kernel encerra o processo que mais consome. Confirme com
 gravado no bundle está errado. Confira `PUBLIC_URL` e rode o `build-front.sh`
 de novo — o `deploy.sh` sozinho não resolve, porque o endereço entra na hora de
 construir.
+
+**O e-mail de confirmação, de redefinição ou de desbloqueio não chega.** A
+mensagem fica guardada no banco até a fila aceitá-la, e a falha do envio aparece
+no log da API. Veja se a fila está de pé com
+`docker compose -p fateconnect-hml ps` e o motivo com
+`docker compose -p fateconnect-hml logs api`.
 
 **O deploy para dizendo que há alterações não commitadas.** Alguém editou algo
 direto na VPS. Veja com `git status` e descarte se não houver nada a salvar.
