@@ -256,12 +256,6 @@ public class User
         RegisterUpdate();
     }
 
-    public void AddToken(UserToken token)
-    {
-        ArgumentNullException.ThrowIfNull(token);
-        _tokens.Add(token);
-    }
-
     public bool IsLocked(DateTime now) => LockedUntil.HasValue && LockedUntil.Value > now;
 
     public void RegisterFailedLoginAttempt(DateTime now)

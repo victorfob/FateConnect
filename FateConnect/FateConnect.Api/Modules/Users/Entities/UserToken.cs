@@ -34,10 +34,6 @@ public class UserToken
         ExpiresAt = expiresAt;
     }
 
-    public bool IsExpired(DateTime now) => now > ExpiresAt;
-
-    public bool IsValid(DateTime now) => !IsConsumed && !IsExpired(now);
-
     public void Consume(DateTime now)
     {
         if (IsConsumed)
