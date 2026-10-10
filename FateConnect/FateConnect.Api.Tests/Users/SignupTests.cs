@@ -18,9 +18,11 @@ public class SignupTests : IClassFixture<ApiFactory>
     private static string BirthDateForAge(int years) =>
         DateTime.UtcNow.Date.AddYears(-years).ToString("yyyy-MM-dd'T'00:00:00'Z'");
 
-    private static object SignupPayload(string? birthDate = null) => new
+    private static string NewFatecEmail() => $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br";
+
+    private static object SignupPayload(string? birthDate = null, string? fatecEmail = null) => new
     {
-        fatecEmail = $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+        fatecEmail = fatecEmail ?? NewFatecEmail(),
         password = "SenhaForte123!",
         fullName = "Mariana Alves Rocha",
         birthDate = birthDate ?? "2000-01-01T00:00:00Z",
@@ -45,9 +47,14 @@ public class SignupTests : IClassFixture<ApiFactory>
         return (response.StatusCode, field);
     }
 
-    private async Task<HttpClient> SignedInWith(HttpResponseMessage signup)
+    private async Task<HttpClient> SignedInAfterConfirming(string fatecEmail)
     {
-        TokenResponseDto body = (await signup.Content.ReadFromJsonAsync<TokenResponseDto>())!;
+        IReadOnlyList<SentEmail> sent = await _factory.Emails.WaitForAsync(fatecEmail, SentEmailKind.Confirmation);
+
+        HttpResponseMessage confirmation = await _factory.CreateClient()
+            .PostAsJsonAsync("/Auth/confirm-email", new { token = sent[0].Token });
+
+        TokenResponseDto body = (await confirmation.Content.ReadFromJsonAsync<TokenResponseDto>())!;
         HttpClient authenticated = _factory.CreateClient();
         authenticated.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", body.Token);
 
@@ -65,28 +72,42 @@ public class SignupTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task Signup_AnswersATokenThatOpensTheApi()
+    public async Task Signup_AnswersWithoutATokenAndTheConfirmationLinkOpensTheApi()
     {
-        HttpResponseMessage signup = await _factory.CreateClient().PostAsJsonAsync("/Users/signup", SignupPayload());
+        string fatecEmail = NewFatecEmail();
+
+        HttpResponseMessage signup = await _factory.CreateClient()
+            .PostAsJsonAsync("/Users/signup", SignupPayload(fatecEmail: fatecEmail));
 
         Assert.Equal(HttpStatusCode.Created, signup.StatusCode);
+        Assert.Empty(await signup.Content.ReadAsStringAsync());
 
-        JsonElement raw = JsonDocument.Parse(await signup.Content.ReadAsStringAsync()).RootElement;
-
-        Assert.Single(raw.EnumerateObject());
-        Assert.True(raw.TryGetProperty("token", out _));
-
-        HttpResponseMessage rides = await (await SignedInWith(signup)).GetAsync("/Rides");
+        HttpResponseMessage rides = await (await SignedInAfterConfirming(fatecEmail)).GetAsync("/Rides");
 
         Assert.Equal(HttpStatusCode.OK, rides.StatusCode);
     }
 
     [Fact]
+    public async Task Signup_SendsOneConfirmationLinkToTheLoginEmail()
+    {
+        string fatecEmail = NewFatecEmail();
+
+        await _factory.CreateClient().PostAsJsonAsync("/Users/signup", SignupPayload(fatecEmail: fatecEmail));
+
+        SentEmail email = Assert.Single(await _factory.Emails.WaitForAsync(fatecEmail, SentEmailKind.Confirmation));
+
+        Assert.StartsWith("https://fateconnect.test/confirmar-email?", email.Link);
+        Assert.Equal(Uri.EscapeDataString(fatecEmail), email.QueryValue("email"));
+    }
+
+    [Fact]
     public async Task Signup_CarryingContactFields_OpensAnAccountWithoutContact()
     {
+        string fatecEmail = NewFatecEmail();
+
         HttpResponseMessage signup = await _factory.CreateClient().PostAsJsonAsync("/Users/signup", new
         {
-            fatecEmail = $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
+            fatecEmail,
             password = "SenhaForte123!",
             fullName = "Mariana Alves Rocha",
             birthDate = "2000-01-01T00:00:00Z",
@@ -96,7 +117,7 @@ public class SignupTests : IClassFixture<ApiFactory>
             acceptances = new[] { new { document = "TermsOfUse", version = "2026-01-15" } },
         });
 
-        JsonElement profile = JsonDocument.Parse(await (await SignedInWith(signup)).GetStringAsync("/Users/me")).RootElement;
+        JsonElement profile = JsonDocument.Parse(await (await SignedInAfterConfirming(fatecEmail)).GetStringAsync("/Users/me")).RootElement;
 
         Assert.Equal(HttpStatusCode.Created, signup.StatusCode);
         Assert.Equal(JsonValueKind.Null, profile.GetProperty("phone").ValueKind);

@@ -112,8 +112,8 @@ public sealed class ImageStorageTests : IDisposable
     {
         Assert.False(ImageContentTypes.IsSupported(contentType));
 
-        InvalidImageException exception =
-            Assert.Throws<InvalidImageException>(() => ImageContentTypes.ExtensionFor(contentType));
+        UnsupportedImageFormatException exception =
+            Assert.Throws<UnsupportedImageFormatException>(() => ImageContentTypes.ExtensionFor(contentType));
 
         Assert.Equal(new UnsupportedImageFormatException().Message, exception.Message);
     }
@@ -171,7 +171,7 @@ public sealed class ImageStorageTests : IDisposable
     {
         StorageService service = ServiceOn(_webRoot);
 
-        await Assert.ThrowsAsync<InvalidImageException>(
+        await Assert.ThrowsAsync<UnsupportedImageFormatException>(
             () => service.UploadImageAsync(FileOf("text/html"), EnumStorageContainer.LostAndFound));
 
         Assert.False(Directory.Exists(Path.Combine(_webRoot, "uploads", "lostandfound")));
