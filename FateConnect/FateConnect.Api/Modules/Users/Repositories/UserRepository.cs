@@ -45,6 +45,15 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.FatecEmail == normalizedEmail);
     }
 
+    public async Task<User?> GetByEmailWithTokensAsync(string email, EnumTokenType tokenType)
+    {
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+
+        return await _context.Users
+            .Include(u => u.Tokens.Where(token => token.Type == tokenType))
+            .FirstOrDefaultAsync(u => u.FatecEmail == normalizedEmail);
+    }
+
     public async Task<User?> GetByIdAsync(int id, bool includePreferences = false, bool asNoTracking = false)
     {
         var query = _context.Users.AsQueryable();

@@ -176,7 +176,7 @@ public partial class AuthService(
 
     public async Task ResendConfirmationEmailAsync(EmailRequestDto dto)
     {
-        User? user = await userRepository.GetByEmailAsync(dto.FatecEmail);
+        User? user = await userRepository.GetByEmailWithTokensAsync(dto.FatecEmail, EnumTokenType.EmailConfirmation);
 
         if (user is null) return;
 
@@ -220,7 +220,7 @@ public partial class AuthService(
 
     public async Task ForgotPasswordAsync(EmailRequestDto dto)
     {
-        User? user = await userRepository.GetByEmailAsync(dto.FatecEmail);
+        User? user = await userRepository.GetByEmailWithTokensAsync(dto.FatecEmail, EnumTokenType.PasswordReset);
 
         if (user is null)
             throw new UserNotFoundException();
