@@ -36,7 +36,7 @@ public class EmailAlreadyConfirmedException()
     : AuthDomainException("Este e-mail já foi confirmado anteriormente.");
 
 public class ExpiredConfirmationTokenException()
-    : AuthDomainException("O link de confirmação expirou. Por favor, solicite um novo.");
+    : AuthDomainException("O link de confirmação expirou. Peça um novo.");
 
 public class InvalidPasswordResetTokenException()
     : AuthDomainException("O link de redefinição de senha é inválido ou não foi encontrado.");
@@ -45,7 +45,7 @@ public class PasswordResetTokenConsumedException()
     : AuthDomainException("Este link já foi utilizado para redefinir a senha.");
 
 public class ExpiredPasswordResetTokenException()
-    : AuthDomainException("O link de redefinição expirou. Por favor, solicite um novo.");
+    : AuthDomainException("O link de redefinição expirou. Peça um novo.");
 
 public class AccountLockedException : AuthDomainException
 {

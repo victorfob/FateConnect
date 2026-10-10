@@ -19,7 +19,7 @@ public partial class EmailService(
 
     public async Task SendConfirmationEmailAsync(string toEmail, string fullName, string confirmationLink)
     {
-        var subject = "Confirme sua conta no FateConnect";
+        var subject = ConfirmationEmailTemplate.Subject;
 
         var message = new EmailMessage
         {
@@ -38,7 +38,7 @@ public partial class EmailService(
 
     public async Task SendPasswordResetEmailAsync(string toEmail, string fullName, string resetLink)
     {
-        var subject = "Redefinição de Senha - FateConnect";
+        var subject = PasswordResetEmailTemplate.Subject;
 
         var message = new EmailMessage
         {
@@ -57,7 +57,7 @@ public partial class EmailService(
 
     public async Task SendAccountLockedEmailAsync(string toEmail, string fullName, string unlockLink)
     {
-        var subject = "Sua conta foi bloqueada - FateConnect";
+        var subject = AccountLockedEmailTemplate.Subject;
 
         var message = new EmailMessage
         {

@@ -21,7 +21,7 @@ public static class EmailLayout
     public static string Footer() => $@"
                 </div>
                 <div style='background-color: #43545C; padding: 20px; text-align: center; font-size: 12px; color: #E0E0E0;'>
-                    <p style='margin: 0 0 10px 0;'>Este é um e-mail automático, por favor, não responda.</p>
+                    <p style='margin: 0 0 10px 0;'>Este e-mail é automático e não recebe respostas.</p>
                     <p style='margin: 0;'>&copy; {DateTime.UtcNow.Year} FateConnect. Todos os direitos reservados.</p>
                 </div>
             </div>

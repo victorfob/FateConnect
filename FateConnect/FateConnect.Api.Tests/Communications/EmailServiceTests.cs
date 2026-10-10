@@ -45,9 +45,9 @@ public class EmailServiceTests
 
     public static TheoryData<string, Func<IEmailService, Task>> EveryEmail => new()
     {
-        { "Confirme sua conta no FateConnect", service => service.SendConfirmationEmailAsync(Recipient, "Lucas Teixeira", Link) },
-        { "Redefinição de Senha - FateConnect", service => service.SendPasswordResetEmailAsync(Recipient, "Lucas Teixeira", Link) },
-        { "Sua conta foi bloqueada - FateConnect", service => service.SendAccountLockedEmailAsync(Recipient, "Lucas Teixeira", Link) },
+        { "Confirme seu e-mail do FateConnect", service => service.SendConfirmationEmailAsync(Recipient, "Lucas Teixeira", Link) },
+        { "Redefina sua senha do FateConnect", service => service.SendPasswordResetEmailAsync(Recipient, "Lucas Teixeira", Link) },
+        { "Sua conta do FateConnect foi bloqueada por 30 minutos", service => service.SendAccountLockedEmailAsync(Recipient, "Lucas Teixeira", Link) },
     };
 
     [Theory]
