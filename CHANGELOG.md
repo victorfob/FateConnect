@@ -26,7 +26,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a recusar o acesso de contas temporariamente bloqueadas mesmo mediante a inserção da senha correta, obrigando a espera do tempo de segurança ou o desbloqueio via e-mail (#553) [Backend]
 - Passa a invalidar todas as sessões ativas da conta no momento em que a senha é redefinida, impedindo que acessos indevidos continuem ativos (#553) [Backend]
 - Passa a emitir um novo passe de acesso (JWT) e logar o usuário automaticamente após o salvamento da nova senha no fluxo de redefinição (#553) [Backend]
-- Passa a omitir se um e-mail existe ou não no sistema durante o pedido de redefinição de senha, devolvendo sucesso silencioso para evitar exposição de dados (anti-enumeration) (#553) [Backend]
+- Passa a responder explicitamente quando não há conta cadastrada para o e-mail informado no pedido de redefinição de senha, de acordo com o desenho de UX para orientar o usuário na tela (#553) [Backend]
 - Passa a recusar o login de contas que ainda não confirmaram o e-mail institucional, exigindo a validação da caixa de entrada primeiro (#553) [Backend]
 - Passa a realizar o login automático apenas após o usuário clicar no link de confirmação do e-mail, em vez de logá-lo imediatamente após o preenchimento da tela de cadastro (#553) [Backend]
 - Passa a organizar de forma mais coesa a estrutura de arquivos do módulo de Storage, além de limpar as importações (`usings`) não utilizadas em toda a API (#553) [Backend]

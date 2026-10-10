@@ -19,5 +19,8 @@ public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
             .WithMany(u => u.Tokens)
             .HasForeignKey(e => e.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(t => t.Token)
+            .IsUnique();
     }
 }

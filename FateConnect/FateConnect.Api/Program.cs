@@ -53,6 +53,19 @@ public class Program
             Env.Load();
         }
 
+        string publicUrl = Environment.GetEnvironmentVariable("PUBLIC_URL") ?? string.Empty;
+        string emailSender = Environment.GetEnvironmentVariable("EMAIL_SENDER") ?? string.Empty;
+        string resendApiKey = Environment.GetEnvironmentVariable("RESEND_API_KEY") ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(publicUrl))
+            throw new InvalidOperationException("A variável de ambiente PUBLIC_URL é obrigatória para gerar os links dos e-mails.");
+
+        if (string.IsNullOrWhiteSpace(emailSender))
+            throw new InvalidOperationException("A variável de ambiente EMAIL_SENDER é obrigatória para o envio de e-mails.");
+
+        if (string.IsNullOrWhiteSpace(resendApiKey))
+            throw new InvalidOperationException("A variável de ambiente RESEND_API_KEY é obrigatória para o envio de e-mails.");
+
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -221,9 +234,13 @@ public class Program
 
             x.UsingRabbitMq((context, cfg) =>
             {
-                string rabbitHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
-                string rabbitUser = Environment.GetEnvironmentVariable("RABBITMQ_USER") ?? "guest";
-                string rabbitPass = Environment.GetEnvironmentVariable("RABBITMQ_PASS") ?? "guest";
+                string rabbitHostEnv = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? string.Empty;
+                string rabbitUserEnv = Environment.GetEnvironmentVariable("RABBITMQ_USER") ?? string.Empty;
+                string rabbitPassEnv = Environment.GetEnvironmentVariable("RABBITMQ_PASS") ?? string.Empty;
+
+                string rabbitHost = string.IsNullOrWhiteSpace(rabbitHostEnv) ? "localhost" : rabbitHostEnv;
+                string rabbitUser = string.IsNullOrWhiteSpace(rabbitUserEnv) ? "guest" : rabbitUserEnv;
+                string rabbitPass = string.IsNullOrWhiteSpace(rabbitPassEnv) ? "guest" : rabbitPassEnv;
 
                 cfg.Host(rabbitHost, "/", h =>
                 {
@@ -255,7 +272,7 @@ public class Program
 
         builder.Services.AddResend(options =>
         {
-            options.ApiToken = Environment.GetEnvironmentVariable("RESEND_API_KEY") ?? string.Empty;
+            options.ApiToken = resendApiKey;
         });
 
         WebApplication app = builder.Build();

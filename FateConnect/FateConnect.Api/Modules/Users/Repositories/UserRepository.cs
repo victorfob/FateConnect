@@ -164,10 +164,10 @@ public class UserRepository : IUserRepository
                 .SetProperty(user => user.UpdatedAt, DateTime.UtcNow));
     }
 
-    public async Task<User?> GetByTokenAsync(string token)
+    public async Task<UserToken?> GetTokenAsync(string tokenHash)
     {
-        return await _context.Users
-            .Include(u => u.Tokens)
-            .FirstOrDefaultAsync(u => u.Tokens.Any(t => t.Token == token));
+        return await _context.Set<UserToken>()
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Token == tokenHash);
     }
 }

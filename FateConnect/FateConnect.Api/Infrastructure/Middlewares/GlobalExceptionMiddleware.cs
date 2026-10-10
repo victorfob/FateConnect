@@ -58,6 +58,11 @@ public partial class GlobalExceptionMiddleware(
                 errorCode = ContactRequiredException.ErrorCode;
                 break;
 
+            case UserNotFoundException:
+                statusCode = HttpStatusCode.NotFound;
+                errorMessage = exception.Message;
+                break;
+
             case DeactivatedAccountException:
                 statusCode = HttpStatusCode.Conflict;
                 errorMessage = exception.Message;

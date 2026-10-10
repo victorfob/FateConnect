@@ -67,3 +67,6 @@ public class InvalidUnlockTokenException()
 
 public class ExpiredUnlockTokenException()
     : AuthDomainException("Este link expirou. O tempo de segurança já passou e você já pode fazer login normalmente com a sua senha.");
+
+public class UserNotFoundException()
+    : AuthDomainException("Não há conta cadastrada com este e-mail.");

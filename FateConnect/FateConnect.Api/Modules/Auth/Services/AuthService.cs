@@ -133,18 +133,14 @@ public partial class AuthService(
     {
         string tokenHash = HashToken(dto.Token);
 
-        User? user = await userRepository.GetByTokenAsync(tokenHash);
+        UserToken? unlockToken = await userRepository.GetTokenAsync(tokenHash);
 
-        if (user is null)
+        bool isInvalidToken = unlockToken is null || unlockToken.Type != EnumTokenType.AccountUnlock;
+
+        if (isInvalidToken)
             throw new InvalidUnlockTokenException();
 
-        UserToken? unlockToken = user.Tokens.FirstOrDefault(t =>
-            t.Token == tokenHash &&
-            t.Type == EnumTokenType.AccountUnlock);
-
-        if (unlockToken is null)
-            throw new InvalidUnlockTokenException();
-
+        User user = unlockToken!.User;
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
         if (unlockToken.IsConsumed)
@@ -160,7 +156,6 @@ public partial class AuthService(
 
         LogUserUnlocked(logger, user.Id);
     }
-
     private TokenResponseDto IssueToken(User user) =>
         new() { Token = tokenService.GenerateJwtToken(user) };
 
@@ -168,20 +163,17 @@ public partial class AuthService(
     {
         string tokenHash = HashToken(dto.Token);
 
-        User? user = await userRepository.GetByTokenAsync(tokenHash);
+        UserToken? emailToken = await userRepository.GetTokenAsync(tokenHash);
 
-        if (user is null)
+        bool isInvalidToken = emailToken is null || emailToken.Type != EnumTokenType.EmailConfirmation;
+
+        if (isInvalidToken)
             throw new InvalidConfirmationTokenException();
+
+        User user = emailToken!.User;
 
         if (user.Status is EnumAccountStatus.Banned)
             throw new BannedAccountException();
-
-        UserToken? emailToken = user.Tokens.FirstOrDefault(t =>
-            t.Token == tokenHash &&
-            t.Type == EnumTokenType.EmailConfirmation);
-
-        if (emailToken is null)
-            throw new InvalidConfirmationTokenException();
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
@@ -261,7 +253,10 @@ public partial class AuthService(
     {
         User? user = await userRepository.GetByEmailAsync(dto.FatecEmail);
 
-        if (user is null || user.Status is EnumAccountStatus.Banned)
+        if (user is null)
+            throw new UserNotFoundException();
+
+        if (user.Status is EnumAccountStatus.Banned)
             return;
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
@@ -313,46 +308,37 @@ public partial class AuthService(
         LogPasswordResetRequested(logger, user.Id);
     }
 
-    public async Task<User> VerifyResetTokenAsync(string rawToken)
+    public async Task<UserToken> VerifyResetTokenAsync(string rawToken)
     {
         string tokenHash = HashToken(rawToken);
 
-        User? user = await userRepository.GetByTokenAsync(tokenHash);
+        UserToken? resetToken = await userRepository.GetTokenAsync(tokenHash);
 
-        if (user is null)
-            throw new InvalidPasswordResetTokenException();
+        bool isInvalidToken = resetToken is null || resetToken.Type != EnumTokenType.PasswordReset;
 
-        UserToken? resetToken = user.Tokens.FirstOrDefault(t =>
-            t.Token == tokenHash &&
-            t.Type == EnumTokenType.PasswordReset);
-
-        if (resetToken is null)
+        if (isInvalidToken)
             throw new InvalidPasswordResetTokenException();
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
-        if (resetToken.IsConsumed)
+        if (resetToken!.IsConsumed)
             throw new PasswordResetTokenConsumedException();
 
         if (resetToken.ExpiresAt < now)
             throw new ExpiredPasswordResetTokenException();
 
-        return user;
+        return resetToken;
     }
 
     public async Task<TokenResponseDto> ResetPasswordAsync(ResetPasswordDto dto)
     {
-        User user = await VerifyResetTokenAsync(dto.Token);
+        UserToken resetToken = await VerifyResetTokenAsync(dto.Token);
+        User user = resetToken.User;
 
         if (user.Status is EnumAccountStatus.Banned)
             throw new BannedAccountException();
 
-        string tokenHash = HashToken(dto.Token);
-
-        UserToken resetToken = user.Tokens.First(t => t.Token == tokenHash && t.Type == EnumTokenType.PasswordReset);
-
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
-
         string newPasswordHash = HashPassword(dto.NewPassword);
 
         user.ChangePassword(newPasswordHash);
