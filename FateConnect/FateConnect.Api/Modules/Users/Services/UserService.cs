@@ -53,14 +53,19 @@ public partial class UserService(
 
         string rawToken = newUser.IssueToken(EnumTokenType.EmailConfirmation, now, TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
 
-        await publishEndpoint.Publish(new UserRegisteredEvent(
-            UserId: newUser.Id,
-            FullName: newUser.FullName,
-            FatecEmail: newUser.FatecEmail,
-            ConfirmationToken: rawToken
-        ));
+        await userRepository.InTransactionAsync(async () =>
+        {
+            await userRepository.AddAsync(newUser);
 
-        await userRepository.AddAsync(newUser);
+            await publishEndpoint.Publish(new UserRegisteredEvent(
+                UserId: newUser.Id,
+                FullName: newUser.FullName,
+                FatecEmail: newUser.FatecEmail,
+                ConfirmationToken: rawToken
+            ));
+
+            await userRepository.SaveChangesAsync();
+        });
 
         LogUserCreated(logger, newUser.Id);
     }

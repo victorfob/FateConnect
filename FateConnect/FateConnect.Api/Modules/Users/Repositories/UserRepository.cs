@@ -8,6 +8,7 @@ using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 public class UserRepository : IUserRepository
 {
@@ -145,6 +146,15 @@ public class UserRepository : IUserRepository
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
+    }
+
+    public async Task InTransactionAsync(Func<Task> work)
+    {
+        await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+
+        await work();
+
+        await transaction.CommitAsync();
     }
 
     public async Task<int?> GetTokenVersionAsync(int userId)

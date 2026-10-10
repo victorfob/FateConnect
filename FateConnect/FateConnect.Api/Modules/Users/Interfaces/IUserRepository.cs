@@ -24,6 +24,7 @@ public interface IUserRepository
     Task AddAsync(User user);
     void AddAdministrativeAction(AdministrativeAction action);
     Task SaveChangesAsync();
+    Task InTransactionAsync(Func<Task> work);
 
     Task<int?> GetTokenVersionAsync(int userId);
     Task IncrementTokenVersionAsync(int userId);
