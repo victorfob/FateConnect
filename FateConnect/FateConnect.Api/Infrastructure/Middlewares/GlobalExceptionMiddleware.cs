@@ -44,7 +44,6 @@ public partial class GlobalExceptionMiddleware(
                 break;
 
             case BannedAccountException:
-            case EmailNotConfirmedException:
             case DenunciationNotReportedByUserException:
             case LostAndFoundNotReportedByUserException:
             case RideNotDrivenByUserException:
@@ -56,6 +55,12 @@ public partial class GlobalExceptionMiddleware(
                 statusCode = HttpStatusCode.Forbidden;
                 errorMessage = exception.Message;
                 errorCode = ContactRequiredException.ErrorCode;
+                break;
+
+            case EmailNotConfirmedException:
+                statusCode = HttpStatusCode.Forbidden;
+                errorMessage = exception.Message;
+                errorCode = EmailNotConfirmedException.ErrorCode;
                 break;
 
             case UserNotFoundException:

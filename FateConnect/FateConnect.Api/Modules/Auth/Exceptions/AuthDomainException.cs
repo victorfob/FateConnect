@@ -14,7 +14,10 @@ public class InvalidCredentialsException()
     : AuthDomainException("E-mail ou senha inválidos.");
 
 public class EmailNotConfirmedException()
-    : AuthDomainException("Para acessar o sistema, é necessário confirmar o seu e-mail através do link que enviamos.");
+    : AuthDomainException("Para acessar o sistema, é necessário confirmar o seu e-mail através do link que enviamos.")
+{
+    public const string ErrorCode = "EmailNotConfirmed";
+}
 
 public class UnconfiguredProfileHierarchyException(string profileType)
     : Exception($"A hierarquia de acesso para o perfil '{profileType}' não foi configurada no AuthorizeProfileAttribute. Atualize o mapa de perfis permitidos.");
