@@ -25,9 +25,9 @@ public partial class AuthService
     [LoggerMessage(Level = LogLevel.Information, Message = "User ID {UserId} successfully reset their password.")]
     private static partial void LogPasswordResetSuccessfully(ILogger logger, int userId);
 
-    [LoggerMessage(EventId = 15, Level = LogLevel.Warning, Message = "Conta do usuário {UserId} bloqueada temporariamente após múltiplas tentativas falhas.")]
+    [LoggerMessage(EventId = 15, Level = LogLevel.Warning, Message = "User account {UserId} temporarily locked after multiple failed attempts.")]
     private static partial void LogUserLockedOut(ILogger logger, int userId);
 
-    [LoggerMessage(EventId = 16, Level = LogLevel.Information, Message = "Conta do usuário {UserId} desbloqueada via token de e-mail.")]
+    [LoggerMessage(EventId = 16, Level = LogLevel.Information, Message = "User account {UserId} unlocked via email token.")]
     private static partial void LogUserUnlocked(ILogger logger, int userId);
 }

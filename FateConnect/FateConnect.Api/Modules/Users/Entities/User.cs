@@ -1,5 +1,7 @@
 namespace FateConnect.Api.Modules.Users.Entities;
 
+using FateConnect.Api.Modules.Auth.Constants;
+using FateConnect.Api.Modules.Auth.Utils;
 using FateConnect.Api.Modules.Common.Constants;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.Enums;
@@ -274,7 +276,7 @@ public class User
 
         if (FailedLoginAttempts >= 3)
         {
-            LockedUntil = now.AddMinutes(30);
+            LockedUntil = now.AddMinutes(AuthConstants.LockoutMinutes);
         }
 
         RegisterUpdate();
@@ -289,5 +291,23 @@ public class User
         LockedUntil = null;
 
         RegisterUpdate();
+    }
+
+    public string IssueToken(EnumTokenType type, DateTime now, TimeSpan lifetime)
+    {
+        string rawToken = TokenHelper.GenerateRawToken();
+        string tokenHash = TokenHelper.HashToken(rawToken);
+
+        var token = new UserToken(
+            userId: Id,
+            token: tokenHash,
+            type: type,
+            createdAt: now,
+            expiresAt: now.Add(lifetime)
+        );
+
+        _tokens.Add(token);
+
+        return rawToken;
     }
 }

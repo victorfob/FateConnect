@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Users.Entities;
 
+using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
 using System;
@@ -43,5 +44,24 @@ public class UserToken
             return;
 
         ConsumedAt = now;
+    }
+
+    public void Validate(DateTime now)
+    {
+        if (IsConsumed)
+            throw Type switch
+            {
+                EnumTokenType.EmailConfirmation => new EmailAlreadyConfirmedException(),
+                EnumTokenType.PasswordReset => new PasswordResetTokenConsumedException(),
+                _ => new InvalidUnlockTokenException()
+            };
+
+        if (ExpiresAt < now)
+            throw Type switch
+            {
+                EnumTokenType.EmailConfirmation => new ExpiredConfirmationTokenException(),
+                EnumTokenType.PasswordReset => new ExpiredPasswordResetTokenException(),
+                _ => new ExpiredUnlockTokenException()
+            };
     }
 }

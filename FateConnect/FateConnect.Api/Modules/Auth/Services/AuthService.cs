@@ -1,20 +1,20 @@
 namespace FateConnect.Api.Modules.Auth.Services;
 
+using FateConnect.Api.Modules.Auth.Constants;
+using FateConnect.Api.Modules.Auth.DTOs;
+using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Auth.Interfaces;
+using FateConnect.Api.Modules.Auth.Utils;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Interfaces;
-using FateConnect.Api.Modules.Auth.DTOs;
-using FateConnect.Api.Modules.Auth.Exceptions;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using static BCrypt.Net.BCrypt;
-using MassTransit;
-using FateConnect.Api.Modules.Common.Events;
-using System.Text;
-using System.Security.Cryptography;
 
 public partial class AuthService(
     IUserRepository userRepository,
@@ -41,9 +41,10 @@ public partial class AuthService(
         User user = await AuthenticateAsync(dto);
 
         if (user.Status is EnumAccountStatus.SelfDeactivated)
+        {
             await userRepository.ReactivateAsync(user.Id);
-
-        LogUserReactivated(logger, user.Id);
+            LogUserReactivated(logger, user.Id);
+        }
 
         return IssueToken(user);
     }
@@ -99,20 +100,7 @@ public partial class AuthService(
             throw new InvalidCredentialsException();
         }
 
-        string rawToken = RandomNumberGenerator.GetHexString(64);
-        string tokenHash = HashToken(rawToken);
-
-        DateTime expiration = now.AddMinutes(30);
-
-        var token = new UserToken(
-            userId: user.Id,
-            token: tokenHash,
-            type: EnumTokenType.AccountUnlock,
-            createdAt: now,
-            expiresAt: expiration
-        );
-
-        user.AddToken(token);
+        string rawToken = user.IssueToken(EnumTokenType.AccountUnlock, now, TimeSpan.FromMinutes(AuthConstants.LockoutMinutes));
 
         await publishEndpoint.Publish(new AccountLockedEvent(
             UserId: user.Id,
@@ -123,15 +111,14 @@ public partial class AuthService(
 
         await userRepository.SaveChangesAsync();
 
-
         LogUserLockedOut(logger, user.Id);
 
-        throw new AccountLockedException(30);
+        throw new AccountLockedException(AuthConstants.LockoutMinutes);
     }
 
     public async Task UnlockAccountAsync(UnlockAccountDto dto)
     {
-        string tokenHash = HashToken(dto.Token);
+        string tokenHash = TokenHelper.HashToken(dto.Token);
 
         UserToken? unlockToken = await userRepository.GetTokenAsync(tokenHash);
 
@@ -140,14 +127,11 @@ public partial class AuthService(
         if (isInvalidToken)
             throw new InvalidUnlockTokenException();
 
-        User user = unlockToken!.User;
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
-        if (unlockToken.IsConsumed)
-            throw new InvalidUnlockTokenException();
+        unlockToken!.Validate(now);
 
-        if (unlockToken.ExpiresAt < now)
-            throw new ExpiredUnlockTokenException();
+        User user = unlockToken.User;
 
         user.ResetFailedLoginAttempts();
         unlockToken.Consume(now);
@@ -156,12 +140,13 @@ public partial class AuthService(
 
         LogUserUnlocked(logger, user.Id);
     }
+
     private TokenResponseDto IssueToken(User user) =>
         new() { Token = tokenService.GenerateJwtToken(user) };
 
     public async Task<TokenResponseDto> ConfirmEmailAsync(ConfirmEmailDto dto)
     {
-        string tokenHash = HashToken(dto.Token);
+        string tokenHash = TokenHelper.HashToken(dto.Token);
 
         UserToken? emailToken = await userRepository.GetTokenAsync(tokenHash);
 
@@ -177,11 +162,7 @@ public partial class AuthService(
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
-        if (emailToken.IsConsumed)
-            throw new EmailAlreadyConfirmedException();
-
-        if (emailToken.ExpiresAt < now)
-            throw new ExpiredConfirmationTokenException();
+        emailToken.Validate(now);
 
         emailToken.Consume(now);
         user.ConfirmEmail();
@@ -208,7 +189,7 @@ public partial class AuthService(
             .OrderByDescending(t => t.CreatedAt)
             .FirstOrDefault();
 
-        bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < 1;
+        bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
 
         if (isCooldownActive)
             return;
@@ -223,19 +204,7 @@ public partial class AuthService(
             oldToken.Consume(now);
         }
 
-        string rawToken = RandomNumberGenerator.GetHexString(64);
-        string tokenHash = HashToken(rawToken);
-        DateTime expiration = now.AddHours(8);
-
-        var token = new UserToken(
-            userId: user.Id,
-            token: tokenHash,
-            type: EnumTokenType.EmailConfirmation,
-            createdAt: now,
-            expiresAt: expiration
-        );
-
-        user.AddToken(token);
+        string rawToken = user.IssueToken(EnumTokenType.EmailConfirmation, now, TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
 
         await publishEndpoint.Publish(new UserRegisteredEvent(
             UserId: user.Id,
@@ -266,7 +235,7 @@ public partial class AuthService(
             .OrderByDescending(t => t.CreatedAt)
             .FirstOrDefault();
 
-        bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < 1;
+        bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
 
         if (isCooldownActive)
             return;
@@ -281,20 +250,7 @@ public partial class AuthService(
             oldToken.Consume(now);
         }
 
-        string rawToken = RandomNumberGenerator.GetHexString(64);
-        string tokenHash = HashToken(rawToken);
-
-        DateTime expiration = now.AddMinutes(30);
-
-        var token = new UserToken(
-            userId: user.Id,
-            token: tokenHash,
-            type: EnumTokenType.PasswordReset,
-            createdAt: now,
-            expiresAt: expiration
-        );
-
-        user.AddToken(token);
+        string rawToken = user.IssueToken(EnumTokenType.PasswordReset, now, TimeSpan.FromMinutes(AuthConstants.PasswordResetMinutes));
 
         await publishEndpoint.Publish(new PasswordResetRequestedEvent(
             UserId: user.Id,
@@ -310,7 +266,7 @@ public partial class AuthService(
 
     public async Task<UserToken> VerifyResetTokenAsync(string rawToken)
     {
-        string tokenHash = HashToken(rawToken);
+        string tokenHash = TokenHelper.HashToken(rawToken);
 
         UserToken? resetToken = await userRepository.GetTokenAsync(tokenHash);
 
@@ -321,11 +277,7 @@ public partial class AuthService(
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
-        if (resetToken!.IsConsumed)
-            throw new PasswordResetTokenConsumedException();
-
-        if (resetToken.ExpiresAt < now)
-            throw new ExpiredPasswordResetTokenException();
+        resetToken!.Validate(now);
 
         return resetToken;
     }
@@ -344,6 +296,13 @@ public partial class AuthService(
         user.ChangePassword(newPasswordHash);
         resetToken.Consume(now);
 
+        user.ResetFailedLoginAttempts();
+
+        if (!user.IsEmailConfirmed)
+        {
+            user.ConfirmEmail();
+        }
+
         await userRepository.SaveChangesAsync();
 
         LogPasswordResetSuccessfully(logger, user.Id);
@@ -352,12 +311,5 @@ public partial class AuthService(
             throw new DeactivatedAccountException();
 
         return IssueToken(user);
-    }
-
-    private static string HashToken(string rawToken)
-    {
-        byte[] bytes = Encoding.UTF8.GetBytes(rawToken);
-        byte[] hash = SHA256.HashData(bytes);
-        return Convert.ToHexString(hash).ToLowerInvariant();
     }
 }

@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Users.Services;
 
+using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
@@ -50,13 +51,13 @@ public partial class UserService(
         ConfigurePreferences(newUser, dto);
         AddAcceptances(newUser, dto, origin, now);
 
-        var emailToken = AddEmailConfirmationToken(newUser, now);
+        string rawToken = newUser.IssueToken(EnumTokenType.EmailConfirmation, now, TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
 
         await publishEndpoint.Publish(new UserRegisteredEvent(
             UserId: newUser.Id,
             FullName: newUser.FullName,
             FatecEmail: newUser.FatecEmail,
-            ConfirmationToken: emailToken.Token
+            ConfirmationToken: rawToken
         ));
 
         await userRepository.AddAsync(newUser);
@@ -88,23 +89,6 @@ public partial class UserService(
         }
     }
 
-    private static UserToken AddEmailConfirmationToken(User user, DateTime now)
-    {
-        var tokenString = Guid.NewGuid().ToString("N");
-        DateTime expiration = now.AddHours(8);
-
-        var token = new UserToken(
-            userId: 0,
-            token: tokenString,
-            type: EnumTokenType.EmailConfirmation,
-            createdAt: now,
-            expiresAt: expiration
-        );
-
-        user.AddToken(token);
-
-        return token;
-    }
 
     public async Task<ReadUserDto?> GetProfileAsync(int currentUserId)
     {

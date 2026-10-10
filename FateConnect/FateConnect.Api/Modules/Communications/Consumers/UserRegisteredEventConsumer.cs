@@ -17,26 +17,26 @@ public sealed partial class UserRegisteredEventConsumer(
 {
     public async Task Consume(ConsumeContext<UserRegisteredEvent> context)
     {
-        var evento = context.Message;
+        var message = context.Message;
 
         try
         {
-            LogEmailDispatchStarted(logger, evento.FatecEmail);
+            LogEmailDispatchStarted(logger, message.UserId);
 
             string frontendUrl = configuration["PUBLIC_URL"]
                 ?? throw new MissingCommunicationConfigurationException("PUBLIC_URL");
 
-            string safeEmail = Uri.EscapeDataString(evento.FatecEmail);
+            string safeEmail = Uri.EscapeDataString(message.FatecEmail);
 
-            string confirmationLink = $"{frontendUrl.TrimEnd('/')}/confirmar-email?token={evento.ConfirmationToken}&email={safeEmail}";
+            string confirmationLink = $"{frontendUrl.TrimEnd('/')}/confirmar-email?token={message.ConfirmationToken}&email={safeEmail}";
 
-            await emailService.SendConfirmationEmailAsync(evento.FatecEmail, evento.FullName, confirmationLink);
+            await emailService.SendConfirmationEmailAsync(message.FatecEmail, message.FullName, confirmationLink);
 
-            LogEmailDispatchSucceeded(logger, evento.FatecEmail);
+            LogEmailDispatchSucceeded(logger, message.UserId);
         }
         catch (Exception ex)
         {
-            LogEmailDispatchFailed(logger, ex, evento.FatecEmail);
+            LogEmailDispatchFailed(logger, ex, message.UserId);
             throw;
         }
     }

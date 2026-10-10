@@ -17,26 +17,26 @@ public partial class PasswordResetRequestedEventConsumer(
 {
     public async Task Consume(ConsumeContext<PasswordResetRequestedEvent> context)
     {
-        var evento = context.Message;
+        var message = context.Message;
 
         try
         {
-            LogPasswordResetDispatchStarted(logger, evento.FatecEmail);
+            LogPasswordResetDispatchStarted(logger, message.UserId);
 
             string frontendUrl = configuration["PUBLIC_URL"]
                 ?? throw new MissingCommunicationConfigurationException("PUBLIC_URL");
 
-            string safeEmail = Uri.EscapeDataString(evento.FatecEmail);
+            string safeEmail = Uri.EscapeDataString(message.FatecEmail);
 
-            string resetLink = $"{frontendUrl.TrimEnd('/')}/redefinir-senha?token={evento.ResetToken}&email={safeEmail}";
+            string resetLink = $"{frontendUrl.TrimEnd('/')}/redefinir-senha?token={message.ResetToken}&email={safeEmail}";
 
-            await emailService.SendPasswordResetEmailAsync(evento.FatecEmail, evento.FullName, resetLink);
+            await emailService.SendPasswordResetEmailAsync(message.FatecEmail, message.FullName, resetLink);
 
-            LogPasswordResetDispatchSucceeded(logger, evento.FatecEmail);
+            LogPasswordResetDispatchSucceeded(logger, message.UserId);
         }
         catch (Exception ex)
         {
-            LogPasswordResetDispatchFailed(logger, ex, evento.FatecEmail);
+            LogPasswordResetDispatchFailed(logger, ex, message.UserId);
             throw;
         }
     }

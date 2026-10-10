@@ -17,26 +17,26 @@ public partial class AccountLockedEventConsumer(
 {
     public async Task Consume(ConsumeContext<AccountLockedEvent> context)
     {
-        var evento = context.Message;
+        var message = context.Message;
 
         try
         {
-            LogAccountLockedDispatchStarted(logger, evento.FatecEmail);
+            LogAccountLockedDispatchStarted(logger, message.UserId);
 
             string frontendUrl = configuration["PUBLIC_URL"]
                 ?? throw new MissingCommunicationConfigurationException("PUBLIC_URL");
 
-            string safeEmail = Uri.EscapeDataString(evento.FatecEmail);
+            string safeEmail = Uri.EscapeDataString(message.FatecEmail);
 
-            string unlockLink = $"{frontendUrl.TrimEnd('/')}/desbloquear-conta?token={evento.UnlockToken}&email={safeEmail}";
+            string unlockLink = $"{frontendUrl.TrimEnd('/')}/desbloquear-conta?token={message.UnlockToken}&email={safeEmail}";
 
-            await emailService.SendAccountLockedEmailAsync(evento.FatecEmail, evento.FullName, unlockLink);
+            await emailService.SendAccountLockedEmailAsync(message.FatecEmail, message.FullName, unlockLink);
 
-            LogAccountLockedDispatchSucceeded(logger, evento.FatecEmail);
+            LogAccountLockedDispatchSucceeded(logger, message.UserId);
         }
         catch (Exception ex)
         {
-            LogAccountLockedDispatchFailed(logger, ex, evento.FatecEmail);
+            LogAccountLockedDispatchFailed(logger, ex, message.UserId);
             throw;
         }
     }
