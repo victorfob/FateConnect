@@ -20,7 +20,8 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 
 - Ação secundária é `variant="soft"`. No rodapé de diálogo as duas ações são `contained` (`primary` na neutra, `secondary` na que confirma). Falta variante: declare no tema, não componha no ponto de uso.
 - ⛔ A altura do botão é a do `size` no tema (`buttonHeightTokens`), igual em toda variante: botão menor é `size="small"`, nunca `height` fixo nem rótulo trocado por `caption` no ponto de uso.
-- Diálogo é sempre o `Dialog` do DS: `Dialog.Body`, `Dialog.Footer` e a frase em `Dialog.Message`. ⛔ No desktop sem X (decisão de produto: `Esc` e clique fora dispensam); no estreito, com X.
+- Diálogo é sempre o `Dialog` do DS: `Dialog.Body`, `Dialog.Footer` e a frase em `Dialog.Message`. ⛔ No desktop sem X (decisão de produto: `Esc` e clique fora dispensam); no estreito, tela cheia com X.
+- No estreito, os botões do rodapé dividem a largura; sem formulário, o conteúdo vai para o meio da tela, e sem rodapé nem formulário entra um *Fechar* no pé. Quem decide é a estrutura (`:has(form)`, `data-dialog-footer`), sem prop.
 - Diálogo de formulário monta `Dialog.Form` (envio pela validação da tela), `Dialog.Fields` (grade com folga para o rótulo flutuante; `layout="column"` põe um campo por linha) e `Dialog.Submit` (largura cheia, com `loading`).
 - ⛔ O `Dialog.Body` rola e corta o que sai da largura dele: controle com halo (o `Slider`) vai fora do `Dialog.Body`, direto no diálogo.
 - Formulário em grade é o `FormGrid` (`FormGrid.Wide` ocupa a linha); cartão com título e ícone é o `SectionCard`. Não escreva outro.

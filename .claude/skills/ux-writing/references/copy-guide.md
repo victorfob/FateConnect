@@ -42,6 +42,19 @@ O glossário decidido e as proibições de uma linha estão na rule `product-cop
 - **Pontuação:** onde o `—` apareceria cabe ponto, dois pontos, ou nada porque a frase encurtou.
 - **Neutro e acessível:** linguagem neutra ("a pessoa responsável"), nunca `x` ou `@`; o texto funciona só ouvido; sem jargão nem metáfora.
 
+## E-mail transacional
+
+O e-mail que a conta dispara (confirmação, redefinição, aviso de segurança) segue o [manual de serviço do GOV.UK](https://www.gov.uk/service-manual/design/sending-emails-and-text-messages):
+
+- **Assunto** com a ação ou o fato primeiro e a marca no fim (`Confirme seu e-mail do FateConnect`): o celular corta o fim.
+- **A primeira frase diz por que a pessoa recebeu o e-mail**, a ação que ela fez; é a que aparece na prévia da caixa de entrada.
+- Abre com `Olá, {nome}.`, o nome por extenso, igual em todos: o nome completo dificulta a imitação.
+- **Uma ação por e-mail**: o botão segue a régua de botão, e abaixo dele vai o endereço inteiro, para quem desconfia do botão ver para onde ele leva.
+- Diz o prazo e o uso único do link, e o que acontece se não foi a pessoa (`Se não foi você, pode ignorar este e-mail. Sua senha continua a mesma.`).
+- **"Se não foi você" depende do que aconteceu:** pedido que talvez não seja da pessoa (confirmação, senha) se ignora; fato consumado (bloqueio) pede uma saída ativa, como trocar a senha, e nunca "responda", que o rodapé desmente.
+- Prazo e contagem vêm das constantes da regra, nunca escritos à mão no texto, e o número decide o plural da palavra ao lado (`1 minuto`, `30 minutos`): com a constante em 1, o plural fixo sai "1 minutos" sem erro nenhum.
+- Dois-pontos só antes de lista ou do endereço do link; no meio da frase, ponto. Os dois-pontos cortam a leitura e deixam o texto com cara de formulário.
+
 ## Largura
 
 Copy que carrega número, faixa ou unidade se mede no contêiner real, a 375px, antes de ir às candidatas. O método de medir e a assimetria de custo por lugar estão na skill `visual-validation`, `references/measurement-pitfalls.md` §"Largura de texto".

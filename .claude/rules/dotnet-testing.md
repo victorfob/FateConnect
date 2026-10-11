@@ -37,13 +37,15 @@ paths:
 - Corrida muito acima dos ~15s de sempre é Docker frio, não código: rode a suíte direto uma vez antes de empurrar de novo. ⛔ `--no-verify` pula a suíte inteira e não é saída.
 - ⛔ Não serialize a criação dos bancos nem desligue o paralelismo do xUnit: o `template1` não recebe conexão, e a falha clássica de `CREATE DATABASE` concorrente não acontece aqui.
 - Teste que grava arquivo: `git status` depois da suíte. A `ApiFactory` já isola o webroot num temporário.
+- ⛔ A `ApiFactory` executa o `Program.Main`: variável de ambiente que ele passa a exigir entra no construtor dela, com valor falso, senão a suíte inteira cai na subida.
+- Harness do MassTransit em teste leva `SetTestTimeouts` com folga: a inatividade padrão (~1,2 s) estoura com a suíte em paralelo, e o teste falha só às vezes.
 
 ## Suíte verde não prova que ela pega o defeito
 
 Quebre o código de propósito e confira que a suíte cai; restaure e confira com `git status`.
 
 - ⛔ Se a build da mutação falha, `dotnet test --no-build` roda a DLL anterior e tudo passa: confira o exit da build antes de ler o teste. Escreva `--verbosity quiet` por extenso: wrapper de shell que reescreve argumentos pode ficar com o `-v q`, e o build responde `Project file does not exist`.
-- Mute o corpo do predicado, não a chamada: tirar o `.Where(Predicado())` deixa o método sem uso, e o analisador reprova antes de qualquer teste.
+- Mute o corpo do predicado, não a chamada: tirar o `.Where(Predicado())` deixa o método sem uso, e o analisador reprova antes de qualquer teste. Ele reprova também a mutação óbvia (`if (false)`, ramo igual a outro do `switch`): mute com um valor plausível.
 - ⛔ Medindo memória: `Process.PeakWorkingSet64` responde 0 no macOS, e medir no processo que gerou a carga põe a carga no "antes". Separe em processos: um gera o arquivo, outro só o processa sob `/usr/bin/time -l`, e um terceiro só o lê (o controle).
 
 ## Fixture
