@@ -1,4 +1,5 @@
 import { Button, Dialog } from '@design-system';
+import { HelpOutlineOutlinedIcon } from '@design-system/icons';
 
 import { REACTIVATION_DIALOG } from './constants';
 
@@ -18,7 +19,9 @@ export function AccountReactivationDialog({
   return (
     <Dialog open={open} onClose={onDismiss} title={REACTIVATION_DIALOG.title} width="narrow">
       <Dialog.Body>
-        <Dialog.Message tone="info">{REACTIVATION_DIALOG.message}</Dialog.Message>
+        <Dialog.Message tone="info" icon={HelpOutlineOutlinedIcon}>
+          {REACTIVATION_DIALOG.message}
+        </Dialog.Message>
       </Dialog.Body>
 
       <Dialog.Footer>

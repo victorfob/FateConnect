@@ -1,6 +1,5 @@
 import { Link as RouterLink } from 'react-router';
 import { Button, Dialog } from '@design-system';
-import { ContactPageOutlinedIcon } from '@design-system/icons';
 
 import { RoutePathEnum } from '@app/routes/paths';
 
@@ -18,9 +17,7 @@ export function ContactRequiredDialog({ open, action, onClose }: ContactRequired
   return (
     <Dialog open={open} onClose={onClose} title={C.CONTACT_REQUIRED_TITLE}>
       <Dialog.Body>
-        <Dialog.Message tone="info" icon={ContactPageOutlinedIcon}>
-          {C.CONTACT_REQUIRED_MESSAGES[action]}
-        </Dialog.Message>
+        <Dialog.Message tone="warning">{C.CONTACT_REQUIRED_MESSAGES[action]}</Dialog.Message>
       </Dialog.Body>
 
       <Dialog.Footer>
@@ -33,7 +30,7 @@ export function ContactRequiredDialog({ open, action, onClose }: ContactRequired
           component={RouterLink}
           to={RoutePathEnum.PROFILE}
         >
-          {C.REGISTER_CONTACTS_LABEL}
+          {C.REGISTER_LABEL}
         </Button>
       </Dialog.Footer>
     </Dialog>

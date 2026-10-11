@@ -13,7 +13,7 @@ import { ContactRequiredActionEnum } from '@app/components/ContactRequiredDialog
 import {
   CONTACT_REQUIRED_MESSAGES,
   CONTACT_REQUIRED_TITLE,
-  REGISTER_CONTACTS_LABEL,
+  REGISTER_LABEL,
 } from '@app/components/ContactRequiredDialog/constants';
 import { useLacksContact } from '@app/hooks/useLacksContact';
 import { server } from '@app/mocks/server';
@@ -216,7 +216,7 @@ describe('Rides', () => {
     expect(
       notice.getByText(CONTACT_REQUIRED_MESSAGES[ContactRequiredActionEnum.OFFER_RIDE]),
     ).toBeInTheDocument();
-    expect(notice.getByRole('link', { name: REGISTER_CONTACTS_LABEL })).toHaveAttribute(
+    expect(notice.getByRole('link', { name: REGISTER_LABEL })).toHaveAttribute(
       'href',
       RoutePathEnum.PROFILE,
     );
