@@ -1,3 +1,5 @@
+import { PersonOffOutlinedIcon } from '@design-system/icons';
+
 import { render, screen, userEvent } from '@app/test/testing-library';
 
 import { CONFIRMATION } from './constants';
@@ -46,6 +48,26 @@ describe('ConfirmAction', () => {
     expect(screen.getByRole('button', { name: DEFAULT_PROPS.label })).not.toHaveStyle({
       color: 'rgb(207, 46, 46)',
     });
+  });
+
+  it.each([
+    [false, 'HelpOutlineOutlinedIcon'],
+    [true, 'DangerousOutlinedIcon'],
+  ])('should ask with the matching icon when destructive is %s', async (destructive, testId) => {
+    renderComponent({ ...DEFAULT_PROPS, destructive });
+
+    await userEvent.click(screen.getByRole('button', { name: DEFAULT_PROPS.label }));
+
+    expect(screen.getByTestId(testId)).toBeInTheDocument();
+  });
+
+  it('should ask with the icon the action names, in place of the tone default', async () => {
+    renderComponent({ ...DEFAULT_PROPS, destructive: true, dialogIcon: PersonOffOutlinedIcon });
+
+    await userEvent.click(screen.getByRole('button', { name: DEFAULT_PROPS.label }));
+
+    expect(screen.getByTestId('PersonOffOutlinedIcon')).toBeInTheDocument();
+    expect(screen.queryByTestId('DangerousOutlinedIcon')).not.toBeInTheDocument();
   });
 
   it('should act only once confirmed', async () => {
