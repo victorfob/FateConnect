@@ -50,7 +50,7 @@ O e-mail que a conta dispara (confirmação, redefinição, aviso de segurança)
 - **A primeira frase diz por que a pessoa recebeu o e-mail**, a ação que ela fez; é a que aparece na prévia da caixa de entrada.
 - Abre com `Olá, {nome}.`, o nome por extenso, igual em todos: o nome completo dificulta a imitação.
 - **Uma ação por e-mail**: o botão segue a régua de botão, e abaixo dele vai o endereço inteiro, para quem desconfia do botão ver para onde ele leva.
-- Diz o prazo e o uso único do link, e o que acontece se não foi a pessoa (`ignore este e-mail: sua senha continua a mesma`).
+- Diz o prazo e o uso único do link, e o que acontece se não foi a pessoa (`Se não foi você, pode ignorar este e-mail. Sua senha continua a mesma.`).
 - Prazo e contagem vêm das constantes da regra, nunca escritos à mão no texto.
 
 ## Largura
