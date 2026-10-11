@@ -27,7 +27,8 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 - Formulário em grade é o `FormGrid` (`FormGrid.Wide` ocupa a linha); cartão com título e ícone é o `SectionCard`. Não escreva outro.
 - ⛔ Ação destrutiva usa a variante `destructive` (o `ConfirmAction` a liga com `destructive`). O *Banir* da gestão ainda está neutro: pergunte antes de migrá-lo.
 - ⛔ Diálogo só de texto leva o tom no `Dialog.Message`, com o ícone acima da frase: confirmação comum `info` com a interrogação, destrutiva `error` com o ícone da ação (`dialogIcon` do `ConfirmAction`: a lixeira, a pessoa riscada), atenção `warning`. O octógono do erro é só de falha: confirmação não é erro.
-- Tela de recado (`PageMessage`) leva `tone` pelo que aconteceu; carregando fica sem ícone.
+- Tela de recado (`PageMessage`) leva `tone` pelo que aconteceu; carregando fica sem ícone. Link vencido que pede ação (confirmar o e-mail) é `warning`; o do desbloqueio, onde nada se perdeu, é `info`.
+- Dois botões no `PageMessage` dividem a largura no desktop e empilham em largura cheia abaixo de `md`, com a ação principal por último; um botão só fica do tamanho do rótulo. Quem decide é a estrutura, sem prop.
 - Barra de ações no estreito: conteúdo centralizado e botões em largura cheia, um sob o outro, a ação principal por último.
 - Esconder visualmente sem tirar da acessibilidade é `HiddenField`.
 - Tipografia só por variante do tema. `ListItemText`, `MenuItem`, `Chip` e `Alert` aplicam a escala deles se ninguém disser nada: a variante entra por `slotProps` (`slotProps={{ primary: { variant: 'caption' } }}`).

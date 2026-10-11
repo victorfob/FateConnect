@@ -18,6 +18,7 @@ description: "Valida no app rodando uma mudança visual do front antes de dizer 
 4. **Confira os estados de interação** que a mudança alcança: hover, foco, selecionado, desabilitado, tema claro e escuro.
 5. **Desconfie das medições que mentem** antes de relatar um número: leia `references/measurement-pitfalls.md`. Relato de quem olha a tela contra a sua medição quase sempre é o instrumento medindo a caixa em vez do desenho.
 6. **Copy nova:** meça a largura do texto no contêiner mais apertado que vai recebê-lo (método na mesma referência) e leve o número às candidatas da skill `ux-writing`.
+7. ⛔ **Mudou componente do design system: valide todos os consumidores, não só as telas do pedido.** Ache-os pelo nome (`grep`), recapture cada um nas duas larguras, inclusive o caso que a mudança não devia tocar, e compare com a captura anterior por diferença de pixels. Empilhar os dois botões do `PageMessage` esticou o botão único de cinco telas que o pedido não nomeava.
 
 Com dois servidores de dev no ar, toda medição leva a porta lida da página (skill `parallel-work`).
 
