@@ -5,7 +5,7 @@ import * as S from './styles';
 
 export type PageMessageProps = Readonly<{
   title: string;
-  description: string;
+  description?: string;
   /** Ação de saída — normalmente um botão de volta. */
   children?: ReactNode;
 }>;
@@ -19,7 +19,7 @@ export function PageMessage({ title, description, children }: PageMessageProps) 
     <S.PageMessageRoot>
       <S.MessageContent>
         <Typography variant="h1">{title}</Typography>
-        <Typography variant="body">{description}</Typography>
+        {description && <Typography variant="body">{description}</Typography>}
 
         {children}
       </S.MessageContent>
