@@ -18,6 +18,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a foto original à lista de contas da gestão, ao lado da miniatura (#561) [Backend]
 - Adiciona a remoção da foto ao editar um item de achados e perdidos, como em Meu perfil: a foto sai ao salvar, e o arquivo é apagado na hora (#563) [Frontend]
 - Adiciona à edição de um item de achados e perdidos o pedido de tirar a foto, que apaga o arquivo; com uma foto nova no mesmo pedido, fica a nova (#563) [Backend]
+- Adiciona a página do link de confirmação, que confirma o e-mail Fatec ao abrir e já entra; com o link expirado ou já usado, ela oferece um novo link e o caminho para o login (#577) [Frontend]
+- Adiciona ao login um diálogo para quem ainda não confirmou o e-mail Fatec, que diz o que falta e reenvia o link de confirmação (#577) [Frontend]
 
 ### Changed
 
@@ -32,6 +34,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a declarar na política de privacidade que quem cadastrou um item pode trocar ou tirar a foto ao editá-lo, e que a anterior é apagada na hora, em nova versão do documento (#563) [Frontend]
 - Passa a mostrar as telas de recado (área ainda não disponível, erro inesperado, sessão expirada e desbloqueio da conta) num cartão, com um ícone pela natureza do recado: informação, sucesso, aviso ou erro (#573) [Frontend]
 - Passa a mostrar, nos diálogos que só têm texto, um ícone pela natureza do recado acima da frase, como o cadeado na conta bloqueada e a lixeira na exclusão de carona (#573) [Frontend]
+- Passa a criar a conta sem entrar logado: depois do cadastro a tela mostra para qual e-mail o link de confirmação foi, com o reenvio liberado a cada minuto e o caminho para entrar (#577) [Frontend]
 
 ### Fixed
 
