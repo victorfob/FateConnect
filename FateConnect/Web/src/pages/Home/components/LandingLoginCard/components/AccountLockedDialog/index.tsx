@@ -1,4 +1,5 @@
 import { Button, Dialog } from '@design-system';
+import { LockOutlinedIcon } from '@design-system/icons';
 
 import { ACCOUNT_LOCKED_DIALOG, lockedAccountMessage } from './constants';
 
@@ -12,7 +13,9 @@ export function AccountLockedDialog({ open, minutesRemaining, onClose }: Account
   return (
     <Dialog open={open} onClose={onClose} title={ACCOUNT_LOCKED_DIALOG.title} width="narrow">
       <Dialog.Body>
-        <Dialog.Message>{lockedAccountMessage(minutesRemaining)}</Dialog.Message>
+        <Dialog.Message tone="warning" icon={LockOutlinedIcon}>
+          {lockedAccountMessage(minutesRemaining)}
+        </Dialog.Message>
       </Dialog.Body>
 
       <Dialog.Footer>
