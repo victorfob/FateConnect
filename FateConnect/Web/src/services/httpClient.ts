@@ -13,13 +13,22 @@ export class ApiError extends Error {
   readonly field?: string;
   /** Motivo que a API nomeia quando o mesmo status tem mais de um (`ContactRequired`). */
   readonly code?: string;
+  /** Minutos até a conta destravar sozinha, no `429` do bloqueio por senha errada. */
+  readonly minutesRemaining?: number;
 
-  constructor(message: string, status?: number, field?: string, code?: string) {
+  constructor(
+    message: string,
+    status?: number,
+    field?: string,
+    code?: string,
+    minutesRemaining?: number,
+  ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.field = field;
     this.code = code;
+    this.minutesRemaining = minutesRemaining;
   }
 }
 
@@ -41,11 +50,22 @@ export const SESSION_EXPIRED_MESSAGE = 'Sessão expirada. Entre novamente para c
 
 const UNAUTHORIZED = 401;
 
-function textPropertyOf(body: unknown, key: 'field' | 'code'): string | undefined {
+function propertyOf(body: unknown, key: string): unknown {
   if (typeof body !== 'object' || body === null) return undefined;
 
-  const value: unknown = Reflect.get(body, key);
+  return Reflect.get(body, key);
+}
+
+function textPropertyOf(body: unknown, key: 'field' | 'code'): string | undefined {
+  const value = propertyOf(body, key);
   if (typeof value !== 'string') return undefined;
+
+  return value;
+}
+
+function numberPropertyOf(body: unknown, key: 'minutesRemaining'): number | undefined {
+  const value = propertyOf(body, key);
+  if (typeof value !== 'number') return undefined;
 
   return value;
 }
@@ -87,6 +107,7 @@ function withInterceptors(client: AxiosInstance): AxiosInstance {
           error.response.status,
           textPropertyOf(error.response.data, 'field'),
           textPropertyOf(error.response.data, 'code'),
+          numberPropertyOf(error.response.data, 'minutesRemaining'),
         ),
       );
     },

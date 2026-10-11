@@ -10,7 +10,9 @@ import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { login, reactivate } from '@app/services/auth/authService';
 import type { LoginRequest } from '@app/services/auth/types';
 import type { ApiError } from '@app/services/httpClient';
+import { prefilledEmailOf } from '@app/utils/loginPrefill';
 
+import { AccountLockedDialog } from './components/AccountLockedDialog';
 import { AccountReactivationDialog } from './components/AccountReactivationDialog';
 import { loginSchema, type LoginFormValues } from './schema';
 import * as C from './constants';
@@ -19,13 +21,17 @@ import * as S from './styles';
 const UNAUTHORIZED = 401;
 const FORBIDDEN = 403;
 const CONFLICT = 409;
+const TOO_MANY_REQUESTS = 429;
 
 export function LandingLoginCard() {
   const navigate = useNavigate();
-  const { hash } = useLocation();
+  const { hash, state } = useLocation();
+  const prefilledEmail = prefilledEmailOf(state);
   const { notifyError, notifySuccess } = useNotification();
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
   const [credentialsToReactivate, setCredentialsToReactivate] = useState<LoginRequest | null>(null);
+  const [lockout, setLockout] = useState<ApiError | null>(null);
 
   const {
     register,
@@ -33,17 +39,22 @@ export function LandingLoginCard() {
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: prefilledEmail ?? '', password: '' },
   });
 
-  // Chegando na landing pela âncora de login, o campo de e-mail recebe o foco.
+  // Chegando na landing pela âncora de login, o foco vai ao primeiro campo vazio.
   useEffect(() => {
     if (hash !== `#${LandingSectionEnum.LOGIN}`) return;
 
-    emailInputRef.current?.focus();
-  }, [hash]);
+    if (prefilledEmail) {
+      passwordInputRef.current?.focus();
+      return;
+    }
 
-  const notifyRefusal = useCallback(
+    emailInputRef.current?.focus();
+  }, [hash, prefilledEmail]);
+
+  const handleRefusal = useCallback(
     (error: ApiError) => {
       if (error.status === UNAUTHORIZED) {
         notifyError(C.LOGIN_ERROR_MESSAGES.invalidCredentials);
@@ -52,6 +63,11 @@ export function LandingLoginCard() {
 
       if (error.status === FORBIDDEN) {
         notifyError(C.LOGIN_ERROR_MESSAGES.bannedAccount);
+        return;
+      }
+
+      if (error.status === TOO_MANY_REQUESTS) {
+        setLockout(error);
         return;
       }
 
@@ -73,7 +89,7 @@ export function LandingLoginCard() {
         return;
       }
 
-      notifyRefusal(error);
+      handleRefusal(error);
     },
   });
 
@@ -86,11 +102,13 @@ export function LandingLoginCard() {
     },
     onError: (error: ApiError) => {
       setCredentialsToReactivate(null);
-      notifyRefusal(error);
+      handleRefusal(error);
     },
   });
 
   const handleDismissReactivation = useCallback(() => setCredentialsToReactivate(null), []);
+
+  const handleCloseLockout = useCallback(() => setLockout(null), []);
 
   const handleConfirmReactivation = useCallback(() => {
     if (credentialsToReactivate) mutateReactivation(credentialsToReactivate);
@@ -101,14 +119,23 @@ export function LandingLoginCard() {
   });
 
   const { ref: registerEmailRef, ...emailField } = register('email');
+  const { ref: registerPasswordRef, ...passwordField } = register('password');
 
-  // Dois donos: o formulário, que registrou o campo, e a âncora de login.
+  // Dois donos em cada campo: o formulário, que o registrou, e a âncora de login.
   const setEmailRef = useCallback(
     (element: HTMLInputElement | null) => {
       registerEmailRef(element);
       emailInputRef.current = element;
     },
     [registerEmailRef],
+  );
+
+  const setPasswordRef = useCallback(
+    (element: HTMLInputElement | null) => {
+      registerPasswordRef(element);
+      passwordInputRef.current = element;
+    },
+    [registerPasswordRef],
   );
 
   return (
@@ -131,7 +158,8 @@ export function LandingLoginCard() {
         />
 
         <Input.Password
-          {...register('password')}
+          {...passwordField}
+          ref={setPasswordRef}
           purpose="current"
           label={C.PASSWORD_LABEL}
           required
@@ -157,6 +185,12 @@ export function LandingLoginCard() {
         reactivating={isReactivating}
         onDismiss={handleDismissReactivation}
         onConfirm={handleConfirmReactivation}
+      />
+
+      <AccountLockedDialog
+        open={lockout !== null}
+        minutesRemaining={lockout?.minutesRemaining}
+        onClose={handleCloseLockout}
       />
     </S.CardRoot>
   );

@@ -19,7 +19,7 @@ export function UnsavedChangesDialog({
   return (
     <Dialog open={open} onClose={onCancel} title={UNSAVED_CHANGES.title}>
       <Dialog.Body>
-        <Dialog.Message>{message}</Dialog.Message>
+        <Dialog.Message tone="warning">{message}</Dialog.Message>
       </Dialog.Body>
 
       <Dialog.Footer>

@@ -18,7 +18,7 @@ export function AccountReactivationDialog({
   return (
     <Dialog open={open} onClose={onDismiss} title={REACTIVATION_DIALOG.title} width="narrow">
       <Dialog.Body>
-        <Dialog.Message>{REACTIVATION_DIALOG.message}</Dialog.Message>
+        <Dialog.Message tone="info">{REACTIVATION_DIALOG.message}</Dialog.Message>
       </Dialog.Body>
 
       <Dialog.Footer>
