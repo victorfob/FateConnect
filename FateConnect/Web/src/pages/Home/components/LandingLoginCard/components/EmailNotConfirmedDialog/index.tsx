@@ -1,8 +1,10 @@
 import { Button, Dialog } from '@design-system';
 import { MarkEmailUnreadOutlinedIcon } from '@design-system/icons';
 
-import { ResendConfirmationButton } from '@app/components/ResendConfirmationButton';
+import { ResendLinkButton } from '@app/components/ResendLinkButton';
+import { CONFIRMATION_LINK_RESENT } from '@app/constants/emailLink';
 import type { Countdown } from '@app/hooks/useCountdown';
+import { resendConfirmationEmail } from '@app/services/auth/authService';
 
 import { EMAIL_NOT_CONFIRMED_DIALOG } from './constants';
 
@@ -31,7 +33,12 @@ export function EmailNotConfirmedDialog({
         <Button type="button" variant="contained" color="primary" onClick={onClose}>
           {EMAIL_NOT_CONFIRMED_DIALOG.closeLabel}
         </Button>
-        <ResendConfirmationButton email={email} countdown={resendCountdown} />
+        <ResendLinkButton
+          email={email}
+          send={resendConfirmationEmail}
+          sentMessage={CONFIRMATION_LINK_RESENT}
+          countdown={resendCountdown}
+        />
       </Dialog.Footer>
     </Dialog>
   );

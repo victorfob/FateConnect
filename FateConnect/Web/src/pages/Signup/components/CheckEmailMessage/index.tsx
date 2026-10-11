@@ -1,9 +1,11 @@
 import { PageMessage } from '@design-system';
 
-import { ResendConfirmationButton } from '@app/components/ResendConfirmationButton';
-import { RESEND_COOLDOWN_SECONDS } from '@app/components/ResendConfirmationButton/constants';
+import { ResendLinkButton } from '@app/components/ResendLinkButton';
+import { RESEND_COOLDOWN_SECONDS } from '@app/components/ResendLinkButton/constants';
 import { SignInButton } from '@app/components/SignInButton';
+import { CONFIRMATION_LINK_RESENT } from '@app/constants/emailLink';
 import { useCountdown } from '@app/hooks/useCountdown';
+import { resendConfirmationEmail } from '@app/services/auth/authService';
 
 import * as C from './constants';
 
@@ -19,7 +21,13 @@ export function CheckEmailMessage({ email }: CheckEmailMessageProps) {
       description={C.checkEmailDescription(email)}
       tone="info"
     >
-      <ResendConfirmationButton email={email} countdown={resendCountdown} variant="soft" />
+      <ResendLinkButton
+        email={email}
+        send={resendConfirmationEmail}
+        sentMessage={CONFIRMATION_LINK_RESENT}
+        countdown={resendCountdown}
+        variant="soft"
+      />
       <SignInButton email={email} />
     </PageMessage>
   );

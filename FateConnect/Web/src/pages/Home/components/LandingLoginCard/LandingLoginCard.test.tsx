@@ -2,7 +2,8 @@ import { createMemoryRouter, RouterProvider, type InitialEntry } from 'react-rou
 import { PASSWORD_TOGGLE_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
-import { RESEND_LABEL, RESENT_MESSAGE } from '@app/components/ResendConfirmationButton/constants';
+import { RESEND_LABEL } from '@app/components/ResendLinkButton/constants';
+import { CONFIRMATION_LINK_RESENT } from '@app/constants/emailLink';
 import {
   FATEC_EMAIL_DOMAIN_MESSAGE,
   FATEC_EMAIL_LOCAL_PART_MESSAGE,
@@ -170,7 +171,7 @@ describe('LandingLoginCard', () => {
     expect(within(dialog).getByText(EMAIL_NOT_CONFIRMED_DIALOG.message)).toBeInTheDocument();
     await userEvent.click(within(dialog).getByRole('button', { name: RESEND_LABEL }));
 
-    expect(await screen.findByText(RESENT_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(CONFIRMATION_LINK_RESENT)).toBeInTheDocument();
     expect(resentBodies).toEqual([{ fatecEmail: EMAIL }]);
     expect(screen.queryByText(C.LOGIN_ERROR_MESSAGES.bannedAccount)).not.toBeInTheDocument();
   });
@@ -189,7 +190,7 @@ describe('LandingLoginCard', () => {
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
     const dialog = await screen.findByRole('dialog', { name: EMAIL_NOT_CONFIRMED_DIALOG.title });
     await userEvent.click(within(dialog).getByRole('button', { name: RESEND_LABEL }));
-    await screen.findByText(RESENT_MESSAGE);
+    await screen.findByText(CONFIRMATION_LINK_RESENT);
 
     await userEvent.click(
       within(dialog).getByRole('button', { name: EMAIL_NOT_CONFIRMED_DIALOG.closeLabel }),

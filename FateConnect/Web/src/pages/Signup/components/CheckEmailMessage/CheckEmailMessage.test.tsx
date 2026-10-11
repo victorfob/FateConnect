@@ -4,7 +4,7 @@ import {
   RESEND_COOLDOWN_SECONDS,
   RESEND_LABEL,
   waitingLabel,
-} from '@app/components/ResendConfirmationButton/constants';
+} from '@app/components/ResendLinkButton/constants';
 import { SIGN_IN_LABEL } from '@app/components/SignInButton/constants';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { act, render, screen, userEvent } from '@app/test/testing-library';
