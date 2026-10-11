@@ -1,8 +1,12 @@
-import { ApiError } from '@app/services/httpClient';
+import { unlockAccount } from '@app/services/auth/authService';
 
-const BAD_REQUEST = 400;
+/** O desbloqueio responde 204 sem corpo, e a consulta não pode devolver `undefined`. */
+const UNLOCKED = true;
 
-/** A API não separa o link inválido do vencido e do já usado: os três são `400`. */
-export function isExpiredLink(error: unknown): boolean {
-  return error instanceof ApiError && error.status === BAD_REQUEST;
+export function unlockQueryFunction(token: string) {
+  return async () => {
+    await unlockAccount(token);
+
+    return UNLOCKED;
+  };
 }
