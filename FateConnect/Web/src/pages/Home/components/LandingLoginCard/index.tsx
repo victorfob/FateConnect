@@ -11,6 +11,7 @@ import { login, reactivate } from '@app/services/auth/authService';
 import type { LoginRequest } from '@app/services/auth/types';
 import type { ApiError } from '@app/services/httpClient';
 
+import { AccountLockedDialog } from './components/AccountLockedDialog';
 import { AccountReactivationDialog } from './components/AccountReactivationDialog';
 import { loginSchema, type LoginFormValues } from './schema';
 import * as C from './constants';
@@ -19,6 +20,7 @@ import * as S from './styles';
 const UNAUTHORIZED = 401;
 const FORBIDDEN = 403;
 const CONFLICT = 409;
+const TOO_MANY_REQUESTS = 429;
 
 export function LandingLoginCard() {
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ export function LandingLoginCard() {
   const { notifyError, notifySuccess } = useNotification();
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [credentialsToReactivate, setCredentialsToReactivate] = useState<LoginRequest | null>(null);
+  const [lockout, setLockout] = useState<ApiError | null>(null);
 
   const {
     register,
@@ -43,7 +46,7 @@ export function LandingLoginCard() {
     emailInputRef.current?.focus();
   }, [hash]);
 
-  const notifyRefusal = useCallback(
+  const handleRefusal = useCallback(
     (error: ApiError) => {
       if (error.status === UNAUTHORIZED) {
         notifyError(C.LOGIN_ERROR_MESSAGES.invalidCredentials);
@@ -52,6 +55,11 @@ export function LandingLoginCard() {
 
       if (error.status === FORBIDDEN) {
         notifyError(C.LOGIN_ERROR_MESSAGES.bannedAccount);
+        return;
+      }
+
+      if (error.status === TOO_MANY_REQUESTS) {
+        setLockout(error);
         return;
       }
 
@@ -73,7 +81,7 @@ export function LandingLoginCard() {
         return;
       }
 
-      notifyRefusal(error);
+      handleRefusal(error);
     },
   });
 
@@ -86,11 +94,13 @@ export function LandingLoginCard() {
     },
     onError: (error: ApiError) => {
       setCredentialsToReactivate(null);
-      notifyRefusal(error);
+      handleRefusal(error);
     },
   });
 
   const handleDismissReactivation = useCallback(() => setCredentialsToReactivate(null), []);
+
+  const handleCloseLockout = useCallback(() => setLockout(null), []);
 
   const handleConfirmReactivation = useCallback(() => {
     if (credentialsToReactivate) mutateReactivation(credentialsToReactivate);
@@ -157,6 +167,12 @@ export function LandingLoginCard() {
         reactivating={isReactivating}
         onDismiss={handleDismissReactivation}
         onConfirm={handleConfirmReactivation}
+      />
+
+      <AccountLockedDialog
+        open={lockout !== null}
+        minutesRemaining={lockout?.minutesRemaining}
+        onClose={handleCloseLockout}
       />
     </S.CardRoot>
   );

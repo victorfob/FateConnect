@@ -10,6 +10,10 @@ import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
+import {
+  ACCOUNT_LOCKED_DIALOG,
+  lockedAccountMessage,
+} from './components/AccountLockedDialog/constants';
 import { REACTIVATION_DIALOG } from './components/AccountReactivationDialog/constants';
 import { LOGIN_MESSAGES } from './schema';
 import * as C from './constants';
@@ -20,6 +24,7 @@ const REACTIVATE_URL = 'https://api.fateconnect.test/auth/reactivate';
 
 const FORBIDDEN = 403;
 const CONFLICT = 409;
+const TOO_MANY_REQUESTS = 429;
 const SERVER_ERROR = 500;
 const EMAIL = 'aluno.teste@aluno.cps.sp.gov.br';
 const PASSWORD = 'segredo123';
@@ -229,6 +234,48 @@ describe('LandingLoginCard', () => {
     expect(within(submitButton).getByRole('progressbar')).toBeInTheDocument();
 
     respond();
+  });
+
+  it('should explain the locked account in a dialog, with the minutes the api returns', async () => {
+    server.use(
+      http.post(LOGIN_URL, () =>
+        HttpResponse.json(
+          { error: 'bloqueada', code: 'AccountLocked', minutesRemaining: 12 },
+          { status: TOO_MANY_REQUESTS },
+        ),
+      ),
+    );
+    renderCard();
+    await preencher(EMAIL, PASSWORD);
+
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+    const dialog = await screen.findByRole('dialog', { name: ACCOUNT_LOCKED_DIALOG.title });
+
+    expect(
+      within(dialog).getByText(
+        'Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec ou aguarde 12 minutos e tente novamente.',
+      ),
+    ).toBeInTheDocument();
+    // O bloqueio é explicado no diálogo; um aviso a mais repetiria o recado.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: ACCOUNT_LOCKED_DIALOG.closeLabel }),
+    );
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('should write a single minute in the singular', () => {
+    expect(lockedAccountMessage(1)).toBe(
+      'Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec ou aguarde 1 minuto e tente novamente.',
+    );
+  });
+
+  it('should point only to the link when the api does not say the minutes', () => {
+    expect(lockedAccountMessage(undefined)).toBe(
+      'Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec.',
+    );
   });
 
   it('should focus the email field when the page is opened at the login anchor', async () => {
