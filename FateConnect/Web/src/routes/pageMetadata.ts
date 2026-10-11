@@ -38,6 +38,7 @@ export const PAGE_METADATA: Record<RoutePathEnum, PageMetadata> = {
       'Crie sua conta com o e-mail institucional da Fatec para oferecer caronas, pegar carona e cadastrar itens perdidos no campus.',
   },
   [RoutePathEnum.UNLOCK_ACCOUNT]: { title: titleFor('Desbloquear conta') },
+  [RoutePathEnum.CONFIRM_EMAIL]: { title: titleFor('Confirmar e-mail') },
   [RoutePathEnum.MENU]: { title: titleFor('Menu') },
   [RoutePathEnum.LOST_AND_FOUND]: { title: titleFor('Achados & Perdidos') },
   [RoutePathEnum.RIDES]: { title: titleFor('Caronas') },
