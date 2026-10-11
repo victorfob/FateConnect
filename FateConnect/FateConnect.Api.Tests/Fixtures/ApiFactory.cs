@@ -27,6 +27,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using static BCrypt.Net.BCrypt;
 
 namespace FateConnect.Api.Tests.Fixtures;
@@ -89,8 +90,19 @@ public class ApiFactory : WebApplicationFactory<Program>
     {
         base.Dispose(disposing);
 
-        if (disposing && Directory.Exists(_webRoot))
+        if (!disposing)
+            return;
+
+        CloseIdleDatabaseConnections();
+
+        if (Directory.Exists(_webRoot))
             Directory.Delete(_webRoot, recursive: true);
+    }
+
+    private void CloseIdleDatabaseConnections()
+    {
+        using NpgsqlConnection connection = new(TestDatabase.ConnectionStringFor(_databaseName));
+        NpgsqlConnection.ClearPool(connection);
     }
 
     public static string IssueToken(
