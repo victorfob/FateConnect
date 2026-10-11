@@ -27,7 +27,7 @@ export function PageMessage({ title, description, tone, children }: PageMessageP
         <Typography variant="h1">{title}</Typography>
         {description && <Typography variant="body">{description}</Typography>}
 
-        {children}
+        {children && <S.Actions>{children}</S.Actions>}
       </S.MessageCard>
     </S.PageMessageRoot>
   );

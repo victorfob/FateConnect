@@ -30,5 +30,3 @@ export const SIGNUP_CONFLICT_MESSAGES: Record<SignupConflictFieldEnum, string> =
   [SignupConflictFieldEnum.PHONE]: 'Telefone já cadastrado',
   [SignupConflictFieldEnum.CONTACT_EMAIL]: 'E-mail já cadastrado',
 };
-
-export const SIGNUP_SUCCESS_MESSAGE = 'Conta criada.';
