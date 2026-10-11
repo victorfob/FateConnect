@@ -33,7 +33,7 @@ export function ContactRequiredDialog({ open, action, onClose }: ContactRequired
           component={RouterLink}
           to={RoutePathEnum.PROFILE}
         >
-          {C.REGISTER_CONTACTS_LABEL}
+          {C.REGISTER_LABEL}
         </Button>
       </Dialog.Footer>
     </Dialog>

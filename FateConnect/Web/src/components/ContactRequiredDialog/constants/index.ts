@@ -12,3 +12,6 @@ export const CONTACT_REQUIRED_MESSAGES: Readonly<Record<ContactRequiredActionEnu
 export const CONTACT_REQUIRED_DISMISS_LABEL = 'Agora não';
 
 export const REGISTER_CONTACTS_LABEL = 'Cadastrar contatos';
+
+/** No rodapé do diálogo o título já diz o quê, e o rótulo inteiro quebra linha no celular. */
+export const REGISTER_LABEL = 'Cadastrar';
