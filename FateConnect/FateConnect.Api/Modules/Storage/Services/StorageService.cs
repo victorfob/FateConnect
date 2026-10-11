@@ -1,7 +1,7 @@
-namespace FateConnect.Api.Modules.Common.Services;
+namespace FateConnect.Api.Modules.Storage.Services;
 
-using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Enums;
+using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

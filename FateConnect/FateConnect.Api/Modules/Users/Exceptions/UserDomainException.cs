@@ -62,3 +62,6 @@ public class ContactRequiredException(EnumPublication publication)
 
 public class InvalidUserStatusTransitionException()
     : UserDomainException("Não é possível realizar esta alteração de status de conta por este endpoint.");
+
+public class InvalidTokenException()
+    : UserDomainException("O token fornecido é inválido ou está em branco.");

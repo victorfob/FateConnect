@@ -1,3 +1,6 @@
+namespace FateConnect.Api.Modules.Auth.Services;
+
+using System;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -6,19 +9,16 @@ using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Users.Entities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace FateConnect.Api.Modules.Auth.Services;
-
-public class TokenService : ITokenService
+public partial class TokenService(
+    IOptions<JwtOptions> jwtOptions,
+    ILogger<TokenService> logger
+) : ITokenService
 {
-    private readonly JwtOptions _jwtOptions;
-
-    public TokenService(IOptions<JwtOptions> jwtOptions)
-    {
-        _jwtOptions = jwtOptions.Value;
-    }
+    private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
     public string GenerateJwtToken(User user)
     {
@@ -27,10 +27,12 @@ public class TokenService : ITokenService
         byte[] securityKey = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
         ClaimsIdentity userClaims = BuildUserClaims(user);
 
+        DateTime expirationDate = DateTime.UtcNow.AddHours(_jwtOptions.ExpirationHours);
+
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = userClaims,
-            Expires = DateTime.UtcNow.AddHours(_jwtOptions.ExpirationHours),
+            Expires = expirationDate,
             Issuer = _jwtOptions.Issuer,
             Audience = _jwtOptions.Audience,
             SigningCredentials = new SigningCredentials(
@@ -39,6 +41,8 @@ public class TokenService : ITokenService
         };
 
         SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+
+        LogJwtTokenGenerated(logger, user.Id, expirationDate);
 
         return tokenHandler.WriteToken(token);
     }

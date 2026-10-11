@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Common.Extensions;
+namespace FateConnect.Api.Modules.Storage.Extensions;
 
 using FateConnect.Api.Modules.Common.Enums;
 using FateConnect.Api.Modules.Common.Utils;
