@@ -1,5 +1,11 @@
 import { render, screen } from '@app/test/testing-library';
+import {
+  declarationsFor,
+  narrowDeclarationsFor,
+  sheetRules,
+} from '@app/test/utils/styleSheetRules';
 import type { FeedbackTone } from '@ds-root/theme/types';
+import { Button } from '@ds-root/ui';
 
 import { PageMessage, type PageMessageProps } from '.';
 
@@ -42,5 +48,27 @@ describe('PageMessage', () => {
     for (const [, testId] of TONE_ICON_TEST_IDS)
       expect(screen.queryByTestId(testId)).not.toBeInTheDocument();
     expect(screen.queryByText(DESCRIPTION)).not.toBeInTheDocument();
+  });
+
+  it('should split the width between two actions and stack them on a narrow screen', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: [<Button key="voltar">Voltar</Button>, <Button key="entrar">Entrar</Button>],
+    });
+    const action = screen.getByRole('button', { name: 'Entrar' });
+
+    expect(declarationsFor(sheetRules(), action)).toContain('flex:1');
+    expect(narrowDeclarationsFor(action.parentElement)).toContain('flex-direction:column');
+    expect(narrowDeclarationsFor(action)).toContain('flex:00auto');
+    expect(narrowDeclarationsFor(action)).toContain('align-self:stretch');
+  });
+
+  it('should keep a single action at the width of its label, at any width', () => {
+    renderComponent({ ...DEFAULT_PROPS, children: <Button>Entrar</Button> });
+    const action = screen.getByRole('button', { name: 'Entrar' });
+
+    expect(declarationsFor(sheetRules(), action)).not.toContain('flex:1');
+    expect(narrowDeclarationsFor(action)).not.toContain('align-self:stretch');
+    expect(narrowDeclarationsFor(action.parentElement)).toContain('align-items:center');
   });
 });

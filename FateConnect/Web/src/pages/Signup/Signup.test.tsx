@@ -20,12 +20,13 @@ import { DocumentTypeEnum } from '@app/services/signup/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import { SignupConflictFieldEnum } from './@types';
+import { CHECK_EMAIL_TITLE, checkEmailDescription } from './components/CheckEmailMessage/constants';
 import { SIGNUP_MESSAGES } from './schema';
 import * as C from './constants';
 import { Signup } from '.';
 
 const SIGNUP_URL = 'https://api.fateconnect.test/users/signup';
-const SIGNUP_TOKEN = 'token-do-cadastro';
+const CREATED = 201;
 
 const VALID_SIGNUP = {
   fullName: 'Maria Silva',
@@ -222,16 +223,17 @@ describe('Signup', () => {
     expect(options[0]).toHaveTextContent(SELECT_PLACEHOLDER);
   });
 
-  it('should create the account and send the user into the app already signed in', async () => {
-    server.use(http.post(SIGNUP_URL, () => HttpResponse.json({ token: SIGNUP_TOKEN })));
+  it('should create the account and ask for the email confirmation, without a session', async () => {
+    server.use(http.post(SIGNUP_URL, () => new HttpResponse(null, { status: CREATED })));
     const router = renderSignup();
     await fillRequiredFields();
 
     await submit();
 
-    expect(await screen.findByText(C.SIGNUP_SUCCESS_MESSAGE)).toBeInTheDocument();
-    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
-    expect(tokenStorage.getToken()).toBe(SIGNUP_TOKEN);
+    expect(await screen.findByRole('heading', { name: CHECK_EMAIL_TITLE })).toBeInTheDocument();
+    expect(screen.getByText(checkEmailDescription(VALID_SIGNUP.fatecEmail))).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe(RoutePathEnum.SIGNUP);
+    expect(tokenStorage.getToken()).toBeNull();
   });
 
   it('should send the payload in the contract the backend expects', async () => {
