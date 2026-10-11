@@ -8,12 +8,19 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Adiciona a confirmação do e-mail Fatec: o cadastro envia um link de uso único que vale por 8 horas, e o login de quem não confirmou é recusado, inclusive nas contas que já existiam (#553) [Backend]
+- Adiciona o reenvio do link de confirmação pelo e-mail Fatec, no máximo um por minuto, que invalida o link anterior (#553) [Backend]
+- Adiciona a redefinição da senha esquecida: o pedido pelo e-mail Fatec envia um link de uso único que vale por 30 minutos, e a senha nova derruba as sessões abertas e já entra; e-mail sem conta é avisado, e conta banida não redefine (#553) [Backend]
+- Adiciona o bloqueio da conta por 30 minutos depois de 3 senhas erradas seguidas, no login ou na reativação, que recusa até a senha certa e diz quantos minutos faltam (#553) [Backend]
+- Adiciona o e-mail de desbloqueio, um por bloqueio, com um link de uso único que destrava a conta antes dos 30 minutos (#553) [Backend]
 - Adiciona a foto original à lista de contas da gestão, ao lado da miniatura (#561) [Backend]
 - Adiciona a remoção da foto ao editar um item de achados e perdidos, como em Meu perfil: a foto sai ao salvar, e o arquivo é apagado na hora (#563) [Frontend]
 - Adiciona à edição de um item de achados e perdidos o pedido de tirar a foto, que apaga o arquivo; com uma foto nova no mesmo pedido, fica a nova (#563) [Backend]
 
 ### Changed
 
+- Passa a criar a conta sem entrar logado: a sessão só abre quando o link de confirmação do e-mail é aberto (#553) [Backend]
+- Passa a declarar nos termos de uso a confirmação do e-mail e o bloqueio por senhas erradas, e na política de privacidade o serviço de envio de e-mail, os links enviados e a contagem de senhas erradas, em nova versão dos termos (#553) [Frontend]
 - Passa a abrir os diálogos em tela cheia no celular, com os botões presos no pé da tela e o conteúdo rolando acima deles; no computador eles seguem como antes (#561) [Frontend]
 - Passa a centralizar no celular o conteúdo dos diálogos sem formulário, com os botões dividindo a largura, e a pôr um botão Fechar no pé dos que não têm rodapé (#561) [Frontend]
 - Passa a abrir a foto original num diálogo ao tocar na miniatura das denúncias, de achados e perdidos, de Meu perfil e das contas na gestão, no lugar do botão de baixar das denúncias; salvar a foto fica com o próprio navegador (#561) [Frontend]

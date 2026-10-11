@@ -32,16 +32,14 @@ public partial class GlobalExceptionMiddleware(
         var errorMessage = "Algo deu errado. Tente novamente.";
         string? conflictingField = null;
         string? errorCode = null;
+        int? minutesRemaining = null;
 
         switch (exception)
         {
-            case UserDomainException:
-            case InvalidUserIdentifierException:
-            case DenunciationDomainException:
-            case InvalidImageException:
-            case LostAndFoundDomainException:
-            case RideDomainException:
-                statusCode = HttpStatusCode.BadRequest;
+            case UnidentifiedTokenException:
+            case InvalidCredentialsException:
+            case UnidentifiedUserException:
+                statusCode = HttpStatusCode.Unauthorized;
                 errorMessage = exception.Message;
                 break;
 
@@ -59,6 +57,17 @@ public partial class GlobalExceptionMiddleware(
                 errorCode = ContactRequiredException.ErrorCode;
                 break;
 
+            case EmailNotConfirmedException:
+                statusCode = HttpStatusCode.Forbidden;
+                errorMessage = exception.Message;
+                errorCode = EmailNotConfirmedException.ErrorCode;
+                break;
+
+            case UserNotFoundException:
+                statusCode = HttpStatusCode.NotFound;
+                errorMessage = exception.Message;
+                break;
+
             case DeactivatedAccountException:
                 statusCode = HttpStatusCode.Conflict;
                 errorMessage = exception.Message;
@@ -70,16 +79,22 @@ public partial class GlobalExceptionMiddleware(
                 conflictingField = ex.Field;
                 break;
 
-            case UnidentifiedTokenException:
-            case InvalidCredentialsException:
-            case UnidentifiedUserException:
-                statusCode = HttpStatusCode.Unauthorized;
-                errorMessage = exception.Message;
+            case AccountLockedException lockedEx:
+                statusCode = HttpStatusCode.TooManyRequests;
+                errorMessage = lockedEx.Message;
+                errorCode = AccountLockedException.ErrorCode;
+                minutesRemaining = lockedEx.MinutesRemaining;
                 break;
 
-            case JwtNotConfiguredException ex:
-                statusCode = HttpStatusCode.InternalServerError;
-                errorMessage = ex.Message;
+            case UserDomainException:
+            case AuthDomainException:
+            case InvalidUserIdentifierException:
+            case DenunciationDomainException:
+            case InvalidImageException:
+            case LostAndFoundDomainException:
+            case RideDomainException:
+                statusCode = HttpStatusCode.BadRequest;
+                errorMessage = exception.Message;
                 break;
         }
 
@@ -92,7 +107,13 @@ public partial class GlobalExceptionMiddleware(
         context.Response.StatusCode = (int)statusCode;
 
         await context.Response.WriteAsJsonAsync(
-            new ErrorResponseDto { Error = errorMessage, Field = conflictingField, Code = errorCode },
+            new ErrorResponseDto
+            {
+                Error = errorMessage,
+                Field = conflictingField,
+                Code = errorCode,
+                MinutesRemaining = minutesRemaining
+            },
             context.RequestAborted);
     }
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 public interface IUserService
 {
-    Task<TokenResponseDto> SignUpAsync(CreateUserDto dto, RequestOrigin origin);
+    Task SignUpAsync(CreateUserDto dto, RequestOrigin origin);
     Task<ReadUserDto?> GetProfileAsync(int currentUserId);
     Task<ReadUserPreferencesDto?> GetPreferencesAsync(int currentUserId);
     Task<ReadUserDto?> UpdateProfileAsync(int currentUserId, UpdateUserDto dto);

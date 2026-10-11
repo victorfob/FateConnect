@@ -8,6 +8,7 @@ using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 public class UserRepository : IUserRepository
 {
@@ -42,6 +43,15 @@ public class UserRepository : IUserRepository
         var normalizedEmail = email.Trim().ToLowerInvariant();
 
         return await _context.Users
+            .FirstOrDefaultAsync(u => u.FatecEmail == normalizedEmail);
+    }
+
+    public async Task<User?> GetByEmailWithTokensAsync(string email, EnumTokenType tokenType)
+    {
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+
+        return await _context.Users
+            .Include(u => u.Tokens.Where(token => token.Type == tokenType))
             .FirstOrDefaultAsync(u => u.FatecEmail == normalizedEmail);
     }
 
@@ -138,6 +148,15 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task InTransactionAsync(Func<Task> work)
+    {
+        await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+
+        await work();
+
+        await transaction.CommitAsync();
+    }
+
     public async Task<int?> GetTokenVersionAsync(int userId)
     {
         return await _context.Users
@@ -162,5 +181,12 @@ public class UserRepository : IUserRepository
             .ExecuteUpdateAsync(update => update
                 .SetProperty(user => user.Status, EnumAccountStatus.Active)
                 .SetProperty(user => user.UpdatedAt, DateTime.UtcNow));
+    }
+
+    public async Task<UserToken?> GetTokenAsync(string tokenHash)
+    {
+        return await _context.Set<UserToken>()
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Token == tokenHash);
     }
 }
