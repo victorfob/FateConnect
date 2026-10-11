@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from 'react';
 import { Typography } from '@design-system';
 
+import { AuthCardSubmit } from './AuthCardSubmit';
 import * as S from './styles';
 
 type AuthCardProps = Readonly<{ title: string; description?: string; children: ReactNode }>;
@@ -24,5 +25,5 @@ export function AuthCard({ title, description, children }: AuthCardProps) {
 
 AuthCard.Page = S.PageRoot;
 AuthCard.Form = S.Form;
-AuthCard.Submit = S.SubmitRow;
+AuthCard.Submit = AuthCardSubmit;
 AuthCard.Prompt = S.PromptRow;

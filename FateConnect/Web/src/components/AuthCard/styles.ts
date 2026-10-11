@@ -1,6 +1,5 @@
 import type { FormHTMLAttributes } from 'react';
 import {
-  Box,
   PolymorphicStack,
   radiusScale,
   shadowTokens,
@@ -37,12 +36,6 @@ export const Form = styled(PolymorphicStack)<FormHTMLAttributes<HTMLFormElement>
   gap: theme.space(md),
 
   '& svg': { color: theme.palette.text.secondary },
-}));
-
-export const SubmitRow = styled(Box)(({ theme }) => ({
-  marginTop: theme.space(xs),
-
-  '& .MuiButton-root': { width: '100%' },
 }));
 
 export const PromptRow = styled(PolymorphicStack)(({ theme }) => ({

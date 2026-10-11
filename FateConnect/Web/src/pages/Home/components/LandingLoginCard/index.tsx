@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router';
-import { Button, Input, Typography } from '@design-system';
+import { Input, Typography } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { AccountReactivationDialog } from '@app/components/AccountReactivationDialog';
 import { AuthCard } from '@app/components/AuthCard';
+import { SignupPrompt } from '@app/components/SignupPrompt';
 import { useAccountReactivation } from '@app/hooks/useAccountReactivation';
 import { useCountdown } from '@app/hooks/useCountdown';
 import { useNotification } from '@app/hooks/useNotification';
@@ -14,12 +15,13 @@ import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { login } from '@app/services/auth/authService';
 import type { LoginRequest } from '@app/services/auth/types';
 import type { ApiError } from '@app/services/httpClient';
-import { prefilledEmailOf } from '@app/utils/loginPrefill';
+import { loginPrefillState, prefilledEmailOf } from '@app/utils/loginPrefill';
 
 import { AccountLockedDialog } from './components/AccountLockedDialog';
 import { EmailNotConfirmedDialog } from './components/EmailNotConfirmedDialog';
 import { loginSchema, type LoginFormValues } from './schema';
 import * as C from './constants';
+import * as S from './styles';
 
 const UNAUTHORIZED = 401;
 const FORBIDDEN = 403;
@@ -43,11 +45,14 @@ export function LandingLoginCard() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: prefilledEmail ?? '', password: '' },
   });
+
+  const typedEmail = useWatch({ control, name: 'email' });
 
   // Chegando na landing pela âncora de login, o foco vai ao primeiro campo vazio.
   useEffect(() => {
@@ -158,19 +163,16 @@ export function LandingLoginCard() {
           error={errors.password?.message}
         />
 
-        <AuthCard.Submit>
-          <Button type="submit" variant="contained" color="secondary" loading={isPending}>
-            {C.SUBMIT_LABEL}
-          </Button>
-        </AuthCard.Submit>
+        <S.ForgotPasswordRow component="p">
+          <RouterLink to={RoutePathEnum.FORGOT_PASSWORD} state={loginPrefillState(typedEmail)}>
+            <Typography variant="captionBold">{C.FORGOT_PASSWORD_LINK_LABEL}</Typography>
+          </RouterLink>
+        </S.ForgotPasswordRow>
+
+        <AuthCard.Submit loading={isPending}>{C.SUBMIT_LABEL}</AuthCard.Submit>
       </AuthCard.Form>
 
-      <AuthCard.Prompt component="p">
-        <Typography variant="caption">{C.SIGNUP_PROMPT}</Typography>
-        <RouterLink to={RoutePathEnum.SIGNUP}>
-          <Typography variant="captionBold">{C.SIGNUP_LINK_LABEL}</Typography>
-        </RouterLink>
-      </AuthCard.Prompt>
+      <SignupPrompt />
 
       <AccountReactivationDialog
         open={reactivation.asking}

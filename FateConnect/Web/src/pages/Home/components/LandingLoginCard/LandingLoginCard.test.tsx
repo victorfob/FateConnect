@@ -15,7 +15,7 @@ import {
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
-import { loginPrefillState } from '@app/utils/loginPrefill';
+import { loginPrefillState, prefilledEmailOf } from '@app/utils/loginPrefill';
 
 import {
   ACCOUNT_LOCKED_DIALOG,
@@ -203,6 +203,23 @@ describe('LandingLoginCard', () => {
 
     const reopened = await screen.findByRole('dialog', { name: EMAIL_NOT_CONFIRMED_DIALOG.title });
     expect(within(reopened).getAllByRole('button').at(-1)).toBeDisabled();
+  });
+
+  it('should lead to the forgotten password with the typed email', async () => {
+    const router = createMemoryRouter(
+      [
+        { path: RoutePathEnum.LANDING, element: <LandingLoginCard /> },
+        { path: RoutePathEnum.FORGOT_PASSWORD, element: <p>esqueci</p> },
+      ],
+      { initialEntries: [RoutePathEnum.LANDING] },
+    );
+    render(<RouterProvider router={router} />);
+    await userEvent.type(screen.getByLabelText(/E-mail/), EMAIL);
+
+    await userEvent.click(screen.getByRole('link', { name: C.FORGOT_PASSWORD_LINK_LABEL }));
+
+    expect(await screen.findByText('esqueci')).toBeInTheDocument();
+    expect(prefilledEmailOf(router.state.location.state)).toBe(EMAIL);
   });
 
   it('should reactivate a deactivated account with the typed credentials and enter', async () => {
