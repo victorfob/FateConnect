@@ -46,6 +46,17 @@ export async function unlockAccount(token: string): Promise<void> {
   await apiClient.post(`${AUTH_PATH}/unlock`, { token });
 }
 
+export async function confirmEmail(token: string): Promise<TokenResponse> {
+  const { data } = await apiClient.post<TokenResponse>(`${AUTH_PATH}/confirm-email`, { token });
+  tokenStorage.save(data.token);
+
+  return data;
+}
+
+export async function resendConfirmationEmail(fatecEmail: string): Promise<void> {
+  await apiClient.post(`${AUTH_PATH}/resend-confirmation-email`, { fatecEmail });
+}
+
 export async function isSessionStillValid(): Promise<boolean> {
   try {
     await apiClient.get(`${AUTH_PATH}/session`);
