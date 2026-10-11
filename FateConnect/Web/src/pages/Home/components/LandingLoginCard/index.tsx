@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 
+import { useCountdown } from '@app/hooks/useCountdown';
 import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { login, reactivate } from '@app/services/auth/authService';
@@ -14,6 +15,7 @@ import { prefilledEmailOf } from '@app/utils/loginPrefill';
 
 import { AccountLockedDialog } from './components/AccountLockedDialog';
 import { AccountReactivationDialog } from './components/AccountReactivationDialog';
+import { EmailNotConfirmedDialog } from './components/EmailNotConfirmedDialog';
 import { loginSchema, type LoginFormValues } from './schema';
 import * as C from './constants';
 import * as S from './styles';
@@ -22,6 +24,7 @@ const UNAUTHORIZED = 401;
 const FORBIDDEN = 403;
 const CONFLICT = 409;
 const TOO_MANY_REQUESTS = 429;
+const EMAIL_NOT_CONFIRMED = 'EmailNotConfirmed';
 
 export function LandingLoginCard() {
   const navigate = useNavigate();
@@ -32,6 +35,10 @@ export function LandingLoginCard() {
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const [credentialsToReactivate, setCredentialsToReactivate] = useState<LoginRequest | null>(null);
   const [lockout, setLockout] = useState<ApiError | null>(null);
+  // O e-mail fica depois de fechar: o diálogo ainda aparece enquanto some.
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState('');
+  const [showingUnconfirmed, setShowingUnconfirmed] = useState(false);
+  const resendCountdown = useCountdown();
 
   const {
     register,
@@ -55,9 +62,15 @@ export function LandingLoginCard() {
   }, [hash, prefilledEmail]);
 
   const handleRefusal = useCallback(
-    (error: ApiError) => {
+    (error: ApiError, { fatecEmail }: LoginRequest) => {
       if (error.status === UNAUTHORIZED) {
         notifyError(C.LOGIN_ERROR_MESSAGES.invalidCredentials);
+        return;
+      }
+
+      if (error.status === FORBIDDEN && error.code === EMAIL_NOT_CONFIRMED) {
+        setUnconfirmedEmail(fatecEmail);
+        setShowingUnconfirmed(true);
         return;
       }
 
@@ -89,7 +102,7 @@ export function LandingLoginCard() {
         return;
       }
 
-      handleRefusal(error);
+      handleRefusal(error, credentials);
     },
   });
 
@@ -100,15 +113,17 @@ export function LandingLoginCard() {
       notifySuccess(C.REACTIVATION_SUCCEEDED);
       void navigate(RoutePathEnum.MENU);
     },
-    onError: (error: ApiError) => {
+    onError: (error: ApiError, credentials) => {
       setCredentialsToReactivate(null);
-      handleRefusal(error);
+      handleRefusal(error, credentials);
     },
   });
 
   const handleDismissReactivation = useCallback(() => setCredentialsToReactivate(null), []);
 
   const handleCloseLockout = useCallback(() => setLockout(null), []);
+
+  const handleCloseUnconfirmed = useCallback(() => setShowingUnconfirmed(false), []);
 
   const handleConfirmReactivation = useCallback(() => {
     if (credentialsToReactivate) mutateReactivation(credentialsToReactivate);
@@ -191,6 +206,13 @@ export function LandingLoginCard() {
         open={lockout !== null}
         minutesRemaining={lockout?.minutesRemaining}
         onClose={handleCloseLockout}
+      />
+
+      <EmailNotConfirmedDialog
+        open={showingUnconfirmed}
+        email={unconfirmedEmail}
+        resendCountdown={resendCountdown}
+        onClose={handleCloseUnconfirmed}
       />
     </S.CardRoot>
   );
