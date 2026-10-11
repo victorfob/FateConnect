@@ -7,6 +7,7 @@ import { VisitorRoute } from '@app/components/VisitorRoute';
 import { GuestLayout } from '@app/layouts/GuestLayout';
 import { MainLayout } from '@app/layouts/MainLayout';
 import { RootLayout } from '@app/layouts/RootLayout';
+import { ConfirmEmail } from '@app/pages/ConfirmEmail';
 import { Denunciations } from '@app/pages/Denunciations';
 import { Home } from '@app/pages/Home';
 import { LostAndFound } from '@app/pages/LostAndFound';
@@ -36,6 +37,7 @@ export const routeConfig: RouteObject[] = [
               { path: RoutePathEnum.LANDING, element: <Home /> },
               { path: RoutePathEnum.SIGNUP, element: <Signup /> },
               { path: RoutePathEnum.UNLOCK_ACCOUNT, element: <UnlockAccount /> },
+              { path: RoutePathEnum.CONFIRM_EMAIL, element: <ConfirmEmail /> },
             ],
           },
         ],

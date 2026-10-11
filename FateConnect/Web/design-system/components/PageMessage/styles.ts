@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack';
 import { styled } from '@ds-root/styled';
 import { radiusScale, shadowTokens, spacingScale } from '@ds-root/tokens';
 
-const { md, lg, xl } = spacingScale;
+const { xs, md, lg, xl } = spacingScale;
 
 const CONTENT_MAX_WIDTH_REM = 28;
 
@@ -27,4 +27,21 @@ export const MessageCard = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   boxShadow: shadowTokens.component,
   color: theme.palette.text.primary,
+}));
+
+/** Mais de um botão divide a largura; no estreito, um sob o outro, porque a metade não comporta um rótulo com contador. */
+export const Actions = styled(Stack)(({ theme }) => ({
+  flexDirection: 'row',
+  justifyContent: 'center',
+  gap: theme.space(xs),
+  width: '100%',
+
+  '& > .MuiButton-root:not(:only-child)': { flex: 1 },
+
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+    alignItems: 'center',
+
+    '& > .MuiButton-root:not(:only-child)': { flex: 'none', alignSelf: 'stretch' },
+  },
 }));

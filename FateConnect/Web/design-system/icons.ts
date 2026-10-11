@@ -38,6 +38,7 @@ export { default as LocalOfferIcon } from '@mui/icons-material/LocalOffer';
 export { default as LocationOnIcon } from '@mui/icons-material/LocationOn';
 export { default as LockOutlinedIcon } from '@mui/icons-material/LockOutlined';
 export { default as LogoutIcon } from '@mui/icons-material/Logout';
+export { default as MarkEmailUnreadOutlinedIcon } from '@mui/icons-material/MarkEmailUnreadOutlined';
 export { default as MenuIcon } from '@mui/icons-material/Menu';
 export { default as NoBackpackOutlinedIcon } from '@mui/icons-material/NoBackpackOutlined';
 export { default as NotificationsIcon } from '@mui/icons-material/Notifications';

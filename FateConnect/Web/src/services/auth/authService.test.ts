@@ -3,12 +3,14 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 import { apiClient } from '@app/services/httpClient';
 
-import { login, logout, reactivate } from './authService';
+import { confirmEmail, login, logout, reactivate, resendConfirmationEmail } from './authService';
 import { tokenStorage } from './tokenStorage';
 
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
 const REACTIVATE_URL = 'https://api.fateconnect.test/auth/reactivate';
 const LOGOUT_URL = 'https://api.fateconnect.test/auth/logout';
+const CONFIRM_EMAIL_URL = 'https://api.fateconnect.test/auth/confirm-email';
+const RESEND_CONFIRMATION_URL = 'https://api.fateconnect.test/auth/resend-confirmation-email';
 
 const NO_CONTENT = 204;
 const SERVER_ERROR = 500;
@@ -40,6 +42,36 @@ describe('authService', () => {
     expect(body).toEqual({ fatecEmail: 'a@fatec.sp.gov.br', password: 'segredo123' });
     expect(response).toEqual({ token: 'def' });
     expect(tokenStorage.getToken()).toBe('def');
+  });
+
+  it('should confirm the email with the link token and open the session it answers', async () => {
+    let body: unknown = null;
+    server.use(
+      http.post(CONFIRM_EMAIL_URL, async ({ request }) => {
+        body = await request.json();
+        return HttpResponse.json({ token: 'ghi' });
+      }),
+    );
+
+    const response = await confirmEmail('token-do-link');
+
+    expect(body).toEqual({ token: 'token-do-link' });
+    expect(response).toEqual({ token: 'ghi' });
+    expect(tokenStorage.getToken()).toBe('ghi');
+  });
+
+  it('should ask for a new confirmation link for the given email', async () => {
+    let body: unknown = null;
+    server.use(
+      http.post(RESEND_CONFIRMATION_URL, async ({ request }) => {
+        body = await request.json();
+        return new HttpResponse(null, { status: NO_CONTENT });
+      }),
+    );
+
+    await resendConfirmationEmail('a@fatec.sp.gov.br');
+
+    expect(body).toEqual({ fatecEmail: 'a@fatec.sp.gov.br' });
   });
 
   it('should clear the session on logout without waiting for the server', () => {

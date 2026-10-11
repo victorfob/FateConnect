@@ -1,5 +1,3 @@
-export const TOKEN_PARAM = 'token';
-export const EMAIL_PARAM = 'email';
 export const UNLOCK_QUERY_KEY = 'unlock-account';
 
 export const LOADING_TITLE = 'Desbloqueando a conta';
@@ -22,4 +20,3 @@ export const UNLOCK_FAILED_MESSAGE = {
 };
 
 export const RETRY_LABEL = 'Tentar novamente';
-export const SIGN_IN_LABEL = 'Entrar';

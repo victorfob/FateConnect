@@ -2,9 +2,11 @@ import { StrictMode } from 'react';
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
+import { SIGN_IN_LABEL } from '@app/components/SignInButton/constants';
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
+import { EMAIL_LINK_EMAIL_PARAM, EMAIL_LINK_TOKEN_PARAM } from '@app/utils/emailLink';
 import { prefilledEmailOf } from '@app/utils/loginPrefill';
 
 import * as C from './constants';
@@ -37,7 +39,7 @@ function renderPage(search: string) {
 }
 
 function linkSearch(token: string) {
-  return `?${C.TOKEN_PARAM}=${token}&${C.EMAIL_PARAM}=${encodeURIComponent(EMAIL)}`;
+  return `?${EMAIL_LINK_TOKEN_PARAM}=${token}&${EMAIL_LINK_EMAIL_PARAM}=${encodeURIComponent(EMAIL)}`;
 }
 
 describe('UnlockAccount', () => {
@@ -59,7 +61,7 @@ describe('UnlockAccount', () => {
     // O StrictMode monta a tela duas vezes; o link só vale uma.
     expect(receivedBodies).toEqual([{ token: 'token-que-vale' }]);
 
-    await userEvent.click(screen.getByRole('link', { name: C.SIGN_IN_LABEL }));
+    await userEvent.click(screen.getByRole('link', { name: SIGN_IN_LABEL }));
 
     expect(
       await screen.findByText(`landing #${LandingSectionEnum.LOGIN} ${EMAIL}`),
@@ -97,7 +99,7 @@ describe('UnlockAccount', () => {
       await screen.findByRole('heading', { name: C.EXPIRED_LINK_MESSAGE.title }),
     ).toBeInTheDocument();
     expect(screen.getByText(C.EXPIRED_LINK_MESSAGE.description)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: C.SIGN_IN_LABEL })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: SIGN_IN_LABEL })).toBeInTheDocument();
     // Quem avisa é a tela: a falha esperada não vira notificação.
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
@@ -111,7 +113,7 @@ describe('UnlockAccount', () => {
         return new HttpResponse(null, { status: 204 });
       }),
     );
-    renderPage(`?${C.EMAIL_PARAM}=${encodeURIComponent(EMAIL)}`);
+    renderPage(`?${EMAIL_LINK_EMAIL_PARAM}=${encodeURIComponent(EMAIL)}`);
 
     expect(
       await screen.findByRole('heading', { name: C.EXPIRED_LINK_MESSAGE.title }),

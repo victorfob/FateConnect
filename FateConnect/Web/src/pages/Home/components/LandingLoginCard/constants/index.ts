@@ -1,3 +1,5 @@
+import { BANNED_ACCOUNT_MESSAGE } from '@app/constants/bannedAccount';
+
 export const LOGIN_CARD_TITLE = 'Acesse sua conta';
 export const EMAIL_LABEL = 'E-mail';
 export const PASSWORD_LABEL = 'Senha';
@@ -7,7 +9,7 @@ export const SIGNUP_LINK_LABEL = 'Criar conta';
 
 export const LOGIN_ERROR_MESSAGES = {
   invalidCredentials: 'E-mail ou senha inválidos.',
-  bannedAccount: 'Esta conta foi banida por infringir as regras da plataforma.',
+  bannedAccount: BANNED_ACCOUNT_MESSAGE,
   generic: 'Erro ao realizar login. Tente novamente.',
 };
 

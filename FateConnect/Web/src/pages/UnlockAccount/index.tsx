@@ -1,36 +1,34 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 import { Button, CircularProgress, PageMessage } from '@design-system';
 import { skipToken, useQuery } from '@tanstack/react-query';
 
-import { unlockAccount } from '@app/services/auth/authService';
+import { SignInButton } from '@app/components/SignInButton';
+import {
+  EMAIL_LINK_EMAIL_PARAM,
+  EMAIL_LINK_TOKEN_PARAM,
+  isExpiredLink,
+} from '@app/utils/emailLink';
 
-import { SignInButton } from './components/SignInButton';
-import { isExpiredLink } from './helpers';
+import { unlockQueryFunction } from './helpers';
 import * as C from './constants';
-
-const UNLOCKED = true;
-
-function unlockQueryFunction(token: string | null) {
-  if (token === null) return skipToken;
-
-  return async () => {
-    await unlockAccount(token);
-
-    return UNLOCKED;
-  };
-}
 
 export function UnlockAccount() {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get(C.TOKEN_PARAM);
-  const email = searchParams.get(C.EMAIL_PARAM) ?? '';
+  const token = searchParams.get(EMAIL_LINK_TOKEN_PARAM);
+  const email = searchParams.get(EMAIL_LINK_EMAIL_PARAM) ?? '';
+
+  const queryFn = useMemo(() => {
+    if (token === null) return skipToken;
+
+    return unlockQueryFunction(token);
+  }, [token]);
 
   // Consulta, e não mutação: o StrictMode monta a tela duas vezes e o link só vale
   // uma, e a consulta com a mesma chave chega à API uma vez só.
   const { isSuccess, isFetching, error, refetch } = useQuery({
     queryKey: [C.UNLOCK_QUERY_KEY, token],
-    queryFn: unlockQueryFunction(token),
+    queryFn,
     retry: false,
     staleTime: Infinity,
     meta: { notifiesErrorItself: true },
