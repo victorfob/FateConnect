@@ -2,6 +2,10 @@ import { createMemoryRouter, RouterProvider, type InitialEntry } from 'react-rou
 import { PASSWORD_TOGGLE_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
+import {
+  REACTIVATION_DIALOG,
+  REACTIVATION_SUCCEEDED,
+} from '@app/components/AccountReactivationDialog/constants';
 import { RESEND_LABEL } from '@app/components/ResendLinkButton/constants';
 import { CONFIRMATION_LINK_RESENT } from '@app/constants/emailLink';
 import {
@@ -17,7 +21,6 @@ import {
   ACCOUNT_LOCKED_DIALOG,
   lockedAccountMessage,
 } from './components/AccountLockedDialog/constants';
-import { REACTIVATION_DIALOG } from './components/AccountReactivationDialog/constants';
 import { EMAIL_NOT_CONFIRMED_DIALOG } from './components/EmailNotConfirmedDialog/constants';
 import { LOGIN_MESSAGES } from './schema';
 import * as C from './constants';
@@ -224,7 +227,7 @@ describe('LandingLoginCard', () => {
 
     await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
     expect(reactivationBody).toEqual({ fatecEmail: EMAIL, password: PASSWORD });
-    expect(await screen.findByText(C.REACTIVATION_SUCCEEDED)).toBeInTheDocument();
+    expect(await screen.findByText(REACTIVATION_SUCCEEDED)).toBeInTheDocument();
   });
 
   it('should stay on the landing without reactivating when the person gives up', async () => {

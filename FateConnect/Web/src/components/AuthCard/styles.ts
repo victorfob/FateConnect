@@ -5,10 +5,11 @@ import {
   radiusScale,
   shadowTokens,
   spacingScale,
+  Stack,
   styled,
 } from '@design-system';
 
-const { xxs, xs, md, lg } = spacingScale;
+const { xxs, xs, md, lg, xl } = spacingScale;
 
 const CARD_WIDTH_PX = 360;
 
@@ -25,7 +26,8 @@ export const CardRoot = styled(PolymorphicStack)(({ theme }) => ({
   boxShadow: shadowTokens.component,
 }));
 
-export const CardTitle = styled(Box)(({ theme }) => ({
+export const CardTitle = styled(Stack)(({ theme }) => ({
+  gap: theme.space(xs),
   color: theme.palette.text.primary,
   textAlign: 'center',
 }));
@@ -43,7 +45,7 @@ export const SubmitRow = styled(Box)(({ theme }) => ({
   '& .MuiButton-root': { width: '100%' },
 }));
 
-export const SignupRow = styled(PolymorphicStack)(({ theme }) => ({
+export const PromptRow = styled(PolymorphicStack)(({ theme }) => ({
   flexDirection: 'row',
   flexWrap: 'wrap',
   alignItems: 'baseline',
@@ -63,4 +65,12 @@ export const SignupRow = styled(PolymorphicStack)(({ theme }) => ({
     textDecoration: 'underline',
     textDecorationColor: theme.palette.brandText,
   },
+}));
+
+/** O cartão sozinho na tela, fora da landing: no meio da área de conteúdo. */
+export const PageRoot = styled(Stack)(({ theme }) => ({
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: theme.space(xl, md),
 }));

@@ -12,5 +12,3 @@ export const LOGIN_ERROR_MESSAGES = {
   bannedAccount: BANNED_ACCOUNT_MESSAGE,
   generic: 'Erro ao realizar login. Tente novamente.',
 };
-
-export const REACTIVATION_SUCCEEDED = 'Conta reativada.';
