@@ -1,3 +1,5 @@
+import { PersonOffOutlinedIcon } from '@design-system/icons';
+
 import { render, screen, userEvent } from '@app/test/testing-library';
 
 import { CONFIRMATION } from './constants';
@@ -57,6 +59,15 @@ describe('ConfirmAction', () => {
     await userEvent.click(screen.getByRole('button', { name: DEFAULT_PROPS.label }));
 
     expect(screen.getByTestId(testId)).toBeInTheDocument();
+  });
+
+  it('should ask with the icon the action names, in place of the tone default', async () => {
+    renderComponent({ ...DEFAULT_PROPS, destructive: true, dialogIcon: PersonOffOutlinedIcon });
+
+    await userEvent.click(screen.getByRole('button', { name: DEFAULT_PROPS.label }));
+
+    expect(screen.getByTestId('PersonOffOutlinedIcon')).toBeInTheDocument();
+    expect(screen.queryByTestId('DangerousOutlinedIcon')).not.toBeInTheDocument();
   });
 
   it('should act only once confirmed', async () => {

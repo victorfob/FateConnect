@@ -16,7 +16,6 @@ export { default as CheckCircleIcon } from '@mui/icons-material/CheckCircle';
 export { default as ChevronRightIcon } from '@mui/icons-material/ChevronRight';
 export { default as CloseIcon } from '@mui/icons-material/Close';
 export { default as ContactPageIcon } from '@mui/icons-material/ContactPage';
-export { default as ContactPageOutlinedIcon } from '@mui/icons-material/ContactPageOutlined';
 export { default as DarkModeIcon } from '@mui/icons-material/DarkMode';
 export { default as DeleteIcon } from '@mui/icons-material/Delete';
 export { default as DeleteOutlinedIcon } from '@mui/icons-material/DeleteOutlined';
@@ -45,6 +44,7 @@ export { default as NotificationsIcon } from '@mui/icons-material/Notifications'
 export { default as OpenInFullIcon } from '@mui/icons-material/OpenInFull';
 export { default as PersonIcon } from '@mui/icons-material/Person';
 export { default as PersonOffIcon } from '@mui/icons-material/PersonOff';
+export { default as PersonOffOutlinedIcon } from '@mui/icons-material/PersonOffOutlined';
 export { default as PhoneDisabledIcon } from '@mui/icons-material/PhoneDisabled';
 export { default as PhoneIcon } from '@mui/icons-material/Phone';
 export { default as RestoreIcon } from '@mui/icons-material/Restore';

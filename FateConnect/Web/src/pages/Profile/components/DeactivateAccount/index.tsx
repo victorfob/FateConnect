@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { PersonOffIcon } from '@design-system/icons';
+import { PersonOffIcon, PersonOffOutlinedIcon } from '@design-system/icons';
 import { useMutation } from '@tanstack/react-query';
 
 import { ConfirmAction } from '@app/components/ConfirmAction';
@@ -32,6 +32,7 @@ export function DeactivateAccount() {
         confirmLabel={C.DEACTIVATE.confirmLabel}
         onConfirm={handleDeactivate}
         destructive
+        dialogIcon={PersonOffOutlinedIcon}
       />
     </S.DeactivateRow>
   );

@@ -1,9 +1,11 @@
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, useState, type ComponentProps, type ReactNode } from 'react';
 import { Button, Dialog, type ButtonProps, type FeedbackTone } from '@design-system';
 import { HelpOutlineOutlinedIcon } from '@design-system/icons';
 
 import { CONFIRMATION } from './constants';
 import * as S from './styles';
+
+type DialogIcon = NonNullable<ComponentProps<typeof Dialog.Message>['icon']>;
 
 export type ConfirmActionProps = Readonly<{
   label: string;
@@ -16,6 +18,8 @@ export type ConfirmActionProps = Readonly<{
   confirmLabel: string;
   /** Pinta o gatilho de vermelho, para a ação que desfaz algo que não volta pela tela. */
   destructive?: boolean;
+  /** O ícone do diálogo quando a ação tem um símbolo próprio, no lugar do padrão do tom. */
+  dialogIcon?: DialogIcon;
   onConfirm: VoidFunction;
 }>;
 
@@ -32,7 +36,11 @@ function confirmationTone(destructive: boolean): FeedbackTone {
 }
 
 /** A confirmação que não destrói pergunta: o ícone é a interrogação, e não o "i" de aviso. */
-function confirmationIcon(destructive: boolean) {
+function confirmationIcon(
+  destructive: boolean,
+  dialogIcon: DialogIcon | undefined,
+): DialogIcon | undefined {
+  if (dialogIcon) return dialogIcon;
   if (destructive) return undefined;
 
   return HelpOutlineOutlinedIcon;
@@ -48,6 +56,7 @@ function ConfirmAction({
   subject,
   confirmLabel,
   destructive = false,
+  dialogIcon,
   onConfirm,
 }: ConfirmActionProps) {
   const [confirming, setConfirming] = useState(false);
@@ -68,7 +77,10 @@ function ConfirmAction({
 
       <Dialog open={confirming} onClose={handleDismiss} title={dialogTitle}>
         <Dialog.Body>
-          <Dialog.Message tone={confirmationTone(destructive)} icon={confirmationIcon(destructive)}>
+          <Dialog.Message
+            tone={confirmationTone(destructive)}
+            icon={confirmationIcon(destructive, dialogIcon)}
+          >
             {messagePrefix}
             <strong>{subject}</strong>
             {messageSuffix}
