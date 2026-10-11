@@ -47,6 +47,7 @@ export {
 } from './components/NotificationProvider/NotificationActions';
 export { PageMessage } from './components/PageMessage';
 export type { PageMessageProps } from './components/PageMessage';
+export type { FeedbackTone } from './theme/types';
 export { PageShell } from './components/PageShell';
 export type { PageShellProps } from './components/PageShell';
 export { Pagination } from './components/Pagination';

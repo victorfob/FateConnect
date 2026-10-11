@@ -43,6 +43,7 @@ export function UnlockAccount() {
       <PageMessage
         title={C.EXPIRED_LINK_MESSAGE.title}
         description={C.EXPIRED_LINK_MESSAGE.description}
+        tone="info"
       >
         <SignInButton email={email} />
       </PageMessage>
@@ -50,7 +51,11 @@ export function UnlockAccount() {
 
   if (isSuccess)
     return (
-      <PageMessage title={C.UNLOCKED_MESSAGE.title} description={C.UNLOCKED_MESSAGE.description}>
+      <PageMessage
+        title={C.UNLOCKED_MESSAGE.title}
+        description={C.UNLOCKED_MESSAGE.description}
+        tone="success"
+      >
         <SignInButton email={email} />
       </PageMessage>
     );
@@ -60,6 +65,7 @@ export function UnlockAccount() {
       <PageMessage
         title={C.UNLOCK_FAILED_MESSAGE.title}
         description={C.UNLOCK_FAILED_MESSAGE.description}
+        tone="error"
       >
         <Button variant="contained" color="secondary" loading={isFetching} onClick={handleRetry}>
           {C.RETRY_LABEL}

@@ -11,7 +11,7 @@ export type UnavailableProps = Readonly<{ description: string }>;
 /** As três rotas sem dono mostram esta tela; só a descrição muda. */
 export function Unavailable({ description }: UnavailableProps) {
   return (
-    <PageMessage title={C.UNAVAILABLE_TITLE} description={description}>
+    <PageMessage title={C.UNAVAILABLE_TITLE} description={description} tone="info">
       <Button component={RouterLink} to={RoutePathEnum.MENU} variant="contained" color="secondary">
         {BACK_TO_MENU_LABEL}
       </Button>

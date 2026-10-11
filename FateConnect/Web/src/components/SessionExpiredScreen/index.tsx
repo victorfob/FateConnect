@@ -8,7 +8,11 @@ import * as C from './constants';
 
 export function SessionExpiredScreen() {
   return (
-    <MessageScreen title={C.SESSION_EXPIRED_TITLE} description={C.SESSION_EXPIRED_DESCRIPTION}>
+    <MessageScreen
+      title={C.SESSION_EXPIRED_TITLE}
+      description={C.SESSION_EXPIRED_DESCRIPTION}
+      tone="warning"
+    >
       <Button
         component={RouterLink}
         to={`${RoutePathEnum.LANDING}#${LandingSectionEnum.LOGIN}`}
