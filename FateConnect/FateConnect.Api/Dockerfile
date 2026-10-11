@@ -1,10 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /src/FateConnect.Api
 
-COPY FateConnect.Api.csproj ./
+COPY .editorconfig /src/
+COPY FateConnect.Api/FateConnect.Api.csproj ./
 RUN dotnet restore
 
-COPY . ./
+COPY FateConnect.Api/ ./
 # Segredo, e não `ARG`: o valor do `ARG` sai impresso no log do build e fica
 # gravado no histórico da imagem.
 RUN --mount=type=secret,id=sixlabors_license \

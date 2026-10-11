@@ -8,7 +8,9 @@
 services:
   api:
     build:
-      context: ../FateConnect/FateConnect.Api
+      # A pasta de cima entra para o build ler o .editorconfig, que marca as migrations como código gerado.
+      context: ../FateConnect
+      dockerfile: FateConnect.Api/Dockerfile
       # O ImageSharp reprova o build de publicação sem licença. Ela entra como
       # segredo do build, que não aparece no log nem chega à imagem que sobe.
       secrets:
