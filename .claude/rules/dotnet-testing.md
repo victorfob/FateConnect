@@ -39,6 +39,7 @@ paths:
 - Teste que grava arquivo: `git status` depois da suíte. A `ApiFactory` já isola o webroot num temporário.
 - ⛔ A `ApiFactory` executa o `Program.Main`: variável de ambiente que ele passa a exigir entra no construtor dela, com valor falso, senão a suíte inteira cai na subida.
 - Harness do MassTransit em teste leva `SetTestTimeouts` com folga: a inatividade padrão (~1,2 s) estoura com a suíte em paralelo, e o teste falha só às vezes.
+- ⛔ Cada `ApiFactory` tem banco e pool próprios, e o `Dispose` dela fecha o pool (`NpgsqlConnection.ClearPool`): sem isso as conexões ociosas passam das 100 do contêiner, e o CI cai em `53300` sempre nos mesmos testes.
 
 ## Suíte verde não prova que ela pega o defeito
 

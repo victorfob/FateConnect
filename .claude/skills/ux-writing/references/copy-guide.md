@@ -35,6 +35,7 @@ O glossário decidido e as proibições de uma linha estão na rule `product-cop
 
 ## Peças
 
+- **Aviso que some** (o toast) é uma frase curta: o recado com motivo, prazo e saída vira diálogo, como o da conta bloqueada.
 - **Tooltip** complementa, não repete; no botão só de ícone ele é o nome e repete o rótulo acessível. Até duas linhas.
 - **Nota ao lado de etiqueta** diz o que a etiqueta não diz; havendo só repetição, a nota não existe. Texto de reserva é onde a repetição nasce.
 - **Estado vazio:** status, o que apareceria ali e a saída. Nunca "Ops", nunca parecer erro.

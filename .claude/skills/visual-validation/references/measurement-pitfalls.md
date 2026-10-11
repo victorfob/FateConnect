@@ -27,6 +27,7 @@ Cada caso: o que o número responde, o que ele parece responder, e o controle.
 - Painel oculto mede `window.innerWidth` 0 e geometria lixo. Emular o viewport com largura e altura explícitas devolve layout real; leia a largura junto de cada medição e devolva o preset `desktop` ao terminar.
 - ⛔ **Painel oculto não entrega `ResizeObserver` nem `requestAnimationFrame`** (`document.visibilityState` é `hidden`): o que depende deles parece quebrado, inclusive um observador seu, que não recebe nem a chamada inicial. Meça num Chrome `--headless=new` com `--remote-debugging-port`, pelo `WebSocket` do Node: `Emulation.setDeviceMetricsOverride` troca a largura sem recarregar, e o controle é o mesmo script com o mecanismo tirado do código.
 - Mover ou renomear pasta de módulo com o Vite de pé deixa todo servidor que lê a árvore com o grafo velho, inclusive o da porta padrão: a página sai em branco e o log diz `Failed to load url`. Reinicie os servidores depois do `mv`.
+- ⛔ Captura de servidor caído (o app também para os servidores de preview) sai com a página de erro do navegador e sobrescreve a boa no mesmo nome. Antes da rodada, `200` na porta; depois, leia cada captura antes de mandar.
 
 ## Tema e dado da captura
 
