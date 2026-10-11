@@ -1,5 +1,6 @@
 import { useCallback, useState, type ReactNode } from 'react';
 import { Button, Dialog, type ButtonProps, type FeedbackTone } from '@design-system';
+import { HelpOutlineOutlinedIcon } from '@design-system/icons';
 
 import { CONFIRMATION } from './constants';
 import * as S from './styles';
@@ -28,6 +29,13 @@ function confirmationTone(destructive: boolean): FeedbackTone {
   if (destructive) return 'error';
 
   return 'info';
+}
+
+/** A confirmação que não destrói pergunta: o ícone é a interrogação, e não o "i" de aviso. */
+function confirmationIcon(destructive: boolean) {
+  if (destructive) return undefined;
+
+  return HelpOutlineOutlinedIcon;
 }
 
 /** O botão de uma ação sem volta pela tela e a confirmação que ele abre. */
@@ -60,7 +68,7 @@ function ConfirmAction({
 
       <Dialog open={confirming} onClose={handleDismiss} title={dialogTitle}>
         <Dialog.Body>
-          <Dialog.Message tone={confirmationTone(destructive)}>
+          <Dialog.Message tone={confirmationTone(destructive)} icon={confirmationIcon(destructive)}>
             {messagePrefix}
             <strong>{subject}</strong>
             {messageSuffix}

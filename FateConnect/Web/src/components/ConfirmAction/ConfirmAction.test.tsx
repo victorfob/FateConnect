@@ -48,6 +48,17 @@ describe('ConfirmAction', () => {
     });
   });
 
+  it.each([
+    [false, 'HelpOutlineOutlinedIcon'],
+    [true, 'DangerousOutlinedIcon'],
+  ])('should ask with the matching icon when destructive is %s', async (destructive, testId) => {
+    renderComponent({ ...DEFAULT_PROPS, destructive });
+
+    await userEvent.click(screen.getByRole('button', { name: DEFAULT_PROPS.label }));
+
+    expect(screen.getByTestId(testId)).toBeInTheDocument();
+  });
+
   it('should act only once confirmed', async () => {
     renderComponent();
 

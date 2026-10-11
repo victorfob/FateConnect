@@ -29,6 +29,7 @@ export { default as ExpandMoreIcon } from '@mui/icons-material/ExpandMore';
 export { default as FilterAltIcon } from '@mui/icons-material/FilterAlt';
 export { default as FormatListBulletedIcon } from '@mui/icons-material/FormatListBulleted';
 export { default as GroupsIcon } from '@mui/icons-material/Groups';
+export { default as HelpOutlineOutlinedIcon } from '@mui/icons-material/HelpOutlineOutlined';
 export { default as ImageIcon } from '@mui/icons-material/Image';
 export { IncognitoIcon } from './components/IncognitoIcon';
 export { default as InfoIcon } from '@mui/icons-material/Info';
