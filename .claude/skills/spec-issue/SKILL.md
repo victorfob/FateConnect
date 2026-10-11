@@ -60,6 +60,8 @@ Aconteceu na #226. O pedido dizia *"o login continua retornando `fullName` mas o
 
 **O tell é o verbo no presente sobre o código:** "já não usa", "ninguém chama", "isso é só", "não tem mais". Cada um é um `Grep` que você ainda não fez.
 
+⚠️ **Evento que avisa alguém: confira no modelo quem recebe além de quem agiu.** A carona só guarda o motorista e o item só o dono: "carona cancelada" e "item encontrado" não tinham a quem notificar e saíram da lista.
+
 ⚠️ **O tell no passado cobra busca mais funda:** "aquela tela que tínhamos antes", "o componente que a gente removeu", "como era na versão anterior". Ali o `Grep` no código atual não responde — precisa do histórico, com `git log --all -S "<termo>" -i --name-only` —, e a resposta pode ser que **nunca existiu**. Aconteceu em 03/09/2026: "aquela tela de em breve que tínhamos antes" não estava no código nem no histórico, e o que havia era um componente do design system escrito para aquele caso e sem consumidor nenhum. Especificar sobre a lembrança teria mandado ressuscitar o inexistente.
 
 ### Issue de "todos os X" começa pelo inventário medido

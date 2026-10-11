@@ -29,6 +29,11 @@ gh run view <run-id> --json jobs --jq '.jobs[].steps[] | "\(.conclusion)\t\(.nam
 
 `skipped` depois de `failure` é passo que ninguém mediu.
 
+## Rodar de novo
+
+- O re-run reusa o commit do evento: correção que entrou na base depois só chega com push novo na branch (rebase ou merge da base).
+- Falha que se repete nos mesmos testes a cada rodada é determinística, porque a ordem do CI é fixa: ache o mecanismo em vez de rodar de novo.
+
 ## A suíte que o CI não rodou
 
 - Job verde também se lê pelos passos: o filtro de caminhos pula build e testes e o job responde `success`. Sem um passo de teste `success` no head, nada se afirma sobre a suíte.
