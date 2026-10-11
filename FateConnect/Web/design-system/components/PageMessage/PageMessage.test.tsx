@@ -14,7 +14,7 @@ const TONE_ICON_TEST_IDS: [FeedbackTone, string][] = [
   ['info', 'InfoOutlinedIcon'],
   ['success', 'CheckCircleOutlinedIcon'],
   ['warning', 'WarningAmberOutlinedIcon'],
-  ['error', 'ErrorOutlineOutlinedIcon'],
+  ['error', 'DangerousOutlinedIcon'],
 ];
 
 describe('PageMessage', () => {
