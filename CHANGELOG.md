@@ -13,6 +13,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a redefinição da senha esquecida: o pedido pelo e-mail Fatec envia um link de uso único que vale por 30 minutos, e a senha nova derruba as sessões abertas e já entra; e-mail sem conta é avisado, e conta banida não redefine (#553) [Backend]
 - Adiciona o bloqueio da conta por 30 minutos depois de 3 senhas erradas seguidas, no login ou na reativação, que recusa até a senha certa e diz quantos minutos faltam (#553) [Backend]
 - Adiciona o e-mail de desbloqueio, um por bloqueio, com um link de uso único que destrava a conta antes dos 30 minutos (#553) [Backend]
+- Adiciona ao login um diálogo de conta bloqueada por senhas erradas, que explica o motivo, quanto tempo falta para ela destravar e o link enviado ao e-mail Fatec como saída (#573) [Frontend]
+- Adiciona a página do link de desbloqueio, que destrava a conta ao abrir e leva ao login com o e-mail preenchido; com o link expirado ou já usado, ela avisa que a conta já está liberada (#573) [Frontend]
 - Adiciona a foto original à lista de contas da gestão, ao lado da miniatura (#561) [Backend]
 - Adiciona a remoção da foto ao editar um item de achados e perdidos, como em Meu perfil: a foto sai ao salvar, e o arquivo é apagado na hora (#563) [Frontend]
 - Adiciona à edição de um item de achados e perdidos o pedido de tirar a foto, que apaga o arquivo; com uma foto nova no mesmo pedido, fica a nova (#563) [Backend]
@@ -28,6 +30,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a abrir o aplicativo de e-mail ao tocar no e-mail do contato de quem publicou, como no rodapé, no lugar de copiar o endereço (#563) [Frontend]
 - Passa a dividir a largura do rodapé entre os botões no celular também nos diálogos com formulário, como os filtros (#563) [Frontend]
 - Passa a declarar na política de privacidade que quem cadastrou um item pode trocar ou tirar a foto ao editá-lo, e que a anterior é apagada na hora, em nova versão do documento (#563) [Frontend]
+- Passa a mostrar as telas de recado (área ainda não disponível, erro inesperado, sessão expirada e desbloqueio da conta) num cartão, com um ícone pela natureza do recado: informação, sucesso, aviso ou erro (#573) [Frontend]
+- Passa a mostrar, nos diálogos que só têm texto, um ícone pela natureza do recado acima da frase, como o cadeado na conta bloqueada e a lixeira na exclusão de carona (#573) [Frontend]
 
 ### Fixed
 

@@ -42,6 +42,10 @@ export function logout(): void {
   if (token) void endServerSession(token);
 }
 
+export async function unlockAccount(token: string): Promise<void> {
+  await apiClient.post(`${AUTH_PATH}/unlock`, { token });
+}
+
 export async function isSessionStillValid(): Promise<boolean> {
   try {
     await apiClient.get(`${AUTH_PATH}/session`);

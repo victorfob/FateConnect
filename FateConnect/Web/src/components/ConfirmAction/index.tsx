@@ -1,5 +1,5 @@
 import { useCallback, useState, type ReactNode } from 'react';
-import { Button, Dialog, type ButtonProps } from '@design-system';
+import { Button, Dialog, type ButtonProps, type FeedbackTone } from '@design-system';
 
 import { CONFIRMATION } from './constants';
 import * as S from './styles';
@@ -22,6 +22,12 @@ function triggerVariant(destructive: boolean): ButtonProps['variant'] {
   if (destructive) return 'destructive';
 
   return 'soft';
+}
+
+function confirmationTone(destructive: boolean): FeedbackTone {
+  if (destructive) return 'error';
+
+  return 'info';
 }
 
 /** O botão de uma ação sem volta pela tela e a confirmação que ele abre. */
@@ -54,7 +60,7 @@ function ConfirmAction({
 
       <Dialog open={confirming} onClose={handleDismiss} title={dialogTitle}>
         <Dialog.Body>
-          <Dialog.Message>
+          <Dialog.Message tone={confirmationTone(destructive)}>
             {messagePrefix}
             <strong>{subject}</strong>
             {messageSuffix}

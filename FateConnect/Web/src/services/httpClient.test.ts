@@ -60,11 +60,31 @@ describe('httpClient', () => {
     );
   });
 
+  it('should carry the minutes left when the api reports a locked account', async () => {
+    server.use(
+      http.get(PING_URL, () =>
+        HttpResponse.json(
+          { error: 'bloqueada', code: 'AccountLocked', minutesRemaining: 12 },
+          { status: 429 },
+        ),
+      ),
+    );
+
+    await expect(apiClient.get('/ping')).rejects.toThrow(
+      expect.objectContaining({ status: 429, code: 'AccountLocked', minutesRemaining: 12 }),
+    );
+  });
+
   it('should leave the field and the code empty when the body has none', async () => {
     server.use(http.get(PING_URL, () => HttpResponse.json({ error: 'falhou' }, { status: 400 })));
 
     await expect(apiClient.get('/ping')).rejects.toThrow(
-      expect.objectContaining({ status: 400, field: undefined, code: undefined }),
+      expect.objectContaining({
+        status: 400,
+        field: undefined,
+        code: undefined,
+        minutesRemaining: undefined,
+      }),
     );
   });
 

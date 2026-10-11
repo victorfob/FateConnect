@@ -1,5 +1,6 @@
 import { cleanup, render, screen, userEvent, within } from '@app/test/testing-library';
 import { narrowDeclarationsFor } from '@app/test/utils/styleSheetRules';
+import { LockOutlinedIcon } from '@ds-root/icons';
 
 import { CLOSE_LABEL } from './constants';
 import type { DialogSubmitProps } from './DialogSubmit';
@@ -146,6 +147,52 @@ describe('Dialog', () => {
     renderComponent({ ...DEFAULT_PROPS, open: false });
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('should draw the tone icon above the message, hidden from assistive technology', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Body>
+          <Dialog.Message tone="warning">Frase do diálogo</Dialog.Message>
+        </Dialog.Body>
+      ),
+    });
+
+    expect(screen.getByText('Frase do diálogo')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('WarningAmberOutlinedIcon').closest('[aria-hidden="true"]'),
+    ).not.toBeNull();
+  });
+
+  it('should draw the icon the message names in place of the tone default', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Body>
+          <Dialog.Message tone="warning" icon={LockOutlinedIcon}>
+            Frase do diálogo
+          </Dialog.Message>
+        </Dialog.Body>
+      ),
+    });
+
+    expect(screen.getByTestId('LockOutlinedIcon')).toBeInTheDocument();
+    expect(screen.queryByTestId('WarningAmberOutlinedIcon')).not.toBeInTheDocument();
+  });
+
+  it('should leave the message without icon when it has no tone', () => {
+    renderComponent({
+      ...DEFAULT_PROPS,
+      children: (
+        <Dialog.Body>
+          <Dialog.Message>Frase do diálogo</Dialog.Message>
+        </Dialog.Body>
+      ),
+    });
+
+    expect(screen.getByText('Frase do diálogo')).toBeInTheDocument();
+    expect(document.querySelector('[role="dialog"] [aria-hidden="true"] svg')).toBeNull();
   });
 
   it('should submit the form from the submit slot, and leave validation to the screen', async () => {

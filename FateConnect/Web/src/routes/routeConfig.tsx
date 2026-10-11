@@ -18,6 +18,7 @@ import { Rides } from '@app/pages/Rides';
 import { Signup } from '@app/pages/Signup';
 import { Unavailable } from '@app/pages/Unavailable';
 import * as C from '@app/pages/Unavailable/constants';
+import { UnlockAccount } from '@app/pages/UnlockAccount';
 
 import { RoutePathEnum } from './paths';
 
@@ -34,6 +35,7 @@ export const routeConfig: RouteObject[] = [
             children: [
               { path: RoutePathEnum.LANDING, element: <Home /> },
               { path: RoutePathEnum.SIGNUP, element: <Signup /> },
+              { path: RoutePathEnum.UNLOCK_ACCOUNT, element: <UnlockAccount /> },
             ],
           },
         ],
