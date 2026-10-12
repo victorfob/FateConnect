@@ -13,7 +13,7 @@ public class PasswordResetTests(ApiFactory factory) : IClassFixture<ApiFactory>
     private const string NewPassword = "NovaSenha456!";
 
     private static readonly TimeSpan ResetLifetime = TimeSpan.FromMinutes(30);
-    private static readonly TimeSpan ResendCooldown = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan ResendCooldown = TimeSpan.FromMinutes(3);
 
     private static async Task<SentEmail> RequestResetLinkAsync(ApiFactory api, string fatecEmail, int expectedCount = 1)
     {
@@ -76,14 +76,17 @@ public class PasswordResetTests(ApiFactory factory) : IClassFixture<ApiFactory>
     [Fact]
     public async Task ForgotPassword_WithinTheCooldown_SendsNothingNew()
     {
-        (_, string fatecEmail) = factory.SeedUserWithPassword("Renato Faria Campos", KnownPassword);
-        await RequestResetLinkAsync(factory, fatecEmail);
+        MovableTimeProvider clock = new(DateTimeOffset.UtcNow);
+        using ApiFactory api = new() { Clock = clock };
+        (_, string fatecEmail) = api.SeedUserWithPassword("Renato Faria Campos", KnownPassword);
+        await RequestResetLinkAsync(api, fatecEmail);
 
-        HttpResponseMessage again = await factory.CreateClient()
+        clock.Now += ResendCooldown - TimeSpan.FromSeconds(1);
+        HttpResponseMessage again = await api.CreateClient()
             .PostAsJsonAsync("/Auth/forgot-password", new { fatecEmail });
 
         Assert.Equal(HttpStatusCode.NoContent, again.StatusCode);
-        Assert.Equal(1, factory.TokenCountOf(fatecEmail, EnumTokenType.PasswordReset));
+        Assert.Equal(1, api.TokenCountOf(fatecEmail, EnumTokenType.PasswordReset));
     }
 
     [Fact]
