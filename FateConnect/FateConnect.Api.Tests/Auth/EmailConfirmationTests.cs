@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using FateConnect.Api.Modules.Auth.DTOs;
+using FateConnect.Api.Modules.Communications.Enums;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Tests.Fixtures;
 
@@ -26,7 +27,7 @@ public class EmailConfirmationTests(ApiFactory factory) : IClassFixture<ApiFacto
     {
         await api.CreateClient().PostAsJsonAsync("/Auth/resend-confirmation-email", new { fatecEmail });
 
-        IReadOnlyList<SentEmail> sent = await api.Emails.WaitForAsync(fatecEmail, SentEmailKind.Confirmation, expectedCount);
+        IReadOnlyList<SentEmail> sent = await api.Emails.WaitForAsync(fatecEmail, EnumAccountEmail.Confirmation, expectedCount);
 
         return sent[expectedCount - 1];
     }
@@ -127,7 +128,7 @@ public class EmailConfirmationTests(ApiFactory factory) : IClassFixture<ApiFacto
         (_, string fatecEmail) = factory.SeedUserWithPassword("Lívia Moraes Prado", KnownPassword);
 
         await factory.CreateClient().PostAsJsonAsync("/Auth/forgot-password", new { fatecEmail });
-        IReadOnlyList<SentEmail> reset = await factory.Emails.WaitForAsync(fatecEmail, SentEmailKind.PasswordReset);
+        IReadOnlyList<SentEmail> reset = await factory.Emails.WaitForAsync(fatecEmail, EnumAccountEmail.PasswordReset);
 
         HttpResponseMessage confirmation = await ConfirmAsync(factory, reset[0].Token);
 

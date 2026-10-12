@@ -1,16 +1,10 @@
 using System.Collections.Concurrent;
+using FateConnect.Api.Modules.Communications.Enums;
 using FateConnect.Api.Modules.Communications.Interfaces;
 
 namespace FateConnect.Api.Tests.Fixtures;
 
-public enum SentEmailKind
-{
-    Confirmation,
-    PasswordReset,
-    AccountLocked
-}
-
-public sealed record SentEmail(SentEmailKind Kind, string ToEmail, string Link)
+public sealed record SentEmail(EnumAccountEmail Kind, string ToEmail, string Link)
 {
     public string Token => QueryValue("token");
 
@@ -28,19 +22,17 @@ public sealed class RecordingEmailService : IEmailService
 
     private readonly ConcurrentQueue<SentEmail> _sent = new();
 
-    public Task SendConfirmationEmailAsync(string toEmail, string fullName, string confirmationLink) =>
-        Record(SentEmailKind.Confirmation, toEmail, confirmationLink);
+    public Task SendAsync(EnumAccountEmail email, string toEmail, string fullName, string link)
+    {
+        _sent.Enqueue(new SentEmail(email, toEmail, link));
 
-    public Task SendPasswordResetEmailAsync(string toEmail, string fullName, string resetLink) =>
-        Record(SentEmailKind.PasswordReset, toEmail, resetLink);
+        return Task.CompletedTask;
+    }
 
-    public Task SendAccountLockedEmailAsync(string toEmail, string fullName, string unlockLink) =>
-        Record(SentEmailKind.AccountLocked, toEmail, unlockLink);
-
-    public IReadOnlyList<SentEmail> SentTo(string toEmail, SentEmailKind kind) =>
+    public IReadOnlyList<SentEmail> SentTo(string toEmail, EnumAccountEmail kind) =>
         _sent.Where(email => email.ToEmail == toEmail && email.Kind == kind).ToList();
 
-    public async Task<IReadOnlyList<SentEmail>> WaitForAsync(string toEmail, SentEmailKind kind, int count = 1)
+    public async Task<IReadOnlyList<SentEmail>> WaitForAsync(string toEmail, EnumAccountEmail kind, int count = 1)
     {
         DateTime deadline = DateTime.UtcNow + DeliveryTimeout;
 
@@ -55,12 +47,5 @@ public sealed class RecordingEmailService : IEmailService
         }
 
         throw new TimeoutException($"Expected {count} {kind} email(s) to {toEmail}, got {SentTo(toEmail, kind).Count}.");
-    }
-
-    private Task Record(SentEmailKind kind, string toEmail, string link)
-    {
-        _sent.Enqueue(new SentEmail(kind, toEmail, link));
-
-        return Task.CompletedTask;
     }
 }

@@ -22,6 +22,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona ao login um diálogo para quem ainda não confirmou o e-mail Fatec, que diz o que falta e reenvia o link de confirmação (#577) [Frontend]
 - Adiciona ao login o pedido de redefinição da senha esquecida: a tela leva o e-mail já digitado, avisa quando não há conta e oferece o cadastro, e o link pode ser pedido de novo a cada 3 minutos (#579) [Frontend]
 - Adiciona a página do link de redefinição, que confere o link ao abrir, pede a nova senha com confirmação e as regras do cadastro e já entra; com o link vencido, oferece outro, e a conta desativada é levada a reativar com a nova senha (#579) [Frontend]
+- Adiciona aos e-mails da conta o símbolo e o nome do FateConnect no topo, um desenho que o Outlook, o Gmail e o Apple Mail mostram igual, a primeira frase na prévia da caixa de entrada e uma versão só em texto enviada junto (#583) [Frontend] [Backend]
 
 ### Changed
 
