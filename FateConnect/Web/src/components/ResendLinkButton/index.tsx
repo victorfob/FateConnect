@@ -4,31 +4,34 @@ import { useMutation } from '@tanstack/react-query';
 
 import type { Countdown } from '@app/hooks/useCountdown';
 import { useNotification } from '@app/hooks/useNotification';
-import { resendConfirmationEmail } from '@app/services/auth/authService';
 
 import * as C from './constants';
 
-type ResendConfirmationButtonProps = Readonly<
+type ResendLinkButtonProps = Readonly<
   {
     email: string;
+    send: (email: string) => Promise<void>;
+    sentMessage: string;
     /** De quem monta o botão: a espera sobrevive ao diálogo que fecha e reabre. */
     countdown: Countdown;
   } & Pick<ButtonProps, 'variant'>
 >;
 
-export function ResendConfirmationButton({
+export function ResendLinkButton({
   email,
+  send,
+  sentMessage,
   countdown: { secondsLeft, running, start },
   variant = 'contained',
-}: ResendConfirmationButtonProps) {
+}: ResendLinkButtonProps) {
   const { notifySuccess } = useNotification();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: resendConfirmationEmail,
+    mutationFn: send,
     meta: { errorMessage: C.RESEND_FAILED_MESSAGE },
     onSuccess: () => {
       start(C.RESEND_COOLDOWN_SECONDS);
-      notifySuccess(C.RESENT_MESSAGE);
+      notifySuccess(sentMessage);
     },
   });
 

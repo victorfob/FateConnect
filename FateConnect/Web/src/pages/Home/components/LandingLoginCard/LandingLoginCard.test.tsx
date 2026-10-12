@@ -2,7 +2,12 @@ import { createMemoryRouter, RouterProvider, type InitialEntry } from 'react-rou
 import { PASSWORD_TOGGLE_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
-import { RESEND_LABEL, RESENT_MESSAGE } from '@app/components/ResendConfirmationButton/constants';
+import {
+  REACTIVATION_DIALOG,
+  REACTIVATION_SUCCEEDED,
+} from '@app/components/AccountReactivationDialog/constants';
+import { RESEND_LABEL } from '@app/components/ResendLinkButton/constants';
+import { CONFIRMATION_LINK_RESENT } from '@app/constants/emailLink';
 import {
   FATEC_EMAIL_DOMAIN_MESSAGE,
   FATEC_EMAIL_LOCAL_PART_MESSAGE,
@@ -10,13 +15,12 @@ import {
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
-import { loginPrefillState } from '@app/utils/loginPrefill';
+import { loginPrefillState, prefilledEmailOf } from '@app/utils/loginPrefill';
 
 import {
   ACCOUNT_LOCKED_DIALOG,
   lockedAccountMessage,
 } from './components/AccountLockedDialog/constants';
-import { REACTIVATION_DIALOG } from './components/AccountReactivationDialog/constants';
 import { EMAIL_NOT_CONFIRMED_DIALOG } from './components/EmailNotConfirmedDialog/constants';
 import { LOGIN_MESSAGES } from './schema';
 import * as C from './constants';
@@ -170,7 +174,7 @@ describe('LandingLoginCard', () => {
     expect(within(dialog).getByText(EMAIL_NOT_CONFIRMED_DIALOG.message)).toBeInTheDocument();
     await userEvent.click(within(dialog).getByRole('button', { name: RESEND_LABEL }));
 
-    expect(await screen.findByText(RESENT_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(CONFIRMATION_LINK_RESENT)).toBeInTheDocument();
     expect(resentBodies).toEqual([{ fatecEmail: EMAIL }]);
     expect(screen.queryByText(C.LOGIN_ERROR_MESSAGES.bannedAccount)).not.toBeInTheDocument();
   });
@@ -189,7 +193,7 @@ describe('LandingLoginCard', () => {
     await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
     const dialog = await screen.findByRole('dialog', { name: EMAIL_NOT_CONFIRMED_DIALOG.title });
     await userEvent.click(within(dialog).getByRole('button', { name: RESEND_LABEL }));
-    await screen.findByText(RESENT_MESSAGE);
+    await screen.findByText(CONFIRMATION_LINK_RESENT);
 
     await userEvent.click(
       within(dialog).getByRole('button', { name: EMAIL_NOT_CONFIRMED_DIALOG.closeLabel }),
@@ -199,6 +203,23 @@ describe('LandingLoginCard', () => {
 
     const reopened = await screen.findByRole('dialog', { name: EMAIL_NOT_CONFIRMED_DIALOG.title });
     expect(within(reopened).getAllByRole('button').at(-1)).toBeDisabled();
+  });
+
+  it('should lead to the forgotten password with the typed email', async () => {
+    const router = createMemoryRouter(
+      [
+        { path: RoutePathEnum.LANDING, element: <LandingLoginCard /> },
+        { path: RoutePathEnum.FORGOT_PASSWORD, element: <p>esqueci</p> },
+      ],
+      { initialEntries: [RoutePathEnum.LANDING] },
+    );
+    render(<RouterProvider router={router} />);
+    await userEvent.type(screen.getByLabelText(/E-mail/), EMAIL);
+
+    await userEvent.click(screen.getByRole('link', { name: C.FORGOT_PASSWORD_LINK_LABEL }));
+
+    expect(await screen.findByText('esqueci')).toBeInTheDocument();
+    expect(prefilledEmailOf(router.state.location.state)).toBe(EMAIL);
   });
 
   it('should reactivate a deactivated account with the typed credentials and enter', async () => {
@@ -223,7 +244,7 @@ describe('LandingLoginCard', () => {
 
     await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
     expect(reactivationBody).toEqual({ fatecEmail: EMAIL, password: PASSWORD });
-    expect(await screen.findByText(C.REACTIVATION_SUCCEEDED)).toBeInTheDocument();
+    expect(await screen.findByText(REACTIVATION_SUCCEEDED)).toBeInTheDocument();
   });
 
   it('should stay on the landing without reactivating when the person gives up', async () => {

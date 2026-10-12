@@ -3,7 +3,16 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 import { apiClient } from '@app/services/httpClient';
 
-import { confirmEmail, login, logout, reactivate, resendConfirmationEmail } from './authService';
+import {
+  confirmEmail,
+  forgotPassword,
+  login,
+  logout,
+  reactivate,
+  resendConfirmationEmail,
+  resetPassword,
+  verifyResetToken,
+} from './authService';
 import { tokenStorage } from './tokenStorage';
 
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
@@ -11,6 +20,9 @@ const REACTIVATE_URL = 'https://api.fateconnect.test/auth/reactivate';
 const LOGOUT_URL = 'https://api.fateconnect.test/auth/logout';
 const CONFIRM_EMAIL_URL = 'https://api.fateconnect.test/auth/confirm-email';
 const RESEND_CONFIRMATION_URL = 'https://api.fateconnect.test/auth/resend-confirmation-email';
+const FORGOT_PASSWORD_URL = 'https://api.fateconnect.test/auth/forgot-password';
+const VERIFY_RESET_TOKEN_URL = 'https://api.fateconnect.test/auth/verify-reset-token';
+const RESET_PASSWORD_URL = 'https://api.fateconnect.test/auth/reset-password';
 
 const NO_CONTENT = 204;
 const SERVER_ERROR = 500;
@@ -72,6 +84,50 @@ describe('authService', () => {
     await resendConfirmationEmail('a@fatec.sp.gov.br');
 
     expect(body).toEqual({ fatecEmail: 'a@fatec.sp.gov.br' });
+  });
+
+  it('should ask for the password reset link for the given email', async () => {
+    let body: unknown = null;
+    server.use(
+      http.post(FORGOT_PASSWORD_URL, async ({ request }) => {
+        body = await request.json();
+        return new HttpResponse(null, { status: NO_CONTENT });
+      }),
+    );
+
+    await forgotPassword('a@fatec.sp.gov.br');
+
+    expect(body).toEqual({ fatecEmail: 'a@fatec.sp.gov.br' });
+  });
+
+  it('should check the reset link token in the query', async () => {
+    let token: string | null = null;
+    server.use(
+      http.get(VERIFY_RESET_TOKEN_URL, ({ request }) => {
+        token = new URL(request.url).searchParams.get('token');
+        return new HttpResponse(null, { status: NO_CONTENT });
+      }),
+    );
+
+    await verifyResetToken('token-do-link');
+
+    expect(token).toBe('token-do-link');
+  });
+
+  it('should reset the password and open the session it answers', async () => {
+    let body: unknown = null;
+    server.use(
+      http.post(RESET_PASSWORD_URL, async ({ request }) => {
+        body = await request.json();
+        return HttpResponse.json({ token: 'jkl' });
+      }),
+    );
+
+    const response = await resetPassword({ token: 'token-do-link', newPassword: 'nova-senha-1' });
+
+    expect(body).toEqual({ token: 'token-do-link', newPassword: 'nova-senha-1' });
+    expect(response).toEqual({ token: 'jkl' });
+    expect(tokenStorage.getToken()).toBe('jkl');
   });
 
   it('should clear the session on logout without waiting for the server', () => {

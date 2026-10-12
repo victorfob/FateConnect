@@ -2,9 +2,10 @@ import { StrictMode } from 'react';
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
-import { RESEND_LABEL, RESENT_MESSAGE } from '@app/components/ResendConfirmationButton/constants';
+import { RESEND_LABEL } from '@app/components/ResendLinkButton/constants';
 import { SIGN_IN_LABEL } from '@app/components/SignInButton/constants';
 import { BANNED_ACCOUNT_MESSAGE } from '@app/constants/bannedAccount';
+import { CONFIRMATION_LINK_RESENT } from '@app/constants/emailLink';
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
@@ -118,7 +119,7 @@ describe('ConfirmEmail', () => {
 
     await userEvent.click(screen.getByRole('button', { name: RESEND_LABEL }));
 
-    expect(await screen.findByText(RESENT_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(CONFIRMATION_LINK_RESENT)).toBeInTheDocument();
     expect(resentBodies).toEqual([{ fatecEmail: EMAIL }]);
     expect(tokenStorage.getToken()).toBeNull();
   });

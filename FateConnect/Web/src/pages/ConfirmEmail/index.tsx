@@ -3,12 +3,14 @@ import { Navigate, useSearchParams } from 'react-router';
 import { Button, CircularProgress, PageMessage } from '@design-system';
 import { skipToken, useQuery } from '@tanstack/react-query';
 
-import { ResendConfirmationButton } from '@app/components/ResendConfirmationButton';
+import { ResendLinkButton } from '@app/components/ResendLinkButton';
 import { SignInButton } from '@app/components/SignInButton';
 import { BANNED_ACCOUNT_MESSAGE } from '@app/constants/bannedAccount';
+import { CONFIRMATION_LINK_RESENT } from '@app/constants/emailLink';
 import { useCountdown } from '@app/hooks/useCountdown';
 import { useNotification } from '@app/hooks/useNotification';
 import { RoutePathEnum } from '@app/routes/paths';
+import { resendConfirmationEmail } from '@app/services/auth/authService';
 import {
   EMAIL_LINK_EMAIL_PARAM,
   EMAIL_LINK_TOKEN_PARAM,
@@ -57,7 +59,14 @@ export function ConfirmEmail() {
         tone="warning"
       >
         <SignInButton email={email} variant="soft" />
-        {email && <ResendConfirmationButton email={email} countdown={resendCountdown} />}
+        {email && (
+          <ResendLinkButton
+            email={email}
+            send={resendConfirmationEmail}
+            sentMessage={CONFIRMATION_LINK_RESENT}
+            countdown={resendCountdown}
+          />
+        )}
       </PageMessage>
     );
 

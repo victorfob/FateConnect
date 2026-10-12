@@ -39,6 +39,8 @@ export const PAGE_METADATA: Record<RoutePathEnum, PageMetadata> = {
   },
   [RoutePathEnum.UNLOCK_ACCOUNT]: { title: titleFor('Desbloquear conta') },
   [RoutePathEnum.CONFIRM_EMAIL]: { title: titleFor('Confirmar e-mail') },
+  [RoutePathEnum.FORGOT_PASSWORD]: { title: titleFor('Esqueci minha senha') },
+  [RoutePathEnum.RESET_PASSWORD]: { title: titleFor('Redefinir senha') },
   [RoutePathEnum.MENU]: { title: titleFor('Menu') },
   [RoutePathEnum.LOST_AND_FOUND]: { title: titleFor('Achados & Perdidos') },
   [RoutePathEnum.RIDES]: { title: titleFor('Caronas') },
