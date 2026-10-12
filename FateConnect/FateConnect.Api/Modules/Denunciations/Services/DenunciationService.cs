@@ -15,10 +15,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using FateConnect.Api.Modules.Common.Services;
+using MassTransit;
+using FateConnect.Api.Modules.Common.Events;
 
 public partial class DenunciationService(
     IDenunciationRepository repository,
     IStorageService baseStorageService,
+    IPublishEndpoint publishEndpoint,
     ILogger<DenunciationService> logger
 ) : BaseFileService(baseStorageService), IDenunciationService
 {
@@ -38,6 +41,9 @@ public partial class DenunciationService(
             storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.Denunciation);
             denunciation.AttachImage(storedImageUrl);
         }
+
+        if (!denunciation.IsAnonymous)
+            await publishEndpoint.Publish(new DenunciationReceivedEvent(currentUserId, denunciation.Id, denunciation.Category));
 
         await PersistOrDropImageAsync(() => repository.AddAsync(denunciation), storedImageUrl);
 

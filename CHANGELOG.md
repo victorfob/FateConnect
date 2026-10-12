@@ -6,6 +6,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Adiciona as notificações no aplicativo, que chegam na hora, para carona ofertada para o seu bairro, item arquivado por inatividade e denúncia recebida (#590) [Backend]
+- Adiciona os endpoints de listagem paginada, contagem de não lidas e marcação de leitura (individual e em lote) para as notificações in-app (#590) [Backend]
+
 ## [1.4.0] - 2026-10-12
 
 ### Added

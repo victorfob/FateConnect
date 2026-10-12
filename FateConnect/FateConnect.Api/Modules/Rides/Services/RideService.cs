@@ -1,18 +1,21 @@
 namespace FateConnect.Api.Modules.Rides.Services;
 
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Rides.Interfaces;
 using FateConnect.Api.Modules.Users.Extensions;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 
 public partial class RideService(
     IRideRepository repository,
     IHolidayCalendar holidays,
     TimeProvider clock,
+    IPublishEndpoint publishEndpoint,
     ILogger<RideService> logger
 ) : IRideService
 {
@@ -29,6 +32,12 @@ public partial class RideService(
         );
 
         ride.ChangeRepetition(dto.Frequency, dto.RepeatUntil, holidays);
+
+        await publishEndpoint.Publish(new RideCreatedEvent(
+            RideId: ride.Id,
+            DriverId: currentUserId,
+            Destination: ride.Destination
+        ));
 
         await repository.AddAsync(ride);
 

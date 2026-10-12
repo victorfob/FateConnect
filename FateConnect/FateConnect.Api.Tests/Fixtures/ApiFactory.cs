@@ -7,9 +7,11 @@ using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Common.Utils;
-using FateConnect.Api.Modules.Communications.Interfaces;
+using FateConnect.Api.Modules.Emails.Interfaces;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.InAppNotifications.Entities;
+using FateConnect.Api.Modules.InAppNotifications.Enums;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Workers;
@@ -39,6 +41,10 @@ public class ApiFactory : WebApplicationFactory<Program>
     private readonly string _databaseName = $"fateconnect-tests-{Guid.NewGuid()}";
 
     private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-webroot-{Guid.NewGuid():N}");
+
+    private static readonly TimeSpan NotificationTimeout = TimeSpan.FromSeconds(20);
+    private static readonly TimeSpan HarnessTimeout = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan HarnessInactivityTimeout = TimeSpan.FromSeconds(10);
 
     public TimeProvider? Clock { get; init; }
 
@@ -74,7 +80,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 
             services.Remove(retentionWorker);
 
-            services.AddMassTransitTestHarness();
+            services.AddMassTransitTestHarness(bus => bus.SetTestTimeouts(HarnessTimeout, HarnessInactivityTimeout));
             services.RemoveAll<IEmailService>();
             services.AddSingleton<IEmailService>(Emails);
 
@@ -386,6 +392,69 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.SaveChanges();
 
         return denunciation.Id;
+    }
+
+    public void PrepareForNotifications(int userId, string? neighborhood = null, bool receiveNotifications = true)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        context.Users
+            .Where(user => user.Id == userId)
+            .ExecuteUpdate(setters => setters.SetProperty(user => user.Neighborhood, neighborhood));
+
+        context.UserPreferences
+            .Where(preferences => preferences.UserId == userId)
+            .ExecuteUpdate(setters => setters.SetProperty(preferences => preferences.ReceiveNotifications, receiveNotifications));
+    }
+
+    public int SeedNotification(
+        int userId,
+        DateTime createdAt,
+        EnumInAppNotificationType type = EnumInAppNotificationType.ItemArchived,
+        bool isRead = false)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        InAppNotification notification = new(userId, type, "Seu item foi arquivado por inatividade.", Guid.NewGuid().ToString(), createdAt);
+
+        if (isRead)
+            notification.MarkAsRead(createdAt);
+
+        context.InAppNotifications.Add(notification);
+        context.SaveChanges();
+
+        return notification.Id;
+    }
+
+    public IReadOnlyList<InAppNotification> NotificationsOf(int userId)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        return context.InAppNotifications
+            .AsNoTracking()
+            .Where(notification => notification.UserId == userId)
+            .OrderBy(notification => notification.Id)
+            .ToList();
+    }
+
+    public async Task<IReadOnlyList<InAppNotification>> WaitForNotificationsAsync(int userId)
+    {
+        DateTime deadline = DateTime.UtcNow + NotificationTimeout;
+
+        while (DateTime.UtcNow < deadline)
+        {
+            IReadOnlyList<InAppNotification> notifications = NotificationsOf(userId);
+
+            if (notifications.Count > 0)
+                return notifications;
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+        }
+
+        throw new TimeoutException($"Expected a notification for user {userId}, got none.");
     }
 
     public HttpClient CreateClientFor(

@@ -5,7 +5,7 @@ using System.Text.Json;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Communications.Enums;
+using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Tests.Fixtures;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;

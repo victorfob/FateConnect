@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FateConnect.Api.Modules.Auth.DTOs;
-using FateConnect.Api.Modules.Communications.Enums;
+using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Tests.Fixtures;
 
