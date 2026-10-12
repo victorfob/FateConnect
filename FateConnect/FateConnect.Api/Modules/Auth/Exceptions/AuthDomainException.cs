@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.Auth.Exceptions;
 
 using System;
+using FateConnect.Api.Modules.Common.Utils;
 
 public abstract class AuthDomainException(string message) : Exception(message);
 
@@ -57,12 +58,8 @@ public class AccountLockedException : AuthDomainException
         MinutesRemaining = minutesRemaining;
     }
 
-    private static string BuildMessage(int minutes)
-    {
-        string waitingTime = minutes == 1 ? "1 minuto" : $"{minutes} minutos";
-
-        return $"Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec ou aguarde {waitingTime} e tente novamente.";
-    }
+    private static string BuildMessage(int minutes) =>
+        $"Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec ou aguarde {QuantityUtils.Minutes(minutes)} e tente novamente.";
 }
 
 public class InvalidUnlockTokenException()
