@@ -26,7 +26,7 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         { new StringContent("Garrafa térmica azul"), "Name" },
         { new StringContent("Lost"), "LostAndFoundType" },
         { new StringContent("Biblioteca do bloco B"), "Place" },
-        { new StringContent(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OcurredOn" },
+        { new StringContent(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OccurredOn" },
     };
 
     private static MultipartFormDataContent NewDenunciationForm(bool isAnonymous) => new()

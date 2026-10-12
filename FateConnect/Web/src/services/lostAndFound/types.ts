@@ -22,7 +22,7 @@ export type LostItem = {
   name: string;
   lostAndFoundType: LostItemKindEnum;
   place: string;
-  ocurredOn: string;
+  occurredOn: string;
   description: string | null;
   imageUrl: string | null;
   thumbnailUrl: string | null;
@@ -33,7 +33,7 @@ export type LostItem = {
   createdAt: string;
 };
 
-export type LostItemInput = Pick<LostItem, 'name' | 'lostAndFoundType' | 'place' | 'ocurredOn'> & {
+export type LostItemInput = Pick<LostItem, 'name' | 'lostAndFoundType' | 'place' | 'occurredOn'> & {
   /** String vazia limpa a descrição guardada; omitir o campo a deixaria como está. */
   description: string;
   image: File | null;

@@ -314,7 +314,7 @@ public sealed class ImageStorageTests : IDisposable
             Name = "Garrafa térmica azul",
             LostAndFoundType = EnumLostAndFoundType.Lost,
             Place = "Biblioteca do bloco B",
-            OcurredOn = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
+            OccurredOn = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
             Image = FileOf("image/png"),
         };
 

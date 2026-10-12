@@ -7,8 +7,8 @@ import type { UserFilter } from '@app/services/users/managementTypes';
 
 import * as C from './constants';
 
-function isFilled({ search, status, profileType }: UserFilter): boolean {
-  return Boolean(search || status || profileType);
+function isFilled({ searchTerm, status, profileType }: UserFilter): boolean {
+  return Boolean(searchTerm || status || profileType);
 }
 
 type UsersFilterProps = Readonly<{
@@ -17,15 +17,15 @@ type UsersFilterProps = Readonly<{
 }>;
 
 export function UsersFilter({ initialFilters, onApply }: UsersFilterProps) {
-  const [search, setSearch] = useState(initialFilters.search ?? '');
+  const [searchTerm, setSearchTerm] = useState(initialFilters.searchTerm ?? '');
   const [status, setStatus] = useState<string>(initialFilters.status ?? C.UserFilterEnum.ALL);
   const [profileType, setProfileType] = useState<string>(
     initialFilters.profileType ?? C.UserFilterEnum.ALL,
   );
   const [isFiltered, setIsFiltered] = useState(() => isFilled(initialFilters));
 
-  const handleSearchChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => setSearch(event.target.value),
+  const handleSearchTermChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value),
     [],
   );
   const handleStatusChange = useCallback(
@@ -38,7 +38,7 @@ export function UsersFilter({ initialFilters, onApply }: UsersFilterProps) {
   );
 
   const handleClear = useCallback(() => {
-    setSearch('');
+    setSearchTerm('');
     setStatus(C.UserFilterEnum.ALL);
     setProfileType(C.UserFilterEnum.ALL);
     setIsFiltered(false);
@@ -48,22 +48,22 @@ export function UsersFilter({ initialFilters, onApply }: UsersFilterProps) {
   const handleSubmit = useCallback(() => {
     const filters: UserFilter = {};
 
-    if (search.trim()) filters.search = search.trim();
+    if (searchTerm.trim()) filters.searchTerm = searchTerm.trim();
     if (isAccountStatus(status)) filters.status = status;
     if (isProfileType(profileType)) filters.profileType = profileType;
 
     setIsFiltered(isFilled(filters));
     onApply(filters);
-  }, [search, status, profileType, onApply]);
+  }, [searchTerm, status, profileType, onApply]);
 
   return (
     <FilterDialog active={isFiltered} onSubmit={handleSubmit} onClear={handleClear}>
       <FilterDialog.Field>
         <Input
-          label={C.FILTER_LABELS.search}
+          label={C.FILTER_LABELS.searchTerm}
           fullWidth
-          value={search}
-          onChange={handleSearchChange}
+          value={searchTerm}
+          onChange={handleSearchTermChange}
         />
       </FilterDialog.Field>
 

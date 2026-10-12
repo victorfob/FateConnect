@@ -5,7 +5,7 @@ import { PROFILE_TYPE_OPTIONS } from '@app/pages/Management/components/UsersTab/
 
 /** A busca casa nome, os dois e-mails e o telefone, e o rótulo promete isso. */
 export const FILTER_LABELS = {
-  search: 'Nome, e-mail ou telefone',
+  searchTerm: 'Nome, e-mail ou telefone',
   status: 'Situação',
   profileType: 'Perfil',
 };

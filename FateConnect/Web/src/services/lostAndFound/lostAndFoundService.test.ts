@@ -27,7 +27,7 @@ const LOST_ITEM_INPUT: LostItemInput = {
   name: 'Garrafa térmica',
   lostAndFoundType: LostItemKindEnum.FOUND,
   place: 'Biblioteca',
-  ocurredOn: '2026-08-20',
+  occurredOn: '2026-08-20',
   description: 'Garrafa azul, com adesivos na tampa.',
   image: null,
   removeImage: false,
@@ -37,7 +37,7 @@ const SENT_FIELDS = {
   Name: 'Garrafa térmica',
   LostAndFoundType: LostItemKindEnum.FOUND,
   Place: 'Biblioteca',
-  OcurredOn: '2026-08-20',
+  OccurredOn: '2026-08-20',
   Description: 'Garrafa azul, com adesivos na tampa.',
 };
 
