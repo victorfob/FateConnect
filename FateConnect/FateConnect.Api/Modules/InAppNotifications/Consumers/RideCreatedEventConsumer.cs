@@ -24,26 +24,24 @@ public sealed partial class RideCreatedEventConsumer(
         {
             LogRideNotificationDispatchStarted(logger, message.RideId, message.Destination);
 
-            List<int> targetUserIds = await repository.GetUserIdsInterestedInDestinationAsync(
+            List<int> interestedUserIds = await repository.GetUserIdsInterestedInDestinationAsync(
                 message.Destination,
                 message.DriverId);
 
-            if (targetUserIds.Count == 0)
+            int notifiedCount = await notificationService.NotifyAsync(
+                interestedUserIds,
+                EnumInAppNotificationType.RideToNeighborhood,
+                NotificationContents.RideToDestination(message.Destination),
+                message.RideId.ToString()
+            );
+
+            if (notifiedCount == 0)
             {
                 LogRideNotificationSkippedNoUsers(logger, message.RideId);
                 return;
             }
 
-            string content = NotificationContents.RideToDestination(message.Destination);
-
-            await notificationService.NotifyAsync(
-                targetUserIds,
-                EnumInAppNotificationType.RideToNeighborhood,
-                content,
-                message.RideId.ToString()
-            );
-
-            LogRideNotificationDispatchSucceeded(logger, targetUserIds.Count, message.RideId);
+            LogRideNotificationDispatchSucceeded(logger, notifiedCount, message.RideId);
         }
         catch (Exception ex)
         {

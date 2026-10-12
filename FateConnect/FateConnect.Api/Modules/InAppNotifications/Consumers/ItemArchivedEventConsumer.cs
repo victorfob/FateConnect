@@ -22,14 +22,18 @@ public sealed partial class ItemArchivedEventConsumer(
         {
             LogItemArchivedDispatchStarted(logger, message.OwnerId);
 
-            string content = NotificationContents.ItemArchived(message.ItemName);
-
-            await notificationService.NotifyAsync(
+            int notifiedCount = await notificationService.NotifyAsync(
                 [message.OwnerId],
                 EnumInAppNotificationType.ItemArchived,
-                content,
+                NotificationContents.ItemArchived(message.ItemName),
                 message.RecordId.ToString()
             );
+
+            if (notifiedCount == 0)
+            {
+                LogItemArchivedSkippedForIneligibleUser(logger, message.OwnerId);
+                return;
+            }
 
             LogItemArchivedDispatchSucceeded(logger, message.OwnerId);
         }

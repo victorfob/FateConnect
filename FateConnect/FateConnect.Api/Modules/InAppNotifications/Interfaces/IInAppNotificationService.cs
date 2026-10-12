@@ -11,5 +11,5 @@ public interface IInAppNotificationService
     Task<int> GetUnreadCountAsync(int currentUserId);
     Task MarkAsReadAsync(int notificationId, int currentUserId);
     Task MarkAllAsReadAsync(int currentUserId);
-    Task NotifyAsync(IEnumerable<int> userIds, EnumInAppNotificationType type, string content, string referenceId);
+    Task<int> NotifyAsync(IEnumerable<int> userIds, EnumInAppNotificationType type, string content, string referenceId);
 }

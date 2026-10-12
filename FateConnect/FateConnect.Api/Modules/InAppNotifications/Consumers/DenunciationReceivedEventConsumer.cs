@@ -22,14 +22,18 @@ public sealed partial class DenunciationReceivedEventConsumer(
         {
             LogNotificationDispatchStarted(logger, message.ReporterId);
 
-            string content = NotificationContents.DenunciationReceived(message.Category);
-
-            await notificationService.NotifyAsync(
+            int notifiedCount = await notificationService.NotifyAsync(
                 [message.ReporterId],
                 EnumInAppNotificationType.DenunciationReceived,
-                content,
+                NotificationContents.DenunciationReceived(message.Category),
                 message.DenunciationId.ToString()
             );
+
+            if (notifiedCount == 0)
+            {
+                LogNotificationSkippedForIneligibleUser(logger, message.ReporterId);
+                return;
+            }
 
             LogNotificationDispatchSucceeded(logger, message.ReporterId);
         }

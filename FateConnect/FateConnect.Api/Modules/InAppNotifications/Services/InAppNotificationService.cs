@@ -66,12 +66,12 @@ public partial class InAppNotificationService(
         LogAllNotificationsMarkedAsRead(logger, currentUserId);
     }
 
-    public async Task NotifyAsync(IEnumerable<int> userIds, EnumInAppNotificationType type, string content, string referenceId)
+    public async Task<int> NotifyAsync(IEnumerable<int> userIds, EnumInAppNotificationType type, string content, string referenceId)
     {
         List<int> validUserIds = await repository.GetEligibleUserIdsAsync(userIds);
 
         if (validUserIds.Count == 0)
-            return;
+            return 0;
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
@@ -90,6 +90,8 @@ public partial class InAppNotificationService(
             await publishEndpoint.Publish(new NotificationDispatchedEvent(MapToReadDto(notification), notification.UserId));
 
         await repository.SaveChangesAsync();
+
+        return notifications.Count;
     }
 
     private static ReadInAppNotificationDto MapToReadDto(InAppNotification entity) =>

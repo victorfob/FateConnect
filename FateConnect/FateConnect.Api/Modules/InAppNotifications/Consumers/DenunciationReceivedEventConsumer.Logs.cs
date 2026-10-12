@@ -13,4 +13,7 @@ public sealed partial class DenunciationReceivedEventConsumer
 
     [LoggerMessage(EventId = 3, Level = LogLevel.Error, Message = "Failed to process in-app notification for user ID {UserId}.")]
     private static partial void LogNotificationDispatchFailed(ILogger logger, Exception ex, int userId);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Information, Message = "In-app notification skipped. User ID {UserId} is inactive or has notifications disabled.")]
+    private static partial void LogNotificationSkippedForIneligibleUser(ILogger logger, int userId);
 }
