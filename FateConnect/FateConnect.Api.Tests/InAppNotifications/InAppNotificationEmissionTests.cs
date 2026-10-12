@@ -8,6 +8,7 @@ using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Constants;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
+using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Tests.Fixtures;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,10 +80,13 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         int driverId = _factory.SeedUser("Ana Beatriz Nogueira").Id;
         int residentId = _factory.SeedUser("Bruno Carvalho Souza").Id;
         int optedOutId = _factory.SeedUser("Carla Menezes Duarte").Id;
+        int bannedId = _factory.SeedUser("Otávio Lins Barreto").Id;
         int elsewhereId = _factory.SeedUser("Daniela Prado Lima").Id;
         _factory.PrepareForNotifications(driverId, "Vila Hortência");
         _factory.PrepareForNotifications(residentId, "vila hortencia");
         _factory.PrepareForNotifications(optedOutId, "Vila Hortência", receiveNotifications: false);
+        _factory.PrepareForNotifications(bannedId, "Vila Hortência");
+        _factory.SetAccountStatus(bannedId, EnumAccountStatus.Banned);
         _factory.PrepareForNotifications(elsewhereId, "Campolim");
         const string destination = "Rua das Flores, Vila Hortência";
 
@@ -94,6 +98,7 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         Assert.Equal(NotificationContents.RideToDestination(destination), notification.Content);
         Assert.Empty(_factory.NotificationsOf(driverId));
         Assert.Empty(_factory.NotificationsOf(optedOutId));
+        Assert.Empty(_factory.NotificationsOf(bannedId));
         Assert.Empty(_factory.NotificationsOf(elsewhereId));
     }
 
@@ -170,5 +175,18 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         Assert.Equal(EnumInAppNotificationType.ItemArchived, notification.Type);
         Assert.Equal(recordId.ToString(), notification.ReferenceId);
         Assert.Equal(NotificationContents.ItemArchived("Garrafa térmica azul"), notification.Content);
+    }
+
+    [Fact]
+    public async Task ItemArchived_OwnerWithNotificationsOff_IsNotNotified()
+    {
+        int ownerId = _factory.SeedUser("Marcos Teles Valente").Id;
+        Guid recordId = Guid.NewGuid();
+
+        await Harness.Bus.Publish(new ItemArchivedEvent(ownerId, recordId, "Guarda-chuva preto"));
+
+        Assert.True(await Harness.Consumed.Any<ItemArchivedEvent>(
+            consumed => consumed.Context.Message.RecordId == recordId));
+        Assert.Empty(_factory.NotificationsOf(ownerId));
     }
 }

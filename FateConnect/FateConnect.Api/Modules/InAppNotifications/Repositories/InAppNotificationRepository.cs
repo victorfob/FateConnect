@@ -29,8 +29,6 @@ public class InAppNotificationRepository(FateConnectDbContext context) : IInAppN
         return await context.Users
             .AsNoTracking()
             .Where(u => u.Id != driverId)
-            .Where(u => u.Status == EnumAccountStatus.Active)
-            .Where(u => u.Preferences.ReceiveNotifications)
             .Where(u => u.Neighborhood != null &&
             EF.Functions.ILike(
                 EF.Functions.Unaccent(destination),
