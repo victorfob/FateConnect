@@ -5,6 +5,7 @@ using System.Text.Json;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.Events;
+using FateConnect.Api.Modules.Communications.Enums;
 using FateConnect.Api.Tests.Fixtures;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,7 +54,7 @@ public class SignupTests : IClassFixture<ApiFactory>
 
     private async Task<HttpClient> SignedInAfterConfirming(string fatecEmail)
     {
-        IReadOnlyList<SentEmail> sent = await _factory.Emails.WaitForAsync(fatecEmail, SentEmailKind.Confirmation);
+        IReadOnlyList<SentEmail> sent = await _factory.Emails.WaitForAsync(fatecEmail, EnumAccountEmail.Confirmation);
 
         HttpResponseMessage confirmation = await _factory.CreateClient()
             .PostAsJsonAsync("/Auth/confirm-email", new { token = sent[0].Token });
@@ -98,7 +99,7 @@ public class SignupTests : IClassFixture<ApiFactory>
 
         await _factory.CreateClient().PostAsJsonAsync("/Users/signup", SignupPayload(fatecEmail: fatecEmail));
 
-        SentEmail email = Assert.Single(await _factory.Emails.WaitForAsync(fatecEmail, SentEmailKind.Confirmation));
+        SentEmail email = Assert.Single(await _factory.Emails.WaitForAsync(fatecEmail, EnumAccountEmail.Confirmation));
 
         Assert.StartsWith("https://fateconnect.test/confirmar-email?", email.Link);
         Assert.Equal(Uri.EscapeDataString(fatecEmail), email.QueryValue("email"));
@@ -135,7 +136,7 @@ public class SignupTests : IClassFixture<ApiFactory>
         ITestHarness harness = _factory.Services.GetRequiredService<ITestHarness>();
 
         await _factory.CreateClient().PostAsJsonAsync("/Users/signup", SignupPayload(fatecEmail: fatecEmail));
-        await _factory.Emails.WaitForAsync(fatecEmail, SentEmailKind.Confirmation);
+        await _factory.Emails.WaitForAsync(fatecEmail, EnumAccountEmail.Confirmation);
 
         UserRegisteredEvent registration = harness.Published
             .Select<UserRegisteredEvent>(published => published.Context.Message.FatecEmail == fatecEmail)
