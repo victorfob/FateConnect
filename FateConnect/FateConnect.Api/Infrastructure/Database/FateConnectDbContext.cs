@@ -2,6 +2,7 @@ namespace FateConnect.Api.Infrastructure.Database;
 
 using FateConnect.Api.Infrastructure.Database.Converters;
 using FateConnect.Api.Modules.Denunciations.Entities;
+using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Users.Entities;
@@ -19,6 +20,7 @@ public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options
     public DbSet<RideDeparture> RideDepartures => Set<RideDeparture>();
     public DbSet<LostAndFoundRecord> LostAndFoundRecords => Set<LostAndFoundRecord>();
     public DbSet<Denunciation> Denunciations => Set<Denunciation>();
+    public DbSet<InAppNotification> InAppNotifications => Set<InAppNotification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -63,6 +63,44 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("Denunciations");
                 });
 
+            modelBuilder.Entity("FateConnect.Api.Modules.InAppNotifications.Entities.InAppNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ReferenceId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "IsRead");
+
+                    b.ToTable("InAppNotifications");
+                });
+
             modelBuilder.Entity("FateConnect.Api.Modules.LostAndFound.Entities.LostAndFoundRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -554,6 +592,17 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.InAppNotifications.Entities.InAppNotification", b =>
+                {
+                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
