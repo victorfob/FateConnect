@@ -36,7 +36,7 @@ O glossário decidido e as proibições de uma linha estão na rule `product-cop
 ## Peças
 
 - **Aviso que some** (o toast) é uma frase curta: o recado com motivo, prazo e saída vira diálogo, como o da conta bloqueada.
-- **Aviso de envio que a tela não confirma** (a API responde igual para tudo) condiciona o fato no particípio: `Se a conta ainda não foi confirmada, um novo link foi enviado ao seu e-mail Fatec.`
+- **Aviso de envio que a tela não confirma** (a API responde igual para tudo) condiciona o fato no particípio: `Se a conta ainda não foi confirmada, um novo link foi enviado ao seu e-mail Fatec.` ⛔ Condicione só o que nenhuma outra resposta do mesmo fluxo revela: o pedido de redefinição responde `404` para e-mail sem conta, então a tela de link enviado afirma (`Para escolher a nova senha, abra o link enviado para {e-mail}.`).
 - **Tela que espera uma ação** tem por título a ação, com o verbo do e-mail que a pessoa vai abrir: `Confirme seu e-mail`, como o assunto, e não `Confira seu e-mail`, que só manda olhar.
 - **Tooltip** complementa, não repete; no botão só de ícone ele é o nome e repete o rótulo acessível. Até duas linhas.
 - **Nota ao lado de etiqueta** diz o que a etiqueta não diz; havendo só repetição, a nota não existe. Texto de reserva é onde a repetição nasce.
