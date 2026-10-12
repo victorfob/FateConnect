@@ -1,76 +1,47 @@
 namespace FateConnect.Api.Modules.Communications.Services;
 
+using System;
+using System.Threading.Tasks;
+using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.Communications.Enums;
 using FateConnect.Api.Modules.Communications.Exceptions;
+using FateConnect.Api.Modules.Communications.Extensions;
 using FateConnect.Api.Modules.Communications.Interfaces;
 using FateConnect.Api.Modules.Communications.Templates;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Resend;
-using System.Threading.Tasks;
 
 public partial class EmailService(
     IResend resend,
     IConfiguration configuration,
+    TimeProvider clock,
     ILogger<EmailService> logger
 ) : IEmailService
 {
     private readonly string _senderEmail = configuration["EMAIL_SENDER"]
         ?? throw new MissingCommunicationConfigurationException("EMAIL_SENDER");
 
-    public async Task SendConfirmationEmailAsync(string toEmail, string fullName, string confirmationLink)
+    private readonly string _logoUrl = configuration.RequiredPublicUrl() + EmailTheme.LogoPath;
+
+    public async Task SendAsync(EnumAccountEmail email, string toEmail, string fullName, string link)
     {
-        var subject = ConfirmationEmailTemplate.Subject;
+        AccountEmail content = AccountEmails.For(email);
+        int year = DateTimeUtils.NowInProductTimeZone(clock).Year;
 
         var message = new EmailMessage
         {
             From = _senderEmail,
             To = toEmail,
-            Subject = subject,
-            HtmlBody = ConfirmationEmailTemplate.Build(fullName, confirmationLink)
+            Subject = content.Subject,
+            HtmlBody = EmailLayout.Html(content, fullName, link, _logoUrl, year),
+            TextBody = EmailLayout.Text(content, fullName, link, year)
         };
 
-        LogResendPayloadSent(logger, subject);
+        LogResendPayloadSent(logger, content.Subject);
 
         await resend.EmailSendAsync(message);
 
-        LogResendAccepted(logger, subject);
-    }
-
-    public async Task SendPasswordResetEmailAsync(string toEmail, string fullName, string resetLink)
-    {
-        var subject = PasswordResetEmailTemplate.Subject;
-
-        var message = new EmailMessage
-        {
-            From = _senderEmail,
-            To = toEmail,
-            Subject = subject,
-            HtmlBody = PasswordResetEmailTemplate.Build(fullName, resetLink)
-        };
-
-        LogResendPayloadSent(logger, subject);
-
-        await resend.EmailSendAsync(message);
-
-        LogResendAccepted(logger, subject);
-    }
-
-    public async Task SendAccountLockedEmailAsync(string toEmail, string fullName, string unlockLink)
-    {
-        var subject = AccountLockedEmailTemplate.Subject;
-
-        var message = new EmailMessage
-        {
-            From = _senderEmail,
-            To = toEmail,
-            Subject = subject,
-            HtmlBody = AccountLockedEmailTemplate.Build(fullName, unlockLink)
-        };
-
-        LogResendPayloadSent(logger, subject);
-
-        await resend.EmailSendAsync(message);
-
-        LogResendAccepted(logger, subject);
+        LogResendAccepted(logger, content.Subject);
     }
 }

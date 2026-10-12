@@ -1,5 +1,6 @@
 using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Communications.Consumers;
+using FateConnect.Api.Modules.Communications.Enums;
 using FateConnect.Api.Modules.Communications.Interfaces;
 using MassTransit;
 using MassTransit.Testing;
@@ -17,13 +18,7 @@ public class EmailConsumerTests
 
     private sealed class FailingEmailService : IEmailService
     {
-        public Task SendConfirmationEmailAsync(string toEmail, string fullName, string confirmationLink) =>
-            throw new HttpRequestException("Resend fora do ar");
-
-        public Task SendPasswordResetEmailAsync(string toEmail, string fullName, string resetLink) =>
-            throw new HttpRequestException("Resend fora do ar");
-
-        public Task SendAccountLockedEmailAsync(string toEmail, string fullName, string unlockLink) =>
+        public Task SendAsync(EnumAccountEmail email, string toEmail, string fullName, string link) =>
             throw new HttpRequestException("Resend fora do ar");
     }
 

@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FateConnect.Api.Modules.Auth.DTOs;
+using FateConnect.Api.Modules.Communications.Enums;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Tests.Fixtures;
 
@@ -19,7 +20,7 @@ public class PasswordResetTests(ApiFactory factory) : IClassFixture<ApiFactory>
     {
         await api.CreateClient().PostAsJsonAsync("/Auth/forgot-password", new { fatecEmail });
 
-        IReadOnlyList<SentEmail> sent = await api.Emails.WaitForAsync(fatecEmail, SentEmailKind.PasswordReset, expectedCount);
+        IReadOnlyList<SentEmail> sent = await api.Emails.WaitForAsync(fatecEmail, EnumAccountEmail.PasswordReset, expectedCount);
 
         return sent[expectedCount - 1];
     }

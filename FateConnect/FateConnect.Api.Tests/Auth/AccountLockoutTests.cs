@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using FateConnect.Api.Modules.Communications.Enums;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Tests.Fixtures;
 
@@ -85,7 +86,7 @@ public class AccountLockoutTests(ApiFactory factory) : IClassFixture<ApiFactory>
         await LoginAsync(factory, fatecEmail, WrongPassword);
         await LoginAsync(factory, fatecEmail, KnownPassword);
 
-        SentEmail email = Assert.Single(await factory.Emails.WaitForAsync(fatecEmail, SentEmailKind.AccountLocked));
+        SentEmail email = Assert.Single(await factory.Emails.WaitForAsync(fatecEmail, EnumAccountEmail.AccountLocked));
 
         Assert.StartsWith("https://fateconnect.test/desbloquear-conta?", email.Link);
         Assert.Equal(1, factory.TokenCountOf(fatecEmail, EnumTokenType.AccountUnlock));
@@ -96,7 +97,7 @@ public class AccountLockoutTests(ApiFactory factory) : IClassFixture<ApiFactory>
     {
         (_, string fatecEmail) = factory.SeedUserWithPassword("Helena Duarte Pires", KnownPassword);
         await LockAsync(factory, fatecEmail);
-        IReadOnlyList<SentEmail> sent = await factory.Emails.WaitForAsync(fatecEmail, SentEmailKind.AccountLocked);
+        IReadOnlyList<SentEmail> sent = await factory.Emails.WaitForAsync(fatecEmail, EnumAccountEmail.AccountLocked);
 
         HttpResponseMessage unlock = await factory.CreateClient().PostAsJsonAsync("/Auth/unlock", new { token = sent[0].Token });
         HttpResponseMessage again = await factory.CreateClient().PostAsJsonAsync("/Auth/unlock", new { token = sent[0].Token });
@@ -150,7 +151,7 @@ public class AccountLockoutTests(ApiFactory factory) : IClassFixture<ApiFactory>
         using ApiFactory api = new() { Clock = clock };
         (_, string fatecEmail) = api.SeedUserWithPassword("Helena Duarte Pires", KnownPassword);
         await LockAsync(api, fatecEmail);
-        IReadOnlyList<SentEmail> sent = await api.Emails.WaitForAsync(fatecEmail, SentEmailKind.AccountLocked);
+        IReadOnlyList<SentEmail> sent = await api.Emails.WaitForAsync(fatecEmail, EnumAccountEmail.AccountLocked);
 
         clock.Now += LockDuration + TimeSpan.FromMinutes(1);
         HttpResponseMessage unlock = await api.CreateClient().PostAsJsonAsync("/Auth/unlock", new { token = sent[0].Token });
