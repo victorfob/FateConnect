@@ -6,6 +6,54 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-12
+
+### Added
+
+- Adiciona a confirmação do e-mail Fatec: o cadastro envia um link de uso único que vale por 8 horas, e o login de quem não confirmou é recusado, inclusive nas contas que já existiam (#553) [Backend]
+- Adiciona o reenvio do link de confirmação pelo e-mail Fatec, no máximo um a cada 3 minutos, que invalida o link anterior (#553) [Backend]
+- Adiciona a redefinição da senha esquecida: o pedido pelo e-mail Fatec envia um link de uso único que vale por 30 minutos, e a senha nova derruba as sessões abertas e já entra; e-mail sem conta é avisado, e conta banida não redefine (#553) [Backend]
+- Adiciona o bloqueio da conta por 30 minutos depois de 3 senhas erradas seguidas, no login ou na reativação, que recusa até a senha certa e diz quantos minutos faltam (#553) [Backend]
+- Adiciona o e-mail de desbloqueio, um por bloqueio, com um link de uso único que destrava a conta antes dos 30 minutos (#553) [Backend]
+- Adiciona ao login um diálogo de conta bloqueada por senhas erradas, que explica o motivo, quanto tempo falta para ela destravar e o link enviado ao e-mail Fatec como saída (#573) [Frontend]
+- Adiciona a página do link de desbloqueio, que destrava a conta ao abrir e leva ao login com o e-mail preenchido; com o link expirado ou já usado, ela avisa que a conta já está liberada (#573) [Frontend]
+- Adiciona a foto original à lista de contas da gestão, ao lado da miniatura (#561) [Backend]
+- Adiciona a remoção da foto ao editar um item de achados e perdidos, como em Meu perfil: a foto sai ao salvar, e o arquivo é apagado na hora (#563) [Frontend]
+- Adiciona à edição de um item de achados e perdidos o pedido de tirar a foto, que apaga o arquivo; com uma foto nova no mesmo pedido, fica a nova (#563) [Backend]
+- Adiciona a página do link de confirmação, que confirma o e-mail Fatec ao abrir e já entra; com o link expirado ou já usado, ela oferece um novo link e o caminho para o login (#577) [Frontend]
+- Adiciona ao login um diálogo para quem ainda não confirmou o e-mail Fatec, que diz o que falta e reenvia o link de confirmação (#577) [Frontend]
+- Adiciona ao login o pedido de redefinição da senha esquecida: a tela leva o e-mail já digitado, avisa quando não há conta e oferece o cadastro, e o link pode ser pedido de novo a cada 3 minutos (#579) [Frontend]
+- Adiciona a página do link de redefinição, que confere o link ao abrir, pede a nova senha com confirmação e as regras do cadastro e já entra; com o link vencido, oferece outro, e a conta desativada é levada a reativar com a nova senha (#579) [Frontend]
+- Adiciona aos e-mails da conta o símbolo e o nome do FateConnect no topo, um desenho que o Outlook, o Gmail e o Apple Mail mostram igual, a primeira frase na prévia da caixa de entrada e uma versão só em texto enviada junto (#583) [Frontend] [Backend]
+
+### Changed
+
+- Passa a criar a conta sem entrar logado: a sessão só abre quando o link de confirmação do e-mail é aberto (#553) [Backend]
+- Passa a declarar nos termos de uso a confirmação do e-mail e o bloqueio por senhas erradas, e na política de privacidade o serviço de envio de e-mail, os links enviados e a contagem de senhas erradas, em nova versão dos termos (#553) [Frontend]
+- Passa a abrir os diálogos em tela cheia no celular, com os botões presos no pé da tela e o conteúdo rolando acima deles; no computador eles seguem como antes (#561) [Frontend]
+- Passa a centralizar no celular o conteúdo dos diálogos sem formulário, com os botões dividindo a largura, e a pôr um botão Fechar no pé dos que não têm rodapé (#561) [Frontend]
+- Passa a abrir a foto original num diálogo ao tocar na miniatura das denúncias, de achados e perdidos, de Meu perfil e das contas na gestão, no lugar do botão de baixar das denúncias; salvar a foto fica com o próprio navegador (#561) [Frontend]
+- Passa a mostrar maior a foto no contato de quem publicou (#561) [Frontend]
+- Passa a abrir o aplicativo de e-mail ao tocar no e-mail do contato de quem publicou, como no rodapé, no lugar de copiar o endereço (#563) [Frontend]
+- Passa a dividir a largura do rodapé entre os botões no celular também nos diálogos com formulário, como os filtros (#563) [Frontend]
+- Passa a declarar na política de privacidade que quem cadastrou um item pode trocar ou tirar a foto ao editá-lo, e que a anterior é apagada na hora, em nova versão do documento (#563) [Frontend]
+- Passa a mostrar as telas de recado (área ainda não disponível, erro inesperado, sessão expirada e desbloqueio da conta) num cartão, com um ícone pela natureza do recado: informação, sucesso, aviso ou erro (#573) [Frontend]
+- Passa a mostrar, nos diálogos que só têm texto, um ícone pela natureza do recado acima da frase, como o cadeado na conta bloqueada e a lixeira na exclusão de carona (#573) [Frontend]
+- Passa a criar a conta sem entrar logado: depois do cadastro a tela mostra para qual e-mail o link de confirmação foi, com o reenvio liberado a cada 3 minutos e o caminho para entrar (#577) [Frontend]
+- Passa a chamar de `occurredOn` a data do item de achados e perdidos, no cadastro, na edição e na resposta, no lugar de `ocurredOn`, que estava escrito errado; o nome antigo deixa de ser aceito, e a coluna é renomeada sem perder as datas (#584) [Frontend] [Backend]
+- Passa a receber em `searchTerm` a busca da lista de usuários da gestão, como os outros filtros; `search` deixa de filtrar (#584) [Frontend] [Backend]
+- Passa a editar carona por `PATCH`, como os outros cadastros, no lugar de `PUT`: o que a edição não manda fica como estava, inclusive o veículo, que deixou de ser obrigatório nela (#584) [Frontend] [Backend]
+
+### Removed
+
+- Remove das preferências a escolha de receber os avisos por e-mail: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A coluna é apagada, então a escolha já guardada se perde (#586) [Backend]
+- Remove das Preferências o canal por e-mail, e os avisos ficam só no aplicativo: Tema e Notificações passam a um cartão só, com o interruptor salvando ao ser tocado, sem botão de salvar, e a caixa do cadastro e a política de privacidade deixam de falar em e-mail (#586) [Frontend]
+
+### Fixed
+
+- Corrige Meu perfil, onde o navegador preenchia sozinho a senha atual ao abrir a tela; o login continua preenchido pelo navegador (#561) [Frontend]
+- Corrige as etiquetas Em análise, das denúncias, e Arquivado, de achados e perdidos, que apareciam como texto solto ao lado das outras (#561) [Frontend]
+
 ## [1.3.0] - 2026-10-06
 
 ### Added

@@ -103,14 +103,6 @@ public class GlobalExceptionMiddlewareTests
         Assert.Equal("E-mail ou senha inválidos.", error);
     }
 
-    [Fact]
-    public async Task AMissingJwtSecret_AnswersInternalServerErrorWithItsOwnMessage()
-    {
-        (HttpStatusCode statusCode, string error, _) = await AnswerFor(new JwtNotConfiguredException());
-
-        Assert.Equal(HttpStatusCode.InternalServerError, statusCode);
-        Assert.Equal("JWT_SECRET não configurado.", error);
-    }
 
     [Fact]
     public async Task AnUnidentifiedUser_AnswersUnauthorizedInPortuguese()

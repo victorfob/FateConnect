@@ -1,10 +1,11 @@
 namespace FateConnect.Api.Modules.Users.Services;
 
+using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.DTOs;
-using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Enums;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Common.Utils;
@@ -13,10 +14,10 @@ using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
 using FateConnect.Api.Modules.Users.Interfaces;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using static BCrypt.Net.BCrypt;
 
@@ -25,18 +26,19 @@ public partial class UserService(
     ITokenService tokenService,
     TimeProvider timeProvider,
     IStorageService baseStorageService,
+    IPublishEndpoint publishEndpoint,
     ILogger<UserService> logger
 ) : BaseFileService(baseStorageService), IUserService
 {
 
-    public async Task<TokenResponseDto> SignUpAsync(CreateUserDto dto, RequestOrigin origin)
+    public async Task SignUpAsync(CreateUserDto dto, RequestOrigin origin)
     {
         await EnsureEmailIsUniqueAsync(dto.FatecEmail);
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
         string hashedPassword = HashPassword(dto.Password);
 
-        User newUser = new User(
+        User newUser = new(
             dto.FatecEmail,
             hashedPassword,
             dto.FullName,
@@ -46,16 +48,40 @@ public partial class UserService(
             now
         );
 
-        UserPreferences newPreferences = new UserPreferences(
-            dto.ReceiveEmails ?? false,
-            dto.ReceiveNotifications ?? false
-        );
+        ConfigurePreferences(newUser, dto);
+        AddAcceptances(newUser, dto, origin, now);
 
-        newUser.SetPreferences(newPreferences);
+        string rawToken = newUser.IssueToken(EnumTokenType.EmailConfirmation, now, TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
 
+        await userRepository.InTransactionAsync(async () =>
+        {
+            await userRepository.AddAsync(newUser);
+
+            await publishEndpoint.Publish(new UserRegisteredEvent(
+                UserId: newUser.Id,
+                FullName: newUser.FullName,
+                FatecEmail: newUser.FatecEmail,
+                ConfirmationToken: rawToken
+            ));
+
+            await userRepository.SaveChangesAsync();
+        });
+
+        LogUserCreated(logger, newUser.Id);
+    }
+
+    private static void ConfigurePreferences(User user, CreateUserDto dto)
+    {
+        var preferences = new UserPreferences(dto.ReceiveNotifications ?? false);
+
+        user.SetPreferences(preferences);
+    }
+
+    private static void AddAcceptances(User user, CreateUserDto dto, RequestOrigin origin, DateTime now)
+    {
         foreach (var acceptanceDto in dto.Acceptances)
         {
-            newUser.AddDocumentAcceptance(new DocumentAcceptance(
+            user.AddDocumentAcceptance(new DocumentAcceptance(
                 documentType: acceptanceDto.Document,
                 version: acceptanceDto.Version,
                 acceptedAt: now,
@@ -63,13 +89,8 @@ public partial class UserService(
                 userAgent: origin.UserAgent
             ));
         }
-
-        await userRepository.AddAsync(newUser);
-
-        LogUserCreated(logger, newUser.Id);
-
-        return new TokenResponseDto { Token = tokenService.GenerateJwtToken(newUser) };
     }
+
 
     public async Task<ReadUserDto?> GetProfileAsync(int currentUserId)
     {
@@ -94,10 +115,7 @@ public partial class UserService(
             return null;
         }
 
-        return new ReadUserPreferencesDto(
-            ReceiveEmails: preferences.ReceiveEmails,
-            ReceiveNotifications: preferences.ReceiveNotifications
-        );
+        return new ReadUserPreferencesDto(preferences.ReceiveNotifications);
     }
 
     public async Task<ReadUserDto?> UpdateProfileAsync(int currentUserId, UpdateUserDto dto)
@@ -154,8 +172,7 @@ public partial class UserService(
         }
 
         var newPreferences = new UserPreferences(
-            receiveEmails: dto.ReceiveEmails ?? user.Preferences.ReceiveEmails,
-            receiveNotifications: dto.ReceiveNotifications ?? user.Preferences.ReceiveNotifications
+            dto.ReceiveNotifications ?? user.Preferences.ReceiveNotifications
         );
 
         user.SetPreferences(newPreferences);
@@ -235,6 +252,7 @@ public partial class UserService(
                 u.FullName,
                 u.ContactEmail,
                 u.Phone,
+                u.ImageUrl,
                 UploadsLocation.ThumbnailOrNullOf(u.ImageUrl),
                 u.Status
             )

@@ -25,7 +25,7 @@ public partial class LostAndFoundService(
             dto.Name,
             dto.LostAndFoundType.GetValueOrDefault(),
             dto.Place,
-            dto.OcurredOn.GetValueOrDefault(),
+            dto.OccurredOn.GetValueOrDefault(),
             dto.Description,
             currentUserId
         );
@@ -94,25 +94,32 @@ public partial class LostAndFoundService(
             dto.Name,
             dto.LostAndFoundType,
             dto.Place,
-            dto.OcurredOn,
+            dto.OccurredOn,
             dto.Description,
             dto.Status
         );
 
-        string? replacedImageUrl = null;
+        string? discardedImageUrl = null;
         string? storedImageUrl = null;
+        bool removesImage = dto.Image is null && dto.RemoveImage == true;
 
         if (dto.Image is not null)
         {
-            replacedImageUrl = record.ImageUrl;
+            discardedImageUrl = record.ImageUrl;
             storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
             record.AttachImage(storedImageUrl);
         }
 
+        if (removesImage)
+        {
+            discardedImageUrl = record.ImageUrl;
+            record.DetachImage();
+        }
+
         await PersistOrDropImageAsync(repository.SaveChangesAsync, storedImageUrl);
 
-        if (!string.IsNullOrWhiteSpace(replacedImageUrl))
-            await StorageService.DeleteImageAsync(replacedImageUrl);
+        if (!string.IsNullOrWhiteSpace(discardedImageUrl))
+            await StorageService.DeleteImageAsync(discardedImageUrl);
 
         LogRecordUpdated(logger, id);
 
@@ -162,7 +169,7 @@ public partial class LostAndFoundService(
             record.Name,
             record.LostAndFoundType,
             record.Place,
-            record.OcurredOn,
+            record.OccurredOn,
             record.Description,
             record.ImageUrl,
             UploadsLocation.ThumbnailOrNullOf(record.ImageUrl),

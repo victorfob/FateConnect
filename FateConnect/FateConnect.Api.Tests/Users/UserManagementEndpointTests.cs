@@ -33,6 +33,7 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
         string FullName,
         string ContactEmail,
         string? Phone,
+        string? ImageUrl,
         string? ThumbnailUrl,
         EnumAccountStatus Status);
 
@@ -87,7 +88,7 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
         factory.SeedUser("Ulisses Moreira Braga");
         HttpClient administrator = factory.CreateClientForNewAdministrator("Vanessa Lacerda Fontes");
 
-        HttpResponseMessage response = await administrator.GetAsync("/Users?Search=Quintela");
+        HttpResponseMessage response = await administrator.GetAsync("/Users?SearchTerm=Quintela");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         UserSummary found = Assert.Single((await PageFrom(response)).Items);
@@ -98,14 +99,15 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
     [Theory]
     [InlineData("uploads/user/perfil.png", "uploads/user/thumbnails/perfil.webp")]
     [InlineData(null, null)]
-    public async Task ListUsers_OfAPersonWithOrWithoutAPhoto_AnswersTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
+    public async Task ListUsers_OfAPersonWithOrWithoutAPhoto_AnswersTheOriginalAndTheThumbnailOrNull(string? imageUrl, string? thumbnailUrl)
     {
         SeededUser person = factory.SeedUser("Jussara Leme Antunes", imageUrl: imageUrl);
         HttpClient administrator = factory.CreateClientForNewAdministrator("Karina Bueno Siqueira");
 
-        HttpResponseMessage response = await administrator.GetAsync($"/Users?Search={person.ContactEmail}");
+        HttpResponseMessage response = await administrator.GetAsync($"/Users?SearchTerm={person.ContactEmail}");
 
         UserSummary found = Assert.Single((await PageFrom(response)).Items);
+        Assert.Equal(imageUrl, found.ImageUrl);
         Assert.Equal(thumbnailUrl, found.ThumbnailUrl);
     }
 
@@ -116,7 +118,7 @@ public class UserManagementEndpointTests(ApiFactory factory) : IClassFixture<Api
         factory.SeedUserWithPassword("Xênia Esteves Lobato", KnownPassword);
         HttpClient administrator = factory.CreateClientForNewAdministrator("Yara Figueiredo Assis");
 
-        HttpResponseMessage response = await administrator.GetAsync("/Users?Search=Lobato&Status=Banned");
+        HttpResponseMessage response = await administrator.GetAsync("/Users?SearchTerm=Lobato&Status=Banned");
 
         UserSummary found = Assert.Single((await PageFrom(response)).Items);
         Assert.Equal(bannedId, found.Id);

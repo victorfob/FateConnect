@@ -7,6 +7,7 @@ using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.Communications.Interfaces;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Enums;
 using FateConnect.Api.Modules.LostAndFound.Entities;
@@ -16,14 +17,17 @@ using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
+using MassTransit;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using static BCrypt.Net.BCrypt;
 
 namespace FateConnect.Api.Tests.Fixtures;
@@ -38,6 +42,8 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public TimeProvider? Clock { get; init; }
 
+    public RecordingEmailService Emails { get; } = new();
+
     public ApiFactory()
     {
         Directory.CreateDirectory(_webRoot);
@@ -45,6 +51,9 @@ public class ApiFactory : WebApplicationFactory<Program>
         Environment.SetEnvironmentVariable("JWT_SECRET", FakeSecret);
         Environment.SetEnvironmentVariable("JWT_ISSUER", "FateConnectTest");
         Environment.SetEnvironmentVariable("JWT_AUDIENCE", "FateConnectTestWeb");
+        Environment.SetEnvironmentVariable("PUBLIC_URL", "https://fateconnect.test");
+        Environment.SetEnvironmentVariable("EMAIL_SENDER", "nao-responda@fateconnect.test");
+        Environment.SetEnvironmentVariable("RESEND_API_KEY", "re_chave_falsa_desta_suite");
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -65,6 +74,10 @@ public class ApiFactory : WebApplicationFactory<Program>
 
             services.Remove(retentionWorker);
 
+            services.AddMassTransitTestHarness();
+            services.RemoveAll<IEmailService>();
+            services.AddSingleton<IEmailService>(Emails);
+
             if (Clock is null)
                 return;
 
@@ -77,8 +90,19 @@ public class ApiFactory : WebApplicationFactory<Program>
     {
         base.Dispose(disposing);
 
-        if (disposing && Directory.Exists(_webRoot))
+        if (!disposing)
+            return;
+
+        CloseIdleDatabaseConnections();
+
+        if (Directory.Exists(_webRoot))
             Directory.Delete(_webRoot, recursive: true);
+    }
+
+    private void CloseIdleDatabaseConnections()
+    {
+        using NpgsqlConnection connection = new(TestDatabase.ConnectionStringFor(_databaseName));
+        NpgsqlConnection.ClearPool(connection);
     }
 
     public static string IssueToken(
@@ -112,7 +136,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         if (tokenVersion != user.TokenVersion)
             typeof(User).GetProperty(nameof(User.TokenVersion))?.SetValue(user, tokenVersion);
 
-        return new TokenService(Options.Create(options)).GenerateJwtToken(user);
+        return new TokenService(Options.Create(options), NullLogger<TokenService>.Instance).GenerateJwtToken(user);
     }
 
     public static string IssueTokenWithoutVersion(int userId = 1)
@@ -170,7 +194,8 @@ public class ApiFactory : WebApplicationFactory<Program>
         if (imageUrl is not null)
             user.AttachImage(imageUrl);
 
-        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
+        user.ConfirmEmail();
+        user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
 
@@ -198,7 +223,8 @@ public class ApiFactory : WebApplicationFactory<Program>
             createdAt: DateTime.UtcNow
         );
 
-        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
+        user.ConfirmEmail();
+        user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
         context.SaveChanges();
@@ -209,7 +235,8 @@ public class ApiFactory : WebApplicationFactory<Program>
     public (int Id, string FatecEmail) SeedUserWithPassword(
         string fullName,
         string password,
-        EnumAccountStatus status = EnumAccountStatus.Active)
+        EnumAccountStatus status = EnumAccountStatus.Active,
+        bool emailConfirmed = true)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
@@ -224,7 +251,10 @@ public class ApiFactory : WebApplicationFactory<Program>
             createdAt: DateTime.UtcNow
         );
 
-        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
+        if (emailConfirmed)
+            user.ConfirmEmail();
+
+        user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
 
@@ -245,6 +275,14 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.Users
             .Where(user => user.Id == userId)
             .ExecuteUpdate(setters => setters.SetProperty(user => user.Status, status));
+    }
+
+    public int TokenCountOf(string fatecEmail, EnumTokenType type)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        return context.UserTokens.Count(token => token.User.FatecEmail == fatecEmail && token.Type == type);
     }
 
     public IReadOnlyList<AdministrativeAction> AdministrativeActionsOn(int targetId)

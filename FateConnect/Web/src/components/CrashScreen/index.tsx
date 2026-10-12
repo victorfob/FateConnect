@@ -8,7 +8,7 @@ type CrashScreenProps = Readonly<{ children: ReactNode }>;
 
 export function CrashScreen({ children }: CrashScreenProps) {
   return (
-    <MessageScreen title={C.ERROR_TITLE} description={C.ERROR_DESCRIPTION}>
+    <MessageScreen title={C.ERROR_TITLE} description={C.ERROR_DESCRIPTION} tone="error">
       {children}
     </MessageScreen>
   );

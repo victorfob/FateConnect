@@ -5,6 +5,10 @@
 export enum RoutePathEnum {
   LANDING = '/',
   SIGNUP = '/cadastro',
+  UNLOCK_ACCOUNT = '/desbloquear-conta',
+  CONFIRM_EMAIL = '/confirmar-email',
+  FORGOT_PASSWORD = '/esqueci-minha-senha',
+  RESET_PASSWORD = '/redefinir-senha',
   MENU = '/menu',
   LOST_AND_FOUND = '/achados-perdidos',
   RIDES = '/caronas',

@@ -7,6 +7,8 @@ export type StatusTagTone = 'neutral' | 'muted' | 'success' | 'warning' | 'dange
 
 export type NotificationVariant = 'success' | 'error' | 'warning';
 
+export type FeedbackTone = 'info' | 'success' | 'warning' | 'error';
+
 export type SurfacePair = { surface: string; content: string };
 
 /**

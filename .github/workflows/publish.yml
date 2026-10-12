@@ -41,14 +41,22 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: FateConnect/Web/.nvmrc
-          cache: yarn
-          cache-dependency-path: FateConnect/Web/yarn.lock
 
-      # `--ignore-scripts` porque instalar dependência não deve executar código:
+      # O Yarn do projeto vem pelo Corepack: o Yarn 1 do runner recusa instalar.
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/cache@v4
+        with:
+          path: FateConnect/Web/node_modules
+          key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
+          restore-keys: node-modules-
+
+      # `--mode=skip-build` porque instalar dependência não deve executar código:
       # sem ele o `postinstall` de qualquer pacote da árvore roda no runner, com
       # os segredos do job ao alcance.
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --immutable --mode=skip-build
         working-directory: FateConnect/Web
 
       # É ela que amarra o erro no Sentry à release que o produziu.

@@ -77,7 +77,7 @@ export const signupSchema = z.object({
     .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.passwordRequired)
     .min(MIN_PASSWORD_LENGTH, SIGNUP_MESSAGES.passwordTooShort),
   acceptTerms: z.boolean().refine((accepted) => accepted, SIGNUP_MESSAGES.termsRequired),
-  acceptMarketing: z.boolean(),
+  acceptNotifications: z.boolean(),
 });
 
 export type SignupFormValues = z.infer<typeof signupSchema>;
@@ -89,5 +89,5 @@ export const SIGNUP_DEFAULT_VALUES: SignupFormValues = {
   gender: '',
   password: '',
   acceptTerms: false,
-  acceptMarketing: false,
+  acceptNotifications: false,
 };

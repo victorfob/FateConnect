@@ -8,12 +8,16 @@
 services:
   api:
     build:
-      context: ../FateConnect/FateConnect.Api
+      # A pasta de cima entra para o build ler o .editorconfig, que marca as migrations como código gerado.
+      context: ../FateConnect
+      dockerfile: FateConnect.Api/Dockerfile
       # O ImageSharp reprova o build de publicação sem licença. Ela entra como
       # segredo do build, que não aparece no log nem chega à imagem que sobe.
       secrets:
         - sixlabors_license
     restart: unless-stopped
+    depends_on:
+      - rabbitmq
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       DB_CONNECTION: Host=host.docker.internal;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
@@ -22,19 +26,44 @@ services:
       JWT_EXPIRATION_HOURS: ${JWT_EXPIRATION_HOURS}
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
-      # Numa máquina apertada o coletor padrão reserva muito mais heap do que
-      # esta API usa. O modo estação de trabalho a mantém dentro do limite.
+      
+      # Comunicação e E-mail
+      PUBLIC_URL: ${PUBLIC_URL}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_SENDER: ${EMAIL_SENDER}
+      
+      # Configurações do RabbitMQ
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+            
+      # O coletor de servidor reserva heap por núcleo, muito acima do que esta
+      # API usa. O modo estação de trabalho a mantém dentro do mem_limit.
       DOTNET_gcServer: '0'
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     ports:
       # Só em 127.0.0.1: quem fala com a internet é o nginx do host.
       - '127.0.0.1:${API_PORT}:8080'
-    mem_limit: 220m
+    # Teto por ambiente: a API que vazar memória cai sozinha, sem levar a
+    # máquina. Na subida ela passa de 170 MB.
+    mem_limit: 512m
     # As imagens enviadas vivem em volume: sem ele, todo deploy recria o
     # contêiner e leva junto o que foi carregado.
     volumes:
       - api_uploads:/app/wwwroot/uploads
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: fateconnect_rabbitmq_${API_PORT} # Nomeia pelo ambiente para evitar colisão entre hml/prod
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    ports:
+      - '127.0.0.1:${RABBITMQ_PORT}:5672'
+      - '127.0.0.1:${RABBITMQ_UI_PORT}:15672'
+    mem_limit: 512m
 
 volumes:
   api_uploads:

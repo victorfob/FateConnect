@@ -1,17 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router';
-import { Button, Input, Typography } from '@design-system';
+import { Input, Typography } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
+import { AccountReactivationDialog } from '@app/components/AccountReactivationDialog';
+import { AuthCard } from '@app/components/AuthCard';
+import { SignupPrompt } from '@app/components/SignupPrompt';
+import { useAccountReactivation } from '@app/hooks/useAccountReactivation';
+import { useCountdown } from '@app/hooks/useCountdown';
 import { useNotification } from '@app/hooks/useNotification';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
-import { login, reactivate } from '@app/services/auth/authService';
+import { login } from '@app/services/auth/authService';
 import type { LoginRequest } from '@app/services/auth/types';
 import type { ApiError } from '@app/services/httpClient';
+import { loginPrefillState, prefilledEmailOf } from '@app/utils/loginPrefill';
 
-import { AccountReactivationDialog } from './components/AccountReactivationDialog';
+import { AccountLockedDialog } from './components/AccountLockedDialog';
+import { EmailNotConfirmedDialog } from './components/EmailNotConfirmedDialog';
 import { loginSchema, type LoginFormValues } from './schema';
 import * as C from './constants';
 import * as S from './styles';
@@ -19,34 +26,56 @@ import * as S from './styles';
 const UNAUTHORIZED = 401;
 const FORBIDDEN = 403;
 const CONFLICT = 409;
+const TOO_MANY_REQUESTS = 429;
+const EMAIL_NOT_CONFIRMED = 'EmailNotConfirmed';
 
 export function LandingLoginCard() {
   const navigate = useNavigate();
-  const { hash } = useLocation();
-  const { notifyError, notifySuccess } = useNotification();
+  const { hash, state } = useLocation();
+  const prefilledEmail = prefilledEmailOf(state);
+  const { notifyError } = useNotification();
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const [credentialsToReactivate, setCredentialsToReactivate] = useState<LoginRequest | null>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+  const [lockout, setLockout] = useState<ApiError | null>(null);
+  // O e-mail fica depois de fechar: o diálogo ainda aparece enquanto some.
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState('');
+  const [showingUnconfirmed, setShowingUnconfirmed] = useState(false);
+  const resendCountdown = useCountdown();
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: prefilledEmail ?? '', password: '' },
   });
 
-  // Chegando na landing pela âncora de login, o campo de e-mail recebe o foco.
+  const typedEmail = useWatch({ control, name: 'email' });
+
+  // Chegando na landing pela âncora de login, o foco vai ao primeiro campo vazio.
   useEffect(() => {
     if (hash !== `#${LandingSectionEnum.LOGIN}`) return;
 
-    emailInputRef.current?.focus();
-  }, [hash]);
+    if (prefilledEmail) {
+      passwordInputRef.current?.focus();
+      return;
+    }
 
-  const notifyRefusal = useCallback(
-    (error: ApiError) => {
+    emailInputRef.current?.focus();
+  }, [hash, prefilledEmail]);
+
+  const handleRefusal = useCallback(
+    (error: ApiError, { fatecEmail }: LoginRequest) => {
       if (error.status === UNAUTHORIZED) {
         notifyError(C.LOGIN_ERROR_MESSAGES.invalidCredentials);
+        return;
+      }
+
+      if (error.status === FORBIDDEN && error.code === EMAIL_NOT_CONFIRMED) {
+        setUnconfirmedEmail(fatecEmail);
+        setShowingUnconfirmed(true);
         return;
       }
 
@@ -55,10 +84,17 @@ export function LandingLoginCard() {
         return;
       }
 
+      if (error.status === TOO_MANY_REQUESTS) {
+        setLockout(error);
+        return;
+      }
+
       notifyError(C.LOGIN_ERROR_MESSAGES.generic);
     },
     [notifyError],
   );
+
+  const reactivation = useAccountReactivation(handleRefusal);
 
   const { mutate, isPending } = useMutation({
     mutationFn: login,
@@ -69,40 +105,26 @@ export function LandingLoginCard() {
     },
     onError: (error: ApiError, credentials) => {
       if (error.status === CONFLICT) {
-        setCredentialsToReactivate(credentials);
+        reactivation.askToReactivate(credentials);
         return;
       }
 
-      notifyRefusal(error);
+      handleRefusal(error, credentials);
     },
   });
 
-  const { mutate: mutateReactivation, isPending: isReactivating } = useMutation({
-    mutationFn: reactivate,
-    meta: { notifiesErrorItself: true },
-    onSuccess: () => {
-      notifySuccess(C.REACTIVATION_SUCCEEDED);
-      void navigate(RoutePathEnum.MENU);
-    },
-    onError: (error: ApiError) => {
-      setCredentialsToReactivate(null);
-      notifyRefusal(error);
-    },
-  });
+  const handleCloseLockout = useCallback(() => setLockout(null), []);
 
-  const handleDismissReactivation = useCallback(() => setCredentialsToReactivate(null), []);
-
-  const handleConfirmReactivation = useCallback(() => {
-    if (credentialsToReactivate) mutateReactivation(credentialsToReactivate);
-  }, [credentialsToReactivate, mutateReactivation]);
+  const handleCloseUnconfirmed = useCallback(() => setShowingUnconfirmed(false), []);
 
   const onSubmit = handleSubmit(({ email, password }) => {
     mutate({ fatecEmail: email, password });
   });
 
   const { ref: registerEmailRef, ...emailField } = register('email');
+  const { ref: registerPasswordRef, ...passwordField } = register('password');
 
-  // Dois donos: o formulário, que registrou o campo, e a âncora de login.
+  // Dois donos em cada campo: o formulário, que o registrou, e a âncora de login.
   const setEmailRef = useCallback(
     (element: HTMLInputElement | null) => {
       registerEmailRef(element);
@@ -111,15 +133,17 @@ export function LandingLoginCard() {
     [registerEmailRef],
   );
 
-  return (
-    <S.CardRoot component="article" aria-labelledby="landing-login-title">
-      <S.CardTitle>
-        <Typography variant="h2" id="landing-login-title">
-          {C.LOGIN_CARD_TITLE}
-        </Typography>
-      </S.CardTitle>
+  const setPasswordRef = useCallback(
+    (element: HTMLInputElement | null) => {
+      registerPasswordRef(element);
+      passwordInputRef.current = element;
+    },
+    [registerPasswordRef],
+  );
 
-      <S.Form component="form" onSubmit={onSubmit} noValidate>
+  return (
+    <AuthCard title={C.LOGIN_CARD_TITLE}>
+      <AuthCard.Form component="form" onSubmit={onSubmit} noValidate>
         <Input
           {...emailField}
           ref={setEmailRef}
@@ -131,33 +155,44 @@ export function LandingLoginCard() {
         />
 
         <Input.Password
-          {...register('password')}
+          {...passwordField}
+          ref={setPasswordRef}
           purpose="current"
           label={C.PASSWORD_LABEL}
           required
           error={errors.password?.message}
         />
 
-        <S.SubmitRow>
-          <Button type="submit" variant="contained" color="secondary" loading={isPending}>
-            {C.SUBMIT_LABEL}
-          </Button>
-        </S.SubmitRow>
-      </S.Form>
+        <S.ForgotPasswordRow component="p">
+          <RouterLink to={RoutePathEnum.FORGOT_PASSWORD} state={loginPrefillState(typedEmail)}>
+            <Typography variant="captionBold">{C.FORGOT_PASSWORD_LINK_LABEL}</Typography>
+          </RouterLink>
+        </S.ForgotPasswordRow>
 
-      <S.SignupRow component="p">
-        <Typography variant="caption">{C.SIGNUP_PROMPT}</Typography>
-        <RouterLink to={RoutePathEnum.SIGNUP}>
-          <Typography variant="captionBold">{C.SIGNUP_LINK_LABEL}</Typography>
-        </RouterLink>
-      </S.SignupRow>
+        <AuthCard.Submit loading={isPending}>{C.SUBMIT_LABEL}</AuthCard.Submit>
+      </AuthCard.Form>
+
+      <SignupPrompt />
 
       <AccountReactivationDialog
-        open={credentialsToReactivate !== null}
-        reactivating={isReactivating}
-        onDismiss={handleDismissReactivation}
-        onConfirm={handleConfirmReactivation}
+        open={reactivation.asking}
+        reactivating={reactivation.reactivating}
+        onDismiss={reactivation.dismiss}
+        onConfirm={reactivation.confirm}
       />
-    </S.CardRoot>
+
+      <AccountLockedDialog
+        open={lockout !== null}
+        minutesRemaining={lockout?.minutesRemaining}
+        onClose={handleCloseLockout}
+      />
+
+      <EmailNotConfirmedDialog
+        open={showingUnconfirmed}
+        email={unconfirmedEmail}
+        resendCountdown={resendCountdown}
+        onClose={handleCloseUnconfirmed}
+      />
+    </AuthCard>
   );
 }

@@ -1,7 +1,13 @@
-import { createMemoryRouter, RouterProvider } from 'react-router';
+import { createMemoryRouter, RouterProvider, type InitialEntry } from 'react-router';
 import { PASSWORD_TOGGLE_LABEL } from '@design-system';
 import { http, HttpResponse } from 'msw';
 
+import {
+  REACTIVATION_DIALOG,
+  REACTIVATION_SUCCEEDED,
+} from '@app/components/AccountReactivationDialog/constants';
+import { RESEND_LABEL } from '@app/components/ResendLinkButton/constants';
+import { CONFIRMATION_LINK_RESENT } from '@app/constants/emailLink';
 import {
   FATEC_EMAIL_DOMAIN_MESSAGE,
   FATEC_EMAIL_LOCAL_PART_MESSAGE,
@@ -9,28 +15,36 @@ import {
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { loginPrefillState, prefilledEmailOf } from '@app/utils/loginPrefill';
 
-import { REACTIVATION_DIALOG } from './components/AccountReactivationDialog/constants';
+import {
+  ACCOUNT_LOCKED_DIALOG,
+  lockedAccountMessage,
+} from './components/AccountLockedDialog/constants';
+import { EMAIL_NOT_CONFIRMED_DIALOG } from './components/EmailNotConfirmedDialog/constants';
 import { LOGIN_MESSAGES } from './schema';
 import * as C from './constants';
 import { LandingLoginCard } from '.';
 
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
 const REACTIVATE_URL = 'https://api.fateconnect.test/auth/reactivate';
+const RESEND_URL = 'https://api.fateconnect.test/auth/resend-confirmation-email';
+const NO_CONTENT = 204;
 
 const FORBIDDEN = 403;
 const CONFLICT = 409;
+const TOO_MANY_REQUESTS = 429;
 const SERVER_ERROR = 500;
 const EMAIL = 'aluno.teste@aluno.cps.sp.gov.br';
 const PASSWORD = 'segredo123';
 
-function renderCard(initialPath: string = RoutePathEnum.LANDING) {
+function renderCard(initialEntry: InitialEntry = RoutePathEnum.LANDING) {
   const router = createMemoryRouter(
     [
       { path: RoutePathEnum.LANDING, element: <LandingLoginCard /> },
       { path: RoutePathEnum.MENU, element: <div>menu</div> },
     ],
-    { initialEntries: [initialPath] },
+    { initialEntries: [initialEntry] },
   );
   render(<RouterProvider router={router} />);
 
@@ -137,6 +151,77 @@ describe('LandingLoginCard', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('should explain the missing confirmation and resend the link to the typed email', async () => {
+    const resentBodies: unknown[] = [];
+    server.use(
+      http.post(LOGIN_URL, () =>
+        HttpResponse.json(
+          { error: 'confirme o e-mail', code: 'EmailNotConfirmed' },
+          { status: FORBIDDEN },
+        ),
+      ),
+      http.post(RESEND_URL, async ({ request }) => {
+        resentBodies.push(await request.json());
+
+        return new HttpResponse(null, { status: NO_CONTENT });
+      }),
+    );
+    renderCard();
+    await preencher(EMAIL, PASSWORD);
+
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+    const dialog = await screen.findByRole('dialog', { name: EMAIL_NOT_CONFIRMED_DIALOG.title });
+    expect(within(dialog).getByText(EMAIL_NOT_CONFIRMED_DIALOG.message)).toBeInTheDocument();
+    await userEvent.click(within(dialog).getByRole('button', { name: RESEND_LABEL }));
+
+    expect(await screen.findByText(CONFIRMATION_LINK_RESENT)).toBeInTheDocument();
+    expect(resentBodies).toEqual([{ fatecEmail: EMAIL }]);
+    expect(screen.queryByText(C.LOGIN_ERROR_MESSAGES.bannedAccount)).not.toBeInTheDocument();
+  });
+
+  // O diálogo desmonta o botão ao fechar; a espera mora no cartão para não liberar
+  // um clique que a API descartaria.
+  it('should keep the resend waiting when the dialog opens again', async () => {
+    server.use(
+      http.post(LOGIN_URL, () =>
+        HttpResponse.json({ code: 'EmailNotConfirmed' }, { status: FORBIDDEN }),
+      ),
+      http.post(RESEND_URL, () => new HttpResponse(null, { status: NO_CONTENT })),
+    );
+    renderCard();
+    await preencher(EMAIL, PASSWORD);
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+    const dialog = await screen.findByRole('dialog', { name: EMAIL_NOT_CONFIRMED_DIALOG.title });
+    await userEvent.click(within(dialog).getByRole('button', { name: RESEND_LABEL }));
+    await screen.findByText(CONFIRMATION_LINK_RESENT);
+
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: EMAIL_NOT_CONFIRMED_DIALOG.closeLabel }),
+    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+
+    const reopened = await screen.findByRole('dialog', { name: EMAIL_NOT_CONFIRMED_DIALOG.title });
+    expect(within(reopened).getAllByRole('button').at(-1)).toBeDisabled();
+  });
+
+  it('should lead to the forgotten password with the typed email', async () => {
+    const router = createMemoryRouter(
+      [
+        { path: RoutePathEnum.LANDING, element: <LandingLoginCard /> },
+        { path: RoutePathEnum.FORGOT_PASSWORD, element: <p>esqueci</p> },
+      ],
+      { initialEntries: [RoutePathEnum.LANDING] },
+    );
+    render(<RouterProvider router={router} />);
+    await userEvent.type(screen.getByLabelText(/E-mail/), EMAIL);
+
+    await userEvent.click(screen.getByRole('link', { name: C.FORGOT_PASSWORD_LINK_LABEL }));
+
+    expect(await screen.findByText('esqueci')).toBeInTheDocument();
+    expect(prefilledEmailOf(router.state.location.state)).toBe(EMAIL);
+  });
+
   it('should reactivate a deactivated account with the typed credentials and enter', async () => {
     let reactivationBody: unknown = null;
     server.use(
@@ -159,7 +244,7 @@ describe('LandingLoginCard', () => {
 
     await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.MENU));
     expect(reactivationBody).toEqual({ fatecEmail: EMAIL, password: PASSWORD });
-    expect(await screen.findByText(C.REACTIVATION_SUCCEEDED)).toBeInTheDocument();
+    expect(await screen.findByText(REACTIVATION_SUCCEEDED)).toBeInTheDocument();
   });
 
   it('should stay on the landing without reactivating when the person gives up', async () => {
@@ -229,6 +314,59 @@ describe('LandingLoginCard', () => {
     expect(within(submitButton).getByRole('progressbar')).toBeInTheDocument();
 
     respond();
+  });
+
+  it('should explain the locked account in a dialog, with the minutes the api returns', async () => {
+    server.use(
+      http.post(LOGIN_URL, () =>
+        HttpResponse.json(
+          { error: 'bloqueada', code: 'AccountLocked', minutesRemaining: 12 },
+          { status: TOO_MANY_REQUESTS },
+        ),
+      ),
+    );
+    renderCard();
+    await preencher(EMAIL, PASSWORD);
+
+    await userEvent.click(screen.getByRole('button', { name: C.SUBMIT_LABEL }));
+    const dialog = await screen.findByRole('dialog', { name: ACCOUNT_LOCKED_DIALOG.title });
+
+    expect(
+      within(dialog).getByText(
+        'Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec ou aguarde 12 minutos e tente novamente.',
+      ),
+    ).toBeInTheDocument();
+    // O bloqueio é explicado no diálogo; um aviso a mais repetiria o recado.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: ACCOUNT_LOCKED_DIALOG.closeLabel }),
+    );
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('should write a single minute in the singular', () => {
+    expect(lockedAccountMessage(1)).toBe(
+      'Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec ou aguarde 1 minuto e tente novamente.',
+    );
+  });
+
+  it('should point only to the link when the api does not say the minutes', () => {
+    expect(lockedAccountMessage(undefined)).toBe(
+      'Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec.',
+    );
+  });
+
+  it('should fill the email and focus the password when it comes from the unlock page', () => {
+    renderCard({
+      pathname: RoutePathEnum.LANDING,
+      hash: `#${LandingSectionEnum.LOGIN}`,
+      state: loginPrefillState(EMAIL),
+    });
+
+    expect(screen.getByLabelText(/E-mail/)).toHaveValue(EMAIL);
+    expect(screen.getByLabelText(/Senha/)).toHaveFocus();
   });
 
   it('should focus the email field when the page is opened at the login anchor', async () => {

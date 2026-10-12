@@ -36,7 +36,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         string Name,
         EnumLostAndFoundType LostAndFoundType,
         string Place,
-        DateOnly OcurredOn,
+        DateOnly OccurredOn,
         string? Description,
         string? ImageUrl,
         string? ThumbnailUrl,
@@ -50,14 +50,14 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         EnumLostAndFoundType type = EnumLostAndFoundType.Lost,
         string place = "Biblioteca do bloco B",
         string? description = "Ficou na mesa do fundo.",
-        DateOnly? ocurredOn = null)
+        DateOnly? occurredOn = null)
     {
         MultipartFormDataContent form = new()
         {
             { new StringContent(name), "Name" },
             { new StringContent(type.ToString()), "LostAndFoundType" },
             { new StringContent(place), "Place" },
-            { new StringContent((ocurredOn ?? Yesterday).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OcurredOn" },
+            { new StringContent((occurredOn ?? Yesterday).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OccurredOn" },
         };
 
         if (description is not null)
@@ -78,6 +78,18 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Path.Combine(
             UploadsLocation.PhysicalRootOf(_factory.Services.GetRequiredService<IWebHostEnvironment>()),
             "lostandfound");
+
+    private static async Task<ReadItem> CreateItemWithImageAsync(HttpClient client, byte shade)
+    {
+        MultipartFormDataContent creation = NewItemForm();
+        creation.Add(ImagePayload(shade), "Image", "foto.png");
+
+        HttpResponseMessage response = await client.PostAsync("/LostAndFound", creation);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        return (await response.Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!;
+    }
 
     private static MultipartFormDataContent StatusForm(EnumStatusLostAndFound status) =>
         new() { { new StringContent(status.ToString()), "Status" } };
@@ -282,7 +294,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Eduardo Ramos Lima");
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(2));
 
-        HttpResponseMessage response = await client.PostAsync("/LostAndFound", NewItemForm(ocurredOn: tomorrow));
+        HttpResponseMessage response = await client.PostAsync("/LostAndFound", NewItemForm(occurredOn: tomorrow));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains("A data do ocorrido não pode ser no futuro.", await response.Content.ReadAsStringAsync());
@@ -343,6 +355,82 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task UpdateItem_RemovingTheImage_ClearsItAndDropsTheFile()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Laura Mendes Bastos");
+        ReadItem created = await CreateItemWithImageAsync(client, 0x05);
+
+        MultipartFormDataContent removal = new() { { new StringContent("true"), "RemoveImage" } };
+
+        HttpResponseMessage response = await client.PatchAsync($"/LostAndFound/{created.Id}", removal);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        ReadItem updated = (await response.Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!;
+
+        Assert.Null(updated.ImageUrl);
+        Assert.Null(updated.ThumbnailUrl);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/{created.ImageUrl}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/{created.ThumbnailUrl}")).StatusCode);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("false")]
+    public async Task UpdateItem_WithoutAskingToRemoveTheImage_KeepsIt(string? removeImage)
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Marcelo Duarte Fonseca");
+        ReadItem created = await CreateItemWithImageAsync(client, 0x06);
+
+        MultipartFormDataContent edition = new() { { new StringContent("Mochila preta"), "Name" } };
+        if (removeImage is not null)
+            edition.Add(new StringContent(removeImage), "RemoveImage");
+
+        ReadItem updated = (await (await client.PatchAsync($"/LostAndFound/{created.Id}", edition))
+            .Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!;
+
+        Assert.Equal("Mochila preta", updated.Name);
+        Assert.Equal(created.ImageUrl, updated.ImageUrl);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync($"/{created.ImageUrl}")).StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateItem_WithANewImageAndTheRemovalTogether_KeepsTheNewImage()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Natália Brito Esteves");
+        ReadItem created = await CreateItemWithImageAsync(client, 0x07);
+
+        MultipartFormDataContent replacement = new()
+        {
+            { ImagePayload(0x08), "Image", "nova.png" },
+            { new StringContent("true"), "RemoveImage" },
+        };
+
+        ReadItem updated = (await (await client.PatchAsync($"/LostAndFound/{created.Id}", replacement))
+            .Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!;
+
+        Assert.NotNull(updated.ImageUrl);
+        Assert.NotEqual(created.ImageUrl, updated.ImageUrl);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync($"/{updated.ImageUrl}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/{created.ImageUrl}")).StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateItem_RemovingTheImageOfAnItemWithoutOne_AnswersTheItem()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Otávio Ramos Pacheco");
+        ReadItem created = (await (await client.PostAsync("/LostAndFound", NewItemForm()))
+            .Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!;
+
+        MultipartFormDataContent removal = new() { { new StringContent("true"), "RemoveImage" } };
+
+        HttpResponseMessage response = await client.PatchAsync($"/LostAndFound/{created.Id}", removal);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Null((await response.Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!.ImageUrl);
+    }
+
+    [Fact]
     public async Task CreateItem_WithAnImageTheEntityRefuses_LeavesNoFileBehind()
     {
         HttpClient client = _factory.CreateClientForNewUser("Igor Nascimento Aguiar");
@@ -352,7 +440,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Directory.CreateDirectory(folder);
         int filesBefore = Directory.GetFiles(folder).Length;
 
-        MultipartFormDataContent form = NewItemForm(ocurredOn: tomorrow);
+        MultipartFormDataContent form = NewItemForm(occurredOn: tomorrow);
         form.Add(ImagePayload(0x03), "Image", "foto.png");
 
         HttpResponseMessage response = await client.PostAsync("/LostAndFound", form);
@@ -472,7 +560,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         {
             { new StringContent("Mochila cinza"), "Name" },
             { new StringContent("Biblioteca do bloco B"), "Place" },
-            { new StringContent(Yesterday.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OcurredOn" },
+            { new StringContent(Yesterday.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OccurredOn" },
         };
 
         HttpResponseMessage response = await _factory.CreateClientFor(reporter.Id).PostAsync("/LostAndFound", form);

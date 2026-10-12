@@ -24,6 +24,7 @@ paths:
 
 - `type` por padrão; `interface` só quando herda (`interface RideFilter extends PageQuery`).
 - ⛔ Sem `as const`: conjunto finito de chaves é `enum` (o lint aceita os dois; o precedente do repo decide).
+- Prop repassada a um componente da biblioteca reusa o tipo dele por `Pick` (`Readonly<{ email: string } & Pick<ButtonProps, 'variant'>>`): `variant?: ButtonProps['variant']` reprova como opcional redundante, e `NonNullable` não se explica a quem lê.
 - Props em `Readonly<…>`. `enum` da aplicação leva sufixo `Enum` (`RideTypeEnum`); tipo público do DS é união de literais.
 - ⛔ Import é nomeado. `import * as X` só em duas exceções, as duas da pasta do próprio componente: `import * as S from './styles'` e `import * as C from './constants'`. Estilo ou constante de outra pasta entra por import nomeado (`import { ShellRoot } from '../shell.styles'`). Estilo que outro componente também precisa se promove (ao design system ou a um componente comum), em vez de se importar do `styles.ts` do vizinho.
 - Constante consumida por um componente só mora na pasta dele; conte os consumidores antes de mover.
@@ -45,6 +46,7 @@ Um teste que conte `getAllByRole('alert')` protege contra o aviso em dobro.
 - ⛔ Sem `let` de módulo guardando estado nem sinalizador mutável dentro de efeito: é `useState`/contexto, ou a proteção não era necessária. `let` local de laço em função pura continua certo.
 - ⛔ Recurso criado num `useMemo` e liberado na limpeza de um efeito quebra no `StrictMode`: no dev a limpeza roda antes da segunda montagem e o `useMemo` devolve o recurso já liberado. O padrão está em `useFilePreviewUrl`.
 - `if` de uma instrução não leva chaves, mesmo quebrando a linha.
+- ⛔ `sonarjs/function-return-type` é desligada só em `.tsx` (`eslint.config.js`): a função que devolve `skipToken` ou a consulta passa no `index.tsx` e reprova ao ir para `helpers/*.ts`. O helper recebe o token já garantido, e o `skipToken` fica na tela, num `useMemo` com `if` (`pages/ConfirmEmail`).
 - ⛔ Ternário fora do JSX vira `if` com retorno antecipado ou helper puro (`inputLabelSlot`). No JSX, `cond ? <A /> : null` vira `cond && <A />` — antes, confira se o componente do MUI decide por presença ou por veracidade. Ternário só com dois conteúdos; `attr ? { x } : undefined` costuma ser só `{ x }`, porque atributo indefinido já some.
 - Constante de módulo mora num bloco só, logo depois dos imports; nada (nem função) no meio do bloco.
 - ⛔ Número com significado vira nome pelo significado (`JANUARY`, `SINGLE_PAGE`), nunca `ZERO`/`ONE`. Antes, veja se dá para remover o número (`value === ''`). Repetido com o mesmo sentido em vários arquivos vira função (`firstCharacters`, `firstItems` em `utils/sequence.ts`).

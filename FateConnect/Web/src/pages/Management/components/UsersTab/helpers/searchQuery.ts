@@ -8,7 +8,7 @@ import { accountStatusSlug, parseAccountStatus } from './accountStatus';
 import { parseProfileType, profileTypeSlug } from './profileType';
 
 enum SearchParamEnum {
-  SEARCH = 'busca',
+  SEARCH_TERM = 'busca',
   STATUS = 'situacao',
   PROFILE = 'perfil',
 }
@@ -16,8 +16,8 @@ enum SearchParamEnum {
 function fromParams(params: URLSearchParams): UserFilter {
   const filter: UserFilter = { page: readPageParam(params), pageSize: PAGE_SIZE };
 
-  const search = readParamValue(params, SearchParamEnum.SEARCH);
-  if (search) filter.search = search;
+  const searchTerm = readParamValue(params, SearchParamEnum.SEARCH_TERM);
+  if (searchTerm) filter.searchTerm = searchTerm;
 
   const status = parseAccountStatus(params.get(SearchParamEnum.STATUS));
   if (status) filter.status = status;
@@ -33,7 +33,7 @@ function toParams(filter: UserFilter): Record<string, string> {
   const params: Record<string, string> = { [TAB_PARAM]: ManagementTabEnum.USERS };
 
   writePageParam(params, filter.page);
-  if (filter.search) params[SearchParamEnum.SEARCH] = filter.search;
+  if (filter.searchTerm) params[SearchParamEnum.SEARCH_TERM] = filter.searchTerm;
   if (filter.status) params[SearchParamEnum.STATUS] = accountStatusSlug(filter.status);
   if (filter.profileType) params[SearchParamEnum.PROFILE] = profileTypeSlug(filter.profileType);
 

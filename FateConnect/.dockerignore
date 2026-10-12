@@ -1,0 +1,9 @@
+*
+!.editorconfig
+!FateConnect.Api
+FateConnect.Api/bin/
+FateConnect.Api/obj/
+FateConnect.Api/.env
+FateConnect.Api/.env.*
+!FateConnect.Api/.env.example
+FateConnect.Api/sixlabors.lic

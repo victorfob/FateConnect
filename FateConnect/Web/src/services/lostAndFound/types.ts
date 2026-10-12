@@ -22,8 +22,9 @@ export type LostItem = {
   name: string;
   lostAndFoundType: LostItemKindEnum;
   place: string;
-  ocurredOn: string;
+  occurredOn: string;
   description: string | null;
+  imageUrl: string | null;
   thumbnailUrl: string | null;
   contact: UserContact;
   status: LostItemStatusEnum;
@@ -32,10 +33,12 @@ export type LostItem = {
   createdAt: string;
 };
 
-export type LostItemInput = Pick<LostItem, 'name' | 'lostAndFoundType' | 'place' | 'ocurredOn'> & {
+export type LostItemInput = Pick<LostItem, 'name' | 'lostAndFoundType' | 'place' | 'occurredOn'> & {
   /** String vazia limpa a descrição guardada; omitir o campo a deixaria como está. */
   description: string;
   image: File | null;
+  /** Tira a foto guardada; com `image`, a API fica com a nova. */
+  removeImage: boolean;
 };
 
 /** Filtros da listagem, com os mesmos nomes que a API recebe na query. */

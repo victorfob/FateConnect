@@ -40,7 +40,7 @@ Este é um repositório **público** de trabalho acadêmico. **Nenhum conteúdo 
 
 ## Comandos
 
-Front (`FateConnect/Web`, Node do `.nvmrc` + Yarn 1.x):
+Front (`FateConnect/Web`, Node do `.nvmrc` + Yarn 4 pelo Corepack, com `corepack enable` uma vez por máquina):
 
 ```bash
 cd FateConnect/Web && nvm use && yarn && yarn dev

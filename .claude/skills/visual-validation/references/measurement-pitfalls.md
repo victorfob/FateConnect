@@ -27,11 +27,15 @@ Cada caso: o que o número responde, o que ele parece responder, e o controle.
 - Painel oculto mede `window.innerWidth` 0 e geometria lixo. Emular o viewport com largura e altura explícitas devolve layout real; leia a largura junto de cada medição e devolva o preset `desktop` ao terminar.
 - ⛔ **Painel oculto não entrega `ResizeObserver` nem `requestAnimationFrame`** (`document.visibilityState` é `hidden`): o que depende deles parece quebrado, inclusive um observador seu, que não recebe nem a chamada inicial. Meça num Chrome `--headless=new` com `--remote-debugging-port`, pelo `WebSocket` do Node: `Emulation.setDeviceMetricsOverride` troca a largura sem recarregar, e o controle é o mesmo script com o mecanismo tirado do código.
 - Mover ou renomear pasta de módulo com o Vite de pé deixa todo servidor que lê a árvore com o grafo velho, inclusive o da porta padrão: a página sai em branco e o log diz `Failed to load url`. Reinicie os servidores depois do `mv`.
+- ⛔ Captura de servidor caído (o app também para os servidores de preview) sai com a página de erro do navegador e sobrescreve a boa no mesmo nome. Antes da rodada, `200` na porta; depois, leia cada captura antes de mandar.
 
 ## Tema e dado da captura
 
 - A chave `theme_mode` do `localStorage` vence o `prefers-color-scheme` emulado; sem ela vale o emulado (o *Automático*). Grave ou apague a chave antes de navegar: captura escura idêntica à clara é o sinal.
 - No Chrome sem janela, `elemento.focus()` por script não dá estado de foco: o rótulo flutuante não sobe, o painel que abre no foco não abre, e a captura mostra uma tela que ninguém vê. Clique por `Input.dispatchMouseEvent`, com `Emulation.setFocusEmulationEnabled` ligado.
+- Estado transitório (carregando, enviando) some antes da foto: o script de captura espera depois de navegar, e o stub que responde antes disso entrega a tela seguinte. Para esse caso, um token do stub que demora bem mais que a espera.
+- Stub que guarda estado (falha preparada, escolha salva) atende a resposta atrasada da captura anterior depois que o Chrome dela morreu, e ela gasta o que você preparou para a próxima: espere a resposta pendente antes de preparar o stub.
+- Tela logada: grave o `jwt_token` na raiz e só então navegue para a rota. Recarregar dentro do script que espera a promessa trava a captura para sempre.
 - Stub com o tipo pela metade muda o comportamento: campo ausente no registro faz o formulário nascer alterado (`isDirty`), e o salvar desabilitado parece quebrado. Antes de culpar o código, confira o stub contra o tipo do serviço (`services/**/types.ts`).
 
 ## Limite de tela

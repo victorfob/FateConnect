@@ -7,17 +7,21 @@ import { VisitorRoute } from '@app/components/VisitorRoute';
 import { GuestLayout } from '@app/layouts/GuestLayout';
 import { MainLayout } from '@app/layouts/MainLayout';
 import { RootLayout } from '@app/layouts/RootLayout';
+import { ConfirmEmail } from '@app/pages/ConfirmEmail';
 import { Denunciations } from '@app/pages/Denunciations';
+import { ForgotPassword } from '@app/pages/ForgotPassword';
 import { Home } from '@app/pages/Home';
 import { LostAndFound } from '@app/pages/LostAndFound';
 import { Management } from '@app/pages/Management';
 import { Menu } from '@app/pages/Menu';
 import { Preferences } from '@app/pages/Preferences';
 import { Profile } from '@app/pages/Profile';
+import { ResetPassword } from '@app/pages/ResetPassword';
 import { Rides } from '@app/pages/Rides';
 import { Signup } from '@app/pages/Signup';
 import { Unavailable } from '@app/pages/Unavailable';
 import * as C from '@app/pages/Unavailable/constants';
+import { UnlockAccount } from '@app/pages/UnlockAccount';
 
 import { RoutePathEnum } from './paths';
 
@@ -34,6 +38,10 @@ export const routeConfig: RouteObject[] = [
             children: [
               { path: RoutePathEnum.LANDING, element: <Home /> },
               { path: RoutePathEnum.SIGNUP, element: <Signup /> },
+              { path: RoutePathEnum.UNLOCK_ACCOUNT, element: <UnlockAccount /> },
+              { path: RoutePathEnum.CONFIRM_EMAIL, element: <ConfirmEmail /> },
+              { path: RoutePathEnum.FORGOT_PASSWORD, element: <ForgotPassword /> },
+              { path: RoutePathEnum.RESET_PASSWORD, element: <ResetPassword /> },
             ],
           },
         ],
