@@ -57,7 +57,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         (ReadRide ride, HttpClient driver) = await OfferRideAsync();
         DateOnly newDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(14));
 
-        HttpResponseMessage response = await driver.PutAsJsonAsync($"/Rides/{ride.Id}", new
+        HttpResponseMessage response = await driver.PatchAsJsonAsync($"/Rides/{ride.Id}", new
         {
             destination = "Votorantim",
             departureDate = newDate.ToString("yyyy-MM-dd"),
@@ -83,7 +83,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         (ReadRide ride, HttpClient driver) = await OfferRideAsync();
 
         HttpResponseMessage response = await driver
-            .PutAsJsonAsync($"/Rides/{ride.Id}", new { departureTime = "21:15:00", vehicleType = "Car" });
+            .PatchAsJsonAsync($"/Rides/{ride.Id}", new { departureTime = "21:15:00", vehicleType = "Car" });
 
         ReadRide updated = (await response.Content.ReadFromJsonAsync<ReadRide>(JsonOptions))!;
         Assert.Equal("21:15:00", updated.DepartureTime);
@@ -132,17 +132,32 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task UpdateRide_WithoutTheVehicle_IsRejectedAndKeepsTheRide()
+    public async Task UpdateRide_WithOnlySomeFields_ChangesThemAndKeepsTheRest()
     {
         (ReadRide ride, HttpClient driver) = await OfferRideAsync();
 
         HttpResponseMessage response = await driver
-            .PutAsJsonAsync($"/Rides/{ride.Id}", new { description = "Passa pelo terminal." });
+            .PatchAsJsonAsync($"/Rides/{ride.Id}", new { description = "Passa pelo terminal." });
 
         ReadRide read = (await driver.GetFromJsonAsync<ReadRide>($"/Rides/{ride.Id}", JsonOptions))!;
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Equal(ride.Description, read.Description);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Passa pelo terminal.", read.Description);
         Assert.Equal(EnumVehicleType.Car, read.VehicleType);
+        Assert.Equal(ride.Destination, read.Destination);
+        Assert.Equal(ride.DepartureTime, read.DepartureTime);
+    }
+
+    [Fact]
+    public async Task UpdateRide_ByPut_IsNotAnEditRoute()
+    {
+        (ReadRide ride, HttpClient driver) = await OfferRideAsync();
+
+        HttpResponseMessage response = await driver
+            .PutAsJsonAsync($"/Rides/{ride.Id}", new { description = "Passa pelo terminal.", vehicleType = "Car" });
+
+        ReadRide read = (await driver.GetFromJsonAsync<ReadRide>($"/Rides/{ride.Id}", JsonOptions))!;
+        Assert.Equal(HttpStatusCode.MethodNotAllowed, response.StatusCode);
+        Assert.Equal(ride.Description, read.Description);
     }
 
     [Fact]
@@ -170,7 +185,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         (ReadRide ride, HttpClient driver) = await OfferRideAsync();
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
 
-        HttpResponseMessage response = await driver.PutAsJsonAsync(
+        HttpResponseMessage response = await driver.PatchAsJsonAsync(
             $"/Rides/{ride.Id}", new { departureDate = lastWeek.ToString("yyyy-MM-dd"), vehicleType = "Car" });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -192,7 +207,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Bruno Carvalho Souza");
 
         HttpResponseMessage response = await client
-            .PutAsJsonAsync($"/Rides/{AbsentRideId}", new { description = "Sai do portão principal.", vehicleType = "Car" });
+            .PatchAsJsonAsync($"/Rides/{AbsentRideId}", new { description = "Sai do portão principal.", vehicleType = "Car" });
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
