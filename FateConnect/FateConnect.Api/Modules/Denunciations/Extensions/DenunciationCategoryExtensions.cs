@@ -17,7 +17,6 @@ public static class DenunciationCategoryExtensions
         EnumDenunciationCategory.FraudulentClaim => "reivindicação falsa de item",
         EnumDenunciationCategory.FakeItemPosting => "anúncio falso de item",
 
-        EnumDenunciationCategory.Other => "outros motivos",
-        _ => "conduta inadequada"
+        _ => "outros motivos"
     };
 }

@@ -7,4 +7,6 @@ public interface IInAppNotificationRepository
 {
     Task<bool> UserAllowsInAppNotificationsAsync(int userId);
     Task<InAppNotification> AddAsync(InAppNotification notification);
+    Task<List<int>> GetUserIdsInterestedInNeighborhoodAsync(string neighborhood, int driverId);
+    Task AddRangeAsync(IEnumerable<InAppNotification> notifications);
 }

@@ -16,4 +16,7 @@ public static class NotificationContents
 
     public static string ItemArchived(string itemName) =>
         $"Seu anúncio '{itemName}' foi arquivado automaticamente por inatividade após 60 dias.";
+
+    public static string RideToNeighborhood(string neighborhood) =>
+        $"Uma nova carona para {neighborhood} acabou de ser publicada. Aproveite para reservar sua vaga!";
 }
