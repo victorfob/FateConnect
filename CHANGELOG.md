@@ -38,6 +38,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a mostrar as telas de recado (área ainda não disponível, erro inesperado, sessão expirada e desbloqueio da conta) num cartão, com um ícone pela natureza do recado: informação, sucesso, aviso ou erro (#573) [Frontend]
 - Passa a mostrar, nos diálogos que só têm texto, um ícone pela natureza do recado acima da frase, como o cadeado na conta bloqueada e a lixeira na exclusão de carona (#573) [Frontend]
 - Passa a criar a conta sem entrar logado: depois do cadastro a tela mostra para qual e-mail o link de confirmação foi, com o reenvio liberado a cada 3 minutos e o caminho para entrar (#577) [Frontend]
+- Passa a chamar de `occurredOn` a data do item de achados e perdidos, no cadastro, na edição e na resposta, no lugar de `ocurredOn`, que estava escrito errado; o nome antigo deixa de ser aceito, e a coluna é renomeada sem perder as datas (#584) [Frontend] [Backend]
+- Passa a receber em `searchTerm` a busca da lista de usuários da gestão, como os outros filtros; `search` deixa de filtrar (#584) [Frontend] [Backend]
+- Passa a editar carona por `PATCH`, como os outros cadastros, no lugar de `PUT`: o que a edição não manda fica como estava, inclusive o veículo, que deixou de ser obrigatório nela (#584) [Frontend] [Backend]
 
 ### Fixed
 
