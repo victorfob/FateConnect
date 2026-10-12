@@ -6,6 +6,7 @@ using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.Storage.Services;
 using FateConnect.Api.Tests.Fixtures;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -60,6 +61,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
             new LostAndFoundRepository(context),
             new StorageService(new TemporaryWebRoot(_webRoot), NullLogger<StorageService>.Instance),
             new FixedTimeProvider(_now),
+            new NullPublishEndpoint(),
             NullLogger<LostAndFoundRetentionService>.Instance);
 
         await service.SweepAsync();
