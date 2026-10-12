@@ -1,16 +1,19 @@
 namespace FateConnect.Api.Modules.LostAndFound.Services;
 
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Constants;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 
 public partial class LostAndFoundRetentionService(
     ILostAndFoundRepository repository,
     IStorageService storageService,
     TimeProvider clock,
+    IPublishEndpoint publishEndpoint,
     ILogger<LostAndFoundRetentionService> logger
 ) : ILostAndFoundRetentionService
 {
@@ -30,7 +33,15 @@ public partial class LostAndFoundRetentionService(
             await repository.GetOpenRecordsUntouchedSinceAsync(untouchedSince);
 
         foreach (LostAndFoundRecord record in inactiveRecords)
+        {
             record.MarkAsDeleted(EnumDeletionReason.Inactivity);
+
+            await publishEndpoint.Publish(new ItemArchivedEvent(
+                record.UserId,
+                record.Id,
+                record.Name
+            ));
+        }
 
         await repository.SaveChangesAsync();
 
