@@ -7,6 +7,7 @@ public record ReadUserSummaryDto(
     string FullName,
     string? ContactEmail,
     string? Phone,
+    string? ImageUrl,
     string? ThumbnailUrl,
     EnumAccountStatus Status
 );

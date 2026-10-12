@@ -21,7 +21,7 @@ public class LostAndFoundRecordConfiguration : IEntityTypeConfiguration<LostAndF
                .HasMaxLength(100)
                .IsRequired();
 
-        builder.Property(r => r.OcurredOn)
+        builder.Property(r => r.OccurredOn)
                .IsRequired();
 
         builder.Property(r => r.Description)

@@ -12,7 +12,7 @@ public class LostAndFoundRecord
     public string Name { get; private set; } = default!;
     public EnumLostAndFoundType LostAndFoundType { get; private set; }
     public string Place { get; private set; } = default!;
-    public DateOnly OcurredOn { get; private set; }
+    public DateOnly OccurredOn { get; private set; }
     public string? Description { get; private set; }
     public string? ImageUrl { get; private set; }
     public EnumStatusLostAndFound Status { get; private set; }
@@ -29,13 +29,13 @@ public class LostAndFoundRecord
         string name,
         EnumLostAndFoundType lostAndFoundType,
         string place,
-        DateOnly ocurredOn,
+        DateOnly occurredOn,
         string? description,
         int userId)
     {
         ValidateName(name);
         ValidatePlace(place);
-        ValidateOcurredOn(ocurredOn);
+        ValidateOccurredOn(occurredOn);
         ValidateType(lostAndFoundType);
         ValidateUser(userId);
 
@@ -44,7 +44,7 @@ public class LostAndFoundRecord
         Name = name.Trim();
         LostAndFoundType = lostAndFoundType;
         Place = place.Trim();
-        OcurredOn = ocurredOn;
+        OccurredOn = occurredOn;
         Description = description.NormalizeOptionalText();
         Status = EnumStatusLostAndFound.Open;
         CreatedAt = DateTime.UtcNow;
@@ -55,7 +55,7 @@ public class LostAndFoundRecord
         string? name,
         EnumLostAndFoundType? lostAndFoundType,
         string? place,
-        DateOnly? ocurredOn,
+        DateOnly? occurredOn,
         string? description,
         EnumStatusLostAndFound? status)
     {
@@ -82,10 +82,10 @@ public class LostAndFoundRecord
             receivedAnyField = true;
         }
 
-        if (ocurredOn.HasValue)
+        if (occurredOn.HasValue)
         {
-            ValidateOcurredOn(ocurredOn.Value);
-            OcurredOn = ocurredOn.Value;
+            ValidateOccurredOn(occurredOn.Value);
+            OccurredOn = occurredOn.Value;
             receivedAnyField = true;
         }
 
@@ -179,7 +179,7 @@ public class LostAndFoundRecord
             throw new InvalidLostAndFoundPlaceException();
     }
 
-    private static void ValidateOcurredOn(DateOnly date)
+    private static void ValidateOccurredOn(DateOnly date)
     {
         if (date == default)
             throw new MissingOccurrenceDateException();

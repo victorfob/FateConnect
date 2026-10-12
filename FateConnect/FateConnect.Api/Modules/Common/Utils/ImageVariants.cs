@@ -12,8 +12,6 @@ using SixLabors.ImageSharp.Processing;
 public static class ImageVariants
 {
     public const int ThumbnailEdgeInPixels = 288;
-    public const string CorruptedMessage = "A imagem enviada está vazia ou corrompida.";
-
     private const int OriginalQuality = 90;
     private const int ThumbnailQuality = 80;
 
@@ -70,7 +68,7 @@ public static class ImageVariants
         }
         catch (Exception exception) when (exception is UnknownImageFormatException or InvalidImageContentException)
         {
-            throw new InvalidImageException(CorruptedMessage);
+            throw new CorruptedImageException();
         }
     }
 

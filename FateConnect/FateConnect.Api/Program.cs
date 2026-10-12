@@ -31,10 +31,16 @@ using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Common.Interfaces;
-using FateConnect.Api.Modules.Common.Services;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
 using FateConnect.Api.Modules.Denunciations.Services;
 using FateConnect.Api.Modules.Denunciations.Repositories;
+using MassTransit;
+using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Communications.Consumers;
+using Resend;
+using FateConnect.Api.Modules.Communications.Interfaces;
+using FateConnect.Api.Modules.Communications.Services;
 
 public class Program
 {
@@ -47,6 +53,10 @@ public class Program
         {
             Env.Load();
         }
+
+        EnvironmentUtils.Required("PUBLIC_URL", "para gerar os links dos e-mails");
+        EnvironmentUtils.Required("EMAIL_SENDER", "para o envio de e-mails");
+        string resendApiKey = EnvironmentUtils.Required("RESEND_API_KEY", "para o envio de e-mails");
 
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -109,6 +119,8 @@ public class Program
 
         builder.Services.AddScoped<IDenunciationRepository, DenunciationRepository>();
         builder.Services.AddScoped<IDenunciationService, DenunciationService>();
+
+        builder.Services.AddScoped<IEmailService, EmailService>();
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -200,6 +212,26 @@ public class Program
         builder.Services.AddDbContext<FateConnectDbContext>(options =>
             options.UseNpgsql(connectionString));
 
+        builder.Services.AddMassTransit(x =>
+        {
+            x.AddEntityFrameworkOutbox<FateConnectDbContext>(o =>
+            {
+                o.UsePostgres();
+                o.UseBusOutbox();
+            });
+
+            x.AddConsumer<UserRegisteredEventConsumer>();
+            x.AddConsumer<PasswordResetRequestedEventConsumer>();
+            x.AddConsumer<AccountLockedEventConsumer>();
+
+            x.UsingRabbitMq(ConfigureRabbitMq);
+        });
+
+        builder.Services.AddResend(options =>
+        {
+            options.ApiToken = resendApiKey;
+        });
+
         WebApplication app = builder.Build();
 
         using (IServiceScope scope = app.Services.CreateScope())
@@ -222,6 +254,44 @@ public class Program
         app.MapControllers();
 
         app.Run();
+    }
+
+    [ExcludeFromCodeCoverage]
+    private static void ConfigureRabbitMq(IBusRegistrationContext context, IRabbitMqBusFactoryConfigurator cfg)
+    {
+        string rabbitHostEnv = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? string.Empty;
+        string rabbitUserEnv = Environment.GetEnvironmentVariable("RABBITMQ_USER") ?? string.Empty;
+        string rabbitPassEnv = Environment.GetEnvironmentVariable("RABBITMQ_PASS") ?? string.Empty;
+
+        string rabbitHost = string.IsNullOrWhiteSpace(rabbitHostEnv) ? "localhost" : rabbitHostEnv;
+        string rabbitUser = string.IsNullOrWhiteSpace(rabbitUserEnv) ? "guest" : rabbitUserEnv;
+        string rabbitPass = string.IsNullOrWhiteSpace(rabbitPassEnv) ? "guest" : rabbitPassEnv;
+
+        cfg.Host(rabbitHost, "/", h =>
+        {
+            h.Username(rabbitUser);
+            h.Password(rabbitPass);
+        });
+
+        cfg.UseMessageRetry(r => r.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5)));
+
+        cfg.ReceiveEndpoint("user-registered-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<UserRegisteredEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("password-reset-requested-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<PasswordResetRequestedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("account-locked-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<AccountLockedEventConsumer>(context);
+        });
     }
 
     private static async Task RejectRevokedTokenAsync(TokenValidatedContext context)

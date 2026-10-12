@@ -12,7 +12,13 @@ import { components } from './components';
 import { radius } from './helpers/radius';
 import { spacing } from './helpers/spacing';
 import { darkPalette, lightPalette } from './palettes';
-import type { ChromeColors, NotificationVariant, StatusTagTone, SurfacePair } from './types';
+import type {
+  ChromeColors,
+  FeedbackTone,
+  NotificationVariant,
+  StatusTagTone,
+  SurfacePair,
+} from './types';
 
 declare module '@mui/material/styles' {
   interface BreakpointOverrides {
@@ -50,6 +56,7 @@ declare module '@mui/material/styles' {
     dateRangeBand: string;
     statusTag: Record<StatusTagTone, SurfacePair>;
     notification: Record<NotificationVariant, SurfacePair>;
+    feedback: Record<FeedbackTone, SurfacePair>;
   }
 
   interface PaletteOptions {
@@ -63,6 +70,7 @@ declare module '@mui/material/styles' {
     dateRangeBand: string;
     statusTag: Record<StatusTagTone, SurfacePair>;
     notification: Record<NotificationVariant, SurfacePair>;
+    feedback: Record<FeedbackTone, SurfacePair>;
   }
 
   interface TypographyVariants {

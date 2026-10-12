@@ -3,6 +3,11 @@ export type LoginRequest = {
   password: string;
 };
 
+export type ResetPasswordRequest = {
+  token: string;
+  newPassword: string;
+};
+
 export type TokenResponse = {
   token: string;
 };

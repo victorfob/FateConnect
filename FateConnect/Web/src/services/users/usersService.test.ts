@@ -56,13 +56,13 @@ describe('usersService', () => {
     );
 
     await listUsers({
-      search: 'maria',
+      searchTerm: 'maria',
       status: AccountStatusEnum.BANNED,
       profileType: ProfileTypeEnum.ADMINISTRATOR,
       page: 2,
     });
 
-    expect(asked).toContain('search=maria');
+    expect(asked).toContain('searchTerm=maria');
     expect(asked).toContain('status=Banned');
     expect(asked).toContain('profileType=Administrator');
     expect(asked).toContain('page=2');

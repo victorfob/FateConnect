@@ -1,12 +1,12 @@
 import { Typography } from '@design-system';
 import { EmailIcon, PhoneIcon } from '@design-system/icons';
 
+import { mailtoUrl } from '@app/utils/contactLinks';
+
 import { ContactAvatar } from './ContactAvatar';
 import { ContactChannel } from './ContactChannel';
+import * as C from './constants';
 import * as S from './styles';
-
-/** Prefixo do nome acessível do e-mail — o texto visível vem depois dele. */
-const COPY_EMAIL_LABEL = 'Copiar';
 
 export type ContactDetailsProps = Readonly<{
   name: string;
@@ -22,8 +22,6 @@ export type ContactDetailsProps = Readonly<{
    * de produto — conversa em aplicativo, chamada.
    */
   phoneHref: string | null;
-  /** O que acontece ao acionar o e-mail. Quem compõe copia e avisa. */
-  onCopyEmail: VoidFunction;
 }>;
 
 /**
@@ -38,7 +36,6 @@ export function ContactDetails({
   email,
   phone,
   phoneHref,
-  onCopyEmail,
 }: ContactDetailsProps) {
   return (
     <S.DetailsRow>
@@ -50,8 +47,8 @@ export function ContactDetails({
       <S.Channels>
         {email && (
           <ContactChannel
-            onClick={onCopyEmail}
-            label={`${COPY_EMAIL_LABEL} ${email}`}
+            href={mailtoUrl(email)}
+            accessibleLabel={C.sendEmailLabel(email)}
             icon={<EmailIcon />}
           >
             {email}
@@ -59,7 +56,7 @@ export function ContactDetails({
         )}
 
         {phone && phoneHref && (
-          <ContactChannel href={phoneHref} icon={<PhoneIcon />}>
+          <ContactChannel href={phoneHref} icon={<PhoneIcon />} opensInNewTab>
             {phone}
           </ContactChannel>
         )}

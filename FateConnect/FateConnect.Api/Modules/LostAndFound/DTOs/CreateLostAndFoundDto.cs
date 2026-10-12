@@ -17,7 +17,7 @@ public record CreateLostAndFoundDto
     public required string Place { get; init; }
 
     [Required(ErrorMessage = "Informe a data do ocorrido.")]
-    public DateOnly? OcurredOn { get; init; }
+    public DateOnly? OccurredOn { get; init; }
 
     [StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
     public string? Description { get; init; }

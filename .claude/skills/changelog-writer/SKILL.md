@@ -21,6 +21,7 @@ O diff diz o que foi tocado; a entrada diz o **efeito para quem usa**. Se o efei
 - **Entra** toda alteração de comportamento: tela nova, comportamento diferente, defeito corrigido, funcionalidade removida.
 - **Correção entra mesmo que ninguém chegue nela hoje**: o changelog registra alteração, e o marcador de lado avisa o que precisa subir. Descreva o defeito como ele era, sem inventar vítima.
 - ⛔ **Defeito que nasceu e morreu dentro do mesmo `Unreleased` não entra.** O corte é a release: atravessou uma versão publicada, entra; viveu entre dois merges da mesma seção, não.
+- Comportamento que ainda não saiu em release e muda de novo ajusta a entrada do `Unreleased`, sem criar outra: o intervalo de reenvio que passou a 3 minutos antes da release reescreveu as entradas que diziam "um por minuto".
 - **Não entra** o que não muda comportamento: refactor sem efeito externo, código morto, teste, lint, CI.
 
 Na dúvida: *o comportamento mudou?*, não *o usuário perceberia?*

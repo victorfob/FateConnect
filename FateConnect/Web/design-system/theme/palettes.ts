@@ -81,6 +81,12 @@ export const lightPalette: PaletteOptions = {
     error: { surface: colorTokens.dangerBackground, content: colorVariants.secondaryDark },
     warning: { surface: colorTokens.warningBackground, content: colorTokens.warningText },
   },
+  feedback: {
+    info: { surface: colorTokens.mutedBackground, content: colorTokens.mutedText },
+    success: { surface: colorTokens.successBackground, content: colorTokens.successText },
+    warning: { surface: colorTokens.warningBackground, content: colorTokens.warningText },
+    error: { surface: colorTokens.dangerBackground, content: colorVariants.secondaryDark },
+  },
 };
 
 export const darkPalette: PaletteOptions = {
@@ -159,5 +165,17 @@ export const darkPalette: PaletteOptions = {
       surface: darkColorTokens.warningTagBackground,
       content: darkColorTokens.warningTagText,
     },
+  },
+  feedback: {
+    info: { surface: darkColorTokens.mutedTagBackground, content: darkColorTokens.mutedTagText },
+    success: {
+      surface: darkColorTokens.successTagBackground,
+      content: darkColorTokens.successTagText,
+    },
+    warning: {
+      surface: darkColorTokens.warningTagBackground,
+      content: darkColorTokens.warningTagText,
+    },
+    error: { surface: darkColorTokens.dangerTagBackground, content: darkColorTokens.dangerTagText },
   },
 };

@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router';
+import { useCallback, useState } from 'react';
+import { Link as RouterLink } from 'react-router';
 import { Button, FormGrid, Typography } from '@design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -12,6 +12,7 @@ import { signup } from '@app/services/signup/signupService';
 
 import { SignupConflictFieldEnum } from './@types';
 import { AccountSection } from './components/AccountSection';
+import { CheckEmailMessage } from './components/CheckEmailMessage';
 import { ConsentSection } from './components/ConsentSection';
 import { conflictFieldOf } from './helpers/conflictField';
 import { toSignupRequest } from './helpers/mapper';
@@ -32,17 +33,14 @@ function errorMessageFor(status?: number): string {
 }
 
 export function Signup() {
-  const navigate = useNavigate();
-  const { notifySuccess, notifyError } = useNotification();
+  const { notifyError } = useNotification();
+  const [confirmationSentTo, setConfirmationSentTo] = useState<string | null>(null);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: signup,
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
-    onSuccess: () => {
-      notifySuccess(C.SIGNUP_SUCCESS_MESSAGE);
-      void navigate(RoutePathEnum.MENU);
-    },
+    onSuccess: (_created, request) => setConfirmationSentTo(request.fatecEmail),
   });
 
   const form = useForm<SignupFormValues>({
@@ -79,6 +77,8 @@ export function Signup() {
       reportFailure(error);
     }
   });
+
+  if (confirmationSentTo) return <CheckEmailMessage email={confirmationSentTo} />;
 
   return (
     <S.PageRoot>

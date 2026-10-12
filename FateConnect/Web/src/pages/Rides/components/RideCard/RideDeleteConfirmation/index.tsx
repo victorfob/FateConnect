@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Button, Dialog, IconButton } from '@design-system';
-import { DeleteIcon } from '@design-system/icons';
+import { DeleteIcon, DeleteOutlinedIcon } from '@design-system/icons';
 
 import { RIDE_CARD_LABELS } from '@app/pages/Rides/constants';
 import type { Ride } from '@app/services/rides/types';
@@ -34,7 +34,7 @@ export function RideDeleteConfirmation({ ride, onDelete }: RideDeleteConfirmatio
 
       <Dialog open={confirming} onClose={handleDismiss} title={DELETE_DIALOG.title}>
         <Dialog.Body>
-          <Dialog.Message>
+          <Dialog.Message tone="error" icon={DeleteOutlinedIcon}>
             {DELETE_DIALOG.messagePrefix}
             <strong>{ride.destination}</strong>
             {DELETE_DIALOG.messageSuffix}

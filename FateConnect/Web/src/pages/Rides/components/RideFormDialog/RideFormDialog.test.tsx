@@ -258,7 +258,7 @@ describe('RideFormDialog', () => {
   it('should send the whole ride on update, so the description survives', async () => {
     let body: RideInput | null = null;
     server.use(
-      http.put(`${RIDES_URL}/:id`, async ({ request }) => {
+      http.patch(`${RIDES_URL}/:id`, async ({ request }) => {
         body = (await request.json()) as RideInput;
         return HttpResponse.json({ id: RIDE.id });
       }),
@@ -299,7 +299,7 @@ describe('RideFormDialog', () => {
   });
 
   it('should keep the dialog open when the api fails, with what was typed', async () => {
-    server.use(http.put(`${RIDES_URL}/:id`, () => new HttpResponse(null, { status: 500 })));
+    server.use(http.patch(`${RIDES_URL}/:id`, () => new HttpResponse(null, { status: 500 })));
     renderComponent({ ...DEFAULT_PROPS, ride: RIDE });
     await screen.findByRole('heading', { name: EDIT_MODE.title });
     await retypeDestination(EDITED_DESTINATION);
@@ -517,7 +517,7 @@ describe('RideFormDialog', () => {
     holidaysAre([]);
     let body: RideInput | null = null;
     server.use(
-      http.put(`${RIDES_URL}/:id`, async ({ request }) => {
+      http.patch(`${RIDES_URL}/:id`, async ({ request }) => {
         body = (await request.json()) as RideInput;
         return HttpResponse.json({ id: RIDE.id });
       }),

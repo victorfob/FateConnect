@@ -131,7 +131,7 @@ describe('ridesService', () => {
     let body: RideInput | null = null;
     let updatedId: string | undefined;
     server.use(
-      http.put(`${RIDES_URL}/:id`, async ({ request, params }) => {
+      http.patch(`${RIDES_URL}/:id`, async ({ request, params }) => {
         updatedId = params.id as string;
         body = (await request.json()) as RideInput;
         return HttpResponse.json({ id: params.id });

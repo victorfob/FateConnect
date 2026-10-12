@@ -36,9 +36,8 @@ export function DenunciationCard({
         <StoredPhoto
           url={denunciation.thumbnailUrl}
           alt={C.photoAlt(denunciation)}
-          download={{
-            label: C.DOWNLOAD_LABEL,
-            baseName: C.photoBaseName(denunciation),
+          viewer={{
+            title: denunciationCategoryLabel(denunciation.category),
             originalUrl: denunciation.imageUrl,
           }}
         />

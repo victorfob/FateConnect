@@ -28,11 +28,13 @@ paths:
 - ⛔ O `getComputedStyle` ignora `@media`, estado e pseudo-elemento: estilo de uma largura, o `:hover` e o `::before` se afirmam lendo a folha do Emotion pelo `src/test/utils/styleSheetRules.ts` (`narrowDeclarationsFor`, `declarationsFor`). Não escreva outra leitura no teste.
 - Não há `ResizeObserver` (o `vitest.setup.ts` põe um vazio). O falso do teste dispara só o que passou por `observe`; o que dispara sempre deixa a mutação "tirar a observação" passar. Altura de texto recolhido se forja com `src/test/utils/contentHeight.ts`.
 - O `index.html` não é carregado, e o `<head>` do teste só tem o que o componente escreveu. Asserção que depende do `<head>` real lê o arquivo; asserção que pega "o primeiro" de algo é o sinal — conte antes.
+- ⛔ O relógio falso só dispara o que já está agendado: `setTimeout` que o efeito reagenda a cada render anda um passo por `act`, e o teste de "libera depois de um minuto" fica parado no primeiro segundo. Contagem regressiva é `setInterval` enquanto corre (`src/hooks/useCountdown.ts`).
 - `vitest.setup.ts` fixa `TZ` no fuso do produto, e `TZ=UTC` na linha de comando não vence. Para discriminar fuso, troque `process.env.TZ` dentro do caso e restaure.
 
 ## Asserção que não consegue falhar
 
 - ⛔ Quebre o código de propósito e veja o teste cair. Em arquivo que a branch altera, não restaure com `git checkout --`: ele apaga a sua mudança, e o `git status` limpo é o alarme. Mutação que reprova por `TS6133` (import órfão) não foi testada; refaça tirando o órfão.
+- ⛔ O caso que a mudança não deve tocar se afirma nas duas larguras (`declarationsFor` e `narrowDeclarationsFor`): conferido só no largo, o botão único do `PageMessage` esticou no estreito com o teste verde.
 - O teste alimenta o formato que o código recebe de verdade (o do campo, não o da API).
 - Valor esperado que é o mesmo símbolo que a implementação importa não testa nada: afirme a propriedade que o consumidor exige (`new URL(href)` sem base), não o valor.
 - ⛔ Negativa (`not.toBeInTheDocument()`) só depois da positiva com a mesma consulta, e ancorada no lugar — o que vem logo depois —, não no texto proibido.

@@ -1,6 +1,9 @@
 import { useId, type ReactNode } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
+import Button from '@mui/material/Button';
 import MuiDialog from '@mui/material/Dialog';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { IconButton } from '@ds-root/components/IconButton';
 
@@ -42,6 +45,10 @@ const MAX_WIDTH_BY_WIDTH: Readonly<Record<DialogWidth, 'xs' | 'sm'>> = {
 function Dialog({ open, onClose, title, width = 'standard', children }: DialogProps) {
   // O id nasce do React: título fixo colidiria se dois diálogos coexistissem.
   const titleId = useId();
+  const theme = useTheme();
+  // Lido na primeira pintura: com o valor padrão o desktop abriria um quadro em
+  // tela cheia antes de o efeito corrigir.
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
 
   return (
     // `fullWidth` faz o papel ocupar a largura disponível até o teto, em vez de
@@ -53,6 +60,7 @@ function Dialog({ open, onClose, title, width = 'standard', children }: DialogPr
       onClose={onClose}
       aria-labelledby={titleId}
       fullWidth
+      fullScreen={!isDesktop}
       maxWidth={MAX_WIDTH_BY_WIDTH[width]}
     >
       <S.DialogSurface>
@@ -69,6 +77,14 @@ function Dialog({ open, onClose, title, width = 'standard', children }: DialogPr
         </S.TitleRow>
 
         {children}
+
+        <S.CloseFooterSlot data-close-footer>
+          <DialogFooter>
+            <Button type="button" variant="contained" color="primary" onClick={onClose}>
+              {CLOSE_LABEL}
+            </Button>
+          </DialogFooter>
+        </S.CloseFooterSlot>
       </S.DialogSurface>
     </MuiDialog>
   );

@@ -27,16 +27,17 @@ const LOST_ITEM_INPUT: LostItemInput = {
   name: 'Garrafa térmica',
   lostAndFoundType: LostItemKindEnum.FOUND,
   place: 'Biblioteca',
-  ocurredOn: '2026-08-20',
+  occurredOn: '2026-08-20',
   description: 'Garrafa azul, com adesivos na tampa.',
   image: null,
+  removeImage: false,
 };
 
 const SENT_FIELDS = {
   Name: 'Garrafa térmica',
   LostAndFoundType: LostItemKindEnum.FOUND,
   Place: 'Biblioteca',
-  OcurredOn: '2026-08-20',
+  OccurredOn: '2026-08-20',
   Description: 'Garrafa azul, com adesivos na tampa.',
 };
 
@@ -196,6 +197,15 @@ describe('lostAndFoundService', () => {
     expect(requestUrl).toBe(`${LOST_AND_FOUND_URL}/${ITEM_ID}`);
     expect(fields).toEqual(SENT_FIELDS);
     expect(updated.id).toBe(ITEM_ID);
+  });
+
+  it('should ask the api to drop the stored photo only when told to', async () => {
+    const received: Record<string, FormDataEntryValue>[] = [];
+    itemEndpointRecording(received);
+
+    await updateLostItem(ITEM_ID, { ...LOST_ITEM_INPUT, removeImage: true });
+
+    expect(received).toEqual([{ ...SENT_FIELDS, RemoveImage: 'true' }]);
   });
 
   // A API só limpa a descrição quando o campo chega vazio; omiti-lo a deixaria como está.

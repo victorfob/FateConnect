@@ -82,7 +82,7 @@ export function DenunciationStatusAction({
         title={`${C.STATUS_DIALOG.titlePrefix}${denunciationStatusLabel(chosen)}`}
       >
         <Dialog.Body>
-          <Dialog.Message>{C.STATUS_DIALOG.message}</Dialog.Message>
+          <Dialog.Message tone="warning">{C.STATUS_DIALOG.message}</Dialog.Message>
         </Dialog.Body>
 
         <Dialog.Footer>

@@ -18,6 +18,7 @@ export { Footer } from './components/Footer';
 export type { FooterContact } from './components/Footer';
 export { NavigationDrawer } from './components/NavigationDrawer';
 export { InitialsAvatar } from './components/InitialsAvatar';
+export type { InitialsAvatarProps } from './components/InitialsAvatar';
 export { Dialog } from './components/Dialog';
 export { FilterDialog } from './components/FilterDialog';
 export {
@@ -46,6 +47,7 @@ export {
 } from './components/NotificationProvider/NotificationActions';
 export { PageMessage } from './components/PageMessage';
 export type { PageMessageProps } from './components/PageMessage';
+export type { FeedbackTone } from './theme/types';
 export { PageShell } from './components/PageShell';
 export type { PageShellProps } from './components/PageShell';
 export { Pagination } from './components/Pagination';

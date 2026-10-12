@@ -1,11 +1,10 @@
 import { PageShell, SectionCard } from '@design-system';
-import { SettingsIcon } from '@design-system/icons';
 
 import { BackToMenu } from '@app/components/BackToMenu';
 import { ThemeMenu } from '@app/components/ThemeMenu';
 import { THEME_LABEL } from '@app/components/ThemeMenu/constants';
 
-import { CommunicationsForm } from './components/CommunicationsForm';
+import { NotificationsSwitch } from './components/NotificationsSwitch';
 import { SettingText } from './components/SettingText';
 import { usePreferences } from './hooks/usePreferences';
 import * as C from './constants';
@@ -16,18 +15,16 @@ export function Preferences() {
 
   return (
     <PageShell title={C.PREFERENCES_TITLE} action={<BackToMenu />}>
-      <S.PreferencesSections>
-        <SectionCard title={C.APPEARANCE_SECTION_TITLE} icon={<SettingsIcon fontSize="small" />}>
-          <S.SettingRow>
-            <SettingText label={THEME_LABEL} description={C.THEME_DESCRIPTION} />
-            <ThemeMenu />
-          </S.SettingRow>
-        </SectionCard>
+      <SectionCard>
+        <S.SettingRow>
+          <SettingText label={THEME_LABEL} description={C.THEME_DESCRIPTION} />
+          <ThemeMenu />
+        </S.SettingRow>
 
         {preferences && (
-          <CommunicationsForm preferences={preferences} onSaved={replacePreferences} />
+          <NotificationsSwitch preferences={preferences} replacePreferences={replacePreferences} />
         )}
-      </S.PreferencesSections>
+      </SectionCard>
     </PageShell>
   );
 }

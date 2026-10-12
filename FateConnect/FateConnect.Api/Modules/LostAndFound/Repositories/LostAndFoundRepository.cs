@@ -68,7 +68,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         record => record.User.Status == EnumAccountStatus.Active;
 
     private static Expression<Func<LostAndFoundRecord, bool>> OccurredWithin(DateOnly rangeStart, DateOnly rangeEnd) =>
-        record => record.OcurredOn >= rangeStart && record.OcurredOn <= rangeEnd;
+        record => record.OccurredOn >= rangeStart && record.OccurredOn <= rangeEnd;
 
     public async Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true)
     {

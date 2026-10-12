@@ -20,16 +20,21 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 
 - Ação secundária é `variant="soft"`. No rodapé de diálogo as duas ações são `contained` (`primary` na neutra, `secondary` na que confirma). Falta variante: declare no tema, não componha no ponto de uso.
 - ⛔ A altura do botão é a do `size` no tema (`buttonHeightTokens`), igual em toda variante: botão menor é `size="small"`, nunca `height` fixo nem rótulo trocado por `caption` no ponto de uso.
-- Diálogo é sempre o `Dialog` do DS: `Dialog.Body`, `Dialog.Footer` e a frase em `Dialog.Message`. ⛔ No desktop sem X (decisão de produto: `Esc` e clique fora dispensam); no estreito, com X.
+- Diálogo é sempre o `Dialog` do DS: `Dialog.Body`, `Dialog.Footer` e a frase em `Dialog.Message`. ⛔ No desktop sem X (decisão de produto: `Esc` e clique fora dispensam); no estreito, tela cheia com X.
+- No estreito, os botões do rodapé dividem a largura, e o rótulo cabe na metade dela a 375px (no diálogo de contatos pendentes, `Cadastrar`, e não `Cadastrar contatos`); sem formulário, o conteúdo vai para o meio da tela, e sem rodapé nem formulário entra um *Fechar* no pé. Quem decide é a estrutura (`:has(form)`, `data-dialog-footer`), sem prop.
 - Diálogo de formulário monta `Dialog.Form` (envio pela validação da tela), `Dialog.Fields` (grade com folga para o rótulo flutuante; `layout="column"` põe um campo por linha) e `Dialog.Submit` (largura cheia, com `loading`).
 - ⛔ O `Dialog.Body` rola e corta o que sai da largura dele: controle com halo (o `Slider`) vai fora do `Dialog.Body`, direto no diálogo.
 - Formulário em grade é o `FormGrid` (`FormGrid.Wide` ocupa a linha); cartão com título e ícone é o `SectionCard`. Não escreva outro.
+- Tela de autenticação (entrar, pedir o link, nova senha) monta o `AuthCard`, com `AuthCard.Submit` e o `SignupPrompt`: repetidos à mão, o botão e o convite ao cadastro reprovam a duplicação do Sonar.
 - ⛔ Ação destrutiva usa a variante `destructive` (o `ConfirmAction` a liga com `destructive`). O *Banir* da gestão ainda está neutro: pergunte antes de migrá-lo.
+- ⛔ Diálogo só de texto leva o tom no `Dialog.Message`, com o ícone acima da frase: confirmação comum `info` com a interrogação, destrutiva `error` com o ícone da ação (`dialogIcon` do `ConfirmAction`: a lixeira, a pessoa riscada), atenção `warning`. O octógono do erro é só de falha: confirmação não é erro.
+- Tela de recado (`PageMessage`) leva `tone` pelo que aconteceu; carregando fica sem ícone. Link vencido que pede ação (confirmar o e-mail) é `warning`; o do desbloqueio, onde nada se perdeu, é `info`.
+- Dois botões no `PageMessage` dividem a largura no desktop e empilham em largura cheia abaixo de `md`, com a ação principal por último; um botão só fica do tamanho do rótulo. Quem decide é a estrutura, sem prop.
 - Barra de ações no estreito: conteúdo centralizado e botões em largura cheia, um sob o outro, a ação principal por último.
 - Esconder visualmente sem tirar da acessibilidade é `HiddenField`.
 - Tipografia só por variante do tema. `ListItemText`, `MenuItem`, `Chip` e `Alert` aplicam a escala deles se ninguém disser nada: a variante entra por `slotProps` (`slotProps={{ primary: { variant: 'caption' } }}`).
 - `palette.text.*` e `contrastText` nunca como fundo.
-- Ícone ao lado de outros segue a família deles: preenchido junto de preenchido.
+- Ícone ao lado de outros segue a família deles: preenchido junto de preenchido. Na v9 dos ícones o contorno é `<Nome>Outlined`, mas `ErrorOutlined` é preenchido (o contorno é `ErrorOutlineOutlined`): confira o desenho renderizado, não o nome.
 - Linha de largura cheia com um controle na ponta: `FormControlLabel`, com o rótulo ocupando a sobra — a linha inteira é o alvo.
 
 ## Tela de módulo
@@ -53,4 +58,4 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 
 ## Gate
 
-⛔ Gate só pelo `yarn` (`yarn lint`, `yarn typecheck`, `yarn test:ci`), de dentro de `FateConnect/Web` depois do `nvm use`: o binário de `node_modules/.bin` roda em qualquer Node e responde verde; só o `yarn` cobra o `engines`. O que o CI roda está em `.github/workflows/check-front.yml`.
+⛔ Gate só pelo `yarn` (`yarn lint`, `yarn typecheck`, `yarn test:ci`), de dentro de `FateConnect/Web` depois do `nvm use`: o binário de `node_modules/.bin` roda em qualquer Node e responde verde. O Yarn 4 não cobra o `engines`: quem recusa o Node errado é o `scripts/check-node.sh`, na frente de cada script de gate do `package.json`. O que o CI roda está em `.github/workflows/check-front.yml`.

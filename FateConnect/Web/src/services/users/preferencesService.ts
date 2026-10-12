@@ -1,5 +1,5 @@
 import { apiClient } from '../httpClient';
-import type { Preferences, PreferencesChange } from './preferencesTypes';
+import type { Preferences } from './preferencesTypes';
 
 const PREFERENCES_PATH = '/users/me/preferences';
 
@@ -9,6 +9,6 @@ export async function getPreferences(): Promise<Preferences> {
   return data;
 }
 
-export async function updatePreferences(change: PreferencesChange): Promise<void> {
-  await apiClient.patch(PREFERENCES_PATH, change);
+export async function updatePreferences(preferences: Preferences): Promise<void> {
+  await apiClient.patch(PREFERENCES_PATH, preferences);
 }

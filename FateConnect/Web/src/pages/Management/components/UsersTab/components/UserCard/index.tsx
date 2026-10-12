@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import { IconButton, InitialsAvatar, ListCard, StatusTag, Typography } from '@design-system';
+import { IconButton, ListCard, StatusTag, Typography } from '@design-system';
 import { EditIcon, EmailIcon, PhoneDisabledIcon, PhoneIcon } from '@design-system/icons';
 
+import { AvatarPhoto } from '@app/components/AvatarPhoto';
 import { useStoredImage } from '@app/hooks/useStoredImage';
 import {
   accountStatusLabel,
@@ -28,6 +29,11 @@ export function UserCard({ user, isOwnAccount, onEdit, onStatusConfirm }: UserCa
   const handleEdit = useCallback(() => onEdit(user), [onEdit, user]);
   const photo = useStoredImage(user.thumbnailUrl);
   const initials = useMemo(() => getInitials(user.fullName), [user.fullName]);
+  const originalPhoto = useMemo(() => {
+    if (!user.imageUrl) return null;
+
+    return { storedUrl: user.imageUrl };
+  }, [user.imageUrl]);
 
   const displayPhone = useMemo(() => {
     if (!user.phone) return null;
@@ -39,11 +45,12 @@ export function UserCard({ user, isOwnAccount, onEdit, onStatusConfirm }: UserCa
     <ListCard own={isOwnAccount} ownLabel={OWN_ACCOUNT_LABEL}>
       <ListCard.Header>
         <S.Identity>
-          <InitialsAvatar
+          <AvatarPhoto
             initials={initials}
             label={user.fullName}
             photoSrc={photo.image?.objectUrl}
             loading={photo.loading}
+            source={originalPhoto}
           />
           <Typography variant="subtitleBold">{user.fullName}</Typography>
         </S.Identity>

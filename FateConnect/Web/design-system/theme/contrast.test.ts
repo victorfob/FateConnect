@@ -2,7 +2,7 @@ import type { Theme } from '@mui/material/styles';
 
 import { AA_NON_TEXT, AA_NORMAL_TEXT, contrastRatio } from './contrast';
 import { createAppTheme } from './createAppTheme';
-import type { NotificationVariant, StatusTagTone } from './types';
+import type { FeedbackTone, NotificationVariant, StatusTagTone } from './types';
 
 const lightTheme = createAppTheme('light');
 const darkTheme = createAppTheme('dark');
@@ -143,6 +143,7 @@ function boundPairs(theme: Theme): Par[] {
   const { palette } = theme;
   const tones: StatusTagTone[] = ['muted', 'success', 'warning', 'danger'];
   const variants: NotificationVariant[] = ['success', 'error', 'warning'];
+  const feedbackTones: FeedbackTone[] = ['info', 'success', 'warning', 'error'];
 
   return [
     ['content on the app chrome', palette.chrome.contrastText, palette.chrome.main],
@@ -158,6 +159,11 @@ function boundPairs(theme: Theme): Par[] {
       `a ${variant} notification`,
       palette.notification[variant].content,
       palette.notification[variant].surface,
+    ]),
+    ...feedbackTones.map((tone): Par => [
+      `the ${tone} feedback icon`,
+      palette.feedback[tone].content,
+      palette.feedback[tone].surface,
     ]),
   ];
 }

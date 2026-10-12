@@ -53,8 +53,9 @@ const LOST_ITEM: LostItem = {
   name: 'Carteira preta',
   lostAndFoundType: LostItemKindEnum.LOST,
   place: 'Biblioteca',
-  ocurredOn: '2026-08-11T00:00:00',
+  occurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos e cartões.',
+  imageUrl: null,
   thumbnailUrl: null,
   contact: {
     name: 'Marina Duarte',

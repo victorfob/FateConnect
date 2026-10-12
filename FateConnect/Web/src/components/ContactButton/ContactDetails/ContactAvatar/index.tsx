@@ -12,7 +12,7 @@ export function ContactAvatar({ name, initials, thumbnailUrl }: ContactAvatarPro
     <InitialsAvatar
       initials={initials}
       label={name}
-      size="large"
+      size="portrait"
       photoSrc={image?.objectUrl}
       loading={loading}
     />

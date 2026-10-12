@@ -10,6 +10,8 @@ Vale ao mergear um PR ou uma sub-issue, e ao trocar uma decisão com o PR aberto
 gh issue close <n> --comment "Entregue no #<pr>."
 ```
 
+Era a última issue aberta da milestone: feche a milestone também (`gh api -X PATCH repos/<dono>/<repo>/milestones/<n> -f state=closed`).
+
 O card vai para `Done` sozinho: quem move é o `github-project-automation[bot]`, que reage a criar e a fechar issue. As colunas do meio são manuais (`In Progress` ao criar a branch, `In Review` ao abrir o PR). Card em `Done` não prova quem o moveu; a linha do tempo, sim:
 
 ```bash

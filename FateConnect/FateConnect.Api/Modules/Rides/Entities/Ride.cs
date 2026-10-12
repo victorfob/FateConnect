@@ -74,11 +74,14 @@ public class Ride
     public void UpdateBasicAttributes(
         string? destination,
         EnumRideType? rideType,
-        EnumVehicleType vehicleType,
+        EnumVehicleType? vehicleType,
         string? description)
     {
-        ValidateVehicleType(vehicleType);
-        VehicleType = vehicleType;
+        if (vehicleType.HasValue)
+        {
+            ValidateVehicleType(vehicleType.Value);
+            VehicleType = vehicleType.Value;
+        }
 
         if (destination is not null)
         {

@@ -31,14 +31,14 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         string name,
         EnumLostAndFoundType type = EnumLostAndFoundType.Lost,
         string? description = null,
-        DateOnly? ocurredOn = null)
+        DateOnly? occurredOn = null)
     {
         MultipartFormDataContent form = new()
         {
             { new StringContent(name), "Name" },
             { new StringContent(type.ToString()), "LostAndFoundType" },
             { new StringContent("Biblioteca do bloco B"), "Place" },
-            { new StringContent((ocurredOn ?? Yesterday).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OcurredOn" },
+            { new StringContent((occurredOn ?? Yesterday).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OccurredOn" },
         };
 
         if (description is not null)
@@ -137,7 +137,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Eduardo Ramos Lima");
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
         Guid yesterday = await ReportAsync(client, ItemForm("Boné do Eduardo"));
-        Guid older = await ReportAsync(client, ItemForm("Cinto do Eduardo", ocurredOn: lastWeek));
+        Guid older = await ReportAsync(client, ItemForm("Cinto do Eduardo", occurredOn: lastWeek));
 
         PagedItems page = await ListAsync(
             client, $"?SearchTerm=Eduardo&DateFrom={lastWeek:yyyy-MM-dd}&DateTo={lastWeek:yyyy-MM-dd}");
@@ -239,9 +239,9 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         DateOnly threeDaysAgo = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-3));
         DateOnly twoDaysAgo = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2));
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
-        Guid inside = await ReportAsync(client, ItemForm("Guarda-chuva da Camila", ocurredOn: threeDaysAgo));
-        Guid alsoInside = await ReportAsync(client, ItemForm("Caderno da Camila", ocurredOn: twoDaysAgo));
-        Guid outside = await ReportAsync(client, ItemForm("Chaveiro da Camila", ocurredOn: lastWeek));
+        Guid inside = await ReportAsync(client, ItemForm("Guarda-chuva da Camila", occurredOn: threeDaysAgo));
+        Guid alsoInside = await ReportAsync(client, ItemForm("Caderno da Camila", occurredOn: twoDaysAgo));
+        Guid outside = await ReportAsync(client, ItemForm("Chaveiro da Camila", occurredOn: lastWeek));
 
         PagedItems page = await ListAsync(
             client, $"?SearchTerm=Camila&DateFrom={threeDaysAgo:yyyy-MM-dd}&DateTo={twoDaysAgo:yyyy-MM-dd}");
@@ -257,7 +257,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Rafael Antunes Vieira");
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
         Guid yesterday = await ReportAsync(client, ItemForm("Mochila do Rafael"));
-        Guid older = await ReportAsync(client, ItemForm("Fone do Rafael", ocurredOn: lastWeek));
+        Guid older = await ReportAsync(client, ItemForm("Fone do Rafael", occurredOn: lastWeek));
 
         PagedItems page = await ListAsync(client, $"?SearchTerm=Rafael&DateTo={lastWeek:yyyy-MM-dd}");
 
@@ -271,7 +271,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Larissa Moreira Pinto");
         DateOnly lastWeek = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
         Guid yesterday = await ReportAsync(client, ItemForm("Cachecol da Larissa"));
-        Guid older = await ReportAsync(client, ItemForm("Luva da Larissa", ocurredOn: lastWeek));
+        Guid older = await ReportAsync(client, ItemForm("Luva da Larissa", occurredOn: lastWeek));
 
         PagedItems page = await ListAsync(client, "?SearchTerm=Larissa");
 

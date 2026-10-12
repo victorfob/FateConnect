@@ -1,6 +1,6 @@
 import { apiClient, SessionExpiredError } from '../httpClient';
 import { tokenStorage } from './tokenStorage';
-import type { LoginRequest, TokenResponse } from './types';
+import type { LoginRequest, ResetPasswordRequest, TokenResponse } from './types';
 
 const AUTH_PATH = '/auth';
 
@@ -40,6 +40,36 @@ export function logout(): void {
   tokenStorage.clear();
 
   if (token) void endServerSession(token);
+}
+
+export async function unlockAccount(token: string): Promise<void> {
+  await apiClient.post(`${AUTH_PATH}/unlock`, { token });
+}
+
+export async function confirmEmail(token: string): Promise<TokenResponse> {
+  const { data } = await apiClient.post<TokenResponse>(`${AUTH_PATH}/confirm-email`, { token });
+  tokenStorage.save(data.token);
+
+  return data;
+}
+
+export async function resendConfirmationEmail(fatecEmail: string): Promise<void> {
+  await apiClient.post(`${AUTH_PATH}/resend-confirmation-email`, { fatecEmail });
+}
+
+export async function forgotPassword(fatecEmail: string): Promise<void> {
+  await apiClient.post(`${AUTH_PATH}/forgot-password`, { fatecEmail });
+}
+
+export async function verifyResetToken(token: string): Promise<void> {
+  await apiClient.get(`${AUTH_PATH}/verify-reset-token`, { params: { token } });
+}
+
+export async function resetPassword(payload: ResetPasswordRequest): Promise<TokenResponse> {
+  const { data } = await apiClient.post<TokenResponse>(`${AUTH_PATH}/reset-password`, payload);
+  tokenStorage.save(data.token);
+
+  return data;
 }
 
 export async function isSessionStillValid(): Promise<boolean> {

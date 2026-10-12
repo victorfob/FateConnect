@@ -24,7 +24,7 @@ export async function createRide(input: RideInput): Promise<Ride> {
 }
 
 export async function updateRide(rideId: string, input: RideInput): Promise<Ride> {
-  const { data } = await apiClient.put<Ride>(`${RIDES_PATH}/${rideId}`, input);
+  const { data } = await apiClient.patch<Ride>(`${RIDES_PATH}/${rideId}`, input);
 
   return data;
 }
