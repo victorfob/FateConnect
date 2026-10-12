@@ -5,13 +5,13 @@
 # ao rodar com o plugin do nginx. Escrever à mão o que ele gera é como as duas
 # configurações divergem na primeira renovação.
 
-# Formato de log seguro para WebSockets: usa $uri no lugar de$request_uri
-# para omitir a query string, impedindo o vazamento do access_token em texto plano 
-# caso o SignalR caia para o fallback de Server-Sent Events ou Long Polling.
-log_format no_query_log '$remote_addr - $remote_user [$time_local] '
-                        '"$request_method $uri$server_protocol" '
-                        '$status$body_bytes_sent '
-                        '"$http_referer" "$http_user_agent"';
+# Quando o SignalR cai para SSE ou long polling, o token viaja na query: o log
+# do hub grava o caminho sem ela. O nome leva o ambiente porque os dois sites
+# dividem o mesmo nginx, e um `log_format` repetido reprova o `nginx -t`.
+log_format fateconnect___ENVIRONMENT___without_query '$remote_addr - $remote_user [$time_local] '
+                                                     '"$request_method $uri $server_protocol" '
+                                                     '$status $body_bytes_sent '
+                                                     '"$http_referer" "$http_user_agent"';
 
 server {
     listen 80;
@@ -39,12 +39,11 @@ server {
     gzip_min_length 1024;
     gzip_vary on;
 
-    # ⛔ Bloco exclusivo para o SignalR. PRECISA vir antes do /api/ genérico.
-    # Repassa os cabeçalhos de Upgrade para abrir a conexão WebSocket e aumenta
-    # o timeout de leitura para evitar a queda de clientes ociosos.
+    # O WebSocket do SignalR só abre com HTTP/1.1 e os cabeçalhos de troca, que o
+    # `/api/` não repassa. Entre dois `^~`, vence o prefixo mais longo, em qualquer
+    # ordem. ⛔ O `proxy_pass` termina em `/hubs/`: com `/`, a API recebe o caminho sem ele.
     location ^~ /api/hubs/ {
-        proxy_pass http://127.0.0.1:__API_PORT__/;
-        
+        proxy_pass http://127.0.0.1:__API_PORT__/hubs/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -54,8 +53,7 @@ server {
         proxy_read_timeout 120s;
         proxy_send_timeout 120s;
 
-        # Aplica o formato de log customizado declarado no topo
-        access_log /var/log/nginx/fateconnect-__ENVIRONMENT__.access.log no_query_log;
+        access_log /var/log/nginx/fateconnect-__ENVIRONMENT__.access.log fateconnect___ENVIRONMENT___without_query;
     }
 
     # ⛔ `^~` para vencer a regex de extensão mais abaixo: no nginx, regex ganha
@@ -107,7 +105,7 @@ server {
     # O React Router resolve as rotas no navegador: qualquer caminho que não
     # seja arquivo precisa devolver o index, senão recarregar a página dá 404.
     location / {
-        try_files $uri$uri/ /index.html;
+        try_files $uri $uri/ /index.html;
     }
 
     # Cada arquivo aqui leva o hash do conteúdo no nome, então publicar gera
