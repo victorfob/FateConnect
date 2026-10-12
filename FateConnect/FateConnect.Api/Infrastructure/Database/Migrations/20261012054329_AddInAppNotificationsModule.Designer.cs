@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FateConnect.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(FateConnectDbContext))]
-    [Migration("20261012045136_AddInAppNotificationsModule")]
+    [Migration("20261012054329_AddInAppNotificationsModule")]
     partial class AddInAppNotificationsModule
     {
         /// <inheritdoc />
@@ -85,8 +85,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("ReferenceId")
-                        .HasColumnType("integer");
+                    b.Property<string>("ReferenceId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");

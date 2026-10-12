@@ -11,8 +11,8 @@ public class InAppNotificationConfiguration : IEntityTypeConfiguration<InAppNoti
 
         builder.HasKey(e => e.Id);
 
-        builder.Property(e => e.UserId)
-            .IsRequired();
+        builder.Property(e => e.ReferenceId)
+            .HasMaxLength(50);
 
         builder.Property(e => e.Type)
             .IsRequired();

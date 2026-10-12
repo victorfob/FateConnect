@@ -21,7 +21,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Content = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    ReferenceId = table.Column<int>(type: "integer", nullable: true),
+                    ReferenceId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     IsRead = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)

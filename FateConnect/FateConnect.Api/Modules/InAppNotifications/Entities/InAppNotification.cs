@@ -12,7 +12,7 @@ public class InAppNotification
     public int UserId { get; private set; }
     public EnumInAppNotificationType Type { get; private set; }
     public string Content { get; private set; } = string.Empty;
-    public int? ReferenceId { get; private set; }
+    public string? ReferenceId { get; private set; }
 
     public bool IsRead { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -26,7 +26,7 @@ public class InAppNotification
         int userId,
         EnumInAppNotificationType type,
         string content,
-        int? referenceId,
+        string? referenceId,
         DateTime createdAt)
     {
         ValidateContent(content);
