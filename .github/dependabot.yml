@@ -1,0 +1,57 @@
+version: 2
+
+# O GitHub lê este arquivo na `main`: ele passa a valer na release seguinte ao merge.
+# O `target-branch` vale só para as atualizações de versão; as de segurança sempre
+# miram a `main` (ver a skill `create-release`).
+updates:
+  - package-ecosystem: npm
+    directory: /FateConnect/Web
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Sao_Paulo
+    # O `.yarnrc.yml` recusa pacote com menos de 7 dias (`npmMinimalAgeGate`), e o
+    # `yarn install` do PR reprovaria com versão mais nova que isso.
+    cooldown:
+      default-days: 7
+    groups:
+      front-minor-and-patch:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: chore
+
+  - package-ecosystem: nuget
+    directories:
+      - /FateConnect/FateConnect.Api
+      - /FateConnect/FateConnect.Api.Tests
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Sao_Paulo
+    cooldown:
+      default-days: 7
+    groups:
+      api-minor-and-patch:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: chore
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Sao_Paulo
+    cooldown:
+      default-days: 7
+    groups:
+      actions-minor-and-patch:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: ci
