@@ -1,10 +1,10 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Services;
 
 using FateConnect.Api.Modules.Common.DTOs;
-using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
+using FateConnect.Api.Modules.InAppNotifications.Events;
 using FateConnect.Api.Modules.InAppNotifications.Exceptions;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using MassTransit;

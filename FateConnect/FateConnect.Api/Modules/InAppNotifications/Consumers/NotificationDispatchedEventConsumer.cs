@@ -1,6 +1,6 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Consumers;
 
-using FateConnect.Api.Modules.Common.Events;
+using FateConnect.Api.Modules.InAppNotifications.Events;
 using FateConnect.Api.Modules.InAppNotifications.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;

@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Common.Events;
+namespace FateConnect.Api.Modules.InAppNotifications.Events;
 
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
 

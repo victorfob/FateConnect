@@ -4,6 +4,7 @@ using FateConnect.Api.Modules.Denunciations.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Consumers;
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
+using FateConnect.Api.Modules.InAppNotifications.Events;
 using FateConnect.Api.Modules.InAppNotifications.Hubs;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using MassTransit;

@@ -8,6 +8,7 @@ using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Constants;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
+using FateConnect.Api.Modules.InAppNotifications.Events;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Tests.Fixtures;
 using MassTransit.Testing;
