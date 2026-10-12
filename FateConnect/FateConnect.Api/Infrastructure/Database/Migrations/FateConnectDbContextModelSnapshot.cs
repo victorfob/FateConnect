@@ -334,9 +334,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("ReceiveEmails")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("ReceiveNotifications")
                         .HasColumnType("boolean");
 

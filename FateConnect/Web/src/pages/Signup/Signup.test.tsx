@@ -261,7 +261,6 @@ describe('Signup', () => {
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
         { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },
       ],
-      receiveEmails: false,
       receiveNotifications: false,
     });
   });

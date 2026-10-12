@@ -49,7 +49,7 @@ describe('signupSchema', () => {
   });
 
   it('should accept the form without the optional field', () => {
-    const result = parse({ acceptMarketing: false });
+    const result = parse({ acceptNotifications: false });
 
     expect(result.success).toBe(true);
   });

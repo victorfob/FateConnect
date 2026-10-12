@@ -2,7 +2,7 @@ import { FormControlLabel, spacingScale, styled } from '@design-system';
 
 const { none, sm } = spacingScale;
 
-export const ChannelRow = styled(FormControlLabel)(({ theme }) => ({
+export const SwitchRow = styled(FormControlLabel)(({ theme }) => ({
   justifyContent: 'space-between',
   gap: theme.space(sm),
 

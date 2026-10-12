@@ -16,7 +16,6 @@ const PAYLOAD: SignupRequest = {
   birthDate: '2000-01-01T00:00:00Z',
   gender: 'Female',
   acceptances: [{ document: DocumentTypeEnum.TERMS_OF_USE, version: '2026-01-15' }],
-  receiveEmails: false,
   receiveNotifications: false,
 };
 

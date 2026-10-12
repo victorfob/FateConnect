@@ -40,8 +40,5 @@ public class CreateUserDto
     [];
 
     [DefaultValue(false)]
-    public bool? ReceiveEmails { get; set; }
-
-    [DefaultValue(false)]
     public bool? ReceiveNotifications { get; set; }
 }

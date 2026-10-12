@@ -161,24 +161,23 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
 
         User user = ReadUser(fatecEmail);
 
-        Assert.False(user.Preferences.ReceiveEmails);
         Assert.False(user.Preferences.ReceiveNotifications);
     }
 
     [Fact]
-    public async Task Signup_WithThePreferencesChosen_StoresBothOfThem()
+    public async Task Signup_WithNotificationsChosen_StoresThemAndIgnoresTheRemovedEmailChoice()
     {
         string fatecEmail = UniqueEmail();
         Dictionary<string, object> payload = SignupPayload(fatecEmail);
         payload["receiveEmails"] = true;
         payload["receiveNotifications"] = true;
 
-        await SignUpAsync(payload);
+        HttpResponseMessage response = await SignUpAsync(payload);
 
         User user = ReadUser(fatecEmail);
 
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Equal(user.Id, user.Preferences.UserId);
-        Assert.True(user.Preferences.ReceiveEmails);
         Assert.True(user.Preferences.ReceiveNotifications);
     }
 

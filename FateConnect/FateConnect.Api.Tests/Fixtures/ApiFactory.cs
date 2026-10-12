@@ -195,7 +195,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             user.AttachImage(imageUrl);
 
         user.ConfirmEmail();
-        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
+        user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
 
@@ -224,7 +224,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         );
 
         user.ConfirmEmail();
-        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
+        user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
         context.SaveChanges();
@@ -254,7 +254,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         if (emailConfirmed)
             user.ConfirmEmail();
 
-        user.SetPreferences(new UserPreferences(receiveEmails: false, receiveNotifications: false));
+        user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
 
