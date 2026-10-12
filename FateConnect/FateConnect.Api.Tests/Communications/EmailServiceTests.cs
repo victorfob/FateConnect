@@ -156,7 +156,7 @@ public partial class EmailServiceTests
     {
         IResend resend = DispatchProxy.Create<IResend, ResendRecorder>();
 
-        MissingCommunicationConfigurationException exception = Assert.Throws<MissingCommunicationConfigurationException>(
+        MissingEmailConfigurationException exception = Assert.Throws<MissingEmailConfigurationException>(
             () => ServiceWith(resend, sender, publicUrl));
 
         Assert.Contains(variable, exception.Message);

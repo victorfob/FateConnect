@@ -18,7 +18,7 @@ public partial class EmailService(
 ) : IEmailService
 {
     private readonly string _senderEmail = configuration["EMAIL_SENDER"]
-        ?? throw new MissingCommunicationConfigurationException("EMAIL_SENDER");
+        ?? throw new MissingEmailConfigurationException("EMAIL_SENDER");
 
     private readonly string _logoUrl = configuration.RequiredPublicUrl() + EmailTheme.LogoPath;
 

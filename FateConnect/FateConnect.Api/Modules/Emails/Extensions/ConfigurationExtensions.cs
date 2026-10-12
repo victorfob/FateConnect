@@ -8,7 +8,7 @@ public static class ConfigurationExtensions
     public static string RequiredPublicUrl(this IConfiguration configuration)
     {
         string publicUrl = configuration["PUBLIC_URL"]
-            ?? throw new MissingCommunicationConfigurationException("PUBLIC_URL");
+            ?? throw new MissingEmailConfigurationException("PUBLIC_URL");
 
         return publicUrl.TrimEnd('/');
     }
