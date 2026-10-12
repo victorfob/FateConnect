@@ -45,6 +45,7 @@ using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using FateConnect.Api.Modules.InAppNotifications.Repositories;
 using FateConnect.Api.Modules.InAppNotifications.Services;
 using FateConnect.Api.Modules.InAppNotifications.Consumers;
+using FateConnect.Api.Modules.InAppNotifications.Hubs;
 
 public class Program
 {
@@ -137,6 +138,8 @@ public class Program
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
+        builder.Services.AddSignalR();
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
@@ -205,7 +208,19 @@ public class Program
                 };
                 options.Events = new JwtBearerEvents
                 {
-                    OnTokenValidated = RejectRevokedTokenAsync
+                    OnTokenValidated = RejectRevokedTokenAsync,
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -263,6 +278,8 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
+
+        app.MapHub<NotificationHub>("/hubs/notifications");
 
         app.Run();
     }
