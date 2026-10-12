@@ -48,6 +48,10 @@ ssh <host> 'curl -sk --http2 -o /dev/null -D - \
 
 Acrescentou um `location ~`? Todo `location /prefixo/` que precisa ganhar leva `^~`, e o mutante prova. O sintoma é o status seguir 200 e sumir um cabeçalho, ou o proxy ser ignorado.
 
+## ⛔ Dois sites, um nginx
+
+Homologação e produção instalam o mesmo template no mesmo nginx. Diretiva do contexto `http` (`log_format`, `map`, `upstream`) leva o ambiente no nome (`fateconnect___ENVIRONMENT___without_query`): com nome fixo, o segundo `install-site.sh` reprova no `nginx -t`. A bancada carrega os dois sites juntos.
+
 ## certbot e `install-site.sh`
 
 - O certbot altera o **nosso** bloco (tira o `listen 80`, põe o 443 e o certificado) e cria outro só para o redirecionamento: diretiva escrita no template acaba no servidor HTTPS.

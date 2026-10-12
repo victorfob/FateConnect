@@ -61,6 +61,8 @@ Rode o gate da seção "Comandos" do `.claude/CLAUDE.md` sobre o que mudou (fron
 
 ⛔ Esperar o CI depois do push nomeia o check que o PR exige, nunca `all(pending)` nem `length >= N`; o relato lê a lista inteira e nomeia cada bucket. Receita: `.claude/skills/prove-the-mechanism/references/ci-e-checks.md`.
 
+⛔ **Corrigindo o PR de outra pessoa, releia o diff inteiro dele contra a base antes do push**, não só o que a rodada mexeu: o commit de correção do autor traz defeito novo, e o push encerra a revisão que custa barato.
+
 ## 6. Commit — peça confirmação antes
 
 Uma mudança lógica por commit, mensagem em inglês no imperativo, pela skill `write-commit`. **Mostre o que vai ser preparado e a mensagem, e espere o sim** antes de qualquer comando git. Entrada de changelog vai em commit próprio, pela skill `changelog-writer`, e é sempre o último da branch.
