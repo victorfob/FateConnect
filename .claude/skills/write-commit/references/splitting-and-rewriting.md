@@ -30,6 +30,10 @@ No back-end, troque o compilador: `cd /tmp/checa && dotnet build FateConnect/Fat
 
 Rode nos commits que tocam índice ou alargam interface, não em todos. Achando erro, mova para o commit que traz o símbolo **só o trecho que depende dele**: não o arquivo inteiro (ele carrega junto o que não era dali), e não reordene os commits.
 
+## Índice parcial: o hook mexe no disco
+
+Preparar no índice uma versão intermediária de um arquivo (`git hash-object -w` + `git update-index --cacheinfo`) deixa a final no disco, e o `lint-staged` do `pre-commit` esconde e reaplica o que não está preparado: nessa volta ele já comeu linha do arquivo no disco, com o commit certo. Copie `src` antes, e depois de **cada** commit compare (`diff -r`) e restaure da cópia.
+
 ## Corte que exige inventar um estado é corte errado
 
 ⛔ **Se dividir por assunto obriga a autorar uma versão de arquivo que nunca existiu, recorte, não invente.** Duas mudanças que reescreveram as mesmas regiões (uma função morreu *porque* a outra mudança aconteceu) não viram dois commits: o do meio carregaria código que ninguém escreveu. O tell é abrir o editor para "desfazer" parte de uma mudança só para o commit anterior fechar.
