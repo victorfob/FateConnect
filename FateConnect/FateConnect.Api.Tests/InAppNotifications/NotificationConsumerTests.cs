@@ -52,7 +52,7 @@ public class NotificationConsumerTests
     public static TheoryData<object> EveryEvent => new()
     {
         new RideCreatedEvent(Guid.NewGuid(), 7, "Rua das Flores, Vila Hortência"),
-        new DenunciationReceivedEvent(7, Guid.NewGuid(), EnumDenunciationCategory.RecklessDriving, IsAnonymous: false),
+        new DenunciationReceivedEvent(7, Guid.NewGuid(), EnumDenunciationCategory.RecklessDriving),
         new ItemArchivedEvent(7, Guid.NewGuid(), "Garrafa térmica azul"),
         new NotificationDispatchedEvent(
             new ReadInAppNotificationDto(3, EnumInAppNotificationType.ItemArchived, "Seu item foi arquivado.", null, false, DateTime.UtcNow),

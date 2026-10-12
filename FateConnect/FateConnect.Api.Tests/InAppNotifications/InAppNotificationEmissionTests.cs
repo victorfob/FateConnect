@@ -134,14 +134,15 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task CreateDenunciation_Confidential_NotifiesNoOne()
+    public async Task CreateDenunciation_Confidential_LeavesTheNotificationQueueOut()
     {
         int reporterId = _factory.SeedUser("Igor Mendes Batista").Id;
         _factory.PrepareForNotifications(reporterId);
 
         Guid denunciationId = await ReportAsync(reporterId, EnumDenunciationCategory.FakeProfile, isAnonymous: true);
-        await WaitUntilConsumedAsync(denunciationId);
 
+        Assert.False(await Harness.Published.Any<DenunciationReceivedEvent>(
+            published => published.Context.Message.DenunciationId == denunciationId));
         Assert.Empty(_factory.NotificationsOf(reporterId));
     }
 

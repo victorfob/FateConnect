@@ -6,5 +6,4 @@ using FateConnect.Api.Modules.Denunciations.Enums;
 public record DenunciationReceivedEvent(
     int ReporterId,
     Guid DenunciationId,
-    EnumDenunciationCategory Category,
-    bool IsAnonymous);
+    EnumDenunciationCategory Category);

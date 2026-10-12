@@ -22,12 +22,6 @@ public sealed partial class DenunciationReceivedEventConsumer(
         {
             LogNotificationDispatchStarted(logger, message.ReporterId);
 
-            if (message.IsAnonymous)
-            {
-                LogNotificationSkippedDueToAnonymous(logger, message.ReporterId);
-                return;
-            }
-
             string content = NotificationContents.DenunciationReceived(message.Category);
 
             await notificationService.NotifyAsync(

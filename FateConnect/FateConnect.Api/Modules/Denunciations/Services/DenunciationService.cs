@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using FateConnect.Api.Modules.Common.Services;
 using MassTransit;
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Denunciations.Extensions;
 
 public partial class DenunciationService(
     IDenunciationRepository repository,
@@ -43,12 +42,8 @@ public partial class DenunciationService(
             denunciation.AttachImage(storedImageUrl);
         }
 
-        await publishEndpoint.Publish(new DenunciationReceivedEvent(
-            ReporterId: currentUserId,
-            DenunciationId: denunciation.Id,
-            Category: denunciation.Category,
-            IsAnonymous: denunciation.IsAnonymous
-        ));
+        if (!denunciation.IsAnonymous)
+            await publishEndpoint.Publish(new DenunciationReceivedEvent(currentUserId, denunciation.Id, denunciation.Category));
 
         await PersistOrDropImageAsync(() => repository.AddAsync(denunciation), storedImageUrl);
 
