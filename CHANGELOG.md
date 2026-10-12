@@ -9,7 +9,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Adiciona a confirmação do e-mail Fatec: o cadastro envia um link de uso único que vale por 8 horas, e o login de quem não confirmou é recusado, inclusive nas contas que já existiam (#553) [Backend]
-- Adiciona o reenvio do link de confirmação pelo e-mail Fatec, no máximo um por minuto, que invalida o link anterior (#553) [Backend]
+- Adiciona o reenvio do link de confirmação pelo e-mail Fatec, no máximo um a cada 3 minutos, que invalida o link anterior (#553) [Backend]
 - Adiciona a redefinição da senha esquecida: o pedido pelo e-mail Fatec envia um link de uso único que vale por 30 minutos, e a senha nova derruba as sessões abertas e já entra; e-mail sem conta é avisado, e conta banida não redefine (#553) [Backend]
 - Adiciona o bloqueio da conta por 30 minutos depois de 3 senhas erradas seguidas, no login ou na reativação, que recusa até a senha certa e diz quantos minutos faltam (#553) [Backend]
 - Adiciona o e-mail de desbloqueio, um por bloqueio, com um link de uso único que destrava a conta antes dos 30 minutos (#553) [Backend]
@@ -20,7 +20,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona à edição de um item de achados e perdidos o pedido de tirar a foto, que apaga o arquivo; com uma foto nova no mesmo pedido, fica a nova (#563) [Backend]
 - Adiciona a página do link de confirmação, que confirma o e-mail Fatec ao abrir e já entra; com o link expirado ou já usado, ela oferece um novo link e o caminho para o login (#577) [Frontend]
 - Adiciona ao login um diálogo para quem ainda não confirmou o e-mail Fatec, que diz o que falta e reenvia o link de confirmação (#577) [Frontend]
-- Adiciona ao login o pedido de redefinição da senha esquecida: a tela leva o e-mail já digitado, avisa quando não há conta e oferece o cadastro, e o link pode ser pedido de novo a cada minuto (#579) [Frontend]
+- Adiciona ao login o pedido de redefinição da senha esquecida: a tela leva o e-mail já digitado, avisa quando não há conta e oferece o cadastro, e o link pode ser pedido de novo a cada 3 minutos (#579) [Frontend]
 - Adiciona a página do link de redefinição, que confere o link ao abrir, pede a nova senha com confirmação e as regras do cadastro e já entra; com o link vencido, oferece outro, e a conta desativada é levada a reativar com a nova senha (#579) [Frontend]
 
 ### Changed
@@ -36,7 +36,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a declarar na política de privacidade que quem cadastrou um item pode trocar ou tirar a foto ao editá-lo, e que a anterior é apagada na hora, em nova versão do documento (#563) [Frontend]
 - Passa a mostrar as telas de recado (área ainda não disponível, erro inesperado, sessão expirada e desbloqueio da conta) num cartão, com um ícone pela natureza do recado: informação, sucesso, aviso ou erro (#573) [Frontend]
 - Passa a mostrar, nos diálogos que só têm texto, um ícone pela natureza do recado acima da frase, como o cadeado na conta bloqueada e a lixeira na exclusão de carona (#573) [Frontend]
-- Passa a criar a conta sem entrar logado: depois do cadastro a tela mostra para qual e-mail o link de confirmação foi, com o reenvio liberado a cada minuto e o caminho para entrar (#577) [Frontend]
+- Passa a criar a conta sem entrar logado: depois do cadastro a tela mostra para qual e-mail o link de confirmação foi, com o reenvio liberado a cada 3 minutos e o caminho para entrar (#577) [Frontend]
 
 ### Fixed
 
