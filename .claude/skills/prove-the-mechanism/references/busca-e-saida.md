@@ -7,6 +7,7 @@ O instrumento nasce cobrindo uma forma, e a resposta está na outra. O silêncio
 - **Truncar:** `grep … | head` some com a 11ª linha, e a saída parece completa. Em busca que sustenta conclusão, conte antes (`grep -c`) ou não trunque.
 - **Texto de código mora em cinco formas:** string, template, regex literal (`/nome deve ter ao menos/i`), comentário e bloco de código (sem crase nenhuma — `csharp`, JSON, diagrama). Varredura que lê quatro responde com a mesma confiança sobre as quatro.
 - **Caixa e acento:** `grep` casa literal. `onlyMyItems` não acha `OnlyMyItems`; `per[ií]odo` no locale C não alcança o `í` (dois bytes). Busca de presença ou contagem roda com `-i` e `LC_ALL=pt_BR.UTF-8`, e o controle é procurar um trecho que você sabe que existe.
+- **Fronteira de palavra:** `\b` no `git grep -E` e no `sed` do macOS não casa nada, e a troca não acontece, sem erro. Use `git grep -w` ou Python, e confira com uma busca que você sabe que acha algo.
 - **Glob no zsh:** `--include=*.ts` sem aspas é expandido pelo shell, que aborta com `no matches found` e deixa na tela só o seu `echo`. Aspas no padrão (`--include='*.ts'`) e `echo "exit=$?"` logo depois.
 - **`cd` que falhou:** em `cd X && grep …` o zero pode ser do diretório anterior. `pwd` na mesma saída.
 - **Pedido visual não tem símbolo:** recuo, largura e alinhamento não se procuram por nome. Pergunte ao rastreador:
