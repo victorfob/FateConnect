@@ -41,6 +41,10 @@ using FateConnect.Api.Modules.Emails.Consumers;
 using Resend;
 using FateConnect.Api.Modules.Emails.Interfaces;
 using FateConnect.Api.Modules.Emails.Services;
+using FateConnect.Api.Modules.InAppNotifications.Interfaces;
+using FateConnect.Api.Modules.InAppNotifications.Repositories;
+using FateConnect.Api.Modules.InAppNotifications.Services;
+using FateConnect.Api.Modules.InAppNotifications.Consumers;
 
 public class Program
 {
@@ -121,6 +125,9 @@ public class Program
         builder.Services.AddScoped<IDenunciationService, DenunciationService>();
 
         builder.Services.AddScoped<IEmailService, EmailService>();
+
+        builder.Services.AddScoped<IInAppNotificationRepository, InAppNotificationRepository>();
+        builder.Services.AddScoped<IInAppNotificationService, InAppNotificationService>();
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -224,6 +231,10 @@ public class Program
             x.AddConsumer<PasswordResetRequestedEventConsumer>();
             x.AddConsumer<AccountLockedEventConsumer>();
 
+            x.AddConsumer<RideCreatedEventConsumer>();
+            x.AddConsumer<DenunciationReceivedEventConsumer>();
+            x.AddConsumer<ItemArchivedEventConsumer>();
+
             x.UsingRabbitMq(ConfigureRabbitMq);
         });
 
@@ -291,6 +302,24 @@ public class Program
         {
             e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
             e.ConfigureConsumer<AccountLockedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("ride-created-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<RideCreatedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("denunciation-received-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<DenunciationReceivedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("item-archived-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<ItemArchivedEventConsumer>(context);
         });
     }
 
