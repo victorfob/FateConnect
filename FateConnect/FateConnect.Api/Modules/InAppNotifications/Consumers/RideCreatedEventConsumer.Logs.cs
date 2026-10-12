@@ -5,8 +5,8 @@ using System;
 
 public sealed partial class RideCreatedEventConsumer
 {
-    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Starting dispatch of ride notifications for Ride ID {RideId} to '{Neighborhood}'.")]
-    private static partial void LogRideNotificationDispatchStarted(ILogger logger, Guid rideId, string neighborhood);
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Starting dispatch of ride notifications for Ride ID {RideId} to '{Destination}'.")]
+    private static partial void LogRideNotificationDispatchStarted(ILogger logger, Guid rideId, string destination);
 
     [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "No eligible users found for Ride ID {RideId}. Notifications skipped.")]
     private static partial void LogRideNotificationSkippedNoUsers(ILogger logger, Guid rideId);
