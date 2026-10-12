@@ -19,7 +19,7 @@ describe('managementUserCodec', () => {
     expect(fromParams(params)).toEqual({
       page: 3,
       pageSize: PAGE_SIZE,
-      search: 'maria',
+      searchTerm: 'maria',
       status: AccountStatusEnum.BANNED,
       profileType: ProfileTypeEnum.ADMINISTRATOR,
     });
@@ -44,7 +44,7 @@ describe('managementUserCodec', () => {
     const filter: UserFilter = {
       page: 2,
       pageSize: PAGE_SIZE,
-      search: 'maria',
+      searchTerm: 'maria',
       status: AccountStatusEnum.SELF_DEACTIVATED,
       profileType: ProfileTypeEnum.OPERATOR,
     };

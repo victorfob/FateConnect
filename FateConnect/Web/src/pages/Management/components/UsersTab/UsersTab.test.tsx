@@ -257,7 +257,7 @@ describe('UsersTab', () => {
       `${RoutePathEnum.MANAGEMENT}?aba=usuarios&busca=maria&situacao=banida&perfil=operador`,
     );
 
-    await waitFor(() => expect(asked).toContain('search=maria'));
+    await waitFor(() => expect(asked).toContain('searchTerm=maria'));
     expect(asked).toContain('status=Banned');
     expect(asked).toContain('profileType=Operator');
   });
@@ -271,14 +271,14 @@ describe('UsersTab', () => {
     await screen.findByText(C.EMPTY_LIST_MESSAGE);
 
     await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE_PLURAL }));
-    await userEvent.type(await screen.findByLabelText(FILTER_LABELS.search), '15999');
+    await userEvent.type(await screen.findByLabelText(FILTER_LABELS.searchTerm), '15999');
     await userEvent.click(screen.getByRole('combobox', { name: FILTER_LABELS.status }));
     await userEvent.click(screen.getByRole('option', { name: 'Desativada' }));
     await userEvent.click(screen.getByRole('combobox', { name: FILTER_LABELS.profileType }));
     await userEvent.click(screen.getByRole('option', { name: 'Administrador' }));
     await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
 
-    await waitFor(() => expect(asked.at(-1)).toContain('search=15999'));
+    await waitFor(() => expect(asked.at(-1)).toContain('searchTerm=15999'));
     expect(asked.at(-1)).toContain('status=SelfDeactivated');
     expect(asked.at(-1)).toContain('profileType=Administrator');
     expect(router.state.location.search).toContain('aba=usuarios');
@@ -507,7 +507,7 @@ describe('UsersTab', () => {
     await userEvent.click(screen.getByRole('button', { name: FILTER_TITLE_PLURAL }));
     await userEvent.click(await screen.findByRole('button', { name: FILTER_CLEAR_LABEL }));
 
-    await waitFor(() => expect(asked.at(-1)).not.toContain('search'));
+    await waitFor(() => expect(asked.at(-1)).not.toContain('searchTerm'));
     expect(asked.at(-1)).not.toContain('profileType');
     expect(router.state.location.search).toBe('?aba=usuarios');
   });

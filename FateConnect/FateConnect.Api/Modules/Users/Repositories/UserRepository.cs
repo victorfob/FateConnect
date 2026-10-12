@@ -92,9 +92,9 @@ public class UserRepository : IUserRepository
         if (filter.ProfileType.HasValue)
             query = query.Where(u => u.ProfileType == filter.ProfileType.Value);
 
-        if (!string.IsNullOrWhiteSpace(filter.Search))
+        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            string escapedSearchTerm = filter.Search.SanitizeSearchTerm();
+            string escapedSearchTerm = filter.SearchTerm.SanitizeSearchTerm();
 
             query = query.Where(u =>
                 EF.Functions.ILike(

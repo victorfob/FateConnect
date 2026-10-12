@@ -13,7 +13,7 @@ export type UserSummary = {
 };
 
 export interface UserFilter extends PageQuery {
-  search?: string;
+  searchTerm?: string;
   status?: AccountStatusEnum;
   profileType?: ProfileTypeEnum;
 }
