@@ -11,6 +11,7 @@ paths:
 - ⛔ **Código novo sai com ≥90%**, acima do portão do Sonar de propósito: portão verde não é entrega.
 - Medir é `./scripts/coverage-changed.sh` (base padrão `origin/develop`), **com o trabalho commitado**: ele cruza o relatório com o diff commitado. Se a contagem não bate com os arquivos que você mexeu, a medida está errada. Rode antes de dizer que acabou.
 - Linha que não dá para cobrir se marca com `[ExcludeFromCodeCoverage]`; não se baixa o alvo. Cobertura baixa costuma acusar teste que falta.
+- O atributo no método não alcança as lambdas dentro dele: os `ReceiveEndpoint` do `ConfigureRabbitMq` contam como descobertos, e o `Program.cs` fica abaixo de 90% sem faltar teste. Confira as linhas antes de escrever teste para elas.
 
 ## Onde o teste mora
 
@@ -46,6 +47,7 @@ paths:
 
 Quebre o código de propósito e confira que a suíte cai; restaure e confira com `git status`.
 
+- ⛔ Mute só arquivo sem mudança pendente: `git checkout -- <arquivo>` volta ao último commit e leva junto o que você ainda não commitou nele. Commite antes de mutar.
 - ⛔ Se a build da mutação falha, `dotnet test --no-build` roda a DLL anterior e tudo passa: confira o exit da build antes de ler o teste. Escreva `--verbosity quiet` por extenso: wrapper de shell que reescreve argumentos pode ficar com o `-v q`, e o build responde `Project file does not exist`.
 - Mute o corpo do predicado, não a chamada: tirar o `.Where(Predicado())` deixa o método sem uso, e o analisador reprova antes de qualquer teste. Ele reprova também a mutação óbvia (`if (false)`, ramo igual a outro do `switch`): mute com um valor plausível.
 - ⛔ Medindo memória: `Process.PeakWorkingSet64` responde 0 no macOS, e medir no processo que gerou a carga põe a carga no "antes". Separe em processos: um gera o arquivo, outro só o processa sob `/usr/bin/time -l`, e um terceiro só o lê (o controle).

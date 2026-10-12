@@ -10,7 +10,7 @@ Este é um repositório **público** de trabalho acadêmico. **Nenhum conteúdo 
 ## Mapa do repositório
 
 - **Front:** `FateConnect/Web` — React + Vite, MUI + Emotion. Design system local em `Web/design-system/`, fora de `src`, com os barrels `@design-system` e `@design-system/icons`; alias `@app` para `Web/src`. Padrões em `fateconnect-web-react.md` e nas rules `web-*`.
-- **API (.NET 8):** `FateConnect/FateConnect.Api`, uma só, em módulos por domínio (`Auth`, `Common`, `Denunciations`, `LostAndFound`, `Rides`, `Users`). Os testes ficam em `FateConnect/FateConnect.Api.Tests`, pasta irmã.
+- **API (.NET 8):** `FateConnect/FateConnect.Api`, uma só, em módulos por domínio (`Auth`, `Common`, `Denunciations`, `Emails`, `InAppNotifications`, `LostAndFound`, `Rides`, `Storage`, `Users`). Os testes ficam em `FateConnect/FateConnect.Api.Tests`, pasta irmã.
 
 ## Idioma
 

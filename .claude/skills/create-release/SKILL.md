@@ -153,7 +153,9 @@ E confira que a `develop` recebeu o back-merge: `git rev-list --count origin/dev
 
 ## PR de segurança do Dependabot
 
-Ele mira a `main` sem subir versão, então cai no `Version`, e no Sonar por não ter o `SONAR_TOKEN`; o job dele "falha" quando um pacote não resolve, mesmo abrindo PR com os outros. Feche o PR e faça `hotfix/X.Y.Z` a partir da `main`, com as correções num commit e o bump e o changelog noutro. Correção transitiva que cabe na faixa sai por `yarn up -R <pacote>`, sem `resolutions`. Os alertas fecham no merge na `main`.
+Os PRs de versão vão para a `develop` (`.github/dependabot.yml`); só o de segurança mira a `main`, e sem subir versão ele cai no `Version`. O job dele "falha" quando um pacote não resolve, mesmo abrindo PR com os outros. Feche o PR e faça `hotfix/X.Y.Z` a partir da `main`, com as correções num commit e o bump e o changelog noutro. Correção transitiva que cabe na faixa sai por `yarn up -R <pacote>`, sem `resolutions`.
+
+⚠️ O alerta não fecha no merge: fecha quando o Dependabot reavalia a `main`, e não há API que force. Confira com `gh api repos/<dono>/<repo>/dependabot/alerts/<n> --jq .state` antes de dizer que fechou.
 
 ## Armadilhas já pagas
 
