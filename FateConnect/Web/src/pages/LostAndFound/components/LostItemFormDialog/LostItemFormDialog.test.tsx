@@ -40,7 +40,7 @@ const LOST_ITEM: LostItem = {
   name: 'Carteira preta',
   lostAndFoundType: LostItemKindEnum.LOST,
   place: 'Biblioteca',
-  ocurredOn: '2026-08-11T00:00:00',
+  occurredOn: '2026-08-11T00:00:00',
   description: 'Carteira de couro preta com documentos.',
   imageUrl: null,
   thumbnailUrl: null,
@@ -66,7 +66,7 @@ const STORED_PHOTO_REMOVAL = {
   Name: LOST_ITEM.name,
   LostAndFoundType: LOST_ITEM.lostAndFoundType,
   Place: LOST_ITEM.place,
-  OcurredOn: '2026-08-11',
+  OccurredOn: '2026-08-11',
   Description: LOST_ITEM.description,
   RemoveImage: 'true',
 };
@@ -257,7 +257,7 @@ describe('LostItemFormDialog', () => {
       Name: EDITED_NAME,
       LostAndFoundType: LOST_ITEM.lostAndFoundType,
       Place: LOST_ITEM.place,
-      OcurredOn: '2026-08-11',
+      OccurredOn: '2026-08-11',
       Description: LOST_ITEM.description,
     });
   });
@@ -314,7 +314,7 @@ describe('LostItemFormDialog', () => {
       Name: 'Garrafa térmica',
       LostAndFoundType: LostItemKindEnum.FOUND,
       Place: 'Bloco C',
-      OcurredOn: toApiDate(OCCURRED_AT),
+      OccurredOn: toApiDate(OCCURRED_AT),
       Description: '',
     });
   });

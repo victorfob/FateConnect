@@ -91,7 +91,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<DateOnly>("OcurredOn")
+                    b.Property<DateOnly>("OccurredOn")
                         .HasColumnType("date");
 
                     b.Property<string>("Place")

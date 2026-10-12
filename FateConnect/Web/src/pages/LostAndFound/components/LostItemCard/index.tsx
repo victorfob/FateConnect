@@ -65,7 +65,7 @@ export function LostItemCard({ item, onEdit, onResolve, onDelete, onRestore }: L
         <ListCard.InfoItem>
           <CalendarTodayIcon />
           <Typography variant="caption" color="inherit">
-            {format(parseISO(item.ocurredOn), DATE_FORMAT)}
+            {format(parseISO(item.occurredOn), DATE_FORMAT)}
           </Typography>
         </ListCard.InfoItem>
 

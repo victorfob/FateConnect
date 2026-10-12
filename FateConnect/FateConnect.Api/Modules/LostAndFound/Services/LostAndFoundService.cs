@@ -25,7 +25,7 @@ public partial class LostAndFoundService(
             dto.Name,
             dto.LostAndFoundType.GetValueOrDefault(),
             dto.Place,
-            dto.OcurredOn.GetValueOrDefault(),
+            dto.OccurredOn.GetValueOrDefault(),
             dto.Description,
             currentUserId
         );
@@ -94,7 +94,7 @@ public partial class LostAndFoundService(
             dto.Name,
             dto.LostAndFoundType,
             dto.Place,
-            dto.OcurredOn,
+            dto.OccurredOn,
             dto.Description,
             dto.Status
         );
@@ -169,7 +169,7 @@ public partial class LostAndFoundService(
             record.Name,
             record.LostAndFoundType,
             record.Place,
-            record.OcurredOn,
+            record.OccurredOn,
             record.Description,
             record.ImageUrl,
             UploadsLocation.ThumbnailOrNullOf(record.ImageUrl),

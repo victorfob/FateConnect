@@ -36,7 +36,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         string Name,
         EnumLostAndFoundType LostAndFoundType,
         string Place,
-        DateOnly OcurredOn,
+        DateOnly OccurredOn,
         string? Description,
         string? ImageUrl,
         string? ThumbnailUrl,
@@ -50,14 +50,14 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         EnumLostAndFoundType type = EnumLostAndFoundType.Lost,
         string place = "Biblioteca do bloco B",
         string? description = "Ficou na mesa do fundo.",
-        DateOnly? ocurredOn = null)
+        DateOnly? occurredOn = null)
     {
         MultipartFormDataContent form = new()
         {
             { new StringContent(name), "Name" },
             { new StringContent(type.ToString()), "LostAndFoundType" },
             { new StringContent(place), "Place" },
-            { new StringContent((ocurredOn ?? Yesterday).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OcurredOn" },
+            { new StringContent((occurredOn ?? Yesterday).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OccurredOn" },
         };
 
         if (description is not null)
@@ -294,7 +294,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Eduardo Ramos Lima");
         DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(2));
 
-        HttpResponseMessage response = await client.PostAsync("/LostAndFound", NewItemForm(ocurredOn: tomorrow));
+        HttpResponseMessage response = await client.PostAsync("/LostAndFound", NewItemForm(occurredOn: tomorrow));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains("A data do ocorrido não pode ser no futuro.", await response.Content.ReadAsStringAsync());
@@ -440,7 +440,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         Directory.CreateDirectory(folder);
         int filesBefore = Directory.GetFiles(folder).Length;
 
-        MultipartFormDataContent form = NewItemForm(ocurredOn: tomorrow);
+        MultipartFormDataContent form = NewItemForm(occurredOn: tomorrow);
         form.Add(ImagePayload(0x03), "Image", "foto.png");
 
         HttpResponseMessage response = await client.PostAsync("/LostAndFound", form);
@@ -560,7 +560,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         {
             { new StringContent("Mochila cinza"), "Name" },
             { new StringContent("Biblioteca do bloco B"), "Place" },
-            { new StringContent(Yesterday.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OcurredOn" },
+            { new StringContent(Yesterday.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OccurredOn" },
         };
 
         HttpResponseMessage response = await _factory.CreateClientFor(reporter.Id).PostAsync("/LostAndFound", form);
