@@ -2,26 +2,35 @@ import { http, HttpResponse } from 'msw';
 
 import { useCountdown } from '@app/hooks/useCountdown';
 import { server } from '@app/mocks/server';
+import { resendConfirmationEmail } from '@app/services/auth/authService';
 import { act, render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
 import * as C from './constants';
-import { ResendConfirmationButton } from '.';
+import { ResendLinkButton } from '.';
 
 const RESEND_URL = 'https://api.fateconnect.test/auth/resend-confirmation-email';
 const NO_CONTENT = 204;
 const SERVER_ERROR = 500;
 const EMAIL = 'aluno.teste@aluno.cps.sp.gov.br';
 const ONE_SECOND_MS = 1000;
+const SENT_MESSAGE = 'Novo link enviado.';
 
 type ButtonHostProps = Readonly<{ initialSeconds?: number }>;
 
 function ButtonHost({ initialSeconds }: ButtonHostProps) {
   const countdown = useCountdown(initialSeconds);
 
-  return <ResendConfirmationButton email={EMAIL} countdown={countdown} />;
+  return (
+    <ResendLinkButton
+      email={EMAIL}
+      send={resendConfirmationEmail}
+      sentMessage={SENT_MESSAGE}
+      countdown={countdown}
+    />
+  );
 }
 
-describe('ResendConfirmationButton', () => {
+describe('ResendLinkButton', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -40,7 +49,7 @@ describe('ResendConfirmationButton', () => {
 
     await userEvent.click(button);
 
-    expect(await screen.findByText(C.RESENT_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(SENT_MESSAGE)).toBeInTheDocument();
     expect(receivedBodies).toEqual([{ fatecEmail: EMAIL }]);
     await waitFor(() => expect(button).toBeDisabled());
   });
@@ -91,7 +100,7 @@ describe('ResendConfirmationButton', () => {
     expect(within(button).getByRole('progressbar')).toBeInTheDocument();
 
     respond();
-    expect(await screen.findByText(C.RESENT_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(SENT_MESSAGE)).toBeInTheDocument();
   });
 });
 

@@ -4,3 +4,5 @@ export const REACTIVATION_DIALOG = {
   dismissLabel: 'Cancelar',
   confirmLabel: 'Reativar',
 };
+
+export const REACTIVATION_SUCCEEDED = 'Conta reativada.';

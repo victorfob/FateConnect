@@ -5,8 +5,6 @@ const SECONDS_PER_MINUTE = 60;
 const CLOCK_SECONDS_DIGITS = 2;
 
 export const RESEND_LABEL = 'Reenviar link';
-export const RESENT_MESSAGE =
-  'Se a conta ainda não foi confirmada, um novo link foi enviado ao seu e-mail Fatec.';
 export const RESEND_FAILED_MESSAGE = 'Erro ao reenviar o link. Tente novamente.';
 
 export function waitingLabel(secondsLeft: number): string {

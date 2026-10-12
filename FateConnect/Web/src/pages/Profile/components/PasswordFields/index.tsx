@@ -1,10 +1,10 @@
 import { Input } from '@design-system';
 import { useFormContext } from 'react-hook-form';
 
+import { AccountUsername } from '@app/components/AccountUsername';
 import type { ProfileFormInput, ProfileFormValues } from '@app/pages/Profile/schema';
 
 import * as C from './constants';
-import * as S from './styles';
 
 export type PasswordFieldsProps = Readonly<{ fatecEmail: string }>;
 
@@ -16,13 +16,7 @@ export function PasswordFields({ fatecEmail }: PasswordFieldsProps) {
 
   return (
     <>
-      <S.AccountUsername
-        component="input"
-        type="email"
-        autoComplete="username"
-        value={fatecEmail}
-        readOnly
-      />
+      <AccountUsername email={fatecEmail} />
 
       <Input.Password
         {...register('currentPassword')}

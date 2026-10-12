@@ -20,6 +20,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona à edição de um item de achados e perdidos o pedido de tirar a foto, que apaga o arquivo; com uma foto nova no mesmo pedido, fica a nova (#563) [Backend]
 - Adiciona a página do link de confirmação, que confirma o e-mail Fatec ao abrir e já entra; com o link expirado ou já usado, ela oferece um novo link e o caminho para o login (#577) [Frontend]
 - Adiciona ao login um diálogo para quem ainda não confirmou o e-mail Fatec, que diz o que falta e reenvia o link de confirmação (#577) [Frontend]
+- Adiciona ao login o pedido de redefinição da senha esquecida: a tela leva o e-mail já digitado, avisa quando não há conta e oferece o cadastro, e o link pode ser pedido de novo a cada minuto (#579) [Frontend]
+- Adiciona a página do link de redefinição, que confere o link ao abrir, pede a nova senha com confirmação e as regras do cadastro e já entra; com o link vencido, oferece outro, e a conta desativada é levada a reativar com a nova senha (#579) [Frontend]
 
 ### Changed
 
