@@ -25,6 +25,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 - Diálogo de formulário monta `Dialog.Form` (envio pela validação da tela), `Dialog.Fields` (grade com folga para o rótulo flutuante; `layout="column"` põe um campo por linha) e `Dialog.Submit` (largura cheia, com `loading`).
 - ⛔ O `Dialog.Body` rola e corta o que sai da largura dele: controle com halo (o `Slider`) vai fora do `Dialog.Body`, direto no diálogo.
 - Formulário em grade é o `FormGrid` (`FormGrid.Wide` ocupa a linha); cartão com título e ícone é o `SectionCard`. Não escreva outro.
+- Tela de autenticação (entrar, pedir o link, nova senha) monta o `AuthCard`, com `AuthCard.Submit` e o `SignupPrompt`: repetidos à mão, o botão e o convite ao cadastro reprovam a duplicação do Sonar.
 - ⛔ Ação destrutiva usa a variante `destructive` (o `ConfirmAction` a liga com `destructive`). O *Banir* da gestão ainda está neutro: pergunte antes de migrá-lo.
 - ⛔ Diálogo só de texto leva o tom no `Dialog.Message`, com o ícone acima da frase: confirmação comum `info` com a interrogação, destrutiva `error` com o ícone da ação (`dialogIcon` do `ConfirmAction`: a lixeira, a pessoa riscada), atenção `warning`. O octógono do erro é só de falha: confirmação não é erro.
 - Tela de recado (`PageMessage`) leva `tone` pelo que aconteceu; carregando fica sem ícone. Link vencido que pede ação (confirmar o e-mail) é `warning`; o do desbloqueio, onde nada se perdeu, é `info`.
