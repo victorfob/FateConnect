@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Communications.Consumers;
+namespace FateConnect.Api.Modules.Emails.Consumers;
 
 using System;
 using System.Threading.Tasks;

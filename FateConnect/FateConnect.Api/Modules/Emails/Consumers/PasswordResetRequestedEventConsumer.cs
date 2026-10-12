@@ -1,7 +1,6 @@
 namespace FateConnect.Api.Modules.Emails.Consumers;
 
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Communications.Consumers;
 using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.Emails.Interfaces;
 using Microsoft.Extensions.Configuration;

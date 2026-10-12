@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Communications.Consumers;
+namespace FateConnect.Api.Modules.Emails.Consumers;
 
 using FateConnect.Api.Modules.Emails.Enums;
 
