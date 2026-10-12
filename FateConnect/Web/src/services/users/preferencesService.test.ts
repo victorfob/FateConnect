@@ -9,7 +9,7 @@ const PREFERENCES_URL = 'https://api.fateconnect.test/users/me/preferences';
 
 const NO_CONTENT = 204;
 
-const PREFERENCES: Preferences = { receiveEmails: false, receiveNotifications: true };
+const PREFERENCES: Preferences = { receiveNotifications: true };
 
 describe('preferencesService', () => {
   it('should read the preferences of whoever is logged in', async () => {
@@ -18,7 +18,7 @@ describe('preferencesService', () => {
     await expect(getPreferences()).resolves.toEqual(PREFERENCES);
   });
 
-  it('should send only the preference that changed', async () => {
+  it('should send the chosen preference', async () => {
     let body: unknown = null;
     server.use(
       http.patch(PREFERENCES_URL, async ({ request }) => {
@@ -28,8 +28,8 @@ describe('preferencesService', () => {
       }),
     );
 
-    await updatePreferences({ receiveEmails: true });
+    await updatePreferences({ receiveNotifications: false });
 
-    expect(body).toEqual({ receiveEmails: true });
+    expect(body).toEqual({ receiveNotifications: false });
   });
 });

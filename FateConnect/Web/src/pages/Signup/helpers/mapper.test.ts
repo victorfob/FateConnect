@@ -55,17 +55,15 @@ describe('toSignupRequest', () => {
     ]);
   });
 
-  it('should turn both preferences on from the single checkbox', () => {
-    const request = toSignupRequest({ ...FILLED, acceptMarketing: true });
+  it('should turn the notifications on from the checkbox', () => {
+    const request = toSignupRequest({ ...FILLED, acceptNotifications: true });
 
-    expect(request.receiveEmails).toBe(true);
     expect(request.receiveNotifications).toBe(true);
   });
 
-  it('should leave both preferences off when the checkbox is unticked', () => {
-    const request = toSignupRequest({ ...FILLED, acceptMarketing: false });
+  it('should leave the notifications off when the checkbox is unticked', () => {
+    const request = toSignupRequest({ ...FILLED, acceptNotifications: false });
 
-    expect(request.receiveEmails).toBe(false);
     expect(request.receiveNotifications).toBe(false);
   });
 
@@ -86,7 +84,6 @@ describe('toSignupRequest', () => {
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
         { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },
       ],
-      receiveEmails: false,
       receiveNotifications: false,
     });
   });
