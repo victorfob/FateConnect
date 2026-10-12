@@ -25,6 +25,11 @@ paths:
 - ⛔ **A imagem da API compila com o contexto `FateConnect/`** (`deploy/docker-compose.yml`), para ler o mesmo `.editorconfig` do CI: com o contexto na pasta da API, a migration com array reprova o deploy no CA1861.
 - **ImageSharp valida licença:** em Release a build exige `SIXLABORS_LICENSE` (o conteúdo inteiro do `.lic`, segredo do `.env` da VPS); localmente, `-p:SixLaborsLicenseFile=<caminho>`. O "License ID" sozinho não é a chave.
 
+## Mensageria
+
+- ⛔ **Com o bus outbox, o `Publish` vem antes do `SaveChanges` que o grava:** publicado depois do último `SaveChanges`, o evento nunca sai. Repositório cujo `AddAsync` já salva recebe o `Publish` antes da chamada (`RideService.CreateAsync`).
+- ⛔ **Entidade com `Id` de identidade não tem o `Id` antes de salvar:** o EF não o escreve na propriedade, e o evento sai com `0`. Salve, publique e salve de novo (`InAppNotificationService.NotifyAsync`).
+
 ## Forma
 
 - `if` de uma instrução não leva chaves; a instrução vai na linha seguinte, indentada.
@@ -69,3 +74,4 @@ Depois de qualquer substituição em lote, procure as três formas de estrago, q
 
 - Identificador, namespace, pasta e arquivo em inglês. Enum com **prefixo** `Enum` (`EnumRideType`); no front é sufixo, e a divergência não se corrige (o CA1711 reprova o sufixo aqui).
 - ⛔ Mensagem que a pessoa lê (validação, exceção de domínio, erro do middleware) em pt-BR, com o mesmo texto da tela. `summary`/`description` do Swagger e template de `LoggerMessage` em inglês, e o log registra o tipo da exceção: nunca interpole a mensagem de produto nele.
+- Os `EventId` de `LoggerMessage` de uma classe seguem contínuos: removido um log que ainda não saiu em release, renumere os seguintes.
