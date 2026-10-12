@@ -7,7 +7,7 @@ using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Common.Utils;
-using FateConnect.Api.Modules.Communications.Interfaces;
+using FateConnect.Api.Modules.Emails.Interfaces;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Enums;
 using FateConnect.Api.Modules.LostAndFound.Entities;

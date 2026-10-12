@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Communications.Consumers;
 
 using System;
-using FateConnect.Api.Modules.Communications.Enums;
+using FateConnect.Api.Modules.Emails.Enums;
 using Microsoft.Extensions.Logging;
 
 public abstract partial class AccountEmailConsumer<TEvent>

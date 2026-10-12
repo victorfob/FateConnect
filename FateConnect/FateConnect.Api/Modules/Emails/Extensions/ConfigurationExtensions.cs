@@ -1,6 +1,6 @@
-namespace FateConnect.Api.Modules.Communications.Extensions;
+namespace FateConnect.Api.Modules.Emails.Extensions;
 
-using FateConnect.Api.Modules.Communications.Exceptions;
+using FateConnect.Api.Modules.Emails.Exceptions;
 using Microsoft.Extensions.Configuration;
 
 public static class ConfigurationExtensions

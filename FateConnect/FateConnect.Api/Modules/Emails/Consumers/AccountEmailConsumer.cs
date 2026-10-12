@@ -2,10 +2,9 @@ namespace FateConnect.Api.Modules.Communications.Consumers;
 
 using System;
 using System.Threading.Tasks;
-using FateConnect.Api.Modules.Communications.Enums;
-using FateConnect.Api.Modules.Communications.Extensions;
-using FateConnect.Api.Modules.Communications.Interfaces;
-using FateConnect.Api.Modules.Communications.Templates;
+using FateConnect.Api.Modules.Emails.Extensions;
+using FateConnect.Api.Modules.Emails.Interfaces;
+using FateConnect.Api.Modules.Emails.Templates;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

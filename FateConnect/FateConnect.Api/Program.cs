@@ -37,10 +37,10 @@ using FateConnect.Api.Modules.Denunciations.Services;
 using FateConnect.Api.Modules.Denunciations.Repositories;
 using MassTransit;
 using FateConnect.Api.Modules.Storage.Services;
-using FateConnect.Api.Modules.Communications.Consumers;
+using FateConnect.Api.Modules.Emails.Consumers;
 using Resend;
-using FateConnect.Api.Modules.Communications.Interfaces;
-using FateConnect.Api.Modules.Communications.Services;
+using FateConnect.Api.Modules.Emails.Interfaces;
+using FateConnect.Api.Modules.Emails.Services;
 
 public class Program
 {

@@ -1,7 +1,7 @@
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Communications.Consumers;
-using FateConnect.Api.Modules.Communications.Enums;
-using FateConnect.Api.Modules.Communications.Interfaces;
+using FateConnect.Api.Modules.Emails.Consumers;
+using FateConnect.Api.Modules.Emails.Enums;
+using FateConnect.Api.Modules.Emails.Interfaces;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.Configuration;

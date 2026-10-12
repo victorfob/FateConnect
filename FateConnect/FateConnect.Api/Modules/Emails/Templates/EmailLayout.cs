@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Communications.Templates;
+namespace FateConnect.Api.Modules.Emails.Templates;
 
 using System.Collections.Generic;
 using System.Globalization;

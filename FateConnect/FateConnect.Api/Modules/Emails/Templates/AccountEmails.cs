@@ -1,9 +1,9 @@
-namespace FateConnect.Api.Modules.Communications.Templates;
+namespace FateConnect.Api.Modules.Emails.Templates;
 
 using System;
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Common.Utils;
-using FateConnect.Api.Modules.Communications.Enums;
+using FateConnect.Api.Modules.Emails.Enums;
 
 public static class AccountEmails
 {

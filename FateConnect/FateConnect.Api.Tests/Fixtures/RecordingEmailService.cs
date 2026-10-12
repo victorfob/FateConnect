@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
-using FateConnect.Api.Modules.Communications.Enums;
-using FateConnect.Api.Modules.Communications.Interfaces;
+using FateConnect.Api.Modules.Emails.Enums;
+using FateConnect.Api.Modules.Emails.Interfaces;
 
 namespace FateConnect.Api.Tests.Fixtures;
 

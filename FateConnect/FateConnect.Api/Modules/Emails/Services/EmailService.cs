@@ -1,13 +1,11 @@
-namespace FateConnect.Api.Modules.Communications.Services;
+namespace FateConnect.Api.Modules.Emails.Services;
 
-using System;
-using System.Threading.Tasks;
 using FateConnect.Api.Modules.Common.Utils;
-using FateConnect.Api.Modules.Communications.Enums;
-using FateConnect.Api.Modules.Communications.Exceptions;
-using FateConnect.Api.Modules.Communications.Extensions;
-using FateConnect.Api.Modules.Communications.Interfaces;
-using FateConnect.Api.Modules.Communications.Templates;
+using FateConnect.Api.Modules.Emails.Enums;
+using FateConnect.Api.Modules.Emails.Exceptions;
+using FateConnect.Api.Modules.Emails.Extensions;
+using FateConnect.Api.Modules.Emails.Interfaces;
+using FateConnect.Api.Modules.Emails.Templates;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Resend;

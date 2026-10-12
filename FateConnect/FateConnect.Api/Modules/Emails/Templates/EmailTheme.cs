@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Communications.Templates;
+namespace FateConnect.Api.Modules.Emails.Templates;
 
 public static class EmailTheme
 {

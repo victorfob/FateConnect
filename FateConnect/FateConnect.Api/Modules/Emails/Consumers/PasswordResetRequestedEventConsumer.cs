@@ -1,12 +1,13 @@
-namespace FateConnect.Api.Modules.Communications.Consumers;
+namespace FateConnect.Api.Modules.Emails.Consumers;
 
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Communications.Enums;
-using FateConnect.Api.Modules.Communications.Interfaces;
+using FateConnect.Api.Modules.Communications.Consumers;
+using FateConnect.Api.Modules.Emails.Enums;
+using FateConnect.Api.Modules.Emails.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-public sealed class PasswordResetRequestedEventConsumer(
+public sealed partial class PasswordResetRequestedEventConsumer(
     IEmailService emailService,
     IConfiguration configuration,
     ILogger<PasswordResetRequestedEventConsumer> logger

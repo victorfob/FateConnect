@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Communications.Services;
+namespace FateConnect.Api.Modules.Emails.Services;
 
 using Microsoft.Extensions.Logging;
 

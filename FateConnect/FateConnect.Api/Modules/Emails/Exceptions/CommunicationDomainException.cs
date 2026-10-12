@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Communications.Exceptions;
+namespace FateConnect.Api.Modules.Emails.Exceptions;
 
 using System;
 

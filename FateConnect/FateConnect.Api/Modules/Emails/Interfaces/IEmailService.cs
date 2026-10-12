@@ -1,7 +1,7 @@
-namespace FateConnect.Api.Modules.Communications.Interfaces;
+namespace FateConnect.Api.Modules.Emails.Interfaces;
 
 using System.Threading.Tasks;
-using FateConnect.Api.Modules.Communications.Enums;
+using FateConnect.Api.Modules.Emails.Enums;
 
 public interface IEmailService
 {
