@@ -138,7 +138,13 @@ public class Program
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR()
+            .AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.PayloadSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
+                options.PayloadSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
@@ -249,6 +255,7 @@ public class Program
             x.AddConsumer<RideCreatedEventConsumer>();
             x.AddConsumer<DenunciationReceivedEventConsumer>();
             x.AddConsumer<ItemArchivedEventConsumer>();
+            x.AddConsumer<NotificationDispatchedEventConsumer>();
 
             x.UsingRabbitMq(ConfigureRabbitMq);
         });
@@ -279,7 +286,10 @@ public class Program
 
         app.MapControllers();
 
-        app.MapHub<NotificationHub>("/hubs/notifications");
+        app.MapHub<NotificationHub>("/hubs/notifications", options =>
+        {
+            options.CloseOnAuthenticationExpiration = true;
+        });
 
         app.Run();
     }
@@ -337,6 +347,12 @@ public class Program
         {
             e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
             e.ConfigureConsumer<ItemArchivedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("notification-dispatched-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<NotificationDispatchedEventConsumer>(context);
         });
     }
 

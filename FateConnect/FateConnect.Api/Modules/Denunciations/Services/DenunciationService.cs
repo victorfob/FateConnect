@@ -43,14 +43,14 @@ public partial class DenunciationService(
             denunciation.AttachImage(storedImageUrl);
         }
 
-        await PersistOrDropImageAsync(() => repository.AddAsync(denunciation), storedImageUrl);
-
         await publishEndpoint.Publish(new DenunciationReceivedEvent(
             ReporterId: currentUserId,
             DenunciationId: denunciation.Id,
-            Reason: denunciation.Category.ToFriendlyName(),
+            Category: denunciation.Category,
             IsAnonymous: denunciation.IsAnonymous
         ));
+
+        await PersistOrDropImageAsync(() => repository.AddAsync(denunciation), storedImageUrl);
 
         LogDenunciationCreated(logger, denunciation.Id);
 

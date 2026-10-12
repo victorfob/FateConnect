@@ -13,37 +13,39 @@ using System.Threading.Tasks;
 
 public class InAppNotificationRepository(FateConnectDbContext context) : IInAppNotificationRepository
 {
-    public async Task<bool> UserAllowsInAppNotificationsAsync(int userId)
+    public async Task<List<int>> GetEligibleUserIdsAsync(IEnumerable<int> userIds)
     {
-        return await context.UserPreferences
+        return await context.Users
             .AsNoTracking()
-            .Where(p => p.UserId == userId)
-            .Select(p => p.ReceiveNotifications)
-            .SingleAsync();
+            .Where(u => userIds.Contains(u.Id))
+            .Where(u => u.Status == EnumAccountStatus.Active)
+            .Where(u => u.Preferences.ReceiveNotifications)
+            .Select(u => u.Id)
+            .ToListAsync();
     }
 
-    public async Task<InAppNotification> AddAsync(InAppNotification notification)
+    public Task<InAppNotification> AddAsync(InAppNotification notification)
     {
         context.InAppNotifications.Add(notification);
-        await context.SaveChangesAsync();
 
-        return notification;
+        return Task.FromResult(notification);
     }
 
-    public async Task<List<int>> GetUserIdsInterestedInNeighborhoodAsync(string neighborhood, int driverId)
+    public async Task<List<int>> GetUserIdsInterestedInDestinationAsync(string destination, int driverId)
     {
-        string escapedNeighborhood = neighborhood.SanitizeSearchTerm();
-
         return await context.Users
             .AsNoTracking()
             .Where(u => u.Id != driverId)
             .Where(u => u.Status == EnumAccountStatus.Active)
             .Where(u => u.Preferences.ReceiveNotifications)
-            .Where(u => u.Neighborhood != null && EF.Functions.ILike(
-                EF.Functions.Unaccent(u.Neighborhood),
-                "%" + EF.Functions.Unaccent(escapedNeighborhood) + "%",
-                @"\"
-            ))
+            .Where(u => u.Neighborhood != null &&
+            EF.Functions.ILike(
+                EF.Functions.Unaccent(destination),
+                "%" + EF.Functions.Unaccent(u.Neighborhood)
+                    .Replace(@"\", @"\\")
+                    .Replace("%", @"\%")
+                    .Replace("_", @"\_")
+                    + "%"))
             .Select(u => u.Id)
             .ToListAsync();
     }
@@ -51,7 +53,6 @@ public class InAppNotificationRepository(FateConnectDbContext context) : IInAppN
     public async Task AddRangeAsync(IEnumerable<InAppNotification> notifications)
     {
         await context.InAppNotifications.AddRangeAsync(notifications);
-        await context.SaveChangesAsync();
     }
 
     public async Task<(IReadOnlyList<InAppNotification> Items, int Total)> GetAllAsync(FilterInAppNotificationDto filter, int userId)
@@ -70,7 +71,7 @@ public class InAppNotificationRepository(FateConnectDbContext context) : IInAppN
 
         List<InAppNotification> items = await query
             .OrderByDescending(n => n.CreatedAt)
-            .ThenBy(n => n.Id)
+            .ThenByDescending(n => n.Id)
             .Skip(filter.ItemsToSkip)
             .Take(filter.EffectivePageSize)
             .ToListAsync();

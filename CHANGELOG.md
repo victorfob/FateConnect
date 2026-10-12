@@ -8,12 +8,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- Adiciona as notificações in-app em tempo real: o sistema avisa o usuário na mesma hora (via SignalR/WebSockets) sobre novas caronas para seu bairro, arquivamento de itens e atualizações de denúncias (#590) [Backend]
-- Adiciona o processamento em segundo plano e a gravação do histórico de notificações (lidas e não lidas) via MassTransit e RabbitMQ, evitando travamentos na requisição principal (#590) [Backend]
-
-### Changed
-
-- Passa a nomear o diretório do módulo de `communications` como `emails`, melhorando a semântica e a clareza sobre o escopo da pasta (#590) [Backend]
+- Adiciona o sistema de notificações in-app em tempo real via SignalR/WebSockets para novas caronas no bairro, itens arquivados e recebimento de denúncias (#590) [Backend]
+- Adiciona os endpoints de listagem paginada, contagem de não lidas e marcação de leitura (individual e em lote) para as notificações in-app (#590) [Backend]
 
 ## [1.4.0] - 2026-10-12
 

@@ -7,7 +7,7 @@ using MassTransit.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FateConnect.Api.Tests.Communications;
+namespace FateConnect.Api.Tests.Emails;
 
 public class EmailConsumerTests
 {

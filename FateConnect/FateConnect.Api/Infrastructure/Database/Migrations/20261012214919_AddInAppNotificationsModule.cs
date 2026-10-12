@@ -38,6 +38,11 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_InAppNotifications_UserId_CreatedAt",
+                table: "InAppNotifications",
+                columns: new[] { "UserId", "CreatedAt" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InAppNotifications_UserId_IsRead",
                 table: "InAppNotifications",
                 columns: new[] { "UserId", "IsRead" });

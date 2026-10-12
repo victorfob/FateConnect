@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FateConnect.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(FateConnectDbContext))]
-    [Migration("20261012054329_AddInAppNotificationsModule")]
+    [Migration("20261012214919_AddInAppNotificationsModule")]
     partial class AddInAppNotificationsModule
     {
         /// <inheritdoc />
@@ -100,6 +100,8 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId", "CreatedAt");
+
                     b.HasIndex("UserId", "IsRead");
 
                     b.ToTable("InAppNotifications");
@@ -133,7 +135,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<DateOnly>("OcurredOn")
+                    b.Property<DateOnly>("OccurredOn")
                         .HasColumnType("date");
 
                     b.Property<string>("Place")
@@ -375,9 +377,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("ReceiveEmails")
-                        .HasColumnType("boolean");
 
                     b.Property<bool>("ReceiveNotifications")
                         .HasColumnType("boolean");

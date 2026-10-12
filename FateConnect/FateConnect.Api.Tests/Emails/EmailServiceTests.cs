@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Resend;
 
-namespace FateConnect.Api.Tests.Communications;
+namespace FateConnect.Api.Tests.Emails;
 
 public partial class EmailServiceTests
 {

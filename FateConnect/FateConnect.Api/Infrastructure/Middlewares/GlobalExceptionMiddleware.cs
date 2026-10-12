@@ -98,7 +98,6 @@ public partial class GlobalExceptionMiddleware(
             case InvalidImageException:
             case LostAndFoundDomainException:
             case RideDomainException:
-            case InAppNotificationDomainException:
                 statusCode = HttpStatusCode.BadRequest;
                 errorMessage = exception.Message;
                 break;

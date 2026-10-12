@@ -97,6 +97,8 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId", "CreatedAt");
+
                     b.HasIndex("UserId", "IsRead");
 
                     b.ToTable("InAppNotifications");

@@ -6,7 +6,7 @@ using FateConnect.Api.Modules.Emails.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-public sealed partial class AccountLockedEventConsumer(
+public sealed class AccountLockedEventConsumer(
     IEmailService emailService,
     IConfiguration configuration,
     ILogger<AccountLockedEventConsumer> logger

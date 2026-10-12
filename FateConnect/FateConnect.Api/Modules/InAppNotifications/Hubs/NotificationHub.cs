@@ -7,4 +7,5 @@ using Microsoft.AspNetCore.SignalR;
 public class NotificationHub : Hub
 {
     public const string ReceiveNotificationEvent = "ReceiveNotification";
+    public const string SessionRevokedEvent = "SessionRevoked";
 }

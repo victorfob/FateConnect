@@ -1,18 +1,25 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Services;
 
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
+using FateConnect.Api.Modules.InAppNotifications.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Exceptions;
+using FateConnect.Api.Modules.InAppNotifications.Hubs;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
+using MassTransit;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
 public partial class InAppNotificationService(
     IInAppNotificationRepository repository,
+    IPublishEndpoint publishEndpoint,
     TimeProvider timeProvider,
     ILogger<InAppNotificationService> logger
 ) : IInAppNotificationService
@@ -47,9 +54,6 @@ public partial class InAppNotificationService(
             throw new InAppNotificationNotFoundException();
         }
 
-        if (notification.IsRead)
-            return;
-
         notification.MarkAsRead(timeProvider.GetUtcNow().UtcDateTime);
 
         await repository.SaveChangesAsync();
@@ -63,6 +67,34 @@ public partial class InAppNotificationService(
         await repository.MarkAllAsReadAsync(currentUserId, now);
 
         LogAllNotificationsMarkedAsRead(logger, currentUserId);
+    }
+
+    public async Task NotifyAsync(IEnumerable<int> userIds, EnumInAppNotificationType type, string content, string referenceId)
+    {
+        List<int> validUserIds = await repository.GetEligibleUserIdsAsync(userIds);
+
+        if (validUserIds.Count == 0)
+            return;
+
+        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+
+        var notifications = validUserIds.Select(userId => new InAppNotification(
+            userId: userId,
+            type: type,
+            content: content,
+            referenceId: referenceId,
+            createdAt: now
+        )).ToList();
+
+        await repository.AddRangeAsync(notifications);
+
+        foreach (var notification in notifications)
+        {
+            var dto = MapToReadDto(notification);
+            await publishEndpoint.Publish(new NotificationDispatchedEvent(dto, notification.UserId));
+        }
+
+        await repository.SaveChangesAsync();
     }
 
     private static ReadInAppNotificationDto MapToReadDto(InAppNotification entity) =>

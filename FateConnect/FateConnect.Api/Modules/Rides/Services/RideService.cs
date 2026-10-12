@@ -33,13 +33,14 @@ public partial class RideService(
 
         ride.ChangeRepetition(dto.Frequency, dto.RepeatUntil, holidays);
 
-        await repository.AddAsync(ride);
-
         await publishEndpoint.Publish(new RideCreatedEvent(
             RideId: ride.Id,
             DriverId: currentUserId,
-            DestinationNeighborhood: ride.Destination
+            Destination: ride.Destination
         ));
+
+        await repository.AddAsync(ride);
+
 
         LogRideCreated(logger, ride.Id);
 

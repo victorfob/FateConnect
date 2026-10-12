@@ -6,12 +6,15 @@ using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Auth.Utils;
 using FateConnect.Api.Modules.Common.Events;
+using FateConnect.Api.Modules.InAppNotifications.Hubs;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Interfaces;
 using MassTransit;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using static BCrypt.Net.BCrypt;
@@ -21,6 +24,7 @@ public partial class AuthService(
     ITokenService tokenService,
     TimeProvider timeProvider,
     IPublishEndpoint publishEndpoint,
+    IHubContext<NotificationHub> hubContext,
     ILogger<AuthService> logger
 ) : IAuthService
 {
@@ -52,6 +56,10 @@ public partial class AuthService(
     public async Task LogoutAsync(int userId)
     {
         await userRepository.IncrementTokenVersionAsync(userId);
+
+        await hubContext.Clients
+            .User(userId.ToString(CultureInfo.InvariantCulture))
+            .SendAsync(NotificationHub.SessionRevokedEvent);
 
         LogUserLoggedOut(logger, userId);
     }
@@ -311,6 +319,10 @@ public partial class AuthService(
         await userRepository.SaveChangesAsync();
 
         LogPasswordResetSuccessfully(logger, user.Id);
+
+        await hubContext.Clients
+            .User(user.Id.ToString(CultureInfo.InvariantCulture))
+            .SendAsync(NotificationHub.SessionRevokedEvent);
 
         if (user.Status is EnumAccountStatus.SelfDeactivated)
             throw new DeactivatedAccountException();

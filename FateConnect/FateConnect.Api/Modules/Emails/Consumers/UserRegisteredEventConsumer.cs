@@ -6,7 +6,7 @@ using FateConnect.Api.Modules.Emails.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-public sealed partial class UserRegisteredEventConsumer(
+public sealed class UserRegisteredEventConsumer(
     IEmailService emailService,
     IConfiguration configuration,
     ILogger<UserRegisteredEventConsumer> logger

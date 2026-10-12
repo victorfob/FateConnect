@@ -8,7 +8,6 @@ public class InAppNotificationConfiguration : IEntityTypeConfiguration<InAppNoti
 {
     public void Configure(EntityTypeBuilder<InAppNotification> builder)
     {
-
         builder.HasKey(e => e.Id);
 
         builder.Property(e => e.ReferenceId)
@@ -21,17 +20,15 @@ public class InAppNotificationConfiguration : IEntityTypeConfiguration<InAppNoti
             .HasMaxLength(500)
             .IsRequired();
 
-        builder.Property(e => e.ReferenceId);
-
         builder.Property(e => e.IsRead)
             .IsRequired();
 
         builder.Property(e => e.CreatedAt)
             .IsRequired();
 
-        builder.Property(e => e.UpdatedAt);
-
         builder.HasIndex(e => new { e.UserId, e.IsRead });
+
+        builder.HasIndex(e => new { e.UserId, e.CreatedAt });
 
         builder.HasOne(e => e.User)
                .WithMany()
