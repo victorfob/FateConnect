@@ -46,7 +46,7 @@ describe('CheckEmailMessage', () => {
   });
 
   // O primeiro link saiu com o cadastro: o reenvio só libera depois do intervalo da API.
-  it('should open the resend already waiting and free it after a minute', () => {
+  it('should open the resend already waiting and free it after the interval', () => {
     vi.useFakeTimers();
     renderMessage();
 
