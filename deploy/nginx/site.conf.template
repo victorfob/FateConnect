@@ -5,6 +5,14 @@
 # ao rodar com o plugin do nginx. Escrever à mão o que ele gera é como as duas
 # configurações divergem na primeira renovação.
 
+# Quando o SignalR cai para SSE ou long polling, o token viaja na query: o log
+# do hub grava o caminho sem ela. O nome leva o ambiente porque os dois sites
+# dividem o mesmo nginx, e um `log_format` repetido reprova o `nginx -t`.
+log_format fateconnect___ENVIRONMENT___without_query '$remote_addr - $remote_user [$time_local] '
+                                                     '"$request_method $uri $server_protocol" '
+                                                     '$status $body_bytes_sent '
+                                                     '"$http_referer" "$http_user_agent"';
+
 server {
     listen 80;
     listen [::]:80;
@@ -30,6 +38,23 @@ server {
     gzip_types application/javascript text/javascript text/css application/json image/svg+xml;
     gzip_min_length 1024;
     gzip_vary on;
+
+    # O WebSocket do SignalR só abre com HTTP/1.1 e os cabeçalhos de troca, que o
+    # `/api/` não repassa. Entre dois `^~`, vence o prefixo mais longo, em qualquer
+    # ordem. ⛔ O `proxy_pass` termina em `/hubs/`: com `/`, a API recebe o caminho sem ele.
+    location ^~ /api/hubs/ {
+        proxy_pass http://127.0.0.1:__API_PORT__/hubs/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+        proxy_read_timeout 120s;
+        proxy_send_timeout 120s;
+
+        access_log /var/log/nginx/fateconnect-__ENVIRONMENT__.access.log fateconnect___ENVIRONMENT___without_query;
+    }
 
     # ⛔ `^~` para vencer a regex de extensão mais abaixo: no nginx, regex ganha
     # de prefixo simples, e sem isto uma chamada com ponto no caminho deixaria

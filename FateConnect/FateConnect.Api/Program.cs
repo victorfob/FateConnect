@@ -37,10 +37,15 @@ using FateConnect.Api.Modules.Denunciations.Services;
 using FateConnect.Api.Modules.Denunciations.Repositories;
 using MassTransit;
 using FateConnect.Api.Modules.Storage.Services;
-using FateConnect.Api.Modules.Communications.Consumers;
+using FateConnect.Api.Modules.Emails.Consumers;
 using Resend;
-using FateConnect.Api.Modules.Communications.Interfaces;
-using FateConnect.Api.Modules.Communications.Services;
+using FateConnect.Api.Modules.Emails.Interfaces;
+using FateConnect.Api.Modules.Emails.Services;
+using FateConnect.Api.Modules.InAppNotifications.Interfaces;
+using FateConnect.Api.Modules.InAppNotifications.Repositories;
+using FateConnect.Api.Modules.InAppNotifications.Services;
+using FateConnect.Api.Modules.InAppNotifications.Consumers;
+using FateConnect.Api.Modules.InAppNotifications.Hubs;
 
 public class Program
 {
@@ -122,12 +127,23 @@ public class Program
 
         builder.Services.AddScoped<IEmailService, EmailService>();
 
+        builder.Services.AddScoped<IInAppNotificationRepository, InAppNotificationRepository>();
+        builder.Services.AddScoped<IInAppNotificationService, InAppNotificationService>();
+
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
+
+        builder.Services.AddSignalR()
+            .AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.PayloadSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
+                options.PayloadSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
         builder.Services.AddEndpointsApiExplorer();
@@ -198,7 +214,19 @@ public class Program
                 };
                 options.Events = new JwtBearerEvents
                 {
-                    OnTokenValidated = RejectRevokedTokenAsync
+                    OnTokenValidated = RejectRevokedTokenAsync,
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -223,6 +251,11 @@ public class Program
             x.AddConsumer<UserRegisteredEventConsumer>();
             x.AddConsumer<PasswordResetRequestedEventConsumer>();
             x.AddConsumer<AccountLockedEventConsumer>();
+
+            x.AddConsumer<RideCreatedEventConsumer>();
+            x.AddConsumer<DenunciationReceivedEventConsumer>();
+            x.AddConsumer<ItemArchivedEventConsumer>();
+            x.AddConsumer<NotificationDispatchedEventConsumer>();
 
             x.UsingRabbitMq(ConfigureRabbitMq);
         });
@@ -252,6 +285,11 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
+
+        app.MapHub<NotificationHub>("/hubs/notifications", options =>
+        {
+            options.CloseOnAuthenticationExpiration = true;
+        });
 
         app.Run();
     }
@@ -291,6 +329,30 @@ public class Program
         {
             e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
             e.ConfigureConsumer<AccountLockedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("ride-created-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<RideCreatedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("denunciation-received-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<DenunciationReceivedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("item-archived-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<ItemArchivedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("notification-dispatched-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<NotificationDispatchedEventConsumer>(context);
         });
     }
 

@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 using System.Text;
 using FateConnect.Api.Modules.Common.Enums;
 using FateConnect.Api.Modules.Common.Exceptions;
-using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Common.Validators;
 using FateConnect.Api.Modules.Denunciations.DTOs;
@@ -327,8 +327,12 @@ public sealed class ImageStorageTests : IDisposable
     public async Task CreateDenunciation_WhenTheDatabaseRefusesIt_LeavesNoFileBehind()
     {
         StorageService storage = ServiceOn(_webRoot);
+
         DenunciationService service = new(
-            new RefusingDenunciationRepository(), storage, NullLogger<DenunciationService>.Instance);
+            new RefusingDenunciationRepository(),
+            storage,
+            new NullPublishEndpoint(),
+            NullLogger<DenunciationService>.Instance);
 
         CreateDenunciationDto dto = new()
         {
