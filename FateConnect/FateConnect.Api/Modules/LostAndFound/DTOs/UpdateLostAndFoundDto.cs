@@ -15,7 +15,7 @@ public record UpdateLostAndFoundDto
     [StringLength(100, MinimumLength = 3, ErrorMessage = "O local deve ter entre 3 e 100 caracteres.")]
     public string? Place { get; init; }
 
-    public DateOnly? OcurredOn { get; init; }
+    public DateOnly? OccurredOn { get; init; }
 
     [DisplayFormat(ConvertEmptyStringToNull = false)]
     [StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]

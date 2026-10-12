@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 public record UserFilterDto : PagedFilterDto
 {
-    public string? Search { get; init; }
+    public string? SearchTerm { get; init; }
 
     [EnumDataType(typeof(EnumAccountStatus), ErrorMessage = "Status da conta inválido")]
     public EnumAccountStatus? Status { get; init; }

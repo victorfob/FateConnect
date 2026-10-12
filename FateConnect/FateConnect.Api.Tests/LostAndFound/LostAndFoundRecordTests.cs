@@ -128,7 +128,7 @@ public class LostAndFoundRecordTests
         Assert.Equal("Guarda-chuva preto", record.Name);
         Assert.Equal(EnumLostAndFoundType.Found, record.LostAndFoundType);
         Assert.Equal("Cantina", record.Place);
-        Assert.Equal(lastWeek, record.OcurredOn);
+        Assert.Equal(lastWeek, record.OccurredOn);
         Assert.Equal("Estava embaixo da mesa.", record.Description);
         Assert.Equal(EnumStatusLostAndFound.Resolved, record.Status);
         Assert.Equal("uploads/lostandfound/outra.png", record.ImageUrl);

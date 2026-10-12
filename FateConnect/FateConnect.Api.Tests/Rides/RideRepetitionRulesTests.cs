@@ -103,7 +103,7 @@ public class RideRepetitionRulesTests : IClassFixture<ApiFactory>
         HttpResponseMessage created = await client.PostAsJsonAsync("/Rides", RidePayload("Weekly", start, start.AddDays(7)));
         ReadRide ride = (await created.Content.ReadFromJsonAsync<ReadRide>())!;
 
-        HttpResponseMessage response = await client.PutAsJsonAsync(
+        HttpResponseMessage response = await client.PatchAsJsonAsync(
             $"/Rides/{ride.Id}", new { description = "Sai do portão principal.", vehicleType = "Car" });
 
         ReadRide updated = (await response.Content.ReadFromJsonAsync<ReadRide>())!;
@@ -119,7 +119,7 @@ public class RideRepetitionRulesTests : IClassFixture<ApiFactory>
         HttpResponseMessage created = await client.PostAsJsonAsync("/Rides", RidePayload("Once", StartFor("ordinary"), null));
         ReadRide ride = (await created.Content.ReadFromJsonAsync<ReadRide>())!;
 
-        HttpResponseMessage response = await client.PutAsJsonAsync(
+        HttpResponseMessage response = await client.PatchAsJsonAsync(
             $"/Rides/{ride.Id}", new { departureDate = Iso(StartFor("holiday")), vehicleType = "Car" });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -133,7 +133,7 @@ public class RideRepetitionRulesTests : IClassFixture<ApiFactory>
         HttpResponseMessage created = await client.PostAsJsonAsync("/Rides", RidePayload("Weekly", start, start.AddDays(7)));
         ReadRide ride = (await created.Content.ReadFromJsonAsync<ReadRide>())!;
 
-        HttpResponseMessage response = await client.PutAsJsonAsync($"/Rides/{ride.Id}", new { frequency = "Once", vehicleType = "Car" });
+        HttpResponseMessage response = await client.PatchAsJsonAsync($"/Rides/{ride.Id}", new { frequency = "Once", vehicleType = "Car" });
 
         ReadRide updated = (await response.Content.ReadFromJsonAsync<ReadRide>())!;
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

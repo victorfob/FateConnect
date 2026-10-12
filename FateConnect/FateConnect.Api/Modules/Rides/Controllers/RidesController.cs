@@ -50,8 +50,8 @@ public class RidesController(IRideService rideService) : ControllerBase
         );
     }
 
-    [HttpPut("{id:guid}")]
-    [SwaggerOperation(Summary = "Update an existing ride", Description = "Updates ride details such as destination, departure time, type, or description. Only the user who offered the ride can change it.")]
+    [HttpPatch("{id:guid}")]
+    [SwaggerOperation(Summary = "Update an existing ride", Description = "Updates ride details such as destination, departure time, type, or description; fields left out keep their value. Only the user who offered the ride can change it.")]
     public async Task<ActionResult<ReadRideDto>> UpdateAsync(Guid id, UpdateRideDto dto)
     {
         var updatedRide = await rideService.UpdateAsync(id, dto, User.GetUserId());

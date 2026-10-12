@@ -119,7 +119,7 @@ public class RideRepetitionListingTests
         ReadRide monthly = await OfferAsync(client, "Monthly", reference, reference.AddMonths(2));
         DateOnly shorterMonthDeparture = reference.AddMonths(1);
         clock.Now = InProductTimeZone(reference.AddDays(1), DepartureHour);
-        HttpResponseMessage update = await client.PutAsJsonAsync($"/Rides/{monthly.Id}", new
+        HttpResponseMessage update = await client.PatchAsJsonAsync($"/Rides/{monthly.Id}", new
         {
             departureDate = Iso(shorterMonthDeparture),
             description = "Sai do portão principal.",

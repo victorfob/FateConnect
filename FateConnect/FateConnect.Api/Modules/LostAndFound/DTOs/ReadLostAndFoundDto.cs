@@ -8,7 +8,7 @@ public record ReadLostAndFoundDto(
     string Name,
     EnumLostAndFoundType LostAndFoundType,
     string Place,
-    DateOnly OcurredOn,
+    DateOnly OccurredOn,
     string? Description,
     string? ImageUrl,
     string? ThumbnailUrl,
