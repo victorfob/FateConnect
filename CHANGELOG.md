@@ -42,6 +42,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a receber em `searchTerm` a busca da lista de usuários da gestão, como os outros filtros; `search` deixa de filtrar (#584) [Frontend] [Backend]
 - Passa a editar carona por `PATCH`, como os outros cadastros, no lugar de `PUT`: o que a edição não manda fica como estava, inclusive o veículo, que deixou de ser obrigatório nela (#584) [Frontend] [Backend]
 
+### Removed
+
+- Remove das preferências a escolha de receber os avisos por e-mail: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A coluna é apagada, então a escolha já guardada se perde (#586) [Backend]
+- Remove das Preferências o canal por e-mail, e os avisos ficam só no aplicativo: Tema e Notificações passam a um cartão só, com o interruptor salvando ao ser tocado, sem botão de salvar, e a caixa do cadastro e a política de privacidade deixam de falar em e-mail (#586) [Frontend]
+
 ### Fixed
 
 - Corrige Meu perfil, onde o navegador preenchia sozinho a senha atual ao abrir a tela; o login continua preenchido pelo navegador (#561) [Frontend]
