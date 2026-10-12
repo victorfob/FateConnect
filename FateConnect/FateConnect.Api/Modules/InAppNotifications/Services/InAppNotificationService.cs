@@ -6,14 +6,11 @@ using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Exceptions;
-using FateConnect.Api.Modules.InAppNotifications.Hubs;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using MassTransit;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -87,12 +84,10 @@ public partial class InAppNotificationService(
         )).ToList();
 
         await repository.AddRangeAsync(notifications);
+        await repository.SaveChangesAsync();
 
         foreach (var notification in notifications)
-        {
-            var dto = MapToReadDto(notification);
-            await publishEndpoint.Publish(new NotificationDispatchedEvent(dto, notification.UserId));
-        }
+            await publishEndpoint.Publish(new NotificationDispatchedEvent(MapToReadDto(notification), notification.UserId));
 
         await repository.SaveChangesAsync();
     }
