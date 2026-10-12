@@ -41,7 +41,6 @@ public partial class RideService(
 
         await repository.AddAsync(ride);
 
-
         LogRideCreated(logger, ride.Id);
 
         return MapToReadDto(ride, currentUserId);

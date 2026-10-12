@@ -24,13 +24,6 @@ public class InAppNotificationRepository(FateConnectDbContext context) : IInAppN
             .ToListAsync();
     }
 
-    public Task<InAppNotification> AddAsync(InAppNotification notification)
-    {
-        context.InAppNotifications.Add(notification);
-
-        return Task.FromResult(notification);
-    }
-
     public async Task<List<int>> GetUserIdsInterestedInDestinationAsync(string destination, int driverId)
     {
         return await context.Users

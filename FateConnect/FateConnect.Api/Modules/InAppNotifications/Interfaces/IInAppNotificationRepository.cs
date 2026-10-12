@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 public interface IInAppNotificationRepository
 {
     Task<List<int>> GetEligibleUserIdsAsync(IEnumerable<int> userIds);
-    Task<InAppNotification> AddAsync(InAppNotification notification);
     Task<List<int>> GetUserIdsInterestedInDestinationAsync(string destination, int driverId);
     Task AddRangeAsync(IEnumerable<InAppNotification> notifications);
     Task<(IReadOnlyList<InAppNotification> Items, int Total)> GetAllAsync(FilterInAppNotificationDto filter, int userId);
