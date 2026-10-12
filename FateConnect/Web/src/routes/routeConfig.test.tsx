@@ -44,7 +44,7 @@ describe('routeConfig', () => {
       http.get('https://api.fateconnect.test/denunciations/mine', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/users', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/users/me/preferences', () =>
-        HttpResponse.json({ receiveEmails: false, receiveNotifications: false }),
+        HttpResponse.json({ receiveNotifications: false }),
       ),
     );
   });

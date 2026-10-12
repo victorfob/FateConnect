@@ -52,8 +52,8 @@ export function ConsentSection() {
       )}
 
       <FormControlLabel
-        control={<Checkbox {...register('acceptMarketing')} />}
-        label={C.CONSENT_MARKETING_LABEL}
+        control={<Checkbox {...register('acceptNotifications')} />}
+        label={C.CONSENT_NOTIFICATIONS_LABEL}
       />
     </S.ConsentGroup>
   );

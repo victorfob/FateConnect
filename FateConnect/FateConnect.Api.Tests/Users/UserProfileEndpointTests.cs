@@ -32,7 +32,7 @@ public class UserProfileEndpointTests(ApiFactory factory) : IClassFixture<ApiFac
         EnumProfileType ProfileType,
         EnumAccountStatus Status);
 
-    private sealed record ReadPreferences(bool ReceiveEmails, bool ReceiveNotifications);
+    private sealed record ReadPreferences(bool ReceiveNotifications);
 
     private sealed record SignedInUser(int Id, string FatecEmail, HttpClient Client);
 
@@ -233,24 +233,28 @@ public class UserProfileEndpointTests(ApiFactory factory) : IClassFixture<ApiFac
     }
 
     [Fact]
-    public async Task GetPreferences_OfANewAccount_AnswersBothOff()
+    public async Task GetPreferences_OfANewAccount_AnswersNotificationsOffAndNoEmailChoice()
     {
         SignedInUser person = await SignedInAsync("João Ribeiro Costa");
 
         HttpResponseMessage response = await person.Client.GetAsync("/Users/me/preferences");
 
-        Assert.Equal(new ReadPreferences(false, false), await response.Content.ReadFromJsonAsync<ReadPreferences>());
+        Assert.Equal("{\"receiveNotifications\":false}", await response.Content.ReadAsStringAsync());
     }
 
     [Fact]
-    public async Task UpdatePreferences_WithOnlyOneField_KeepsTheOther()
+    public async Task UpdatePreferences_TurningNotificationsOnAndOff_StoresEachChoice()
     {
         SignedInUser person = await SignedInAsync("Karina Moraes Dutra");
+
         await person.Client.PatchAsJsonAsync("/Users/me/preferences", new { receiveNotifications = true });
+        ReadPreferences? turnedOn = await person.Client.GetFromJsonAsync<ReadPreferences>("/Users/me/preferences");
 
-        HttpResponseMessage response = await person.Client.GetAsync("/Users/me/preferences");
+        await person.Client.PatchAsJsonAsync("/Users/me/preferences", new { receiveNotifications = false });
+        ReadPreferences? turnedOff = await person.Client.GetFromJsonAsync<ReadPreferences>("/Users/me/preferences");
 
-        Assert.Equal(new ReadPreferences(false, true), await response.Content.ReadFromJsonAsync<ReadPreferences>());
+        Assert.Equal(new ReadPreferences(true), turnedOn);
+        Assert.Equal(new ReadPreferences(false), turnedOff);
     }
 
     [Fact]

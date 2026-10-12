@@ -35,8 +35,6 @@ export function toSignupRequest(values: SignupFormValues): SignupRequest {
     birthDate: toApiBirthDateOrEmpty(values.birthDate),
     gender: values.gender,
     acceptances: acceptedDocuments(),
-    // Uma caixa só decide as duas: a tela de preferências as separa depois.
-    receiveEmails: values.acceptMarketing,
-    receiveNotifications: values.acceptMarketing,
+    receiveNotifications: values.acceptNotifications,
   };
 }

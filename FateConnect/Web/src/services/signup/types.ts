@@ -17,6 +17,5 @@ export type SignupRequest = {
   birthDate: string;
   gender: string;
   acceptances: SignupAcceptance[];
-  receiveEmails: boolean;
   receiveNotifications: boolean;
 };

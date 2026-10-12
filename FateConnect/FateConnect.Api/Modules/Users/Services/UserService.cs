@@ -72,10 +72,7 @@ public partial class UserService(
 
     private static void ConfigurePreferences(User user, CreateUserDto dto)
     {
-        var preferences = new UserPreferences(
-            dto.ReceiveEmails ?? false,
-            dto.ReceiveNotifications ?? false
-        );
+        var preferences = new UserPreferences(dto.ReceiveNotifications ?? false);
 
         user.SetPreferences(preferences);
     }
@@ -118,10 +115,7 @@ public partial class UserService(
             return null;
         }
 
-        return new ReadUserPreferencesDto(
-            ReceiveEmails: preferences.ReceiveEmails,
-            ReceiveNotifications: preferences.ReceiveNotifications
-        );
+        return new ReadUserPreferencesDto(preferences.ReceiveNotifications);
     }
 
     public async Task<ReadUserDto?> UpdateProfileAsync(int currentUserId, UpdateUserDto dto)
@@ -178,8 +172,7 @@ public partial class UserService(
         }
 
         var newPreferences = new UserPreferences(
-            receiveEmails: dto.ReceiveEmails ?? user.Preferences.ReceiveEmails,
-            receiveNotifications: dto.ReceiveNotifications ?? user.Preferences.ReceiveNotifications
+            dto.ReceiveNotifications ?? user.Preferences.ReceiveNotifications
         );
 
         user.SetPreferences(newPreferences);
