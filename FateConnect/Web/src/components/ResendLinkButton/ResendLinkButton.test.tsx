@@ -54,7 +54,7 @@ describe('ResendLinkButton', () => {
     await waitFor(() => expect(button).toBeDisabled());
   });
 
-  it('should show the seconds left in the label and free the button after a minute', () => {
+  it('should show the time left in the label and free the button after the interval', () => {
     vi.useFakeTimers();
     render(<ButtonHost initialSeconds={C.RESEND_COOLDOWN_SECONDS} />);
 
@@ -106,7 +106,8 @@ describe('ResendLinkButton', () => {
 
 describe('waitingLabel', () => {
   it('should write the time left as a clock, with two digits for the seconds', () => {
-    expect(C.waitingLabel(C.RESEND_COOLDOWN_SECONDS)).toBe('Reenviar em 1:00');
+    expect(C.waitingLabel(C.RESEND_COOLDOWN_SECONDS)).toBe('Reenviar em 3:00');
+    expect(C.waitingLabel(60)).toBe('Reenviar em 1:00');
     expect(C.waitingLabel(59)).toBe('Reenviar em 0:59');
     expect(C.waitingLabel(9)).toBe('Reenviar em 0:09');
   });

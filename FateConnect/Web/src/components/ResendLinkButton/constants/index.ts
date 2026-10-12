@@ -1,5 +1,5 @@
 /** O mesmo intervalo da API: liberado aqui, todo clique vira e-mail de verdade. */
-export const RESEND_COOLDOWN_SECONDS = 60;
+export const RESEND_COOLDOWN_SECONDS = 180;
 
 const SECONDS_PER_MINUTE = 60;
 const CLOCK_SECONDS_DIGITS = 2;

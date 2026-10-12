@@ -13,7 +13,7 @@ public class EmailConfirmationTests(ApiFactory factory) : IClassFixture<ApiFacto
     private const string KnownPassword = "SenhaForte123!";
 
     private static readonly TimeSpan ConfirmationLifetime = TimeSpan.FromHours(8);
-    private static readonly TimeSpan ResendCooldown = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan ResendCooldown = TimeSpan.FromMinutes(3);
 
     private static async Task<string?> ErrorCodeOf(HttpResponseMessage response)
     {
@@ -149,14 +149,17 @@ public class EmailConfirmationTests(ApiFactory factory) : IClassFixture<ApiFacto
     [Fact]
     public async Task ResendConfirmation_WithinTheCooldown_SendsNothingNew()
     {
-        (_, string fatecEmail) = factory.SeedUserWithPassword("Lívia Moraes Prado", KnownPassword, emailConfirmed: false);
-        await RequestConfirmationLinkAsync(factory, fatecEmail);
+        MovableTimeProvider clock = new(DateTimeOffset.UtcNow);
+        using ApiFactory api = new() { Clock = clock };
+        (_, string fatecEmail) = api.SeedUserWithPassword("Lívia Moraes Prado", KnownPassword, emailConfirmed: false);
+        await RequestConfirmationLinkAsync(api, fatecEmail);
 
-        HttpResponseMessage again = await factory.CreateClient()
+        clock.Now += ResendCooldown - TimeSpan.FromSeconds(1);
+        HttpResponseMessage again = await api.CreateClient()
             .PostAsJsonAsync("/Auth/resend-confirmation-email", new { fatecEmail });
 
         Assert.Equal(HttpStatusCode.NoContent, again.StatusCode);
-        Assert.Equal(1, factory.TokenCountOf(fatecEmail, EnumTokenType.EmailConfirmation));
+        Assert.Equal(1, api.TokenCountOf(fatecEmail, EnumTokenType.EmailConfirmation));
     }
 
     [Fact]
