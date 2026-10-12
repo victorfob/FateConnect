@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-12
+
 ### Added
 
 - Adiciona a confirmação do e-mail Fatec: o cadastro envia um link de uso único que vale por 8 horas, e o login de quem não confirmou é recusado, inclusive nas contas que já existiam (#553) [Backend]
