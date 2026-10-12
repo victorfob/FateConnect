@@ -21,6 +21,7 @@ paths:
 
 - `Método_Cenário_Comportamento`, em inglês. As fases se separam por linha em branco, sem rótulo (C# não leva comentário).
 - Vários casos viram `[Theory]`, nunca laço dentro do teste.
+- Variável que recebe um objeto construído no próprio teste se tipa pelo concreto (`EmailService service`), não pela interface: o CA1859 só aparece na IDE e no Sonar, e o `dotnet build` local não o mostra.
 - ⛔ **O par positivo é obrigatório.** Teste que só prova a recusa passa numa API que recusa tudo: a rota que responde 401 sem token responde 200 com token; validação que rejeita tem o caso que aceita; filtro que exclui, o que inclui.
 
 ## Estático precisa de costura
