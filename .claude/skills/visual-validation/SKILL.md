@@ -16,9 +16,10 @@ description: "Valida no app rodando uma mudança visual do front antes de dizer 
 2. **Olhe primeiro, meça depois.** `getComputedStyle` responde a pergunta que você faz; sem estranhar nada, você não pergunta nada. A comparação lado a lado com o vizinho é o que enxerga (o vão de 4px contra 8px de um rótulo, o link sem nada que o distinga do texto).
 3. **Meça em duas larguras, no mínimo** — a base de 375px e o desktop. ⛔ Largura é dimensão de varredura: cada limite declarado e um pixel de cada lado dele, mais a largura em que cada contêiner elástico para de crescer. Elemento que divide a linha com outro não tem a largura da janela: meça a do contêiner junto.
 4. **Confira os estados de interação** que a mudança alcança: hover, foco, selecionado, desabilitado, tema claro e escuro.
-5. **Desconfie das medições que mentem** antes de relatar um número: leia `references/measurement-pitfalls.md`. Relato de quem olha a tela contra a sua medição quase sempre é o instrumento medindo a caixa em vez do desenho.
-6. **Copy nova:** meça a largura do texto no contêiner mais apertado que vai recebê-lo (método na mesma referência) e leve o número às candidatas da skill `ux-writing`.
-7. ⛔ **Mudou componente do design system: valide todos os consumidores, não só as telas do pedido.** Ache-os pelo nome (`grep`), recapture cada um nas duas larguras, inclusive o caso que a mudança não devia tocar, e compare com a captura anterior por diferença de pixels. Empilhar os dois botões do `PageMessage` esticou o botão único de cinco telas que o pedido não nomeava.
+5. **Artefato fora da aplicação (e-mail, PDF):** capture o equivalente do produto ao lado (o cabeçalho do site) e compare marca, largura e fundo. A convenção do meio que diverge do produto vira pergunta, com as duas capturas.
+6. **Desconfie das medições que mentem** antes de relatar um número: leia `references/measurement-pitfalls.md`. Relato de quem olha a tela contra a sua medição quase sempre é o instrumento medindo a caixa em vez do desenho.
+7. **Copy nova:** meça a largura do texto no contêiner mais apertado que vai recebê-lo (método na mesma referência) e leve o número às candidatas da skill `ux-writing`.
+8. ⛔ **Mudou componente do design system: valide todos os consumidores, não só as telas do pedido.** Ache-os pelo nome (`grep`), recapture cada um nas duas larguras, inclusive o caso que a mudança não devia tocar, e compare com a captura anterior por diferença de pixels. Empilhar os dois botões do `PageMessage` esticou o botão único de cinco telas que o pedido não nomeava.
 
 Com dois servidores de dev no ar, toda medição leva a porta lida da página (skill `parallel-work`).
 
