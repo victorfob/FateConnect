@@ -19,7 +19,7 @@ public interface IUserService
 
     Task<PagedResultDto<ReadUserSummaryDto>> GetAllUsersAsync(UserFilterDto filter);
     Task<ReadUserDto?> GetUserByIdAsync(int id);
-    Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto);
+    Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto, int currentUserId);
     Task<ReadUserDto?> ChangeUserProfileAsync(int id, EnumProfileType newProfile, int currentUserId);
     Task<ReadUserDto?> ChangeUserStatusAsync(int id, EnumAccountStatus newStatus, int currentUserId);
 }

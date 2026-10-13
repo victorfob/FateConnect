@@ -23,7 +23,7 @@ public partial class DenunciationService(
     IStorageService baseStorageService,
     IPublishEndpoint publishEndpoint,
     ILogger<DenunciationService> logger
-) : BaseFileService(baseStorageService), IDenunciationService
+) : BaseFileService(baseStorageService, logger), IDenunciationService
 {
     public async Task<ReadDenunciationDto> CreateAsync(CreateDenunciationDto dto, int currentUserId)
     {

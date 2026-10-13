@@ -28,7 +28,7 @@ public partial class UserService(
     IStorageService baseStorageService,
     IPublishEndpoint publishEndpoint,
     ILogger<UserService> logger
-) : BaseFileService(baseStorageService), IUserService
+) : BaseFileService(baseStorageService, logger), IUserService
 {
 
     public async Task SignUpAsync(CreateUserDto dto, RequestOrigin origin)
@@ -156,6 +156,9 @@ public partial class UserService(
             await StorageService.DeleteImageAsync(replacedImageUrl);
         }
 
+        if (dto.Image is not null)
+            LogUserPhotoReplaced(logger, currentUserId);
+
         LogUserProfileUpdated(logger, currentUserId);
 
         return MapToReadDto(user);
@@ -178,6 +181,7 @@ public partial class UserService(
         user.SetPreferences(newPreferences);
 
         await userRepository.SaveChangesAsync();
+        LogUserPreferencesUpdated(logger, currentUserId);
     }
 
     public async Task<TokenResponseDto?> ChangePasswordAsync(int currentUserId, ChangePasswordDto dto)
@@ -191,7 +195,10 @@ public partial class UserService(
         }
 
         if (!Verify(dto.CurrentPassword, user.Password))
+        {
+            LogPasswordChangeRefused(logger, currentUserId);
             throw new IncorrectCurrentPasswordException();
+        }
 
         user.ChangePassword(HashPassword(dto.NewPassword));
 
@@ -224,7 +231,7 @@ public partial class UserService(
         await userRepository.SaveChangesAsync();
         await StorageService.DeleteImageAsync(imageToDelete);
 
-        LogUserProfileUpdated(logger, currentUserId);
+        LogUserPhotoRemoved(logger, currentUserId);
     }
 
     public async Task DeactivateAccountAsync(int currentUserId)
@@ -280,7 +287,7 @@ public partial class UserService(
         return MapToReadDto(user);
     }
 
-    public async Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto)
+    public async Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto, int currentUserId)
     {
         var user = await userRepository.GetByIdAsync(id);
 
@@ -308,7 +315,7 @@ public partial class UserService(
         );
 
         await userRepository.SaveChangesAsync();
-        LogUserUpdatedByAdmin(logger, id);
+        LogUserUpdatedByAdmin(logger, currentUserId, id);
 
         return MapToReadDto(user);
     }
@@ -344,7 +351,7 @@ public partial class UserService(
             RecordAdministrativeAction(currentUserId, id, ProfileChangeAction(user.ProfileType));
 
         await userRepository.SaveChangesAsync();
-        LogUserProfileTypeChangedByAdmin(logger, id, newProfile.ToString());
+        LogUserProfileTypeChangedByAdmin(logger, currentUserId, id, newProfile);
 
         return MapToReadDto(user);
     }
@@ -387,7 +394,7 @@ public partial class UserService(
             RecordAdministrativeAction(currentUserId, id, action);
 
         await userRepository.SaveChangesAsync();
-        LogUserStatusChangedByAdmin(logger, id, newStatus.ToString());
+        LogUserStatusChangedByAdmin(logger, currentUserId, id, newStatus);
 
         return MapToReadDto(user);
     }

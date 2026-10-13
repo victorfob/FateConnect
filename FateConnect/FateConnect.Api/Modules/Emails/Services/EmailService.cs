@@ -5,15 +5,13 @@ using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.Emails.Interfaces;
 using FateConnect.Api.Modules.Emails.Options;
 using FateConnect.Api.Modules.Emails.Templates;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Resend;
 
-public partial class EmailService(
+public class EmailService(
     IResend resend,
     IOptions<EmailOptions> emailOptions,
-    TimeProvider clock,
-    ILogger<EmailService> logger
+    TimeProvider clock
 ) : IEmailService
 {
     private readonly string _senderEmail = emailOptions.Value.Sender;
@@ -34,10 +32,6 @@ public partial class EmailService(
             TextBody = EmailLayout.Text(content, fullName, link, year)
         };
 
-        LogResendPayloadSent(logger, content.Subject);
-
         await resend.EmailSendAsync(message);
-
-        LogResendAccepted(logger, content.Subject);
     }
 }
