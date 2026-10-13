@@ -88,6 +88,22 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task CreateDenunciation_AnswersCreatedPointingAtTheDenunciationItSaved()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Mariana Alves Rocha");
+        HttpClient administrator = _factory.CreateClientForNewAdministrator("Carla Mendes Lima");
+
+        HttpResponseMessage response = await reporter.PostAsync("/Denunciations", NewDenunciationForm());
+
+        ReadDenunciation created = (await response.Content.ReadFromJsonAsync<ReadDenunciation>(JsonOptions))!;
+        HttpResponseMessage atLocation = await administrator.GetAsync(response.Headers.Location);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, atLocation.StatusCode);
+        Assert.Equal(created.Id, (await atLocation.Content.ReadFromJsonAsync<ReadDenunciation>(JsonOptions))!.Id);
+    }
+
+    [Fact]
     public async Task CreateDenunciation_AsOperator_IsAcceptedAndAnswersTheReporterContact()
     {
         HttpClient reporter = _factory.CreateClientForNewUser("Mariana Alves Rocha");

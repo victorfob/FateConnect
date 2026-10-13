@@ -27,7 +27,7 @@ public class DenunciationsController(IDenunciationService service, IWebHostEnvir
     {
         var result = await service.CreateAsync(dto, User.GetUserId());
 
-        return StatusCode(StatusCodes.Status201Created, result);
+        return CreatedAtRoute("GetDenunciationById", new { id = result.Id }, result);
     }
 
     [HttpGet("mine")]
