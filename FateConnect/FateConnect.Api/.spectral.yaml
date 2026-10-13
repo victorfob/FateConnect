@@ -1,0 +1,50 @@
+extends: ["spectral:oas"]
+
+rules:
+  # O cabeçalho leva a licença pelo nome e não leva contato.
+  info-contact: off
+  info-license: error
+  license-url: off
+  operation-description: error
+  operation-operationId: error
+  operation-tags: error
+  operation-tag-defined: error
+  tag-description: error
+  oas3-parameter-description: error
+
+  operation-summary:
+    description: Every operation has a summary.
+    severity: error
+    given: "$.paths[*][get,post,put,patch,delete]"
+    then:
+      field: summary
+      function: truthy
+
+  operation-4xx-response:
+    description: Every operation documents at least one 4xx response.
+    severity: error
+    given: "$.paths[*][get,post,put,patch,delete].responses"
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          not:
+            propertyNames:
+              not:
+                pattern: "^4[0-9]{2}$"
+
+  schema-property-description:
+    description: Every schema property has a description.
+    severity: error
+    given: "$.components.schemas[*].properties[*]"
+    then:
+      field: description
+      function: truthy
+
+  request-body-property-example:
+    description: Every request body property has an example, except files.
+    severity: error
+    given: "$.paths[*][post,put,patch].requestBody.content[*].schema.properties[?(@.format != 'binary')]"
+    then:
+      field: example
+      function: defined

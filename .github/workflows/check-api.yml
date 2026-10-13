@@ -151,15 +151,29 @@ jobs:
       #
       # O formato é OpenCover porque o Sonar não lê Cobertura para C#, que é o
       # que o `dotnet test` produz por padrão.
+      #
+      # A suíte também grava o documento OpenAPI para o passo do Spectral: gerá-lo
+      # fora dela pediria um banco, porque o `Program` migra antes de o Swashbuckle
+      # ler as rotas.
       - name: Tests
         if: steps.changes.outputs.api == 'true'
         run: |
           dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build \
             --collect:"XPlat Code Coverage;Format=opencover" \
             --results-directory coverage
+        env:
+          OPENAPI_DOCUMENT_PATH: ${{ github.workspace }}/openapi.json
 
       - name: Sonar end
         if: steps.changes.outputs.api == 'true'
         run: dotnet sonarscanner end /d:sonar.token=$SONAR_TOKEN
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Depois do Sonar de propósito: reprovado aqui, o PR não perde a análise.
+      # As regras estão em `.spectral.yaml`, ao lado da API.
+      - name: OpenAPI lint
+        if: steps.changes.outputs.api == 'true'
+        run: >
+          docker run --rm -v "$PWD:/work" -w /work stoplight/spectral:6.15.0
+          lint openapi.json --ruleset FateConnect/FateConnect.Api/.spectral.yaml --fail-severity error
