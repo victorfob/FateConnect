@@ -20,6 +20,7 @@ export { default as DarkModeIcon } from '@mui/icons-material/DarkMode';
 export { default as DeleteIcon } from '@mui/icons-material/Delete';
 export { default as DeleteOutlinedIcon } from '@mui/icons-material/DeleteOutlined';
 export { default as DirectionsCarIcon } from '@mui/icons-material/DirectionsCar';
+export { default as DoneAllIcon } from '@mui/icons-material/DoneAll';
 export { default as EditIcon } from '@mui/icons-material/Edit';
 export { default as EmailIcon } from '@mui/icons-material/Email';
 export { default as EventRepeatIcon } from '@mui/icons-material/EventRepeat';

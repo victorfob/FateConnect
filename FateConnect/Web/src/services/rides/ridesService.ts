@@ -17,6 +17,12 @@ export async function listRides(filters?: RideFilter): Promise<PagedResult<Ride>
   return data;
 }
 
+export async function getRide(rideId: string): Promise<Ride> {
+  const { data } = await apiClient.get<Ride>(`${RIDES_PATH}/${rideId}`);
+
+  return data;
+}
+
 export async function createRide(input: RideInput): Promise<Ride> {
   const { data } = await apiClient.post<Ride>(RIDES_PATH, input);
 

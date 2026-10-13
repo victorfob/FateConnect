@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { act, render, screen, userEvent } from '@app/test/testing-library';
 
-import { ARROW_OFFSET_VARIABLE } from './styles';
+import { ARROW_OFFSET_VARIABLE, MAX_HEIGHT_VARIABLE } from './styles';
 import { AnchoredPopover } from '.';
 
 const TRIGGER_LABEL = 'Abrir painel';
@@ -13,10 +13,15 @@ const TRIGGER_WIDTH = 40;
 const PANEL_WIDTH = 200;
 const PANEL_RIGHT = 260;
 const PANEL_RIGHT_AFTER_RESIZE = 300;
+const PANEL_TOP = 60;
+const WINDOW_HEIGHT = 812;
 
 /** O gatilho tem 40px e o centro dele cai em 120: `260 - 120` sobra da direita. */
 const EXPECTED_OFFSET = '60px';
 const EXPECTED_OFFSET_AFTER_RESIZE = '20px';
+
+/** Da tela de 812, tira o topo do papel em 60 e a folga de 16 da borda. */
+const EXPECTED_MAX_HEIGHT = '736px';
 
 function stubGeometry(panelRight: number) {
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
@@ -25,7 +30,7 @@ function stubGeometry(panelRight: number) {
     if (this.getAttribute('aria-label') === TRIGGER_LABEL)
       return { left: TRIGGER_LEFT, width: TRIGGER_WIDTH } as DOMRect;
 
-    return { right: panelRight, width: PANEL_WIDTH } as DOMRect;
+    return { top: PANEL_TOP, right: panelRight, width: PANEL_WIDTH } as DOMRect;
   });
 }
 
@@ -66,9 +71,12 @@ function panel(): HTMLElement {
 }
 
 describe('AnchoredPopover', () => {
+  const windowHeight = Object.getOwnPropertyDescriptor(window, 'innerHeight');
+
   afterEach(() => {
     vi.restoreAllMocks();
     Reflect.deleteProperty(HTMLElement.prototype, 'offsetWidth');
+    if (windowHeight) Object.defineProperty(window, 'innerHeight', windowHeight);
   });
 
   it('should point the arrow at the centre of the trigger', async () => {
@@ -93,6 +101,17 @@ describe('AnchoredPopover', () => {
     expect(panel().style.getPropertyValue(ARROW_OFFSET_VARIABLE)).toBe(
       EXPECTED_OFFSET_AFTER_RESIZE,
     );
+  });
+
+  it('should keep the panel above the bottom of the window, however much it grows', async () => {
+    stubGeometry(PANEL_RIGHT);
+    stubWidths(PANEL_WIDTH);
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: WINDOW_HEIGHT });
+    render(<Harness />);
+
+    await userEvent.click(screen.getByRole('button', { name: TRIGGER_LABEL }));
+
+    expect(panel().style.getPropertyValue(MAX_HEIGHT_VARIABLE)).toBe(EXPECTED_MAX_HEIGHT);
   });
 
   // O positivo acima usa a mesma consulta, então a ausência aqui significa que

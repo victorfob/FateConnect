@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 
-import { createRide, deleteRide, listRides, updateRide } from './ridesService';
+import { createRide, deleteRide, getRide, listRides, updateRide } from './ridesService';
 import {
   RideFrequencyEnum,
   RideShiftEnum,
@@ -156,5 +156,17 @@ describe('ridesService', () => {
     await deleteRide('7');
 
     expect(deletedId).toBe('7');
+  });
+
+  it('should read one ride by id', async () => {
+    server.use(
+      http.get(`${RIDES_URL}/:id`, ({ params }) =>
+        HttpResponse.json({ id: params.id, destination: 'Fatec Sorocaba' }),
+      ),
+    );
+
+    const ride = await getRide('c7d2');
+
+    expect(ride).toEqual({ id: 'c7d2', destination: 'Fatec Sorocaba' });
   });
 });
