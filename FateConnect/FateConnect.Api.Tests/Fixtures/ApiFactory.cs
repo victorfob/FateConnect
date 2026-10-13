@@ -106,6 +106,17 @@ public class ApiFactory : WebApplicationFactory<Program>
             Directory.Delete(_webRoot, recursive: true);
     }
 
+    public void DropDatabase()
+    {
+        CloseIdleDatabaseConnections();
+
+        using NpgsqlConnection connection = new(TestDatabase.ConnectionStringFor("postgres"));
+        connection.Open();
+
+        using NpgsqlCommand command = new($"DROP DATABASE \"{_databaseName}\" WITH (FORCE)", connection);
+        command.ExecuteNonQuery();
+    }
+
     private void CloseIdleDatabaseConnections()
     {
         using NpgsqlConnection connection = new(TestDatabase.ConnectionStringFor(_databaseName));

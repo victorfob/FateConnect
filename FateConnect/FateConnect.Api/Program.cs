@@ -23,7 +23,9 @@ using FateConnect.Api.Modules.Users.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -238,6 +240,9 @@ public class Program
         builder.Services.AddDbContext<FateConnectDbContext>(options =>
             options.UseNpgsql(settings.DbConnection));
 
+        builder.Services.AddHealthChecks()
+            .AddDbContextCheck<FateConnectDbContext>();
+
         builder.Services.AddMassTransit(x =>
         {
             x.AddEntityFrameworkOutbox<FateConnectDbContext>(o =>
@@ -283,6 +288,11 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
+
+        app.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            ResultStatusCodes = { [HealthStatus.Degraded] = StatusCodes.Status503ServiceUnavailable },
+        }).AllowAnonymous();
 
         app.MapHub<NotificationHub>("/hubs/notifications", options =>
         {
