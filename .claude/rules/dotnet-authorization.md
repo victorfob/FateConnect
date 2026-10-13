@@ -32,7 +32,7 @@ Endpoint novo entra na teoria de rotas do `AuthorizationTests` (401 sem token) e
 ## O que roda antes da autorização não passa por ela
 
 - Middleware registrado antes de `UseAuthentication`/`UseAuthorization` responde sem token. O que precisa de token precisa ser endpoint, como o `UploadsController`, e não middleware de arquivo estático.
-- ⛔ **O Swagger é público de propósito**, nos dois ambientes. Não "corrija" como vazamento.
+- ⛔ **O documento (`/swagger/v1/swagger.json`) e a página do Scalar (`/scalar/v1`) são públicos de propósito**, nos dois ambientes. Não "corrija" como vazamento.
 
 ## O recorte que o token responde não vira parâmetro
 
