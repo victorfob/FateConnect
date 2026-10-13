@@ -149,26 +149,22 @@ jobs:
             exit 1
           fi
 
-          # E contêiner estável ainda não prova que o nginx alcança a
-          # aplicação: a mesma queda devolvia 502 aqui. Qualquer caminho sob
-          # `/api/` responde quando a aplicação está servindo, porque a
-          # fallback policy do `Program.cs` atende requisição que não casa
-          # endpoint nenhum — por isso a sonda não cita rota de produto, e o
-          # que se cobra é ter havido resposta, não um código específico.
-          sonda="${{ vars.PUBLIC_URL }}/api/__deploy_probe"
+          # Contêiner estável ainda não prova que a aplicação alcança o banco e a
+          # fila. A rota de saúde responde 200 só com os dois de pé, e 503 sem um
+          # deles; logo após a subida ela pode demorar, então se tenta por 2min.
+          saude="${{ vars.PUBLIC_URL }}/api/health"
           for tentativa in $(seq 1 20); do
-            codigo=$(curl -s -o /dev/null -m 10 -w '%{http_code}' "$sonda") || codigo=000
-            case "$codigo" in
-              000|502|503|504) echo "  tentativa $tentativa: $codigo"; sleep 6 ;;
-              *) break ;;
-            esac
+            codigo=$(curl -s -o /dev/null -m 10 -w '%{http_code}' "$saude") || codigo=000
+            [[ "$codigo" == 200 ]] && break
+            echo "  tentativa $tentativa: $codigo"
+            sleep 6
           done
-          case "$codigo" in
-            000|502|503|504)
-              echo "ERRO: a aplicação não respondeu em 2min; último código: $codigo." >&2
-              exit 1 ;;
-          esac
-          echo "A aplicação respondeu $codigo."
+          if [[ "$codigo" != 200 ]]; then
+            echo "ERRO: a rota de saúde não respondeu 200 em 2min; último código: $codigo." >&2
+            echo "503 é banco ou fila fora; 502 é a aplicação fora do ar." >&2
+            exit 1
+          fi
+          echo "A aplicação respondeu saudável, com o banco e a fila."
 
       - name: Remove the deploy key
         if: always()
