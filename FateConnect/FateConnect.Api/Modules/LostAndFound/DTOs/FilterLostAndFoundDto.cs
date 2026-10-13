@@ -9,7 +9,7 @@ public record FilterLostAndFoundDto : DateRangeFilterDto
 
     public EnumLostAndFoundType? LostAndFoundType { get; init; }
 
-    public EnumStatusLostAndFound? Status { get; init; }
+    public EnumLostAndFoundStatus? Status { get; init; }
 
     public bool? OnlyMine { get; init; }
 }

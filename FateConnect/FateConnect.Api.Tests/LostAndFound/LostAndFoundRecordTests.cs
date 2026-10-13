@@ -24,7 +24,7 @@ public class LostAndFoundRecordTests
         LostAndFoundRecord record = NewRecord();
 
         Assert.NotEqual(Guid.Empty, record.Id);
-        Assert.Equal(EnumStatusLostAndFound.Open, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Open, record.Status);
         Assert.Null(record.DeletionReason);
         Assert.Null(record.UpdatedAt);
         Assert.True(record.IsReportedBy(ReporterId));
@@ -121,7 +121,7 @@ public class LostAndFoundRecordTests
             "Cantina",
             lastWeek,
             "Estava embaixo da mesa.",
-            EnumStatusLostAndFound.Resolved);
+            EnumLostAndFoundStatus.Resolved);
 
         record.AttachImage("uploads/lostandfound/outra.png");
 
@@ -130,7 +130,7 @@ public class LostAndFoundRecordTests
         Assert.Equal("Cantina", record.Place);
         Assert.Equal(lastWeek, record.OccurredOn);
         Assert.Equal("Estava embaixo da mesa.", record.Description);
-        Assert.Equal(EnumStatusLostAndFound.Resolved, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Resolved, record.Status);
         Assert.Equal("uploads/lostandfound/outra.png", record.ImageUrl);
         Assert.NotNull(record.UpdatedAt);
     }
@@ -146,7 +146,7 @@ public class LostAndFoundRecordTests
         Assert.Equal(EnumLostAndFoundType.Lost, record.LostAndFoundType);
         Assert.Equal("Biblioteca do bloco B", record.Place);
         Assert.Equal("Ficou na mesa do fundo.", record.Description);
-        Assert.Equal(EnumStatusLostAndFound.Open, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Open, record.Status);
         Assert.Null(record.UpdatedAt);
     }
 
@@ -214,7 +214,7 @@ public class LostAndFoundRecordTests
         LostAndFoundRecord record = NewRecord();
 
         Assert.Throws<InvalidLostAndFoundStatusException>(
-            () => record.UpdateBasicAttributes(null, null, null, null, null, (EnumStatusLostAndFound)99));
+            () => record.UpdateBasicAttributes(null, null, null, null, null, (EnumLostAndFoundStatus)99));
     }
 
     [Fact]
@@ -224,7 +224,7 @@ public class LostAndFoundRecordTests
 
         record.MarkAsDeleted(EnumDeletionReason.User);
 
-        Assert.Equal(EnumStatusLostAndFound.Deleted, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Deleted, record.Status);
         Assert.Equal(EnumDeletionReason.User, record.DeletionReason);
         Assert.NotNull(record.UpdatedAt);
         Assert.Equal(record.UpdatedAt, record.StatusChangedAt);
@@ -239,9 +239,9 @@ public class LostAndFoundRecordTests
     }
 
     [Theory]
-    [InlineData(EnumStatusLostAndFound.Resolved)]
-    [InlineData(EnumStatusLostAndFound.Deleted)]
-    public void UpdateBasicAttributes_ReachingATerminalStatus_StampsTheChange(EnumStatusLostAndFound status)
+    [InlineData(EnumLostAndFoundStatus.Resolved)]
+    [InlineData(EnumLostAndFoundStatus.Deleted)]
+    public void UpdateBasicAttributes_ReachingATerminalStatus_StampsTheChange(EnumLostAndFoundStatus status)
     {
         LostAndFoundRecord record = NewRecord();
 
@@ -251,16 +251,16 @@ public class LostAndFoundRecordTests
     }
 
     [Theory]
-    [InlineData(EnumStatusLostAndFound.Resolved)]
-    [InlineData(EnumStatusLostAndFound.Deleted)]
-    public void UpdateBasicAttributes_ReopeningARecord_ClearsTheStatusStamp(EnumStatusLostAndFound terminalStatus)
+    [InlineData(EnumLostAndFoundStatus.Resolved)]
+    [InlineData(EnumLostAndFoundStatus.Deleted)]
+    public void UpdateBasicAttributes_ReopeningARecord_ClearsTheStatusStamp(EnumLostAndFoundStatus terminalStatus)
     {
         LostAndFoundRecord record = NewRecord();
         record.UpdateBasicAttributes(null, null, null, null, null, terminalStatus);
 
-        record.UpdateBasicAttributes(null, null, null, null, null, EnumStatusLostAndFound.Open);
+        record.UpdateBasicAttributes(null, null, null, null, null, EnumLostAndFoundStatus.Open);
 
-        Assert.Equal(EnumStatusLostAndFound.Open, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Open, record.Status);
         Assert.Null(record.StatusChangedAt);
     }
 
@@ -276,9 +276,9 @@ public class LostAndFoundRecordTests
     }
 
     [Theory]
-    [InlineData(EnumStatusLostAndFound.Open)]
-    [InlineData(EnumStatusLostAndFound.Resolved)]
-    public void UpdateBasicAttributes_LeavingDeleted_ClearsTheDeletionReason(EnumStatusLostAndFound status)
+    [InlineData(EnumLostAndFoundStatus.Open)]
+    [InlineData(EnumLostAndFoundStatus.Resolved)]
+    public void UpdateBasicAttributes_LeavingDeleted_ClearsTheDeletionReason(EnumLostAndFoundStatus status)
     {
         LostAndFoundRecord record = NewRecord();
         record.MarkAsDeleted(EnumDeletionReason.Inactivity);
@@ -294,9 +294,9 @@ public class LostAndFoundRecordTests
     {
         LostAndFoundRecord record = NewRecord();
 
-        record.UpdateBasicAttributes(null, null, null, null, null, EnumStatusLostAndFound.Deleted);
+        record.UpdateBasicAttributes(null, null, null, null, null, EnumLostAndFoundStatus.Deleted);
 
-        Assert.Equal(EnumStatusLostAndFound.Deleted, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Deleted, record.Status);
         Assert.Equal(EnumDeletionReason.User, record.DeletionReason);
     }
 }

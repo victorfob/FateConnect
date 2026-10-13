@@ -356,7 +356,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public Guid SeedLostAndFoundRecord(
         int reporterId,
-        EnumStatusLostAndFound status = EnumStatusLostAndFound.Open,
+        EnumLostAndFoundStatus status = EnumLostAndFoundStatus.Open,
         DateTime? createdAt = null,
         DateTime? updatedAt = null,
         DateTime? statusChangedAt = null,

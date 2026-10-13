@@ -106,12 +106,12 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
     }
 
     private static Expression<Func<LostAndFoundRecord, bool>> UntouchedWhileOpenSince(DateTime untouchedSince) =>
-        record => record.Status == EnumStatusLostAndFound.Open
+        record => record.Status == EnumLostAndFoundStatus.Open
             && (record.UpdatedAt ?? record.CreatedAt) <= untouchedSince;
 
     private static Expression<Func<LostAndFoundRecord, bool>> HoldsAnImageAndIsTerminalSince(DateTime terminalSince) =>
         record => record.ImageUrl != null
-            && (record.Status == EnumStatusLostAndFound.Resolved || record.Status == EnumStatusLostAndFound.Deleted)
+            && (record.Status == EnumLostAndFoundStatus.Resolved || record.Status == EnumLostAndFoundStatus.Deleted)
             && record.StatusChangedAt != null
             && record.StatusChangedAt <= terminalSince;
 

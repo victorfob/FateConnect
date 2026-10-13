@@ -21,7 +21,7 @@ public record UpdateLostAndFoundDto
     [StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
     public string? Description { get; init; }
 
-    public EnumStatusLostAndFound? Status { get; init; }
+    public EnumLostAndFoundStatus? Status { get; init; }
 
     [ValidImage]
     public IFormFile? Image { get; init; }

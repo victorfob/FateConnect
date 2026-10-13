@@ -15,7 +15,7 @@ public class LostAndFoundRecord
     public DateOnly OccurredOn { get; private set; }
     public string? Description { get; private set; }
     public string? ImageUrl { get; private set; }
-    public EnumStatusLostAndFound Status { get; private set; }
+    public EnumLostAndFoundStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
     public DateTime? StatusChangedAt { get; private set; }
@@ -46,7 +46,7 @@ public class LostAndFoundRecord
         Place = place.Trim();
         OccurredOn = occurredOn;
         Description = description.NormalizeOptionalText();
-        Status = EnumStatusLostAndFound.Open;
+        Status = EnumLostAndFoundStatus.Open;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
     }
@@ -57,7 +57,7 @@ public class LostAndFoundRecord
         string? place,
         DateOnly? occurredOn,
         string? description,
-        EnumStatusLostAndFound? status)
+        EnumLostAndFoundStatus? status)
     {
         bool receivedAnyField = false;
 
@@ -114,7 +114,7 @@ public class LostAndFoundRecord
     {
         DateTime changedAt = DateTime.UtcNow;
 
-        Status = EnumStatusLostAndFound.Deleted;
+        Status = EnumLostAndFoundStatus.Deleted;
         DeletionReason = reason;
         StatusChangedAt = changedAt;
         UpdatedAt = changedAt;
@@ -122,11 +122,11 @@ public class LostAndFoundRecord
 
     public bool IsReportedBy(int userId) => UserId == userId;
 
-    public bool IsDeleted => Status == EnumStatusLostAndFound.Deleted;
+    public bool IsDeleted => Status == EnumLostAndFoundStatus.Deleted;
 
-    private void ApplyStatus(EnumStatusLostAndFound status)
+    private void ApplyStatus(EnumLostAndFoundStatus status)
     {
-        if (status == EnumStatusLostAndFound.Deleted)
+        if (status == EnumLostAndFoundStatus.Deleted)
         {
             MarkAsDeleted(EnumDeletionReason.User);
             return;
@@ -137,9 +137,9 @@ public class LostAndFoundRecord
         StatusChangedAt = StampFor(status);
     }
 
-    private static DateTime? StampFor(EnumStatusLostAndFound status)
+    private static DateTime? StampFor(EnumLostAndFoundStatus status)
     {
-        if (status == EnumStatusLostAndFound.Resolved)
+        if (status == EnumLostAndFoundStatus.Resolved)
             return DateTime.UtcNow;
 
         return null;
@@ -157,7 +157,7 @@ public class LostAndFoundRecord
             throw new InvalidLostAndFoundTypeException();
     }
 
-    private static void ValidateStatus(EnumStatusLostAndFound status)
+    private static void ValidateStatus(EnumLostAndFoundStatus status)
     {
         if (!Enum.IsDefined(status))
             throw new InvalidLostAndFoundStatusException();
