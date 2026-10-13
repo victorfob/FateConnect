@@ -10,41 +10,32 @@ using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-public class UserRepository : IUserRepository
+public class UserRepository(FateConnectDbContext context, TimeProvider clock) : IUserRepository
 {
-    private readonly FateConnectDbContext _context;
-    private readonly TimeProvider _clock;
-
-    public UserRepository(FateConnectDbContext context, TimeProvider clock)
-    {
-        _context = context;
-        _clock = clock;
-    }
-
     public async Task<bool> EmailExistsAsync(string email, int? excludeUserId = null)
     {
         var normalizedEmail = email.Trim().ToLowerInvariant();
 
-        return await _context.Users.AnyAsync(u => u.FatecEmail == normalizedEmail && u.Id != excludeUserId);
+        return await context.Users.AnyAsync(u => u.FatecEmail == normalizedEmail && u.Id != excludeUserId);
     }
 
     public async Task<bool> ContactPhoneExistsAsync(string phone, int? excludeUserId = null)
     {
-        return await _context.Users.AnyAsync(u => u.Phone == phone && u.Id != excludeUserId);
+        return await context.Users.AnyAsync(u => u.Phone == phone && u.Id != excludeUserId);
     }
 
     public async Task<bool> ContactEmailExistsAsync(string contactEmail, int? excludeUserId = null)
     {
         var normalizedEmail = contactEmail.Trim().ToLowerInvariant();
 
-        return await _context.Users.AnyAsync(u => u.ContactEmail == normalizedEmail && u.Id != excludeUserId);
+        return await context.Users.AnyAsync(u => u.ContactEmail == normalizedEmail && u.Id != excludeUserId);
     }
 
     public async Task<User?> GetByEmailAsync(string email)
     {
         var normalizedEmail = email.Trim().ToLowerInvariant();
 
-        return await _context.Users
+        return await context.Users
             .FirstOrDefaultAsync(u => u.FatecEmail == normalizedEmail);
     }
 
@@ -52,14 +43,14 @@ public class UserRepository : IUserRepository
     {
         var normalizedEmail = email.Trim().ToLowerInvariant();
 
-        return await _context.Users
+        return await context.Users
             .Include(u => u.Tokens.Where(token => token.Type == tokenType))
             .FirstOrDefaultAsync(u => u.FatecEmail == normalizedEmail);
     }
 
     public async Task<User?> GetByIdAsync(int id, bool includePreferences = false, bool asNoTracking = false)
     {
-        var query = _context.Users.AsQueryable();
+        var query = context.Users.AsQueryable();
 
         if (asNoTracking)
         {
@@ -76,7 +67,7 @@ public class UserRepository : IUserRepository
 
     public async Task<UserPreferences?> GetPreferencesByUserIdAsync(int userId)
     {
-        return await _context.Users
+        return await context.Users
             .Where(u => u.Id == userId)
             .Select(u => u.Preferences)
             .FirstOrDefaultAsync();
@@ -86,7 +77,7 @@ public class UserRepository : IUserRepository
         UserFilterDto filter,
         Expression<Func<User, TResult>> selector)
     {
-        IQueryable<User> query = _context.Users.AsNoTracking();
+        IQueryable<User> query = context.Users.AsNoTracking();
 
         if (filter.Status.HasValue)
             query = query.Where(u => u.Status == filter.Status.Value);
@@ -136,23 +127,23 @@ public class UserRepository : IUserRepository
 
     public async Task AddAsync(User user)
     {
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
     }
 
     public void AddAdministrativeAction(AdministrativeAction action)
     {
-        _context.AdministrativeActions.Add(action);
+        context.AdministrativeActions.Add(action);
     }
 
     public async Task SaveChangesAsync()
     {
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     public async Task InTransactionAsync(Func<Task> work)
     {
-        await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
 
         await work();
 
@@ -161,7 +152,7 @@ public class UserRepository : IUserRepository
 
     public async Task<int?> GetTokenVersionAsync(int userId)
     {
-        return await _context.Users
+        return await context.Users
             .Where(user => user.Id == userId)
             .Select(user => (int?)user.TokenVersion)
             .FirstOrDefaultAsync();
@@ -169,25 +160,25 @@ public class UserRepository : IUserRepository
 
     public async Task IncrementTokenVersionAsync(int userId)
     {
-        await _context.Users
+        await context.Users
             .Where(user => user.Id == userId)
             .ExecuteUpdateAsync(update => update
                 .SetProperty(user => user.TokenVersion, user => user.TokenVersion + 1)
-                .SetProperty(user => user.UpdatedAt, _clock.GetUtcNow().UtcDateTime));
+                .SetProperty(user => user.UpdatedAt, clock.GetUtcNow().UtcDateTime));
     }
 
     public async Task ReactivateAsync(int userId)
     {
-        await _context.Users
+        await context.Users
             .Where(user => user.Id == userId)
             .ExecuteUpdateAsync(update => update
                 .SetProperty(user => user.Status, EnumAccountStatus.Active)
-                .SetProperty(user => user.UpdatedAt, _clock.GetUtcNow().UtcDateTime));
+                .SetProperty(user => user.UpdatedAt, clock.GetUtcNow().UtcDateTime));
     }
 
     public async Task<UserToken?> GetTokenAsync(string tokenHash)
     {
-        return await _context.Set<UserToken>()
+        return await context.Set<UserToken>()
             .Include(t => t.User)
             .FirstOrDefaultAsync(t => t.Token == tokenHash);
     }
