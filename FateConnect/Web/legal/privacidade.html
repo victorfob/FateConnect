@@ -87,7 +87,26 @@
       <h3>2.5 Dados técnicos de funcionamento</h3>
       <p>
         Para manter a plataforma no ar e corrigir falhas, tratamos dados técnicos de erro e
-        desempenho, descritos na seção 6.
+        desempenho, descritos na seção 6, e o servidor mantém registros técnicos:
+      </p>
+      <ul>
+        <li>
+          o registro da aplicação, com o identificador da sua conta, a ação feita, o endereço
+          acessado e o erro, quando há um, inclusive as tentativas de entrar recusadas e as ações
+          de quem administra a plataforma. Ele não guarda o seu endereço IP;
+        </li>
+        <li>
+          o registro de acesso, com o endereço IP sem a parte final, a data e a hora, a página
+          acessada e a página de onde você veio, sem o texto das buscas nem o código dos links
+          enviados por e-mail, e a identificação do navegador;
+        </li>
+        <li>
+          o registro de falhas, que só é escrito quando um pedido falha e guarda o endereço IP
+          completo e o endereço acessado por inteiro.
+        </li>
+      </ul>
+      <p>
+        Esses registros servem para manter a segurança, investigar abusos e corrigir falhas.
       </p>
 
       <p>
@@ -292,6 +311,9 @@
         <li>
           <strong>Dados técnicos de erro:</strong> pelo prazo de retenção do serviço de
           monitoramento.
+        </li>
+        <li>
+          <strong>Registros técnicos do servidor:</strong> apagados 14 dias depois de escritos.
         </li>
       </ul>
     </section>

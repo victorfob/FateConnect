@@ -25,10 +25,16 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a reprovar a publicação quando a rota de saúde não responde em 2 minutos, e a API passa a esperar a fila ficar pronta para subir, em vez de falhar a primeira conexão (#595) [Backend]
 - Passa a recusar a subida da API sem a conexão com o banco ou sem as configurações da sessão, dizendo qual faltou, em vez de subir com elas vazias (#595) [Backend]
 - Passa a registrar no log o método, a rota e o usuário de cada erro tratado, e os campos que a validação recusou, sem os valores (#598) [Backend]
+- Passa a apagar o log da API e da fila depois de 14 dias, em vez de guardá-lo até a próxima publicação recriar o contêiner (#603) [Backend]
+- Passa a declarar na política de privacidade os registros técnicos do servidor, o que cada um guarda, para quê e o prazo de 14 dias (#603) [Frontend]
 
 ### Fixed
 
 - Corrige a requisição que a pessoa abandona no meio, que era registrada como erro interno (#598) [Backend]
+
+### Security
+
+- Para de gravar no log de acesso do servidor o token dos links de e-mail e o texto das buscas, e passa a gravar o IP com o fim zerado, inclusive nos pedidos que não chegam a nenhum dos sites (#603) [Backend]
 
 ## [1.4.0] - 2026-10-12
 
