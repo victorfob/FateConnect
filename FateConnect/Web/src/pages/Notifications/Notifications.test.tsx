@@ -36,9 +36,9 @@ const NOT_FOUND = 404;
 const SERVER_ERROR = 500;
 const RETRY_WINDOW_MS = 5000;
 
-const DENUNCIATION_NOTICE: InAppNotification = {
+const REPORT_NOTICE: InAppNotification = {
   id: 1,
-  type: InAppNotificationTypeEnum.DENUNCIATION_RECEIVED,
+  type: InAppNotificationTypeEnum.REPORT_RECEIVED,
   content:
     'Recebemos sua denúncia de direção imprudente na carona. O andamento aparece na página Denúncias, na aba Acompanhar.',
   referenceId: 'a1f0d2c4-5b3e-4a6c-9f81-7d2e5b0a3c14',
@@ -77,7 +77,7 @@ function renderScreen(search = '') {
     [
       { path: RoutePathEnum.NOTIFICATIONS, element: <Notifications /> },
       { path: RoutePathEnum.MENU, element: <div>menu</div> },
-      { path: RoutePathEnum.DENUNCIATIONS, element: <div>denúncias</div> },
+      { path: RoutePathEnum.REPORTS, element: <div>denúncias</div> },
       { path: RoutePathEnum.RIDES, element: <div>caronas</div> },
       { path: RoutePathEnum.LOST_AND_FOUND, element: <div>achados e perdidos</div> },
     ],
@@ -113,20 +113,20 @@ describe('Notifications', () => {
   });
 
   it('should show the whole notice text, which the panel cuts', async () => {
-    listing([DENUNCIATION_NOTICE], 1);
+    listing([REPORT_NOTICE], 1);
     renderScreen();
 
-    const content = await screen.findByText(DENUNCIATION_NOTICE.content);
+    const content = await screen.findByText(REPORT_NOTICE.content);
 
     expect(declarationsFor(sheetRules(), content)).toContain('display:block');
     expect(declarationsFor(sheetRules(), content)).not.toContain('line-clamp');
   });
 
   it('should list the notifications with the title of each type', async () => {
-    listing([DENUNCIATION_NOTICE, RIDE_NOTICE, ITEM_NOTICE], 2);
+    listing([REPORT_NOTICE, RIDE_NOTICE, ITEM_NOTICE], 2);
     renderScreen();
 
-    expect(await screen.findByText(DENUNCIATION_NOTICE.content)).toBeInTheDocument();
+    expect(await screen.findByText(REPORT_NOTICE.content)).toBeInTheDocument();
     Object.values(IN_APP_NOTIFICATION_TITLES).forEach((title) =>
       expect(screen.getByText(title)).toBeInTheDocument(),
     );
@@ -218,9 +218,9 @@ describe('Notifications', () => {
     expect(addressOf(router).pathname).toBe(RoutePathEnum.NOTIFICATIONS);
   });
 
-  it('should take the denunciation notice to the denunciations, marking it as read', async () => {
+  it('should take the report notice to the reports, marking it as read', async () => {
     let markedId: string | undefined;
-    listing([DENUNCIATION_NOTICE], 1);
+    listing([REPORT_NOTICE], 1);
     server.use(
       http.patch(`${IN_APP_NOTIFICATIONS_URL}/:id/read`, ({ params }) => {
         markedId = String(params.id);
@@ -229,10 +229,10 @@ describe('Notifications', () => {
     );
     const router = renderScreen();
 
-    await userEvent.click(await screen.findByText(DENUNCIATION_NOTICE.content));
+    await userEvent.click(await screen.findByText(REPORT_NOTICE.content));
 
-    await waitFor(() => expect(addressOf(router).pathname).toBe(RoutePathEnum.DENUNCIATIONS));
-    expect(markedId).toBe(String(DENUNCIATION_NOTICE.id));
+    await waitFor(() => expect(addressOf(router).pathname).toBe(RoutePathEnum.REPORTS));
+    expect(markedId).toBe(String(REPORT_NOTICE.id));
   });
 
   it('should take the archived item notice to the archived items, without marking it again', async () => {
@@ -329,13 +329,13 @@ describe('Notifications', () => {
 
   it('should offer marking all as read only while something is unread', async () => {
     let markedAll = false;
-    listing([DENUNCIATION_NOTICE, RIDE_NOTICE], 2);
+    listing([REPORT_NOTICE, RIDE_NOTICE], 2);
     server.use(
       http.patch(`${IN_APP_NOTIFICATIONS_URL}/read-all`, () => {
         markedAll = true;
         listing(
           [
-            { ...DENUNCIATION_NOTICE, isRead: true },
+            { ...REPORT_NOTICE, isRead: true },
             { ...RIDE_NOTICE, isRead: true },
           ],
           0,

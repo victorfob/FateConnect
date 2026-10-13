@@ -23,46 +23,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Denunciations.Entities.Denunciation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Category")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<bool>("IsAnonymous")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Denunciations");
-                });
-
             modelBuilder.Entity("FateConnect.Api.Modules.InAppNotifications.Entities.InAppNotification", b =>
                 {
                     b.Property<int>("Id")
@@ -157,6 +117,46 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("LostAndFoundRecords");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Reports.Entities.Report", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Rides.Entities.Ride", b =>
@@ -589,17 +589,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("OutboxState");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Denunciations.Entities.Denunciation", b =>
-                {
-                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("FateConnect.Api.Modules.InAppNotifications.Entities.InAppNotification", b =>
                 {
                     b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
@@ -612,6 +601,17 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.LostAndFound.Entities.LostAndFoundRecord", b =>
+                {
+                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.Reports.Entities.Report", b =>
                 {
                     b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
                         .WithMany()

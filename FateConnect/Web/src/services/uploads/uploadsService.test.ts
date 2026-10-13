@@ -18,9 +18,9 @@ describe('fetchStoredImage', () => {
       }),
     );
 
-    const image = await fetchStoredImage('uploads/denunciations/foto.png');
+    const image = await fetchStoredImage('uploads/reports/foto.png');
 
-    expect(requestUrl).toBe('https://api.fateconnect.test/uploads/denunciations/foto.png');
+    expect(requestUrl).toBe('https://api.fateconnect.test/uploads/reports/foto.png');
     expect(image.type).toBe('image/png');
   });
 });

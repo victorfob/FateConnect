@@ -21,7 +21,7 @@ const PNG_BYTES = '\x89PNG\r\n\x1a\n';
 
 const SERVER_ERROR = 500;
 
-const ORIGINAL_PATH = 'Denunciations/a1f0/image';
+const ORIGINAL_PATH = 'Reports/a1f0/image';
 const ORIGINAL_URL = `https://api.fateconnect.test/${ORIGINAL_PATH}`;
 
 const VIEWER = { title: 'Spam ou propaganda', originalUrl: ORIGINAL_PATH };

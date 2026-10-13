@@ -4,5 +4,5 @@ public enum EnumPublication
 {
     Ride = 1,
     LostAndFoundItem = 2,
-    IdentifiedDenunciation = 3
+    IdentifiedReport = 3
 }

@@ -14,7 +14,7 @@ export enum RoutePathEnum {
   RIDES = '/caronas',
   PREFERENCES = '/preferencias',
   PROFILE = '/perfil',
-  DENUNCIATIONS = '/denuncias',
+  REPORTS = '/denuncias',
   MANAGEMENT = '/gestao',
   NOTIFICATIONS = '/notificacoes',
 }
