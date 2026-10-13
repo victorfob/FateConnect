@@ -1,5 +1,5 @@
 ---
-description: Mudar ou instalar a configuração do nginx — provar antes da VPS, o template que não se instala sozinho, a precedência de location que rouba prefixo, o que o certbot faz com o nosso bloco, e o `install-site.sh` por `sudo`
+description: Mudar ou instalar a configuração do nginx — provar antes da VPS, o template que não se instala sozinho, a precedência de location que rouba prefixo, o formato de log do host sem IP inteiro nem query, o que o certbot faz com o nosso bloco, e o `install-site.sh` por `sudo`
 paths:
   - "deploy/nginx/**"
   - "deploy/install-site.sh"
@@ -50,7 +50,13 @@ Acrescentou um `location ~`? Todo `location /prefixo/` que precisa ganhar leva `
 
 ## ⛔ Dois sites, um nginx
 
-Homologação e produção instalam o mesmo template no mesmo nginx. Diretiva do contexto `http` (`log_format`, `map`, `upstream`) leva o ambiente no nome (`fateconnect___ENVIRONMENT___without_query`): com nome fixo, o segundo `install-site.sh` reprova no `nginx -t`. A bancada carrega os dois sites juntos.
+Homologação e produção instalam o mesmo template no mesmo nginx, e por isso o template não declara nada no contexto `http`. O formato de log mora no `nginx/host-log.conf` (`fateconnect_masked`), instalado uma vez por host **antes** dos sites, e o `install-site.sh` para sem ele. Diretiva de `http` nova vai para lá, com nome único: `log_format` repetido reprova o `nginx -t`, e `map` repetido passa calado, valendo o do último arquivo lido. A bancada carrega os dois sites juntos.
+
+## ⛔ O log de acesso não guarda a query
+
+- O caminho sai do `$request_uri` cortado no `?`: depois do `try_files`, o `$uri` vira `/index.html`.
+- O `Referer` também sai sem a query, porque a página devolve o token dos links de e-mail no pedido seguinte.
+- Dois `access_log` no mesmo nível gravam os dois arquivos: o do `nginx.conf` fica comentado (`vps-setup.sh`).
 
 ## certbot e `install-site.sh`
 
@@ -65,3 +71,5 @@ Ele decide a posse da pasta do front por `SUDO_USER` (`chown -R "${SUDO_USER:-ro
 ```bash
 ls -ld /var/www/fateconnect /var/www/fateconnect/<ambiente>   # dono = o usuário do deploy
 ```
+
+Já dentro de um shell de root, o usuário vai explícito: `SUDO_USER=<usuário do deploy> ./install-site.sh <ambiente>`, com a mesma conferência.
