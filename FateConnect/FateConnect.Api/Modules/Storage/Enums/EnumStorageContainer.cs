@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Common.Enums;
+namespace FateConnect.Api.Modules.Storage.Enums;
 
 public enum EnumStorageContainer
 {

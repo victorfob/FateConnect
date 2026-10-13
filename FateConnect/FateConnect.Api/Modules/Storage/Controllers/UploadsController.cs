@@ -1,9 +1,9 @@
 namespace FateConnect.Api.Modules.Storage.Controllers;
 
 using FateConnect.Api.Modules.Auth.Attributes;
-using FateConnect.Api.Modules.Common.Enums;
-using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.Storage.Enums;
 using FateConnect.Api.Modules.Storage.Extensions;
+using FateConnect.Api.Modules.Storage.Utils;
 using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;

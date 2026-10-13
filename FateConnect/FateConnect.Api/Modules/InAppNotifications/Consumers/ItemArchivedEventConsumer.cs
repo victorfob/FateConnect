@@ -1,13 +1,13 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Consumers;
 
+using System;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.InAppNotifications.Constants;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 public sealed partial class ItemArchivedEventConsumer(
     IInAppNotificationService notificationService,

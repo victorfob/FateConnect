@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Auth.Entities;
+namespace FateConnect.Api.Modules.Auth.Options;
 
 public class JwtOptions
 {

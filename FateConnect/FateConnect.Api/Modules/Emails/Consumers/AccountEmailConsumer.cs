@@ -26,7 +26,8 @@ public abstract partial class AccountEmailConsumer<TEvent>(
             LogDispatchStarted(logger, dispatch.Email, dispatch.UserId);
 
             string safeEmail = Uri.EscapeDataString(dispatch.FatecEmail);
-            string link = $"{emailOptions.Value.PublicUrl}/{AccountEmails.For(dispatch.Email).Route}?token={dispatch.Token}&email={safeEmail}";
+            string route = AccountEmails.For(dispatch.Email).Route;
+            string link = $"{emailOptions.Value.PublicUrl}/{route}?token={dispatch.Token}&email={safeEmail}";
 
             await emailService.SendAsync(dispatch.Email, dispatch.FatecEmail, dispatch.FullName, link);
 

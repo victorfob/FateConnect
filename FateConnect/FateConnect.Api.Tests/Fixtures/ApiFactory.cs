@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using FateConnect.Api.Infrastructure.Database;
-using FateConnect.Api.Modules.Auth.Entities;
+using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Emails.Interfaces;
@@ -154,12 +154,12 @@ public class ApiFactory : WebApplicationFactory<Program>
         };
 
         if (profileType == EnumProfileType.Administrator)
-            user.PromoteToAdministrator();
+            user.PromoteToAdministrator(DateTime.UtcNow);
 
         if (tokenVersion != user.TokenVersion)
             typeof(User).GetProperty(nameof(User.TokenVersion))?.SetValue(user, tokenVersion);
 
-        return new TokenService(Options.Create(options)).GenerateJwtToken(user);
+        return new TokenService(Options.Create(options), TimeProvider.System).GenerateJwtToken(user);
     }
 
     public static string IssueTokenWithoutVersion(int userId = 1)
@@ -215,9 +215,9 @@ public class ApiFactory : WebApplicationFactory<Program>
         );
 
         if (imageUrl is not null)
-            user.AttachImage(imageUrl);
+            user.AttachImage(imageUrl, DateTime.UtcNow);
 
-        user.ConfirmEmail();
+        user.ConfirmEmail(DateTime.UtcNow);
         user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
@@ -246,7 +246,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             createdAt: DateTime.UtcNow
         );
 
-        user.ConfirmEmail();
+        user.ConfirmEmail(DateTime.UtcNow);
         user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
@@ -275,7 +275,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         );
 
         if (emailConfirmed)
-            user.ConfirmEmail();
+            user.ConfirmEmail(DateTime.UtcNow);
 
         user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
@@ -340,7 +340,14 @@ public class ApiFactory : WebApplicationFactory<Program>
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
         DateOnly acceptedDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
-        Ride ride = new(destination, acceptedDate, departureTime, EnumRideType.Solidarity, vehicleType, driverId, description);
+        Ride ride = new(
+            destination,
+            new RideFirstDeparture(acceptedDate, departureTime),
+            EnumRideType.Solidarity,
+            vehicleType,
+            driverId,
+            DateTime.UtcNow,
+            description);
 
         context.Rides.Add(ride);
         context.Entry(ride).Property(entity => entity.DepartureDate).CurrentValue = departureDate;
@@ -356,7 +363,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public Guid SeedLostAndFoundRecord(
         int reporterId,
-        EnumStatusLostAndFound status = EnumStatusLostAndFound.Open,
+        EnumLostAndFoundStatus status = EnumLostAndFoundStatus.Open,
         DateTime? createdAt = null,
         DateTime? updatedAt = null,
         DateTime? statusChangedAt = null,
@@ -371,7 +378,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             "Biblioteca do bloco B",
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
             "Ficou na mesa do fundo.",
-            reporterId);
+            reporterId, DateTime.UtcNow);
 
         if (imageUrl is not null)
             record.AttachImage(imageUrl);
@@ -400,7 +407,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
-        Denunciation denunciation = new(category, description, reporterId, isAnonymous);
+        Denunciation denunciation = new(category, description, reporterId, isAnonymous, DateTime.UtcNow);
 
         context.Denunciations.Add(denunciation);
         context.Entry(denunciation).Property(entity => entity.CreatedAt).CurrentValue =

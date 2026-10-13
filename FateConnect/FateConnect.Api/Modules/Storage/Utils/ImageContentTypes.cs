@@ -1,7 +1,7 @@
-namespace FateConnect.Api.Modules.Common.Utils;
+namespace FateConnect.Api.Modules.Storage.Utils;
 
 using System.Diagnostics.CodeAnalysis;
-using FateConnect.Api.Modules.Common.Exceptions;
+using FateConnect.Api.Modules.Storage.Exceptions;
 
 public static class ImageContentTypes
 {

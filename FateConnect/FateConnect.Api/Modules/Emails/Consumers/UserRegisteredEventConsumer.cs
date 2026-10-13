@@ -14,5 +14,10 @@ public sealed class UserRegisteredEventConsumer(
 ) : AccountEmailConsumer<UserRegisteredEvent>(emailService, emailOptions, logger)
 {
     protected override AccountEmailDispatch DispatchFor(UserRegisteredEvent message) =>
-        new(EnumAccountEmail.Confirmation, message.UserId, message.FullName, message.FatecEmail, message.ConfirmationToken);
+        new(
+            EnumAccountEmail.Confirmation,
+            message.UserId,
+            message.FullName,
+            message.FatecEmail,
+            message.ConfirmationToken);
 }

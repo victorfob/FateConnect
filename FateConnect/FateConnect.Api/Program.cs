@@ -1,6 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
 namespace FateConnect.Api;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json.Serialization;
 using DotNetEnv;
@@ -10,46 +10,46 @@ using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Infrastructure.Middlewares;
 using FateConnect.Api.Infrastructure.Observability;
 using FateConnect.Api.Infrastructure.Validation;
-using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Interfaces;
+using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Services;
+using FateConnect.Api.Modules.Denunciations.Interfaces;
+using FateConnect.Api.Modules.Denunciations.Repositories;
+using FateConnect.Api.Modules.Denunciations.Services;
+using FateConnect.Api.Modules.Emails.Consumers;
+using FateConnect.Api.Modules.Emails.Interfaces;
+using FateConnect.Api.Modules.Emails.Options;
+using FateConnect.Api.Modules.Emails.Services;
+using FateConnect.Api.Modules.InAppNotifications.Consumers;
+using FateConnect.Api.Modules.InAppNotifications.Hubs;
+using FateConnect.Api.Modules.InAppNotifications.Interfaces;
+using FateConnect.Api.Modules.InAppNotifications.Repositories;
+using FateConnect.Api.Modules.InAppNotifications.Services;
+using FateConnect.Api.Modules.LostAndFound.Interfaces;
+using FateConnect.Api.Modules.LostAndFound.Repositories;
+using FateConnect.Api.Modules.LostAndFound.Services;
+using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Rides.Interfaces;
 using FateConnect.Api.Modules.Rides.Repositories;
 using FateConnect.Api.Modules.Rides.Services;
+using FateConnect.Api.Modules.Storage.Interfaces;
+using FateConnect.Api.Modules.Storage.Services;
 using FateConnect.Api.Modules.Users.Interfaces;
 using FateConnect.Api.Modules.Users.Repositories;
 using FateConnect.Api.Modules.Users.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
-using FateConnect.Api.Modules.LostAndFound.Interfaces;
-using FateConnect.Api.Modules.LostAndFound.Repositories;
-using FateConnect.Api.Modules.LostAndFound.Services;
-using FateConnect.Api.Modules.LostAndFound.Workers;
-using FateConnect.Api.Modules.Common.Interfaces;
-using FateConnect.Api.Modules.Denunciations.Interfaces;
-using FateConnect.Api.Modules.Denunciations.Services;
-using FateConnect.Api.Modules.Denunciations.Repositories;
-using MassTransit;
-using FateConnect.Api.Modules.Storage.Services;
-using FateConnect.Api.Modules.Emails.Consumers;
 using Resend;
 using Sentry.AspNetCore;
 using Sentry.Extensibility;
-using FateConnect.Api.Modules.Emails.Interfaces;
-using FateConnect.Api.Modules.Emails.Options;
-using FateConnect.Api.Modules.Emails.Services;
-using FateConnect.Api.Modules.InAppNotifications.Interfaces;
-using FateConnect.Api.Modules.InAppNotifications.Repositories;
-using FateConnect.Api.Modules.InAppNotifications.Services;
-using FateConnect.Api.Modules.InAppNotifications.Consumers;
-using FateConnect.Api.Modules.InAppNotifications.Hubs;
 
 public class Program
 {
@@ -105,7 +105,9 @@ public class Program
             Secret = settings.JwtSecret,
             Issuer = settings.JwtIssuer,
             Audience = settings.JwtAudience,
-            ExpirationHours = double.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRATION_HOURS"), out double hours) ? hours : 8
+            ExpirationHours = double.TryParse(
+                Environment.GetEnvironmentVariable("JWT_EXPIRATION_HOURS"),
+                out double hours) ? hours : 8
         };
 
         builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(jwtOptions));
@@ -140,14 +142,16 @@ public class Program
         builder.Services.AddScoped<IDenunciationService, DenunciationService>();
 
         builder.Services.AddScoped<IEmailService, EmailService>();
-        builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(new EmailOptions(settings.PublicUrl, settings.EmailSender)));
+        builder.Services.AddSingleton(
+            Microsoft.Extensions.Options.Options.Create(new EmailOptions(settings.PublicUrl, settings.EmailSender)));
 
         builder.Services.AddScoped<IInAppNotificationRepository, InAppNotificationRepository>();
         builder.Services.AddScoped<IInAppNotificationService, InAppNotificationService>();
 
         builder.Services.AddControllers()
             .ConfigureApiBehaviorOptions(options =>
-                options.InvalidModelStateResponseFactory = InvalidModelStateLogging.LoggingFirst(options.InvalidModelStateResponseFactory))
+                options.InvalidModelStateResponseFactory = InvalidModelStateLogging.LoggingFirst(
+                    options.InvalidModelStateResponseFactory))
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -334,7 +338,8 @@ public class Program
             h.Password(rabbitPass);
         });
 
-        cfg.UseMessageRetry(r => r.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5)));
+        cfg.UseMessageRetry(
+            r => r.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5)));
 
         cfg.ReceiveEndpoint("user-registered-event", e =>
         {

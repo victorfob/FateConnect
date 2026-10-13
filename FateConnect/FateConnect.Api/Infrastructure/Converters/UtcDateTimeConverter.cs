@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Infrastructure.Database.Converters;
+namespace FateConnect.Api.Infrastructure.Converters;
 
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 

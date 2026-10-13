@@ -1,7 +1,7 @@
+namespace FateConnect.Api.Modules.Common.DTOs;
+
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-
-namespace FateConnect.Api.Modules.Common.DTOs;
 
 public class ErrorResponseDto
 {

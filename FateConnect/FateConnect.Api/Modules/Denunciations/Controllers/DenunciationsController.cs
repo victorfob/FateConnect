@@ -1,19 +1,19 @@
 namespace FateConnect.Api.Modules.Denunciations.Controllers;
 
+using System;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.Attributes;
 using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Common.DTOs;
-using FateConnect.Api.Modules.Common.Enums;
 using FateConnect.Api.Modules.Denunciations.DTOs;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
+using FateConnect.Api.Modules.Storage.Enums;
 using FateConnect.Api.Modules.Storage.Extensions;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 [ApiController]
 [Route("[controller]")]
@@ -27,12 +27,13 @@ public class DenunciationsController(IDenunciationService service, IWebHostEnvir
     {
         var result = await service.CreateAsync(dto, User.GetUserId());
 
-        return StatusCode(StatusCodes.Status201Created, result);
+        return CreatedAtRoute("GetDenunciationById", new { id = result.Id }, result);
     }
 
     [HttpGet("mine")]
     [AuthorizeProfile(EnumProfileType.Operator)]
-    public async Task<ActionResult<PagedResultDto<ReadDenunciationDto>>> GetMineAsync([FromQuery] DenunciationFilterDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadDenunciationDto>>> GetMineAsync(
+        [FromQuery] DenunciationFilterDto filter)
     {
         var result = await service.GetReportedByAsync(filter, User.GetUserId());
 
@@ -41,7 +42,8 @@ public class DenunciationsController(IDenunciationService service, IWebHostEnvir
 
     [HttpGet]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    public async Task<ActionResult<PagedResultDto<ReadDenunciationDto>>> GetAllAsync([FromQuery] DenunciationFilterDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadDenunciationDto>>> GetAllAsync(
+        [FromQuery] DenunciationFilterDto filter)
     {
         var result = await service.GetAllAsync(filter);
 
@@ -87,7 +89,9 @@ public class DenunciationsController(IDenunciationService service, IWebHostEnvir
 
     [HttpPatch("{id:guid}/status")]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    public async Task<ActionResult<ReadDenunciationDto>> UpdateStatusAsync(Guid id, [FromBody] UpdateDenunciationStatusDto dto)
+    public async Task<ActionResult<ReadDenunciationDto>> UpdateStatusAsync(
+        Guid id,
+        [FromBody] UpdateDenunciationStatusDto dto)
     {
         var result = await service.UpdateStatusAsync(id, dto);
 

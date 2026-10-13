@@ -17,15 +17,20 @@ using Swashbuckle.AspNetCore.Annotations;
 public class RidesController(IRideService rideService) : ControllerBase
 {
     [HttpGet]
-    [SwaggerOperation(Summary = "Get active rides", Description = "Returns a page of active rides whose departure has not passed yet, matching the optional filters.")]
-    public async Task<ActionResult<PagedResultDto<ReadRideDto>>> GetAllAsync([FromQuery] FilterRideDto filters)
+    [SwaggerOperation(
+        Summary = "Get active rides",
+        Description = "Returns a page of active rides whose departure has not passed yet, matching the optional " +
+            "filters.")]
+    public async Task<ActionResult<PagedResultDto<ReadRideDto>>> GetAllAsync([FromQuery] RideFilterDto filters)
     {
         var rides = await rideService.GetAllAsync(filters, User.GetUserId());
         return Ok(rides);
     }
 
     [HttpGet("{id:guid}", Name = "GetRideById")]
-    [SwaggerOperation(Summary = "Get ride by ID", Description = "Returns a specific ride by its ID, provided it is active.")]
+    [SwaggerOperation(
+        Summary = "Get ride by ID",
+        Description = "Returns a specific ride by its ID, provided it is active.")]
     public async Task<ActionResult<ReadRideDto>> GetByIdAsync(Guid id)
     {
         var ride = await rideService.GetByIdAsync(id, User.GetUserId());
@@ -38,7 +43,9 @@ public class RidesController(IRideService rideService) : ControllerBase
 
     [HttpPost]
     [RequiresContact(EnumPublication.Ride)]
-    [SwaggerOperation(Summary = "Create a new ride", Description = "Registers a new ride in the system, offered by the authenticated user.")]
+    [SwaggerOperation(
+        Summary = "Create a new ride",
+        Description = "Registers a new ride in the system, offered by the authenticated user.")]
     public async Task<ActionResult<ReadRideDto>> CreateAsync(CreateRideDto dto)
     {
         var newRide = await rideService.CreateAsync(dto, User.GetUserId());
@@ -51,7 +58,10 @@ public class RidesController(IRideService rideService) : ControllerBase
     }
 
     [HttpPatch("{id:guid}")]
-    [SwaggerOperation(Summary = "Update an existing ride", Description = "Updates ride details such as destination, departure time, type, or description; fields left out keep their value. Only the user who offered the ride can change it.")]
+    [SwaggerOperation(
+        Summary = "Update an existing ride",
+        Description = "Updates ride details such as destination, departure time, type, or description; fields left " +
+            "out keep their value. Only the user who offered the ride can change it.")]
     public async Task<ActionResult<ReadRideDto>> UpdateAsync(Guid id, UpdateRideDto dto)
     {
         var updatedRide = await rideService.UpdateAsync(id, dto, User.GetUserId());
@@ -63,10 +73,12 @@ public class RidesController(IRideService rideService) : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [SwaggerOperation(Summary = "Deactivate a ride", Description = "Sets the ride active status to false. Only the user who offered the ride can do it.")]
+    [SwaggerOperation(
+        Summary = "Deactivate a ride",
+        Description = "Sets the ride active status to false. Only the user who offered the ride can do it.")]
     public async Task<IActionResult> DeleteAsync(Guid id)
     {
-        var isDeactivated = await rideService.DeleteAsync(id, User.GetUserId());
+        var isDeactivated = await rideService.DeactivateAsync(id, User.GetUserId());
 
         if (!isDeactivated)
             return NotFound();

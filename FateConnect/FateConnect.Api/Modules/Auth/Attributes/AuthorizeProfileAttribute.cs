@@ -1,10 +1,10 @@
 namespace FateConnect.Api.Modules.Auth.Attributes;
 
+using System;
+using System.Collections.Generic;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Collections.Generic;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class AuthorizeProfileAttribute : AuthorizeAttribute

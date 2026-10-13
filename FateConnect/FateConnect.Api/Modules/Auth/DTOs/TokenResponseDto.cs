@@ -1,7 +1,7 @@
+namespace FateConnect.Api.Modules.Auth.DTOs;
+
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-
-namespace FateConnect.Api.Modules.Auth.DTOs;
 
 public class TokenResponseDto
 {

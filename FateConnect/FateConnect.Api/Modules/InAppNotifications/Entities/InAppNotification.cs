@@ -1,9 +1,9 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Entities;
 
+using System;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Exceptions;
 using FateConnect.Api.Modules.Users.Entities;
-using System;
 
 public class InAppNotification
 {

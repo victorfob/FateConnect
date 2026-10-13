@@ -1,6 +1,6 @@
 namespace FateConnect.Api.Infrastructure.Database;
 
-using FateConnect.Api.Infrastructure.Database.Converters;
+using FateConnect.Api.Infrastructure.Converters;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.LostAndFound.Entities;

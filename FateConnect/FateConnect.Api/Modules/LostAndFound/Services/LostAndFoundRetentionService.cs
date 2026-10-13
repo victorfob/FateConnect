@@ -1,11 +1,11 @@
 namespace FateConnect.Api.Modules.LostAndFound.Services;
 
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Constants;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
+using FateConnect.Api.Modules.Storage.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -34,7 +34,7 @@ public partial class LostAndFoundRetentionService(
 
         foreach (LostAndFoundRecord record in inactiveRecords)
         {
-            record.MarkAsDeleted(EnumDeletionReason.Inactivity);
+            record.MarkAsDeleted(EnumDeletionReason.Inactivity, now);
 
             await publishEndpoint.Publish(new ItemArchivedEvent(
                 record.UserId,

@@ -1,9 +1,9 @@
 namespace FateConnect.Api.Modules.LostAndFound.DTOs;
 
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.LostAndFound.Enums;
-using FateConnect.Api.Modules.Common.Validators;
+using Microsoft.AspNetCore.Http;
 
 public record CreateLostAndFoundDto
 {

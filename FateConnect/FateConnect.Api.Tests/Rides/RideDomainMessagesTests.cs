@@ -16,7 +16,13 @@ public class RideDomainMessagesTests
         EnumRideType rideType = EnumRideType.Solidarity,
         EnumVehicleType vehicleType = EnumVehicleType.Car,
         int driverId = 1) =>
-        new(destination, departureDate ?? FutureDate, DepartureTime, rideType, vehicleType, driverId);
+        new(
+            destination,
+            new RideFirstDeparture(departureDate ?? FutureDate, DepartureTime),
+            rideType,
+            vehicleType,
+            driverId,
+            DateTime.UtcNow);
 
     [Fact]
     public void ARideInThePast_AnswersTheScheduleMessageInPortuguese()
@@ -62,7 +68,7 @@ public class RideDomainMessagesTests
         Ride ride = CreateRide(vehicleType: EnumVehicleType.Motorcycle);
 
         Assert.Throws<InvalidVehicleTypeException>(
-            () => ride.UpdateBasicAttributes(null, null, (EnumVehicleType)99, null));
+            () => ride.UpdateBasicAttributes(null, null, (EnumVehicleType)99, null, DateTime.UtcNow));
 
         Assert.Equal(EnumVehicleType.Motorcycle, ride.VehicleType);
     }

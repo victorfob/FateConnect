@@ -1,27 +1,28 @@
 namespace FateConnect.Api.Modules.Denunciations.Services;
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Common.DTOs;
-using FateConnect.Api.Modules.Common.Enums;
-using FateConnect.Api.Modules.Common.Interfaces;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Denunciations.DTOs;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Exceptions;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
+using FateConnect.Api.Modules.Storage.Enums;
+using FateConnect.Api.Modules.Storage.Interfaces;
+using FateConnect.Api.Modules.Storage.Services;
 using FateConnect.Api.Modules.Users.Extensions;
-using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using FateConnect.Api.Modules.Common.Services;
 using MassTransit;
-using FateConnect.Api.Modules.Common.Events;
+using Microsoft.Extensions.Logging;
 
 public partial class DenunciationService(
     IDenunciationRepository repository,
     IStorageService baseStorageService,
     IPublishEndpoint publishEndpoint,
+    TimeProvider clock,
     ILogger<DenunciationService> logger
 ) : BaseFileService(baseStorageService, logger), IDenunciationService
 {
@@ -31,7 +32,8 @@ public partial class DenunciationService(
             dto.Category,
             dto.Description,
             currentUserId,
-            dto.IsAnonymous
+            dto.IsAnonymous,
+            clock.GetUtcNow().UtcDateTime
         );
 
         string? storedImageUrl = null;
@@ -43,7 +45,8 @@ public partial class DenunciationService(
         }
 
         if (!denunciation.IsAnonymous)
-            await publishEndpoint.Publish(new DenunciationReceivedEvent(currentUserId, denunciation.Id, denunciation.Category));
+            await publishEndpoint.Publish(
+                new DenunciationReceivedEvent(currentUserId, denunciation.Id, denunciation.Category));
 
         await PersistOrDropImageAsync(() => repository.AddAsync(denunciation), storedImageUrl);
 
@@ -101,7 +104,7 @@ public partial class DenunciationService(
             return null;
         }
 
-        denunciation.UpdateStatus(dto.Status);
+        denunciation.UpdateStatus(dto.Status, clock.GetUtcNow().UtcDateTime);
 
         await repository.SaveChangesAsync();
 

@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Common.Exceptions;
+namespace FateConnect.Api.Modules.Storage.Exceptions;
 
 public abstract class InvalidImageException(string message) : Exception(message);
 

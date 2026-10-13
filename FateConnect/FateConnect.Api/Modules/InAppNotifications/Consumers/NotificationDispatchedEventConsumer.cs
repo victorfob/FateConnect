@@ -1,13 +1,13 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Consumers;
 
+using System;
+using System.Globalization;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.InAppNotifications.Events;
 using FateConnect.Api.Modules.InAppNotifications.Hubs;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Globalization;
-using System.Threading.Tasks;
 
 public sealed partial class NotificationDispatchedEventConsumer(
     IHubContext<NotificationHub> hubContext,

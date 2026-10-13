@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.Constants;
-using FateConnect.Api.Modules.Rides.DTOs;
-using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
 
@@ -16,22 +14,6 @@ public class ValidationMessagesTests
         Validator.TryValidateObject(model, new ValidationContext(model), results, validateAllProperties: true);
 
         return results;
-    }
-
-    [Fact]
-    public void AnUndefinedRideType_IsRejectedInPortuguese()
-    {
-        List<ValidationResult> results = Validate(new FilterRideDto { RideType = (EnumRideType)99 });
-
-        Assert.Contains(results, result => result.ErrorMessage == "Tipo de carona inválido");
-    }
-
-    [Fact]
-    public void AnUndefinedVehicle_IsRejectedInPortuguese()
-    {
-        List<ValidationResult> results = Validate(new FilterRideDto { VehicleType = (EnumVehicleType)99 });
-
-        Assert.Contains(results, result => result.ErrorMessage == "Veículo inválido");
     }
 
     [Fact]

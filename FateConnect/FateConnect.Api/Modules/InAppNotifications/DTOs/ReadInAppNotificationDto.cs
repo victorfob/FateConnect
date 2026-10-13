@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.InAppNotifications.DTOs;
 
-using FateConnect.Api.Modules.InAppNotifications.Enums;
 using System;
+using FateConnect.Api.Modules.InAppNotifications.Enums;
 
 public record ReadInAppNotificationDto(
     int Id,

@@ -1,6 +1,5 @@
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Repositories;
@@ -87,7 +86,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
 
         LostAndFoundRecord record = await ReloadAsync(id);
 
-        Assert.Equal(EnumStatusLostAndFound.Open, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Open, record.Status);
         Assert.Null(record.DeletionReason);
         Assert.Null(record.StatusChangedAt);
     }
@@ -101,7 +100,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
 
         LostAndFoundRecord record = await ReloadAsync(id);
 
-        Assert.Equal(EnumStatusLostAndFound.Deleted, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Deleted, record.Status);
         Assert.Equal(EnumDeletionReason.Inactivity, record.DeletionReason);
         Assert.NotNull(record.StatusChangedAt);
     }
@@ -134,7 +133,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
 
         LostAndFoundRecord record = await ReloadAsync(id);
 
-        Assert.Equal(EnumStatusLostAndFound.Open, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Open, record.Status);
     }
 
     [Fact]
@@ -142,7 +141,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
     {
         Guid id = _factory.SeedLostAndFoundRecord(
             _reporterId,
-            EnumStatusLostAndFound.Resolved,
+            EnumLostAndFoundStatus.Resolved,
             createdAt: DaysAgo(InactivityDays * 2),
             statusChangedAt: DaysAgo(ImageRetentionDays - 1));
 
@@ -150,7 +149,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
 
         LostAndFoundRecord record = await ReloadAsync(id);
 
-        Assert.Equal(EnumStatusLostAndFound.Resolved, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Resolved, record.Status);
         Assert.Null(record.DeletionReason);
     }
 
@@ -160,7 +159,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
         string imageUrl = StoredImage();
         Guid id = _factory.SeedLostAndFoundRecord(
             _reporterId,
-            EnumStatusLostAndFound.Resolved,
+            EnumLostAndFoundStatus.Resolved,
             statusChangedAt: DaysAgo(ImageRetentionDays - 1),
             imageUrl: imageUrl);
 
@@ -173,10 +172,10 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
     }
 
     [Theory]
-    [InlineData(EnumStatusLostAndFound.Resolved)]
-    [InlineData(EnumStatusLostAndFound.Deleted)]
+    [InlineData(EnumLostAndFoundStatus.Resolved)]
+    [InlineData(EnumLostAndFoundStatus.Deleted)]
     public async Task Sweep_WithATerminalRecordAtTheImageLimit_ClearsTheImageFromDiskAndFromTheRecord(
-        EnumStatusLostAndFound status)
+        EnumLostAndFoundStatus status)
     {
         string imageUrl = StoredImage();
         Guid id = _factory.SeedLostAndFoundRecord(
@@ -200,7 +199,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
         string imageUrl = StoredImage();
         Guid id = _factory.SeedLostAndFoundRecord(
             _reporterId,
-            EnumStatusLostAndFound.Resolved,
+            EnumLostAndFoundStatus.Resolved,
             createdAt: DaysAgo(InactivityDays),
             updatedAt: DaysAgo(1),
             statusChangedAt: DaysAgo(ImageRetentionDays),
@@ -238,7 +237,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
         string imageUrl = StoredImage();
         Guid id = _factory.SeedLostAndFoundRecord(
             _reporterId,
-            EnumStatusLostAndFound.Deleted,
+            EnumLostAndFoundStatus.Deleted,
             createdAt: DaysAgo(InactivityDays * 2),
             imageUrl: imageUrl);
 
