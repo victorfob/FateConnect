@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Users.Services;
+namespace FateConnect.Api.Modules.Users.Interfaces;
 
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.DTOs;

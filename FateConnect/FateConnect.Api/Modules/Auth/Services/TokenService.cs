@@ -6,7 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using FateConnect.Api.Modules.Auth.Constants;
-using FateConnect.Api.Modules.Auth.Entities;
+using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Users.Entities;
 using Microsoft.Extensions.Options;

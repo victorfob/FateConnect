@@ -10,7 +10,7 @@ using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Infrastructure.Middlewares;
 using FateConnect.Api.Infrastructure.Observability;
 using FateConnect.Api.Infrastructure.Validation;
-using FateConnect.Api.Modules.Auth.Entities;
+using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Rides.Interfaces;

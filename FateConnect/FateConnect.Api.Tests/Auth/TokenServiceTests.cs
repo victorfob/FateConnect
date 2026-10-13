@@ -1,7 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using FateConnect.Api.Modules.Auth.Entities;
+using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;

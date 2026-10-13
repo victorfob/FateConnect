@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using FateConnect.Api.Infrastructure.Database;
-using FateConnect.Api.Modules.Auth.Entities;
+using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Emails.Interfaces;

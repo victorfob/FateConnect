@@ -7,7 +7,7 @@ using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
-using FateConnect.Api.Modules.Users.Services;
+using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
