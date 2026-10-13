@@ -54,6 +54,7 @@ Quebre o código de propósito e confira que a suíte cai; restaure e confira co
 
 ## Fixture
 
+- Log que é o comportamento se prova pela `ApiFactory.LogMessages`/`LogRecords` (o `FakeLogger` da fábrica) ou por um `FakeLogger<T>` no teste de unidade, filtrando pelo id semeado: a fábrica é da classe e junta o log de todos os testes dela. `NullLogger` só onde o log não é o que se prova.
 - Foto em teste é imagem de verdade, porque a API decodifica o envio: `TestImages.Png()`, ou `TestImages.JpegTakenWithAPhone()` quando o teste é de rotação ou EXIF.
 - Nome e contato plausíveis (`"Mariana Alves Rocha"`), sem rótulo de papel no nome: quem diz o papel é a variável (`driverId`).
 - ⛔ O dado passa pelas validações da própria aplicação: o e-mail institucional é `@(aluno.)?cps.sp.gov.br` (`FatecEmailAttribute`). Fixture inválida quebra o próximo teste que validar, sem dizer por quê.
