@@ -15,7 +15,6 @@ public class EmailConsumerTests
     private const string FatecEmail = "lucas+teste@aluno.cps.sp.gov.br";
 
     private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(30);
-    private static readonly TimeSpan InactivityTimeout = TimeSpan.FromSeconds(10);
 
     private sealed class FailingEmailService : IEmailService
     {
@@ -31,7 +30,7 @@ public class EmailConsumerTests
             .AddLogging()
             .AddMassTransitTestHarness(bus =>
             {
-                bus.SetTestTimeouts(TestTimeout, InactivityTimeout);
+                bus.SetTestTimeouts(TestTimeout, testInactivityTimeout: TestTimeout);
                 bus.AddConsumer<UserRegisteredEventConsumer>();
                 bus.AddConsumer<PasswordResetRequestedEventConsumer>();
                 bus.AddConsumer<AccountLockedEventConsumer>();

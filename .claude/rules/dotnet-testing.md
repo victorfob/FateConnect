@@ -40,7 +40,7 @@ paths:
 - ⛔ Não serialize a criação dos bancos nem desligue o paralelismo do xUnit: o `template1` não recebe conexão, e a falha clássica de `CREATE DATABASE` concorrente não acontece aqui.
 - Teste que grava arquivo: `git status` depois da suíte. A `ApiFactory` já isola o webroot num temporário.
 - ⛔ A `ApiFactory` executa o `Program.Main`: variável de ambiente que ele passa a exigir entra no construtor dela, com valor falso, senão a suíte inteira cai na subida.
-- Harness do MassTransit em teste leva `SetTestTimeouts` com folga: a inatividade padrão (~1,2 s) estoura com a suíte em paralelo, e o teste falha só às vezes.
+- Harness do MassTransit em teste leva `SetTestTimeouts` com folga: a inatividade padrão (~1,2 s) estoura com a suíte em paralelo, e o teste falha só às vezes. Esperando uma mensagem que sempre chega, a inatividade é o próprio tempo do teste: no começo da suíte as fábricas tomam as threads do pool e passam-se 10 s sem atividade. A inatividade curta fica só para o `Any` que espera `false`.
 - ⛔ Cada `ApiFactory` tem banco e pool próprios, e o `Dispose` dela fecha o pool (`NpgsqlConnection.ClearPool`): sem isso as conexões ociosas passam das 100 do contêiner, e o CI cai em `53300` sempre nos mesmos testes.
 
 ## Suíte verde não prova que ela pega o defeito

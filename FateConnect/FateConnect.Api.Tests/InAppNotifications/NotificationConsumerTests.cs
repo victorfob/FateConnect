@@ -17,7 +17,6 @@ namespace FateConnect.Api.Tests.InAppNotifications;
 public class NotificationConsumerTests
 {
     private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(30);
-    private static readonly TimeSpan InactivityTimeout = TimeSpan.FromSeconds(10);
 
     public class OutOfServiceProxy : DispatchProxy
     {
@@ -36,7 +35,7 @@ public class NotificationConsumerTests
             .AddLogging()
             .AddMassTransitTestHarness(bus =>
             {
-                bus.SetTestTimeouts(TestTimeout, InactivityTimeout);
+                bus.SetTestTimeouts(TestTimeout, testInactivityTimeout: TestTimeout);
                 bus.AddConsumer<RideCreatedEventConsumer>();
                 bus.AddConsumer<DenunciationReceivedEventConsumer>();
                 bus.AddConsumer<ItemArchivedEventConsumer>();
