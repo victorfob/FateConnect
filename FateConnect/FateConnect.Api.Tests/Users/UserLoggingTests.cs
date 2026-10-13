@@ -48,4 +48,18 @@ public class UserLoggingTests(ApiFactory factory) : IClassFixture<ApiFactory>
         Assert.True(response.IsSuccessStatusCode);
         Assert.Contains($"User ID {userId} preferences updated successfully.", factory.LogMessages);
     }
+
+    [Fact]
+    public async Task AFieldTheValidationRefuses_IsLoggedByNameAndNeverByValue()
+    {
+        int userId = factory.SeedUser("Caio Medeiros Assis").Id;
+        string tooLong = new('x', 101);
+
+        HttpResponseMessage response = await factory.CreateClientFor(userId)
+            .PatchAsync("/Users/me", new MultipartFormDataContent { { new StringContent(tooLong), "Neighborhood" } });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains($"Validation refused PATCH Users/me for user ID {userId}, on the fields: Neighborhood.", factory.LogMessages);
+        Assert.DoesNotContain(factory.LogMessages, message => message.Contains(tooLong, StringComparison.Ordinal));
+    }
 }

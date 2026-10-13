@@ -1,38 +1,113 @@
 using System.Net;
+using System.Security.Claims;
 using System.Text.Json;
 using FateConnect.Api.Infrastructure.Middlewares;
+using FateConnect.Api.Infrastructure.Observability;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace FateConnect.Api.Tests.Infrastructure;
 
 public class GlobalExceptionMiddlewareTests
 {
-    private static async Task<(HttpStatusCode StatusCode, string Error, string? Field)> AnswerFor(Exception thrown)
+    private sealed class RecordingErrorReporter : IErrorReporter
     {
-        await using ServiceProvider services = new ServiceCollection().BuildServiceProvider();
+        public List<Exception> Reported { get; } = [];
 
-        DefaultHttpContext context = new() { RequestServices = services };
+        public void Report(Exception exception, HttpContext context) => Reported.Add(exception);
+    }
 
-        using MemoryStream body = new();
-        context.Response.Body = body;
+    private sealed record Outcome(HttpContext Context, FakeLogger<GlobalExceptionMiddleware> Logger, RecordingErrorReporter Reporter);
 
-        GlobalExceptionMiddleware middleware = new(
-            _ => throw thrown,
-            NullLogger<GlobalExceptionMiddleware>.Instance);
+    private static async Task<Outcome> Run(Exception thrown, Action<DefaultHttpContext>? prepare = null)
+    {
+        DefaultHttpContext context = new() { RequestServices = new ServiceCollection().BuildServiceProvider() };
+        context.Request.Method = HttpMethods.Post;
+        context.Request.Path = "/Rides";
+        context.Response.Body = new MemoryStream();
+        prepare?.Invoke(context);
+
+        FakeLogger<GlobalExceptionMiddleware> logger = new();
+        RecordingErrorReporter reporter = new();
+        GlobalExceptionMiddleware middleware = new(_ => throw thrown, reporter, logger);
 
         await middleware.InvokeAsync(context);
+
+        return new Outcome(context, logger, reporter);
+    }
+
+    private static async Task<(HttpStatusCode StatusCode, string Error, string? Field)> AnswerFor(Exception thrown)
+    {
+        Outcome outcome = await Run(thrown);
+        Stream body = outcome.Context.Response.Body;
 
         body.Position = 0;
         using JsonDocument document = await JsonDocument.ParseAsync(body);
 
         string? field = document.RootElement.TryGetProperty("field", out JsonElement raw) ? raw.GetString() : null;
 
-        return ((HttpStatusCode)context.Response.StatusCode, document.RootElement.GetProperty("error").GetString()!, field);
+        return ((HttpStatusCode)outcome.Context.Response.StatusCode, document.RootElement.GetProperty("error").GetString()!, field);
+    }
+
+    [Fact]
+    public async Task AHandledError_LogsTheStatusTheRouteAndWhoAsked()
+    {
+        Outcome outcome = await Run(new InvalidRideTypeException(), context =>
+            context.User = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, "42")], "Bearer")));
+
+        FakeLogRecord record = Assert.Single(outcome.Logger.Collector.GetSnapshot());
+        Assert.Equal(LogLevel.Warning, record.Level);
+        Assert.Equal("Handled error (400) InvalidRideTypeException on POST /Rides for user ID 42.", record.Message);
+        Assert.Empty(outcome.Reporter.Reported);
+    }
+
+    [Fact]
+    public async Task AHandledErrorWithoutASession_LogsTheUserAsAnonymous()
+    {
+        Outcome outcome = await Run(new InvalidCredentialsException());
+
+        Assert.EndsWith("for user ID anonymous.", Assert.Single(outcome.Logger.Collector.GetSnapshot()).Message);
+    }
+
+    [Fact]
+    public async Task AnUnmappedException_LogsAnErrorAndReportsIt()
+    {
+        TimeoutException thrown = new("connection dropped");
+
+        Outcome outcome = await Run(thrown);
+
+        FakeLogRecord record = Assert.Single(outcome.Logger.Collector.GetSnapshot());
+        Assert.Equal(LogLevel.Error, record.Level);
+        Assert.Equal("Unhandled error on POST /Rides.", record.Message);
+        Assert.Same(thrown, record.Exception);
+        Assert.Same(thrown, Assert.Single(outcome.Reporter.Reported));
+    }
+
+    [Fact]
+    public async Task ARequestTheClientAborted_IsNeitherAnErrorNorReported()
+    {
+        Outcome outcome = await Run(new OperationCanceledException(), context =>
+            context.RequestAborted = new CancellationToken(canceled: true));
+
+        FakeLogRecord record = Assert.Single(outcome.Logger.Collector.GetSnapshot());
+        Assert.Equal(LogLevel.Information, record.Level);
+        Assert.Equal("Request POST /Rides aborted by the client.", record.Message);
+        Assert.Empty(outcome.Reporter.Reported);
+        Assert.Equal(StatusCodes.Status200OK, outcome.Context.Response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ACancellationTheClientDidNotAsk_StaysAnUnhandledError()
+    {
+        Outcome outcome = await Run(new OperationCanceledException());
+
+        Assert.Equal(StatusCodes.Status500InternalServerError, outcome.Context.Response.StatusCode);
+        Assert.Single(outcome.Reporter.Reported);
     }
 
     [Fact]

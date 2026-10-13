@@ -8,6 +8,8 @@ using FateConnect.Api.Infrastructure.Configuration;
 using FateConnect.Api.Infrastructure.Converters;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Infrastructure.Middlewares;
+using FateConnect.Api.Infrastructure.Observability;
+using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Auth.Services;
@@ -38,6 +40,8 @@ using MassTransit;
 using FateConnect.Api.Modules.Storage.Services;
 using FateConnect.Api.Modules.Emails.Consumers;
 using Resend;
+using Sentry.AspNetCore;
+using Sentry.Extensibility;
 using FateConnect.Api.Modules.Emails.Interfaces;
 using FateConnect.Api.Modules.Emails.Options;
 using FateConnect.Api.Modules.Emails.Services;
@@ -64,6 +68,18 @@ public class Program
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+        builder.WebHost.UseSentry(options =>
+        {
+            options.Dsn = Environment.GetEnvironmentVariable("SENTRY_DSN") ?? string.Empty;
+            options.SendDefaultPii = false;
+            options.MaxRequestBodySize = RequestSize.None;
+            options.MinimumBreadcrumbLevel = LogLevel.None;
+            options.MinimumEventLevel = LogLevel.None;
+            options.SetBeforeSend(SentryEventScrubber.Scrub);
+        });
+
+        builder.Services.AddSingleton<IErrorReporter, SentryErrorReporter>();
 
         var originsEnv = Environment.GetEnvironmentVariable("CORS_ORIGINS");
 
@@ -130,6 +146,8 @@ public class Program
         builder.Services.AddScoped<IInAppNotificationService, InAppNotificationService>();
 
         builder.Services.AddControllers()
+            .ConfigureApiBehaviorOptions(options =>
+                options.InvalidModelStateResponseFactory = InvalidModelStateLogging.LoggingFirst(options.InvalidModelStateResponseFactory))
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
