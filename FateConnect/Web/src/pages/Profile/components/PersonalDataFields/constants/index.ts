@@ -1,4 +1,4 @@
-export const NEIGHBORHOOD_LABEL = 'Bairro';
+export const NEIGHBORHOOD_LABEL = 'Bairro e cidade';
 export const NEIGHBORHOOD_HELP =
   'Serve para notificar quando surgir carona com destino ao seu bairro.';
 export const FATEC_EMAIL_HELP =

@@ -23,7 +23,7 @@ public class InvalidGenderException()
     : UserDomainException("O gênero informado é inválido.");
 
 public class InvalidNeighborhoodException()
-    : UserDomainException("O bairro pode ter no máximo 100 caracteres.");
+    : UserDomainException("O bairro e a cidade podem ter no máximo 100 caracteres.");
 
 public class ContactEmailAlreadyRegisteredException(string contactEmail)
     : AlreadyRegisteredException("contactEmail", $"O e-mail de contato '{contactEmail}' já está em uso no sistema.");
