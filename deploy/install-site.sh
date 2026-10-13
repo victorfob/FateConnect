@@ -35,6 +35,13 @@ for name in DOMAIN API_PORT; do
   fi
 done
 
+HOST_LOG=/etc/nginx/conf.d/fateconnect-host-log.conf
+if ! grep -q '^log_format fateconnect_masked ' "$HOST_LOG" 2>/dev/null; then
+  echo "ERRO: falta $HOST_LOG, com o formato de log que o site usa." >&2
+  echo "Instale o log do host antes: o vps-setup.sh, ou o passo de \"Uma vez por VPS\" no deploy/README.md." >&2
+  exit 1
+fi
+
 TARGET="/var/www/fateconnect/$ENVIRONMENT"
 CONF="/etc/nginx/sites-available/fateconnect-$ENVIRONMENT"
 

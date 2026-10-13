@@ -5,14 +5,6 @@
 # ao rodar com o plugin do nginx. Escrever à mão o que ele gera é como as duas
 # configurações divergem na primeira renovação.
 
-# Quando o SignalR cai para SSE ou long polling, o token viaja na query: o log
-# do hub grava o caminho sem ela. O nome leva o ambiente porque os dois sites
-# dividem o mesmo nginx, e um `log_format` repetido reprova o `nginx -t`.
-log_format fateconnect___ENVIRONMENT___without_query '$remote_addr - $remote_user [$time_local] '
-                                                     '"$request_method $uri $server_protocol" '
-                                                     '$status $body_bytes_sent '
-                                                     '"$http_referer" "$http_user_agent"';
-
 server {
     listen 80;
     listen [::]:80;
@@ -27,7 +19,9 @@ server {
     root /var/www/fateconnect/__ENVIRONMENT__;
     index index.html;
 
-    access_log /var/log/nginx/fateconnect-__ENVIRONMENT__.access.log;
+    # O formato, com o IP mascarado e sem a query onde viaja o token, mora no
+    # host-log.conf, que o vps-setup.sh instala antes dos sites.
+    access_log /var/log/nginx/fateconnect-__ENVIRONMENT__.access.log fateconnect_masked;
     error_log  /var/log/nginx/fateconnect-__ENVIRONMENT__.error.log;
 
     # O build escreve um .gz ao lado de cada estático, e é esse arquivo pronto que
@@ -52,8 +46,6 @@ server {
 
         proxy_read_timeout 120s;
         proxy_send_timeout 120s;
-
-        access_log /var/log/nginx/fateconnect-__ENVIRONMENT__.access.log fateconnect___ENVIRONMENT___without_query;
     }
 
     # ⛔ `^~` para vencer a regex de extensão mais abaixo: no nginx, regex ganha
