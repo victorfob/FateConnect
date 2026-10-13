@@ -35,6 +35,8 @@ Cada caso: o que o número responde, o que ele parece responder, e o controle.
 - No Chrome sem janela, `elemento.focus()` por script não dá estado de foco: o rótulo flutuante não sobe, o painel que abre no foco não abre, e a captura mostra uma tela que ninguém vê. Clique por `Input.dispatchMouseEvent`, com `Emulation.setFocusEmulationEnabled` ligado.
 - Estado transitório (carregando, enviando) some antes da foto: o script de captura espera depois de navegar, e o stub que responde antes disso entrega a tela seguinte. Para esse caso, um token do stub que demora bem mais que a espera.
 - Stub que guarda estado (falha preparada, escolha salva) atende a resposta atrasada da captura anterior depois que o Chrome dela morreu, e ela gasta o que você preparou para a próxima: espere a resposta pendente antes de preparar o stub.
+- Espera fixa depois de navegar mede o esqueleto quando o dev server acabou de subir, porque ele compila sob demanda: espere, com prazo, um seletor que só existe com o conteúdo carregado.
+- Captura de página inteira (`captureBeyondViewport`) desenha a página parada no topo: o que é `sticky` no pé sai onde a primeira janela termina, no meio da imagem. Barra presa ao pé se captura com a janela rolada até o fim.
 - Tela logada: grave o `jwt_token` na raiz e só então navegue para a rota. Recarregar dentro do script que espera a promessa trava a captura para sempre.
 - Stub com o tipo pela metade muda o comportamento: campo ausente no registro faz o formulário nascer alterado (`isDirty`), e o salvar desabilitado parece quebrado. Antes de culpar o código, confira o stub contra o tipo do serviço (`services/**/types.ts`).
 
