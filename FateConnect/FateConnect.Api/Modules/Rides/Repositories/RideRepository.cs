@@ -16,7 +16,9 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
     private static readonly TimeOnly AfternoonStart = new(12, 0);
     private static readonly TimeOnly NightStart = new(18, 0);
 
-    public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter, int? currentUserId = null)
+    public async Task<(
+        IReadOnlyList<Ride> Items,
+        int Total)> GetAllAsync(RideFilterDto filter, int? currentUserId = null)
     {
         DateTime nowInProductTimeZone = DateTimeUtils.NowInProductTimeZone(clock);
         DateOnly today = DateOnly.FromDateTime(nowInProductTimeZone);
@@ -96,7 +98,8 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
 
     private static Expression<Func<Ride, DateOnly>> NextDepartureDate(DateOnly today, TimeOnly currentTime) =>
         ride => ride.Departures
-            .Where(departure => departure.Date > today || (departure.Date == today && ride.DepartureTime >= currentTime))
+            .Where(
+                departure => departure.Date > today || (departure.Date == today && ride.DepartureTime >= currentTime))
             .Min(departure => departure.Date);
 
     private static Expression<Func<Ride, bool>> DepartsInShift(EnumRideShift shift) => shift switch
@@ -134,7 +137,7 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
         return ride;
     }
 
-    public async Task UpdateAsync(Ride ride)
+    public async Task SaveChangesAsync()
     {
         await context.SaveChangesAsync();
     }

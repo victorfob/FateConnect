@@ -1,10 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 using System.Text;
-using FateConnect.Api.Modules.Common.Enums;
-using FateConnect.Api.Modules.Common.Exceptions;
-using FateConnect.Api.Modules.Common.Utils;
-using FateConnect.Api.Modules.Common.Validators;
 using FateConnect.Api.Modules.Denunciations.DTOs;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Enums;
@@ -15,14 +10,19 @@ using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Services;
+using FateConnect.Api.Modules.Storage.Enums;
+using FateConnect.Api.Modules.Storage.Exceptions;
 using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Storage.Utils;
 using FateConnect.Api.Tests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using SixLabors.ImageSharp;
+using FateConnect.Api.Infrastructure.Validation;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
-namespace FateConnect.Api.Tests.Common;
+namespace FateConnect.Api.Tests.Storage;
 
 public sealed class ImageStorageTests : IDisposable
 {
@@ -54,7 +54,7 @@ public sealed class ImageStorageTests : IDisposable
     private sealed class RefusingRepository : ILostAndFoundRepository
     {
         public Task<(IReadOnlyList<LostAndFoundRecord> Items, int Total)> GetAllAsync(
-            FilterLostAndFoundDto filter, int? currentUserId = null) =>
+            LostAndFoundFilterDto filter, int? currentUserId = null) =>
             throw new NotSupportedException();
 
         public Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true) =>
@@ -307,7 +307,7 @@ public sealed class ImageStorageTests : IDisposable
     public async Task CreateItem_WhenTheDatabaseRefusesIt_LeavesNoFileBehind()
     {
         StorageService storage = ServiceOn(_webRoot);
-        LostAndFoundService service = new(new RefusingRepository(), storage, NullLogger<LostAndFoundService>.Instance);
+        LostAndFoundService service = new(new RefusingRepository(), storage, TimeProvider.System, NullLogger<LostAndFoundService>.Instance);
 
         CreateLostAndFoundDto dto = new()
         {
@@ -332,6 +332,7 @@ public sealed class ImageStorageTests : IDisposable
             new RefusingDenunciationRepository(),
             storage,
             new NullPublishEndpoint(),
+            TimeProvider.System,
             NullLogger<DenunciationService>.Instance);
 
         CreateDenunciationDto dto = new()

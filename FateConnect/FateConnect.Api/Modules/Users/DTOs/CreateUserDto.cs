@@ -1,9 +1,9 @@
+namespace FateConnect.Api.Modules.Users.DTOs;
+
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Users.Enums;
-
-namespace FateConnect.Api.Modules.Users.DTOs;
 
 public class CreateUserDto
 {

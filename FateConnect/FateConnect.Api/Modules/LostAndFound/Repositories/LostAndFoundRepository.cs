@@ -12,7 +12,9 @@ using Microsoft.EntityFrameworkCore;
 
 public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoundRepository
 {
-    public async Task<(IReadOnlyList<LostAndFoundRecord> Items, int Total)> GetAllAsync(FilterLostAndFoundDto filter, int? currentUserId = null)
+    public async Task<(
+        IReadOnlyList<LostAndFoundRecord> Items,
+        int Total)> GetAllAsync(LostAndFoundFilterDto filter, int? currentUserId = null)
     {
         IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
             .AsNoTracking()
@@ -106,12 +108,12 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
     }
 
     private static Expression<Func<LostAndFoundRecord, bool>> UntouchedWhileOpenSince(DateTime untouchedSince) =>
-        record => record.Status == EnumStatusLostAndFound.Open
+        record => record.Status == EnumLostAndFoundStatus.Open
             && (record.UpdatedAt ?? record.CreatedAt) <= untouchedSince;
 
     private static Expression<Func<LostAndFoundRecord, bool>> HoldsAnImageAndIsTerminalSince(DateTime terminalSince) =>
         record => record.ImageUrl != null
-            && (record.Status == EnumStatusLostAndFound.Resolved || record.Status == EnumStatusLostAndFound.Deleted)
+            && (record.Status == EnumLostAndFoundStatus.Resolved || record.Status == EnumLostAndFoundStatus.Deleted)
             && record.StatusChangedAt != null
             && record.StatusChangedAt <= terminalSince;
 

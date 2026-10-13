@@ -1,6 +1,6 @@
 namespace FateConnect.Api.Modules.LostAndFound.Enums;
 
-public enum EnumStatusLostAndFound
+public enum EnumLostAndFoundStatus
 {
     Open = 1,
     Resolved = 2,

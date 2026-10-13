@@ -1,8 +1,8 @@
+namespace FateConnect.Api.Modules.Auth.DTOs;
+
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.Validation;
-
-namespace FateConnect.Api.Modules.Auth.DTOs;
 
 public class LoginDto
 {

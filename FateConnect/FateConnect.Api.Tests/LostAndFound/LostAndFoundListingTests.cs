@@ -23,7 +23,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         _factory = factory;
     }
 
-    private sealed record ListedItem(Guid Id, string Name, string? Description, EnumStatusLostAndFound Status, bool IsOwner);
+    private sealed record ListedItem(Guid Id, string Name, string? Description, EnumLostAndFoundStatus Status, bool IsOwner);
 
     private sealed record PagedItems(IReadOnlyList<ListedItem> Items, int Page, int PageSize, int Total);
 

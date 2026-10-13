@@ -1,13 +1,13 @@
 namespace FateConnect.Api.Modules.Users.Entities;
 
+using System;
+using System.Collections.Generic;
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.Utils;
 using FateConnect.Api.Modules.Common.Constants;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
-using System;
-using System.Collections.Generic;
 
 public class User
 {
@@ -81,7 +81,8 @@ public class User
         DateTime birthDate,
         EnumGender gender,
         UserContact? contact,
-        string? neighborhood)
+        string? neighborhood,
+        DateTime now)
     {
         ValidateFullName(fullName);
         ValidateGender(gender);
@@ -93,41 +94,42 @@ public class User
         ReplaceContact(contact);
         Neighborhood = neighborhood.NormalizeOptionalText();
 
-        RegisterUpdate();
+        RegisterUpdate(now);
     }
 
-    public void AttachImage(string imageUrl)
+    public void AttachImage(string imageUrl, DateTime now)
     {
         ImageUrl = imageUrl.Trim();
-        RegisterUpdate();
+        RegisterUpdate(now);
     }
 
-    public void RemoveImage()
+    public void RemoveImage(DateTime now)
     {
         ImageUrl = null;
-        RegisterUpdate();
+        RegisterUpdate(now);
     }
 
-    public void ChangePassword(string newPasswordHash)
+    public void ChangePassword(string newPasswordHash, DateTime now)
     {
         Password = newPasswordHash;
-        RegisterUpdate();
-        IncrementTokenVersion();
+        RegisterUpdate(now);
+        IncrementTokenVersion(now);
     }
 
-    public void Deactivate()
+    public void Deactivate(DateTime now)
     {
         if (Status == EnumAccountStatus.SelfDeactivated)
             return;
 
         Status = EnumAccountStatus.SelfDeactivated;
-        IncrementTokenVersion();
+        IncrementTokenVersion(now);
     }
 
     public void UpdateByAdmin(
         string fullName,
         string fatecEmail,
-        UserContact? contact)
+        UserContact? contact,
+        DateTime now)
     {
         ValidateFullName(fullName);
         ValidateEmail(fatecEmail);
@@ -136,43 +138,43 @@ public class User
         FatecEmail = fatecEmail.Trim().ToLowerInvariant();
         ReplaceContact(contact);
 
-        RegisterUpdate();
+        RegisterUpdate(now);
     }
 
-    public void PromoteToAdministrator()
+    public void PromoteToAdministrator(DateTime now)
     {
         if (ProfileType == EnumProfileType.Administrator)
             return;
 
         ProfileType = EnumProfileType.Administrator;
-        IncrementTokenVersion();
+        IncrementTokenVersion(now);
     }
 
-    public void DemoteToOperator()
+    public void DemoteToOperator(DateTime now)
     {
         if (ProfileType == EnumProfileType.Operator)
             return;
 
         ProfileType = EnumProfileType.Operator;
-        IncrementTokenVersion();
+        IncrementTokenVersion(now);
     }
 
-    public void Ban()
+    public void Ban(DateTime now)
     {
         if (Status == EnumAccountStatus.Banned)
             return;
 
         Status = EnumAccountStatus.Banned;
-        IncrementTokenVersion();
+        IncrementTokenVersion(now);
     }
 
-    public void ReactivateFromBan()
+    public void ReactivateFromBan(DateTime now)
     {
         if (Status != EnumAccountStatus.Banned)
             return;
 
         Status = EnumAccountStatus.Active;
-        RegisterUpdate();
+        RegisterUpdate(now);
     }
 
     public void SetPreferences(UserPreferences preferences)
@@ -181,7 +183,7 @@ public class User
         Preferences = preferences;
     }
 
-    public void AddDocumentAcceptance(DocumentAcceptance acceptance)
+    public void AddDocumentAcceptance(DocumentAcceptance acceptance, DateTime now)
     {
         ArgumentNullException.ThrowIfNull(acceptance);
         _documentAcceptances.Add(acceptance);
@@ -196,13 +198,13 @@ public class User
         ContactEmail = contact.ContactEmail.Trim().ToLowerInvariant();
     }
 
-    private void IncrementTokenVersion()
+    private void IncrementTokenVersion(DateTime now)
     {
         TokenVersion++;
-        RegisterUpdate();
+        RegisterUpdate(now);
     }
 
-    private void RegisterUpdate() => UpdatedAt = DateTime.UtcNow;
+    private void RegisterUpdate(DateTime now) => UpdatedAt = now;
 
     private static void ValidateFullName(string name)
     {
@@ -247,13 +249,13 @@ public class User
             throw new InvalidNeighborhoodException();
     }
 
-    public void ConfirmEmail()
+    public void ConfirmEmail(DateTime now)
     {
         if (IsEmailConfirmed)
             return;
 
         IsEmailConfirmed = true;
-        RegisterUpdate();
+        RegisterUpdate(now);
     }
 
     public bool IsLocked(DateTime now) => LockedUntil.HasValue && LockedUntil.Value > now;
@@ -273,10 +275,10 @@ public class User
             LockedUntil = now.AddMinutes(AuthConstants.LockoutMinutes);
         }
 
-        RegisterUpdate();
+        RegisterUpdate(now);
     }
 
-    public void ResetFailedLoginAttempts()
+    public void ResetFailedLoginAttempts(DateTime now)
     {
         if (FailedLoginAttempts == 0 && LockedUntil is null)
             return;
@@ -284,7 +286,7 @@ public class User
         FailedLoginAttempts = 0;
         LockedUntil = null;
 
-        RegisterUpdate();
+        RegisterUpdate(now);
     }
 
     public string IssueToken(EnumTokenType type, DateTime now, TimeSpan lifetime)

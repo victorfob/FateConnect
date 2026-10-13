@@ -6,16 +6,17 @@ using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
-using FateConnect.Api.Modules.Common.Interfaces;
-using FateConnect.Api.Modules.Common.Enums;
-using Microsoft.Extensions.Logging;
+using FateConnect.Api.Modules.Storage.Enums;
+using FateConnect.Api.Modules.Storage.Interfaces;
+using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Storage.Utils;
 using FateConnect.Api.Modules.Users.Extensions;
-using FateConnect.Api.Modules.Common.Services;
-using FateConnect.Api.Modules.Common.Utils;
+using Microsoft.Extensions.Logging;
 
 public partial class LostAndFoundService(
     ILostAndFoundRepository repository,
     IStorageService baseStorageService,
+    TimeProvider clock,
     ILogger<LostAndFoundService> logger
 ) : BaseFileService(baseStorageService, logger), ILostAndFoundService
 {
@@ -27,7 +28,8 @@ public partial class LostAndFoundService(
             dto.Place,
             dto.OccurredOn.GetValueOrDefault(),
             dto.Description,
-            currentUserId
+            currentUserId,
+            clock.GetUtcNow().UtcDateTime
         );
 
         string? storedImageUrl = null;
@@ -45,7 +47,7 @@ public partial class LostAndFoundService(
         return MapToReadDto(record, currentUserId);
     }
 
-    public async Task<PagedResultDto<ReadLostAndFoundDto>> GetAllAsync(FilterLostAndFoundDto filter, int currentUserId)
+    public async Task<PagedResultDto<ReadLostAndFoundDto>> GetAllAsync(LostAndFoundFilterDto filter, int currentUserId)
     {
         int? userIdToFilter = filter.OnlyMine == true ? currentUserId : null;
 
@@ -96,7 +98,8 @@ public partial class LostAndFoundService(
             dto.Place,
             dto.OccurredOn,
             dto.Description,
-            dto.Status
+            dto.Status,
+            clock.GetUtcNow().UtcDateTime
         );
 
         string? discardedImageUrl = null;
@@ -144,7 +147,7 @@ public partial class LostAndFoundService(
             return false;
         }
 
-        record.MarkAsDeleted(EnumDeletionReason.User);
+        record.MarkAsDeleted(EnumDeletionReason.User, clock.GetUtcNow().UtcDateTime);
 
         await repository.SaveChangesAsync();
 

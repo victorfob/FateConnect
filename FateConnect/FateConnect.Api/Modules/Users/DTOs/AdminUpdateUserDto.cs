@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Users.DTOs;
 
-using FateConnect.Api.Infrastructure.Validation;
 using System.ComponentModel.DataAnnotations;
+using FateConnect.Api.Infrastructure.Validation;
 
 public class AdminUpdateUserDto
 {

@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Controllers;
 
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.Attributes;
 using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Common.DTOs;
@@ -8,7 +9,6 @@ using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 [ApiController]
 [Route("[controller]")]
@@ -17,7 +17,8 @@ public class InAppNotificationsController(IInAppNotificationService service) : C
 {
     [HttpGet]
     [ProducesResponseType(typeof(PagedResultDto<ReadInAppNotificationDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResultDto<ReadInAppNotificationDto>>> GetAllAsync([FromQuery] FilterInAppNotificationDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadInAppNotificationDto>>> GetAllAsync(
+        [FromQuery] FilterInAppNotificationDto filter)
     {
         var result = await service.GetAllAsync(filter, User.GetUserId());
         return Ok(result);

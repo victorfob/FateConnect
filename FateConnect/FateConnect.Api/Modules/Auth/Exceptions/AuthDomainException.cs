@@ -15,13 +15,16 @@ public class InvalidCredentialsException()
     : AuthDomainException("E-mail ou senha inválidos.");
 
 public class EmailNotConfirmedException()
-    : AuthDomainException("Para acessar o sistema, é necessário confirmar o seu e-mail através do link que enviamos.")
+    : AuthDomainException(
+        "Para acessar o sistema, é necessário confirmar o seu e-mail através do link que enviamos.")
 {
     public const string ErrorCode = "EmailNotConfirmed";
 }
 
 public class UnconfiguredProfileHierarchyException(string profileType)
-    : Exception($"A hierarquia de acesso para o perfil '{profileType}' não foi configurada no AuthorizeProfileAttribute. Atualize o mapa de perfis permitidos.");
+    : Exception(
+        $"A hierarquia de acesso para o perfil '{profileType}' não foi configurada no AuthorizeProfileAttribute. " +
+            "Atualize o mapa de perfis permitidos.");
 
 public class UnidentifiedTokenException()
     : UnauthorizedAccessException("Sessão encerrada. Entre novamente para continuar.");
@@ -59,14 +62,18 @@ public class AccountLockedException : AuthDomainException
     }
 
     private static string BuildMessage(int minutes) =>
-        $"Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec ou aguarde {QuantityUtils.Minutes(minutes)} e tente novamente.";
+        "Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. " +
+            "Para entrar, use o link enviado ao seu e-mail Fatec " +
+            $"ou aguarde {QuantityUtils.Minutes(minutes)} e tente novamente.";
 }
 
 public class InvalidUnlockTokenException()
     : AuthDomainException("O link de desbloqueio é inválido ou não foi encontrado.");
 
 public class ExpiredUnlockTokenException()
-    : AuthDomainException("Este link expirou. O tempo de segurança já passou e você já pode fazer login normalmente com a sua senha.");
+    : AuthDomainException(
+        "Este link expirou. O tempo de segurança já passou e você já pode fazer login normalmente " +
+            "com a sua senha.");
 
 public class UserNotFoundException()
     : AuthDomainException("Não há conta cadastrada com este e-mail.");

@@ -1,9 +1,9 @@
 namespace FateConnect.Api.Modules.LostAndFound.DTOs;
 
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.LostAndFound.Enums;
-using FateConnect.Api.Modules.Common.Validators;
+using Microsoft.AspNetCore.Http;
 
 public record UpdateLostAndFoundDto
 {
@@ -21,7 +21,7 @@ public record UpdateLostAndFoundDto
     [StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
     public string? Description { get; init; }
 
-    public EnumStatusLostAndFound? Status { get; init; }
+    public EnumLostAndFoundStatus? Status { get; init; }
 
     [ValidImage]
     public IFormFile? Image { get; init; }

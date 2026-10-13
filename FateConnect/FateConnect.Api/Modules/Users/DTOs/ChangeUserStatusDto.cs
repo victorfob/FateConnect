@@ -1,8 +1,8 @@
 namespace FateConnect.Api.Modules.Users.DTOs;
 
-using FateConnect.Api.Modules.Users.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using FateConnect.Api.Modules.Users.Enums;
 
 public class ChangeUserStatusDto
 {

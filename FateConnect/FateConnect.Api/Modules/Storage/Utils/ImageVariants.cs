@@ -1,6 +1,6 @@
-namespace FateConnect.Api.Modules.Common.Utils;
+namespace FateConnect.Api.Modules.Storage.Utils;
 
-using FateConnect.Api.Modules.Common.Exceptions;
+using FateConnect.Api.Modules.Storage.Exceptions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;

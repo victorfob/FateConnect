@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Infrastructure.Database.Migrations;
+namespace FateConnect.Api.Infrastructure.Database;
 
 public static class DuplicatedContactCleanup
 {

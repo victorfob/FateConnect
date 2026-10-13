@@ -22,9 +22,15 @@ public partial class RideService
     [LoggerMessage(EventId = 6, Level = LogLevel.Information, Message = "Ride {RideId} deactivated successfully.")]
     private static partial void LogRideDeactivated(ILogger logger, Guid rideId);
 
-    [LoggerMessage(EventId = 7, Level = LogLevel.Warning, Message = "Ride {RideId} was already deactivated or not found.")]
+    [LoggerMessage(
+        EventId = 7,
+        Level = LogLevel.Warning,
+        Message = "Ride {RideId} was already deactivated or not found.")]
     private static partial void LogRideDeactivationFailed(ILogger logger, Guid rideId);
 
-    [LoggerMessage(EventId = 8, Level = LogLevel.Warning, Message = "User ID {UserId} tried to change ride {RideId}, offered by another user.")]
+    [LoggerMessage(
+        EventId = 8,
+        Level = LogLevel.Warning,
+        Message = "User ID {UserId} tried to change ride {RideId}, offered by another user.")]
     private static partial void LogRideChangeRefused(ILogger logger, int userId, Guid rideId);
 }

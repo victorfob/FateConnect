@@ -27,6 +27,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a registrar no log o método, a rota e o usuário de cada erro tratado, e os campos que a validação recusou, sem os valores (#598) [Backend]
 - Passa a apagar o log da API e da fila depois de 14 dias, em vez de guardá-lo até a próxima publicação recriar o contêiner (#603) [Backend]
 - Passa a declarar na política de privacidade os registros técnicos do servidor, o que cada um guarda, para quê e o prazo de 14 dias (#603) [Frontend]
+- Passa a responder a criação de denúncia com o endereço da denúncia criada, como caronas e achados e perdidos já respondiam (#602) [Backend]
 
 ### Fixed
 

@@ -17,7 +17,8 @@ public static class NotificationContents
     }
 
     public static string ItemArchived(string itemName) =>
-        $"O item “{itemName}” foi arquivado automaticamente por inatividade, depois de {LostAndFoundRetention.InactivityBeforeArchiving.Days} dias sem alteração.";
+        $"O item “{itemName}” foi arquivado automaticamente por inatividade, depois de " +
+            $"{LostAndFoundRetention.InactivityBeforeArchiving.Days} dias sem alteração.";
 
     public static string RideToDestination(string destination) =>
         $"Uma nova carona para {destination} foi ofertada. Confira se ela serve para você.";

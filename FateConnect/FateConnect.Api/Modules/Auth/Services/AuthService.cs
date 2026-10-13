@@ -1,5 +1,9 @@
 namespace FateConnect.Api.Modules.Auth.Services;
 
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Enums;
@@ -14,10 +18,6 @@ using FateConnect.Api.Modules.Users.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using static BCrypt.Net.BCrypt;
 
 public partial class AuthService(
@@ -100,7 +100,7 @@ public partial class AuthService(
             await HandleFailedAttemptAsync(user, now);
         }
 
-        user.ResetFailedLoginAttempts();
+        user.ResetFailedLoginAttempts(now);
         await userRepository.SaveChangesAsync();
 
         if (!user.IsEmailConfirmed)
@@ -123,7 +123,10 @@ public partial class AuthService(
             throw new InvalidCredentialsException();
         }
 
-        string rawToken = user.IssueToken(EnumTokenType.AccountUnlock, now, TimeSpan.FromMinutes(AuthConstants.LockoutMinutes));
+        string rawToken = user.IssueToken(
+            EnumTokenType.AccountUnlock,
+            now,
+            TimeSpan.FromMinutes(AuthConstants.LockoutMinutes));
 
         await publishEndpoint.Publish(new AccountLockedEvent(
             UserId: user.Id,
@@ -156,7 +159,7 @@ public partial class AuthService(
 
         User user = unlockToken.User;
 
-        user.ResetFailedLoginAttempts();
+        user.ResetFailedLoginAttempts(now);
         unlockToken.Consume(now);
 
         await userRepository.SaveChangesAsync();
@@ -188,7 +191,7 @@ public partial class AuthService(
         emailToken.Validate(now);
 
         emailToken.Consume(now);
-        user.ConfirmEmail();
+        user.ConfirmEmail(now);
 
         await userRepository.SaveChangesAsync();
 
@@ -209,7 +212,11 @@ public partial class AuthService(
 
         if (user.IsEmailConfirmed)
         {
-            LogLinkRequestSkipped(logger, EnumTokenType.EmailConfirmation, user.Id, EnumLinkRequestSkipReason.AlreadyConfirmed);
+            LogLinkRequestSkipped(
+                logger,
+                EnumTokenType.EmailConfirmation,
+                user.Id,
+                EnumLinkRequestSkipReason.AlreadyConfirmed);
             return;
         }
 
@@ -220,7 +227,8 @@ public partial class AuthService(
             .OrderByDescending(t => t.CreatedAt)
             .FirstOrDefault();
 
-        bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
+        bool isCooldownActive = lastToken is not null
+            && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
 
         if (isCooldownActive)
         {
@@ -238,7 +246,10 @@ public partial class AuthService(
             oldToken.Consume(now);
         }
 
-        string rawToken = user.IssueToken(EnumTokenType.EmailConfirmation, now, TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
+        string rawToken = user.IssueToken(
+            EnumTokenType.EmailConfirmation,
+            now,
+            TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
 
         await publishEndpoint.Publish(new UserRegisteredEvent(
             UserId: user.Id,
@@ -275,7 +286,8 @@ public partial class AuthService(
             .OrderByDescending(t => t.CreatedAt)
             .FirstOrDefault();
 
-        bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
+        bool isCooldownActive = lastToken is not null
+            && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
 
         if (isCooldownActive)
         {
@@ -293,7 +305,10 @@ public partial class AuthService(
             oldToken.Consume(now);
         }
 
-        string rawToken = user.IssueToken(EnumTokenType.PasswordReset, now, TimeSpan.FromMinutes(AuthConstants.PasswordResetMinutes));
+        string rawToken = user.IssueToken(
+            EnumTokenType.PasswordReset,
+            now,
+            TimeSpan.FromMinutes(AuthConstants.PasswordResetMinutes));
 
         await publishEndpoint.Publish(new PasswordResetRequestedEvent(
             UserId: user.Id,
@@ -341,14 +356,14 @@ public partial class AuthService(
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
         string newPasswordHash = HashPassword(dto.NewPassword);
 
-        user.ChangePassword(newPasswordHash);
+        user.ChangePassword(newPasswordHash, now);
         resetToken.Consume(now);
 
-        user.ResetFailedLoginAttempts();
+        user.ResetFailedLoginAttempts(now);
 
         if (!user.IsEmailConfirmed)
         {
-            user.ConfirmEmail();
+            user.ConfirmEmail(now);
         }
 
         await userRepository.SaveChangesAsync();

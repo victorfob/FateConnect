@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Users.Controllers;
 
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.Attributes;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Extensions;
@@ -7,11 +8,10 @@ using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
-using FateConnect.Api.Modules.Users.Services;
+using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 [ApiController]
 [Route("[controller]")]
@@ -113,18 +113,18 @@ public class UsersController(IUserService service) : ControllerBase
 
     [HttpGet]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    public async Task<ActionResult<PagedResultDto<ReadUserSummaryDto>>> GetAllUsersAsync([FromQuery] UserFilterDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadUserSummaryDto>>> GetAllAsync([FromQuery] UserFilterDto filter)
     {
-        var result = await service.GetAllUsersAsync(filter);
+        var result = await service.GetAllAsync(filter);
 
         return Ok(result);
     }
 
     [HttpGet("{id:int}")]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    public async Task<ActionResult<ReadUserDto>> GetUserByIdAsync(int id)
+    public async Task<ActionResult<ReadUserDto>> GetByIdAsync(int id)
     {
-        var result = await service.GetUserByIdAsync(id);
+        var result = await service.GetByIdAsync(id);
 
         if (result is null)
             return NotFound();

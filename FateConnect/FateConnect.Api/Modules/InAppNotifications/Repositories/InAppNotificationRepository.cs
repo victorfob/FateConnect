@@ -1,5 +1,8 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Repositories;
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
@@ -8,9 +11,6 @@ using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using FateConnect.Api.Modules.InAppNotifications.Utils;
 using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 public class InAppNotificationRepository(FateConnectDbContext context) : IInAppNotificationRepository
 {
@@ -52,7 +52,9 @@ public class InAppNotificationRepository(FateConnectDbContext context) : IInAppN
         await context.InAppNotifications.AddRangeAsync(notifications);
     }
 
-    public async Task<(IReadOnlyList<InAppNotification> Items, int Total)> GetAllAsync(FilterInAppNotificationDto filter, int userId)
+    public async Task<(
+        IReadOnlyList<InAppNotification> Items,
+        int Total)> GetAllAsync(FilterInAppNotificationDto filter, int userId)
     {
         IQueryable<InAppNotification> query = context.InAppNotifications
             .AsNoTracking()

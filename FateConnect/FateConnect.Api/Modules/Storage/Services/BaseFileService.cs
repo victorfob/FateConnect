@@ -1,9 +1,9 @@
-namespace FateConnect.Api.Modules.Common.Services;
+namespace FateConnect.Api.Modules.Storage.Services;
 
-using FateConnect.Api.Modules.Common.Interfaces;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using FateConnect.Api.Modules.Storage.Interfaces;
+using Microsoft.Extensions.Logging;
 
 public abstract partial class BaseFileService(IStorageService storageService, ILogger logger)
 {

@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Users.DTOs;
 
-using FateConnect.Api.Modules.Users.Enums;
 using System;
+using FateConnect.Api.Modules.Users.Enums;
 
 public record ReadUserDto(
     int Id,

@@ -1,6 +1,6 @@
-namespace FateConnect.Api.Modules.Common.Interfaces;
+namespace FateConnect.Api.Modules.Storage.Interfaces;
 
-using FateConnect.Api.Modules.Common.Enums;
+using FateConnect.Api.Modules.Storage.Enums;
 using Microsoft.AspNetCore.Http;
 
 public interface IStorageService

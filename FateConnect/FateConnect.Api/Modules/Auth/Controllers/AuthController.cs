@@ -1,24 +1,17 @@
-using FateConnect.Api.Modules.Auth.Interfaces;
+namespace FateConnect.Api.Modules.Auth.Controllers;
+
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Extensions;
+using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FateConnect.Api.Modules.Auth.Controllers;
-
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class AuthController : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
-    private readonly IAuthService _authService;
-
-    public AuthController(IAuthService authService)
-    {
-        _authService = authService;
-    }
-
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
@@ -29,7 +22,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
     {
-        var response = await _authService.LoginAsync(dto);
+        var response = await authService.LoginAsync(dto);
         return Ok(response);
     }
 
@@ -42,7 +35,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> ReactivateAsync([FromBody] LoginDto dto)
     {
-        var response = await _authService.ReactivateAsync(dto);
+        var response = await authService.ReactivateAsync(dto);
         return Ok(response);
     }
 
@@ -52,7 +45,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> LogoutAsync()
     {
-        await _authService.LogoutAsync(User.GetUserId());
+        await authService.LogoutAsync(User.GetUserId());
         return NoContent();
     }
 
@@ -71,7 +64,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
     {
-        var tokenResponse = await _authService.ConfirmEmailAsync(dto);
+        var tokenResponse = await authService.ConfirmEmailAsync(dto);
         return Ok(tokenResponse);
     }
 
@@ -81,7 +74,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResendConfirmationEmail([FromBody] EmailRequestDto dto)
     {
-        await _authService.ResendConfirmationEmailAsync(dto);
+        await authService.ResendConfirmationEmailAsync(dto);
         return NoContent();
     }
 
@@ -91,7 +84,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ForgotPassword([FromBody] EmailRequestDto dto)
     {
-        await _authService.ForgotPasswordAsync(dto);
+        await authService.ForgotPasswordAsync(dto);
         return NoContent();
     }
 
@@ -101,7 +94,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> VerifyResetToken([FromQuery] string token)
     {
-        await _authService.VerifyResetTokenAsync(token);
+        await authService.VerifyResetTokenAsync(token);
         return NoContent();
     }
 
@@ -111,7 +104,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
     {
-        var tokenResponse = await _authService.ResetPasswordAsync(dto);
+        var tokenResponse = await authService.ResetPasswordAsync(dto);
         return Ok(tokenResponse);
     }
 
@@ -121,7 +114,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UnlockAccount([FromBody] UnlockAccountDto dto)
     {
-        await _authService.UnlockAccountAsync(dto);
+        await authService.UnlockAccountAsync(dto);
         return NoContent();
     }
 }

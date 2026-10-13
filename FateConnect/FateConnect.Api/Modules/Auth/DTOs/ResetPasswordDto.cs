@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace FateConnect.Api.Modules.Auth.DTOs;
+
+using System.ComponentModel.DataAnnotations;
 
 public class ResetPasswordDto
 {

@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Storage.Extensions;
 
-using FateConnect.Api.Modules.Common.Enums;
-using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.Storage.Enums;
+using FateConnect.Api.Modules.Storage.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,7 +38,11 @@ public static class StoredImageExtensions
         if (variant == EnumStoredImageVariant.Thumbnail)
             requestedFileName = $"{Path.GetFileNameWithoutExtension(fileName)}{UploadsLocation.ThumbnailExtension}";
 
-        if (!ImageContentTypes.TryDescribeStoredFile(requestedFileName, out string? storedFileName, out string? contentType))
+        if (
+            !ImageContentTypes.TryDescribeStoredFile(
+                requestedFileName,
+                out string? storedFileName,
+                out string? contentType))
             return controller.NotFound();
 
         string containerFolder = Path.Combine(
