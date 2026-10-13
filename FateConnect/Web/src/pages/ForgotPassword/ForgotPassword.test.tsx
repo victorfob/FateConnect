@@ -7,6 +7,7 @@ import { server } from '@app/mocks/server';
 import { LOGIN_MESSAGES } from '@app/pages/Home/components/LandingLoginCard/schema';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { problemResponse } from '@app/test/utils/problemResponse';
 import { loginPrefillState } from '@app/utils/loginPrefill';
 
 import {
@@ -85,11 +86,7 @@ describe('ForgotPassword', () => {
   });
 
   it('should point at the field and the signup when the email has no account', async () => {
-    server.use(
-      http.post(FORGOT_PASSWORD_URL, () =>
-        HttpResponse.json({ error: 'sem conta' }, { status: NOT_FOUND }),
-      ),
-    );
+    server.use(http.post(FORGOT_PASSWORD_URL, () => problemResponse(NOT_FOUND)));
     renderPage(EMAIL);
 
     await submit();

@@ -18,6 +18,7 @@ import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { PROFILE } from '@app/test/profile';
 import { act, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
+import { problemResponse } from '@app/test/utils/problemResponse';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 import { ADDRESS_OFF_AUTOCOMPLETE } from '@ds-root/components/Input/components/AutocompleteField/constants';
 
@@ -373,11 +374,7 @@ describe('Profile', () => {
   ])(
     'should point at the contact %s the api says is already taken, and keep the change pending',
     async (_, field, label) => {
-      server.use(
-        http.patch(PROFILE_URL, () =>
-          HttpResponse.json({ error: 'em uso', field, code: null }, { status: CONFLICT }),
-        ),
-      );
+      server.use(http.patch(PROFILE_URL, () => problemResponse(CONFLICT, { field })));
       await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
 
       await userEvent.type(screen.getByLabelText(CONTACT_FIELD_LABELS.phone), '15991234567');

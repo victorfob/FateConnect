@@ -1,11 +1,11 @@
 namespace FateConnect.Api.Infrastructure.Middlewares;
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using FateConnect.Api.Infrastructure.Observability;
 using FateConnect.Api.Modules.Auth.Exceptions;
-using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Reports.Exceptions;
 using FateConnect.Api.Modules.InAppNotifications.Exceptions;
@@ -129,17 +129,19 @@ public partial class GlobalExceptionMiddleware(
                 context.UserIdOrAnonymous());
         }
 
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)statusCode;
+        Dictionary<string, object?> extensions = [];
 
-        await context.Response.WriteAsJsonAsync(
-            new ErrorResponseDto
-            {
-                Error = errorMessage,
-                Field = conflictingField,
-                Code = errorCode,
-                MinutesRemaining = minutesRemaining
-            },
-            context.RequestAborted);
+        if (conflictingField is not null)
+            extensions["field"] = conflictingField;
+
+        if (errorCode is not null)
+            extensions["code"] = errorCode;
+
+        if (minutesRemaining is not null)
+            extensions["minutesRemaining"] = minutesRemaining;
+
+        await TypedResults
+            .Problem(detail: errorMessage, statusCode: (int)statusCode, extensions: extensions)
+            .ExecuteAsync(context);
     }
 }
