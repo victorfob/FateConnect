@@ -5,8 +5,10 @@
  * envolver, substituir ou restringir um componente sem varrer o app inteiro.
  */
 export { default as AppBar } from '@mui/material/AppBar';
+export { default as Badge } from '@mui/material/Badge';
 export { default as Box } from '@mui/material/Box';
 export { default as Button } from '@mui/material/Button';
+export { default as ButtonBase } from '@mui/material/ButtonBase';
 export { default as Checkbox } from '@mui/material/Checkbox';
 export { default as CircularProgress } from '@mui/material/CircularProgress';
 export { default as Divider } from '@mui/material/Divider';

@@ -14,6 +14,7 @@ import { ContactBanner } from './components/ContactBanner';
 import { DrawerNavigation } from './components/DrawerNavigation';
 import { DrawerSignOut } from './components/DrawerSignOut';
 import { NotificationsMenu } from './components/NotificationsMenu';
+import { useInAppNotificationHub } from './hooks/useInAppNotificationHub';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
@@ -21,6 +22,7 @@ export function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { pathname } = useLocation();
   const appLinks = useAppLinks();
+  useInAppNotificationHub();
 
   const handleMenuClick = useCallback(() => setDrawerOpen(true), []);
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);

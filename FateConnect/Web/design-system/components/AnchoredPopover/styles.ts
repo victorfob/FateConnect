@@ -14,12 +14,18 @@ const ARROW_SIZE_PX = 10;
  */
 const ARROW_MIN_INSET_PX = 20;
 
+/** O teto do `Popover`, valendo até a medida do componente chegar. */
+const DEFAULT_MAX_HEIGHT = 'calc(100% - 32px)';
+
 /**
  * Onde o centro do gatilho cai dentro do papel. Quem mede é o componente, na
  * abertura e a cada redimensionamento — o `50%` só vale no quadro em que a
  * medida ainda não chegou.
  */
 export const ARROW_OFFSET_VARIABLE = '--anchored-popover-arrow-offset';
+
+/** O espaço entre o topo do papel e o pé da janela, medido pelo componente. */
+export const MAX_HEIGHT_VARIABLE = '--anchored-popover-max-height';
 
 export const PopoverSurface = styled(Popover)(({ theme }) => ({
   '& .MuiPopover-paper': {
@@ -30,6 +36,11 @@ export const PopoverSurface = styled(Popover)(({ theme }) => ({
     // dois recortam a seta, que vive fora da caixa. Não remova por parecer
     // redundante: sem isto ela desaparece sem erro nenhum.
     overflow: 'visible',
+    // Sem rolar, o papel deixaria passar da tela o que não cabe na altura dele.
+    // Em coluna, o conteúdo que declara `minHeight: 0` encolhe e rola por dentro.
+    display: 'flex',
+    flexDirection: 'column',
+    maxHeight: `var(${MAX_HEIGHT_VARIABLE}, ${DEFAULT_MAX_HEIGHT})`,
 
     '&::before': {
       content: '""',
