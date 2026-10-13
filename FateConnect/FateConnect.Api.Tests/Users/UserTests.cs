@@ -54,6 +54,17 @@ public class UserTests
     }
 
     [Fact]
+    public void UpdatePersonalData_WithANeighborhoodOverTheLimit_IsRefusedNamingTheField()
+    {
+        User user = NewUser("mariana.rocha@aluno.cps.sp.gov.br");
+
+        InvalidNeighborhoodException exception = Assert.Throws<InvalidNeighborhoodException>(() =>
+            user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, user.Gender, contact: null, neighborhood: new string('a', 101)));
+
+        Assert.Equal("O bairro e a cidade podem ter no máximo 100 caracteres.", exception.Message);
+    }
+
+    [Fact]
     public void UpdateByAdmin_WithoutAContact_KeepsTheOneAlreadyRegistered()
     {
         User user = NewUser("mariana.rocha@aluno.cps.sp.gov.br");
