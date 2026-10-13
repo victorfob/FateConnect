@@ -34,6 +34,7 @@ paths:
 
 ## Máscara e envio
 
+- Mapper de formulário existe para converter (data, máscara, `removeImage`). Campo que só mudaria de nome se chama como na API (`image`), e os valores vão direto ao serviço.
 - Máscara de data preserva a posição do cursor ao editar no meio e ao colar; máscara alternativa por comprimento (fixo e celular) se resolve na função pura.
 - `isPending` vai na prop `loading` do `Button`, que já desabilita e desenha o indicador: sem rótulo alternativo e sem `disabled` manual. A mensagem de erro se decide pelo `status` que o cliente HTTP normaliza.
 - ⛔ O 409 com `field` (e-mail ou telefone já em uso) se marca no campo, com foco, em todo formulário que envia o campo (`conflictFieldOf`); o aviso genérico fica para o resto. Campo que muda de tela leva esse tratamento junto.
