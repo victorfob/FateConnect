@@ -3,11 +3,11 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using FateConnect.Api.Modules.Emails.Enums;
-using FateConnect.Api.Modules.Emails.Exceptions;
+using FateConnect.Api.Modules.Emails.Options;
 using FateConnect.Api.Modules.Emails.Services;
 using FateConnect.Api.Tests.Fixtures;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Resend;
 
 namespace FateConnect.Api.Tests.Emails;
@@ -43,13 +43,8 @@ public partial class EmailServiceTests
     [GeneratedRegex(@"display\s*:\s*(flex|grid)|var\(|box-shadow|<svg", RegexOptions.IgnoreCase)]
     private static partial Regex CssTheClientsIgnore();
 
-    private static IConfiguration ConfigurationWith(string? sender, string? publicUrl) =>
-        new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["EMAIL_SENDER"] = sender, ["PUBLIC_URL"] = publicUrl })
-            .Build();
-
-    private static EmailService ServiceWith(IResend resend, string? sender = Sender, string? publicUrl = PublicUrl) =>
-        new(resend, ConfigurationWith(sender, publicUrl), new FixedTimeProvider(NewYearInUtcStillDecemberInBrazil), NullLogger<EmailService>.Instance);
+    private static EmailService ServiceWith(IResend resend) =>
+        new(resend, Options.Create(new EmailOptions(PublicUrl, Sender)), new FixedTimeProvider(NewYearInUtcStillDecemberInBrazil), NullLogger<EmailService>.Instance);
 
     private static async Task<EmailMessage> SentMessage(EnumAccountEmail email, string fullName = FullName)
     {
@@ -147,18 +142,5 @@ public partial class EmailServiceTests
             Assert.DoesNotContain("<a href='https://golpe.test'", message.HtmlBody);
             Assert.Contains("&lt;a href=", message.HtmlBody);
         }
-    }
-
-    [Theory]
-    [InlineData(null, PublicUrl, "EMAIL_SENDER")]
-    [InlineData(Sender, null, "PUBLIC_URL")]
-    public void Constructor_WithoutAVariable_FailsNamingIt(string? sender, string? publicUrl, string variable)
-    {
-        IResend resend = DispatchProxy.Create<IResend, ResendRecorder>();
-
-        MissingEmailConfigurationException exception = Assert.Throws<MissingEmailConfigurationException>(
-            () => ServiceWith(resend, sender, publicUrl));
-
-        Assert.Contains(variable, exception.Message);
     }
 }

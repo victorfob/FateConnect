@@ -91,6 +91,10 @@ e `/root/password-fateconnect_prod.txt`; gere os segredos de sessão com
 `openssl rand -base64 32`, **diferentes** em cada ambiente. Deixe `PUBLIC_URL`
 com `http://` por enquanto.
 
+**A API não sobe sem o banco** (`POSTGRES_DB`, `POSTGRES_USER` e
+`POSTGRES_PASSWORD`, que o compose junta na conexão) **nem sem a sessão**
+(`JWT_SECRET`, `JWT_ISSUER` e `JWT_AUDIENCE`): o log diz qual variável faltou.
+
 `SIXLABORS_LICENSE` recebe o conteúdo inteiro do arquivo `sixlabors.lic`, entre aspas
 simples: a API gera a miniatura das fotos com o ImageSharp, e o build da imagem reprova
 sem a licença. Ela entra como segredo do build: não aparece no log do deploy nem chega à
@@ -302,6 +306,22 @@ Rode `sudo ./install-site.sh <ambiente>`, uma vez por ambiente — é o único p
 manual de uma publicação. Ele reaplica o HTTPS sozinho quando já existe
 certificado para o domínio.
 
+## A rota de saúde
+
+`/api/health` responde sem token e diz só se a API está saudável: `Healthy`, com
+200, quando ela alcança o banco do ambiente e a fila; `Unhealthy` (banco fora)
+ou `Degraded` (fila fora ou reconectando), com 503. Não diz versão, host nem o erro: o motivo fica
+no log da API.
+
+```bash
+curl -s https://hml.fateconnect.com.br/api/health
+```
+
+A pipeline confere essa rota depois de subir o contêiner e reprova a publicação
+se ela não responder 200 em 2 minutos. Na subida, a API espera o RabbitMQ ficar
+saudável (o `healthcheck` do compose roda `rabbitmq-diagnostics ping`) antes de
+começar.
+
 ## Dia a dia
 
 | O que você quer | Comando |
@@ -353,6 +373,11 @@ antiga, nesta ordem:
 
 **O site responde 502.** A API daquele ambiente está fora. Veja com
 `docker compose -p fateconnect-hml logs`.
+
+**A publicação reprova na rota de saúde com 503.** A API está de pé, mas não
+alcança o banco ou a fila. Veja qual com `docker compose -p fateconnect-hml ps`
+(a fila aparece `unhealthy`) e o motivo com
+`docker compose -p fateconnect-hml logs api`.
 
 **Um contêiner morre sozinho, sem erro claro.** Quase sempre é falta de
 memória: o kernel encerra o processo que mais consome. Confirme com

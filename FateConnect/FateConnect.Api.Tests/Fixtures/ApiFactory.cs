@@ -54,6 +54,7 @@ public class ApiFactory : WebApplicationFactory<Program>
     {
         Directory.CreateDirectory(_webRoot);
 
+        Environment.SetEnvironmentVariable("DB_CONNECTION", "Host=banco-falso-da-suite;Database=substituido-pela-fabrica");
         Environment.SetEnvironmentVariable("JWT_SECRET", FakeSecret);
         Environment.SetEnvironmentVariable("JWT_ISSUER", "FateConnectTest");
         Environment.SetEnvironmentVariable("JWT_AUDIENCE", "FateConnectTestWeb");
@@ -103,6 +104,17 @@ public class ApiFactory : WebApplicationFactory<Program>
 
         if (Directory.Exists(_webRoot))
             Directory.Delete(_webRoot, recursive: true);
+    }
+
+    public void DropDatabase()
+    {
+        CloseIdleDatabaseConnections();
+
+        using NpgsqlConnection connection = new(TestDatabase.ConnectionStringFor("postgres"));
+        connection.Open();
+
+        using NpgsqlCommand command = new($"DROP DATABASE \"{_databaseName}\" WITH (FORCE)", connection);
+        command.ExecuteNonQuery();
     }
 
     private void CloseIdleDatabaseConnections()

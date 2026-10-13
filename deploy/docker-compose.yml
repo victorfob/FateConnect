@@ -16,8 +16,10 @@ services:
       secrets:
         - sixlabors_license
     restart: unless-stopped
+    # Sem esperar a fila ficar pronta, a API sobe antes dela e falha a primeira conexão.
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       DB_CONNECTION: Host=host.docker.internal;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
@@ -63,6 +65,12 @@ services:
     ports:
       - '127.0.0.1:${RABBITMQ_PORT}:5672'
       - '127.0.0.1:${RABBITMQ_UI_PORT}:15672'
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
     mem_limit: 512m
 
 volumes:

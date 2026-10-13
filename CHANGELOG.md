@@ -13,12 +13,15 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona à campainha do topo o número de avisos não lidos, que sobe na hora em que um chega, sem recarregar, e um painel com os 3 não lidos mais recentes e a opção de marcar todos como lidos (#592) [Frontend]
 - Adiciona a central de notificações, no lugar da tela de área ainda não disponível, com os avisos paginados, o filtro por situação e por tipo e a opção de marcar um ou todos como lidos (#592) [Frontend]
 - Adiciona a ida ao destino de cada aviso: tocar nele o marca como lido e leva às denúncias enviadas, às caronas buscadas pelo destino ou aos seus itens arquivados; a carona já excluída é avisada, e a tela fica (#592) [Frontend]
+- Adiciona a rota de saúde da API, que responde sem login se ela alcança o banco e a fila, sem dizer mais nada (#595) [Backend]
 
 ### Changed
 
 - Passa a levar a aba aberta para a tela de sessão expirada assim que a sessão é encerrada em outro aparelho ou pela troca de senha, e o texto da tela passa a citar essas causas (#592) [Frontend]
 - Passa a declarar na política de privacidade por quanto tempo as notificações ficam guardadas e o uso do bairro e da cidade do perfil no aviso de carona, em nova versão do documento (#592) [Frontend]
 - Renomeia para `Bairro e cidade` o campo do Meu perfil que se chamava `Bairro`, porque ele guarda os dois, e a mensagem de limite de tamanho acompanha (#594) [Frontend] [Backend]
+- Passa a reprovar a publicação quando a rota de saúde não responde em 2 minutos, e a API passa a esperar a fila ficar pronta para subir, em vez de falhar a primeira conexão (#595) [Backend]
+- Passa a recusar a subida da API sem a conexão com o banco ou sem as configurações da sessão, dizendo qual faltou, em vez de subir com elas vazias (#595) [Backend]
 
 ## [1.4.0] - 2026-10-12
 

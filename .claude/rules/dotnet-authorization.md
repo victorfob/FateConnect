@@ -27,7 +27,7 @@ Endpoint novo entra na teoria de rotas do `AuthorizationTests` (401 sem token) e
 
 ## O piso responde 401 até para rota que não existe
 
-⛔ **401 não prova que a rota existe.** Para saber se o código novo subiu, leia o `swagger.json`; para saber se a aplicação está viva, qualquer caminho serve (é o que a sonda de `.github/workflows/publish.yml` faz).
+⛔ **401 não prova que a rota existe.** Para saber se o código novo subiu, leia o `swagger.json`; para saber se ela está de pé com o banco e a fila, `GET /health` (anônima; é o que a publicação confere em `.github/workflows/publish.yml`).
 
 ## O que roda antes da autorização não passa por ela
 
