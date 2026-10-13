@@ -1,7 +1,6 @@
 namespace FateConnect.Api.Modules.Users.DTOs;
 
 using FateConnect.Api.Infrastructure.Validation;
-using FateConnect.Api.Modules.Common.Validators;
 using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Http;
 using System;

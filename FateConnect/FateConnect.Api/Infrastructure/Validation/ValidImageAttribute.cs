@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Common.Validators;
+namespace FateConnect.Api.Infrastructure.Validation;
 
 using System;
 using System.ComponentModel.DataAnnotations;

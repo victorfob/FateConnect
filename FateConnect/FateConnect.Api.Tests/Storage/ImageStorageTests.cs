@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using FateConnect.Api.Modules.Common.Validators;
 using FateConnect.Api.Modules.Denunciations.DTOs;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Enums;
@@ -20,6 +19,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using SixLabors.ImageSharp;
+using FateConnect.Api.Infrastructure.Validation;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace FateConnect.Api.Tests.Storage;
