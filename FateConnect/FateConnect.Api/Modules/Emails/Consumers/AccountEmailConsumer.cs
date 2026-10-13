@@ -2,16 +2,16 @@ namespace FateConnect.Api.Modules.Emails.Consumers;
 
 using System;
 using System.Threading.Tasks;
-using FateConnect.Api.Modules.Emails.Extensions;
 using FateConnect.Api.Modules.Emails.Interfaces;
+using FateConnect.Api.Modules.Emails.Options;
 using FateConnect.Api.Modules.Emails.Templates;
 using MassTransit;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 public abstract partial class AccountEmailConsumer<TEvent>(
     IEmailService emailService,
-    IConfiguration configuration,
+    IOptions<EmailOptions> emailOptions,
     ILogger logger
 ) : IConsumer<TEvent> where TEvent : class
 {
@@ -26,7 +26,7 @@ public abstract partial class AccountEmailConsumer<TEvent>(
             LogDispatchStarted(logger, dispatch.Email, dispatch.UserId);
 
             string safeEmail = Uri.EscapeDataString(dispatch.FatecEmail);
-            string link = $"{configuration.RequiredPublicUrl()}/{AccountEmails.For(dispatch.Email).Route}?token={dispatch.Token}&email={safeEmail}";
+            string link = $"{emailOptions.Value.PublicUrl}/{AccountEmails.For(dispatch.Email).Route}?token={dispatch.Token}&email={safeEmail}";
 
             await emailService.SendAsync(dispatch.Email, dispatch.FatecEmail, dispatch.FullName, link);
 

@@ -4,8 +4,9 @@ using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.Emails.Interfaces;
 using MassTransit;
 using MassTransit.Testing;
-using Microsoft.Extensions.Configuration;
+using FateConnect.Api.Modules.Emails.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FateConnect.Api.Tests.Emails;
 
@@ -14,7 +15,6 @@ public class EmailConsumerTests
     private const string FatecEmail = "lucas+teste@aluno.cps.sp.gov.br";
 
     private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(30);
-    private static readonly TimeSpan InactivityTimeout = TimeSpan.FromSeconds(10);
 
     private sealed class FailingEmailService : IEmailService
     {
@@ -22,19 +22,15 @@ public class EmailConsumerTests
             throw new HttpRequestException("Resend fora do ar");
     }
 
-    private static async Task<ITestHarness> StartedHarness(IEmailService emailService, string? publicUrl)
+    private static async Task<ITestHarness> StartedHarness(IEmailService emailService)
     {
-        IConfiguration configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["PUBLIC_URL"] = publicUrl })
-            .Build();
-
         ServiceProvider provider = new ServiceCollection()
-            .AddSingleton(configuration)
+            .AddSingleton(Options.Create(new EmailOptions("https://fateconnect.test", "nao-responda@fateconnect.test")))
             .AddSingleton(emailService)
             .AddLogging()
             .AddMassTransitTestHarness(bus =>
             {
-                bus.SetTestTimeouts(TestTimeout, InactivityTimeout);
+                bus.SetTestTimeouts(TestTimeout, testInactivityTimeout: TestTimeout);
                 bus.AddConsumer<UserRegisteredEventConsumer>();
                 bus.AddConsumer<PasswordResetRequestedEventConsumer>();
                 bus.AddConsumer<AccountLockedEventConsumer>();
@@ -58,27 +54,13 @@ public class EmailConsumerTests
     [MemberData(nameof(EveryEvent))]
     public async Task Consume_WhenTheSendFails_FaultsTheMessage(object message)
     {
-        ITestHarness harness = await StartedHarness(new FailingEmailService(), "https://fateconnect.test");
+        ITestHarness harness = await StartedHarness(new FailingEmailService());
 
         await harness.Bus.Publish(message);
 
         IReceivedMessage received = await harness.Consumed.SelectAsync(consumed => consumed.Exception is not null).First();
 
         Assert.IsType<HttpRequestException>(received.Exception);
-        await harness.Stop();
-    }
-
-    [Theory]
-    [MemberData(nameof(EveryEvent))]
-    public async Task Consume_WithoutThePublicUrl_FaultsTheMessage(object message)
-    {
-        ITestHarness harness = await StartedHarness(new FailingEmailService(), publicUrl: null);
-
-        await harness.Bus.Publish(message);
-
-        IReceivedMessage received = await harness.Consumed.SelectAsync(consumed => consumed.Exception is not null).First();
-
-        Assert.Contains("PUBLIC_URL", received.Exception!.Message);
         await harness.Stop();
     }
 }
