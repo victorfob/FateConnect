@@ -1,8 +1,9 @@
 namespace FateConnect.Api.Modules.Auth.DTOs;
 
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using FateConnect.Api.Infrastructure.OpenApi;
 using FateConnect.Api.Infrastructure.Validation;
+using Swashbuckle.AspNetCore.Annotations;
 
 public class EmailRequestDto
 {
@@ -10,6 +11,7 @@ public class EmailRequestDto
     [EmailAddress(ErrorMessage = "O formato do e-mail é inválido.")]
     [FatecEmail]
     [MaxLength(150)]
-    [DefaultValue("joao.silva999@aluno.cps.sp.gov.br")]
+    [SwaggerSchema("Institutional e-mail of the account.")]
+    [SchemaExample("joao.silva999@aluno.cps.sp.gov.br")]
     public string FatecEmail { get; set; } = string.Empty;
 }
