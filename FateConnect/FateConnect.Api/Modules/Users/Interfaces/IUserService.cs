@@ -17,8 +17,8 @@ public interface IUserService
     Task DeactivateAccountAsync(int currentUserId);
     Task RemoveProfileImageAsync(int currentUserId);
 
-    Task<PagedResultDto<ReadUserSummaryDto>> GetAllUsersAsync(UserFilterDto filter);
-    Task<ReadUserDto?> GetUserByIdAsync(int id);
+    Task<PagedResultDto<ReadUserSummaryDto>> GetAllAsync(UserFilterDto filter);
+    Task<ReadUserDto?> GetByIdAsync(int id);
     Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto, int currentUserId);
     Task<ReadUserDto?> ChangeUserProfileAsync(int id, EnumProfileType newProfile, int currentUserId);
     Task<ReadUserDto?> ChangeUserStatusAsync(int id, EnumAccountStatus newStatus, int currentUserId);

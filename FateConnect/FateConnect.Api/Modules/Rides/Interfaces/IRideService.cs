@@ -9,5 +9,5 @@ public interface IRideService
     Task<PagedResultDto<ReadRideDto>> GetAllAsync(RideFilterDto filter, int currentUserId);
     Task<ReadRideDto?> GetByIdAsync(Guid id, int currentUserId);
     Task<ReadRideDto?> UpdateAsync(Guid id, UpdateRideDto dto, int currentUserId);
-    Task<bool> DeleteAsync(Guid id, int currentUserId);
+    Task<bool> DeactivateAsync(Guid id, int currentUserId);
 }

@@ -250,7 +250,7 @@ public partial class UserService(
         LogUserDeactivated(logger, currentUserId);
     }
 
-    public async Task<PagedResultDto<ReadUserSummaryDto>> GetAllUsersAsync(UserFilterDto filter)
+    public async Task<PagedResultDto<ReadUserSummaryDto>> GetAllAsync(UserFilterDto filter)
     {
         (IReadOnlyList<ReadUserSummaryDto> records, int total) = await userRepository.GetAllAsync(
             filter,
@@ -274,7 +274,7 @@ public partial class UserService(
         };
     }
 
-    public async Task<ReadUserDto?> GetUserByIdAsync(int id)
+    public async Task<ReadUserDto?> GetByIdAsync(int id)
     {
         var user = await userRepository.GetByIdAsync(id, asNoTracking: true);
 

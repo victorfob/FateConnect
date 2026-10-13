@@ -108,14 +108,14 @@ public partial class RideService(
                 DateTimeUtils.NowInProductTimeZone(clock),
                 holidays);
 
-        await repository.UpdateAsync(ride);
+        await repository.SaveChangesAsync();
 
         LogRideUpdated(logger, id);
 
         return MapToReadDto(ride, currentUserId);
     }
 
-    public async Task<bool> DeleteAsync(Guid id, int currentUserId)
+    public async Task<bool> DeactivateAsync(Guid id, int currentUserId)
     {
         var ride = await repository.GetByIdAsync(id);
 
@@ -129,7 +129,7 @@ public partial class RideService(
 
         ride.Deactivate();
 
-        await repository.UpdateAsync(ride);
+        await repository.SaveChangesAsync();
 
         LogRideDeactivated(logger, id);
         return true;

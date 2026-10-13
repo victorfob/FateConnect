@@ -113,18 +113,18 @@ public class UsersController(IUserService service) : ControllerBase
 
     [HttpGet]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    public async Task<ActionResult<PagedResultDto<ReadUserSummaryDto>>> GetAllUsersAsync([FromQuery] UserFilterDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadUserSummaryDto>>> GetAllAsync([FromQuery] UserFilterDto filter)
     {
-        var result = await service.GetAllUsersAsync(filter);
+        var result = await service.GetAllAsync(filter);
 
         return Ok(result);
     }
 
     [HttpGet("{id:int}")]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    public async Task<ActionResult<ReadUserDto>> GetUserByIdAsync(int id)
+    public async Task<ActionResult<ReadUserDto>> GetByIdAsync(int id)
     {
-        var result = await service.GetUserByIdAsync(id);
+        var result = await service.GetByIdAsync(id);
 
         if (result is null)
             return NotFound();

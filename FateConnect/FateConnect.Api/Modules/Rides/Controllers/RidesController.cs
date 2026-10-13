@@ -66,7 +66,7 @@ public class RidesController(IRideService rideService) : ControllerBase
     [SwaggerOperation(Summary = "Deactivate a ride", Description = "Sets the ride active status to false. Only the user who offered the ride can do it.")]
     public async Task<IActionResult> DeleteAsync(Guid id)
     {
-        var isDeactivated = await rideService.DeleteAsync(id, User.GetUserId());
+        var isDeactivated = await rideService.DeactivateAsync(id, User.GetUserId());
 
         if (!isDeactivated)
             return NotFound();

@@ -134,7 +134,7 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
         return ride;
     }
 
-    public async Task UpdateAsync(Ride ride)
+    public async Task SaveChangesAsync()
     {
         await context.SaveChangesAsync();
     }
