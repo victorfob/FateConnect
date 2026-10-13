@@ -5,7 +5,7 @@ using System;
 public abstract class InAppNotificationDomainException(string message) : Exception(message);
 
 public class InvalidInAppNotificationContentException()
-    : InAppNotificationDomainException("O conteúdo da notificação não pode ser vazio.");
+    : InAppNotificationDomainException("The notification content cannot be empty.");
 
 public class InAppNotificationNotFoundException()
-    : Exception("A notificação solicitada não foi encontrada ou não pertence a você.");
+    : Exception("The notification was not found or does not belong to you.");

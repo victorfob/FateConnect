@@ -17,10 +17,10 @@ public class ValidImageAttribute : ValidationAttribute
             return ValidationResult.Success;
 
         if (image.Length == 0)
-            return new ValidationResult("A imagem enviada está vazia ou corrompida.");
+            return new ValidationResult("The image sent is empty or corrupted.");
 
         if (image.Length > MaxFileSizeInBytes)
-            return new ValidationResult($"O tamanho da imagem não pode ultrapassar {NumberOfMegabytes}MB.");
+            return new ValidationResult($"The image cannot be larger than {NumberOfMegabytes} MB.");
 
         if (!ImageContentTypes.IsSupported(image.ContentType))
             return new ValidationResult(new UnsupportedImageFormatException().Message);

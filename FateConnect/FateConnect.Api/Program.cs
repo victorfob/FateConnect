@@ -9,13 +9,11 @@ using FateConnect.Api.Infrastructure.Converters;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Infrastructure.Middlewares;
 using FateConnect.Api.Infrastructure.Observability;
+using FateConnect.Api.Infrastructure.OpenApi;
 using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Services;
-using FateConnect.Api.Modules.Reports.Interfaces;
-using FateConnect.Api.Modules.Reports.Repositories;
-using FateConnect.Api.Modules.Reports.Services;
 using FateConnect.Api.Modules.Emails.Consumers;
 using FateConnect.Api.Modules.Emails.Interfaces;
 using FateConnect.Api.Modules.Emails.Options;
@@ -29,6 +27,9 @@ using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.LostAndFound.Workers;
+using FateConnect.Api.Modules.Reports.Interfaces;
+using FateConnect.Api.Modules.Reports.Repositories;
+using FateConnect.Api.Modules.Reports.Services;
 using FateConnect.Api.Modules.Rides.Interfaces;
 using FateConnect.Api.Modules.Rides.Repositories;
 using FateConnect.Api.Modules.Rides.Services;
@@ -45,8 +46,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
 using Resend;
 using Sentry.AspNetCore;
 using Sentry.Extensibility;
@@ -169,53 +168,7 @@ public class Program
                 options.PayloadSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.EnableAnnotations();
-
-            options.MapType<DateOnly>(() => new OpenApiSchema
-            {
-                Type = "string",
-                Format = "date",
-                Example = new OpenApiString("2026-08-30")
-            });
-
-            options.MapType<TimeOnly>(() => new OpenApiSchema
-            {
-                Type = "string",
-                Format = "time",
-                Example = new OpenApiString("16:20:00")
-            });
-
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "FateConnect API",
-                Version = "v1",
-                Description = "Car pooling and academic connection platform API."
-            });
-
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer 12345abcdef'",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                Scheme = "Bearer",
-                BearerFormat = "JWT",
-                In = ParameterLocation.Header
-            });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-                    },
-                    Array.Empty<string>()
-                }
-            });
-        });
+        builder.Services.AddOpenApiDocument();
 
         byte[] key = Encoding.UTF8.GetBytes(jwtOptions.Secret);
 
@@ -297,20 +250,22 @@ public class Program
         }
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
-        app.UseStatusCodePages(context =>
-            TypedResults.Problem(statusCode: context.HttpContext.Response.StatusCode).ExecuteAsync(context.HttpContext));
+        app.UseStatusCodePages(context => TypedResults
+            .Problem(statusCode: context.HttpContext.Response.StatusCode)
+            .ExecuteAsync(context.HttpContext));
 
         app.UseForwardedHeaders();
 
         app.UseCors(corsPolicy);
 
         app.UseSwagger();
-        app.UseSwaggerUI();
 
         app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
+
+        app.MapApiReference();
 
         app.MapHealthChecks("/health", new HealthCheckOptions
         {

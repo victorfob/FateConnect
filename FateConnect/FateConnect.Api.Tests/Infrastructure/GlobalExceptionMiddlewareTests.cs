@@ -121,12 +121,12 @@ public class GlobalExceptionMiddlewareTests
     }
 
     [Fact]
-    public async Task AnUnmappedException_AnswersTheFallbackMessageInPortuguese()
+    public async Task AnUnmappedException_AnswersTheFallbackMessage()
     {
         (HttpStatusCode statusCode, string detail, _) = await AnswerFor(new TimeoutException("connection dropped"));
 
         Assert.Equal(HttpStatusCode.InternalServerError, statusCode);
-        Assert.Equal("Algo deu errado. Tente novamente.", detail);
+        Assert.Equal("Something went wrong. Try again.", detail);
     }
 
     [Fact]
@@ -135,7 +135,7 @@ public class GlobalExceptionMiddlewareTests
         (HttpStatusCode statusCode, string detail, _) = await AnswerFor(new InvalidRideTypeException());
 
         Assert.Equal(HttpStatusCode.BadRequest, statusCode);
-        Assert.Equal("Tipo de carona inválido.", detail);
+        Assert.Equal("Invalid ride type.", detail);
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public class GlobalExceptionMiddlewareTests
             await AnswerFor(new EmailAlreadyRegisteredException("mariana.rocha@aluno.cps.sp.gov.br"));
 
         Assert.Equal(HttpStatusCode.Conflict, statusCode);
-        Assert.Equal("O e-mail 'mariana.rocha@aluno.cps.sp.gov.br' já está em uso no sistema.", detail);
+        Assert.Equal("The e-mail 'mariana.rocha@aluno.cps.sp.gov.br' is already in use.", detail);
         Assert.Equal("fatecEmail", field);
     }
 
@@ -156,7 +156,7 @@ public class GlobalExceptionMiddlewareTests
             await AnswerFor(new ContactPhoneAlreadyRegisteredException("15999990000"));
 
         Assert.Equal(HttpStatusCode.Conflict, statusCode);
-        Assert.Equal("O telefone '15999990000' já está em uso no sistema.", detail);
+        Assert.Equal("The phone '15999990000' is already in use.", detail);
         Assert.Equal("phone", field);
     }
 
@@ -167,7 +167,7 @@ public class GlobalExceptionMiddlewareTests
             await AnswerFor(new ContactEmailAlreadyRegisteredException("mariana.rocha@gmail.com"));
 
         Assert.Equal(HttpStatusCode.Conflict, statusCode);
-        Assert.Equal("O e-mail de contato 'mariana.rocha@gmail.com' já está em uso no sistema.", detail);
+        Assert.Equal("The contact e-mail 'mariana.rocha@gmail.com' is already in use.", detail);
         Assert.Equal("contactEmail", field);
     }
 
@@ -198,15 +198,15 @@ public class GlobalExceptionMiddlewareTests
         (HttpStatusCode statusCode, string detail, _) = await AnswerFor(new InvalidCredentialsException());
 
         Assert.Equal(HttpStatusCode.Unauthorized, statusCode);
-        Assert.Equal("E-mail ou senha inválidos.", detail);
+        Assert.Equal("Invalid e-mail or password.", detail);
     }
 
     [Fact]
-    public async Task AnUnidentifiedUser_AnswersUnauthorizedInPortuguese()
+    public async Task AnUnidentifiedUser_AnswersUnauthorized()
     {
         (HttpStatusCode statusCode, string detail, _) = await AnswerFor(new UnidentifiedUserException());
 
         Assert.Equal(HttpStatusCode.Unauthorized, statusCode);
-        Assert.Equal("Sessão expirada. Entre novamente para continuar.", detail);
+        Assert.Equal("Session expired. Sign in again to continue.", detail);
     }
 }

@@ -69,7 +69,7 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         (string? code, string? detail) = await ProblemOf(response);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
-        Assert.Equal("Para ofertar carona, cadastre telefone e e-mail para contato em Meu perfil.", detail);
+        Assert.Equal("To offer a ride, add a contact phone and e-mail in My profile.", detail);
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         (string? code, string? detail) = await ProblemOf(response);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
-        Assert.Equal("Para cadastrar um item, cadastre telefone e e-mail para contato em Meu perfil.", detail);
+        Assert.Equal("To register an item, add a contact phone and e-mail in My profile.", detail);
     }
 
     [Fact]
@@ -108,7 +108,8 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
         Assert.Equal(
-            "Para enviar uma denúncia sem sigilo, cadastre telefone e e-mail para contato em Meu perfil, ou marque a denúncia como sigilosa.",
+            "To send an identified report, add a contact phone and e-mail in My profile, " +
+                "or mark the report as anonymous.",
             detail);
     }
 

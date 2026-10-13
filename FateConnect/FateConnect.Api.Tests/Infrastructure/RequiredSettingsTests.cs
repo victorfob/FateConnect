@@ -45,6 +45,9 @@ public class RequiredSettingsTests
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
             () => RequiredSettings.Read(LookupWithout(missing)));
 
-        Assert.StartsWith($"A variável de ambiente {missing} é obrigatória", exception.Message, StringComparison.Ordinal);
+        Assert.StartsWith(
+            $"The environment variable {missing} is required",
+            exception.Message,
+            StringComparison.Ordinal);
     }
 }

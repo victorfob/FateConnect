@@ -6,8 +6,9 @@ public static partial class RegexConstants
 {
     public const string FatecEmailDomainPattern = @"^.*@(aluno\.)?cps\.sp\.gov\.br$";
     public const string FatecEmailLocalPartPattern = @"^[a-zA-Z0-9._%+-]+@[^@]*$";
-    public const string FatecEmailDomainErrorMessage = "Use o e-mail @aluno.cps.sp.gov.br ou @cps.sp.gov.br";
-    public const string FatecEmailLocalPartErrorMessage = "Use o e-mail sem acento nem espaço, como a Fatec emitiu";
+    public const string FatecEmailDomainErrorMessage = "Use an @aluno.cps.sp.gov.br or @cps.sp.gov.br e-mail.";
+    public const string FatecEmailLocalPartErrorMessage =
+        "Use the e-mail without accents or spaces, as Fatec issued it.";
 
     [GeneratedRegex(FatecEmailDomainPattern, RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 250)]
     public static partial Regex DomainRegex();

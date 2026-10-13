@@ -9,14 +9,15 @@ using Swashbuckle.AspNetCore.Annotations;
 [ApiController]
 [Route("[controller]")]
 [Authorize]
-[SwaggerTag("Holidays")]
+[SwaggerTag("Holidays on which no ride departs.")]
 public class HolidaysController(IHolidayCalendar holidayCalendar) : ControllerBase
 {
     [HttpGet]
     [SwaggerOperation(
-        Summary = "Get the holidays of a year",
+        OperationId = "ListHolidays",
+        Summary = "List the holidays of a year",
         Description = "Returns the national, São Paulo state and Sorocaba municipal holidays of the year, sorted. " +
-            "Rides that repeat skip them.")]
+            "No ride departs on them: a one-off ride on a holiday is refused, and a repeated ride skips it.")]
     public ActionResult<IReadOnlyList<DateOnly>> GetAll([FromQuery] HolidaysQueryDto query)
     {
         return Ok(holidayCalendar.HolidaysIn(query.Year!.Value));

@@ -51,7 +51,7 @@ public class ReportTests
                 () => CreateReport(description: description));
 
         Assert.Equal(
-            "A descrição da denúncia deve conter pelo menos 10 caracteres para fornecer contexto suficiente.",
+            "The report description must have at least 10 characters to give enough context.",
             exception.Message);
     }
 
@@ -63,7 +63,7 @@ public class ReportTests
                 () => CreateReport(category: (EnumReportCategory)77));
 
         Assert.Equal(
-            "A categoria selecionada para a denúncia é inválida ou não existe no sistema.",
+            "The report category is invalid.",
             exception.Message);
     }
 
@@ -130,7 +130,7 @@ public class ReportTests
                 () => report.UpdateStatus(EnumReportStatus.Resolved, DateTime.UtcNow));
 
         Assert.Equal(
-            "Transição inválida: não é possível alterar o status de 'Open' para 'Resolved'.",
+            "Invalid transition: the status cannot change from 'Open' to 'Resolved'.",
             exception.Message);
         Assert.Equal(EnumReportStatus.Open, report.Status);
     }
@@ -144,7 +144,7 @@ public class ReportTests
             Assert.Throws<InvalidReportStatusTransitionException>(
                 () => report.UpdateStatus(EnumReportStatus.Open, DateTime.UtcNow));
 
-        Assert.Equal("A denúncia já se encontra no status 'Open'.", exception.Message);
+        Assert.Equal("The report is already in the status 'Open'.", exception.Message);
         Assert.Null(report.UpdatedAt);
     }
 
@@ -170,6 +170,6 @@ public class ReportTests
             Assert.Throws<InvalidReportStatusException>(
                 () => report.UpdateStatus((EnumReportStatus)99, DateTime.UtcNow));
 
-        Assert.Equal("O status informado para a denúncia é inválido.", exception.Message);
+        Assert.Equal("The report status is invalid.", exception.Message);
     }
 }

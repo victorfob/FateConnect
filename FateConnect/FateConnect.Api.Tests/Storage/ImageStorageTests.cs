@@ -135,7 +135,7 @@ public sealed class ImageStorageTests : IDisposable
     {
         ValidationResult? result = Validate(FileOfSize("image/png", 0));
 
-        Assert.Equal("A imagem enviada está vazia ou corrompida.", result?.ErrorMessage);
+        Assert.Equal("The image sent is empty or corrupted.", result?.ErrorMessage);
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public sealed class ImageStorageTests : IDisposable
     {
         ValidationResult? result = Validate(FileOfSize("image/png", 5 * 1024 * 1024 + 1));
 
-        Assert.Equal("O tamanho da imagem não pode ultrapassar 5MB.", result?.ErrorMessage);
+        Assert.Equal("The image cannot be larger than 5 MB.", result?.ErrorMessage);
     }
 
     [Fact]
