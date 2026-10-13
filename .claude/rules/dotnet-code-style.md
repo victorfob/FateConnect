@@ -33,6 +33,7 @@ paths:
 ## Forma
 
 - `if` de uma instrução não leva chaves; a instrução vai na linha seguinte, indentada.
+- `Infrastructure/` se divide por assunto (`Database`, `Middlewares`, `Validation`, `Observability`), com a interface ao lado da implementação; a quebra em `Interfaces/`, `Services/` e `Extensions/` é dos `Modules/`.
 - ⛔ **O controller só orquestra.** Nada de `private` nele: o auxiliar vira extension no módulo dono do conceito (`Modules/Auth/Extensions/ClaimsPrincipalExtensions.cs`, `GetUserId`), não em `Common`.
 - ⛔ **Outra camada precisa de algo `private`? Exponha o método que responde, não o dado** (`DateTimeUtils.NowInProductTimeZone`, `ToUtcFromProductTimeZone`). O tell é tornar público um `private` para atender um consumidor; extrair para arquivo novo reabre essa decisão.
 - `[Route("[controller]")]`, daí `/Rides`, `/Users` e `/Auth` com maiúscula. Rota que vem de constante do domínio (`UploadsController`, `UploadsLocation.FolderName`) é a exceção.
@@ -74,4 +75,5 @@ Depois de qualquer substituição em lote, procure as três formas de estrago, q
 
 - Identificador, namespace, pasta e arquivo em inglês. Enum com **prefixo** `Enum` (`EnumRideType`); no front é sufixo, e a divergência não se corrige (o CA1711 reprova o sufixo aqui).
 - ⛔ Mensagem que a pessoa lê (validação, exceção de domínio, erro do middleware) em pt-BR, com o mesmo texto da tela. `summary`/`description` do Swagger e template de `LoggerMessage` em inglês, e o log registra o tipo da exceção: nunca interpole a mensagem de produto nele.
-- Os `EventId` de `LoggerMessage` de uma classe seguem contínuos: removido um log que ainda não saiu em release, renumere os seguintes.
+- Todo `LoggerMessage` declara `EventId`, contínuo dentro da classe: removido um log que ainda não saiu em release, renumere os seguintes. O usuário aparece como `User ID {UserId}` (`user ID` no meio da frase).
+- ⛔ Log carrega id, nunca e-mail, senha, token ou o texto que a pessoa digitou; sem id (e-mail sem conta), registra só o fato.

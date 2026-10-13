@@ -12,4 +12,6 @@ git rebase --onto origin/develop <tip-antigo-da-base> <branch>
 
 **A prova é o patch, não o verde:** as linhas `+`/`-` de `git diff <tip-antigo-da-base> <tip-antigo>` e de `git diff origin/develop <branch>` são iguais. Depois, `push --force-with-lease=<branch>:<tip-antigo>`, e o corpo do PR que falava da pilha muda, partindo do corpo publicado.
 
+⚠️ **Branch criada do tip da base e ainda sem commit:** com `git diff --quiet <tip-da-base> origin/develop` vazio, `git reset --soft origin/develop` move a branch sem tocar no índice nem na árvore, e os commits nascem sobre a `develop`, sem replay.
+
 ⚠️ **Squash se reconhece pelo pai:** `git log -1 --format=%P origin/develop` com **um** SHA só. Aqui o commit squashado leva o título do PR com o número no fim (`refactor(454): … (#456)`); merge commit tem dois pais.
