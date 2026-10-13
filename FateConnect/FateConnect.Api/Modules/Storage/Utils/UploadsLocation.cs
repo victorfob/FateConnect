@@ -1,4 +1,4 @@
-namespace FateConnect.Api.Modules.Common.Utils;
+namespace FateConnect.Api.Modules.Storage.Utils;
 
 using Microsoft.AspNetCore.Hosting;
 

@@ -32,7 +32,6 @@ using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.LostAndFound.Workers;
-using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
 using FateConnect.Api.Modules.Denunciations.Services;
 using FateConnect.Api.Modules.Denunciations.Repositories;
@@ -50,6 +49,7 @@ using FateConnect.Api.Modules.InAppNotifications.Repositories;
 using FateConnect.Api.Modules.InAppNotifications.Services;
 using FateConnect.Api.Modules.InAppNotifications.Consumers;
 using FateConnect.Api.Modules.InAppNotifications.Hubs;
+using FateConnect.Api.Modules.Storage.Interfaces;
 
 public class Program
 {

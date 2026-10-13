@@ -14,6 +14,7 @@ using FateConnect.Api.Modules.InAppNotifications.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Users.Exceptions;
+using FateConnect.Api.Modules.Storage.Exceptions;
 
 public partial class GlobalExceptionMiddleware(
     RequestDelegate next,

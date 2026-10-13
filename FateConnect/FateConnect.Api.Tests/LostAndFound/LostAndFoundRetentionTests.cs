@@ -1,6 +1,5 @@
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Common.Services;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Repositories;

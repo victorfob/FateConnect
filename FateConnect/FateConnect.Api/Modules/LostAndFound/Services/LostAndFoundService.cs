@@ -6,12 +6,12 @@ using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
-using FateConnect.Api.Modules.Common.Interfaces;
-using FateConnect.Api.Modules.Common.Enums;
 using Microsoft.Extensions.Logging;
 using FateConnect.Api.Modules.Users.Extensions;
-using FateConnect.Api.Modules.Common.Services;
-using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.Storage.Enums;
+using FateConnect.Api.Modules.Storage.Interfaces;
+using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Storage.Utils;
 
 public partial class LostAndFoundService(
     ILostAndFoundRepository repository,

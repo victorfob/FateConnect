@@ -2,9 +2,9 @@ namespace FateConnect.Api.Modules.Common.Validators;
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using FateConnect.Api.Modules.Common.Exceptions;
-using FateConnect.Api.Modules.Common.Utils;
 using Microsoft.AspNetCore.Http;
+using FateConnect.Api.Modules.Storage.Exceptions;
+using FateConnect.Api.Modules.Storage.Utils;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class ValidImageAttribute : ValidationAttribute

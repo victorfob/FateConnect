@@ -1,13 +1,13 @@
 namespace FateConnect.Api.Modules.LostAndFound.Services;
 
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Common.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Constants;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using FateConnect.Api.Modules.Storage.Interfaces;
 
 public partial class LostAndFoundRetentionService(
     ILostAndFoundRepository repository,

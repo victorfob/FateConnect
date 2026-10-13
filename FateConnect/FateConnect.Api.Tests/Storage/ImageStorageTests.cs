@@ -1,9 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 using System.Text;
-using FateConnect.Api.Modules.Common.Enums;
-using FateConnect.Api.Modules.Common.Exceptions;
-using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Common.Validators;
 using FateConnect.Api.Modules.Denunciations.DTOs;
 using FateConnect.Api.Modules.Denunciations.Entities;
@@ -15,14 +11,18 @@ using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Services;
+using FateConnect.Api.Modules.Storage.Enums;
+using FateConnect.Api.Modules.Storage.Exceptions;
 using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Storage.Utils;
 using FateConnect.Api.Tests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using SixLabors.ImageSharp;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
-namespace FateConnect.Api.Tests.Common;
+namespace FateConnect.Api.Tests.Storage;
 
 public sealed class ImageStorageTests : IDisposable
 {
