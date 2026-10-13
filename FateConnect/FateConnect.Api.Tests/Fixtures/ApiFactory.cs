@@ -8,8 +8,8 @@ using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Emails.Interfaces;
-using FateConnect.Api.Modules.Denunciations.Entities;
-using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.Reports.Entities;
+using FateConnect.Api.Modules.Reports.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
 using FateConnect.Api.Modules.LostAndFound.Entities;
@@ -396,26 +396,26 @@ public class ApiFactory : WebApplicationFactory<Program>
         return record.Id;
     }
 
-    public Guid SeedDenunciation(
+    public Guid SeedReport(
         int reporterId,
         string description,
         DateOnly reportedOn,
-        EnumDenunciationCategory category = EnumDenunciationCategory.ImproperCharging,
-        EnumDenunciationStatus status = EnumDenunciationStatus.Open,
+        EnumReportCategory category = EnumReportCategory.ImproperCharging,
+        EnumReportStatus status = EnumReportStatus.Open,
         bool isAnonymous = false)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
-        Denunciation denunciation = new(category, description, reporterId, isAnonymous, DateTime.UtcNow);
+        Report report = new(category, description, reporterId, isAnonymous, DateTime.UtcNow);
 
-        context.Denunciations.Add(denunciation);
-        context.Entry(denunciation).Property(entity => entity.CreatedAt).CurrentValue =
+        context.Reports.Add(report);
+        context.Entry(report).Property(entity => entity.CreatedAt).CurrentValue =
             DateTimeUtils.ToUtcFromProductTimeZone(reportedOn, new TimeOnly(10, 0));
-        context.Entry(denunciation).Property(entity => entity.Status).CurrentValue = status;
+        context.Entry(report).Property(entity => entity.Status).CurrentValue = status;
         context.SaveChanges();
 
-        return denunciation.Id;
+        return report.Id;
     }
 
     public void PrepareForNotifications(int userId, string? neighborhood = null, bool receiveNotifications = true)

@@ -13,9 +13,9 @@ using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Services;
-using FateConnect.Api.Modules.Denunciations.Interfaces;
-using FateConnect.Api.Modules.Denunciations.Repositories;
-using FateConnect.Api.Modules.Denunciations.Services;
+using FateConnect.Api.Modules.Reports.Interfaces;
+using FateConnect.Api.Modules.Reports.Repositories;
+using FateConnect.Api.Modules.Reports.Services;
 using FateConnect.Api.Modules.Emails.Consumers;
 using FateConnect.Api.Modules.Emails.Interfaces;
 using FateConnect.Api.Modules.Emails.Options;
@@ -138,8 +138,8 @@ public class Program
 
         builder.Services.AddScoped<IStorageService, StorageService>();
 
-        builder.Services.AddScoped<IDenunciationRepository, DenunciationRepository>();
-        builder.Services.AddScoped<IDenunciationService, DenunciationService>();
+        builder.Services.AddScoped<IReportRepository, ReportRepository>();
+        builder.Services.AddScoped<IReportService, ReportService>();
 
         builder.Services.AddScoped<IEmailService, EmailService>();
         builder.Services.AddSingleton(
@@ -275,7 +275,7 @@ public class Program
             x.AddConsumer<AccountLockedEventConsumer>();
 
             x.AddConsumer<RideCreatedEventConsumer>();
-            x.AddConsumer<DenunciationReceivedEventConsumer>();
+            x.AddConsumer<ReportReceivedEventConsumer>();
             x.AddConsumer<ItemArchivedEventConsumer>();
             x.AddConsumer<NotificationDispatchedEventConsumer>();
 
@@ -365,10 +365,10 @@ public class Program
             e.ConfigureConsumer<RideCreatedEventConsumer>(context);
         });
 
-        cfg.ReceiveEndpoint("denunciation-received-event", e =>
+        cfg.ReceiveEndpoint("report-received-event", e =>
         {
             e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
-            e.ConfigureConsumer<DenunciationReceivedEventConsumer>(context);
+            e.ConfigureConsumer<ReportReceivedEventConsumer>(context);
         });
 
         cfg.ReceiveEndpoint("item-archived-event", e =>

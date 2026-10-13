@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using FateConnect.Api.Modules.Denunciations.DTOs;
-using FateConnect.Api.Modules.Denunciations.Entities;
-using FateConnect.Api.Modules.Denunciations.Enums;
-using FateConnect.Api.Modules.Denunciations.Interfaces;
-using FateConnect.Api.Modules.Denunciations.Services;
+using FateConnect.Api.Modules.Reports.DTOs;
+using FateConnect.Api.Modules.Reports.Entities;
+using FateConnect.Api.Modules.Reports.Enums;
+using FateConnect.Api.Modules.Reports.Interfaces;
+using FateConnect.Api.Modules.Reports.Services;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
@@ -72,16 +72,16 @@ public sealed class ImageStorageTests : IDisposable
         public Task SaveChangesAsync() => throw new NotSupportedException();
     }
 
-    private sealed class RefusingDenunciationRepository : IDenunciationRepository
+    private sealed class RefusingReportRepository : IReportRepository
     {
-        public Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(
-            DenunciationFilterDto filter, int? reporterId = null) =>
+        public Task<(IReadOnlyList<Report> Items, int Total)> GetAllAsync(
+            ReportFilterDto filter, int? reporterId = null) =>
             throw new NotSupportedException();
 
-        public Task<Denunciation?> GetByIdAsync(Guid id, bool forChange = true) =>
+        public Task<Report?> GetByIdAsync(Guid id, bool forChange = true) =>
             throw new NotSupportedException();
 
-        public Task<Denunciation> AddAsync(Denunciation denunciation) =>
+        public Task<Report> AddAsync(Report report) =>
             throw new DbUpdateException("o banco recusou a denúncia");
 
         public Task SaveChangesAsync() => throw new NotSupportedException();
@@ -212,7 +212,7 @@ public sealed class ImageStorageTests : IDisposable
         StorageService service = ServiceOn(_webRoot);
         byte[] photo = TestImages.JpegTakenWithAPhone(600, 400, TestImages.RotatedClockwise);
 
-        string path = await service.UploadImageAsync(FileOf("image/jpeg", photo, "foto.jpg"), EnumStorageContainer.Denunciation);
+        string path = await service.UploadImageAsync(FileOf("image/jpeg", photo, "foto.jpg"), EnumStorageContainer.Report);
 
         using Image original = await Image.LoadAsync(PhysicalPathOf(path));
         using Image thumbnail = await Image.LoadAsync(PhysicalPathOf(UploadsLocation.ThumbnailOf(path)));
@@ -324,20 +324,20 @@ public sealed class ImageStorageTests : IDisposable
     }
 
     [Fact]
-    public async Task CreateDenunciation_WhenTheDatabaseRefusesIt_LeavesNoFileBehind()
+    public async Task CreateReport_WhenTheDatabaseRefusesIt_LeavesNoFileBehind()
     {
         StorageService storage = ServiceOn(_webRoot);
 
-        DenunciationService service = new(
-            new RefusingDenunciationRepository(),
+        ReportService service = new(
+            new RefusingReportRepository(),
             storage,
             new NullPublishEndpoint(),
             TimeProvider.System,
-            NullLogger<DenunciationService>.Instance);
+            NullLogger<ReportService>.Instance);
 
-        CreateDenunciationDto dto = new()
+        CreateReportDto dto = new()
         {
-            Category = EnumDenunciationCategory.ImproperCharging,
+            Category = EnumReportCategory.ImproperCharging,
             Description = "O motorista cobrou valor acima do combinado na carona de ontem.",
             IsAnonymous = false,
             Image = FileOf("image/png"),
@@ -345,6 +345,6 @@ public sealed class ImageStorageTests : IDisposable
 
         await Assert.ThrowsAsync<DbUpdateException>(() => service.CreateAsync(dto, 1));
 
-        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "denunciation"), "*", SearchOption.AllDirectories));
+        Assert.Empty(Directory.GetFiles(Path.Combine(_webRoot, "uploads", "report"), "*", SearchOption.AllDirectories));
     }
 }

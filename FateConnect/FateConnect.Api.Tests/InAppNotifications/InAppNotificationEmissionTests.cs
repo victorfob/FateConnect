@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.Reports.Enums;
 using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Constants;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
@@ -41,7 +41,7 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         description = "Vaga para quem sai do campus.",
     };
 
-    private static MultipartFormDataContent NewDenunciationForm(EnumDenunciationCategory category, bool isAnonymous) =>
+    private static MultipartFormDataContent NewReportForm(EnumReportCategory category, bool isAnonymous) =>
         new()
         {
             { new StringContent(category.ToString()), "Category" },
@@ -60,20 +60,20 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         return (await response.Content.ReadFromJsonAsync<CreatedResource>(JsonOptions))!.Id;
     }
 
-    private async Task<Guid> ReportAsync(int reporterId, EnumDenunciationCategory category, bool isAnonymous = false)
+    private async Task<Guid> ReportAsync(int reporterId, EnumReportCategory category, bool isAnonymous = false)
     {
         HttpResponseMessage response = await _factory
             .CreateClientFor(reporterId)
-            .PostAsync("/Denunciations", NewDenunciationForm(category, isAnonymous));
+            .PostAsync("/Reports", NewReportForm(category, isAnonymous));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
         return (await response.Content.ReadFromJsonAsync<CreatedResource>(JsonOptions))!.Id;
     }
 
-    private async Task WaitUntilConsumedAsync(Guid denunciationId) =>
-        Assert.True(await Harness.Consumed.Any<DenunciationReceivedEvent>(
-            consumed => consumed.Context.Message.DenunciationId == denunciationId));
+    private async Task WaitUntilConsumedAsync(Guid reportId) =>
+        Assert.True(await Harness.Consumed.Any<ReportReceivedEvent>(
+            consumed => consumed.Context.Message.ReportId == reportId));
 
     [Fact]
     public async Task CreateRide_NotifiesWhoseNeighborhoodIsTheDestination_AndNoOneElse()
@@ -143,43 +143,43 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task CreateDenunciation_NotifiesOnlyTheReporter_WithoutAnyEmail()
+    public async Task CreateReport_NotifiesOnlyTheReporter_WithoutAnyEmail()
     {
         (int reporterId, string fatecEmail) = _factory.SeedUserWithPassword("Gabriel Nunes Farias", "SenhaForte123!");
         int bystanderId = _factory.SeedUser("Helena Vieira Campos").Id;
         _factory.PrepareForNotifications(reporterId);
         _factory.PrepareForNotifications(bystanderId);
 
-        Guid denunciationId = await ReportAsync(reporterId, EnumDenunciationCategory.RecklessDriving);
+        Guid reportId = await ReportAsync(reporterId, EnumReportCategory.RecklessDriving);
         InAppNotification notification = Assert.Single(await _factory.WaitForNotificationsAsync(reporterId));
 
-        Assert.Equal(EnumInAppNotificationType.DenunciationReceived, notification.Type);
-        Assert.Equal(denunciationId.ToString(), notification.ReferenceId);
-        Assert.Equal(NotificationContents.DenunciationReceived(EnumDenunciationCategory.RecklessDriving), notification.Content);
+        Assert.Equal(EnumInAppNotificationType.ReportReceived, notification.Type);
+        Assert.Equal(reportId.ToString(), notification.ReferenceId);
+        Assert.Equal(NotificationContents.ReportReceived(EnumReportCategory.RecklessDriving), notification.Content);
         Assert.Empty(_factory.NotificationsOf(bystanderId));
         Assert.All(Enum.GetValues<EnumAccountEmail>(), kind => Assert.Empty(_factory.Emails.SentTo(fatecEmail, kind)));
     }
 
     [Fact]
-    public async Task CreateDenunciation_Confidential_LeavesTheNotificationQueueOut()
+    public async Task CreateReport_Confidential_LeavesTheNotificationQueueOut()
     {
         int reporterId = _factory.SeedUser("Igor Mendes Batista").Id;
         _factory.PrepareForNotifications(reporterId);
 
-        Guid denunciationId = await ReportAsync(reporterId, EnumDenunciationCategory.FakeProfile, isAnonymous: true);
+        Guid reportId = await ReportAsync(reporterId, EnumReportCategory.FakeProfile, isAnonymous: true);
 
-        Assert.False(await Harness.Published.Any<DenunciationReceivedEvent>(
-            published => published.Context.Message.DenunciationId == denunciationId));
+        Assert.False(await Harness.Published.Any<ReportReceivedEvent>(
+            published => published.Context.Message.ReportId == reportId));
         Assert.Empty(_factory.NotificationsOf(reporterId));
     }
 
     [Fact]
-    public async Task CreateDenunciation_ReporterWithNotificationsOff_IsNotNotified()
+    public async Task CreateReport_ReporterWithNotificationsOff_IsNotNotified()
     {
         int reporterId = _factory.SeedUser("Juliana Freitas Moura").Id;
 
-        Guid denunciationId = await ReportAsync(reporterId, EnumDenunciationCategory.Spam);
-        await WaitUntilConsumedAsync(denunciationId);
+        Guid reportId = await ReportAsync(reporterId, EnumReportCategory.Spam);
+        await WaitUntilConsumedAsync(reportId);
 
         Assert.Empty(_factory.NotificationsOf(reporterId));
     }
