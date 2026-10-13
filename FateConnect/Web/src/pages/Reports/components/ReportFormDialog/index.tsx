@@ -11,7 +11,6 @@ import { REPORTS_QUERY_KEY } from '@app/pages/Reports/constants';
 import { createReport } from '@app/services/reports/reportsService';
 import type { ReportInput } from '@app/services/reports/types';
 
-import { toReportInput } from './helpers/mapper';
 import { ReportFormFields } from './ReportFormFields';
 import {
   EMPTY_REPORT_FORM,
@@ -55,7 +54,7 @@ export function ReportFormDialog({ open, onClose }: ReportFormDialogProps) {
   }, [open, reset, secrecyIsForced]);
 
   const handleSubmit = form.handleSubmit((values) =>
-    mutate(toReportInput({ ...values, isAnonymous: values.isAnonymous || secrecyIsForced })),
+    mutate({ ...values, isAnonymous: values.isAnonymous || secrecyIsForced }),
   );
 
   return (

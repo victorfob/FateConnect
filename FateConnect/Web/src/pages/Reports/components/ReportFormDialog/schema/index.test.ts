@@ -11,7 +11,7 @@ const VALID: ReportFormInput = {
   category: ReportCategoryEnum.RECKLESS_DRIVING,
   description: 'A pessoa dirigiu acima da velocidade no trajeto inteiro.',
   isAnonymous: false,
-  photo: null,
+  image: null,
 };
 
 /** O tamanho é declarado, não ocupado: alocar 5 MB só para reprovar é desperdício. */
@@ -75,15 +75,15 @@ describe('reportFormSchema', () => {
   });
 
   it('should leave the photo optional', () => {
-    expect(firstErrorOf({ photo: null })).toBeUndefined();
-    expect(firstErrorOf({ photo: photoOf('image/png', MAX_PHOTO_BYTES) })).toBeUndefined();
+    expect(firstErrorOf({ image: null })).toBeUndefined();
+    expect(firstErrorOf({ image: photoOf('image/png', MAX_PHOTO_BYTES) })).toBeUndefined();
   });
 
   it('should reject a photo the API would refuse', () => {
-    expect(firstErrorOf({ photo: photoOf('application/pdf', MAX_PHOTO_BYTES) })).toBe(
+    expect(firstErrorOf({ image: photoOf('application/pdf', MAX_PHOTO_BYTES) })).toBe(
       PHOTO_MESSAGES.formatInvalid,
     );
-    expect(firstErrorOf({ photo: photoOf('image/png', MAX_PHOTO_BYTES + ONE_BYTE) })).toBe(
+    expect(firstErrorOf({ image: photoOf('image/png', MAX_PHOTO_BYTES + ONE_BYTE) })).toBe(
       PHOTO_MESSAGES.tooLarge,
     );
   });

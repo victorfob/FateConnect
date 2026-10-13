@@ -20,13 +20,13 @@ export function ReportFormFields({ secrecyIsForced }: ReportFormFieldsProps) {
     setValue,
     formState: { errors, disabled },
   } = useFormContext<ReportFormInput, unknown, ReportFormValues>();
-  const photo = useWatch({ control, name: 'photo' });
+  const image = useWatch({ control, name: 'image' });
   const isAnonymous = useWatch({ control, name: 'isAnonymous' });
   const description = useWatch({ control, name: 'description' });
 
   // Valida na escolha: o formato e o tamanho se sabem na hora, não no envio.
   const handlePhotoChange = useCallback(
-    (chosen: File | null) => setValue('photo', chosen, { shouldValidate: true }),
+    (chosen: File | null) => setValue('image', chosen, { shouldValidate: true }),
     [setValue],
   );
 
@@ -85,10 +85,10 @@ export function ReportFormFields({ secrecyIsForced }: ReportFormFieldsProps) {
 
       <PhotoField
         label={C.REPORT_FORM_LABELS.photo}
-        value={photo}
+        value={image}
         onChange={handlePhotoChange}
         disabled={disabled}
-        error={errors.photo?.message}
+        error={errors.image?.message}
       />
     </Dialog.Fields>
   );

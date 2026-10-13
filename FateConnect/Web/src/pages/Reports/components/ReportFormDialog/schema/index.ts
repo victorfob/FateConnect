@@ -13,7 +13,7 @@ export const reportFormSchema = z.object({
     .min(REPORT_LIMITS.minDescription, REPORT_FORM_MESSAGES.descriptionTooShort)
     .max(REPORT_LIMITS.maxDescription, REPORT_FORM_MESSAGES.descriptionTooLong),
   isAnonymous: z.boolean(),
-  photo: photoSchema,
+  image: photoSchema,
 });
 
 export type ReportFormInput = z.input<typeof reportFormSchema>;
@@ -23,5 +23,5 @@ export const EMPTY_REPORT_FORM: ReportFormInput = {
   category: '',
   description: '',
   isAnonymous: false,
-  photo: null,
+  image: null,
 };
