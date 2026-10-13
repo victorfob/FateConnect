@@ -1,6 +1,5 @@
 namespace FateConnect.Api.Modules.Rides.DTOs;
 
-using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.Enums;
 
@@ -8,13 +7,10 @@ public record RideFilterDto : DateRangeFilterDto
 {
     public string? SearchTerm { get; init; }
 
-    [EnumDataType(typeof(EnumRideShift), ErrorMessage = "Turno inválido")]
     public EnumRideShift? DepartureShift { get; init; }
 
-    [EnumDataType(typeof(EnumRideType), ErrorMessage = "Tipo de carona inválido")]
     public EnumRideType? RideType { get; init; }
 
-    [EnumDataType(typeof(EnumVehicleType), ErrorMessage = "Veículo inválido")]
     public EnumVehicleType? VehicleType { get; init; }
 
     public bool? OnlyMine { get; init; }
