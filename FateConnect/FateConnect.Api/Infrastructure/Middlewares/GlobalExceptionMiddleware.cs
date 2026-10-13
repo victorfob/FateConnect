@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using FateConnect.Api.Infrastructure.Observability;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Exceptions;
@@ -16,6 +17,7 @@ using FateConnect.Api.Modules.Users.Exceptions;
 
 public partial class GlobalExceptionMiddleware(
     RequestDelegate next,
+    IErrorReporter errorReporter,
     ILogger<GlobalExceptionMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
@@ -23,6 +25,10 @@ public partial class GlobalExceptionMiddleware(
         try
         {
             await next(context);
+        }
+        catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+        {
+            LogRequestAborted(logger, context.Request.Method, context.RouteTemplate());
         }
         catch (Exception ex)
         {
@@ -103,10 +109,18 @@ public partial class GlobalExceptionMiddleware(
                 break;
         }
 
+        string method = context.Request.Method;
+        string route = context.RouteTemplate();
+
         if (statusCode is HttpStatusCode.InternalServerError)
-            LogUnhandledError(logger, exception);
+        {
+            LogUnhandledError(logger, method, route, exception);
+            errorReporter.Report(exception, context);
+        }
         else
-            LogBusinessWarning(logger, (int)statusCode, exception.GetType().Name);
+        {
+            LogBusinessWarning(logger, (int)statusCode, exception.GetType().Name, method, route, context.UserIdOrAnonymous());
+        }
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;

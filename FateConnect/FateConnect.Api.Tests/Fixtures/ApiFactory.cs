@@ -26,7 +26,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
@@ -49,6 +49,10 @@ public class ApiFactory : WebApplicationFactory<Program>
     public TimeProvider? Clock { get; init; }
 
     public RecordingEmailService Emails { get; } = new();
+
+    public IReadOnlyList<FakeLogRecord> LogRecords => Services.GetRequiredService<FakeLogCollector>().GetSnapshot();
+
+    public IReadOnlyList<string> LogMessages => [.. LogRecords.Select(record => record.Message)];
 
     public ApiFactory()
     {
@@ -82,6 +86,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             services.Remove(retentionWorker);
 
             services.AddMassTransitTestHarness(bus => bus.SetTestTimeouts(HarnessTimeout, HarnessInactivityTimeout));
+            services.AddFakeLogging();
             services.RemoveAll<IEmailService>();
             services.AddSingleton<IEmailService>(Emails);
 
@@ -154,7 +159,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         if (tokenVersion != user.TokenVersion)
             typeof(User).GetProperty(nameof(User.TokenVersion))?.SetValue(user, tokenVersion);
 
-        return new TokenService(Options.Create(options), NullLogger<TokenService>.Instance).GenerateJwtToken(user);
+        return new TokenService(Options.Create(options)).GenerateJwtToken(user);
     }
 
     public static string IssueTokenWithoutVersion(int userId = 1)

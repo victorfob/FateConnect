@@ -4,27 +4,27 @@ using Microsoft.Extensions.Logging;
 
 public partial class RideService
 {
-    [LoggerMessage(Level = LogLevel.Information, Message = "Ride {RideId} created successfully.")]
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Ride {RideId} created successfully.")]
     private static partial void LogRideCreated(ILogger logger, Guid rideId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{RidesCount} rides retrieved successfully.")]
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "{RidesCount} rides retrieved successfully.")]
     private static partial void LogRidesRetrieved(ILogger logger, int ridesCount);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Ride {RideId} found.")]
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "Ride {RideId} found.")]
     private static partial void LogRideFound(ILogger logger, Guid rideId);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Ride {RideId} not found.")]
+    [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "Ride {RideId} not found.")]
     private static partial void LogRideNotFound(ILogger logger, Guid rideId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Ride {RideId} updated successfully.")]
+    [LoggerMessage(EventId = 5, Level = LogLevel.Information, Message = "Ride {RideId} updated successfully.")]
     private static partial void LogRideUpdated(ILogger logger, Guid rideId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Ride {RideId} deactivated successfully.")]
+    [LoggerMessage(EventId = 6, Level = LogLevel.Information, Message = "Ride {RideId} deactivated successfully.")]
     private static partial void LogRideDeactivated(ILogger logger, Guid rideId);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Ride {RideId} was already deactivated or not found.")]
+    [LoggerMessage(EventId = 7, Level = LogLevel.Warning, Message = "Ride {RideId} was already deactivated or not found.")]
     private static partial void LogRideDeactivationFailed(ILogger logger, Guid rideId);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "User {UserId} tried to change ride {RideId}, offered by another user.")]
+    [LoggerMessage(EventId = 8, Level = LogLevel.Warning, Message = "User ID {UserId} tried to change ride {RideId}, offered by another user.")]
     private static partial void LogRideChangeRefused(ILogger logger, int userId, Guid rideId);
 }

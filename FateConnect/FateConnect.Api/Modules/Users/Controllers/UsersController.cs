@@ -138,7 +138,7 @@ public class UsersController(IUserService service) : ControllerBase
     [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ReadUserDto>> UpdateUserByAdminAsync(int id, [FromBody] AdminUpdateUserDto dto)
     {
-        var result = await service.UpdateUserByAdminAsync(id, dto);
+        var result = await service.UpdateUserByAdminAsync(id, dto, User.GetUserId());
 
         if (result is null)
             return NotFound();

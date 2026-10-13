@@ -1,10 +1,11 @@
 namespace FateConnect.Api.Modules.Common.Services;
 
 using FateConnect.Api.Modules.Common.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-public abstract class BaseFileService(IStorageService storageService)
+public abstract partial class BaseFileService(IStorageService storageService, ILogger logger)
 {
     protected IStorageService StorageService { get; } = storageService;
 
@@ -17,7 +18,10 @@ public abstract class BaseFileService(IStorageService storageService)
         catch
         {
             if (!string.IsNullOrWhiteSpace(imageToDropOnFailure))
+            {
+                LogImageDroppedAfterFailedSave(logger, imageToDropOnFailure);
                 await StorageService.DeleteImageAsync(imageToDropOnFailure);
+            }
 
             throw;
         }

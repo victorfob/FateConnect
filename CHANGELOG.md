@@ -14,6 +14,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a central de notificações, no lugar da tela de área ainda não disponível, com os avisos paginados, o filtro por situação e por tipo e a opção de marcar um ou todos como lidos (#592) [Frontend]
 - Adiciona a ida ao destino de cada aviso: tocar nele o marca como lido e leva às denúncias enviadas, às caronas buscadas pelo destino ou aos seus itens arquivados; a carona já excluída é avisada, e a tela fica (#592) [Frontend]
 - Adiciona a rota de saúde da API, que responde sem login se ela alcança o banco e a fila, sem dizer mais nada (#595) [Backend]
+- Adiciona ao log da API o login recusado, com o motivo e sem o e-mail, a ação de administração com quem a fez, a troca de senha recusada, as mudanças de foto e a sessão encerrada recusada, cada linha com o identificador da requisição (#598) [Backend]
+- Adiciona o envio dos erros internos da API a um projeto próprio no Sentry, só com método, rota e identificador da requisição, sem usuário, IP nem conteúdo; sem a chave do projeto, nada é enviado (#598) [Backend]
 
 ### Changed
 
@@ -22,6 +24,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Renomeia para `Bairro e cidade` o campo do Meu perfil que se chamava `Bairro`, porque ele guarda os dois, e a mensagem de limite de tamanho acompanha (#594) [Frontend] [Backend]
 - Passa a reprovar a publicação quando a rota de saúde não responde em 2 minutos, e a API passa a esperar a fila ficar pronta para subir, em vez de falhar a primeira conexão (#595) [Backend]
 - Passa a recusar a subida da API sem a conexão com o banco ou sem as configurações da sessão, dizendo qual faltou, em vez de subir com elas vazias (#595) [Backend]
+- Passa a registrar no log o método, a rota e o usuário de cada erro tratado, e os campos que a validação recusou, sem os valores (#598) [Backend]
+
+### Fixed
+
+- Corrige a requisição que a pessoa abandona no meio, que era registrada como erro interno (#598) [Backend]
 
 ## [1.4.0] - 2026-10-12
 
