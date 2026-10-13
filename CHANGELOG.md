@@ -8,7 +8,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- Adiciona as notificações no aplicativo, que chegam na hora, para carona ofertada para o seu bairro, item arquivado por inatividade e denúncia recebida (#590) [Backend]
+- Adiciona as notificações no aplicativo, que chegam na hora, para item arquivado por inatividade, denúncia recebida e carona ofertada para o seu bairro, que compara o nome do bairro e, quando o destino e o perfil a têm, a cidade (#590) [Backend]
 - Adiciona os endpoints de listagem paginada, contagem de não lidas e marcação de leitura (individual e em lote) para as notificações in-app (#590) [Backend]
 - Adiciona à campainha do topo o número de avisos não lidos, que sobe na hora em que um chega, sem recarregar, e um painel com os 3 não lidos mais recentes e a opção de marcar todos como lidos (#592) [Frontend]
 - Adiciona a central de notificações, no lugar da tela de área ainda não disponível, com os avisos paginados, o filtro por situação e por tipo e a opção de marcar um ou todos como lidos (#592) [Frontend]
@@ -17,7 +17,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - Passa a levar a aba aberta para a tela de sessão expirada assim que a sessão é encerrada em outro aparelho ou pela troca de senha, e o texto da tela passa a citar essas causas (#592) [Frontend]
-- Passa a declarar na política de privacidade por quanto tempo as notificações ficam guardadas e o uso do bairro do perfil no aviso de carona, em nova versão do documento (#592) [Frontend]
+- Passa a declarar na política de privacidade por quanto tempo as notificações ficam guardadas e o uso do bairro e da cidade do perfil no aviso de carona, em nova versão do documento (#592) [Frontend]
+- Renomeia para `Bairro e cidade` o campo do Meu perfil que se chamava `Bairro`, porque ele guarda os dois, e a mensagem de limite de tamanho acompanha (#594) [Frontend] [Backend]
 
 ## [1.4.0] - 2026-10-12
 
