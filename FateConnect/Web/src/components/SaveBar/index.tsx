@@ -1,6 +1,8 @@
 import { Button } from '@design-system';
 import { InfoOutlinedIcon, SaveIcon } from '@design-system/icons';
 
+import { ActionBar } from '@app/components/ActionBar';
+
 import { SAVE_BAR_TEXTS } from './constants';
 import * as S from './styles';
 
@@ -12,7 +14,7 @@ export type SaveBarProps = Readonly<{
 
 export function SaveBar({ hasChanges, saving, onDiscard }: SaveBarProps) {
   return (
-    <S.SaveBarRoot>
+    <ActionBar>
       {hasChanges && (
         <S.UnsavedNotice variant="caption" role="status">
           <InfoOutlinedIcon fontSize="small" />
@@ -36,6 +38,6 @@ export function SaveBar({ hasChanges, saving, onDiscard }: SaveBarProps) {
         <SaveIcon fontSize="small" />
         {SAVE_BAR_TEXTS.save}
       </Button>
-    </S.SaveBarRoot>
+    </ActionBar>
   );
 }

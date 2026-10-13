@@ -14,13 +14,12 @@ import { Home } from '@app/pages/Home';
 import { LostAndFound } from '@app/pages/LostAndFound';
 import { Management } from '@app/pages/Management';
 import { Menu } from '@app/pages/Menu';
+import { Notifications } from '@app/pages/Notifications';
 import { Preferences } from '@app/pages/Preferences';
 import { Profile } from '@app/pages/Profile';
 import { ResetPassword } from '@app/pages/ResetPassword';
 import { Rides } from '@app/pages/Rides';
 import { Signup } from '@app/pages/Signup';
-import { Unavailable } from '@app/pages/Unavailable';
-import * as C from '@app/pages/Unavailable/constants';
 import { UnlockAccount } from '@app/pages/UnlockAccount';
 
 import { RoutePathEnum } from './paths';
@@ -65,10 +64,7 @@ export const routeConfig: RouteObject[] = [
                 element: <AdminRoute />,
                 children: [{ path: RoutePathEnum.MANAGEMENT, element: <Management /> }],
               },
-              {
-                path: RoutePathEnum.NOTIFICATIONS,
-                element: <Unavailable description={C.NOTIFICATIONS_DESCRIPTION} />,
-              },
+              { path: RoutePathEnum.NOTIFICATIONS, element: <Notifications /> },
             ],
           },
         ],
