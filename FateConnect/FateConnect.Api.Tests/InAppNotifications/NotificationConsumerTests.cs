@@ -1,6 +1,6 @@
 using System.Reflection;
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.Reports.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Consumers;
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
@@ -37,7 +37,7 @@ public class NotificationConsumerTests
             {
                 bus.SetTestTimeouts(TestTimeout, testInactivityTimeout: TestTimeout);
                 bus.AddConsumer<RideCreatedEventConsumer>();
-                bus.AddConsumer<DenunciationReceivedEventConsumer>();
+                bus.AddConsumer<ReportReceivedEventConsumer>();
                 bus.AddConsumer<ItemArchivedEventConsumer>();
                 bus.AddConsumer<NotificationDispatchedEventConsumer>();
             })
@@ -52,7 +52,7 @@ public class NotificationConsumerTests
     public static TheoryData<object> EveryEvent => new()
     {
         new RideCreatedEvent(Guid.NewGuid(), 7, "Rua das Flores, Vila Hortência"),
-        new DenunciationReceivedEvent(7, Guid.NewGuid(), EnumDenunciationCategory.RecklessDriving),
+        new ReportReceivedEvent(7, Guid.NewGuid(), EnumReportCategory.RecklessDriving),
         new ItemArchivedEvent(7, Guid.NewGuid(), "Garrafa térmica azul"),
         new NotificationDispatchedEvent(
             new ReadInAppNotificationDto(3, EnumInAppNotificationType.ItemArchived, "Seu item foi arquivado.", null, false, DateTime.UtcNow),

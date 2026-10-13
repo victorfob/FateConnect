@@ -20,7 +20,7 @@ public static class StoredImageExtensions
         if (!isValidContainer)
             return controller.NotFound();
 
-        if (storageContainer == EnumStorageContainer.Denunciation)
+        if (storageContainer == EnumStorageContainer.Report)
             return controller.Forbid();
 
         return controller.ServeStoredImage(environment, storageContainer, fileName, variant);

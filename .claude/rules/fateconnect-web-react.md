@@ -54,7 +54,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 ## Dados
 
 - URL da API só de `import.meta.env.VITE_*`; caminho em minúsculo (`/rides`, `/lostandfound`), mesmo com o controlador em PascalCase.
-- ⛔ Função de serviço nomeia o endpoint, não o recorte que o servidor faz pelo token: `listDenunciations`, não `listMyDenunciations`. Nome com recorte só quando o parâmetro existe (`onlyMine`). Ao mudar contrato, releia quem o chama.
+- ⛔ Função de serviço nomeia o endpoint, não o recorte que o servidor faz pelo token: `listReports`, não `listMyReports`. Nome com recorte só quando o parâmetro existe (`onlyMine`). Ao mudar contrato, releia quem o chama.
 
 ## Gate
 

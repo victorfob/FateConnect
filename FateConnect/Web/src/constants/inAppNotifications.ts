@@ -13,13 +13,13 @@ export const IN_APP_NOTIFICATIONS_QUERY_KEY = 'inAppNotifications';
 export const IN_APP_NOTIFICATION_ICONS: Readonly<
   Record<InAppNotificationTypeEnum, SvgIconComponent>
 > = {
-  [InAppNotificationTypeEnum.DENUNCIATION_RECEIVED]: SecurityIcon,
+  [InAppNotificationTypeEnum.REPORT_RECEIVED]: SecurityIcon,
   [InAppNotificationTypeEnum.RIDE_TO_NEIGHBORHOOD]: DirectionsCarIcon,
   [InAppNotificationTypeEnum.ITEM_ARCHIVED]: SearchIcon,
 };
 
 export const IN_APP_NOTIFICATION_TITLES: Readonly<Record<InAppNotificationTypeEnum, string>> = {
-  [InAppNotificationTypeEnum.DENUNCIATION_RECEIVED]: 'Denúncia recebida',
+  [InAppNotificationTypeEnum.REPORT_RECEIVED]: 'Denúncia recebida',
   [InAppNotificationTypeEnum.RIDE_TO_NEIGHBORHOOD]: 'Carona ofertada',
   [InAppNotificationTypeEnum.ITEM_ARCHIVED]: 'Item arquivado',
 };

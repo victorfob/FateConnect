@@ -1,4 +1,4 @@
-using FateConnect.Api.Modules.Denunciations.Enums;
+using FateConnect.Api.Modules.Reports.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Constants;
 
 namespace FateConnect.Api.Tests.InAppNotifications;
@@ -6,28 +6,28 @@ namespace FateConnect.Api.Tests.InAppNotifications;
 public class NotificationContentsTests
 {
     [Theory]
-    [InlineData(EnumDenunciationCategory.InappropriateBehavior, "assédio, bullying ou discriminação")]
-    [InlineData(EnumDenunciationCategory.FakeProfile, "perfil falso")]
-    [InlineData(EnumDenunciationCategory.Spam, "spam ou propaganda")]
-    [InlineData(EnumDenunciationCategory.RecklessDriving, "direção imprudente na carona")]
-    [InlineData(EnumDenunciationCategory.NoShow, "ausência sem aviso na carona")]
-    [InlineData(EnumDenunciationCategory.ImproperCharging, "cobrança indevida na carona")]
-    [InlineData(EnumDenunciationCategory.FraudulentClaim, "pedido de item que não é da pessoa")]
-    [InlineData(EnumDenunciationCategory.FakeItemPosting, "cadastro falso de item")]
-    [InlineData((EnumDenunciationCategory)0, "motivo não especificado")]
-    public void DenunciationReceived_NamesTheReasonAsTheScreenDoes(EnumDenunciationCategory category, string reason)
+    [InlineData(EnumReportCategory.InappropriateBehavior, "assédio, bullying ou discriminação")]
+    [InlineData(EnumReportCategory.FakeProfile, "perfil falso")]
+    [InlineData(EnumReportCategory.Spam, "spam ou propaganda")]
+    [InlineData(EnumReportCategory.RecklessDriving, "direção imprudente na carona")]
+    [InlineData(EnumReportCategory.NoShow, "ausência sem aviso na carona")]
+    [InlineData(EnumReportCategory.ImproperCharging, "cobrança indevida na carona")]
+    [InlineData(EnumReportCategory.FraudulentClaim, "pedido de item que não é da pessoa")]
+    [InlineData(EnumReportCategory.FakeItemPosting, "cadastro falso de item")]
+    [InlineData((EnumReportCategory)0, "motivo não especificado")]
+    public void ReportReceived_NamesTheReasonAsTheScreenDoes(EnumReportCategory category, string reason)
     {
         Assert.Equal(
             $"Recebemos sua denúncia de {reason}. O andamento aparece na página Denúncias, na aba Acompanhar.",
-            NotificationContents.DenunciationReceived(category));
+            NotificationContents.ReportReceived(category));
     }
 
     [Fact]
-    public void DenunciationReceived_ForAnotherReason_LeavesTheReasonOut()
+    public void ReportReceived_ForAnotherReason_LeavesTheReasonOut()
     {
         Assert.Equal(
             "Recebemos sua denúncia. O andamento aparece na página Denúncias, na aba Acompanhar.",
-            NotificationContents.DenunciationReceived(EnumDenunciationCategory.Other));
+            NotificationContents.ReportReceived(EnumReportCategory.Other));
     }
 
     [Fact]

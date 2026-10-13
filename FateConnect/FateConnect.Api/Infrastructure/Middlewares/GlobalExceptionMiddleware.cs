@@ -7,7 +7,7 @@ using FateConnect.Api.Infrastructure.Observability;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Exceptions;
-using FateConnect.Api.Modules.Denunciations.Exceptions;
+using FateConnect.Api.Modules.Reports.Exceptions;
 using FateConnect.Api.Modules.InAppNotifications.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
@@ -55,7 +55,7 @@ public partial class GlobalExceptionMiddleware(
                 break;
 
             case BannedAccountException:
-            case DenunciationNotReportedByUserException:
+            case ReportNotReportedByUserException:
             case LostAndFoundNotReportedByUserException:
             case RideNotDrivenByUserException:
                 statusCode = HttpStatusCode.Forbidden;
@@ -101,7 +101,7 @@ public partial class GlobalExceptionMiddleware(
             case UserDomainException:
             case AuthDomainException:
             case InvalidUserIdentifierException:
-            case DenunciationDomainException:
+            case ReportDomainException:
             case InvalidImageException:
             case LostAndFoundDomainException:
             case RideDomainException:

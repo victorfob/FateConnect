@@ -54,8 +54,7 @@ export function useInAppNotificationActions(): InAppNotificationActions {
   // `null` é a carona que já não existe: a pessoa fica onde está.
   const { mutate: goToDestination } = useMutation({
     mutationFn: async ({ type, referenceId }: InAppNotification): Promise<string | null> => {
-      if (type === InAppNotificationTypeEnum.DENUNCIATION_RECEIVED)
-        return RoutePathEnum.DENUNCIATIONS;
+      if (type === InAppNotificationTypeEnum.REPORT_RECEIVED) return RoutePathEnum.REPORTS;
       if (type === InAppNotificationTypeEnum.ITEM_ARCHIVED) return archivedItemsPath();
       if (!referenceId) return RoutePathEnum.RIDES;
 

@@ -22,7 +22,7 @@ function renderLayout(initialEntry: RoutePathEnum = RoutePathEnum.MENU) {
         children: [
           { path: RoutePathEnum.MENU, element: <div>menu</div> },
           { path: RoutePathEnum.RIDES, element: <div>caronas</div> },
-          { path: RoutePathEnum.DENUNCIATIONS, element: <div>denúncias</div> },
+          { path: RoutePathEnum.REPORTS, element: <div>denúncias</div> },
         ],
       },
     ],
@@ -139,8 +139,8 @@ describe('MainLayout', () => {
     });
   });
 
-  it('should carry the denunciations entry in the header and in the drawer', async () => {
-    renderLayout(RoutePathEnum.DENUNCIATIONS);
+  it('should carry the reports entry in the header and in the drawer', async () => {
+    renderLayout(RoutePathEnum.REPORTS);
 
     expect(screen.getByRole('link', { name: 'Denúncias' })).toHaveAttribute('aria-current', 'page');
 

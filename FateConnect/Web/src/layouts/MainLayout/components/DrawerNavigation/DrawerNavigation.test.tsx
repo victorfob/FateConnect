@@ -73,7 +73,7 @@ describe('DrawerNavigation', () => {
     renderNavigation(vi.fn(), RoutePathEnum.RIDES);
 
     expect(serviceLink(RoutePathEnum.RIDES)).toHaveAttribute('aria-current', 'page');
-    expect(serviceLink(RoutePathEnum.DENUNCIATIONS)).not.toHaveAttribute('aria-current');
+    expect(serviceLink(RoutePathEnum.REPORTS)).not.toHaveAttribute('aria-current');
   });
 
   it('should navigate and ask for the drawer to close when an entry is used', async () => {

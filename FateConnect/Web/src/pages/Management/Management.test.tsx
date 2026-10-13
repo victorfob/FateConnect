@@ -6,7 +6,7 @@ import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
 
-import { EMPTY_LIST_MESSAGE as DENUNCIATIONS_EMPTY_MESSAGE } from './components/DenunciationsTab/constants';
+import { EMPTY_LIST_MESSAGE as REPORTS_EMPTY_MESSAGE } from './components/ReportsTab/constants';
 import { EMPTY_LIST_MESSAGE as USERS_EMPTY_MESSAGE } from './components/UsersTab/constants';
 import * as C from './constants';
 import { Management } from '.';
@@ -29,7 +29,7 @@ function renderAt(initialEntry: string = RoutePathEnum.MANAGEMENT) {
 describe('Management', () => {
   beforeEach(() => {
     server.use(
-      http.get('https://api.fateconnect.test/denunciations', () => HttpResponse.json(EMPTY_PAGE)),
+      http.get('https://api.fateconnect.test/reports', () => HttpResponse.json(EMPTY_PAGE)),
       http.get('https://api.fateconnect.test/users', () => HttpResponse.json(EMPTY_PAGE)),
     );
   });
@@ -59,19 +59,19 @@ describe('Management', () => {
     renderAt(`${RoutePathEnum.MANAGEMENT}?aba=denuncias`);
 
     await waitFor(() =>
-      expect(screen.getByRole('tab', { name: C.DENUNCIATIONS_TAB_LABEL })).toHaveAttribute(
+      expect(screen.getByRole('tab', { name: C.REPORTS_TAB_LABEL })).toHaveAttribute(
         'aria-selected',
         'true',
       ),
     );
-    expect(await screen.findByText(DENUNCIATIONS_EMPTY_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(REPORTS_EMPTY_MESSAGE)).toBeInTheDocument();
     expect(screen.queryByText(USERS_EMPTY_MESSAGE)).not.toBeInTheDocument();
   });
 
   it('should write the chosen tab into the address', async () => {
     const router = renderAt();
 
-    await userEvent.click(screen.getByRole('tab', { name: C.DENUNCIATIONS_TAB_LABEL }));
+    await userEvent.click(screen.getByRole('tab', { name: C.REPORTS_TAB_LABEL }));
 
     await waitFor(() => expect(router.state.location.search).toContain('aba=denuncias'));
   });
