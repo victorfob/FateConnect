@@ -18,7 +18,7 @@ paths:
 
 ## Um formato de erro
 
-- Toda resposta 4xx e 5xx é `ProblemDetails` (RFC 9457), com `application/problem+json`: a exceção da aplicação sai do `GlobalExceptionMiddleware`, a recusa de validação do `[ApiController]`, e a resposta que nasceria sem corpo (401 do piso, 403 de perfil, 404 de rota) do `UseStatusCodePages`.
+- Toda resposta 4xx e 5xx é `ProblemDetails` (RFC 9457), com `application/problem+json`: a exceção da aplicação sai do `GlobalExceptionMiddleware`, a recusa de validação do `[ApiController]`, a resposta que nasceria sem corpo (401 do piso, 403 de perfil, 404 de rota) do `UseStatusCodePages`, e o 503 da saúde do `HealthResponse`. O formato não depende do `Accept`: cliente que pede `text/html` recebe o mesmo corpo.
 - A mensagem em pt-BR vai em `detail`. `field`, `code` e `minutesRemaining` são extensões no topo do corpo e só vêm quando existem. `field` usa o nome da **requisição** (`fatecEmail`, `phone`, `contactEmail`) e só vem quando o erro aponta um campo. `code` só vem quando o mesmo status tem mais de um motivo que a tela precisa separar (`ContactRequired` no 403 de criar carona, item e denúncia sem sigilo).
 - A recusa de validação traz o campo como chave dentro de `errors`, sem `field` no topo: recusa de validação não aponta o campo.
 - ⛔ `[Produces("application/json")]` num controller vale também para a resposta de erro dele, que deixa de sair `application/problem+json`: não declare.
