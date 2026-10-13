@@ -33,6 +33,7 @@ paths:
 ## Forma
 
 - `if` de uma instrução não leva chaves; a instrução vai na linha seguinte, indentada.
+- O build reprova o `using` fora do lugar (IDE0065) e o namespace diferente da pasta (IDE0130), mas não a ordem: `System` primeiro se ajusta com `dotnet format style <csproj> --include <arquivos>`. O arquivo que o IDE0065 converte perde a linha em branco depois do `namespace`.
 - `Infrastructure/` se divide por assunto (`Database`, `Middlewares`, `Validation`, `Observability`), com a interface ao lado da implementação; a quebra em `Interfaces/`, `Services/` e `Extensions/` é dos `Modules/`.
 - ⛔ **O controller só orquestra.** Nada de `private` nele: o auxiliar vira extension no módulo dono do conceito (`Modules/Auth/Extensions/ClaimsPrincipalExtensions.cs`, `GetUserId`), não em `Common`.
 - ⛔ **Outra camada precisa de algo `private`? Exponha o método que responde, não o dado** (`DateTimeUtils.NowInProductTimeZone`, `ToUtcFromProductTimeZone`). O tell é tornar público um `private` para atender um consumidor; extrair para arquivo novo reabre essa decisão.
