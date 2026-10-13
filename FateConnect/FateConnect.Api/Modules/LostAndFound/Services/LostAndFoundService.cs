@@ -17,7 +17,7 @@ public partial class LostAndFoundService(
     ILostAndFoundRepository repository,
     IStorageService baseStorageService,
     ILogger<LostAndFoundService> logger
-) : BaseFileService(baseStorageService), ILostAndFoundService
+) : BaseFileService(baseStorageService, logger), ILostAndFoundService
 {
     public async Task<ReadLostAndFoundDto> CreateAsync(CreateLostAndFoundDto dto, int currentUserId)
     {

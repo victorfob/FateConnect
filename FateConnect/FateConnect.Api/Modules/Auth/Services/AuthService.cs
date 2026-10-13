@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.Auth.Services;
 
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.DTOs;
+using FateConnect.Api.Modules.Auth.Enums;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Auth.Utils;
@@ -33,7 +34,10 @@ public partial class AuthService(
         User user = await AuthenticateAsync(dto);
 
         if (user.Status is EnumAccountStatus.SelfDeactivated)
+        {
+            LogLoginRefused(logger, user.Id, EnumLoginRefusalReason.Deactivated);
             throw new DeactivatedAccountException();
+        }
 
         LogUserLoggedIn(logger, user.Id);
 
@@ -69,15 +73,22 @@ public partial class AuthService(
         User? user = await userRepository.GetByEmailAsync(dto.FatecEmail);
 
         if (user is null)
+        {
+            LogLoginRefusedForUnknownEmail(logger);
             throw new InvalidCredentialsException();
+        }
 
         if (user.Status is EnumAccountStatus.Banned)
+        {
+            LogLoginRefused(logger, user.Id, EnumLoginRefusalReason.Banned);
             throw new BannedAccountException();
+        }
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
         if (user.IsLocked(now))
         {
+            LogLoginRefused(logger, user.Id, EnumLoginRefusalReason.Locked);
             int minutesRemaining = (int)Math.Ceiling((user.LockedUntil!.Value - now).TotalMinutes);
             throw new AccountLockedException(minutesRemaining);
         }
@@ -93,7 +104,10 @@ public partial class AuthService(
         await userRepository.SaveChangesAsync();
 
         if (!user.IsEmailConfirmed)
+        {
+            LogLoginRefused(logger, user.Id, EnumLoginRefusalReason.EmailNotConfirmed);
             throw new EmailNotConfirmedException();
+        }
 
         return user;
     }
@@ -105,6 +119,7 @@ public partial class AuthService(
         if (!user.IsLocked(now))
         {
             await userRepository.SaveChangesAsync();
+            LogLoginRefused(logger, user.Id, EnumLoginRefusalReason.WrongPassword);
             throw new InvalidCredentialsException();
         }
 
@@ -186,9 +201,17 @@ public partial class AuthService(
     {
         User? user = await userRepository.GetByEmailWithTokensAsync(dto.FatecEmail, EnumTokenType.EmailConfirmation);
 
-        if (user is null) return;
+        if (user is null)
+        {
+            LogLinkRequestForUnknownEmail(logger, EnumTokenType.EmailConfirmation);
+            return;
+        }
 
-        if (user.IsEmailConfirmed) return;
+        if (user.IsEmailConfirmed)
+        {
+            LogLinkRequestSkipped(logger, EnumTokenType.EmailConfirmation, user.Id, EnumLinkRequestSkipReason.AlreadyConfirmed);
+            return;
+        }
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
@@ -200,7 +223,10 @@ public partial class AuthService(
         bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
 
         if (isCooldownActive)
+        {
+            LogLinkRequestSkipped(logger, EnumTokenType.EmailConfirmation, user.Id, EnumLinkRequestSkipReason.Cooldown);
             return;
+        }
 
         var activeTokens = user.Tokens.Where(t =>
             t.Type == EnumTokenType.EmailConfirmation &&
@@ -231,10 +257,16 @@ public partial class AuthService(
         User? user = await userRepository.GetByEmailWithTokensAsync(dto.FatecEmail, EnumTokenType.PasswordReset);
 
         if (user is null)
+        {
+            LogLinkRequestForUnknownEmail(logger, EnumTokenType.PasswordReset);
             throw new UserNotFoundException();
+        }
 
         if (user.Status is EnumAccountStatus.Banned)
+        {
+            LogLinkRequestSkipped(logger, EnumTokenType.PasswordReset, user.Id, EnumLinkRequestSkipReason.Banned);
             return;
+        }
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
@@ -246,7 +278,10 @@ public partial class AuthService(
         bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
 
         if (isCooldownActive)
+        {
+            LogLinkRequestSkipped(logger, EnumTokenType.PasswordReset, user.Id, EnumLinkRequestSkipReason.Cooldown);
             return;
+        }
 
         var activeTokens = user.Tokens.Where(t =>
             t.Type == EnumTokenType.PasswordReset &&

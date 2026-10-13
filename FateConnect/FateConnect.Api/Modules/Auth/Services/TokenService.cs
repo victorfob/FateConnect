@@ -9,14 +9,10 @@ using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.Entities;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Users.Entities;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-public partial class TokenService(
-    IOptions<JwtOptions> jwtOptions,
-    ILogger<TokenService> logger
-) : ITokenService
+public class TokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
@@ -41,8 +37,6 @@ public partial class TokenService(
         };
 
         SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-
-        LogJwtTokenGenerated(logger, user.Id, expirationDate);
 
         return tokenHandler.WriteToken(token);
     }

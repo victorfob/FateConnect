@@ -6,7 +6,6 @@ using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.Emails.Options;
 using FateConnect.Api.Modules.Emails.Services;
 using FateConnect.Api.Tests.Fixtures;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Resend;
 
@@ -44,7 +43,7 @@ public partial class EmailServiceTests
     private static partial Regex CssTheClientsIgnore();
 
     private static EmailService ServiceWith(IResend resend) =>
-        new(resend, Options.Create(new EmailOptions(PublicUrl, Sender)), new FixedTimeProvider(NewYearInUtcStillDecemberInBrazil), NullLogger<EmailService>.Instance);
+        new(resend, Options.Create(new EmailOptions(PublicUrl, Sender)), new FixedTimeProvider(NewYearInUtcStillDecemberInBrazil));
 
     private static async Task<EmailMessage> SentMessage(EnumAccountEmail email, string fullName = FullName)
     {

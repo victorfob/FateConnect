@@ -29,6 +29,8 @@ public partial class StorageService(IWebHostEnvironment env, ILogger<StorageServ
             PhysicalPathOf(storedPath),
             PhysicalPathOf(UploadsLocation.ThumbnailOf(storedPath)));
 
+        LogImageStored(logger, storedPath);
+
         return storedPath;
     }
 
@@ -41,6 +43,8 @@ public partial class StorageService(IWebHostEnvironment env, ILogger<StorageServ
 
         DeleteStoredFile(filePath, relativePath);
         DeleteStoredFile(filePath, UploadsLocation.ThumbnailOf(relativePath));
+
+        LogImageRemoved(logger, filePath);
 
         return Task.CompletedTask;
     }
