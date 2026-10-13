@@ -148,6 +148,8 @@ public class Program
         builder.Services.AddScoped<IInAppNotificationRepository, InAppNotificationRepository>();
         builder.Services.AddScoped<IInAppNotificationService, InAppNotificationService>();
 
+        builder.Services.AddProblemDetails();
+
         builder.Services.AddControllers()
             .ConfigureApiBehaviorOptions(options =>
                 options.InvalidModelStateResponseFactory = InvalidModelStateLogging.LoggingFirst(
@@ -295,6 +297,7 @@ public class Program
         }
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
+        app.UseStatusCodePages();
 
         app.UseForwardedHeaders();
 

@@ -22,7 +22,7 @@ public class UsersController(IUserService service) : ControllerBase
     [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> SignUpAsync([FromBody] CreateUserDto dto)
     {
         await service.SignUpAsync(dto, HttpContext.GetRequestOrigin());
@@ -45,7 +45,7 @@ public class UsersController(IUserService service) : ControllerBase
     [HttpPatch("me")]
     [AuthorizeProfile(EnumProfileType.Operator)]
     [ProducesResponseType(typeof(ReadUserDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ReadUserDto>> UpdateProfileAsync([FromForm] UpdateUserDto dto)
     {
         var result = await service.UpdateProfileAsync(User.GetUserId(), dto);
@@ -135,7 +135,7 @@ public class UsersController(IUserService service) : ControllerBase
     [HttpPatch("{id:int}")]
     [AuthorizeProfile(EnumProfileType.Administrator)]
     [ProducesResponseType(typeof(ReadUserDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ReadUserDto>> UpdateUserByAdminAsync(int id, [FromBody] AdminUpdateUserDto dto)
     {
         var result = await service.UpdateUserByAdminAsync(id, dto, User.GetUserId());
