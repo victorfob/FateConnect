@@ -17,7 +17,7 @@ public class ValidationMessagesTests
     }
 
     [Fact]
-    public void AnUndefinedGender_IsRejectedInPortuguese()
+    public void AnUndefinedGender_IsRejected()
     {
         List<ValidationResult> results = Validate(new CreateUserDto
         {
@@ -29,11 +29,11 @@ public class ValidationMessagesTests
             Acceptances = [],
         });
 
-        Assert.Contains(results, result => result.ErrorMessage == "Gênero inválido");
+        Assert.Contains(results, result => result.ErrorMessage == "Invalid gender.");
     }
 
     [Fact]
-    public void AnUnderageBirthDate_IsRejectedInPortuguese()
+    public void AnUnderageBirthDate_IsRejected()
     {
         List<ValidationResult> results = Validate(new CreateUserDto
         {
@@ -45,7 +45,7 @@ public class ValidationMessagesTests
             Acceptances = [],
         });
 
-        Assert.Contains(results, result => result.ErrorMessage == "É necessário ter pelo menos 18 anos");
+        Assert.Contains(results, result => result.ErrorMessage == "You must be at least 18 years old.");
     }
 
     [Fact]

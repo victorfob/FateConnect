@@ -29,25 +29,25 @@ public class TimeOnlyJsonConverterTests
     }
 
     [Fact]
-    public void Read_WithANonStringToken_AsksForTextInPortuguese()
+    public void Read_WithANonStringToken_AsksForText()
     {
         JsonException exception = Assert.Throws<JsonException>(
             () => JsonSerializer.Deserialize<TimeOnly>("830", Options));
 
         Assert.Contains(
-            "Formato de hora inválido. Informe a hora como texto, no formato HH:mm ou HH:mm:ss.",
+            "Invalid time format. Send the time as text, as HH:mm or HH:mm:ss.",
             exception.Message,
             StringComparison.Ordinal);
     }
 
     [Fact]
-    public void Read_WithAnUnparseableString_NamesTheValueInPortuguese()
+    public void Read_WithAnUnparseableString_NamesTheValue()
     {
         JsonException exception = Assert.Throws<JsonException>(
             () => JsonSerializer.Deserialize<TimeOnly>("\"25:99\"", Options));
 
         Assert.Contains(
-            "Formato de hora inválido: '25:99'. Informe a hora no formato HH:mm ou HH:mm:ss.",
+            "Invalid time format: '25:99'. Send the time as HH:mm or HH:mm:ss.",
             exception.Message,
             StringComparison.Ordinal);
     }

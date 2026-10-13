@@ -61,7 +61,7 @@ public class UserTests
         InvalidNeighborhoodException exception = Assert.Throws<InvalidNeighborhoodException>(() =>
             user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, user.Gender, contact: null, neighborhood: new string('a', 101), DateTime.UtcNow));
 
-        Assert.Equal("O bairro e a cidade podem ter no máximo 100 caracteres.", exception.Message);
+        Assert.Equal("The neighborhood and city must have at most 100 characters.", exception.Message);
     }
 
     [Fact]

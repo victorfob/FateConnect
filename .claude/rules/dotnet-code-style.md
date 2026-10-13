@@ -11,7 +11,7 @@ paths:
 
 - **Código novo sai com ≥90% de cobertura**, medida por `./scripts/coverage-changed.sh` rodado **depois de commitar**; se a contagem de arquivos não bate com o que você mexeu, a medida está errada. O portão do Sonar é mais baixo de propósito (detalhe na `dotnet-testing`, que carrega ao abrir `FateConnect.Api.Tests/`).
 - **Mudou entidade ou configuração do EF:** a migration gerada pode dropar em vez de renomear; leia o `Up()` antes de tudo (a `dotnet-migrations` carrega ao abrir `Infrastructure/Database/`).
-- **Mensagem em `Modules/*/Exceptions/*.cs`** é copy que a pessoa lê: passa pela régua da skill `ux-writing`, com o mesmo texto que a tela usa. Ao mudá-la, procure nos testes cada frase do texto antigo, não só o começo: `Assert.EndsWith` guarda o fim.
+- **Mensagem em `Modules/*/Exceptions/*.cs`** sai no `detail` do erro, em inglês, e nenhuma tela a mostra: a copy que a pessoa lê, cada tela escreve. Ao mudá-la, procure nos testes cada frase do texto antigo, não só o começo: `Assert.EndsWith` guarda o fim.
 - **Mudança em `Modules/*/Entities/**` que altera o dado coletado ou mostrado** reabre os termos e a política em `FateConnect/Web/legal/` (rule `legal-documents`).
 - ⛔ **C# não leva comentário** (fora do gerado pelo EF): o `./scripts/check-csharp-comments.sh` reprova no `pre-commit` e no `check-api`, e a explicação vai no nome, no PR ou na issue.
 
@@ -72,9 +72,19 @@ Depois de qualquer substituição em lote, procure as três formas de estrago, q
 - `[RegularExpression]` casa a string inteira: ancore `^…$`. Duas checagens com mensagens diferentes no mesmo campo viram um `ValidationAttribute` próprio (`Infrastructure/Validation/FatecEmailAttribute.cs`), e a ordem dos `if` decide a mensagem; trave-a com teste.
 - ⛔ Coluna que passa a aceitar nulo: procure antes os DTOs de leitura que a devolvem. Nunca feche o tipo com `?? string.Empty`.
 
+## Documento OpenAPI
+
+O passo `OpenAPI lint` do `check-api.yml` roda o Spectral (`FateConnect.Api/.spectral.yaml`) no documento que a suíte grava, e reprova o que faltar:
+
+- Operação leva `[SwaggerOperation]` com `OperationId`, `Summary` e `Description`, e cada resposta que devolve em `ProducesResponseType`. O 401, o 403 de `[AuthorizeProfile]` e o 400 de quem recebe corpo ou query vêm dos filtros de `Infrastructure/OpenApi/`.
+- ⛔ Declarar um erro tira a dedução do 200: a operação com `ActionResult<T>` declara o 200 junto, com o tipo.
+- Propriedade leva `[SwaggerSchema]` (no DTO de query, `[SwaggerParameter]`), e a do corpo de requisição leva `[SchemaExample]`. ⛔ `[DefaultValue]` é o padrão que a API aplica, não exemplo: como exemplo, o documento diria que o e-mail padrão do login é o do exemplo.
+- ⛔ Propriedade que só o código lê se implementa explícita na interface (`IWaivesContact.WaivesContact`): o `[BindNever]` não a tira do formulário multipart no documento.
+- Descrição não repete o limite que o atributo de validação já publica no schema (`StringLength`, `MinLength`, `Range`), nem número de constante (tentativas de login, minutos de espera): a cópia envelhece quando o original muda.
+
 ## Idioma
 
 - Identificador, namespace, pasta e arquivo em inglês. Enum com **prefixo** `Enum` (`EnumRideType`); no front é sufixo, e a divergência não se corrige (o CA1711 reprova o sufixo aqui).
-- ⛔ Mensagem que a pessoa lê (validação, exceção de domínio, erro do middleware) em pt-BR, com o mesmo texto da tela. `summary`/`description` do Swagger e template de `LoggerMessage` em inglês, e o log registra o tipo da exceção: nunca interpole a mensagem de produto nele.
+- ⛔ A API fala inglês inteira: mensagem de validação, de exceção e do middleware, `summary`/`description` e exemplo do Swagger, e template de `LoggerMessage`. Fica em pt-BR o que chega à pessoa por outro caminho, os e-mails (`Modules/Emails/Templates/`) e o texto das notificações (`NotificationContents`), e o comentário de qualquer arquivo (o `.spectral.yaml` inclusive; a `description` da regra, que sai na saída do Spectral, é inglês). O log registra o tipo da exceção: nunca interpole a mensagem nele.
 - Todo `LoggerMessage` declara `EventId`, contínuo dentro da classe: removido um log que ainda não saiu em release, renumere os seguintes. O usuário aparece como `User ID {UserId}` (`user ID` no meio da frase).
 - ⛔ Log carrega id, nunca e-mail, senha, token ou o texto que a pessoa digitou; sem id (e-mail sem conta), registra só o fato.

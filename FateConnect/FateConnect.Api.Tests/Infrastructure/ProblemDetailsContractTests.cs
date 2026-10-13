@@ -31,7 +31,7 @@ public class ProblemDetailsContractTests(ApiFactory factory) : IClassFixture<Api
 
         JsonElement body = await ProblemOf(response, HttpStatusCode.NotFound);
         Assert.Equal(
-            "A notificação solicitada não foi encontrada ou não pertence a você.",
+            "The notification was not found or does not belong to you.",
             body.GetProperty("detail").GetString());
     }
 

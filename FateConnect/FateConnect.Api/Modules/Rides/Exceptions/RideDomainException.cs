@@ -3,37 +3,37 @@ namespace FateConnect.Api.Modules.Rides.Exceptions;
 public abstract class RideDomainException(string message) : Exception(message);
 
 public class InvalidDepartureScheduleException()
-    : RideDomainException("A carona deve ser em data e hora futuras.");
+    : RideDomainException("The ride must depart at a future date and time.");
 
 public class InvalidDestinationException()
-    : RideDomainException("O destino deve ter entre 3 e 100 caracteres.");
+    : RideDomainException("The destination must have between 3 and 100 characters.");
 
 public class InvalidRideTypeException()
-    : RideDomainException("Tipo de carona inválido.");
+    : RideDomainException("Invalid ride type.");
 
 public class InvalidVehicleTypeException()
-    : RideDomainException("Veículo inválido.");
+    : RideDomainException("Invalid vehicle.");
 
 public class RideNotDrivenByUserException()
-    : Exception("Esta carona foi ofertada por outra pessoa. Só quem ofertou pode alterá-la.");
+    : Exception("This ride was offered by someone else. Only who offered it can change it.");
 
 public class InvalidRideFrequencyException()
-    : RideDomainException("Recorrência inválida.");
+    : RideDomainException("Invalid frequency.");
 
 public class RepeatUntilOnASingleRideException()
-    : RideDomainException("Só carona com recorrência tem data final.");
+    : RideDomainException("Only a repeated ride has an end date.");
 
 public class MissingRepeatUntilException()
-    : RideDomainException("Informe a data final da recorrência.");
+    : RideDomainException("The end date of the repetition is required.");
 
 public class RepeatUntilBeforeDepartureException()
-    : RideDomainException("A data final não pode ser anterior à partida.");
+    : RideDomainException("The end date cannot be before the departure.");
 
 public class RepeatUntilTooFarException()
-    : RideDomainException("A recorrência vai até no máximo 6 meses depois da partida.");
+    : RideDomainException("A ride repeats for at most 6 months after the departure.");
 
 public class WeekdaysRideOnAWeekendException()
-    : RideDomainException("A recorrência em dias úteis começa num dia útil.");
+    : RideDomainException("A ride repeated on weekdays starts on a weekday.");
 
 public class RideOnAHolidayException()
-    : RideDomainException("Escolha um dia que não seja feriado.");
+    : RideDomainException("Choose a day that is not a holiday.");

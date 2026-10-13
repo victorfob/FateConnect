@@ -30,6 +30,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a responder a criação de denúncia com o endereço da denúncia criada, como caronas e achados e perdidos já respondiam (#602) [Backend]
 - Passa a publicar as denúncias em `/Reports`, no lugar de `/Denunciations`, e o aviso de denúncia recebida como `ReportReceived`; o caminho antigo deixa de responder, e as imagens já enviadas mudam de endereço sem se perder (#605) [Frontend] [Backend]
 - Passa a responder todo erro da API no formato `ProblemDetails`, com a mensagem em `detail` no lugar de `error`; `field`, `code` e `minutesRemaining` mantêm o nome, e as recusas por falta de login, por perfil e por rota inexistente, que vinham sem corpo, passam a trazer um (#609) [Frontend] [Backend]
+- Passa a descrever no documento da API cada rota, com resumo, as respostas que ela devolve, os campos e parâmetros, exemplos nos corpos e o que é obrigatório ou pode vir nulo, e a esteira reprova a rota nova que chegar sem essa descrição (#611) [Backend]
+- Troca a página de leitura da API, do Swagger UI pelo Scalar, em `/api/scalar/v1`; a página antiga deixa de responder, e o documento continua no mesmo endereço (#611) [Backend]
+- Passa a responder as mensagens de erro da API em inglês; nenhuma tela as mostra, porque cada uma escreve o próprio texto (#611) [Backend]
 
 ### Fixed
 

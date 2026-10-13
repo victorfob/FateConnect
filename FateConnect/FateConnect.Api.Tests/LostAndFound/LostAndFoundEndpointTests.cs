@@ -297,7 +297,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await client.PostAsync("/LostAndFound", NewItemForm(occurredOn: tomorrow));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("A data do ocorrido não pode ser no futuro.", await response.Content.ReadAsStringAsync());
+        Assert.Contains("The date it happened cannot be in the future.", await response.Content.ReadAsStringAsync());
     }
 
     [Fact]
@@ -548,7 +548,10 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await _factory.CreateClientFor(reporter.Id).PostAsync("/LostAndFound", form);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("Informe a data do ocorrido.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.Contains(
+            "The date it happened is required.",
+            await response.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -566,7 +569,10 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await _factory.CreateClientFor(reporter.Id).PostAsync("/LostAndFound", form);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("Informe se o item foi perdido ou achado.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.Contains(
+            "Tell whether the item was lost or found.",
+            await response.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -609,6 +615,6 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await client.PostAsync("/LostAndFound", form);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("Formato de imagem não suportado", await response.Content.ReadAsStringAsync());
+        Assert.Contains("Unsupported image format", await response.Content.ReadAsStringAsync());
     }
 }
