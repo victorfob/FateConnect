@@ -49,11 +49,11 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         return form;
     }
 
-    private static async Task<(string? Code, string? Error)> ErrorOf(HttpResponseMessage response)
+    private static async Task<(string? Code, string? Detail)> ProblemOf(HttpResponseMessage response)
     {
         using JsonDocument body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
-        return (body.RootElement.GetProperty("code").GetString(), body.RootElement.GetProperty("error").GetString());
+        return (body.RootElement.GetProperty("code").GetString(), body.RootElement.GetProperty("detail").GetString());
     }
 
     private static async Task<JsonElement> ProfileOf(HttpClient client) =>
@@ -66,10 +66,10 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
 
         HttpResponseMessage response = await client.PostAsJsonAsync("/Rides", NewRidePayload());
 
-        (string? code, string? error) = await ErrorOf(response);
+        (string? code, string? detail) = await ProblemOf(response);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
-        Assert.Equal("Para ofertar carona, cadastre telefone e e-mail para contato em Meu perfil.", error);
+        Assert.Equal("Para ofertar carona, cadastre telefone e e-mail para contato em Meu perfil.", detail);
     }
 
     [Fact]
@@ -79,10 +79,10 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
 
         HttpResponseMessage response = await client.PostAsync("/LostAndFound", NewItemForm());
 
-        (string? code, string? error) = await ErrorOf(response);
+        (string? code, string? detail) = await ProblemOf(response);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
-        Assert.Equal("Para cadastrar um item, cadastre telefone e e-mail para contato em Meu perfil.", error);
+        Assert.Equal("Para cadastrar um item, cadastre telefone e e-mail para contato em Meu perfil.", detail);
     }
 
     [Fact]
@@ -104,12 +104,12 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
 
         HttpResponseMessage response = await client.PostAsync("/Reports", NewReportForm(isAnonymous: false));
 
-        (string? code, string? error) = await ErrorOf(response);
+        (string? code, string? detail) = await ProblemOf(response);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
         Assert.Equal(
             "Para enviar uma denúncia sem sigilo, cadastre telefone e e-mail para contato em Meu perfil, ou marque a denúncia como sigilosa.",
-            error);
+            detail);
     }
 
     [Fact]

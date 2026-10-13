@@ -1,5 +1,5 @@
 ---
-description: Contrato entre o front e a API — inglês sem tradução na borda, as duas formas de erro e o que o front lê delas, onde se leem campos e filtros, a caixa das rotas e a regra do feriado
+description: Contrato entre o front e a API — inglês sem tradução na borda, o formato único de erro e o que o front lê dele, onde se leem campos e filtros, a caixa das rotas e a regra do feriado
 paths:
   - "FateConnect/Web/src/services/**"
   - "FateConnect/FateConnect.Api/Modules/*/Controllers/**"
@@ -16,11 +16,14 @@ paths:
 - ⚠️ **A API publica `/Rides`, `/Users`, `/Auth`, e os serviços do front chamam minúsculo.** O roteamento é case-insensitive e a divergência é deliberada: não "corrija" nenhum lado.
 - O nome de quem está logado sai do token (claim `unique_name`); se a sessão vale, quem diz é o `GET /Auth/session` (204 ou 401), não o `exp` lido no front.
 
-## Duas formas de erro
+## Um formato de erro
 
-- O que a aplicação lança sai do `GlobalExceptionMiddleware` como `ErrorResponseDto`: `{ error, field?, code? }`, com a mensagem em pt-BR. `field` usa o nome da **requisição** (`fatecEmail`, `phone`, `contactEmail`) e só vem quando o erro aponta um campo. `code` só vem quando o mesmo status tem mais de um motivo que a tela precisa separar (`ContactRequired` no 403 de criar carona, item e denúncia sem sigilo).
-- O que a validação de modelo ou o binder recusa sai como `ProblemDetails` padrão do ASP.NET, com o campo como chave dentro de `errors` e sem `field` no topo: recusa de validação não aponta o campo.
+- Toda resposta 4xx e 5xx é `ProblemDetails` (RFC 9457), com `application/problem+json`: a exceção da aplicação sai do `GlobalExceptionMiddleware`, a recusa de validação do `[ApiController]`, a resposta que nasceria sem corpo (401 do piso, 403 de perfil, 404 de rota) do `UseStatusCodePages`, e o 503 da saúde do `HealthResponse`. O formato não depende do `Accept`: cliente que pede `text/html` recebe o mesmo corpo.
+- A mensagem em pt-BR vai em `detail`. `field`, `code` e `minutesRemaining` são extensões no topo do corpo e só vêm quando existem. `field` usa o nome da **requisição** (`fatecEmail`, `phone`, `contactEmail`) e só vem quando o erro aponta um campo. `code` só vem quando o mesmo status tem mais de um motivo que a tela precisa separar (`ContactRequired` no 403 de criar carona, item e denúncia sem sigilo).
+- A recusa de validação traz o campo como chave dentro de `errors`, sem `field` no topo: recusa de validação não aponta o campo.
+- ⛔ `[Produces("application/json")]` num controller vale também para a resposta de erro dele, que deixa de sair `application/problem+json`: não declare.
 - ⛔ **O front escolhe a copy por `status`, `field` ou `code`, nunca pela mensagem da API.** A mensagem documenta o contrato; o que a pessoa lê, cada tela escreve.
+- No stub do teste do front, o erro da API sai do `problemResponse` (`src/test/utils/problemResponse.ts`).
 
 ## Feriado
 

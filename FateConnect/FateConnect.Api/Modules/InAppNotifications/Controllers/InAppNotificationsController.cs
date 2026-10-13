@@ -34,7 +34,7 @@ public class InAppNotificationsController(IInAppNotificationService service) : C
 
     [HttpPatch("{id:int}/read")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> MarkAsReadAsync(int id)
     {
         await service.MarkAsReadAsync(id, User.GetUserId());

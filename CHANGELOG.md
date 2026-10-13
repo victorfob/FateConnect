@@ -29,6 +29,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a declarar na política de privacidade os registros técnicos do servidor, o que cada um guarda, para quê e o prazo de 14 dias (#603) [Frontend]
 - Passa a responder a criação de denúncia com o endereço da denúncia criada, como caronas e achados e perdidos já respondiam (#602) [Backend]
 - Passa a publicar as denúncias em `/Reports`, no lugar de `/Denunciations`, e o aviso de denúncia recebida como `ReportReceived`; o caminho antigo deixa de responder, e as imagens já enviadas mudam de endereço sem se perder (#605) [Frontend] [Backend]
+- Passa a responder todo erro da API no formato `ProblemDetails`, com a mensagem em `detail` no lugar de `error`; `field`, `code` e `minutesRemaining` mantêm o nome, e as recusas por falta de login, por perfil e por rota inexistente, que vinham sem corpo, passam a trazer um (#609) [Frontend] [Backend]
 
 ### Fixed
 

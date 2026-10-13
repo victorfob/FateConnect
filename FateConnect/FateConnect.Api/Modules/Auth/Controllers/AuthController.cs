@@ -3,23 +3,21 @@ namespace FateConnect.Api.Modules.Auth.Controllers;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Auth.Interfaces;
-using FateConnect.Api.Modules.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("[controller]")]
-[Produces("application/json")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status409Conflict)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> LoginAsync([FromBody] LoginDto dto)
     {
         var response = await authService.LoginAsync(dto);
@@ -29,10 +27,10 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("reactivate")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> ReactivateAsync([FromBody] LoginDto dto)
     {
         var response = await authService.ReactivateAsync(dto);
@@ -42,7 +40,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("logout")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> LogoutAsync()
     {
         await authService.LogoutAsync(User.GetUserId());
@@ -52,7 +50,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpGet("session")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public IActionResult GetSession()
     {
         return NoContent();
@@ -61,7 +59,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("confirm-email")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
     {
         var tokenResponse = await authService.ConfirmEmailAsync(dto);
@@ -71,7 +69,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("resend-confirmation-email")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResendConfirmationEmail([FromBody] EmailRequestDto dto)
     {
         await authService.ResendConfirmationEmailAsync(dto);
@@ -81,7 +79,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("forgot-password")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ForgotPassword([FromBody] EmailRequestDto dto)
     {
         await authService.ForgotPasswordAsync(dto);
@@ -91,7 +89,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpGet("verify-reset-token")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> VerifyResetToken([FromQuery] string token)
     {
         await authService.VerifyResetTokenAsync(token);
@@ -101,7 +99,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("reset-password")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
     {
         var tokenResponse = await authService.ResetPasswordAsync(dto);
@@ -111,7 +109,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("unlock")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UnlockAccount([FromBody] UnlockAccountDto dto)
     {
         await authService.UnlockAccountAsync(dto);
