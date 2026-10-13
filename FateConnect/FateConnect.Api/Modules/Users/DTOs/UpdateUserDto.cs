@@ -1,10 +1,10 @@
 namespace FateConnect.Api.Modules.Users.DTOs;
 
+using System;
+using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.ComponentModel.DataAnnotations;
 
 public class UpdateUserDto
 {

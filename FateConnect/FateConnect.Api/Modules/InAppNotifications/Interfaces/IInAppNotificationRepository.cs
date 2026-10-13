@@ -1,8 +1,8 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Interfaces;
 
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
-using System.Threading.Tasks;
 
 public interface IInAppNotificationRepository
 {

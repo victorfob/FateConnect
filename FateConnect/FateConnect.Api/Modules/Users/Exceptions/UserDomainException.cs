@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Users.Exceptions;
 
-using FateConnect.Api.Modules.Users.Enums;
 using System;
+using FateConnect.Api.Modules.Users.Enums;
 
 public abstract class UserDomainException(string message) : Exception(message);
 

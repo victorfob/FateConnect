@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Denunciations.DTOs;
 
-using FateConnect.Api.Modules.Denunciations.Enums;
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Denunciations.Enums;
 
 public record ReadDenunciationDto(
     Guid Id,

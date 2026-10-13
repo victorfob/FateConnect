@@ -3,8 +3,6 @@ namespace FateConnect.Api.Infrastructure.Middlewares;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using FateConnect.Api.Infrastructure.Observability;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Common.DTOs;
@@ -13,8 +11,10 @@ using FateConnect.Api.Modules.Denunciations.Exceptions;
 using FateConnect.Api.Modules.InAppNotifications.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
-using FateConnect.Api.Modules.Users.Exceptions;
 using FateConnect.Api.Modules.Storage.Exceptions;
+using FateConnect.Api.Modules.Users.Exceptions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 public partial class GlobalExceptionMiddleware(
     RequestDelegate next,

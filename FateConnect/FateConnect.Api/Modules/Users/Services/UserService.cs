@@ -1,10 +1,17 @@
 namespace FateConnect.Api.Modules.Users.Services;
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Events;
+using FateConnect.Api.Modules.Storage.Enums;
+using FateConnect.Api.Modules.Storage.Interfaces;
+using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Storage.Utils;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
@@ -12,13 +19,6 @@ using FateConnect.Api.Modules.Users.Exceptions;
 using FateConnect.Api.Modules.Users.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using FateConnect.Api.Modules.Storage.Enums;
-using FateConnect.Api.Modules.Storage.Interfaces;
-using FateConnect.Api.Modules.Storage.Services;
-using FateConnect.Api.Modules.Storage.Utils;
 using static BCrypt.Net.BCrypt;
 
 public partial class UserService(

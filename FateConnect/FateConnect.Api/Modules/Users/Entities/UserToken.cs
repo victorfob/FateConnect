@@ -1,9 +1,9 @@
 namespace FateConnect.Api.Modules.Users.Entities;
 
+using System;
 using FateConnect.Api.Modules.Auth.Exceptions;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
-using System;
 
 public class UserToken
 {

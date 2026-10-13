@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Denunciations.DTOs;
 
-using FateConnect.Api.Infrastructure.Validation;
 using System.ComponentModel.DataAnnotations;
+using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Denunciations.Enums;
 using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.AspNetCore.Http;

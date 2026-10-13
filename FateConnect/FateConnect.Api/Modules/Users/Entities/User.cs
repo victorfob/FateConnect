@@ -1,13 +1,13 @@
 namespace FateConnect.Api.Modules.Users.Entities;
 
+using System;
+using System.Collections.Generic;
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.Utils;
 using FateConnect.Api.Modules.Common.Constants;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
-using System;
-using System.Collections.Generic;
 
 public class User
 {

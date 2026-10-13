@@ -1,5 +1,9 @@
 namespace FateConnect.Api.Modules.Auth.Services;
 
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Enums;
@@ -14,10 +18,6 @@ using FateConnect.Api.Modules.Users.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using static BCrypt.Net.BCrypt;
 
 public partial class AuthService(

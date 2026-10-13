@@ -1,22 +1,22 @@
 namespace FateConnect.Api.Modules.Denunciations.Services;
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Denunciations.DTOs;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Exceptions;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
-using FateConnect.Api.Modules.Users.Extensions;
-using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using MassTransit;
-using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Storage.Enums;
 using FateConnect.Api.Modules.Storage.Interfaces;
 using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Users.Extensions;
+using MassTransit;
+using Microsoft.Extensions.Logging;
 
 public partial class DenunciationService(
     IDenunciationRepository repository,

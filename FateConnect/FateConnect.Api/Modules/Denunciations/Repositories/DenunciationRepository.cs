@@ -1,16 +1,16 @@
 namespace FateConnect.Api.Modules.Denunciations.Repositories;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Denunciations.DTOs;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 public class DenunciationRepository(FateConnectDbContext context) : IDenunciationRepository
 {

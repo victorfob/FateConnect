@@ -1,9 +1,9 @@
 namespace FateConnect.Api.Modules.Denunciations.Interfaces;
 
-using FateConnect.Api.Modules.Common.DTOs;
-using FateConnect.Api.Modules.Denunciations.DTOs;
 using System;
 using System.Threading.Tasks;
+using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Denunciations.DTOs;
 
 public interface IDenunciationService
 {

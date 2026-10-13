@@ -1,10 +1,10 @@
 namespace FateConnect.Api.Modules.Denunciations.Interfaces;
 
-using FateConnect.Api.Modules.Denunciations.DTOs;
-using FateConnect.Api.Modules.Denunciations.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FateConnect.Api.Modules.Denunciations.DTOs;
+using FateConnect.Api.Modules.Denunciations.Entities;
 
 public interface IDenunciationRepository
 {

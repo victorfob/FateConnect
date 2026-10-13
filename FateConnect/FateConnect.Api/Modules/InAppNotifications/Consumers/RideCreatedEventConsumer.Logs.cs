@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Consumers;
 
-using Microsoft.Extensions.Logging;
 using System;
+using Microsoft.Extensions.Logging;
 
 public sealed partial class RideCreatedEventConsumer
 {

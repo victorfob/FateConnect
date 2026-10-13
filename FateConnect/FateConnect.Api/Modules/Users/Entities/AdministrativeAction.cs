@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Users.Entities;
 
-using FateConnect.Api.Modules.Users.Enums;
 using System;
+using FateConnect.Api.Modules.Users.Enums;
 
 public class AdministrativeAction
 {

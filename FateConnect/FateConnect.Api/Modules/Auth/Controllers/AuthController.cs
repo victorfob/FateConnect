@@ -1,11 +1,11 @@
-using FateConnect.Api.Modules.Auth.Interfaces;
+namespace FateConnect.Api.Modules.Auth.Controllers;
+
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Extensions;
+using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-namespace FateConnect.Api.Modules.Auth.Controllers;
 
 [ApiController]
 [Route("[controller]")]

@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Storage.Utils;
 
+using FateConnect.Api.Modules.Storage.Exceptions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -7,7 +8,6 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Metadata;
 using SixLabors.ImageSharp.Processing;
-using FateConnect.Api.Modules.Storage.Exceptions;
 
 public static class ImageVariants
 {

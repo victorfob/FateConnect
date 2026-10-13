@@ -1,8 +1,8 @@
 namespace FateConnect.Api.Modules.Users.Extensions;
 
 using FateConnect.Api.Modules.Common.DTOs;
-using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Storage.Utils;
+using FateConnect.Api.Modules.Users.Entities;
 
 public static class UserExtensions
 {

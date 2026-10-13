@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Controllers;
 
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.Attributes;
 using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Common.DTOs;
@@ -8,7 +9,6 @@ using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 [ApiController]
 [Route("[controller]")]

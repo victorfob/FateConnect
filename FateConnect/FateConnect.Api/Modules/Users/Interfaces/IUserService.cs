@@ -1,10 +1,10 @@
 namespace FateConnect.Api.Modules.Users.Interfaces;
 
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
-using System.Threading.Tasks;
 
 public interface IUserService
 {

@@ -1,19 +1,19 @@
 namespace FateConnect.Api.Modules.Denunciations.Controllers;
 
+using System;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.Attributes;
 using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Denunciations.DTOs;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
+using FateConnect.Api.Modules.Storage.Enums;
 using FateConnect.Api.Modules.Storage.Extensions;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
-using FateConnect.Api.Modules.Storage.Enums;
 
 [ApiController]
 [Route("[controller]")]

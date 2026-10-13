@@ -1,10 +1,10 @@
 namespace FateConnect.Api.Modules.Denunciations.Entities;
 
+using System;
 using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Denunciations.Enums;
 using FateConnect.Api.Modules.Denunciations.Exceptions;
 using FateConnect.Api.Modules.Users.Entities;
-using System;
 
 public class Denunciation
 {

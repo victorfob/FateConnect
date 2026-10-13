@@ -1,9 +1,9 @@
 namespace FateConnect.Api.Modules.Storage.Extensions;
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using FateConnect.Api.Modules.Storage.Enums;
 using FateConnect.Api.Modules.Storage.Utils;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 
 public static class StoredImageExtensions
 {

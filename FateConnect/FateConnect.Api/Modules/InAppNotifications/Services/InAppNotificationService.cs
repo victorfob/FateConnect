@@ -1,5 +1,9 @@
 namespace FateConnect.Api.Modules.InAppNotifications.Services;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
@@ -9,10 +13,6 @@ using FateConnect.Api.Modules.InAppNotifications.Exceptions;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 public partial class InAppNotificationService(
     IInAppNotificationRepository repository,

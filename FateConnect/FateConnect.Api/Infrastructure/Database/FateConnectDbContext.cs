@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Infrastructure.Database;
 
+using FateConnect.Api.Infrastructure.Converters;
 using FateConnect.Api.Modules.Denunciations.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.LostAndFound.Entities;
@@ -7,7 +8,6 @@ using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Users.Entities;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using FateConnect.Api.Infrastructure.Converters;
 
 public class FateConnectDbContext(DbContextOptions<FateConnectDbContext> options) : DbContext(options)
 {
