@@ -68,8 +68,9 @@ sudo ./vps-setup.sh
 
 Ele instala PostgreSQL 17, nginx, certbot, fail2ban e Docker, fecha a porta do
 banco para a internet com firewall, permite que os contêineres alcancem o
-PostgreSQL do host, e cria um banco e um usuário por ambiente — gravando cada
-senha em `/root/password-<banco>.txt`.
+PostgreSQL do host, cria um banco e um usuário por ambiente — gravando cada
+senha em `/root/password-<banco>.txt` — e limita o journal do host a 14 dias
+(seção [Registros do servidor](#registros-do-servidor)).
 
 ⚠️ **O PostgreSQL escuta em todas as interfaces de propósito**
 (`listen_addresses = '*'`): o contêiner chega pelo gateway do Docker, que não é
@@ -135,7 +136,8 @@ público.
 
 ## 5. Publicar
 
-Uma vez por ambiente, instale a configuração no nginx:
+Uma vez por ambiente, instale a configuração no nginx. O site usa o formato de log
+que o `vps-setup.sh` instalou, e o `install-site.sh` para sem ele:
 
 ```bash
 sudo ./install-site.sh hml
@@ -334,6 +336,84 @@ se ela não responder 200 em 2 minutos. Na subida, a API espera o RabbitMQ ficar
 saudável (o `healthcheck` do compose roda `rabbitmq-diagnostics ping`) antes de
 começar.
 
+## Registros do servidor
+
+Todo registro técnico dura **14 dias**. O log de acesso não guarda a query dos
+endereços, onde viajam o token dos links de e-mail e o texto das buscas.
+
+| Registro | Onde mora | O que guarda |
+| --- | --- | --- |
+| Log da API | journal do host | identificador do usuário e dos registros, método, rota, tipo de erro, login recusado e ação de administrador |
+| Log da fila | journal do host | o funcionamento do RabbitMQ |
+| Acesso do nginx | `/var/log/nginx/fateconnect-<ambiente>.access.log`, e `/var/log/nginx/access.log` para o que não é site (o servidor padrão e o redirecionamento para o HTTPS) | IP com o fim zerado, data, método, caminho sem a query, status, página de origem sem a query e navegador |
+| Erros do nginx | `/var/log/nginx/fateconnect-<ambiente>.error.log` e `/var/log/nginx/error.log` | a cada falha, o **IP inteiro**, o pedido **com a query** e a página de origem: o nginx não aceita formato próprio neste arquivo |
+
+Quem apaga o que passa do prazo:
+
+- **journal**: `/etc/systemd/journald.conf.d/fateconnect.conf`, que o
+  `vps-setup.sh` cria, com `MaxRetentionSec=14day` e um arquivo por dia
+  (`MaxFileSec=1day`), porque o journal só apaga arquivo inteiro. Vale para o
+  journal do host todo, inclusive os logs do sistema.
+- **nginx**: o `logrotate` do Debian (`/etc/logrotate.d/nginx`), que gira os
+  arquivos por dia e guarda 14.
+
+O formato do log de acesso mora num lugar só, o `nginx/host-log.conf`, que o
+`vps-setup.sh` instala em `/etc/nginx/conf.d/`: os sites o usam pelo nome
+(`fateconnect_masked`), e o que não é site cai no `access_log` dele. Dois
+`access_log` no mesmo nível gravam os dois arquivos, e não um no lugar do outro:
+por isso o script também transforma em comentário o `access_log` do
+`/etc/nginx/nginx.conf`, que grava IP e query inteiros.
+
+O IP do log de acesso sai com o fim zerado — IPv4 até o terceiro bloco
+(`203.0.113.0`), IPv6 até o terceiro grupo (`2001:db8:85a3::`): ainda mostra de
+onde veio um abuso, sem identificar a pessoa.
+
+### Ler o log da API
+
+Os contêineres escrevem no journal com o próprio nome. A API é
+`fateconnect-<ambiente>-api-1`, e a fila, `fateconnect_rabbitmq_<porta da API>`:
+
+```bash
+sudo journalctl CONTAINER_NAME=fateconnect-prod-api-1 --since "1 hour ago"
+sudo journalctl -t fateconnect-prod-api-1 -f      # acompanhando
+docker compose -p fateconnect-prod logs api       # o mesmo conteúdo, pelo Docker
+```
+
+### Uma vez por VPS
+
+O `vps-setup.sh` já faz o journal e o log de acesso do host numa máquina nova. Na
+que já estava no ar antes dele, os mesmos passos vão à mão, de dentro de `deploy/`,
+e **nesta ordem: primeiro o log do host, depois os sites**. O journal:
+
+```bash
+sudo mkdir -p /etc/systemd/journald.conf.d
+printf '[Journal]\nMaxRetentionSec=14day\nMaxFileSec=1day\n' \
+  | sudo tee /etc/systemd/journald.conf.d/fateconnect.conf
+sudo systemctl restart systemd-journald
+systemd-analyze cat-config systemd/journald.conf | grep -E '^Max(Retention|File)Sec='
+```
+
+O log do host, conferindo que não sobrou `access_log` ativo no `nginx.conf` (o
+número esperado é 0):
+
+```bash
+sudo install -m 644 nginx/host-log.conf /etc/nginx/conf.d/fateconnect-host-log.conf
+sudo sed -i.bak -E 's/^(\s*)(access_log\s)/\1# \2/' /etc/nginx/nginx.conf
+grep -cE '^\s*access_log\s' /etc/nginx/nginx.conf
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+A próxima publicação de cada ambiente recria a API e a fila já escrevendo no
+journal; o log antigo, do driver `json-file`, sai junto com o contêiner.
+
+Só então os sites. O template não se instala sozinho: depois do merge, rode
+`sudo ./install-site.sh hml` e `sudo ./install-site.sh prod`, e confira a diretiva
+no arquivo instalado — o número esperado é 1 em cada:
+
+```bash
+sudo grep -cF 'access.log fateconnect_masked;' /etc/nginx/sites-available/fateconnect-{hml,prod}
+```
+
 ## Dia a dia
 
 | O que você quer | Comando |
@@ -341,7 +421,7 @@ começar.
 | Publicar a `develop` | `./build-front.sh hml && ./deploy.sh hml` |
 | Publicar uma release | `./build-front.sh prod && ./deploy.sh prod` |
 | Ver o que está de pé | `docker compose -p fateconnect-prod ps` |
-| Ler os logs | `docker compose -p fateconnect-prod logs -f` |
+| Ler os logs | `docker compose -p fateconnect-prod logs -f`, ou `sudo journalctl -t fateconnect-prod-api-1` |
 | Ver a memória | `free -h` |
 
 Para olhar os dados de homologação pelo DBeaver — túnel SSH e campos de
