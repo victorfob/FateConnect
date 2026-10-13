@@ -17,7 +17,8 @@ public class InAppNotificationsController(IInAppNotificationService service) : C
 {
     [HttpGet]
     [ProducesResponseType(typeof(PagedResultDto<ReadInAppNotificationDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResultDto<ReadInAppNotificationDto>>> GetAllAsync([FromQuery] FilterInAppNotificationDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadInAppNotificationDto>>> GetAllAsync(
+        [FromQuery] FilterInAppNotificationDto filter)
     {
         var result = await service.GetAllAsync(filter, User.GetUserId());
         return Ok(result);

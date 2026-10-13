@@ -51,7 +51,10 @@ public partial class UserService(
         ConfigurePreferences(newUser, dto);
         AddAcceptances(newUser, dto, origin, now);
 
-        string rawToken = newUser.IssueToken(EnumTokenType.EmailConfirmation, now, TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
+        string rawToken = newUser.IssueToken(
+            EnumTokenType.EmailConfirmation,
+            now,
+            TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
 
         await userRepository.InTransactionAsync(async () =>
         {

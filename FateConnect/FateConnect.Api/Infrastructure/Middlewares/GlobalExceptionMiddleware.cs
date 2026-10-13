@@ -120,7 +120,13 @@ public partial class GlobalExceptionMiddleware(
         }
         else
         {
-            LogBusinessWarning(logger, (int)statusCode, exception.GetType().Name, method, route, context.UserIdOrAnonymous());
+            LogBusinessWarning(
+                logger,
+                (int)statusCode,
+                exception.GetType().Name,
+                method,
+                route,
+                context.UserIdOrAnonymous());
         }
 
         context.Response.ContentType = "application/json";

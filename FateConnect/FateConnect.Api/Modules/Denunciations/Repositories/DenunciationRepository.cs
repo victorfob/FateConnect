@@ -14,7 +14,9 @@ using Microsoft.EntityFrameworkCore;
 
 public class DenunciationRepository(FateConnectDbContext context) : IDenunciationRepository
 {
-    public async Task<(IReadOnlyList<Denunciation> Items, int Total)> GetAllAsync(DenunciationFilterDto filter, int? reporterId = null)
+    public async Task<(
+        IReadOnlyList<Denunciation> Items,
+        int Total)> GetAllAsync(DenunciationFilterDto filter, int? reporterId = null)
     {
         IQueryable<Denunciation> query = context.Denunciations
             .AsNoTracking()

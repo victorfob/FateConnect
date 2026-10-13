@@ -123,7 +123,10 @@ public partial class AuthService(
             throw new InvalidCredentialsException();
         }
 
-        string rawToken = user.IssueToken(EnumTokenType.AccountUnlock, now, TimeSpan.FromMinutes(AuthConstants.LockoutMinutes));
+        string rawToken = user.IssueToken(
+            EnumTokenType.AccountUnlock,
+            now,
+            TimeSpan.FromMinutes(AuthConstants.LockoutMinutes));
 
         await publishEndpoint.Publish(new AccountLockedEvent(
             UserId: user.Id,
@@ -209,7 +212,11 @@ public partial class AuthService(
 
         if (user.IsEmailConfirmed)
         {
-            LogLinkRequestSkipped(logger, EnumTokenType.EmailConfirmation, user.Id, EnumLinkRequestSkipReason.AlreadyConfirmed);
+            LogLinkRequestSkipped(
+                logger,
+                EnumTokenType.EmailConfirmation,
+                user.Id,
+                EnumLinkRequestSkipReason.AlreadyConfirmed);
             return;
         }
 
@@ -220,7 +227,8 @@ public partial class AuthService(
             .OrderByDescending(t => t.CreatedAt)
             .FirstOrDefault();
 
-        bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
+        bool isCooldownActive = lastToken is not null
+            && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
 
         if (isCooldownActive)
         {
@@ -238,7 +246,10 @@ public partial class AuthService(
             oldToken.Consume(now);
         }
 
-        string rawToken = user.IssueToken(EnumTokenType.EmailConfirmation, now, TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
+        string rawToken = user.IssueToken(
+            EnumTokenType.EmailConfirmation,
+            now,
+            TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
 
         await publishEndpoint.Publish(new UserRegisteredEvent(
             UserId: user.Id,
@@ -275,7 +286,8 @@ public partial class AuthService(
             .OrderByDescending(t => t.CreatedAt)
             .FirstOrDefault();
 
-        bool isCooldownActive = lastToken is not null && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
+        bool isCooldownActive = lastToken is not null
+            && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
 
         if (isCooldownActive)
         {
@@ -293,7 +305,10 @@ public partial class AuthService(
             oldToken.Consume(now);
         }
 
-        string rawToken = user.IssueToken(EnumTokenType.PasswordReset, now, TimeSpan.FromMinutes(AuthConstants.PasswordResetMinutes));
+        string rawToken = user.IssueToken(
+            EnumTokenType.PasswordReset,
+            now,
+            TimeSpan.FromMinutes(AuthConstants.PasswordResetMinutes));
 
         await publishEndpoint.Publish(new PasswordResetRequestedEvent(
             UserId: user.Id,

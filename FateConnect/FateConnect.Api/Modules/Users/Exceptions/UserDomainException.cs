@@ -54,8 +54,10 @@ public class ContactRequiredException(EnumPublication publication)
     private static string MessageFor(EnumPublication publication) => publication switch
     {
         EnumPublication.Ride => "Para ofertar carona, cadastre telefone e e-mail para contato em Meu perfil.",
-        EnumPublication.LostAndFoundItem => "Para cadastrar um item, cadastre telefone e e-mail para contato em Meu perfil.",
-        EnumPublication.IdentifiedDenunciation => "Para enviar uma denúncia sem sigilo, cadastre telefone e e-mail para contato em Meu perfil, ou marque a denúncia como sigilosa.",
+        EnumPublication.LostAndFoundItem => "Para cadastrar um item, cadastre telefone e e-mail para contato em " +
+            "Meu perfil.",
+        EnumPublication.IdentifiedDenunciation => "Para enviar uma denúncia sem sigilo, cadastre telefone e e-mail " +
+            "para contato em Meu perfil, ou marque a denúncia como sigilosa.",
         _ => throw new ArgumentOutOfRangeException(nameof(publication), publication, null)
     };
 }

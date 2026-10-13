@@ -30,6 +30,14 @@ public static partial class InvalidModelStateLogging
             return respond(context);
         };
 
-    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "Validation refused {Method} {Route} for user ID {UserId}, on the fields: {Fields}.")]
-    private static partial void LogValidationRefused(ILogger logger, string method, string route, string userId, string fields);
+    [LoggerMessage(
+        EventId = 1,
+        Level = LogLevel.Warning,
+        Message = "Validation refused {Method} {Route} for user ID {UserId}, on the fields: {Fields}.")]
+    private static partial void LogValidationRefused(
+        ILogger logger,
+        string method,
+        string route,
+        string userId,
+        string fields);
 }

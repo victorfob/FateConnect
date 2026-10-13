@@ -38,7 +38,11 @@ public static class StoredImageExtensions
         if (variant == EnumStoredImageVariant.Thumbnail)
             requestedFileName = $"{Path.GetFileNameWithoutExtension(fileName)}{UploadsLocation.ThumbnailExtension}";
 
-        if (!ImageContentTypes.TryDescribeStoredFile(requestedFileName, out string? storedFileName, out string? contentType))
+        if (
+            !ImageContentTypes.TryDescribeStoredFile(
+                requestedFileName,
+                out string? storedFileName,
+                out string? contentType))
             return controller.NotFound();
 
         string containerFolder = Path.Combine(

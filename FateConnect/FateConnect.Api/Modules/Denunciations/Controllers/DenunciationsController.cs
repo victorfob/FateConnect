@@ -32,7 +32,8 @@ public class DenunciationsController(IDenunciationService service, IWebHostEnvir
 
     [HttpGet("mine")]
     [AuthorizeProfile(EnumProfileType.Operator)]
-    public async Task<ActionResult<PagedResultDto<ReadDenunciationDto>>> GetMineAsync([FromQuery] DenunciationFilterDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadDenunciationDto>>> GetMineAsync(
+        [FromQuery] DenunciationFilterDto filter)
     {
         var result = await service.GetReportedByAsync(filter, User.GetUserId());
 
@@ -41,7 +42,8 @@ public class DenunciationsController(IDenunciationService service, IWebHostEnvir
 
     [HttpGet]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    public async Task<ActionResult<PagedResultDto<ReadDenunciationDto>>> GetAllAsync([FromQuery] DenunciationFilterDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadDenunciationDto>>> GetAllAsync(
+        [FromQuery] DenunciationFilterDto filter)
     {
         var result = await service.GetAllAsync(filter);
 
@@ -87,7 +89,9 @@ public class DenunciationsController(IDenunciationService service, IWebHostEnvir
 
     [HttpPatch("{id:guid}/status")]
     [AuthorizeProfile(EnumProfileType.Administrator)]
-    public async Task<ActionResult<ReadDenunciationDto>> UpdateStatusAsync(Guid id, [FromBody] UpdateDenunciationStatusDto dto)
+    public async Task<ActionResult<ReadDenunciationDto>> UpdateStatusAsync(
+        Guid id,
+        [FromBody] UpdateDenunciationStatusDto dto)
     {
         var result = await service.UpdateStatusAsync(id, dto);
 

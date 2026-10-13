@@ -105,7 +105,9 @@ public class Program
             Secret = settings.JwtSecret,
             Issuer = settings.JwtIssuer,
             Audience = settings.JwtAudience,
-            ExpirationHours = double.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRATION_HOURS"), out double hours) ? hours : 8
+            ExpirationHours = double.TryParse(
+                Environment.GetEnvironmentVariable("JWT_EXPIRATION_HOURS"),
+                out double hours) ? hours : 8
         };
 
         builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(jwtOptions));
@@ -140,14 +142,16 @@ public class Program
         builder.Services.AddScoped<IDenunciationService, DenunciationService>();
 
         builder.Services.AddScoped<IEmailService, EmailService>();
-        builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(new EmailOptions(settings.PublicUrl, settings.EmailSender)));
+        builder.Services.AddSingleton(
+            Microsoft.Extensions.Options.Options.Create(new EmailOptions(settings.PublicUrl, settings.EmailSender)));
 
         builder.Services.AddScoped<IInAppNotificationRepository, InAppNotificationRepository>();
         builder.Services.AddScoped<IInAppNotificationService, InAppNotificationService>();
 
         builder.Services.AddControllers()
             .ConfigureApiBehaviorOptions(options =>
-                options.InvalidModelStateResponseFactory = InvalidModelStateLogging.LoggingFirst(options.InvalidModelStateResponseFactory))
+                options.InvalidModelStateResponseFactory = InvalidModelStateLogging.LoggingFirst(
+                    options.InvalidModelStateResponseFactory))
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -334,7 +338,8 @@ public class Program
             h.Password(rabbitPass);
         });
 
-        cfg.UseMessageRetry(r => r.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5)));
+        cfg.UseMessageRetry(
+            r => r.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5)));
 
         cfg.ReceiveEndpoint("user-registered-event", e =>
         {

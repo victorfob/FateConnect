@@ -62,7 +62,8 @@ public class HolidayCalendar : IHolidayCalendar
         int daysToFullMoon = ((19 * metonicCycleYear) + century - skippedLeapCenturies - lunarCorrection + 15) % 30;
         int leapYearsInCentury = yearInCentury / 4;
         int yearInLeapCycle = yearInCentury % 4;
-        int daysToSunday = (32 + (2 * centuryLeapRemainder) + (2 * leapYearsInCentury) - daysToFullMoon - yearInLeapCycle) % 7;
+        int daysToSunday = (
+            32 + (2 * centuryLeapRemainder) + (2 * leapYearsInCentury) - daysToFullMoon - yearInLeapCycle) % 7;
         int lateFullMoonCorrection = (metonicCycleYear + (11 * daysToFullMoon) + (22 * daysToSunday)) / 451;
         int monthAndDay = daysToFullMoon + daysToSunday - (7 * lateFullMoonCorrection) + 114;
 

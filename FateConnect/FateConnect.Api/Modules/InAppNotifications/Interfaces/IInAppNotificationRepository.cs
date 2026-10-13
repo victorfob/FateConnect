@@ -9,7 +9,9 @@ public interface IInAppNotificationRepository
     Task<List<int>> GetEligibleUserIdsAsync(IEnumerable<int> userIds);
     Task<List<int>> GetUserIdsInterestedInDestinationAsync(string destination, int driverId);
     Task AddRangeAsync(IEnumerable<InAppNotification> notifications);
-    Task<(IReadOnlyList<InAppNotification> Items, int Total)> GetAllAsync(FilterInAppNotificationDto filter, int userId);
+    Task<(
+        IReadOnlyList<InAppNotification> Items,
+        int Total)> GetAllAsync(FilterInAppNotificationDto filter, int userId);
     Task<InAppNotification?> GetByIdAndUserAsync(int id, int userId);
     Task<int> GetUnreadCountAsync(int userId);
     Task MarkAllAsReadAsync(int userId, DateTime readAt);

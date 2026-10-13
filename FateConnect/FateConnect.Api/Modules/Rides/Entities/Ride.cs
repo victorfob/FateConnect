@@ -210,7 +210,8 @@ public class Ride
         if (repeatUntil.Value > reference.AddMonths(MonthsARideRepeatsAtMost))
             throw new RepeatUntilTooFarException();
 
-        bool startsOnAWeekend = frequency == EnumRideFrequency.Weekdays && !RideDepartureSchedule.IsWeekday(firstDeparture);
+        bool startsOnAWeekend = frequency == EnumRideFrequency.Weekdays
+            && !RideDepartureSchedule.IsWeekday(firstDeparture);
 
         if (startsOnAWeekend)
             throw new WeekdaysRideOnAWeekendException();

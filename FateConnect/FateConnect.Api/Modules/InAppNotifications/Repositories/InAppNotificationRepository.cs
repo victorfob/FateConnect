@@ -52,7 +52,9 @@ public class InAppNotificationRepository(FateConnectDbContext context) : IInAppN
         await context.InAppNotifications.AddRangeAsync(notifications);
     }
 
-    public async Task<(IReadOnlyList<InAppNotification> Items, int Total)> GetAllAsync(FilterInAppNotificationDto filter, int userId)
+    public async Task<(
+        IReadOnlyList<InAppNotification> Items,
+        int Total)> GetAllAsync(FilterInAppNotificationDto filter, int userId)
     {
         IQueryable<InAppNotification> query = context.InAppNotifications
             .AsNoTracking()
