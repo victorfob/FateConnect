@@ -33,15 +33,17 @@ public class Ride
 
     public Ride(
         string destination,
-        DateOnly departureDate,
-        TimeOnly departureTime,
+        RideFirstDeparture firstDeparture,
         EnumRideType rideType,
         EnumVehicleType vehicleType,
         int driverId,
+        DateTime now,
         string? description = null)
     {
+        (DateOnly departureDate, TimeOnly departureTime) = firstDeparture;
+
         ValidateDestination(destination);
-        ValidateDepartureDateTime(departureDate, departureTime);
+        ValidateDepartureDateTime(departureDate, departureTime, now);
         ValidateRideType(rideType);
         ValidateVehicleType(vehicleType);
         ValidateDriver(driverId);
@@ -51,7 +53,7 @@ public class Ride
         Destination = destination.Trim();
         DepartureDate = departureDate;
         DepartureTime = departureTime;
-        CreatedAt = DateTime.UtcNow;
+        CreatedAt = now;
         UpdatedAt = null;
         RideType = rideType;
         VehicleType = vehicleType;
@@ -75,7 +77,8 @@ public class Ride
         string? destination,
         EnumRideType? rideType,
         EnumVehicleType? vehicleType,
-        string? description)
+        string? description,
+        DateTime now)
     {
         if (vehicleType.HasValue)
         {
@@ -98,12 +101,12 @@ public class Ride
         if (description is not null)
             Description = description.Trim();
 
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = now;
     }
 
-    public void Reschedule(RideScheduleChange change, DateTime nowInProductTimeZone, IHolidayCalendar holidays)
+    public void Reschedule(RideScheduleChange change, DateTime now, IHolidayCalendar holidays)
     {
-        DateOnly nextDeparture = NextDepartureDate(nowInProductTimeZone);
+        DateOnly nextDeparture = NextDepartureDate(DateTimeUtils.InProductTimeZone(now));
         DateOnly shownDeparture = change.DepartureDate ?? nextDeparture;
         TimeOnly departureTime = change.DepartureTime ?? DepartureTime;
         EnumRideFrequency frequency = change.Frequency ?? Frequency;
@@ -115,7 +118,7 @@ public class Ride
         if (!keepsTheReference)
             reference = shownDeparture;
 
-        ValidateDepartureDateTime(shownDeparture, departureTime);
+        ValidateDepartureDateTime(shownDeparture, departureTime, now);
         ValidateRepetition(frequency, shownDeparture, reference, repeatUntil, holidays);
 
         DepartureDate = reference;
@@ -129,7 +132,7 @@ public class Ride
 
         ReplaceDepartures(upcoming);
 
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = now;
     }
 
     public DateOnly NextDepartureDate(DateTime nowInProductTimeZone)
@@ -147,10 +150,10 @@ public class Ride
             dates[^1]);
     }
 
-    public void Deactivate()
+    public void Deactivate(DateTime now)
     {
         IsActive = false;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = now;
     }
 
     public bool IsDrivenBy(int userId) => DriverId == userId;
@@ -234,11 +237,11 @@ public class Ride
             throw new InvalidVehicleTypeException();
     }
 
-    private static void ValidateDepartureDateTime(DateOnly date, TimeOnly time)
+    private static void ValidateDepartureDateTime(DateOnly date, TimeOnly time, DateTime now)
     {
         DateTime departureUtc = DateTimeUtils.ToUtcFromProductTimeZone(date, time);
 
-        if (departureUtc < DateTime.UtcNow)
+        if (departureUtc < now)
             throw new InvalidDepartureScheduleException();
     }
 

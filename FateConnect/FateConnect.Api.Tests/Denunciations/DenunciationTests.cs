@@ -16,7 +16,7 @@ public class DenunciationTests
         string description = ValidDescription,
         int userId = 7,
         bool isAnonymous = false) =>
-        new(category, description, userId, isAnonymous);
+        new(category, description, userId, isAnonymous, DateTime.UtcNow);
 
     [Fact]
     public void Constructor_WithValidData_StartsOpenAndTrimsTheDescription()
@@ -101,7 +101,7 @@ public class DenunciationTests
     {
         Denunciation denunciation = CreateDenunciation();
 
-        denunciation.UpdateStatus(newStatus);
+        denunciation.UpdateStatus(newStatus, DateTime.UtcNow);
 
         Assert.Equal(newStatus, denunciation.Status);
         Assert.NotNull(denunciation.UpdatedAt);
@@ -113,9 +113,9 @@ public class DenunciationTests
     public void UpdateStatus_FromReview_ReachesTheTerminalStatuses(EnumDenunciationStatus terminalStatus)
     {
         Denunciation denunciation = CreateDenunciation();
-        denunciation.UpdateStatus(EnumDenunciationStatus.InReview);
+        denunciation.UpdateStatus(EnumDenunciationStatus.InReview, DateTime.UtcNow);
 
-        denunciation.UpdateStatus(terminalStatus);
+        denunciation.UpdateStatus(terminalStatus, DateTime.UtcNow);
 
         Assert.Equal(terminalStatus, denunciation.Status);
     }
@@ -127,7 +127,7 @@ public class DenunciationTests
 
         InvalidDenunciationStatusTransitionException exception =
             Assert.Throws<InvalidDenunciationStatusTransitionException>(
-                () => denunciation.UpdateStatus(EnumDenunciationStatus.Resolved));
+                () => denunciation.UpdateStatus(EnumDenunciationStatus.Resolved, DateTime.UtcNow));
 
         Assert.Equal(
             "Transição inválida: não é possível alterar o status de 'Open' para 'Resolved'.",
@@ -142,7 +142,7 @@ public class DenunciationTests
 
         InvalidDenunciationStatusTransitionException exception =
             Assert.Throws<InvalidDenunciationStatusTransitionException>(
-                () => denunciation.UpdateStatus(EnumDenunciationStatus.Open));
+                () => denunciation.UpdateStatus(EnumDenunciationStatus.Open, DateTime.UtcNow));
 
         Assert.Equal("A denúncia já se encontra no status 'Open'.", exception.Message);
         Assert.Null(denunciation.UpdatedAt);
@@ -155,10 +155,10 @@ public class DenunciationTests
     public void UpdateStatus_FromATerminalStatus_IsRefused(EnumDenunciationStatus newStatus)
     {
         Denunciation denunciation = CreateDenunciation();
-        denunciation.UpdateStatus(EnumDenunciationStatus.Dismissed);
+        denunciation.UpdateStatus(EnumDenunciationStatus.Dismissed, DateTime.UtcNow);
 
         Assert.Throws<InvalidDenunciationStatusTransitionException>(
-            () => denunciation.UpdateStatus(newStatus));
+            () => denunciation.UpdateStatus(newStatus, DateTime.UtcNow));
     }
 
     [Fact]
@@ -168,7 +168,7 @@ public class DenunciationTests
 
         InvalidDenunciationStatusException exception =
             Assert.Throws<InvalidDenunciationStatusException>(
-                () => denunciation.UpdateStatus((EnumDenunciationStatus)99));
+                () => denunciation.UpdateStatus((EnumDenunciationStatus)99, DateTime.UtcNow));
 
         Assert.Equal("O status informado para a denúncia é inválido.", exception.Message);
     }

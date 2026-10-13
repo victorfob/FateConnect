@@ -12,7 +12,7 @@ using FateConnect.Api.Modules.Users.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-public class TokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
+public class TokenService(IOptions<JwtOptions> jwtOptions, TimeProvider clock) : ITokenService
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
@@ -23,7 +23,7 @@ public class TokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
         byte[] securityKey = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
         ClaimsIdentity userClaims = BuildUserClaims(user);
 
-        DateTime expirationDate = DateTime.UtcNow.AddHours(_jwtOptions.ExpirationHours);
+        DateTime expirationDate = clock.GetUtcNow().UtcDateTime.AddHours(_jwtOptions.ExpirationHours);
 
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {

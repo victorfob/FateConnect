@@ -13,10 +13,12 @@ using Microsoft.EntityFrameworkCore.Storage;
 public class UserRepository : IUserRepository
 {
     private readonly FateConnectDbContext _context;
+    private readonly TimeProvider _clock;
 
-    public UserRepository(FateConnectDbContext context)
+    public UserRepository(FateConnectDbContext context, TimeProvider clock)
     {
         _context = context;
+        _clock = clock;
     }
 
     public async Task<bool> EmailExistsAsync(string email, int? excludeUserId = null)
@@ -171,7 +173,7 @@ public class UserRepository : IUserRepository
             .Where(user => user.Id == userId)
             .ExecuteUpdateAsync(update => update
                 .SetProperty(user => user.TokenVersion, user => user.TokenVersion + 1)
-                .SetProperty(user => user.UpdatedAt, DateTime.UtcNow));
+                .SetProperty(user => user.UpdatedAt, _clock.GetUtcNow().UtcDateTime));
     }
 
     public async Task ReactivateAsync(int userId)
@@ -180,7 +182,7 @@ public class UserRepository : IUserRepository
             .Where(user => user.Id == userId)
             .ExecuteUpdateAsync(update => update
                 .SetProperty(user => user.Status, EnumAccountStatus.Active)
-                .SetProperty(user => user.UpdatedAt, DateTime.UtcNow));
+                .SetProperty(user => user.UpdatedAt, _clock.GetUtcNow().UtcDateTime));
     }
 
     public async Task<UserToken?> GetTokenAsync(string tokenHash)

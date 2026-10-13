@@ -16,6 +16,7 @@ using FateConnect.Api.Modules.Storage.Utils;
 public partial class LostAndFoundService(
     ILostAndFoundRepository repository,
     IStorageService baseStorageService,
+    TimeProvider clock,
     ILogger<LostAndFoundService> logger
 ) : BaseFileService(baseStorageService, logger), ILostAndFoundService
 {
@@ -27,7 +28,8 @@ public partial class LostAndFoundService(
             dto.Place,
             dto.OccurredOn.GetValueOrDefault(),
             dto.Description,
-            currentUserId
+            currentUserId,
+            clock.GetUtcNow().UtcDateTime
         );
 
         string? storedImageUrl = null;
@@ -96,7 +98,8 @@ public partial class LostAndFoundService(
             dto.Place,
             dto.OccurredOn,
             dto.Description,
-            dto.Status
+            dto.Status,
+            clock.GetUtcNow().UtcDateTime
         );
 
         string? discardedImageUrl = null;
@@ -144,7 +147,7 @@ public partial class LostAndFoundService(
             return false;
         }
 
-        record.MarkAsDeleted(EnumDeletionReason.User);
+        record.MarkAsDeleted(EnumDeletionReason.User, clock.GetUtcNow().UtcDateTime);
 
         await repository.SaveChangesAsync();
 

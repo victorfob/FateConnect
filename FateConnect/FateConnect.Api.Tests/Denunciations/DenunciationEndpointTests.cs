@@ -573,7 +573,7 @@ public class DenunciationEndpointTests : IClassFixture<ApiFactory>
         HttpClient reporter = _factory.CreateClientForNewUser("Paulo Sérgio Ramalho");
         HttpClient moderation = _factory.CreateClientForNewAdministrator("Tatiana Lopes Ferreira");
         string subject = UniqueSubject();
-        DateOnly today = DateOnly.FromDateTime(DateTimeUtils.NowInProductTimeZone());
+        DateOnly today = DateOnly.FromDateTime(DateTimeUtils.NowInProductTimeZone(TimeProvider.System));
 
         await ReportedBy(reporter, NewDenunciationForm(description: $"{ValidDescription} {subject}"));
 

@@ -22,6 +22,7 @@ public partial class DenunciationService(
     IDenunciationRepository repository,
     IStorageService baseStorageService,
     IPublishEndpoint publishEndpoint,
+    TimeProvider clock,
     ILogger<DenunciationService> logger
 ) : BaseFileService(baseStorageService, logger), IDenunciationService
 {
@@ -31,7 +32,8 @@ public partial class DenunciationService(
             dto.Category,
             dto.Description,
             currentUserId,
-            dto.IsAnonymous
+            dto.IsAnonymous,
+            clock.GetUtcNow().UtcDateTime
         );
 
         string? storedImageUrl = null;
@@ -101,7 +103,7 @@ public partial class DenunciationService(
             return null;
         }
 
-        denunciation.UpdateStatus(dto.Status);
+        denunciation.UpdateStatus(dto.Status, clock.GetUtcNow().UtcDateTime);
 
         await repository.SaveChangesAsync();
 

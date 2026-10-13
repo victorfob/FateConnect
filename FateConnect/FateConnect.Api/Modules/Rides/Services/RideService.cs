@@ -23,11 +23,11 @@ public partial class RideService(
     {
         var ride = new Ride(
             dto.Destination,
-            dto.DepartureDate,
-            dto.DepartureTime,
+            new RideFirstDeparture(dto.DepartureDate, dto.DepartureTime),
             dto.RideType,
             dto.VehicleType,
             currentUserId,
+            clock.GetUtcNow().UtcDateTime,
             dto.Description
         );
 
@@ -90,11 +90,14 @@ public partial class RideService(
 
         EnsureRideIsDrivenBy(ride, currentUserId);
 
+        DateTime now = clock.GetUtcNow().UtcDateTime;
+
         ride.UpdateBasicAttributes(
             dto.Destination,
             dto.RideType,
             dto.VehicleType,
-            dto.Description
+            dto.Description,
+            now
         );
 
         bool hasScheduleChanged = dto.DepartureDate.HasValue
@@ -105,7 +108,7 @@ public partial class RideService(
         if (hasScheduleChanged)
             ride.Reschedule(
                 new RideScheduleChange(dto.DepartureDate, dto.DepartureTime, dto.Frequency, dto.RepeatUntil),
-                DateTimeUtils.NowInProductTimeZone(clock),
+                now,
                 holidays);
 
         await repository.SaveChangesAsync();
@@ -127,7 +130,7 @@ public partial class RideService(
 
         EnsureRideIsDrivenBy(ride, currentUserId);
 
-        ride.Deactivate();
+        ride.Deactivate(clock.GetUtcNow().UtcDateTime);
 
         await repository.SaveChangesAsync();
 

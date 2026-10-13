@@ -25,7 +25,8 @@ public class Denunciation
         EnumDenunciationCategory category,
         string description,
         int userId,
-        bool isAnonymous)
+        bool isAnonymous,
+        DateTime now)
     {
         ValidateCategory(category);
         ValidateDescription(description);
@@ -37,17 +38,17 @@ public class Denunciation
         Description = description.Trim();
         IsAnonymous = isAnonymous;
         Status = EnumDenunciationStatus.Open;
-        CreatedAt = DateTime.UtcNow;
+        CreatedAt = now;
         UpdatedAt = null;
     }
 
-    public void UpdateStatus(EnumDenunciationStatus newStatus)
+    public void UpdateStatus(EnumDenunciationStatus newStatus, DateTime now)
     {
         ValidateStatus(newStatus);
         ValidateTransition(Status, newStatus);
 
         Status = newStatus;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = now;
     }
 
     public void AttachImage(string imageUrl) => ImageUrl = imageUrl.Trim();

@@ -100,7 +100,7 @@ public partial class AuthService(
             await HandleFailedAttemptAsync(user, now);
         }
 
-        user.ResetFailedLoginAttempts();
+        user.ResetFailedLoginAttempts(now);
         await userRepository.SaveChangesAsync();
 
         if (!user.IsEmailConfirmed)
@@ -156,7 +156,7 @@ public partial class AuthService(
 
         User user = unlockToken.User;
 
-        user.ResetFailedLoginAttempts();
+        user.ResetFailedLoginAttempts(now);
         unlockToken.Consume(now);
 
         await userRepository.SaveChangesAsync();
@@ -188,7 +188,7 @@ public partial class AuthService(
         emailToken.Validate(now);
 
         emailToken.Consume(now);
-        user.ConfirmEmail();
+        user.ConfirmEmail(now);
 
         await userRepository.SaveChangesAsync();
 
@@ -341,14 +341,14 @@ public partial class AuthService(
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
         string newPasswordHash = HashPassword(dto.NewPassword);
 
-        user.ChangePassword(newPasswordHash);
+        user.ChangePassword(newPasswordHash, now);
         resetToken.Consume(now);
 
-        user.ResetFailedLoginAttempts();
+        user.ResetFailedLoginAttempts(now);
 
         if (!user.IsEmailConfirmed)
         {
-            user.ConfirmEmail();
+            user.ConfirmEmail(now);
         }
 
         await userRepository.SaveChangesAsync();

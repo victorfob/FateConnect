@@ -34,7 +34,7 @@ public partial class LostAndFoundRetentionService(
 
         foreach (LostAndFoundRecord record in inactiveRecords)
         {
-            record.MarkAsDeleted(EnumDeletionReason.Inactivity);
+            record.MarkAsDeleted(EnumDeletionReason.Inactivity, now);
 
             await publishEndpoint.Publish(new ItemArchivedEvent(
                 record.UserId,

@@ -87,7 +87,7 @@ public partial class UserService(
                 acceptedAt: now,
                 ipAddress: origin.IpAddress,
                 userAgent: origin.UserAgent
-            ));
+            ), now);
         }
     }
 
@@ -136,7 +136,8 @@ public partial class UserService(
             dto.BirthDate ?? user.BirthDate,
             dto.Gender ?? user.Gender,
             newContact,
-            dto.Neighborhood ?? user.Neighborhood
+            dto.Neighborhood ?? user.Neighborhood,
+            timeProvider.GetUtcNow().UtcDateTime
         );
 
         string? replacedImageUrl = null;
@@ -146,7 +147,7 @@ public partial class UserService(
         {
             replacedImageUrl = user.ImageUrl;
             storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.User);
-            user.AttachImage(storedImageUrl);
+            user.AttachImage(storedImageUrl, timeProvider.GetUtcNow().UtcDateTime);
         }
 
         await PersistOrDropImageAsync(userRepository.SaveChangesAsync, storedImageUrl);
@@ -200,7 +201,7 @@ public partial class UserService(
             throw new IncorrectCurrentPasswordException();
         }
 
-        user.ChangePassword(HashPassword(dto.NewPassword));
+        user.ChangePassword(HashPassword(dto.NewPassword), timeProvider.GetUtcNow().UtcDateTime);
 
         await userRepository.SaveChangesAsync();
         LogUserPasswordChanged(logger, currentUserId);
@@ -226,7 +227,7 @@ public partial class UserService(
 
         string imageToDelete = user.ImageUrl;
 
-        user.RemoveImage();
+        user.RemoveImage(timeProvider.GetUtcNow().UtcDateTime);
 
         await userRepository.SaveChangesAsync();
         await StorageService.DeleteImageAsync(imageToDelete);
@@ -244,7 +245,7 @@ public partial class UserService(
             return;
         }
 
-        user.Deactivate();
+        user.Deactivate(timeProvider.GetUtcNow().UtcDateTime);
 
         await userRepository.SaveChangesAsync();
         LogUserDeactivated(logger, currentUserId);
@@ -311,7 +312,8 @@ public partial class UserService(
         user.UpdateByAdmin(
             dto.FullName ?? user.FullName,
             newFatecEmail,
-            newContact
+            newContact,
+            timeProvider.GetUtcNow().UtcDateTime
         );
 
         await userRepository.SaveChangesAsync();
@@ -338,10 +340,10 @@ public partial class UserService(
         switch (newProfile)
         {
             case EnumProfileType.Administrator:
-                user.PromoteToAdministrator();
+                user.PromoteToAdministrator(timeProvider.GetUtcNow().UtcDateTime);
                 break;
             case EnumProfileType.Operator:
-                user.DemoteToOperator();
+                user.DemoteToOperator(timeProvider.GetUtcNow().UtcDateTime);
                 break;
         }
 
@@ -375,12 +377,12 @@ public partial class UserService(
         switch (newStatus)
         {
             case EnumAccountStatus.Banned:
-                user.Ban();
+                user.Ban(timeProvider.GetUtcNow().UtcDateTime);
                 action = EnumAdministrativeAction.Banned;
                 break;
 
             case EnumAccountStatus.Active when user.Status == EnumAccountStatus.Banned:
-                user.ReactivateFromBan();
+                user.ReactivateFromBan(timeProvider.GetUtcNow().UtcDateTime);
                 action = EnumAdministrativeAction.BanReverted;
                 break;
 

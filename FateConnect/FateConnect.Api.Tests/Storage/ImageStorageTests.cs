@@ -307,7 +307,7 @@ public sealed class ImageStorageTests : IDisposable
     public async Task CreateItem_WhenTheDatabaseRefusesIt_LeavesNoFileBehind()
     {
         StorageService storage = ServiceOn(_webRoot);
-        LostAndFoundService service = new(new RefusingRepository(), storage, NullLogger<LostAndFoundService>.Instance);
+        LostAndFoundService service = new(new RefusingRepository(), storage, TimeProvider.System, NullLogger<LostAndFoundService>.Instance);
 
         CreateLostAndFoundDto dto = new()
         {
@@ -332,6 +332,7 @@ public sealed class ImageStorageTests : IDisposable
             new RefusingDenunciationRepository(),
             storage,
             new NullPublishEndpoint(),
+            TimeProvider.System,
             NullLogger<DenunciationService>.Instance);
 
         CreateDenunciationDto dto = new()
