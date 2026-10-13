@@ -45,7 +45,7 @@ public partial class LostAndFoundService(
         return MapToReadDto(record, currentUserId);
     }
 
-    public async Task<PagedResultDto<ReadLostAndFoundDto>> GetAllAsync(FilterLostAndFoundDto filter, int currentUserId)
+    public async Task<PagedResultDto<ReadLostAndFoundDto>> GetAllAsync(LostAndFoundFilterDto filter, int currentUserId)
     {
         int? userIdToFilter = filter.OnlyMine == true ? currentUserId : null;
 

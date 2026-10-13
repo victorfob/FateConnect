@@ -18,7 +18,7 @@ public class RidesController(IRideService rideService) : ControllerBase
 {
     [HttpGet]
     [SwaggerOperation(Summary = "Get active rides", Description = "Returns a page of active rides whose departure has not passed yet, matching the optional filters.")]
-    public async Task<ActionResult<PagedResultDto<ReadRideDto>>> GetAllAsync([FromQuery] FilterRideDto filters)
+    public async Task<ActionResult<PagedResultDto<ReadRideDto>>> GetAllAsync([FromQuery] RideFilterDto filters)
     {
         var rides = await rideService.GetAllAsync(filters, User.GetUserId());
         return Ok(rides);

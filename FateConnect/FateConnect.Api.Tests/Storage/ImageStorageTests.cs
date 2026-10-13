@@ -54,7 +54,7 @@ public sealed class ImageStorageTests : IDisposable
     private sealed class RefusingRepository : ILostAndFoundRepository
     {
         public Task<(IReadOnlyList<LostAndFoundRecord> Items, int Total)> GetAllAsync(
-            FilterLostAndFoundDto filter, int? currentUserId = null) =>
+            LostAndFoundFilterDto filter, int? currentUserId = null) =>
             throw new NotSupportedException();
 
         public Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true) =>

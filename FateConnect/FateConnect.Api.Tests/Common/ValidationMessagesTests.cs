@@ -21,7 +21,7 @@ public class ValidationMessagesTests
     [Fact]
     public void AnUndefinedRideType_IsRejectedInPortuguese()
     {
-        List<ValidationResult> results = Validate(new FilterRideDto { RideType = (EnumRideType)99 });
+        List<ValidationResult> results = Validate(new RideFilterDto { RideType = (EnumRideType)99 });
 
         Assert.Contains(results, result => result.ErrorMessage == "Tipo de carona inválido");
     }
@@ -29,7 +29,7 @@ public class ValidationMessagesTests
     [Fact]
     public void AnUndefinedVehicle_IsRejectedInPortuguese()
     {
-        List<ValidationResult> results = Validate(new FilterRideDto { VehicleType = (EnumVehicleType)99 });
+        List<ValidationResult> results = Validate(new RideFilterDto { VehicleType = (EnumVehicleType)99 });
 
         Assert.Contains(results, result => result.ErrorMessage == "Veículo inválido");
     }

@@ -46,7 +46,7 @@ public partial class RideService(
         return MapToReadDto(ride, currentUserId);
     }
 
-    public async Task<PagedResultDto<ReadRideDto>> GetAllAsync(FilterRideDto filter, int currentUserId)
+    public async Task<PagedResultDto<ReadRideDto>> GetAllAsync(RideFilterDto filter, int currentUserId)
     {
         int? userIdToFilter = filter.OnlyMine == true ? currentUserId : null;
 

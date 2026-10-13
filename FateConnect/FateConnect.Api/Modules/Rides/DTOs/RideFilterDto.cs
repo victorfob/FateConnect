@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.Enums;
 
-public record FilterRideDto : DateRangeFilterDto
+public record RideFilterDto : DateRangeFilterDto
 {
     public string? SearchTerm { get; init; }
 

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoundRepository
 {
-    public async Task<(IReadOnlyList<LostAndFoundRecord> Items, int Total)> GetAllAsync(FilterLostAndFoundDto filter, int? currentUserId = null)
+    public async Task<(IReadOnlyList<LostAndFoundRecord> Items, int Total)> GetAllAsync(LostAndFoundFilterDto filter, int? currentUserId = null)
     {
         IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
             .AsNoTracking()

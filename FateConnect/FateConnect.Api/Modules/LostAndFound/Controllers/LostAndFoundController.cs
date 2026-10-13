@@ -24,7 +24,7 @@ public class LostAndFoundController(ILostAndFoundService service) : ControllerBa
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedResultDto<ReadLostAndFoundDto>>> GetAllAsync([FromQuery] FilterLostAndFoundDto filter)
+    public async Task<ActionResult<PagedResultDto<ReadLostAndFoundDto>>> GetAllAsync([FromQuery] LostAndFoundFilterDto filter)
     {
         var result = await service.GetAllAsync(filter, User.GetUserId());
 

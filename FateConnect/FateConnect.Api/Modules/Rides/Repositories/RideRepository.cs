@@ -16,7 +16,7 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
     private static readonly TimeOnly AfternoonStart = new(12, 0);
     private static readonly TimeOnly NightStart = new(18, 0);
 
-    public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(FilterRideDto filter, int? currentUserId = null)
+    public async Task<(IReadOnlyList<Ride> Items, int Total)> GetAllAsync(RideFilterDto filter, int? currentUserId = null)
     {
         DateTime nowInProductTimeZone = DateTimeUtils.NowInProductTimeZone(clock);
         DateOnly today = DateOnly.FromDateTime(nowInProductTimeZone);
