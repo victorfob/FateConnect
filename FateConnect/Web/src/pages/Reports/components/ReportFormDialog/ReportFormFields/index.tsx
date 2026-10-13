@@ -1,0 +1,95 @@
+import { useCallback } from 'react';
+import { Dialog, Input, Switch } from '@design-system';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
+
+import { PhotoField } from '@app/components/PhotoField';
+
+import type { ReportFormInput, ReportFormValues } from '../schema';
+import * as C from '../constants';
+import * as S from './styles';
+
+type ReportFormFieldsProps = Readonly<{
+  /** Sem contato, a denúncia só sai sigilosa: o interruptor vem ligado e travado. */
+  secrecyIsForced: boolean;
+}>;
+
+export function ReportFormFields({ secrecyIsForced }: ReportFormFieldsProps) {
+  const {
+    control,
+    register,
+    setValue,
+    formState: { errors, disabled },
+  } = useFormContext<ReportFormInput, unknown, ReportFormValues>();
+  const photo = useWatch({ control, name: 'photo' });
+  const isAnonymous = useWatch({ control, name: 'isAnonymous' });
+  const description = useWatch({ control, name: 'description' });
+
+  // Valida na escolha: o formato e o tamanho se sabem na hora, não no envio.
+  const handlePhotoChange = useCallback(
+    (chosen: File | null) => setValue('photo', chosen, { shouldValidate: true }),
+    [setValue],
+  );
+
+  return (
+    <Dialog.Fields layout="column">
+      <S.ConfidentialGroup>
+        <S.ConfidentialToggle
+          control={
+            <Switch
+              {...register('isAnonymous')}
+              checked={isAnonymous}
+              disabled={disabled || secrecyIsForced}
+            />
+          }
+          label={C.REPORT_FORM_LABELS.confidential}
+          labelPlacement="start"
+          slotProps={{ typography: { variant: 'subtitleBold' } }}
+        />
+
+        {secrecyIsForced && (
+          <S.ConfidentialHint variant="caption">{C.FORCED_SECRECY_NOTE}</S.ConfidentialHint>
+        )}
+
+        {/* Quem não pediu sigilo não precisa saber o que o sigilo implicaria. */}
+        {!secrecyIsForced && isAnonymous && (
+          <S.ConfidentialHint variant="caption">{C.CONFIDENTIAL_HINT}</S.ConfidentialHint>
+        )}
+      </S.ConfidentialGroup>
+
+      <Controller
+        name="category"
+        control={control}
+        render={({ field }) => (
+          <Input.Select
+            {...field}
+            label={C.REPORT_FORM_LABELS.category}
+            options={C.REPORT_CATEGORY_SELECT_OPTIONS}
+            required
+            error={errors.category?.message}
+          />
+        )}
+      />
+
+      <Input
+        {...register('description')}
+        label={C.REPORT_FORM_LABELS.description}
+        required
+        fullWidth
+        multiline
+        rows={C.DESCRIPTION_ROWS}
+        placeholder={C.REPORT_FORM_PLACEHOLDERS.description}
+        maxLength={C.REPORT_LIMITS.maxDescription}
+        characterCount={description.length}
+        error={errors.description?.message}
+      />
+
+      <PhotoField
+        label={C.REPORT_FORM_LABELS.photo}
+        value={photo}
+        onChange={handlePhotoChange}
+        disabled={disabled}
+        error={errors.photo?.message}
+      />
+    </Dialog.Fields>
+  );
+}

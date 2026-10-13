@@ -2,7 +2,7 @@ import type { PageQuery } from '../types';
 
 /** Valores canônicos alinhados à serialização do backend, na lista e no hub. */
 export enum InAppNotificationTypeEnum {
-  DENUNCIATION_RECEIVED = 'DenunciationReceived',
+  REPORT_RECEIVED = 'ReportReceived',
   RIDE_TO_NEIGHBORHOOD = 'RideToNeighborhood',
   ITEM_ARCHIVED = 'ItemArchived',
 }

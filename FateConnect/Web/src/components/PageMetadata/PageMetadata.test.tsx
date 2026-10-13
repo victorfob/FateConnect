@@ -117,7 +117,7 @@ describe('PageMetadata', () => {
   // componente hoje, e trocá-lo pela tela real não pode perder o título.
   it.each([
     [RoutePathEnum.PROFILE, 'Meu perfil'],
-    [RoutePathEnum.DENUNCIATIONS, 'Denúncias'],
+    [RoutePathEnum.REPORTS, 'Denúncias'],
     [RoutePathEnum.NOTIFICATIONS, 'Notificações'],
   ])('should name %s by its destination, not by the placeholder screen', (path, screen) => {
     expect(PAGE_METADATA[path].title).toContain(screen);

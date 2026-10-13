@@ -8,7 +8,6 @@ import { GuestLayout } from '@app/layouts/GuestLayout';
 import { MainLayout } from '@app/layouts/MainLayout';
 import { RootLayout } from '@app/layouts/RootLayout';
 import { ConfirmEmail } from '@app/pages/ConfirmEmail';
-import { Denunciations } from '@app/pages/Denunciations';
 import { ForgotPassword } from '@app/pages/ForgotPassword';
 import { Home } from '@app/pages/Home';
 import { LostAndFound } from '@app/pages/LostAndFound';
@@ -17,6 +16,7 @@ import { Menu } from '@app/pages/Menu';
 import { Notifications } from '@app/pages/Notifications';
 import { Preferences } from '@app/pages/Preferences';
 import { Profile } from '@app/pages/Profile';
+import { Reports } from '@app/pages/Reports';
 import { ResetPassword } from '@app/pages/ResetPassword';
 import { Rides } from '@app/pages/Rides';
 import { Signup } from '@app/pages/Signup';
@@ -59,7 +59,7 @@ export const routeConfig: RouteObject[] = [
                 path: RoutePathEnum.PROFILE,
                 element: <Profile />,
               },
-              { path: RoutePathEnum.DENUNCIATIONS, element: <Denunciations /> },
+              { path: RoutePathEnum.REPORTS, element: <Reports /> },
               {
                 element: <AdminRoute />,
                 children: [{ path: RoutePathEnum.MANAGEMENT, element: <Management /> }],

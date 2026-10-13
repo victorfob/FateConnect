@@ -35,7 +35,7 @@ const RETRY_WINDOW_MS = 5000;
 
 const UNREAD: InAppNotification = {
   id: 1,
-  type: InAppNotificationTypeEnum.DENUNCIATION_RECEIVED,
+  type: InAppNotificationTypeEnum.REPORT_RECEIVED,
   content:
     'Recebemos sua denúncia de direção imprudente na carona. O andamento aparece na página Denúncias, na aba Acompanhar.',
   referenceId: 'a1f0d2c4-5b3e-4a6c-9f81-7d2e5b0a3c14',
@@ -59,7 +59,7 @@ function renderMenu() {
     [
       { path: RoutePathEnum.MENU, element: <NotificationsMenu /> },
       { path: RoutePathEnum.NOTIFICATIONS, element: <div>notificações</div> },
-      { path: RoutePathEnum.DENUNCIATIONS, element: <div>denúncias</div> },
+      { path: RoutePathEnum.REPORTS, element: <div>denúncias</div> },
     ],
     { initialEntries: [RoutePathEnum.MENU] },
   );
@@ -155,7 +155,7 @@ describe('NotificationsMenu', () => {
 
     expect(
       await within(panel).findAllByText(
-        IN_APP_NOTIFICATION_TITLES[InAppNotificationTypeEnum.DENUNCIATION_RECEIVED],
+        IN_APP_NOTIFICATION_TITLES[InAppNotificationTypeEnum.REPORT_RECEIVED],
       ),
     ).toHaveLength(C.LATEST_UNREAD_COUNT);
     expect(asked.map((url) => Object.fromEntries(url.searchParams))).toEqual([
@@ -217,7 +217,7 @@ describe('NotificationsMenu', () => {
 
     await userEvent.click(await within(panel).findByText(UNREAD.content));
 
-    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.DENUNCIATIONS));
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.REPORTS));
     expect(markedId).toBe(String(UNREAD.id));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
