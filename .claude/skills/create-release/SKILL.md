@@ -45,7 +45,7 @@ done
 
 Para cada `SEM entrada`, leia o título do PR. **Ausência legítima:** `docs`, `ci`, `chore`, refactor sem efeito externo, e componente de design system **sem consumidor** — o efeito visível dele sai no PR que o consome. **Ausência que é defeito:** qualquer `feat` ou `fix` de comportamento.
 
-⛔ **E procure o `(#?)` no arquivo.** O placeholder só vira número por `--amend` quando o PR abre, e o PR que esqueceu não avisa:
+⛔ **E procure o `(#?)` no arquivo.** O check `Changelog placeholder` reprova o PR que esquece, mas não alcança o que entrou antes dele nem o que foi mergeado com o check vermelho:
 
 ```bash
 grep -n '(#?)' CHANGELOG.md   # tem que responder vazio

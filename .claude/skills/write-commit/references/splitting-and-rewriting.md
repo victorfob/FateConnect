@@ -30,6 +30,10 @@ No back-end, troque o compilador: `cd /tmp/checa && dotnet build FateConnect/Fat
 
 Rode nos commits que tocam índice ou alargam interface, não em todos. Achando erro, mova para o commit que traz o símbolo **só o trecho que depende dele**: não o arquivo inteiro (ele carrega junto o que não era dali), e não reordene os commits.
 
+## O `git mv` já está no índice
+
+⛔ O `git mv` prepara o rename na hora. Commitando por área depois de mover arquivos em várias, o `git add <área>` do primeiro commit leva junto os renames das outras, com o conteúdo antigo, e esse commit não compila. Antes de cada commit, conte `git diff --cached --name-only` por área; ou `git reset` e `git add <área>` commit a commit.
+
 ## Índice parcial: o hook mexe no disco
 
 Preparar no índice uma versão intermediária de um arquivo (`git hash-object -w` + `git update-index --cacheinfo`) deixa a final no disco, e o `lint-staged` do `pre-commit` esconde e reaplica o que não está preparado: nessa volta ele já comeu linha do arquivo no disco, com o commit certo. Copie `src` antes, e depois de **cada** commit compare (`diff -r`) e restaure da cópia.
