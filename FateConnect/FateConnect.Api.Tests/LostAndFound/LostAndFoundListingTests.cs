@@ -291,7 +291,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains(
-            "anterior à data inicial",
+            "before the start date",
             await response.Content.ReadAsStringAsync(),
             StringComparison.Ordinal);
     }

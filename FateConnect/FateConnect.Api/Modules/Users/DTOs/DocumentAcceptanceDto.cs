@@ -8,12 +8,12 @@ using Swashbuckle.AspNetCore.Annotations;
 public class DocumentAcceptanceDto
 {
     [Required]
-    [EnumDataType(typeof(EnumDocumentType), ErrorMessage = "Documento inválido")]
+    [EnumDataType(typeof(EnumDocumentType), ErrorMessage = "Invalid document.")]
     [SwaggerSchema("Legal document accepted.")]
     [SchemaExample("TermsOfUse")]
     required public EnumDocumentType Document { get; set; }
 
-    [Required(ErrorMessage = "Informe a versão do documento aceito")]
+    [Required(ErrorMessage = "The version of the accepted document is required.")]
     [MaxLength(20)]
     [SwaggerSchema("Version of the accepted document, as published.")]
     [SchemaExample("2026-08-27")]

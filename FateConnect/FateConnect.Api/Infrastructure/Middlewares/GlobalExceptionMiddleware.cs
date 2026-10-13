@@ -40,7 +40,7 @@ public partial class GlobalExceptionMiddleware(
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var statusCode = HttpStatusCode.InternalServerError;
-        var errorMessage = "Algo deu errado. Tente novamente.";
+        var errorMessage = "Something went wrong. Try again.";
         string? conflictingField = null;
         string? errorCode = null;
         int? minutesRemaining = null;

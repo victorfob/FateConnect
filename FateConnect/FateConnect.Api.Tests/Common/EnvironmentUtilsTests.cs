@@ -9,7 +9,9 @@ public class EnvironmentUtilsTests
     [Fact]
     public void Required_WithTheVariableSet_AnswersItsValue()
     {
-        Assert.Equal("valor-presente", EnvironmentUtils.Required("FATECONNECT_TESTE", "para o teste", LookupWith("valor-presente")));
+        Assert.Equal(
+            "present-value",
+            EnvironmentUtils.Required("FATECONNECT_TEST", "for the test", LookupWith("present-value")));
     }
 
     [Theory]
@@ -18,8 +20,8 @@ public class EnvironmentUtilsTests
     public void Required_WithTheVariableMissingOrBlank_FailsNamingItAndThePurpose(string? value)
     {
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
-            () => EnvironmentUtils.Required("FATECONNECT_TESTE", "para o teste", LookupWith(value)));
+            () => EnvironmentUtils.Required("FATECONNECT_TEST", "for the test", LookupWith(value)));
 
-        Assert.Equal("A variável de ambiente FATECONNECT_TESTE é obrigatória para o teste.", exception.Message);
+        Assert.Equal("The environment variable FATECONNECT_TEST is required for the test.", exception.Message);
     }
 }

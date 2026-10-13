@@ -7,23 +7,23 @@ public abstract class ReportDomainException(string message) : Exception(message)
 
 public class InvalidReportDescriptionException()
     : ReportDomainException(
-        "A descrição da denúncia deve conter pelo menos 10 caracteres para fornecer contexto suficiente.");
+        "The report description must have at least 10 characters to give enough context.");
 
 public class InvalidReportCategoryException()
-    : ReportDomainException("A categoria selecionada para a denúncia é inválida ou não existe no sistema.");
+    : ReportDomainException("The report category is invalid.");
 
 public class InvalidReportStatusException()
-    : ReportDomainException("O status informado para a denúncia é inválido.");
+    : ReportDomainException("The report status is invalid.");
 
 public class ReportNotReportedByUserException()
-    : Exception("Esta denúncia foi registrada por outra pessoa. Só quem a registrou pode ver o anexo dela.");
+    : Exception("This report was sent by someone else. Only who sent it can see its photo.");
 
 public class InvalidReportStatusTransitionException(
     EnumReportStatus currentStatus,
     EnumReportStatus newStatus)
     : ReportDomainException(
         currentStatus == newStatus
-            ? $"A denúncia já se encontra no status '{currentStatus}'."
-            : $"Transição inválida: não é possível alterar o status de '{currentStatus}' para '{newStatus}'.")
+            ? $"The report is already in the status '{currentStatus}'."
+            : $"Invalid transition: the status cannot change from '{currentStatus}' to '{newStatus}'.")
 {
 }

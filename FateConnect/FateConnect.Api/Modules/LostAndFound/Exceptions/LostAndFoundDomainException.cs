@@ -3,22 +3,22 @@ namespace FateConnect.Api.Modules.LostAndFound.Exceptions;
 public abstract class LostAndFoundDomainException(string message) : Exception(message);
 
 public class InvalidOccurrenceDateException()
-    : LostAndFoundDomainException("A data do ocorrido não pode ser no futuro.");
+    : LostAndFoundDomainException("The date it happened cannot be in the future.");
 
 public class MissingOccurrenceDateException()
-    : LostAndFoundDomainException("Informe a data do ocorrido.");
+    : LostAndFoundDomainException("The date it happened is required.");
 
 public class InvalidLostAndFoundNameException()
-    : LostAndFoundDomainException("O nome do item deve ter entre 3 e 100 caracteres.");
+    : LostAndFoundDomainException("The item name must have between 3 and 100 characters.");
 
 public class InvalidLostAndFoundPlaceException()
-    : LostAndFoundDomainException("O local deve ter entre 3 e 100 caracteres.");
+    : LostAndFoundDomainException("The place must have between 3 and 100 characters.");
 
 public class InvalidLostAndFoundTypeException()
-    : LostAndFoundDomainException("Tipo de registro de achados e perdidos inválido.");
+    : LostAndFoundDomainException("Invalid lost and found type.");
 
 public class InvalidLostAndFoundStatusException()
-    : LostAndFoundDomainException("Status do registro inválido.");
+    : LostAndFoundDomainException("Invalid item status.");
 
 public class LostAndFoundNotReportedByUserException()
-    : Exception("Este registro foi criado por outra pessoa. Só quem o reportou pode alterá-lo.");
+    : Exception("This item was registered by someone else. Only who registered it can change it.");

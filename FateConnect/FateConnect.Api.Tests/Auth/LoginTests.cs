@@ -39,7 +39,7 @@ public class LoginTests(ApiFactory factory) : IClassFixture<ApiFactory>
             .PostAsJsonAsync("/Auth/login", new { fatecEmail, password = "OutraSenha456!" });
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-        Assert.Contains("E-mail ou senha inválidos.", await response.Content.ReadAsStringAsync());
+        Assert.Contains("Invalid e-mail or password.", await response.Content.ReadAsStringAsync());
     }
 
     [Fact]

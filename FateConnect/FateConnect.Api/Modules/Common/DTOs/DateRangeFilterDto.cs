@@ -27,7 +27,7 @@ public record DateRangeFilterDto : PagedFilterDto, IValidatableObject
 
         if (isRangeInverted)
             yield return new ValidationResult(
-                "A data final não pode ser anterior à data inicial.",
+                "The end date cannot be before the start date.",
                 [nameof(DateTo)]);
     }
 }

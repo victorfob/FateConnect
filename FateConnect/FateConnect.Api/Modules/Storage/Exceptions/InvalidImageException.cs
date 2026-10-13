@@ -3,7 +3,7 @@ namespace FateConnect.Api.Modules.Storage.Exceptions;
 public abstract class InvalidImageException(string message) : Exception(message);
 
 public class UnsupportedImageFormatException()
-    : InvalidImageException("Formato de imagem não suportado. Apenas JPG, PNG ou WEBP são permitidos.");
+    : InvalidImageException("Unsupported image format. Only JPG, PNG or WEBP are allowed.");
 
 public class CorruptedImageException()
-    : InvalidImageException("A imagem enviada está vazia ou corrompida.");
+    : InvalidImageException("The image sent is empty or corrupted.");

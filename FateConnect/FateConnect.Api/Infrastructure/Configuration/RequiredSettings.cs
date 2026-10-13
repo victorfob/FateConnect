@@ -12,11 +12,11 @@ public sealed record RequiredSettings(
     string ResendApiKey)
 {
     public static RequiredSettings Read(Func<string, string?> lookup) => new(
-        DbConnection: EnvironmentUtils.Required("DB_CONNECTION", "para conectar ao banco de dados", lookup),
-        JwtSecret: EnvironmentUtils.Required("JWT_SECRET", "para assinar os tokens de acesso", lookup),
-        JwtIssuer: EnvironmentUtils.Required("JWT_ISSUER", "para emitir os tokens de acesso", lookup),
-        JwtAudience: EnvironmentUtils.Required("JWT_AUDIENCE", "para emitir os tokens de acesso", lookup),
-        PublicUrl: EnvironmentUtils.Required("PUBLIC_URL", "para gerar os links dos e-mails", lookup),
-        EmailSender: EnvironmentUtils.Required("EMAIL_SENDER", "para o envio de e-mails", lookup),
-        ResendApiKey: EnvironmentUtils.Required("RESEND_API_KEY", "para o envio de e-mails", lookup));
+        DbConnection: EnvironmentUtils.Required("DB_CONNECTION", "to connect to the database", lookup),
+        JwtSecret: EnvironmentUtils.Required("JWT_SECRET", "to sign the access tokens", lookup),
+        JwtIssuer: EnvironmentUtils.Required("JWT_ISSUER", "to issue the access tokens", lookup),
+        JwtAudience: EnvironmentUtils.Required("JWT_AUDIENCE", "to issue the access tokens", lookup),
+        PublicUrl: EnvironmentUtils.Required("PUBLIC_URL", "to build the links in the e-mails", lookup),
+        EmailSender: EnvironmentUtils.Required("EMAIL_SENDER", "to send e-mails", lookup),
+        ResendApiKey: EnvironmentUtils.Required("RESEND_API_KEY", "to send e-mails", lookup));
 }

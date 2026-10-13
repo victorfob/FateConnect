@@ -7,7 +7,7 @@ public static class EnvironmentUtils
         string? value = lookup(name);
 
         if (string.IsNullOrWhiteSpace(value))
-            throw new InvalidOperationException($"A variável de ambiente {name} é obrigatória {purpose}.");
+            throw new InvalidOperationException($"The environment variable {name} is required {purpose}.");
 
         return value;
     }

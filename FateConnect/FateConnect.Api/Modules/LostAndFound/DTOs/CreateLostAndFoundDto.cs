@@ -9,27 +9,27 @@ using Swashbuckle.AspNetCore.Annotations;
 
 public record CreateLostAndFoundDto
 {
-    [StringLength(100, MinimumLength = 3, ErrorMessage = "O nome do item deve ter entre 3 e 100 caracteres.")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "The item name must have between 3 and 100 characters.")]
     [SwaggerSchema("Name of the item.")]
     [SchemaExample("Blue thermal bottle")]
     public required string Name { get; init; }
 
-    [Required(ErrorMessage = "Informe se o item foi perdido ou achado.")]
+    [Required(ErrorMessage = "Tell whether the item was lost or found.")]
     [SwaggerSchema("Whether the item was lost or found.")]
     [SchemaExample("Found")]
     public EnumLostAndFoundType? LostAndFoundType { get; init; }
 
-    [StringLength(100, MinimumLength = 3, ErrorMessage = "O local deve ter entre 3 e 100 caracteres.")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "The place must have between 3 and 100 characters.")]
     [SwaggerSchema("Where it was lost or found.")]
     [SchemaExample("Library, second floor")]
     public required string Place { get; init; }
 
-    [Required(ErrorMessage = "Informe a data do ocorrido.")]
+    [Required(ErrorMessage = "The date it happened is required.")]
     [SwaggerSchema("Day it was lost or found.")]
     [SchemaExample("2026-10-10")]
     public DateOnly? OccurredOn { get; init; }
 
-    [StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
+    [StringLength(300, ErrorMessage = "The description must have at most 300 characters.")]
     [SwaggerSchema("Details that help recognize the item.")]
     [SchemaExample("With a Fatec sticker on the lid.")]
     public string? Description { get; init; }

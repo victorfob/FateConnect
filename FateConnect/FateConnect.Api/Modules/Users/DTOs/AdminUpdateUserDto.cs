@@ -12,7 +12,7 @@ public class AdminUpdateUserDto
     [SchemaExample("João da Silva Santos")]
     public string? FullName { get; set; }
 
-    [EmailAddress(ErrorMessage = "E-mail inválido")]
+    [EmailAddress(ErrorMessage = "Invalid e-mail.")]
     [FatecEmail]
     [MaxLength(150)]
     [SwaggerSchema("Institutional e-mail, `@cps.sp.gov.br` or `@aluno.cps.sp.gov.br`.")]
@@ -24,7 +24,7 @@ public class AdminUpdateUserDto
     [SchemaExample("15999990000")]
     public string? Phone { get; set; }
 
-    [EmailAddress(ErrorMessage = "E-mail inválido")]
+    [EmailAddress(ErrorMessage = "Invalid e-mail.")]
     [MaxLength(150)]
     [SwaggerSchema("Contact e-mail; saved together with the phone.")]
     [SchemaExample("joao.silva@gmail.com")]

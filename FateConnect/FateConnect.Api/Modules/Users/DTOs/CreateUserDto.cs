@@ -9,40 +9,40 @@ using Swashbuckle.AspNetCore.Annotations;
 
 public class CreateUserDto
 {
-    [Required(ErrorMessage = "Informe o e-mail")]
-    [EmailAddress(ErrorMessage = "E-mail inválido")]
+    [Required(ErrorMessage = "The e-mail is required.")]
+    [EmailAddress(ErrorMessage = "Invalid e-mail.")]
     [FatecEmail]
     [MaxLength(150)]
     [SwaggerSchema("Institutional e-mail, `@cps.sp.gov.br` or `@aluno.cps.sp.gov.br`.")]
     [SchemaExample("joao.silva999@aluno.cps.sp.gov.br")]
     public string FatecEmail { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Informe a senha")]
-    [MinLength(8, ErrorMessage = "Mínimo de 8 caracteres")]
+    [Required(ErrorMessage = "The password is required.")]
+    [MinLength(8, ErrorMessage = "The password must have at least 8 characters.")]
     [SwaggerSchema("Password.")]
     [SchemaExample("StrongPassword123!")]
     public string Password { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Informe o nome completo")]
-    [StringLength(200, MinimumLength = 3, ErrorMessage = "O nome completo deve ter entre 3 e 200 caracteres.")]
+    [Required(ErrorMessage = "The full name is required.")]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "The full name must have between 3 and 200 characters.")]
     [SwaggerSchema("Full name.")]
     [SchemaExample("João da Silva")]
     public string FullName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Informe a data de nascimento")]
-    [MinimumAge(18, ErrorMessage = "É necessário ter pelo menos 18 anos")]
+    [Required(ErrorMessage = "The birth date is required.")]
+    [MinimumAge(18, ErrorMessage = "You must be at least 18 years old.")]
     [SwaggerSchema("Birth date; the user must be at least 18.")]
     [SchemaExample("2000-01-01T00:00:00Z")]
     required public DateTime BirthDate { get; set; }
 
     [Required]
-    [EnumDataType(typeof(EnumGender), ErrorMessage = "Gênero inválido")]
+    [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
     [SwaggerSchema("Gender of the user.")]
     [SchemaExample("Male")]
     required public EnumGender Gender { get; set; }
 
-    [Required(ErrorMessage = "Informe o aceite dos documentos")]
-    [MinLength(1, ErrorMessage = "Informe o aceite de ao menos um documento")]
+    [Required(ErrorMessage = "The document acceptances are required.")]
+    [MinLength(1, ErrorMessage = "Accept at least one document.")]
     [SwaggerSchema("Legal documents accepted at sign-up, each with its version.")]
     [SchemaExample(
         """

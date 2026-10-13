@@ -10,7 +10,7 @@ public class ChangeUserStatusDto
 {
     [Required]
     [JsonRequired]
-    [EnumDataType(typeof(EnumAccountStatus), ErrorMessage = "Status da conta inválido")]
+    [EnumDataType(typeof(EnumAccountStatus), ErrorMessage = "Invalid account status.")]
     [SwaggerSchema("`Banned` bans the account and `Active` lifts a ban; any other value answers 400.")]
     [SchemaExample("Banned")]
     public EnumAccountStatus Status { get; set; }

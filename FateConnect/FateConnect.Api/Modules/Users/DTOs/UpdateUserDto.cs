@@ -10,17 +10,17 @@ using Swashbuckle.AspNetCore.Annotations;
 
 public class UpdateUserDto
 {
-    [StringLength(200, MinimumLength = 3, ErrorMessage = "O nome completo deve ter entre 3 e 200 caracteres.")]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "The full name must have between 3 and 200 characters.")]
     [SwaggerSchema("Full name.")]
     [SchemaExample("Maria Souza Lima")]
     public string? FullName { get; set; }
 
-    [MinimumAge(18, ErrorMessage = "É necessário ter pelo menos 18 anos")]
+    [MinimumAge(18, ErrorMessage = "You must be at least 18 years old.")]
     [SwaggerSchema("Birth date; the user must be at least 18.")]
     [SchemaExample("1999-05-14T00:00:00Z")]
     public DateTime? BirthDate { get; set; }
 
-    [EnumDataType(typeof(EnumGender), ErrorMessage = "Gênero inválido")]
+    [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
     [SwaggerSchema("Gender of the user.")]
     [SchemaExample("Female")]
     public EnumGender? Gender { get; set; }
@@ -30,14 +30,14 @@ public class UpdateUserDto
     [SchemaExample("15988887777")]
     public string? Phone { get; set; }
 
-    [EmailAddress(ErrorMessage = "E-mail inválido")]
+    [EmailAddress(ErrorMessage = "Invalid e-mail.")]
     [MaxLength(150)]
     [SwaggerSchema("Contact e-mail; saved together with the phone.")]
     [SchemaExample("maria.souza@gmail.com")]
     public string? ContactEmail { get; set; }
 
     [DisplayFormat(ConvertEmptyStringToNull = false)]
-    [MaxLength(100, ErrorMessage = "O bairro e a cidade podem ter no máximo 100 caracteres.")]
+    [MaxLength(100, ErrorMessage = "The neighborhood and city must have at most 100 characters.")]
     [SwaggerSchema("Neighborhood and city; an empty text clears them.")]
     [SchemaExample("Campolim, Sorocaba")]
     public string? Neighborhood { get; set; }

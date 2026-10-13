@@ -5,8 +5,8 @@ using Swashbuckle.AspNetCore.Annotations;
 
 public record HolidaysQueryDto
 {
-    [Required(ErrorMessage = "Informe o ano.")]
-    [Range(1583, 9999, ErrorMessage = "O ano deve estar entre 1583 e 9999.")]
+    [Required(ErrorMessage = "The year is required.")]
+    [Range(1583, 9999, ErrorMessage = "The year must be between 1583 and 9999.")]
     [SwaggerParameter("Year of the holidays.")]
     public int? Year { get; init; }
 }

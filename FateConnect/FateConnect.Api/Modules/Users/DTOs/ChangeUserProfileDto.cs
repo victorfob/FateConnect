@@ -10,7 +10,7 @@ public class ChangeUserProfileDto
 {
     [Required]
     [JsonRequired]
-    [EnumDataType(typeof(EnumProfileType), ErrorMessage = "Tipo de perfil de acesso inválido")]
+    [EnumDataType(typeof(EnumProfileType), ErrorMessage = "Invalid access profile.")]
     [SwaggerSchema("Profile to give the user.")]
     [SchemaExample("Administrator")]
     public EnumProfileType ProfileType { get; set; }

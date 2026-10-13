@@ -9,7 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 public record UpdateLostAndFoundDto
 {
-    [StringLength(100, MinimumLength = 3, ErrorMessage = "O nome do item deve ter entre 3 e 100 caracteres.")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "The item name must have between 3 and 100 characters.")]
     [SwaggerSchema("New name of the item.")]
     [SchemaExample("Navy blue thermal bottle")]
     public string? Name { get; init; }
@@ -18,7 +18,7 @@ public record UpdateLostAndFoundDto
     [SchemaExample("Found")]
     public EnumLostAndFoundType? LostAndFoundType { get; init; }
 
-    [StringLength(100, MinimumLength = 3, ErrorMessage = "O local deve ter entre 3 e 100 caracteres.")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "The place must have between 3 and 100 characters.")]
     [SwaggerSchema("Where it was lost or found.")]
     [SchemaExample("Library, ground floor")]
     public string? Place { get; init; }
@@ -28,7 +28,7 @@ public record UpdateLostAndFoundDto
     public DateOnly? OccurredOn { get; init; }
 
     [DisplayFormat(ConvertEmptyStringToNull = false)]
-    [StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
+    [StringLength(300, ErrorMessage = "The description must have at most 300 characters.")]
     [SwaggerSchema("Details that help recognize the item; an empty text clears them.")]
     [SchemaExample("Lid with a Fatec sticker.")]
     public string? Description { get; init; }

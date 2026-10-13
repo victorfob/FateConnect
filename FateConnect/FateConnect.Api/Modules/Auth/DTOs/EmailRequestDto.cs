@@ -7,8 +7,8 @@ using Swashbuckle.AspNetCore.Annotations;
 
 public class EmailRequestDto
 {
-    [Required(ErrorMessage = "O e-mail institucional é obrigatório.")]
-    [EmailAddress(ErrorMessage = "O formato do e-mail é inválido.")]
+    [Required(ErrorMessage = "The institutional e-mail is required.")]
+    [EmailAddress(ErrorMessage = "Invalid e-mail format.")]
     [FatecEmail]
     [MaxLength(150)]
     [SwaggerSchema("Institutional e-mail of the account.")]

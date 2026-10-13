@@ -7,7 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 public record UpdateReportStatusDto
 {
-    [Required(ErrorMessage = "O novo status é obrigatório.")]
+    [Required(ErrorMessage = "The new status is required.")]
     [SwaggerSchema("New status of the report.")]
     [SchemaExample("InReview")]
     public required EnumReportStatus Status { get; init; }

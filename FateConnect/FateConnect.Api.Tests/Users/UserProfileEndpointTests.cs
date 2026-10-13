@@ -147,7 +147,10 @@ public class UserProfileEndpointTests(ApiFactory factory) : IClassFixture<ApiFac
         HttpResponseMessage response = await person.Client.PatchAsync("/Users/me", FormWith("Neighborhood", new string('a', 101)));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("O bairro e a cidade podem ter no máximo 100 caracteres.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.Contains(
+            "The neighborhood and city must have at most 100 characters.",
+            await response.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
     }
 
     [Fact]

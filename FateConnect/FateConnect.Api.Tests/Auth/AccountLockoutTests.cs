@@ -52,7 +52,8 @@ public class AccountLockoutTests(ApiFactory factory) : IClassFixture<ApiFactory>
         Assert.Equal("AccountLocked", body.GetProperty("code").GetString());
         Assert.Equal(30, body.GetProperty("minutesRemaining").GetInt32());
         Assert.Equal(
-            "Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec ou aguarde 30 minutos e tente novamente.",
+            "For security, the account was locked after several sign-in attempts with a wrong password. " +
+            "To sign in, use the link sent to your Fatec e-mail or wait 30 minutes and try again.",
             body.GetProperty("detail").GetString());
     }
 
@@ -141,7 +142,7 @@ public class AccountLockoutTests(ApiFactory factory) : IClassFixture<ApiFactory>
         JsonElement body = await BodyOf(await LoginAsync(api, fatecEmail, KnownPassword));
 
         Assert.Equal(1, body.GetProperty("minutesRemaining").GetInt32());
-        Assert.EndsWith("aguarde 1 minuto e tente novamente.", body.GetProperty("detail").GetString());
+        Assert.EndsWith("or wait 1 minute and try again.", body.GetProperty("detail").GetString());
     }
 
     [Fact]
