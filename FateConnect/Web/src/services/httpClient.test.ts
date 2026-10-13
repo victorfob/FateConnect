@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
+import { problemResponse } from '@app/test/utils/problemResponse';
 
 import { tokenStorage } from './auth/tokenStorage';
 import { apiClient, GENERIC_ERROR_MESSAGE, NETWORK_ERROR_MESSAGE } from './httpClient';
@@ -47,12 +48,7 @@ describe('httpClient', () => {
 
   it('should carry the field and the code the api names in the error body', async () => {
     server.use(
-      http.get(PING_URL, () =>
-        HttpResponse.json(
-          { error: 'sem contato', field: 'phone', code: 'ContactRequired' },
-          { status: 403 },
-        ),
-      ),
+      http.get(PING_URL, () => problemResponse(403, { field: 'phone', code: 'ContactRequired' })),
     );
 
     await expect(apiClient.get('/ping')).rejects.toThrow(
@@ -63,10 +59,7 @@ describe('httpClient', () => {
   it('should carry the minutes left when the api reports a locked account', async () => {
     server.use(
       http.get(PING_URL, () =>
-        HttpResponse.json(
-          { error: 'bloqueada', code: 'AccountLocked', minutesRemaining: 12 },
-          { status: 429 },
-        ),
+        problemResponse(429, { code: 'AccountLocked', minutesRemaining: 12 }),
       ),
     );
 
@@ -76,7 +69,7 @@ describe('httpClient', () => {
   });
 
   it('should leave the field and the code empty when the body has none', async () => {
-    server.use(http.get(PING_URL, () => HttpResponse.json({ error: 'falhou' }, { status: 400 })));
+    server.use(http.get(PING_URL, () => problemResponse(400)));
 
     await expect(apiClient.get('/ping')).rejects.toThrow(
       expect.objectContaining({
