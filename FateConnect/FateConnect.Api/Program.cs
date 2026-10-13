@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using DotNetEnv;
+using FateConnect.Api.Infrastructure.Configuration;
 using FateConnect.Api.Infrastructure.Converters;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Infrastructure.Middlewares;
@@ -31,7 +32,6 @@ using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.LostAndFound.Workers;
 using FateConnect.Api.Modules.Common.Interfaces;
-using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Denunciations.Interfaces;
 using FateConnect.Api.Modules.Denunciations.Services;
 using FateConnect.Api.Modules.Denunciations.Repositories;
@@ -40,6 +40,7 @@ using FateConnect.Api.Modules.Storage.Services;
 using FateConnect.Api.Modules.Emails.Consumers;
 using Resend;
 using FateConnect.Api.Modules.Emails.Interfaces;
+using FateConnect.Api.Modules.Emails.Options;
 using FateConnect.Api.Modules.Emails.Services;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using FateConnect.Api.Modules.InAppNotifications.Repositories;
@@ -59,9 +60,7 @@ public class Program
             Env.Load();
         }
 
-        EnvironmentUtils.Required("PUBLIC_URL", "para gerar os links dos e-mails");
-        EnvironmentUtils.Required("EMAIL_SENDER", "para o envio de e-mails");
-        string resendApiKey = EnvironmentUtils.Required("RESEND_API_KEY", "para o envio de e-mails");
+        RequiredSettings settings = RequiredSettings.Read(Environment.GetEnvironmentVariable);
 
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -88,9 +87,9 @@ public class Program
 
         var jwtOptions = new JwtOptions
         {
-            Secret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? string.Empty,
-            Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? string.Empty,
-            Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? string.Empty,
+            Secret = settings.JwtSecret,
+            Issuer = settings.JwtIssuer,
+            Audience = settings.JwtAudience,
             ExpirationHours = double.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRATION_HOURS"), out double hours) ? hours : 8
         };
 
@@ -126,6 +125,7 @@ public class Program
         builder.Services.AddScoped<IDenunciationService, DenunciationService>();
 
         builder.Services.AddScoped<IEmailService, EmailService>();
+        builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(new EmailOptions(settings.PublicUrl, settings.EmailSender)));
 
         builder.Services.AddScoped<IInAppNotificationRepository, InAppNotificationRepository>();
         builder.Services.AddScoped<IInAppNotificationService, InAppNotificationService>();
@@ -235,10 +235,8 @@ public class Program
                 .RequireAuthenticatedUser()
                 .Build());
 
-        string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? string.Empty;
-
         builder.Services.AddDbContext<FateConnectDbContext>(options =>
-            options.UseNpgsql(connectionString));
+            options.UseNpgsql(settings.DbConnection));
 
         builder.Services.AddMassTransit(x =>
         {
@@ -262,7 +260,7 @@ public class Program
 
         builder.Services.AddResend(options =>
         {
-            options.ApiToken = resendApiKey;
+            options.ApiToken = settings.ResendApiKey;
         });
 
         WebApplication app = builder.Build();

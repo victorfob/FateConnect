@@ -54,6 +54,7 @@ public class ApiFactory : WebApplicationFactory<Program>
     {
         Directory.CreateDirectory(_webRoot);
 
+        Environment.SetEnvironmentVariable("DB_CONNECTION", "Host=banco-falso-da-suite;Database=substituido-pela-fabrica");
         Environment.SetEnvironmentVariable("JWT_SECRET", FakeSecret);
         Environment.SetEnvironmentVariable("JWT_ISSUER", "FateConnectTest");
         Environment.SetEnvironmentVariable("JWT_AUDIENCE", "FateConnectTestWeb");
