@@ -26,7 +26,7 @@ public class UpdateUserDto
     public string? ContactEmail { get; set; }
 
     [DisplayFormat(ConvertEmptyStringToNull = false)]
-    [MaxLength(100, ErrorMessage = "O bairro deve ter no máximo 100 caracteres")]
+    [MaxLength(100, ErrorMessage = "O bairro e a cidade podem ter no máximo 100 caracteres.")]
     public string? Neighborhood { get; set; }
 
     [ValidImage]

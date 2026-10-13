@@ -5,6 +5,7 @@ using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
+using FateConnect.Api.Modules.InAppNotifications.Utils;
 using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -26,19 +27,24 @@ public class InAppNotificationRepository(FateConnectDbContext context) : IInAppN
 
     public async Task<List<int>> GetUserIdsInterestedInDestinationAsync(string destination, int driverId)
     {
-        return await context.Users
+        NeighborhoodPlace destinationPlace = NeighborhoodPlace.Parse(destination);
+        string escapedNeighborhood = destinationPlace.Neighborhood.SanitizeSearchTerm();
+
+        var candidates = await context.Users
             .AsNoTracking()
             .Where(u => u.Id != driverId)
             .Where(u => u.Neighborhood != null &&
-            EF.Functions.ILike(
-                EF.Functions.Unaccent(destination),
-                "%" + EF.Functions.Unaccent(u.Neighborhood)
-                    .Replace(@"\", @"\\")
-                    .Replace("%", @"\%")
-                    .Replace("_", @"\_")
-                    + "%"))
-            .Select(u => u.Id)
+                EF.Functions.ILike(
+                    EF.Functions.Unaccent(u.Neighborhood),
+                    EF.Functions.Unaccent(escapedNeighborhood) + "%",
+                    @"\"))
+            .Select(u => new { u.Id, u.Neighborhood })
             .ToListAsync();
+
+        return candidates
+            .Where(candidate => NeighborhoodPlace.Parse(candidate.Neighborhood!).Matches(destinationPlace))
+            .Select(candidate => candidate.Id)
+            .ToList();
     }
 
     public async Task AddRangeAsync(IEnumerable<InAppNotification> notifications)

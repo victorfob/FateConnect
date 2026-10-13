@@ -140,6 +140,17 @@ public class UserProfileEndpointTests(ApiFactory factory) : IClassFixture<ApiFac
     }
 
     [Fact]
+    public async Task UpdateProfile_WithANeighborhoodOverTheLimit_IsRefusedNamingTheField()
+    {
+        SignedInUser person = await SignedInAsync("Gustavo Reis Amaral");
+
+        HttpResponseMessage response = await person.Client.PatchAsync("/Users/me", FormWith("Neighborhood", new string('a', 101)));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("O bairro e a cidade podem ter no máximo 100 caracteres.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task UpdateProfile_WithTheBirthDateOfAMinor_IsRefused()
     {
         SignedInUser person = await SignedInAsync("Elisa Moura Campos");
