@@ -76,23 +76,28 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
             consumed => consumed.Context.Message.DenunciationId == denunciationId));
 
     [Fact]
-    public async Task CreateRide_NotifiesWhoseNeighborhoodAppearsInTheDestination_AndNoOneElse()
+    public async Task CreateRide_NotifiesWhoseNeighborhoodIsTheDestination_AndNoOneElse()
     {
         int driverId = _factory.SeedUser("Ana Beatriz Nogueira").Id;
         int residentId = _factory.SeedUser("Bruno Carvalho Souza").Id;
+        int residentWithoutCityId = _factory.SeedUser("Rafael Siqueira Lopes").Id;
         int optedOutId = _factory.SeedUser("Carla Menezes Duarte").Id;
         int bannedId = _factory.SeedUser("Otávio Lins Barreto").Id;
-        int elsewhereId = _factory.SeedUser("Daniela Prado Lima").Id;
-        _factory.PrepareForNotifications(driverId, "Vila Hortência");
-        _factory.PrepareForNotifications(residentId, "vila hortencia");
-        _factory.PrepareForNotifications(optedOutId, "Vila Hortência", receiveNotifications: false);
-        _factory.PrepareForNotifications(bannedId, "Vila Hortência");
+        int otherCityId = _factory.SeedUser("Daniela Prado Lima").Id;
+        int longerNameId = _factory.SeedUser("Sofia Almeida Rezende").Id;
+        _factory.PrepareForNotifications(driverId, "Vila Hortência, Sorocaba");
+        _factory.PrepareForNotifications(residentId, "Vila Hortência, Sorocaba");
+        _factory.PrepareForNotifications(residentWithoutCityId, "vila hortencia");
+        _factory.PrepareForNotifications(optedOutId, "Vila Hortência, Sorocaba", receiveNotifications: false);
+        _factory.PrepareForNotifications(bannedId, "Vila Hortência, Sorocaba");
         _factory.SetAccountStatus(bannedId, EnumAccountStatus.Banned);
-        _factory.PrepareForNotifications(elsewhereId, "Campolim");
-        const string destination = "Rua das Flores, Vila Hortência";
+        _factory.PrepareForNotifications(otherCityId, "Vila Hortência, Votorantim");
+        _factory.PrepareForNotifications(longerNameId, "Vila Hortência Nova, Sorocaba");
+        const string destination = "Vila Hortência, Sorocaba";
 
         Guid rideId = await OfferRideAsync(driverId, destination);
         InAppNotification notification = Assert.Single(await _factory.WaitForNotificationsAsync(residentId));
+        Assert.Single(await _factory.WaitForNotificationsAsync(residentWithoutCityId));
 
         Assert.Equal(EnumInAppNotificationType.RideToNeighborhood, notification.Type);
         Assert.Equal(rideId.ToString(), notification.ReferenceId);
@@ -100,7 +105,23 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         Assert.Empty(_factory.NotificationsOf(driverId));
         Assert.Empty(_factory.NotificationsOf(optedOutId));
         Assert.Empty(_factory.NotificationsOf(bannedId));
-        Assert.Empty(_factory.NotificationsOf(elsewhereId));
+        Assert.Empty(_factory.NotificationsOf(otherCityId));
+        Assert.Empty(_factory.NotificationsOf(longerNameId));
+    }
+
+    [Fact]
+    public async Task CreateRide_DestinationWithoutCity_NotifiesTheNeighborhoodInAnyCity()
+    {
+        int driverId = _factory.SeedUser("Tiago Fontes Barbosa").Id;
+        int sorocabaResidentId = _factory.SeedUser("Vanessa Duarte Pires").Id;
+        int votorantimResidentId = _factory.SeedUser("Wagner Moreira Castro").Id;
+        _factory.PrepareForNotifications(sorocabaResidentId, "Centro, Sorocaba");
+        _factory.PrepareForNotifications(votorantimResidentId, "Centro, Votorantim");
+
+        Guid rideId = await OfferRideAsync(driverId, "Centro");
+
+        Assert.Equal(rideId.ToString(), Assert.Single(await _factory.WaitForNotificationsAsync(sorocabaResidentId)).ReferenceId);
+        Assert.Equal(rideId.ToString(), Assert.Single(await _factory.WaitForNotificationsAsync(votorantimResidentId)).ReferenceId);
     }
 
     [Fact]
@@ -110,7 +131,7 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         int residentId = _factory.SeedUser("Fernanda Costa Ribeiro").Id;
         _factory.PrepareForNotifications(residentId, "Jardim Gonçalves");
 
-        await OfferRideAsync(driverId, "Avenida Itavuvu, Jardim Gonçalves");
+        await OfferRideAsync(driverId, "Jardim Goncalves, Sorocaba");
         InAppNotification stored = Assert.Single(await _factory.WaitForNotificationsAsync(residentId));
 
         Assert.True(await Harness.Published.Any<NotificationDispatchedEvent>(
