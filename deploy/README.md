@@ -323,9 +323,10 @@ certificado para o domínio.
 ## A rota de saúde
 
 `/api/health` responde sem token e diz só se a API está saudável: `Healthy`, com
-200, quando ela alcança o banco do ambiente e a fila; `Unhealthy` (banco fora)
-ou `Degraded` (fila fora ou reconectando), com 503. Não diz versão, host nem o erro: o motivo fica
-no log da API.
+200, quando ela alcança o banco do ambiente e a fila. Com um dos dois fora, responde
+503 no formato de erro da API (`ProblemDetails`), com `health` valendo `Unhealthy`
+(banco fora) ou `Degraded` (fila fora ou reconectando). Não diz versão, host nem o
+erro: o motivo fica no log da API.
 
 ```bash
 curl -s https://hml.fateconnect.com.br/api/health

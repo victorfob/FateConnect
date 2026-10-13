@@ -74,6 +74,17 @@ public class ProblemDetailsContractTests(ApiFactory factory) : IClassFixture<Api
     }
 
     [Fact]
+    public async Task ARefusalToAClientThatDoesNotAskForJson_StillAnswersAProblem()
+    {
+        HttpClient client = factory.CreateClientForNewUser("Sofia Nunes Tavares");
+        client.DefaultRequestHeaders.Accept.ParseAdd("text/html");
+
+        HttpResponseMessage response = await client.GetAsync("/NoSuchRoute");
+
+        await ProblemOf(response, HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task ASuccessfulResponse_IsNotAProblem()
     {
         HttpClient client = factory.CreateClientForNewUser("Paulo Henrique Basso");

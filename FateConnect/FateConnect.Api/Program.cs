@@ -297,7 +297,8 @@ public class Program
         }
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
-        app.UseStatusCodePages();
+        app.UseStatusCodePages(context =>
+            TypedResults.Problem(statusCode: context.HttpContext.Response.StatusCode).ExecuteAsync(context.HttpContext));
 
         app.UseForwardedHeaders();
 
@@ -314,6 +315,7 @@ public class Program
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
             ResultStatusCodes = { [HealthStatus.Degraded] = StatusCodes.Status503ServiceUnavailable },
+            ResponseWriter = HealthResponse.WriteAsync,
         }).AllowAnonymous();
 
         app.MapHub<NotificationHub>("/hubs/notifications", options =>

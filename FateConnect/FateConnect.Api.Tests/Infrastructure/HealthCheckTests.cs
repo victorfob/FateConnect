@@ -1,5 +1,7 @@
 using System.Net;
+using System.Text.Json;
 using FateConnect.Api.Tests.Fixtures;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +12,17 @@ namespace FateConnect.Api.Tests.Infrastructure;
 
 public class HealthCheckTests
 {
+    private static async Task<string?> HealthOfProblemAsync(HttpResponseMessage response)
+    {
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+
+        using JsonDocument body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal(StatusCodes.Status503ServiceUnavailable, body.RootElement.GetProperty("status").GetInt32());
+        Assert.False(body.RootElement.TryGetProperty("detail", out _));
+
+        return body.RootElement.GetProperty("health").GetString();
+    }
+
     [Fact]
     public async Task Health_WithTheDatabaseUp_AnswersHealthyWithoutAToken()
     {
@@ -22,7 +35,7 @@ public class HealthCheckTests
     }
 
     [Fact]
-    public async Task Health_WithTheDatabaseGone_AnswersUnhealthyWithNothingElse()
+    public async Task Health_WithTheDatabaseGone_AnswersAProblemSayingOnlyUnhealthy()
     {
         using ApiFactory factory = new();
         HttpClient client = factory.CreateClient();
@@ -32,7 +45,7 @@ public class HealthCheckTests
         HttpResponseMessage response = await client.GetAsync("/health");
 
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
-        Assert.Equal("Unhealthy", await response.Content.ReadAsStringAsync());
+        Assert.Equal("Unhealthy", await HealthOfProblemAsync(response));
     }
 
     [Fact]
@@ -46,7 +59,7 @@ public class HealthCheckTests
         HttpResponseMessage response = await degraded.CreateClient().GetAsync("/health");
 
         Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
-        Assert.Equal("Degraded", await response.Content.ReadAsStringAsync());
+        Assert.Equal("Degraded", await HealthOfProblemAsync(response));
     }
 
     [Fact]
