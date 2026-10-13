@@ -34,6 +34,11 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY}
       EMAIL_SENDER: ${EMAIL_SENDER}
       
+      # Erros da API no Sentry: sem DSN, desligado. Ambiente e versão vêm do deploy.sh.
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
+      SENTRY_RELEASE: ${SENTRY_RELEASE}
+
       # Configurações do RabbitMQ
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USER: ${RABBITMQ_USER}

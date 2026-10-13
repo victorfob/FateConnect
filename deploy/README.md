@@ -113,6 +113,18 @@ O envio de e-mail pede quatro variáveis, e **a API não sobe sem as três prime
 As portas da fila seguem a faixa da API: `RABBITMQ_PORT` e `RABBITMQ_UI_PORT` em
 8102 e 8103 na homologação, 8202 e 8203 na produção.
 
+**Erros da API no Sentry (opcional).** `SENTRY_DSN` recebe o DSN de um projeto
+da API no Sentry, separado do projeto do front. Vai só erro 500, com o método, a
+rota e o identificador da requisição; usuário, IP, corpo e query string ficam de
+fora. Quem foi afetado se acha no log da API pelo mesmo identificador, que sai em
+toda linha da requisição (`RequestId`):
+
+```bash
+docker compose -p fateconnect-hml logs api | grep "<identificador>"
+```
+
+Vazio, a API não envia nada. O ambiente e a versão do evento vêm do `deploy.sh`.
+
 ⚠️ **Sem envio, ninguém entra.** O login recusa a conta que não confirmou o
 e-mail, inclusive as que já existiam antes da confirmação, e a de quem administra.
 Preencha as variáveis e confira que um e-mail de teste chega **antes** de
