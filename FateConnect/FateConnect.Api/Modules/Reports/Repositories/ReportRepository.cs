@@ -34,14 +34,11 @@ public class ReportRepository(FateConnectDbContext context) : IReportRepository
         if (filter.Status.HasValue)
             query = query.Where(d => d.Status == filter.Status.Value);
 
-        DateOnly? rangeStart = filter.EffectiveDateFrom;
-        DateOnly? rangeEnd = filter.EffectiveDateTo;
-
-        if (rangeStart.HasValue && rangeEnd.HasValue)
-            query = query.Where(CreatedWithin(rangeStart.Value, rangeEnd.Value));
+        query = query.WhereWithin(filter, CreatedWithin);
 
         return await query.ToPageAsync(filter, reports => reports.OrderByDescending(d => d.CreatedAt).ThenBy(d => d.Id));
     }
+
     private static Expression<Func<Report, bool>> CreatedWithin(DateOnly rangeStart, DateOnly rangeEnd)
     {
         DateTime startUtc = DateTimeUtils.ToUtcFromProductTimeZone(rangeStart, TimeOnly.MinValue);

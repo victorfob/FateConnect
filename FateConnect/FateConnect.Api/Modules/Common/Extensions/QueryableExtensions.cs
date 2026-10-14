@@ -30,4 +30,18 @@ public static class QueryableExtensions
 
         return (items, total);
     }
+
+    public static IQueryable<T> WhereWithin<T>(
+        this IQueryable<T> query,
+        DateRangeFilterDto filter,
+        Func<DateOnly, DateOnly, Expression<Func<T, bool>>> within)
+    {
+        DateOnly? rangeStart = filter.EffectiveDateFrom;
+        DateOnly? rangeEnd = filter.EffectiveDateTo;
+
+        if (rangeStart.HasValue && rangeEnd.HasValue)
+            return query.Where(within(rangeStart.Value, rangeEnd.Value));
+
+        return query;
+    }
 }

@@ -33,11 +33,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         if (filter.Status.HasValue)
             query = query.Where(r => r.Status == filter.Status.Value);
 
-        DateOnly? rangeStart = filter.EffectiveDateFrom;
-        DateOnly? rangeEnd = filter.EffectiveDateTo;
-
-        if (rangeStart.HasValue && rangeEnd.HasValue)
-            query = query.Where(OccurredWithin(rangeStart.Value, rangeEnd.Value));
+        query = query.WhereWithin(filter, OccurredWithin);
 
         return await query.ToPageAsync(filter, records => records.OrderByDescending(r => r.CreatedAt).ThenBy(r => r.Id));
     }

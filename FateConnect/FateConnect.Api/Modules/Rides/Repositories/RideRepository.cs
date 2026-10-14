@@ -36,11 +36,9 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
         if (currentUserId.HasValue)
             query = query.Where(IsOfferedBy(currentUserId.Value));
 
-        DateOnly? rangeStart = filter.EffectiveDateFrom;
-        DateOnly? rangeEnd = filter.EffectiveDateTo;
-
-        if (rangeStart.HasValue && rangeEnd.HasValue)
-            query = query.Where(HasAnUpcomingDepartureWithin(today, currentTime, rangeStart.Value, rangeEnd.Value));
+        query = query.WhereWithin(
+            filter,
+            (rangeStart, rangeEnd) => HasAnUpcomingDepartureWithin(today, currentTime, rangeStart, rangeEnd));
 
         if (filter.DepartureShift.HasValue)
             query = query.Where(DepartsInShift(filter.DepartureShift.Value));
