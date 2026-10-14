@@ -11,7 +11,7 @@ export const FILTER_LABELS = {
   status: 'Situação',
 };
 
-export const FILTER_PLACEHOLDERS = { searchTerm: 'Insira o nome ou parte da descrição' };
+export const FILTER_PLACEHOLDERS = { searchTerm: 'Insira o nome ou trechos da descrição' };
 
 /** `ALL` é sentinela do formulário: não vai para a requisição. */
 export enum LostItemKindFilterEnum {
