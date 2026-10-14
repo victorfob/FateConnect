@@ -13,7 +13,7 @@ export const FILTER_LABELS = {
   owner: 'Quem ofertou',
 };
 
-export const FILTER_PLACEHOLDERS = { searchTerm: 'Insira o destino ou parte da descrição' };
+export const FILTER_PLACEHOLDERS = { searchTerm: 'Insira o destino ou trechos da descrição' };
 
 /** `ALL` é sentinela do formulário: não vai para a requisição. */
 export enum RideTypeFilterEnum {

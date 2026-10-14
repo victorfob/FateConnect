@@ -398,6 +398,46 @@ public class RideListingTests
         Assert.Equal(expected, Assert.Single(page.Items).Id);
     }
 
+    [Theory]
+    [MemberData(nameof(WordSearchExamples.Rows), MemberType = typeof(WordSearchExamples))]
+    public async Task GetRides_FilteredBySearchTerm_FindsByWord(string destination, string search, bool isFound)
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        Guid rideId = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), destination);
+
+        PagedRides page = await GetPageAsync(factory, driverId, $"?SearchTerm={Uri.EscapeDataString(search)}");
+
+        Assert.Equal(isFound, page.Items.Any(ride => ride.Id == rideId));
+    }
+
+    [Fact]
+    public async Task GetRides_SearchedByTheWholeDestinationOfTheNeighborhoodNotice_FindsTheRide()
+    {
+        using ApiFactory factory = new();
+        int driverId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        Guid noticed = factory.SeedRide(driverId, tomorrow, new TimeOnly(8, 30), "Jardim Toledo, Votorantim");
+        factory.SeedRide(driverId, tomorrow, new TimeOnly(9, 0), "Jardim Simus, Sorocaba");
+
+        PagedRides page = await GetPageAsync(
+            factory, driverId, $"?SearchTerm={Uri.EscapeDataString("Jardim Toledo, Votorantim")}");
+
+        Assert.Equal(noticed, Assert.Single(page.Items).Id);
+    }
+
+    [Fact]
+    public async Task GetRides_SearchedOnlyByIgnoredWords_ListsEverything()
+    {
+        using ApiFactory factory = new();
+        int driverId = SeedRides(factory, 3);
+
+        PagedRides ignoredWords = await GetPageAsync(factory, driverId, "?SearchTerm=de%20para");
+
+        Assert.Equal(3, ignoredWords.Total);
+    }
+
     [Fact]
     public async Task GetRides_FilteredBySearchTerm_AlsoMatchesTheDescription()
     {

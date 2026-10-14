@@ -43,7 +43,7 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
         if (filter.DepartureShift.HasValue)
             query = query.Where(DepartsInShift(filter.DepartureShift.Value));
 
-        query = query.WhereAnyColumnContains(filter.SearchTerm, r => r.Destination, r => r.Description ?? "");
+        query = query.WhereMatchesEveryWord(filter.SearchTerm);
 
         if (filter.RideType.HasValue)
             query = query.Where(r => r.RideType == filter.RideType.Value);

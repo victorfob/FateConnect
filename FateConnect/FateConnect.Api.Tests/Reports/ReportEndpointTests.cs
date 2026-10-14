@@ -504,6 +504,37 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
         Assert.EndsWith("ônibus", Assert.Single(page.Items).Description, StringComparison.Ordinal);
     }
 
+    [Theory]
+    [MemberData(nameof(WordSearchExamples.Rows), MemberType = typeof(WordSearchExamples))]
+    public async Task ListReports_FilteredBySearchTerm_FindsByWord(string text, string search, bool isFound)
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Kátia Nunes Barreto");
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Leonardo Pires Sampaio");
+        string subject = UniqueSubject();
+
+        ReadReport created = await ReportedBy(
+            reporter, NewReportForm(description: $"{subject} {text} visto no estacionamento"));
+        PagedReports page = (await moderation.GetFromJsonAsync<PagedReports>(
+            $"/Reports?searchTerm={Uri.EscapeDataString($"{subject} {search}")}", JsonOptions))!;
+
+        Assert.Equal(isFound, page.Items.Any(report => report.Id == created.Id));
+    }
+
+    [Fact]
+    public async Task ListReports_SearchedOnlyByIgnoredWords_ListsEverything()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Marta Quintela Rangel");
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Nelson Furtado Arantes");
+        await ReportedBy(reporter, NewReportForm(description: $"{UniqueSubject()} relatado na portaria"));
+
+        PagedReports everything = (await moderation.GetFromJsonAsync<PagedReports>("/Reports", JsonOptions))!;
+        PagedReports ignoredWords = (await moderation.GetFromJsonAsync<PagedReports>(
+            "/Reports?searchTerm=de%20para", JsonOptions))!;
+
+        Assert.True(everything.Total > 0);
+        Assert.Equal(everything.Total, ignoredWords.Total);
+    }
+
     [Fact]
     public async Task ListReports_FilteredByCategory_LeavesTheOtherCategoriesOut()
     {

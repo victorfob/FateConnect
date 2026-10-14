@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.LostAndFound.Infrastructure;
 
+using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -43,5 +44,7 @@ public class LostAndFoundRecordConfiguration : IEntityTypeConfiguration<LostAndF
                .WithMany()
                .HasForeignKey(r => r.UserId)
                .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasWordSearch(nameof(LostAndFoundRecord.Name), nameof(LostAndFoundRecord.Description));
     }
 }

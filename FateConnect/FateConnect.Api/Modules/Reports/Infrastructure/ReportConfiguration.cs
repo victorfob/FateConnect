@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Reports.Infrastructure;
 
+using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Reports.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -36,5 +37,7 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
                .WithMany()
                .HasForeignKey(d => d.UserId)
                .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasWordSearch(nameof(Report.Description));
     }
 }
