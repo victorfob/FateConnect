@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { ListCard } from '@design-system';
 
 import { ConfirmAction } from '@app/components/ConfirmAction';
 import type { UserSummary } from '@app/services/users/managementTypes';
@@ -25,8 +26,9 @@ export function UserStatusAction({ user, onConfirm }: UserStatusActionProps) {
   );
 
   return (
-    <ConfirmAction.Row>
+    <ListCard.BottomAction>
       <ConfirmAction
+        size="small"
         label={action.label}
         icon={<action.Icon fontSize="small" />}
         dialogTitle={action.dialogTitle}
@@ -36,6 +38,6 @@ export function UserStatusAction({ user, onConfirm }: UserStatusActionProps) {
         confirmLabel={C.CONFIRM_LABEL}
         onConfirm={handleConfirm}
       />
-    </ConfirmAction.Row>
+    </ListCard.BottomAction>
   );
 }
