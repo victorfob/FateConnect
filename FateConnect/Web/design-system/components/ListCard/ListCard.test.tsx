@@ -21,14 +21,23 @@ const SECOND_INFO = '11/08/2026';
 const DESCRIPTION = 'pneumoultramicroscopicossilicovulcanoconiótico';
 const STATUS_LABEL = 'Aberto';
 const ACTION_LABEL = 'Editar';
+const BOTTOM_ACTION_TEXT = 'Marcar como devolvido';
 const TOUCH_TARGET = '32px';
 
 const BEFORE = '::before';
+const MARGIN_BOTTOM = /margin-bottom:([^;]+)/;
 
 function styleOf(candidate: Element | null, what: string): CSSStyleDeclaration {
   if (!candidate) throw new Error(`Não renderizou ${what}.`);
 
   return getComputedStyle(candidate);
+}
+
+function marginBottomOf(element: Element | null): string {
+  const declared = MARGIN_BOTTOM.exec(declarationsFor(sheetRules(), element))?.[1];
+  if (!declared) throw new Error('Sem margem embaixo declarada.');
+
+  return declared;
 }
 
 function renderInfoRow() {
@@ -63,6 +72,10 @@ function renderMediaCard(media?: ListCardProps['media']) {
       </ListCard.InfoRow>
 
       <ListCard.Description>{DESCRIPTION}</ListCard.Description>
+
+      <ListCard.BottomAction>
+        <button type="button">{BOTTOM_ACTION_TEXT}</button>
+      </ListCard.BottomAction>
     </ListCard>,
   );
 
@@ -79,6 +92,7 @@ function renderMediaCard(media?: ListCardProps['media']) {
     actions: screen.getByText(STATUS_LABEL).closest(`[${ACTIONS_ATTRIBUTE}]`),
     infoRow: screen.getByText(FIRST_INFO).parentElement,
     description: screen.getByText(DESCRIPTION).parentElement,
+    bottomAction: screen.getByRole('button', { name: BOTTOM_ACTION_TEXT }).parentElement,
   };
 }
 
@@ -112,6 +126,30 @@ describe('ListCard', () => {
     expect(narrowDeclarationsFor(parts.title)).toContain('grid-area:title');
     expect(narrowDeclarationsFor(parts.infoRow)).toContain('grid-area:info');
     expect(narrowDeclarationsFor(parts.description)).toContain('grid-column:1/-1');
+    expect(narrowDeclarationsFor(parts.bottomAction)).toContain('grid-column:1/-1');
+  });
+
+  it('should put the bottom action on the right of the last line from md up', () => {
+    const parts = renderMediaCard(<span>{MEDIA_TEXT}</span>);
+    const body = declarationsFor(sheetRules(), parts.body);
+
+    expect(body).toContain('display:grid');
+    expect(body).toContain('grid-template-columns:minmax(0,1fr)auto');
+    expect(body).toContain('align-items:end');
+    expect(declarationsFor(sheetRules(), parts.header)).toContain('grid-column:1/-1');
+    expect(declarationsFor(sheetRules(), parts.description)).toContain('grid-column:1;');
+    expect(declarationsFor(sheetRules(), parts.bottomAction)).toContain('grid-column:2');
+    // A base do botão só encontra a do texto com a mesma margem embaixo dos dois.
+    expect(marginBottomOf(parts.bottomAction)).toBe(marginBottomOf(parts.description));
+  });
+
+  it('should give the bottom action a full width line of its own below md', () => {
+    const parts = renderMediaCard();
+
+    expect(narrowDeclarationsFor(parts.body)).toContain('display:flex');
+    expect(narrowDeclarationsFor(parts.body)).toContain('flex-direction:column');
+    expect(narrowDeclarationsFor(parts.body)).toContain('align-items:stretch');
+    expect(narrowDeclarationsFor(parts.bottomAction)).toContain('margin-bottom:0');
   });
 
   it('should keep the card with media in a row from md up', () => {

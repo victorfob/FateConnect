@@ -10,9 +10,10 @@ import type { Report, ReportStatusEnum } from '@app/services/reports/types';
 import { PAGE_SIZE } from '@app/utils/searchParams';
 
 import { ManagementShell } from '../ManagementShell';
+import { ReportAdvanceAction } from './components/ReportAdvanceAction';
+import { ReportDismissAction } from './components/ReportDismissAction';
 import { ReporterContact } from './components/ReporterContact';
 import { ReportsFilter } from './components/ReportsFilter';
-import { ReportStatusAction } from './components/ReportStatusAction';
 import { managementReportCodec } from './helpers/searchQuery';
 import * as C from './constants';
 
@@ -60,8 +61,13 @@ export function ReportsTab() {
           <ReportCard
             key={report.id}
             report={report}
-            reporterContact={<ReporterContact user={report.user} />}
-            actions={<ReportStatusAction report={report} onConfirm={handleStatusConfirm} />}
+            headerActions={
+              <>
+                <ReporterContact user={report.user} />
+                <ReportDismissAction report={report} onConfirm={handleStatusConfirm} />
+              </>
+            }
+            actions={<ReportAdvanceAction report={report} onConfirm={handleStatusConfirm} />}
           />
         ))}
       </CardsList>

@@ -2,6 +2,8 @@ import {
   isReportStatus,
   parseReportStatus,
   REPORT_STATUS_OPTIONS,
+  reportCanBeDismissed,
+  reportForwardStatus,
   reportStatusLabel,
   reportStatusSlug,
   reportStatusTone,
@@ -70,5 +72,27 @@ describe('reportStatusTransitions', () => {
   // O caminho que a tela não pode oferecer: resolver exige passar pela análise.
   it('should keep an open report away from resolved', () => {
     expect(reportStatusTransitions(ReportStatusEnum.OPEN)).not.toContain(ReportStatusEnum.RESOLVED);
+  });
+});
+
+describe('reportForwardStatus', () => {
+  it.each([
+    [ReportStatusEnum.OPEN, ReportStatusEnum.IN_REVIEW],
+    [ReportStatusEnum.IN_REVIEW, ReportStatusEnum.RESOLVED],
+    [ReportStatusEnum.RESOLVED, null],
+    [ReportStatusEnum.DISMISSED, null],
+  ])('should move %s forward to %s, never to the dismissal', (from, expected) => {
+    expect(reportForwardStatus(from)).toBe(expected);
+  });
+});
+
+describe('reportCanBeDismissed', () => {
+  it.each([
+    [ReportStatusEnum.OPEN, true],
+    [ReportStatusEnum.IN_REVIEW, true],
+    [ReportStatusEnum.RESOLVED, false],
+    [ReportStatusEnum.DISMISSED, false],
+  ])('should let %s be dismissed: %s', (from, expected) => {
+    expect(reportCanBeDismissed(from)).toBe(expected);
   });
 });

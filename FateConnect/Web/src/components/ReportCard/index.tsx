@@ -15,14 +15,14 @@ const DATE_FORMAT = 'dd/MM/yyyy';
 
 type ReportCardProps = Readonly<{
   report: Report;
-  /** O contato de quem denunciou. Só a gestão o oferece: na lista de quem
-   * enviou ele seria o próprio. */
-  reporterContact?: ReactNode;
-  /** A mudança de situação, que só a gestão faz. */
+  /** O contato de quem denunciou e o descarte, ao lado da etiqueta. Só a gestão os
+   * oferece: na lista de quem enviou o contato seria o próprio. */
+  headerActions?: ReactNode;
+  /** O passo adiante na situação, que só a gestão dá. */
   actions?: ReactNode;
 }>;
 
-export function ReportCard({ report, reporterContact, actions }: ReportCardProps) {
+export function ReportCard({ report, headerActions, actions }: ReportCardProps) {
   return (
     <ListCard
       media={
@@ -44,7 +44,7 @@ export function ReportCard({ report, reporterContact, actions }: ReportCardProps
             {reportStatusLabel(report.status)}
           </StatusTag>
 
-          {reporterContact && <ListCard.ActionButtons>{reporterContact}</ListCard.ActionButtons>}
+          {headerActions && <ListCard.ActionButtons>{headerActions}</ListCard.ActionButtons>}
         </ListCard.Actions>
       </ListCard.Header>
 

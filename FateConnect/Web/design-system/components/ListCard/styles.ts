@@ -8,6 +8,7 @@ import { iconSizeTokens, radiusScale, shadowTokens, spacingScale } from '@ds-roo
 import {
   ACTIONS_ATTRIBUTE,
   BODY_ATTRIBUTE,
+  BOTTOM_ACTION_ATTRIBUTE,
   HEADER_ATTRIBUTE,
   INFO_ROW_ATTRIBUTE,
   MEDIA_ATTRIBUTE,
@@ -74,17 +75,31 @@ export const CardRoot = styled(PolymorphicStack, {
 export const MediaSlot = styled(Box)({ flexShrink: 0 });
 
 export const CardBody = styled(Stack)(({ theme }) => ({
-  flexDirection: 'column',
+  display: 'grid',
+  gridTemplateColumns: 'minmax(0, 1fr) auto',
+  // Na linha que divide com o slot, texto e botão assentam na mesma base.
+  alignItems: 'end',
   flexGrow: 1,
   minWidth: 0,
   // Herdado por título, fileira e descrição: uma palavra ou um e-mail sem
   // espaço passaria da borda do cartão e alargaria a página no celular.
   overflowWrap: 'anywhere',
 
+  // O slot na coluna da direita cai, pelo posicionamento automático, na linha do
+  // último filho: a descrição, ou a fileira quando não há descrição.
+  '& > *': { gridColumn: '1' },
+  [`& > [${HEADER_ATTRIBUTE}]`]: { gridColumn: '1 / -1' },
+  [`& > [${BOTTOM_ACTION_ATTRIBUTE}]`]: { gridColumn: '2' },
+
   // No estreito o cartão vira coluna, e aí o `flex-start` do topo encolheria o
   // corpo até o conteúdo: o cabeçalho pararia antes da borda, em lugar
   // diferente a cada cartão.
-  [theme.breakpoints.down('md')]: { width: '100%' },
+  [theme.breakpoints.down('md')]: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    width: '100%',
+  },
 }));
 
 export const ActionButtons = styled(Stack)(({ theme }) => ({

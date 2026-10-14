@@ -37,6 +37,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a recusar a redefinição de senha de conta banida como conta banida mesmo quando o link já venceu ou foi usado, em vez de responder que o link não vale, como a confirmação de e-mail já fazia (#612) [Backend]
 - Passa a buscar caronas, achados e perdidos e denúncias por palavra, em qualquer ordem e pelo começo de cada uma, com plural e uma lista curta de sinônimos; pedaço no meio da palavra deixa de achar, e a gestão de usuários segue achando por trecho (#615) [Backend]
 - Passa a dizer, nos filtros de caronas e de achados e perdidos, que a busca aceita trechos da descrição, em vez de "parte" (#615) [Frontend]
+- Passa a pôr o botão dos cartões de achados e perdidos e de contas da gestão à direita da última linha do cartão no computador, e em largura cheia no celular, em vez de numa linha própria à esquerda (#621) [Frontend]
+- Troca o seletor de situação das denúncias, na gestão, por um botão com o próximo passo, iniciar a análise ou marcar como resolvida, e o descarte passa à lixeira no topo do cartão; os três continuam pedindo confirmação (#621) [Frontend]
+- Passa a mostrar em vermelho o botão de banir uma conta, como as outras ações destrutivas, e a confirmação ganha o ícone da ação (#621) [Frontend]
 
 ### Fixed
 
