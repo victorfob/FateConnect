@@ -157,6 +157,20 @@ public class PasswordResetTests(ApiFactory factory) : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task ResetPassword_OfABannedAccountWithAnExpiredLink_AnswersTheBanBeforeTheLink()
+    {
+        MovableTimeProvider clock = new(DateTimeOffset.UtcNow);
+        using ApiFactory api = new() { Clock = clock };
+        (int userId, string fatecEmail) = api.SeedUserWithPassword("Renato Faria Campos", KnownPassword);
+        SentEmail email = await RequestResetLinkAsync(api, fatecEmail);
+
+        api.SetAccountStatus(userId, EnumAccountStatus.Banned);
+        clock.Now += ResetLifetime + TimeSpan.FromMinutes(1);
+
+        Assert.Equal(HttpStatusCode.Forbidden, (await ResetAsync(api, email.Token)).StatusCode);
+    }
+
+    [Fact]
     public async Task ResetPassword_OfAnAccountBannedAfterTheRequest_IsForbiddenAndKeepsThePassword()
     {
         (int userId, string fatecEmail) = factory.SeedUserWithPassword("Renato Faria Campos", KnownPassword);

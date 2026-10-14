@@ -324,10 +324,10 @@ public partial class AuthService(
 
     public async Task VerifyResetTokenAsync(string rawToken)
     {
-        await GetValidResetTokenAsync(rawToken);
+        await GetValidResetTokenAsync(rawToken, refusesBannedAccount: false);
     }
 
-    private async Task<UserToken> GetValidResetTokenAsync(string rawToken)
+    private async Task<UserToken> GetValidResetTokenAsync(string rawToken, bool refusesBannedAccount)
     {
         string tokenHash = TokenHelper.HashToken(rawToken);
 
@@ -338,6 +338,9 @@ public partial class AuthService(
         if (isInvalidToken)
             throw new InvalidPasswordResetTokenException();
 
+        if (refusesBannedAccount && resetToken!.User.Status is EnumAccountStatus.Banned)
+            throw new BannedAccountException();
+
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
         resetToken!.Validate(now);
@@ -347,11 +350,8 @@ public partial class AuthService(
 
     public async Task<TokenResponseDto> ResetPasswordAsync(ResetPasswordDto dto)
     {
-        UserToken resetToken = await GetValidResetTokenAsync(dto.Token);
+        UserToken resetToken = await GetValidResetTokenAsync(dto.Token, refusesBannedAccount: true);
         User user = resetToken.User;
-
-        if (user.Status is EnumAccountStatus.Banned)
-            throw new BannedAccountException();
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
         string newPasswordHash = HashPassword(dto.NewPassword);
