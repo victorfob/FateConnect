@@ -44,4 +44,13 @@ public static class QueryableExtensions
 
         return query;
     }
+
+    public static IQueryable<T> AsTrackingWhen<T>(this IQueryable<T> query, bool tracksChanges)
+        where T : class
+    {
+        if (tracksChanges)
+            return query;
+
+        return query.AsNoTracking();
+    }
 }

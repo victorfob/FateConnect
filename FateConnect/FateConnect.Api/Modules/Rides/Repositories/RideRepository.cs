@@ -108,12 +108,7 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
 
     public async Task<Ride> AddAsync(Ride ride)
     {
-        context.Rides.Add(ride);
-        await context.SaveChangesAsync();
-
-        await context.Entry(ride).Reference(r => r.Driver).LoadAsync();
-
-        return ride;
+        return await context.AddAndLoadAsync(ride, r => r.Driver);
     }
 
     public async Task SaveChangesAsync()

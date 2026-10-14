@@ -49,24 +49,15 @@ public class ReportRepository(FateConnectDbContext context) : IReportRepository
 
     public async Task<Report?> GetByIdAsync(Guid id, bool forChange = true)
     {
-        IQueryable<Report> query = context.Reports
-            .Include(d => d.User);
-
-        if (!forChange)
-            query = query.AsNoTracking();
-
-        return await query.FirstOrDefaultAsync(d => d.Id == id);
+        return await context.Reports
+            .Include(d => d.User)
+            .AsTrackingWhen(forChange)
+            .FirstOrDefaultAsync(d => d.Id == id);
     }
 
     public async Task<Report> AddAsync(Report report)
     {
-        context.Reports.Add(report);
-        await context.SaveChangesAsync();
-
-        if (!report.IsAnonymous)
-            await context.Entry(report).Reference(d => d.User).LoadAsync();
-
-        return report;
+        return await context.AddAndLoadAsync(report, d => d.User, loadsReference: !report.IsAnonymous);
     }
 
     public async Task SaveChangesAsync()

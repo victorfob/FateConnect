@@ -51,17 +51,10 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
 
     public async Task<User?> GetByIdAsync(int id, bool includePreferences = false, bool asNoTracking = false)
     {
-        var query = context.Users.AsQueryable();
-
-        if (asNoTracking)
-        {
-            query = query.AsNoTracking();
-        }
+        IQueryable<User> query = context.Users.AsTrackingWhen(!asNoTracking);
 
         if (includePreferences)
-        {
             query = query.Include(u => u.Preferences);
-        }
 
         return await query.FirstOrDefaultAsync(u => u.Id == id);
     }

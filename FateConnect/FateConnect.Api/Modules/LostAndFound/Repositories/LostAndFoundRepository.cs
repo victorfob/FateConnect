@@ -46,23 +46,15 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
 
     public async Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true)
     {
-        IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
-            .Include(r => r.User);
-
-        if (!forChange)
-            query = query.AsNoTracking();
-
-        return await query.FirstOrDefaultAsync(r => r.Id == id);
+        return await context.LostAndFoundRecords
+            .Include(r => r.User)
+            .AsTrackingWhen(forChange)
+            .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord)
     {
-        context.LostAndFoundRecords.Add(lostAndFoundRecord);
-        await context.SaveChangesAsync();
-
-        await context.Entry(lostAndFoundRecord).Reference(r => r.User).LoadAsync();
-
-        return lostAndFoundRecord;
+        return await context.AddAndLoadAsync(lostAndFoundRecord, r => r.User);
     }
 
     public async Task<IReadOnlyList<LostAndFoundRecord>> GetOpenRecordsUntouchedSinceAsync(DateTime untouchedSince)
