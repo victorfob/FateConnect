@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.Reports.Exceptions;
 
 using System;
+using FateConnect.Api.Modules.Common.Exceptions;
 using FateConnect.Api.Modules.Reports.Enums;
 
 public abstract class ReportDomainException(string message) : Exception(message);
@@ -16,7 +17,7 @@ public class InvalidReportStatusException()
     : ReportDomainException("The report status is invalid.");
 
 public class ReportNotReportedByUserException()
-    : Exception("This report was sent by someone else. Only who sent it can see its photo.");
+    : NotOwnedByUserException("This report was sent by someone else. Only who sent it can see its photo.");
 
 public class InvalidReportStatusTransitionException(
     EnumReportStatus currentStatus,

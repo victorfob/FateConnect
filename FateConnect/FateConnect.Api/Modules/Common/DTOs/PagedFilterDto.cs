@@ -33,4 +33,13 @@ public record PagedFilterDto
             return Math.Min(requested, MaxPageSize);
         }
     }
+
+    public PagedResultDto<T> ToResult<T>(IReadOnlyList<T> items, int total) =>
+        new()
+        {
+            Items = items,
+            Page = EffectivePage,
+            PageSize = EffectivePageSize,
+            Total = total,
+        };
 }

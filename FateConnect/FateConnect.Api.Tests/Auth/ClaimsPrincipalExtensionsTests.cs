@@ -44,32 +44,33 @@ public class ClaimsPrincipalExtensionsTests
     }
 
     [Fact]
-    public void GetTokenVersion_WithTheVersionClaim_ReturnsIt()
+    public void TryGetTokenVersion_WithTheVersionClaim_ReturnsIt()
     {
         ClaimsPrincipal user = PrincipalWith(
             new Claim(TokenClaimNames.TokenVersion, TokenVersion.ToString(CultureInfo.InvariantCulture)));
 
-        int version = user.GetTokenVersion();
+        bool isReadable = user.TryGetTokenVersion(out int version);
 
+        Assert.True(isReadable);
         Assert.Equal(TokenVersion, version);
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("nao-e-numero")]
-    public void GetTokenVersion_WithAnUnreadableVersionClaim_Throws(string version)
+    public void TryGetTokenVersion_WithAnUnreadableVersionClaim_AnswersFalse(string version)
     {
         ClaimsPrincipal user = PrincipalWith(new Claim(TokenClaimNames.TokenVersion, version));
 
-        Assert.Throws<UnidentifiedTokenException>(() => user.GetTokenVersion());
+        Assert.False(user.TryGetTokenVersion(out _));
     }
 
     [Fact]
-    public void GetTokenVersion_WithoutTheVersionClaim_Throws()
+    public void TryGetTokenVersion_WithoutTheVersionClaim_AnswersFalse()
     {
         ClaimsPrincipal user = PrincipalWith();
 
-        Assert.Throws<UnidentifiedTokenException>(() => user.GetTokenVersion());
+        Assert.False(user.TryGetTokenVersion(out _));
     }
 
     private static ClaimsPrincipal PrincipalWith(params Claim[] claims) =>

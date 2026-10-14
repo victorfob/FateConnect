@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Events;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Reports.DTOs;
 using FateConnect.Api.Modules.Reports.Entities;
 using FateConnect.Api.Modules.Reports.Exceptions;
@@ -36,19 +37,13 @@ public partial class ReportService(
             clock.GetUtcNow().UtcDateTime
         );
 
-        string? storedImageUrl = null;
-
-        if (dto.Image is not null)
-        {
-            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.Report);
-            report.AttachImage(storedImageUrl);
-        }
+        string? storedImageUrl = await StoreImageAsync(dto.Image, EnumStorageContainer.Report, report.AttachImage);
 
         if (!report.IsAnonymous)
             await publishEndpoint.Publish(
                 new ReportReceivedEvent(currentUserId, report.Id, report.Category));
 
-        await PersistOrDropImageAsync(() => repository.AddAsync(report), storedImageUrl);
+        await SaveImageChangeAsync(() => repository.AddAsync(report), storedImageUrl);
 
         LogReportCreated(logger, report.Id);
 
@@ -119,32 +114,21 @@ public partial class ReportService(
 
         LogReportsRetrieved(logger, records.Count);
 
-        return new PagedResultDto<ReadReportDto>
-        {
-            Items = [.. records.Select(MapToReadDto)],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total,
-        };
+        return filter.ToResult<ReadReportDto>([.. records.Select(MapToReadDto)], total);
     }
 
-    private void EnsureImageIsVisibleTo(Report report, int currentUserId, bool isAdministrator)
-    {
-        if (isAdministrator || report.IsReportedBy(currentUserId))
-            return;
-
-        LogReportImageRefused(logger, currentUserId, report.Id);
-
-        throw new ReportNotReportedByUserException();
-    }
+    private void EnsureImageIsVisibleTo(Report report, int currentUserId, bool isAdministrator) =>
+        OwnershipGuard.EnsureOwnedBy<ReportNotReportedByUserException>(
+            isAdministrator || report.IsReportedBy(currentUserId),
+            () => LogReportImageRefused(logger, currentUserId, report.Id));
 
     private static ReadReportDto MapToReadDto(Report record) =>
         new(
             Id: record.Id,
             Category: record.Category,
             Description: record.Description,
-            ImageUrl: ImageAddressOf(record),
-            ThumbnailUrl: ThumbnailAddressOf(record),
+            ImageUrl: ImageAddressOf(record, EnumStoredImageVariant.Original),
+            ThumbnailUrl: ImageAddressOf(record, EnumStoredImageVariant.Thumbnail),
             HasImage: record.ImageUrl is not null,
             Status: record.Status,
             User: record.IsAnonymous ? null : record.User?.ToContactDto(),
@@ -152,19 +136,16 @@ public partial class ReportService(
             CreatedAt: record.CreatedAt
         );
 
-    private static string? ImageAddressOf(Report record)
+    private static string? ImageAddressOf(Report record, EnumStoredImageVariant variant)
     {
         if (record.ImageUrl is null)
             return null;
 
-        return $"Reports/{record.Id}/image";
-    }
+        string imageAddress = $"Reports/{record.Id}/image";
 
-    private static string? ThumbnailAddressOf(Report record)
-    {
-        if (record.ImageUrl is null)
-            return null;
+        if (variant == EnumStoredImageVariant.Thumbnail)
+            return $"{imageAddress}/thumbnail";
 
-        return $"Reports/{record.Id}/image/thumbnail";
+        return imageAddress;
     }
 }

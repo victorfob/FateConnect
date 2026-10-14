@@ -1,5 +1,7 @@
 namespace FateConnect.Api.Modules.LostAndFound.Exceptions;
 
+using FateConnect.Api.Modules.Common.Exceptions;
+
 public abstract class LostAndFoundDomainException(string message) : Exception(message);
 
 public class InvalidOccurrenceDateException()
@@ -21,4 +23,4 @@ public class InvalidLostAndFoundStatusException()
     : LostAndFoundDomainException("Invalid item status.");
 
 public class LostAndFoundNotReportedByUserException()
-    : Exception("This item was registered by someone else. Only who registered it can change it.");
+    : NotOwnedByUserException("This item was registered by someone else. Only who registered it can change it.");

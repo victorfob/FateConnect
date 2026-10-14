@@ -29,13 +29,7 @@ public partial class InAppNotificationService(
 
         LogNotificationsRetrieved(logger, currentUserId, records.Count);
 
-        return new PagedResultDto<ReadInAppNotificationDto>
-        {
-            Items = [.. records.Select(MapToReadDto)],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total
-        };
+        return filter.ToResult<ReadInAppNotificationDto>([.. records.Select(MapToReadDto)], total);
     }
 
     public async Task<int> GetUnreadCountAsync(int currentUserId)

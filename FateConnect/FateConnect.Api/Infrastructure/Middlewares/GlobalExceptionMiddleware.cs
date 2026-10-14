@@ -47,7 +47,6 @@ public partial class GlobalExceptionMiddleware(
 
         switch (exception)
         {
-            case UnidentifiedTokenException:
             case InvalidCredentialsException:
             case UnidentifiedUserException:
                 statusCode = HttpStatusCode.Unauthorized;
@@ -55,9 +54,7 @@ public partial class GlobalExceptionMiddleware(
                 break;
 
             case BannedAccountException:
-            case ReportNotReportedByUserException:
-            case LostAndFoundNotReportedByUserException:
-            case RideNotDrivenByUserException:
+            case NotOwnedByUserException:
                 statusCode = HttpStatusCode.Forbidden;
                 errorMessage = exception.Message;
                 break;

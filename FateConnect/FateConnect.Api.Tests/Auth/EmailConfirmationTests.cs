@@ -148,6 +148,20 @@ public class EmailConfirmationTests(ApiFactory factory) : IClassFixture<ApiFacto
     }
 
     [Fact]
+    public async Task ConfirmEmail_OfABannedAccountWithAnExpiredLink_AnswersTheBanBeforeTheLink()
+    {
+        MovableTimeProvider clock = new(DateTimeOffset.UtcNow);
+        using ApiFactory api = new() { Clock = clock };
+        (int userId, string fatecEmail) = api.SeedUserWithPassword("Lívia Moraes Prado", KnownPassword, emailConfirmed: false);
+        SentEmail email = await RequestConfirmationLinkAsync(api, fatecEmail);
+
+        api.SetAccountStatus(userId, EnumAccountStatus.Banned);
+        clock.Now += ConfirmationLifetime + TimeSpan.FromMinutes(1);
+
+        Assert.Equal(HttpStatusCode.Forbidden, (await ConfirmAsync(api, email.Token)).StatusCode);
+    }
+
+    [Fact]
     public async Task ResendConfirmation_WithinTheCooldown_SendsNothingNew()
     {
         MovableTimeProvider clock = new(DateTimeOffset.UtcNow);

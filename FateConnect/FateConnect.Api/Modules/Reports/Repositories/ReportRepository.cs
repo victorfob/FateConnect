@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Reports.DTOs;
 using FateConnect.Api.Modules.Reports.Entities;
@@ -25,18 +26,7 @@ public class ReportRepository(FateConnectDbContext context) : IReportRepository
         if (reporterId.HasValue)
             query = query.Where(d => d.UserId == reporterId.Value);
 
-        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-        {
-            string escapedSearchTerm = filter.SearchTerm.SanitizeSearchTerm();
-
-            query = query.Where(d =>
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(d.Description),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                )
-            );
-        }
+        query = query.WhereAnyColumnContains(filter.SearchTerm, d => d.Description);
 
         if (filter.Category.HasValue)
             query = query.Where(d => d.Category == filter.Category.Value);
@@ -44,23 +34,11 @@ public class ReportRepository(FateConnectDbContext context) : IReportRepository
         if (filter.Status.HasValue)
             query = query.Where(d => d.Status == filter.Status.Value);
 
-        DateOnly? rangeStart = filter.EffectiveDateFrom;
-        DateOnly? rangeEnd = filter.EffectiveDateTo;
+        query = query.WhereWithin(filter, CreatedWithin);
 
-        if (rangeStart.HasValue && rangeEnd.HasValue)
-            query = query.Where(CreatedWithin(rangeStart.Value, rangeEnd.Value));
-
-        int total = await query.CountAsync();
-
-        List<Report> items = await query
-            .OrderByDescending(d => d.CreatedAt)
-            .ThenBy(d => d.Id)
-            .Skip(filter.ItemsToSkip)
-            .Take(filter.EffectivePageSize)
-            .ToListAsync();
-
-        return (items, total);
+        return await query.ToPageAsync(filter, reports => reports.OrderByDescending(d => d.CreatedAt).ThenBy(d => d.Id));
     }
+
     private static Expression<Func<Report, bool>> CreatedWithin(DateOnly rangeStart, DateOnly rangeEnd)
     {
         DateTime startUtc = DateTimeUtils.ToUtcFromProductTimeZone(rangeStart, TimeOnly.MinValue);
@@ -71,24 +49,15 @@ public class ReportRepository(FateConnectDbContext context) : IReportRepository
 
     public async Task<Report?> GetByIdAsync(Guid id, bool forChange = true)
     {
-        IQueryable<Report> query = context.Reports
-            .Include(d => d.User);
-
-        if (!forChange)
-            query = query.AsNoTracking();
-
-        return await query.FirstOrDefaultAsync(d => d.Id == id);
+        return await context.Reports
+            .Include(d => d.User)
+            .AsTrackingWhen(forChange)
+            .FirstOrDefaultAsync(d => d.Id == id);
     }
 
     public async Task<Report> AddAsync(Report report)
     {
-        context.Reports.Add(report);
-        await context.SaveChangesAsync();
-
-        if (!report.IsAnonymous)
-            await context.Entry(report).Reference(d => d.User).LoadAsync();
-
-        return report;
+        return await context.AddAndLoadAsync(report, d => d.User, loadsReference: !report.IsAnonymous);
     }
 
     public async Task SaveChangesAsync()

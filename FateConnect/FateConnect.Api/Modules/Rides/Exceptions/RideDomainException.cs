@@ -1,5 +1,7 @@
 namespace FateConnect.Api.Modules.Rides.Exceptions;
 
+using FateConnect.Api.Modules.Common.Exceptions;
+
 public abstract class RideDomainException(string message) : Exception(message);
 
 public class InvalidDepartureScheduleException()
@@ -15,7 +17,7 @@ public class InvalidVehicleTypeException()
     : RideDomainException("Invalid vehicle.");
 
 public class RideNotDrivenByUserException()
-    : Exception("This ride was offered by someone else. Only who offered it can change it.");
+    : NotOwnedByUserException("This ride was offered by someone else. Only who offered it can change it.");
 
 public class InvalidRideFrequencyException()
     : RideDomainException("Invalid frequency.");
