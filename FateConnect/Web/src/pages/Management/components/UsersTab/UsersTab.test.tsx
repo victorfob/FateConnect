@@ -45,6 +45,7 @@ const OBJECT_URL = 'blob:https://fateconnect.test/maria';
 /** Basta ser corpo binário: o que a tela usa é o blob que o cliente devolve. */
 const WEBP_BYTES = 'RIFF\0\0\0\0WEBP';
 const WHOLE_LINE = 'grid-column:1/-1';
+const DESTRUCTIVE_TEXT = 'rgb(207, 46, 46)';
 
 const OWN_ACCOUNT: UserSummary = {
   id: ADMIN_ID,
@@ -325,6 +326,27 @@ describe('UsersTab', () => {
     await userEvent.click(await screen.findByRole('button', { name: CONFIRMATION.dismissLabel }));
 
     expect(received).toEqual([]);
+  });
+
+  it('should paint only the ban red, and ask for it with the block icon', async () => {
+    listServing([ACTIVE_USER, BANNED_USER]);
+
+    renderTab();
+    const active = await cardOf(ACTIVE_USER.fullName);
+    const banned = await cardOf(BANNED_USER.fullName);
+
+    // O vermelho da marca como texto, o mesmo do teste do `ConfirmAction`.
+    expect(active.getByRole('button', { name: BAN_ACTION.label })).toHaveStyle({
+      color: DESTRUCTIVE_TEXT,
+    });
+    expect(banned.getByRole('button', { name: REVERT_BAN_ACTION.label })).not.toHaveStyle({
+      color: DESTRUCTIVE_TEXT,
+    });
+
+    await userEvent.click(active.getByRole('button', { name: BAN_ACTION.label }));
+
+    const dialog = within(await screen.findByRole('dialog', { name: BAN_ACTION.dialogTitle }));
+    expect(dialog.getByTestId('BlockIcon')).toBeInTheDocument();
   });
 
   it('should offer to revert the ban only to a banned account', async () => {

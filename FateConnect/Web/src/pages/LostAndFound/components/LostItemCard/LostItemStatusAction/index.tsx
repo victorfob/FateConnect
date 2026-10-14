@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Button } from '@design-system';
+import { Button, ListCard } from '@design-system';
 import { CheckCircleIcon, RestoreIcon } from '@design-system/icons';
 
 import { ConfirmAction } from '@app/components/ConfirmAction';
@@ -21,12 +21,12 @@ export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemSta
 
   if (item.status === LostItemStatusEnum.DELETED) {
     return (
-      <ConfirmAction.Row>
-        <Button type="button" variant="soft" onClick={handleRestore}>
+      <ListCard.BottomAction>
+        <Button type="button" variant="soft" size="small" onClick={handleRestore}>
           <RestoreIcon fontSize="small" />
           {C.RESTORE_LABEL}
         </Button>
-      </ConfirmAction.Row>
+      </ListCard.BottomAction>
     );
   }
 
@@ -35,7 +35,7 @@ export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemSta
   const resolveLabel = C.lostItemResolveLabel(item.lostAndFoundType);
 
   return (
-    <ConfirmAction.Row>
+    <ListCard.BottomAction>
       <ConfirmAction
         label={resolveLabel}
         icon={<CheckCircleIcon fontSize="small" />}
@@ -44,8 +44,9 @@ export function LostItemStatusAction({ item, onResolve, onRestore }: LostItemSta
         messageSuffix={C.lostItemResolveSuffix(item.lostAndFoundType)}
         subject={item.name}
         confirmLabel={C.RESOLVE_DIALOG.confirmLabel}
+        size="small"
         onConfirm={handleResolve}
       />
-    </ConfirmAction.Row>
+    </ListCard.BottomAction>
   );
 }
