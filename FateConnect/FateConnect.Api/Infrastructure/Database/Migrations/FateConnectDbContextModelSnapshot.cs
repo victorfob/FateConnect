@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 
 #nullable disable
 
@@ -100,6 +101,11 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('fateconnect', coalesce(\"Name\", '') || ' ' || coalesce(\"Description\", ''))", true);
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -113,6 +119,10 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
 
                     b.HasIndex("UserId");
 
@@ -143,6 +153,11 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<bool>("IsAnonymous")
                         .HasColumnType("boolean");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('fateconnect', coalesce(\"Description\", ''))", true);
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -153,6 +168,10 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
 
                     b.HasIndex("UserId");
 
@@ -198,6 +217,11 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("RideType")
                         .HasColumnType("integer");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('fateconnect', coalesce(\"Destination\", '') || ' ' || coalesce(\"Description\", ''))", true);
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -207,6 +231,10 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DriverId");
+
+                    b.HasIndex("SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
 
                     b.ToTable("Rides");
                 });
