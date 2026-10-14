@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.Auth.Services;
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -144,19 +145,12 @@ public partial class AuthService(
 
     public async Task UnlockAccountAsync(UnlockAccountDto dto)
     {
-        string tokenHash = TokenHelper.HashToken(dto.Token);
-
-        UserToken? unlockToken = await userRepository.GetTokenAsync(tokenHash);
-
-        bool isInvalidToken = unlockToken is null || unlockToken.Type != EnumTokenType.AccountUnlock;
-
-        if (isInvalidToken)
-            throw new InvalidUnlockTokenException();
+        UserToken unlockToken = await GetValidTokenAsync(
+            dto.Token,
+            EnumTokenType.AccountUnlock,
+            refusesBannedAccount: false);
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
-
-        unlockToken!.Validate(now);
-
         User user = unlockToken.User;
 
         user.ResetFailedLoginAttempts(now);
@@ -172,23 +166,13 @@ public partial class AuthService(
 
     public async Task<TokenResponseDto> ConfirmEmailAsync(ConfirmEmailDto dto)
     {
-        string tokenHash = TokenHelper.HashToken(dto.Token);
-
-        UserToken? emailToken = await userRepository.GetTokenAsync(tokenHash);
-
-        bool isInvalidToken = emailToken is null || emailToken.Type != EnumTokenType.EmailConfirmation;
-
-        if (isInvalidToken)
-            throw new InvalidConfirmationTokenException();
-
-        User user = emailToken!.User;
-
-        if (user.Status is EnumAccountStatus.Banned)
-            throw new BannedAccountException();
+        UserToken emailToken = await GetValidTokenAsync(
+            dto.Token,
+            EnumTokenType.EmailConfirmation,
+            refusesBannedAccount: true);
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
-
-        emailToken.Validate(now);
+        User user = emailToken.User;
 
         emailToken.Consume(now);
         user.ConfirmEmail(now);
@@ -220,36 +204,14 @@ public partial class AuthService(
             return;
         }
 
-        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
-
-        UserToken? lastToken = user.Tokens
-            .Where(t => t.Type == EnumTokenType.EmailConfirmation)
-            .OrderByDescending(t => t.CreatedAt)
-            .FirstOrDefault();
-
-        bool isCooldownActive = lastToken is not null
-            && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
-
-        if (isCooldownActive)
-        {
-            LogLinkRequestSkipped(logger, EnumTokenType.EmailConfirmation, user.Id, EnumLinkRequestSkipReason.Cooldown);
-            return;
-        }
-
-        var activeTokens = user.Tokens.Where(t =>
-            t.Type == EnumTokenType.EmailConfirmation &&
-            !t.IsConsumed &&
-            t.ExpiresAt > now);
-
-        foreach (var oldToken in activeTokens)
-        {
-            oldToken.Consume(now);
-        }
-
-        string rawToken = user.IssueToken(
+        bool isReissued = TryReissueToken(
+            user,
             EnumTokenType.EmailConfirmation,
-            now,
-            TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
+            TimeSpan.FromHours(AuthConstants.EmailConfirmationHours),
+            out string rawToken);
+
+        if (!isReissued)
+            return;
 
         await publishEndpoint.Publish(new UserRegisteredEvent(
             UserId: user.Id,
@@ -279,36 +241,14 @@ public partial class AuthService(
             return;
         }
 
-        DateTime now = timeProvider.GetUtcNow().UtcDateTime;
-
-        UserToken? lastToken = user.Tokens
-            .Where(t => t.Type == EnumTokenType.PasswordReset)
-            .OrderByDescending(t => t.CreatedAt)
-            .FirstOrDefault();
-
-        bool isCooldownActive = lastToken is not null
-            && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
-
-        if (isCooldownActive)
-        {
-            LogLinkRequestSkipped(logger, EnumTokenType.PasswordReset, user.Id, EnumLinkRequestSkipReason.Cooldown);
-            return;
-        }
-
-        var activeTokens = user.Tokens.Where(t =>
-            t.Type == EnumTokenType.PasswordReset &&
-            !t.IsConsumed &&
-            t.ExpiresAt > now);
-
-        foreach (var oldToken in activeTokens)
-        {
-            oldToken.Consume(now);
-        }
-
-        string rawToken = user.IssueToken(
+        bool isReissued = TryReissueToken(
+            user,
             EnumTokenType.PasswordReset,
-            now,
-            TimeSpan.FromMinutes(AuthConstants.PasswordResetMinutes));
+            TimeSpan.FromMinutes(AuthConstants.PasswordResetMinutes),
+            out string rawToken);
+
+        if (!isReissued)
+            return;
 
         await publishEndpoint.Publish(new PasswordResetRequestedEvent(
             UserId: user.Id,
@@ -324,33 +264,70 @@ public partial class AuthService(
 
     public async Task VerifyResetTokenAsync(string rawToken)
     {
-        await GetValidResetTokenAsync(rawToken, refusesBannedAccount: false);
+        await GetValidTokenAsync(rawToken, EnumTokenType.PasswordReset, refusesBannedAccount: false);
     }
 
-    private async Task<UserToken> GetValidResetTokenAsync(string rawToken, bool refusesBannedAccount)
+    private async Task<UserToken> GetValidTokenAsync(string rawToken, EnumTokenType type, bool refusesBannedAccount)
     {
-        string tokenHash = TokenHelper.HashToken(rawToken);
+        UserToken? token = await userRepository.GetTokenAsync(TokenHelper.HashToken(rawToken));
 
-        UserToken? resetToken = await userRepository.GetTokenAsync(tokenHash);
-
-        bool isInvalidToken = resetToken is null || resetToken.Type != EnumTokenType.PasswordReset;
+        bool isInvalidToken = token is null || token.Type != type;
 
         if (isInvalidToken)
-            throw new InvalidPasswordResetTokenException();
+            throw type switch
+            {
+                EnumTokenType.EmailConfirmation => new InvalidConfirmationTokenException(),
+                EnumTokenType.PasswordReset => new InvalidPasswordResetTokenException(),
+                _ => new InvalidUnlockTokenException()
+            };
 
-        if (refusesBannedAccount && resetToken!.User.Status is EnumAccountStatus.Banned)
+        if (refusesBannedAccount && token!.User.Status is EnumAccountStatus.Banned)
             throw new BannedAccountException();
 
+        token!.Validate(timeProvider.GetUtcNow().UtcDateTime);
+
+        return token;
+    }
+
+    private bool TryReissueToken(User user, EnumTokenType type, TimeSpan lifetime, out string rawToken)
+    {
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
 
-        resetToken!.Validate(now);
+        UserToken? lastToken = user.Tokens
+            .Where(t => t.Type == type)
+            .OrderByDescending(t => t.CreatedAt)
+            .FirstOrDefault();
 
-        return resetToken;
+        bool isCooldownActive = lastToken is not null
+            && (now - lastToken.CreatedAt).TotalMinutes < AuthConstants.ResendCooldownMinutes;
+
+        if (isCooldownActive)
+        {
+            LogLinkRequestSkipped(logger, type, user.Id, EnumLinkRequestSkipReason.Cooldown);
+            rawToken = string.Empty;
+
+            return false;
+        }
+
+        IEnumerable<UserToken> activeTokens = user.Tokens.Where(t =>
+            t.Type == type &&
+            !t.IsConsumed &&
+            t.ExpiresAt > now);
+
+        foreach (UserToken oldToken in activeTokens)
+            oldToken.Consume(now);
+
+        rawToken = user.IssueToken(type, now, lifetime);
+
+        return true;
     }
 
     public async Task<TokenResponseDto> ResetPasswordAsync(ResetPasswordDto dto)
     {
-        UserToken resetToken = await GetValidResetTokenAsync(dto.Token, refusesBannedAccount: true);
+        UserToken resetToken = await GetValidTokenAsync(
+            dto.Token,
+            EnumTokenType.PasswordReset,
+            refusesBannedAccount: true);
         User user = resetToken.User;
 
         DateTime now = timeProvider.GetUtcNow().UtcDateTime;
