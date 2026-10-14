@@ -86,32 +86,12 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
         if (filter.ProfileType.HasValue)
             query = query.Where(u => u.ProfileType == filter.ProfileType.Value);
 
-        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-        {
-            string escapedSearchTerm = filter.SearchTerm.SanitizeSearchTerm();
-
-            query = query.Where(u =>
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(u.FullName),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ) ||
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(u.FatecEmail),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ) ||
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(u.ContactEmail!),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ) ||
-                EF.Functions.ILike(
-                    u.Phone!,
-                    "%" + escapedSearchTerm + "%",
-                    @"\"
-                ));
-        }
+        query = query.WhereAnyColumnContains(
+            filter.SearchTerm,
+            u => u.FullName,
+            u => u.FatecEmail,
+            u => u.ContactEmail!,
+            u => u.Phone!);
 
         return await query.ToPageAsync(
             filter,

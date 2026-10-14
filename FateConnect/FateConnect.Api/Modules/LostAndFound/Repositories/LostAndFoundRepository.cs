@@ -25,23 +25,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         if (currentUserId.HasValue)
             query = query.Where(r => r.UserId == currentUserId.Value);
 
-        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-        {
-            string escapedSearchTerm = filter.SearchTerm.SanitizeSearchTerm();
-
-            query = query.Where(r =>
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(r.Name),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ) ||
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(r.Description ?? ""),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                )
-            );
-        }
+        query = query.WhereAnyColumnContains(filter.SearchTerm, r => r.Name, r => r.Description ?? "");
 
         if (filter.LostAndFoundType.HasValue)
             query = query.Where(r => r.LostAndFoundType == filter.LostAndFoundType.Value);

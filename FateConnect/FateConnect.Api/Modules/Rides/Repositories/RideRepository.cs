@@ -45,22 +45,7 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
         if (filter.DepartureShift.HasValue)
             query = query.Where(DepartsInShift(filter.DepartureShift.Value));
 
-        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-        {
-            string escapedSearchTerm = filter.SearchTerm.SanitizeSearchTerm();
-
-            query = query.Where(r =>
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(r.Destination),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ) ||
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(r.Description ?? ""),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ));
-        }
+        query = query.WhereAnyColumnContains(filter.SearchTerm, r => r.Destination, r => r.Description ?? "");
 
         if (filter.RideType.HasValue)
             query = query.Where(r => r.RideType == filter.RideType.Value);
