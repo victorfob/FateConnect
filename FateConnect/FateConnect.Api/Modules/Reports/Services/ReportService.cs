@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Events;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Reports.DTOs;
 using FateConnect.Api.Modules.Reports.Entities;
 using FateConnect.Api.Modules.Reports.Exceptions;
@@ -122,15 +123,10 @@ public partial class ReportService(
         return filter.ToResult<ReadReportDto>([.. records.Select(MapToReadDto)], total);
     }
 
-    private void EnsureImageIsVisibleTo(Report report, int currentUserId, bool isAdministrator)
-    {
-        if (isAdministrator || report.IsReportedBy(currentUserId))
-            return;
-
-        LogReportImageRefused(logger, currentUserId, report.Id);
-
-        throw new ReportNotReportedByUserException();
-    }
+    private void EnsureImageIsVisibleTo(Report report, int currentUserId, bool isAdministrator) =>
+        OwnershipGuard.EnsureOwnedBy<ReportNotReportedByUserException>(
+            isAdministrator || report.IsReportedBy(currentUserId),
+            () => LogReportImageRefused(logger, currentUserId, report.Id));
 
     private static ReadReportDto MapToReadDto(Report record) =>
         new(

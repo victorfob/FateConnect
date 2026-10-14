@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.LostAndFound.Services;
 
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
@@ -152,15 +153,10 @@ public partial class LostAndFoundService(
         return true;
     }
 
-    private void EnsureRecordIsReportedBy(LostAndFoundRecord record, int currentUserId)
-    {
-        if (record.IsReportedBy(currentUserId))
-            return;
-
-        LogRecordChangeRefused(logger, currentUserId, record.Id);
-
-        throw new LostAndFoundNotReportedByUserException();
-    }
+    private void EnsureRecordIsReportedBy(LostAndFoundRecord record, int currentUserId) =>
+        OwnershipGuard.EnsureOwnedBy<LostAndFoundNotReportedByUserException>(
+            record.IsReportedBy(currentUserId),
+            () => LogRecordChangeRefused(logger, currentUserId, record.Id));
 
     private static ReadLostAndFoundDto MapToReadDto(LostAndFoundRecord record, int currentUserId) =>
         new(

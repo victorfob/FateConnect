@@ -55,9 +55,7 @@ public partial class GlobalExceptionMiddleware(
                 break;
 
             case BannedAccountException:
-            case ReportNotReportedByUserException:
-            case LostAndFoundNotReportedByUserException:
-            case RideNotDrivenByUserException:
+            case NotOwnedByUserException:
                 statusCode = HttpStatusCode.Forbidden;
                 errorMessage = exception.Message;
                 break;
