@@ -84,6 +84,19 @@ export function reportStatusTransitions(value: ReportStatusEnum): readonly Repor
   return STATUS_TRANSITIONS[value];
 }
 
+/** O passo adiante, que a gestão oferece como botão; o descarte vai à parte. */
+export function reportForwardStatus(value: ReportStatusEnum): ReportStatusEnum | null {
+  const forward = reportStatusTransitions(value).find(
+    (status) => status !== ReportStatusEnum.DISMISSED,
+  );
+
+  return forward ?? null;
+}
+
+export function reportCanBeDismissed(value: ReportStatusEnum): boolean {
+  return reportStatusTransitions(value).includes(ReportStatusEnum.DISMISSED);
+}
+
 export function reportStatusTone(value: string | null | undefined): StatusTagTone {
   if (!value || !isReportStatus(value)) return 'neutral';
 

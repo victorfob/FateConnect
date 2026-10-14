@@ -8,20 +8,17 @@ import { REPORT_CARD_MARKERS } from '@app/components/ReportCard/constants';
 import { server } from '@app/mocks/server';
 import { reportCategoryLabel } from '@app/pages/Reports/helpers/reportCategory';
 import { RoutePathEnum } from '@app/routes/paths';
-import { reportStatusLabel } from '@app/services/reports/reportStatus';
 import { ReportCategoryEnum, ReportStatusEnum, type Report } from '@app/services/reports/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 
+import { ADVANCE_ACTIONS } from './components/ReportAdvanceAction/constants';
+import { DISMISS_LABEL } from './components/ReportDismissAction/constants';
 import { FILTER_LABELS } from './components/ReportsFilter/constants';
-import { STATUS_DIALOG, STATUS_SELECT_LABEL } from './components/ReportStatusAction/constants';
+import { STATUS_DIALOG } from './components/ReportStatusDialog/constants';
 import * as C from './constants';
 import { ReportsTab } from '.';
 
 const REPORTS_URL = 'https://api.fateconnect.test/reports';
-
-const IN_REVIEW_LABEL = reportStatusLabel(ReportStatusEnum.IN_REVIEW);
-const DISMISSED_LABEL = reportStatusLabel(ReportStatusEnum.DISMISSED);
-const RESOLVED_LABEL = reportStatusLabel(ReportStatusEnum.RESOLVED);
 
 const OPEN_REPORT: Report = {
   id: 'a3f1c0d2-5b3e-4a6c-9f81-7d2e5b0a3c14',
@@ -47,6 +44,26 @@ const CONFIDENTIAL_REPORT: Report = {
   user: null,
   isAnonymous: true,
 };
+
+function advanceLabel(status: ReportStatusEnum): string {
+  const action = ADVANCE_ACTIONS[status];
+  if (!action) throw new Error(`Sem passo adiante para ${status}.`);
+
+  return action.label;
+}
+
+function statusRequests(): unknown[] {
+  const sent: unknown[] = [];
+  server.use(
+    http.patch(`${REPORTS_URL}/:id/status`, async ({ request }) => {
+      sent.push(await request.json());
+
+      return new HttpResponse(null, { status: 204 });
+    }),
+  );
+
+  return sent;
+}
 
 function pageWith(items: Report[]) {
   return { items, page: 1, pageSize: 10, total: items.length, totalPages: 1 };
@@ -150,70 +167,95 @@ describe('ReportsTab', () => {
     expect(asked).toEqual(['miniatura', 'original']);
   });
 
-  it('should offer only what the api accepts from the current status', async () => {
-    listServing([OPEN_REPORT]);
+  it.each([
+    [ReportStatusEnum.OPEN, ReportStatusEnum.IN_REVIEW, ReportStatusEnum.RESOLVED],
+    [ReportStatusEnum.IN_REVIEW, ReportStatusEnum.RESOLVED, ReportStatusEnum.IN_REVIEW],
+  ])(
+    'should offer the next step and the trash while the report is %s',
+    async (status, next, other) => {
+      listServing([{ ...OPEN_REPORT, status }]);
+
+      renderTab();
+      await screen.findByText(OPEN_REPORT.description);
+
+      expect(screen.getByRole('button', { name: advanceLabel(next) })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: DISMISS_LABEL })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: advanceLabel(other) })).not.toBeInTheDocument();
+    },
+  );
+
+  it.each([ReportStatusEnum.RESOLVED, ReportStatusEnum.DISMISSED])(
+    'should offer no action at all once the report is %s',
+    async (status) => {
+      listServing([{ ...OPEN_REPORT, status }]);
+
+      renderTab();
+      await screen.findByText(OPEN_REPORT.description);
+
+      expect(screen.getByRole('button', { name: CONTACT_LABEL })).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: advanceLabel(ReportStatusEnum.IN_REVIEW) }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: advanceLabel(ReportStatusEnum.RESOLVED) }),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: DISMISS_LABEL })).not.toBeInTheDocument();
+    },
+  );
+
+  it.each([
+    [ReportStatusEnum.OPEN, advanceLabel(ReportStatusEnum.IN_REVIEW), ReportStatusEnum.IN_REVIEW],
+    [
+      ReportStatusEnum.IN_REVIEW,
+      advanceLabel(ReportStatusEnum.RESOLVED),
+      ReportStatusEnum.RESOLVED,
+    ],
+    [ReportStatusEnum.OPEN, DISMISS_LABEL, ReportStatusEnum.DISMISSED],
+    [ReportStatusEnum.IN_REVIEW, DISMISS_LABEL, ReportStatusEnum.DISMISSED],
+  ])('should ask before moving %s with "%s"', async (status, label, target) => {
+    listServing([{ ...OPEN_REPORT, status }]);
+    const sent = statusRequests();
 
     renderTab();
     await screen.findByText(OPEN_REPORT.description);
+    await userEvent.click(screen.getByRole('button', { name: label }));
 
-    await userEvent.click(screen.getByRole('combobox', { name: STATUS_SELECT_LABEL }));
-
-    expect(screen.getByRole('option', { name: IN_REVIEW_LABEL })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: DISMISSED_LABEL })).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: RESOLVED_LABEL })).not.toBeInTheDocument();
-  });
-
-  it('should offer no action at all once the report is closed', async () => {
-    listServing([CONFIDENTIAL_REPORT]);
-
-    renderTab();
-    await screen.findByText(REPORT_CARD_MARKERS.confidential);
-
-    expect(screen.queryByRole('combobox', { name: STATUS_SELECT_LABEL })).not.toBeInTheDocument();
-  });
-
-  it('should ask before moving, because no transition goes back', async () => {
-    listServing([OPEN_REPORT]);
-    const sent: unknown[] = [];
-    server.use(
-      http.patch(`${REPORTS_URL}/:id/status`, async ({ request }) => {
-        sent.push(await request.json());
-
-        return new HttpResponse(null, { status: 204 });
-      }),
-    );
-
-    renderTab();
-    await screen.findByText(OPEN_REPORT.description);
-    await userEvent.click(screen.getByRole('combobox', { name: STATUS_SELECT_LABEL }));
-    await userEvent.click(screen.getByRole('option', { name: 'Em análise' }));
-
-    expect(screen.getByText(STATUS_DIALOG.message)).toBeInTheDocument();
+    const dialog = within(screen.getByRole('dialog', { name: label }));
+    expect(dialog.getByText(STATUS_DIALOG.message)).toBeInTheDocument();
     expect(sent).toEqual([]);
 
-    await userEvent.click(screen.getByRole('button', { name: STATUS_DIALOG.confirmLabel }));
+    await userEvent.click(dialog.getByRole('button', { name: STATUS_DIALOG.confirmLabel }));
 
-    await waitFor(() => expect(sent).toEqual([{ Status: ReportStatusEnum.IN_REVIEW }]));
+    await waitFor(() => expect(sent).toEqual([{ Status: target }]));
   });
 
-  it('should keep the report as it is when the confirmation is dismissed', async () => {
-    listServing([OPEN_REPORT]);
-    const sent: unknown[] = [];
-    server.use(
-      http.patch(`${REPORTS_URL}/:id/status`, async ({ request }) => {
-        sent.push(await request.json());
+  it.each([advanceLabel(ReportStatusEnum.IN_REVIEW), DISMISS_LABEL])(
+    'should keep the report as it is when "%s" is dismissed',
+    async (label) => {
+      listServing([OPEN_REPORT]);
+      const sent = statusRequests();
 
-        return new HttpResponse(null, { status: 204 });
-      }),
-    );
+      renderTab();
+      await screen.findByText(OPEN_REPORT.description);
+      await userEvent.click(screen.getByRole('button', { name: label }));
+      await userEvent.click(screen.getByRole('button', { name: STATUS_DIALOG.dismissLabel }));
+
+      await waitFor(() =>
+        expect(screen.queryByRole('dialog', { name: label })).not.toBeInTheDocument(),
+      );
+      expect(sent).toEqual([]);
+    },
+  );
+
+  it('should ask for the dismissal in red, with the trash over the message', async () => {
+    listServing([OPEN_REPORT]);
 
     renderTab();
     await screen.findByText(OPEN_REPORT.description);
-    await userEvent.click(screen.getByRole('combobox', { name: STATUS_SELECT_LABEL }));
-    await userEvent.click(screen.getByRole('option', { name: 'Em análise' }));
-    await userEvent.click(screen.getByRole('button', { name: STATUS_DIALOG.dismissLabel }));
+    await userEvent.click(screen.getByRole('button', { name: DISMISS_LABEL }));
 
-    expect(sent).toEqual([]);
+    const dialog = within(screen.getByRole('dialog', { name: DISMISS_LABEL }));
+    expect(dialog.getByTestId('DeleteOutlinedIcon')).toBeInTheDocument();
   });
 
   it('should build the request from every field the filter offers', async () => {
