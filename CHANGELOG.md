@@ -33,6 +33,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a descrever no documento da API cada rota, com resumo, as respostas que ela devolve, os campos e parâmetros, exemplos nos corpos e o que é obrigatório ou pode vir nulo, e a esteira reprova a rota nova que chegar sem essa descrição (#611) [Backend]
 - Troca a página de leitura da API, do Swagger UI pelo Scalar, em `/api/scalar/v1`; a página antiga deixa de responder, e o documento continua no mesmo endereço (#611) [Backend]
 - Passa a responder as mensagens de erro da API em inglês; nenhuma tela as mostra, porque cada uma escreve o próprio texto (#611) [Backend]
+- Passa a recusar a redefinição de senha de conta banida como conta banida mesmo quando o link já venceu ou foi usado, em vez de responder que o link não vale, como a confirmação de e-mail já fazia (#612) [Backend]
 
 ### Fixed
 

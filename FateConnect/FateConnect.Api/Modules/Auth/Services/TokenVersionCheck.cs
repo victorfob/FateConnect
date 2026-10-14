@@ -1,9 +1,7 @@
 namespace FateConnect.Api.Modules.Auth.Services;
 
-using System.Globalization;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using FateConnect.Api.Modules.Auth.Constants;
+using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,12 +15,11 @@ public static partial class TokenVersionCheck
             .GetRequiredService<ILoggerFactory>()
             .CreateLogger(typeof(TokenVersionCheck));
 
-        string? carriedVersion = context.Principal?.FindFirstValue(TokenClaimNames.TokenVersion);
-        string? identifier = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        bool isVersionReadable = int.TryParse(carriedVersion, CultureInfo.InvariantCulture, out int tokenVersion);
-        bool isIdentifierReadable = int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId);
-        bool canCompareVersions = isVersionReadable && isIdentifierReadable;
+        int tokenVersion = 0;
+        int userId = 0;
+        bool canCompareVersions = context.Principal is not null
+            && context.Principal.TryGetTokenVersion(out tokenVersion)
+            && context.Principal.TryGetUserId(out userId);
 
         if (!canCompareVersions)
         {

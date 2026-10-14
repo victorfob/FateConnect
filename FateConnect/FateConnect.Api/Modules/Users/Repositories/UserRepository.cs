@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.Users.Repositories;
 
 using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
@@ -50,17 +51,10 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
 
     public async Task<User?> GetByIdAsync(int id, bool includePreferences = false, bool asNoTracking = false)
     {
-        var query = context.Users.AsQueryable();
-
-        if (asNoTracking)
-        {
-            query = query.AsNoTracking();
-        }
+        IQueryable<User> query = context.Users.AsTrackingWhen(!asNoTracking);
 
         if (includePreferences)
-        {
             query = query.Include(u => u.Preferences);
-        }
 
         return await query.FirstOrDefaultAsync(u => u.Id == id);
     }
@@ -85,44 +79,17 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
         if (filter.ProfileType.HasValue)
             query = query.Where(u => u.ProfileType == filter.ProfileType.Value);
 
-        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-        {
-            string escapedSearchTerm = filter.SearchTerm.SanitizeSearchTerm();
+        query = query.WhereAnyColumnContains(
+            filter.SearchTerm,
+            u => u.FullName,
+            u => u.FatecEmail,
+            u => u.ContactEmail!,
+            u => u.Phone!);
 
-            query = query.Where(u =>
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(u.FullName),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ) ||
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(u.FatecEmail),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ) ||
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(u.ContactEmail!),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ) ||
-                EF.Functions.ILike(
-                    u.Phone!,
-                    "%" + escapedSearchTerm + "%",
-                    @"\"
-                ));
-        }
-
-        int total = await query.CountAsync();
-
-        List<TResult> items = await query
-        .OrderByDescending(u => u.CreatedAt)
-        .ThenBy(u => u.Id)
-        .Skip(filter.ItemsToSkip)
-        .Take(filter.EffectivePageSize)
-        .Select(selector)
-        .ToListAsync();
-
-        return (items, total);
+        return await query.ToPageAsync(
+            filter,
+            users => users.OrderByDescending(u => u.CreatedAt).ThenBy(u => u.Id),
+            selector);
     }
 
     public async Task AddAsync(User user)

@@ -26,9 +26,6 @@ public class UnconfiguredProfileHierarchyException(string profileType)
         $"The access hierarchy of the profile '{profileType}' is not configured in the AuthorizeProfileAttribute. " +
             "Update the map of allowed profiles.");
 
-public class UnidentifiedTokenException()
-    : UnauthorizedAccessException("Session ended. Sign in again to continue.");
-
 public class UnidentifiedUserException()
     : UnauthorizedAccessException("Session expired. Sign in again to continue.");
 

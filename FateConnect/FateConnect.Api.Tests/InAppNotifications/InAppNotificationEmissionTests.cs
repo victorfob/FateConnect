@@ -71,9 +71,10 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         return (await response.Content.ReadFromJsonAsync<CreatedResource>(JsonOptions))!.Id;
     }
 
-    private async Task WaitUntilConsumedAsync(Guid reportId) =>
-        Assert.True(await Harness.Consumed.Any<ReportReceivedEvent>(
-            consumed => consumed.Context.Message.ReportId == reportId));
+    private Task WaitUntilConsumedAsync(Guid reportId) =>
+        ApiFactory.WaitUntilAsync(
+            () => Harness.Consumed.Any<ReportReceivedEvent>(consumed => consumed.Context.Message.ReportId == reportId),
+            $"Expected the report {reportId} to be consumed.");
 
     [Fact]
     public async Task CreateRide_NotifiesWhoseNeighborhoodIsTheDestination_AndNoOneElse()
@@ -134,8 +135,10 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         await OfferRideAsync(driverId, "Jardim Goncalves, Sorocaba");
         InAppNotification stored = Assert.Single(await _factory.WaitForNotificationsAsync(residentId));
 
-        Assert.True(await Harness.Published.Any<NotificationDispatchedEvent>(
-            published => published.Context.Message.TargetUserId == residentId));
+        await ApiFactory.WaitUntilAsync(
+            () => Harness.Published.Any<NotificationDispatchedEvent>(
+                published => published.Context.Message.TargetUserId == residentId),
+            $"Expected a notification dispatched to user {residentId}.");
         NotificationDispatchedEvent dispatched = Harness.Published
             .Select<NotificationDispatchedEvent>(published => published.Context.Message.TargetUserId == residentId)
             .Single().Context.Message;
@@ -166,11 +169,15 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         int reporterId = _factory.SeedUser("Igor Mendes Batista").Id;
         _factory.PrepareForNotifications(reporterId);
 
-        Guid reportId = await ReportAsync(reporterId, EnumReportCategory.FakeProfile, isAnonymous: true);
+        Guid confidentialId = await ReportAsync(reporterId, EnumReportCategory.FakeProfile, isAnonymous: true);
+        Guid identifiedId = await ReportAsync(reporterId, EnumReportCategory.Spam);
+        await WaitUntilConsumedAsync(identifiedId);
 
-        Assert.False(await Harness.Published.Any<ReportReceivedEvent>(
-            published => published.Context.Message.ReportId == reportId));
-        Assert.Empty(_factory.NotificationsOf(reporterId));
+        Assert.Empty(Harness.Published.Select<ReportReceivedEvent>(
+            published => published.Context.Message.ReportId == confidentialId));
+        Assert.Equal(
+            identifiedId.ToString(),
+            Assert.Single(await _factory.WaitForNotificationsAsync(reporterId)).ReferenceId);
     }
 
     [Fact]
@@ -207,8 +214,9 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
 
         await Harness.Bus.Publish(new ItemArchivedEvent(ownerId, recordId, "Guarda-chuva preto"));
 
-        Assert.True(await Harness.Consumed.Any<ItemArchivedEvent>(
-            consumed => consumed.Context.Message.RecordId == recordId));
+        await ApiFactory.WaitUntilAsync(
+            () => Harness.Consumed.Any<ItemArchivedEvent>(consumed => consumed.Context.Message.RecordId == recordId),
+            $"Expected the archived item {recordId} to be consumed.");
         Assert.Empty(_factory.NotificationsOf(ownerId));
     }
 }

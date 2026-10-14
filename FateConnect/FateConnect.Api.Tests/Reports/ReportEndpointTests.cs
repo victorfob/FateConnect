@@ -488,6 +488,23 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task ListReports_FilteredBySearchTerm_IgnoresAccentsAndCaseAndLeavesOutWhatDoesNotMatch()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Vânia Corrêa Brandão");
+        HttpClient moderation = _factory.CreateClientForNewAdministrator("Otávio Lacerda Mourão");
+        string subject = UniqueSubject();
+
+        await ReportedBy(reporter, NewReportForm(description: $"{ValidDescription} {subject} ônibus"));
+        await ReportedBy(reporter, NewReportForm(description: $"{ValidDescription} {subject} caneca"));
+
+        PagedReports page = (await moderation.GetFromJsonAsync<PagedReports>(
+            $"/Reports?searchTerm={Uri.EscapeDataString($"{subject} ONIBUS".ToUpperInvariant())}", JsonOptions))!;
+
+        Assert.Equal(1, page.Total);
+        Assert.EndsWith("ônibus", Assert.Single(page.Items).Description, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ListReports_FilteredByCategory_LeavesTheOtherCategoriesOut()
     {
         HttpClient reporter = _factory.CreateClientForNewUser("Rafael Moreira Pinto");

@@ -54,13 +54,7 @@ public partial class RideService(
 
         LogRidesRetrieved(logger, rides.Count);
 
-        return new PagedResultDto<ReadRideDto>
-        {
-            Items = [.. rides.Select(ride => MapToReadDto(ride, currentUserId))],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total,
-        };
+        return filter.ToResult<ReadRideDto>([.. rides.Select(ride => MapToReadDto(ride, currentUserId))], total);
     }
 
     public async Task<ReadRideDto?> GetByIdAsync(Guid id, int currentUserId)
@@ -138,15 +132,10 @@ public partial class RideService(
         return true;
     }
 
-    private void EnsureRideIsDrivenBy(Ride ride, int currentUserId)
-    {
-        if (ride.IsDrivenBy(currentUserId))
-            return;
-
-        LogRideChangeRefused(logger, currentUserId, ride.Id);
-
-        throw new RideNotDrivenByUserException();
-    }
+    private void EnsureRideIsDrivenBy(Ride ride, int currentUserId) =>
+        OwnershipGuard.EnsureOwnedBy<RideNotDrivenByUserException>(
+            ride.IsDrivenBy(currentUserId),
+            () => LogRideChangeRefused(logger, currentUserId, ride.Id));
 
     private ReadRideDto MapToReadDto(Ride ride, int currentUserId) =>
         new(

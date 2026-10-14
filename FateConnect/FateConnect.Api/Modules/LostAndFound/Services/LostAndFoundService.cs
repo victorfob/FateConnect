@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.LostAndFound.Services;
 
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
@@ -32,15 +33,12 @@ public partial class LostAndFoundService(
             clock.GetUtcNow().UtcDateTime
         );
 
-        string? storedImageUrl = null;
+        string? storedImageUrl = await StoreImageAsync(
+            dto.Image,
+            EnumStorageContainer.LostAndFound,
+            record.AttachImage);
 
-        if (dto.Image is not null)
-        {
-            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
-            record.AttachImage(storedImageUrl);
-        }
-
-        await PersistOrDropImageAsync(() => repository.AddAsync(record), storedImageUrl);
+        await SaveImageChangeAsync(() => repository.AddAsync(record), storedImageUrl);
 
         LogRecordCreated(logger, record.Id);
 
@@ -55,13 +53,9 @@ public partial class LostAndFoundService(
 
         LogRecordsRetrieved(logger, records.Count);
 
-        return new PagedResultDto<ReadLostAndFoundDto>
-        {
-            Items = [.. records.Select(record => MapToReadDto(record, currentUserId))],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total,
-        };
+        return filter.ToResult<ReadLostAndFoundDto>(
+            [.. records.Select(record => MapToReadDto(record, currentUserId))],
+            total);
     }
 
     public async Task<ReadLostAndFoundDto?> GetByIdAsync(Guid id, int currentUserId)
@@ -102,27 +96,21 @@ public partial class LostAndFoundService(
             clock.GetUtcNow().UtcDateTime
         );
 
-        string? discardedImageUrl = null;
-        string? storedImageUrl = null;
         bool removesImage = dto.Image is null && dto.RemoveImage == true;
+        string? discardedImageUrl = null;
 
-        if (dto.Image is not null)
-        {
+        if (dto.Image is not null || removesImage)
             discardedImageUrl = record.ImageUrl;
-            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
-            record.AttachImage(storedImageUrl);
-        }
+
+        string? storedImageUrl = await StoreImageAsync(
+            dto.Image,
+            EnumStorageContainer.LostAndFound,
+            record.AttachImage);
 
         if (removesImage)
-        {
-            discardedImageUrl = record.ImageUrl;
             record.DetachImage();
-        }
 
-        await PersistOrDropImageAsync(repository.SaveChangesAsync, storedImageUrl);
-
-        if (!string.IsNullOrWhiteSpace(discardedImageUrl))
-            await StorageService.DeleteImageAsync(discardedImageUrl);
+        await SaveImageChangeAsync(repository.SaveChangesAsync, storedImageUrl, discardedImageUrl);
 
         LogRecordUpdated(logger, id);
 
@@ -156,15 +144,10 @@ public partial class LostAndFoundService(
         return true;
     }
 
-    private void EnsureRecordIsReportedBy(LostAndFoundRecord record, int currentUserId)
-    {
-        if (record.IsReportedBy(currentUserId))
-            return;
-
-        LogRecordChangeRefused(logger, currentUserId, record.Id);
-
-        throw new LostAndFoundNotReportedByUserException();
-    }
+    private void EnsureRecordIsReportedBy(LostAndFoundRecord record, int currentUserId) =>
+        OwnershipGuard.EnsureOwnedBy<LostAndFoundNotReportedByUserException>(
+            record.IsReportedBy(currentUserId),
+            () => LogRecordChangeRefused(logger, currentUserId, record.Id));
 
     private static ReadLostAndFoundDto MapToReadDto(LostAndFoundRecord record, int currentUserId) =>
         new(
