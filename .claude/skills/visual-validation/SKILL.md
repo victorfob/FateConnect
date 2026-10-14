@@ -30,6 +30,7 @@ Com dois servidores de dev no ar, toda medição leva a porta lida da página (s
 - A evidência mostra o estado atual do PR: a captura de antes da correção só sai a pedido.
 - Lista com estados (não lido, lido, vazio) leva uma captura de cada estado em cada tema, nas duas larguras, numeradas por largura: desktop primeiro, depois mobile (`01-desktop-central-escuro`, `12-mobile-central-escuro`). Estado que o desenho tira da tela se diz ao dono, e o desfecho dele (o vazio) entra no lugar.
 - Estado que o painel não mostra (hover forçado, largura trocada sem recarregar) sai de um Chrome headless pelo protocolo de depuração, com `Page.captureScreenshot` (`references/measurement-pitfalls.md`).
+- ⛔ Contra homologação, a captura sai no Chrome do dono, pela extensão (Claude in Chrome), numa aba do grupo em que ele entra uma vez: nunca num Chrome descartável. A receita de resolução e de 375px está em `references/measurement-pitfalls.md`, "Captura no Chrome do dono".
 
 ⛔ Validado contra stub, a entrega ao dono é o servidor da porta padrão falando com homologação, sem `VITE_API_URL` na linha de comando e com o stub derrubado: é ali que ele captura as evidências. O stub só volta a pedido.
 
