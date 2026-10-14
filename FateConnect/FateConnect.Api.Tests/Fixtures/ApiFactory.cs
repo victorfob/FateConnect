@@ -466,19 +466,26 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     public async Task<IReadOnlyList<InAppNotification>> WaitForNotificationsAsync(int userId)
     {
+        await WaitUntilAsync(
+            () => Task.FromResult(NotificationsOf(userId).Count > 0),
+            $"Expected a notification for user {userId}, got none.");
+
+        return NotificationsOf(userId);
+    }
+
+    public static async Task WaitUntilAsync(Func<Task<bool>> condition, string failure)
+    {
         DateTime deadline = DateTime.UtcNow + NotificationTimeout;
 
         while (DateTime.UtcNow < deadline)
         {
-            IReadOnlyList<InAppNotification> notifications = NotificationsOf(userId);
-
-            if (notifications.Count > 0)
-                return notifications;
+            if (await condition())
+                return;
 
             await Task.Delay(TimeSpan.FromMilliseconds(100));
         }
 
-        throw new TimeoutException($"Expected a notification for user {userId}, got none.");
+        throw new TimeoutException(failure);
     }
 
     public HttpClient CreateClientFor(
