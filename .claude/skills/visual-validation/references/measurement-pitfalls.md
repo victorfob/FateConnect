@@ -57,3 +57,12 @@ O rótulo encolhido do campo do MUI fica 9px acima da caixa (`translate(14px, -9
 - Trocar fonte ou peso muda largura: remeça a 375px as larguras decididas por tamanho (e-mail e telefone lado a lado no rodapé).
 - A largura só decide quando separa as candidatas: se todas cabem ou nenhuma cabe, a escolha volta a ser por precisão.
 - Estourar custa diferente por lugar: título e `helperText` quebram linha (barato); o rodapé de diálogo empilha as ações e a fileira de informações do cartão desce um item (caro).
+
+## Captura no Chrome do dono
+
+- `zoom` da região inteira com `save_to_disk` e **sem `scale`**: o `scale` reduz também o arquivo salvo, e o `screenshot` comum sai em JPEG de densidade 1.
+- A janela do grupo não aceita `resize_window`. Para 375px, sobreponha à página um iframe de 375px da mesma rota (mesma origem, mesma sessão) e esconda a barra dele (`scrollbarWidth: 'none'` no documento do iframe): sem isso o layout mede 360px. O `zoom` da região sai em densidade 2.
+- Rolar até um cartão desconta o cabeçalho fixo, senão o topo do cartão fica embaixo dele. Para cortar o que não deve sair (foto com conteúdo de fora), encurte a região do `zoom`.
+- `hover` num canto vazio antes de capturar: o cursor da extensão sai na imagem.
+- Diálogo se abre por `click()` no botão e se fecha com `Escape`, sem confirmar nada. A aba é sua: feche-a no fim.
+
