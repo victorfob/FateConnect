@@ -37,19 +37,13 @@ public partial class ReportService(
             clock.GetUtcNow().UtcDateTime
         );
 
-        string? storedImageUrl = null;
-
-        if (dto.Image is not null)
-        {
-            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.Report);
-            report.AttachImage(storedImageUrl);
-        }
+        string? storedImageUrl = await StoreImageAsync(dto.Image, EnumStorageContainer.Report, report.AttachImage);
 
         if (!report.IsAnonymous)
             await publishEndpoint.Publish(
                 new ReportReceivedEvent(currentUserId, report.Id, report.Category));
 
-        await PersistOrDropImageAsync(() => repository.AddAsync(report), storedImageUrl);
+        await SaveImageChangeAsync(() => repository.AddAsync(report), storedImageUrl);
 
         LogReportCreated(logger, report.Id);
 

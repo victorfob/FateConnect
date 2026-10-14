@@ -144,21 +144,16 @@ public partial class UserService(
         );
 
         string? replacedImageUrl = null;
-        string? storedImageUrl = null;
 
         if (dto.Image is not null)
-        {
             replacedImageUrl = user.ImageUrl;
-            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.User);
-            user.AttachImage(storedImageUrl, timeProvider.GetUtcNow().UtcDateTime);
-        }
 
-        await PersistOrDropImageAsync(userRepository.SaveChangesAsync, storedImageUrl);
+        string? storedImageUrl = await StoreImageAsync(
+            dto.Image,
+            EnumStorageContainer.User,
+            imageUrl => user.AttachImage(imageUrl, timeProvider.GetUtcNow().UtcDateTime));
 
-        if (dto.Image is not null && !string.IsNullOrWhiteSpace(replacedImageUrl))
-        {
-            await StorageService.DeleteImageAsync(replacedImageUrl);
-        }
+        await SaveImageChangeAsync(userRepository.SaveChangesAsync, storedImageUrl, replacedImageUrl);
 
         if (dto.Image is not null)
             LogUserPhotoReplaced(logger, currentUserId);
@@ -232,8 +227,7 @@ public partial class UserService(
 
         user.RemoveImage(timeProvider.GetUtcNow().UtcDateTime);
 
-        await userRepository.SaveChangesAsync();
-        await StorageService.DeleteImageAsync(imageToDelete);
+        await SaveImageChangeAsync(userRepository.SaveChangesAsync, storedImageUrl: null, imageToDelete);
 
         LogUserPhotoRemoved(logger, currentUserId);
     }

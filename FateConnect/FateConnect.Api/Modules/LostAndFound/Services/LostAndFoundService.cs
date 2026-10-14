@@ -33,15 +33,12 @@ public partial class LostAndFoundService(
             clock.GetUtcNow().UtcDateTime
         );
 
-        string? storedImageUrl = null;
+        string? storedImageUrl = await StoreImageAsync(
+            dto.Image,
+            EnumStorageContainer.LostAndFound,
+            record.AttachImage);
 
-        if (dto.Image is not null)
-        {
-            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
-            record.AttachImage(storedImageUrl);
-        }
-
-        await PersistOrDropImageAsync(() => repository.AddAsync(record), storedImageUrl);
+        await SaveImageChangeAsync(() => repository.AddAsync(record), storedImageUrl);
 
         LogRecordCreated(logger, record.Id);
 
@@ -99,27 +96,21 @@ public partial class LostAndFoundService(
             clock.GetUtcNow().UtcDateTime
         );
 
-        string? discardedImageUrl = null;
-        string? storedImageUrl = null;
         bool removesImage = dto.Image is null && dto.RemoveImage == true;
+        string? discardedImageUrl = null;
 
-        if (dto.Image is not null)
-        {
+        if (dto.Image is not null || removesImage)
             discardedImageUrl = record.ImageUrl;
-            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.LostAndFound);
-            record.AttachImage(storedImageUrl);
-        }
+
+        string? storedImageUrl = await StoreImageAsync(
+            dto.Image,
+            EnumStorageContainer.LostAndFound,
+            record.AttachImage);
 
         if (removesImage)
-        {
-            discardedImageUrl = record.ImageUrl;
             record.DetachImage();
-        }
 
-        await PersistOrDropImageAsync(repository.SaveChangesAsync, storedImageUrl);
-
-        if (!string.IsNullOrWhiteSpace(discardedImageUrl))
-            await StorageService.DeleteImageAsync(discardedImageUrl);
+        await SaveImageChangeAsync(repository.SaveChangesAsync, storedImageUrl, discardedImageUrl);
 
         LogRecordUpdated(logger, id);
 
