@@ -119,13 +119,7 @@ public partial class ReportService(
 
         LogReportsRetrieved(logger, records.Count);
 
-        return new PagedResultDto<ReadReportDto>
-        {
-            Items = [.. records.Select(MapToReadDto)],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total,
-        };
+        return filter.ToResult<ReadReportDto>([.. records.Select(MapToReadDto)], total);
     }
 
     private void EnsureImageIsVisibleTo(Report report, int currentUserId, bool isAdministrator)

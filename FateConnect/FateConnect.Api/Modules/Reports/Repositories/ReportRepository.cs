@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Reports.DTOs;
 using FateConnect.Api.Modules.Reports.Entities;
@@ -50,16 +51,7 @@ public class ReportRepository(FateConnectDbContext context) : IReportRepository
         if (rangeStart.HasValue && rangeEnd.HasValue)
             query = query.Where(CreatedWithin(rangeStart.Value, rangeEnd.Value));
 
-        int total = await query.CountAsync();
-
-        List<Report> items = await query
-            .OrderByDescending(d => d.CreatedAt)
-            .ThenBy(d => d.Id)
-            .Skip(filter.ItemsToSkip)
-            .Take(filter.EffectivePageSize)
-            .ToListAsync();
-
-        return (items, total);
+        return await query.ToPageAsync(filter, reports => reports.OrderByDescending(d => d.CreatedAt).ThenBy(d => d.Id));
     }
     private static Expression<Func<Report, bool>> CreatedWithin(DateOnly rangeStart, DateOnly rangeEnd)
     {

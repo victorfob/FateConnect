@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.Users.Repositories;
 
 using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
@@ -112,17 +113,10 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
                 ));
         }
 
-        int total = await query.CountAsync();
-
-        List<TResult> items = await query
-        .OrderByDescending(u => u.CreatedAt)
-        .ThenBy(u => u.Id)
-        .Skip(filter.ItemsToSkip)
-        .Take(filter.EffectivePageSize)
-        .Select(selector)
-        .ToListAsync();
-
-        return (items, total);
+        return await query.ToPageAsync(
+            filter,
+            users => users.OrderByDescending(u => u.CreatedAt).ThenBy(u => u.Id),
+            selector);
     }
 
     public async Task AddAsync(User user)

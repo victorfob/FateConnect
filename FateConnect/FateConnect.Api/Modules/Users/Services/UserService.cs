@@ -269,13 +269,7 @@ public partial class UserService(
             )
         );
 
-        return new PagedResultDto<ReadUserSummaryDto>
-        {
-            Items = [.. records],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total
-        };
+        return filter.ToResult(records, total);
     }
 
     public async Task<ReadUserDto?> GetByIdAsync(int id)

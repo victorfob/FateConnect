@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.LostAndFound.Repositories;
 
 using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
@@ -54,16 +55,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         if (rangeStart.HasValue && rangeEnd.HasValue)
             query = query.Where(OccurredWithin(rangeStart.Value, rangeEnd.Value));
 
-        int total = await query.CountAsync();
-
-        List<LostAndFoundRecord> items = await query
-            .OrderByDescending(r => r.CreatedAt)
-            .ThenBy(r => r.Id)
-            .Skip(filter.ItemsToSkip)
-            .Take(filter.EffectivePageSize)
-            .ToListAsync();
-
-        return (items, total);
+        return await query.ToPageAsync(filter, records => records.OrderByDescending(r => r.CreatedAt).ThenBy(r => r.Id));
     }
 
     private static Expression<Func<LostAndFoundRecord, bool>> IsReportedByAnActiveAccount() =>

@@ -54,13 +54,7 @@ public partial class RideService(
 
         LogRidesRetrieved(logger, rides.Count);
 
-        return new PagedResultDto<ReadRideDto>
-        {
-            Items = [.. rides.Select(ride => MapToReadDto(ride, currentUserId))],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total,
-        };
+        return filter.ToResult<ReadRideDto>([.. rides.Select(ride => MapToReadDto(ride, currentUserId))], total);
     }
 
     public async Task<ReadRideDto?> GetByIdAsync(Guid id, int currentUserId)

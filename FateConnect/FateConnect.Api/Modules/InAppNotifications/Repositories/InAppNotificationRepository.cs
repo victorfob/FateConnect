@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
@@ -66,16 +67,9 @@ public class InAppNotificationRepository(FateConnectDbContext context) : IInAppN
         if (filter.Type.HasValue)
             query = query.Where(n => n.Type == filter.Type.Value);
 
-        int total = await query.CountAsync();
-
-        List<InAppNotification> items = await query
-            .OrderByDescending(n => n.CreatedAt)
-            .ThenByDescending(n => n.Id)
-            .Skip(filter.ItemsToSkip)
-            .Take(filter.EffectivePageSize)
-            .ToListAsync();
-
-        return (items, total);
+        return await query.ToPageAsync(
+            filter,
+            notifications => notifications.OrderByDescending(n => n.CreatedAt).ThenByDescending(n => n.Id));
     }
 
     public async Task<InAppNotification?> GetByIdAndUserAsync(int id, int userId)

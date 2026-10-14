@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.Rides.Repositories;
 
 using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
@@ -67,17 +68,12 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
         if (filter.VehicleType.HasValue)
             query = query.Where(r => r.VehicleType == filter.VehicleType.Value);
 
-        int total = await query.CountAsync();
-
-        List<Ride> items = await query
-            .OrderBy(NextDepartureDate(today, currentTime))
-            .ThenBy(r => r.DepartureTime)
-            .ThenBy(r => r.Id)
-            .Skip(filter.ItemsToSkip)
-            .Take(filter.EffectivePageSize)
-            .ToListAsync();
-
-        return (items, total);
+        return await query.ToPageAsync(
+            filter,
+            rides => rides
+                .OrderBy(NextDepartureDate(today, currentTime))
+                .ThenBy(r => r.DepartureTime)
+                .ThenBy(r => r.Id));
     }
 
     private static Expression<Func<Ride, bool>> IsOfferedByAnActiveAccount() =>

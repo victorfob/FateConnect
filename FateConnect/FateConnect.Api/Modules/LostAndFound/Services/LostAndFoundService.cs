@@ -55,13 +55,9 @@ public partial class LostAndFoundService(
 
         LogRecordsRetrieved(logger, records.Count);
 
-        return new PagedResultDto<ReadLostAndFoundDto>
-        {
-            Items = [.. records.Select(record => MapToReadDto(record, currentUserId))],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total,
-        };
+        return filter.ToResult<ReadLostAndFoundDto>(
+            [.. records.Select(record => MapToReadDto(record, currentUserId))],
+            total);
     }
 
     public async Task<ReadLostAndFoundDto?> GetByIdAsync(Guid id, int currentUserId)
