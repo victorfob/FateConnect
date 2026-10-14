@@ -1,5 +1,6 @@
 namespace FateConnect.Api.Modules.Rides.Infrastructure;
 
+using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Rides.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -50,5 +51,7 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
               .WithOne()
               .HasForeignKey(departure => departure.RideId)
               .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasWordSearch(nameof(Ride.Destination), nameof(Ride.Description));
     }
 }

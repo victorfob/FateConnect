@@ -1,7 +1,9 @@
 namespace FateConnect.Api.Modules.Common.Utils;
 
 using System.Linq.Expressions;
+using FateConnect.Api.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 
 public static class SearchQueryUtils
 {
@@ -18,6 +20,21 @@ public static class SearchQueryUtils
             .Replace("%", @"\%")
             .Replace("_", @"\_");
     }
+
+    public static IQueryable<T> WhereMatchesEveryWord<T>(this IQueryable<T> query, string? searchTerm)
+    {
+        string? tsQuery = WordSearchTerm.ToTsQuery(searchTerm);
+
+        if (tsQuery is null)
+            return query;
+
+        return query.Where(MatchesEveryWordOrOnlyStopWords<T>(tsQuery));
+    }
+
+    private static Expression<Func<T, bool>> MatchesEveryWordOrOnlyStopWords<T>(string tsQuery) =>
+        item => EF.Functions.ToTsQuery(WordSearch.Configuration, tsQuery).GetNodeCount() == 0
+            || EF.Property<NpgsqlTsVector>(item!, WordSearch.VectorProperty)
+                .Matches(EF.Functions.ToTsQuery(WordSearch.Configuration, tsQuery));
 
     public static IQueryable<T> WhereAnyColumnContains<T>(
         this IQueryable<T> query,

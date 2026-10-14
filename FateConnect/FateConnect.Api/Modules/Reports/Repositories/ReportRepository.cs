@@ -26,7 +26,7 @@ public class ReportRepository(FateConnectDbContext context) : IReportRepository
         if (reporterId.HasValue)
             query = query.Where(d => d.UserId == reporterId.Value);
 
-        query = query.WhereAnyColumnContains(filter.SearchTerm, d => d.Description);
+        query = query.WhereMatchesEveryWord(filter.SearchTerm);
 
         if (filter.Category.HasValue)
             query = query.Where(d => d.Category == filter.Category.Value);

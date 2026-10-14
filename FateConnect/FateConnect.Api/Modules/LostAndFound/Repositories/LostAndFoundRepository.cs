@@ -25,7 +25,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         if (currentUserId.HasValue)
             query = query.Where(r => r.UserId == currentUserId.Value);
 
-        query = query.WhereAnyColumnContains(filter.SearchTerm, r => r.Name, r => r.Description ?? "");
+        query = query.WhereMatchesEveryWord(filter.SearchTerm);
 
         if (filter.LostAndFoundType.HasValue)
             query = query.Where(r => r.LostAndFoundType == filter.LostAndFoundType.Value);
