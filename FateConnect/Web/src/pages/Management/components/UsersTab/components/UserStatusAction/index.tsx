@@ -36,6 +36,8 @@ export function UserStatusAction({ user, onConfirm }: UserStatusActionProps) {
         messageSuffix={action.messageSuffix}
         subject={user.fullName}
         confirmLabel={C.CONFIRM_LABEL}
+        destructive={action.destructive}
+        dialogIcon={action.dialogIcon}
         onConfirm={handleConfirm}
       />
     </ListCard.BottomAction>
