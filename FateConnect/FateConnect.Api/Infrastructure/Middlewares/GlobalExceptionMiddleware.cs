@@ -47,7 +47,6 @@ public partial class GlobalExceptionMiddleware(
 
         switch (exception)
         {
-            case UnidentifiedTokenException:
             case InvalidCredentialsException:
             case UnidentifiedUserException:
                 statusCode = HttpStatusCode.Unauthorized;
