@@ -5,7 +5,8 @@ using Swashbuckle.AspNetCore.Annotations;
 
 public class UpdatePreferencesDto
 {
-    [SwaggerSchema("Whether the user receives in-app notifications; absent keeps the current choice.")]
+    [SwaggerSchema("Whether the user receives the notifications, in the app and by push; absent keeps the " +
+        "current choice.")]
     [SchemaExample(true)]
     public bool? ReceiveNotifications { get; set; }
 }

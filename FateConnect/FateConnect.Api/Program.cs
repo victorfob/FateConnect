@@ -21,6 +21,7 @@ using FateConnect.Api.Modules.Emails.Services;
 using FateConnect.Api.Modules.InAppNotifications.Consumers;
 using FateConnect.Api.Modules.InAppNotifications.Hubs;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
+using FateConnect.Api.Modules.InAppNotifications.Options;
 using FateConnect.Api.Modules.InAppNotifications.Repositories;
 using FateConnect.Api.Modules.InAppNotifications.Services;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
@@ -146,6 +147,11 @@ public class Program
 
         builder.Services.AddScoped<IInAppNotificationRepository, InAppNotificationRepository>();
         builder.Services.AddScoped<IInAppNotificationService, InAppNotificationService>();
+        builder.Services.AddScoped<IPushSubscriptionRepository, PushSubscriptionRepository>();
+        builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();
+        builder.Services.AddHttpClient<IPushSender, WebPushSender>().RemoveAllLoggers();
+        builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(
+            new PushOptions(settings.PublicUrl, settings.Vapid.PublicKey, settings.Vapid.PrivateKey)));
 
         builder.Services.AddProblemDetails();
 
@@ -233,6 +239,7 @@ public class Program
             x.AddConsumer<ReportReceivedEventConsumer>();
             x.AddConsumer<ItemArchivedEventConsumer>();
             x.AddConsumer<NotificationDispatchedEventConsumer>();
+            x.AddConsumer<NotificationDispatchedEventPushConsumer>();
 
             x.UsingRabbitMq(ConfigureRabbitMq);
         });
@@ -341,6 +348,12 @@ public class Program
         {
             e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
             e.ConfigureConsumer<NotificationDispatchedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("notification-push-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<NotificationDispatchedEventPushConsumer>(context);
         });
     }
 }

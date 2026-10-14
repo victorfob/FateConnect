@@ -8,6 +8,7 @@ using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Events;
+using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using FateConnect.Api.Modules.Storage.Enums;
 using FateConnect.Api.Modules.Storage.Interfaces;
 using FateConnect.Api.Modules.Storage.Services;
@@ -27,6 +28,7 @@ public partial class UserService(
     TimeProvider timeProvider,
     IStorageService baseStorageService,
     IPublishEndpoint publishEndpoint,
+    IPushNotificationService pushNotificationService,
     ILogger<UserService> logger
 ) : BaseFileService(baseStorageService, logger), IUserService
 {
@@ -181,6 +183,9 @@ public partial class UserService(
 
         await userRepository.SaveChangesAsync();
         LogUserPreferencesUpdated(logger, currentUserId);
+
+        if (!newPreferences.ReceiveNotifications)
+            await pushNotificationService.RemoveAllAsync(currentUserId);
     }
 
     public async Task<TokenResponseDto?> ChangePasswordAsync(int currentUserId, ChangePasswordDto dto)
