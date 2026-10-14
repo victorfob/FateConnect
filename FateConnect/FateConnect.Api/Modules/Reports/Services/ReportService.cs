@@ -127,8 +127,8 @@ public partial class ReportService(
             Id: record.Id,
             Category: record.Category,
             Description: record.Description,
-            ImageUrl: ImageAddressOf(record),
-            ThumbnailUrl: ThumbnailAddressOf(record),
+            ImageUrl: ImageAddressOf(record, EnumStoredImageVariant.Original),
+            ThumbnailUrl: ImageAddressOf(record, EnumStoredImageVariant.Thumbnail),
             HasImage: record.ImageUrl is not null,
             Status: record.Status,
             User: record.IsAnonymous ? null : record.User?.ToContactDto(),
@@ -136,19 +136,16 @@ public partial class ReportService(
             CreatedAt: record.CreatedAt
         );
 
-    private static string? ImageAddressOf(Report record)
+    private static string? ImageAddressOf(Report record, EnumStoredImageVariant variant)
     {
         if (record.ImageUrl is null)
             return null;
 
-        return $"Reports/{record.Id}/image";
-    }
+        string imageAddress = $"Reports/{record.Id}/image";
 
-    private static string? ThumbnailAddressOf(Report record)
-    {
-        if (record.ImageUrl is null)
-            return null;
+        if (variant == EnumStoredImageVariant.Thumbnail)
+            return $"{imageAddress}/thumbnail";
 
-        return $"Reports/{record.Id}/image/thumbnail";
+        return imageAddress;
     }
 }
