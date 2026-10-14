@@ -34,6 +34,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Troca a página de leitura da API, do Swagger UI pelo Scalar, em `/api/scalar/v1`; a página antiga deixa de responder, e o documento continua no mesmo endereço (#611) [Backend]
 - Passa a responder as mensagens de erro da API em inglês; nenhuma tela as mostra, porque cada uma escreve o próprio texto (#611) [Backend]
 - Passa a recusar a redefinição de senha de conta banida como conta banida mesmo quando o link já venceu ou foi usado, em vez de responder que o link não vale, como a confirmação de e-mail já fazia (#612) [Backend]
+- Passa a buscar caronas, achados e perdidos e denúncias por palavra, em qualquer ordem e pelo começo de cada uma, com plural e uma lista curta de sinônimos; pedaço no meio da palavra deixa de achar, e a gestão de usuários segue achando por trecho (#615) [Backend]
+- Passa a dizer, nos filtros de caronas e de achados e perdidos, que a busca aceita trechos da descrição, em vez de "parte" (#615) [Frontend]
 
 ### Fixed
 
