@@ -40,6 +40,16 @@ gh run view <run-id> --json jobs --jq '.jobs[].steps[] | "\(.conclusion)\t\(.nam
 - Rode-a localmente no head, com a `develop` como controle: o que falha ou trava só no head é do PR.
 - No macOS não há `timeout`. Suíte .NET que pode travar roda com `--blame-hang-timeout 3m` e `--logger trx`; quem não terminou é a diferença entre `dotnet test --list-tests` e os `testName` do `.trx`.
 
+## Defeito no script da esteira
+
+Reproduz-se num contêiner do sistema do runner, não no Mac: buffer de pipe e coreutils diferem.
+
+```bash
+docker run --rm -v "<pasta com o script e a entrada>:/f:ro" ubuntu:24.04 bash /f/repro.sh
+```
+
+O `| grep -q` sob `pipefail` com uma lista grande passou sempre no Mac e falhou na maioria das rodadas no Ubuntu: o `grep` sai no primeiro achado, quem escreve no pipe morre com Broken pipe, e o `if` dá falso. A leitura vai por here-string (`grep -q … <<< "$lista"`).
+
 ## Artefato entre jobs
 
 - `actions/upload-artifact` nasce com `if-no-files-found: warn`: caminho errado sobe zero arquivo e o job fica verde, e quem quebra é o consumidor, longe da causa. Arquivo oculto (`.vitest-reports`) é ignorado sem `include-hidden-files: true`.

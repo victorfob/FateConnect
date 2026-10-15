@@ -58,7 +58,7 @@ lighthouse --version        # anote no relatório
 
 ⛔ Aconteceu na primeira rodada, a da #361: instalei `lighthouse@12` e recebi a **12.8.2** com a **13.4.1** publicada. As quatro notas batiam nas duas versões, então nada acusou — o que ficou invisível foi uma **categoria inteira**, `agentic-browsing`, que só existe a partir da 13 e onde o site marcava 67.
 
-⚠️ **A lista de categorias não é fechada.** Quem descobriu o buraco foi o Victor, abrindo o PageSpeed Insights — que roda sempre a versão hospedada — e vendo uma categoria que nenhum relatório meu tinha. **Confira o conjunto de categorias do relatório contra o que o PageSpeed mostra**, em vez de supor que são quatro.
+⚠️ **A lista de categorias não é fechada.** O buraco apareceu abrindo o PageSpeed Insights — que roda sempre a versão hospedada — e vendo uma categoria que nenhum relatório meu tinha. **Confira o conjunto de categorias do relatório contra o que o PageSpeed mostra**, em vez de supor que são quatro.
 
 ### ⛔ Auditoria migra entre versões, e uma delas perde o nome
 
