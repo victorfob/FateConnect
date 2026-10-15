@@ -190,6 +190,13 @@ export default defineConfig([
     rules: { 'sonarjs/no-hardcoded-passwords': 'off' },
   },
   {
+    // O Sonar acusa `await` dentro de laço no código da aplicação. No teste a
+    // sequência é o roteiro (cada clique espera o anterior), e o Sonar não analisa teste.
+    files: ['**/*.{js,ts,tsx}'],
+    ignores: ['**/*.test.{ts,tsx}'],
+    rules: { 'no-await-in-loop': 'error' },
+  },
+  {
     files: ['**/*.{js,ts,tsx}'],
     plugins: { unicorn },
     // Só estas duas do `unicorn`, porque são as que o Sonar toma emprestadas
