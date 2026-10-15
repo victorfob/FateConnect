@@ -6,10 +6,15 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Adiciona o backup automático de produção: nos dias 1 e 16, o banco e as fotos saem cifrados para fora do servidor, ficam as 6 cópias mais recentes, e o monitoramento alerta quando uma execução falha ou não acontece (#659) [Backend]
+
 ### Changed
 
 - Passa a enviar ao monitoramento de erros do site e da API o e-mail institucional da conta autenticada; do navegador seguem também a identificação dele e a página de origem, sem o IP (#656) [Frontend] [Backend]
 - Passa a declarar na política de privacidade o e-mail, a identificação do navegador e a página de origem enviados ao monitoramento de erros, em nova versão do documento, que pede novo aceite (#656) [Frontend]
+- Passa a declarar na política de privacidade o serviço que guarda as cópias de segurança, que um dado apagado segue nas cópias antigas por até 3 meses, e quais serviços guardam dados fora do Brasil (#659) [Frontend]
 
 ### Fixed
 
