@@ -1,4 +1,4 @@
-import { DenunciationsTab } from './components/DenunciationsTab';
+import { ReportsTab } from './components/ReportsTab';
 import { UsersTab } from './components/UsersTab';
 import { useManagementTab } from './hooks/useManagementTab';
 import { ManagementTabEnum } from './types';
@@ -8,5 +8,5 @@ export function Management() {
 
   if (selectedTab === ManagementTabEnum.USERS) return <UsersTab />;
 
-  return <DenunciationsTab />;
+  return <ReportsTab />;
 }

@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Users.Exceptions;
 
-using FateConnect.Api.Modules.Users.Enums;
 using System;
+using FateConnect.Api.Modules.Users.Enums;
 
 public abstract class UserDomainException(string message) : Exception(message);
 
@@ -11,40 +11,40 @@ public abstract class AlreadyRegisteredException(string field, string message) :
 }
 
 public class InvalidUserFullNameException()
-    : UserDomainException("O nome completo deve ter entre 3 e 200 caracteres.");
+    : UserDomainException("The full name must have between 3 and 200 characters.");
 
 public class InvalidFatecEmailLocalPartException()
-    : UserDomainException("O endereço de e-mail contém caracteres inválidos antes do '@'.");
+    : UserDomainException("The e-mail address has invalid characters before the '@'.");
 
 public class InvalidFatecEmailDomainException()
-    : UserDomainException("O e-mail fornecido não pertence a um domínio válido da Fatec.");
+    : UserDomainException("The e-mail does not belong to a valid Fatec domain.");
 
 public class InvalidGenderException()
-    : UserDomainException("O gênero informado é inválido.");
+    : UserDomainException("Invalid gender.");
 
 public class InvalidNeighborhoodException()
-    : UserDomainException("O bairro pode ter no máximo 100 caracteres.");
+    : UserDomainException("The neighborhood and city must have at most 100 characters.");
 
 public class ContactEmailAlreadyRegisteredException(string contactEmail)
-    : AlreadyRegisteredException("contactEmail", $"O e-mail de contato '{contactEmail}' já está em uso no sistema.");
+    : AlreadyRegisteredException("contactEmail", $"The contact e-mail '{contactEmail}' is already in use.");
 
 public class ContactPhoneAlreadyRegisteredException(string phone)
-    : AlreadyRegisteredException("phone", $"O telefone '{phone}' já está em uso no sistema.");
+    : AlreadyRegisteredException("phone", $"The phone '{phone}' is already in use.");
 
 public class EmailAlreadyRegisteredException(string email)
-    : AlreadyRegisteredException("fatecEmail", $"O e-mail '{email}' já está em uso no sistema.");
+    : AlreadyRegisteredException("fatecEmail", $"The e-mail '{email}' is already in use.");
 
 public class CannotModifyOwnAccountException()
-    : UserDomainException("Não é permitido banir, rebaixar ou alterar o status da própria conta administrativa.");
+    : UserDomainException("An administrator cannot ban, demote or change the status of their own account.");
 
 public class InvalidDocumentVersionException()
-    : UserDomainException("A versão do documento aceito é obrigatória e não pode estar em branco.");
+    : UserDomainException("The version of the accepted document is required and cannot be blank.");
 
 public class IncorrectCurrentPasswordException()
-    : UserDomainException("A senha atual informada está incorreta.");
+    : UserDomainException("The current password is incorrect.");
 
 public class IncompleteContactException()
-    : UserDomainException("Para salvar as informações de contato, preencha o telefone e o e-mail.");
+    : UserDomainException("To save the contact, fill in both the phone and the e-mail.");
 
 public class ContactRequiredException(EnumPublication publication)
     : InvalidOperationException(MessageFor(publication))
@@ -53,15 +53,22 @@ public class ContactRequiredException(EnumPublication publication)
 
     private static string MessageFor(EnumPublication publication) => publication switch
     {
-        EnumPublication.Ride => "Para ofertar carona, cadastre telefone e e-mail para contato em Meu perfil.",
-        EnumPublication.LostAndFoundItem => "Para cadastrar um item, cadastre telefone e e-mail para contato em Meu perfil.",
-        EnumPublication.IdentifiedDenunciation => "Para enviar uma denúncia sem sigilo, cadastre telefone e e-mail para contato em Meu perfil, ou marque a denúncia como sigilosa.",
+        EnumPublication.Ride => "To offer a ride, add a contact phone and e-mail in My profile.",
+        EnumPublication.LostAndFoundItem => "To register an item, add a contact phone and e-mail in My profile.",
+        EnumPublication.IdentifiedReport => "To send an identified report, add a contact phone and e-mail in " +
+            "My profile, or mark the report as anonymous.",
         _ => throw new ArgumentOutOfRangeException(nameof(publication), publication, null)
     };
 }
 
 public class InvalidUserStatusTransitionException()
-    : UserDomainException("Não é possível realizar esta alteração de status de conta por este endpoint.");
+    : UserDomainException("This account status change is not possible through this endpoint.");
 
 public class InvalidTokenException()
-    : UserDomainException("O token fornecido é inválido ou está em branco.");
+    : UserDomainException("The token is invalid or blank.");
+
+public class MissingLegalDocumentVersionException(EnumDocumentType document)
+    : InvalidOperationException($"The legal document versions file has no current version for {document}.");
+
+public class MissingLegalDocumentVersionsFileException(string resourceName)
+    : InvalidOperationException($"The legal document versions file '{resourceName}' is not embedded in the API.");

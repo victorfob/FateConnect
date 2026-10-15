@@ -1,46 +1,55 @@
-using System.Diagnostics.CodeAnalysis;
 namespace FateConnect.Api;
 
-using System.Globalization;
-using System.Security.Claims;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json.Serialization;
 using DotNetEnv;
+using FateConnect.Api.Infrastructure.Configuration;
 using FateConnect.Api.Infrastructure.Converters;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Infrastructure.Middlewares;
-using FateConnect.Api.Modules.Auth.Entities;
-using FateConnect.Api.Modules.Auth.Constants;
+using FateConnect.Api.Infrastructure.Observability;
+using FateConnect.Api.Infrastructure.OpenApi;
+using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Auth.Interfaces;
+using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Services;
-using FateConnect.Api.Modules.Rides.Interfaces;
-using FateConnect.Api.Modules.Rides.Repositories;
-using FateConnect.Api.Modules.Rides.Services;
-using FateConnect.Api.Modules.Users.Interfaces;
-using FateConnect.Api.Modules.Users.Repositories;
-using FateConnect.Api.Modules.Users.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using FateConnect.Api.Modules.Emails.Consumers;
+using FateConnect.Api.Modules.Emails.Interfaces;
+using FateConnect.Api.Modules.Emails.Options;
+using FateConnect.Api.Modules.Emails.Services;
+using FateConnect.Api.Modules.InAppNotifications.Consumers;
+using FateConnect.Api.Modules.InAppNotifications.Hubs;
+using FateConnect.Api.Modules.InAppNotifications.Interfaces;
+using FateConnect.Api.Modules.InAppNotifications.Options;
+using FateConnect.Api.Modules.InAppNotifications.Repositories;
+using FateConnect.Api.Modules.InAppNotifications.Services;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.LostAndFound.Workers;
-using FateConnect.Api.Modules.Common.Interfaces;
-using FateConnect.Api.Modules.Common.Utils;
-using FateConnect.Api.Modules.Denunciations.Interfaces;
-using FateConnect.Api.Modules.Denunciations.Services;
-using FateConnect.Api.Modules.Denunciations.Repositories;
-using MassTransit;
+using FateConnect.Api.Modules.Reports.Interfaces;
+using FateConnect.Api.Modules.Reports.Repositories;
+using FateConnect.Api.Modules.Reports.Services;
+using FateConnect.Api.Modules.Rides.Interfaces;
+using FateConnect.Api.Modules.Rides.Repositories;
+using FateConnect.Api.Modules.Rides.Services;
+using FateConnect.Api.Modules.Storage.Interfaces;
 using FateConnect.Api.Modules.Storage.Services;
-using FateConnect.Api.Modules.Communications.Consumers;
+using FateConnect.Api.Modules.Users.Interfaces;
+using FateConnect.Api.Modules.Users.Repositories;
+using FateConnect.Api.Modules.Users.Services;
+using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
 using Resend;
-using FateConnect.Api.Modules.Communications.Interfaces;
-using FateConnect.Api.Modules.Communications.Services;
+using Sentry.AspNetCore;
+using Sentry.Extensibility;
 
 public class Program
 {
@@ -54,13 +63,23 @@ public class Program
             Env.Load();
         }
 
-        EnvironmentUtils.Required("PUBLIC_URL", "para gerar os links dos e-mails");
-        EnvironmentUtils.Required("EMAIL_SENDER", "para o envio de e-mails");
-        string resendApiKey = EnvironmentUtils.Required("RESEND_API_KEY", "para o envio de e-mails");
+        RequiredSettings settings = RequiredSettings.Read(Environment.GetEnvironmentVariable);
 
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+        builder.WebHost.UseSentry(options =>
+        {
+            options.Dsn = Environment.GetEnvironmentVariable("SENTRY_DSN") ?? string.Empty;
+            options.SendDefaultPii = false;
+            options.MaxRequestBodySize = RequestSize.None;
+            options.MinimumBreadcrumbLevel = LogLevel.None;
+            options.MinimumEventLevel = LogLevel.None;
+            options.SetBeforeSend(SentryEventScrubber.Scrub);
+        });
+
+        builder.Services.AddSingleton<IErrorReporter, SentryErrorReporter>();
 
         var originsEnv = Environment.GetEnvironmentVariable("CORS_ORIGINS");
 
@@ -83,16 +102,21 @@ public class Program
 
         var jwtOptions = new JwtOptions
         {
-            Secret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? string.Empty,
-            Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? string.Empty,
-            Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? string.Empty,
-            ExpirationHours = double.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRATION_HOURS"), out double hours) ? hours : 8
+            Secret = settings.JwtSecret,
+            Issuer = settings.JwtIssuer,
+            Audience = settings.JwtAudience,
+            ExpirationHours = double.TryParse(
+                Environment.GetEnvironmentVariable("JWT_EXPIRATION_HOURS"),
+                out double hours) ? hours : 8
         };
 
         builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(jwtOptions));
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IPublicationModerationService, PublicationModerationService>();
+        builder.Services.AddScoped<ILegalDocumentService, LegalDocumentService>();
+        builder.Services.AddSingleton<ILegalDocumentVersions>(LegalDocumentVersions.FromEmbeddedFile());
 
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
@@ -117,12 +141,27 @@ public class Program
 
         builder.Services.AddScoped<IStorageService, StorageService>();
 
-        builder.Services.AddScoped<IDenunciationRepository, DenunciationRepository>();
-        builder.Services.AddScoped<IDenunciationService, DenunciationService>();
+        builder.Services.AddScoped<IReportRepository, ReportRepository>();
+        builder.Services.AddScoped<IReportService, ReportService>();
 
         builder.Services.AddScoped<IEmailService, EmailService>();
+        builder.Services.AddSingleton(
+            Microsoft.Extensions.Options.Options.Create(new EmailOptions(settings.PublicUrl, settings.EmailSender)));
+
+        builder.Services.AddScoped<IInAppNotificationRepository, InAppNotificationRepository>();
+        builder.Services.AddScoped<IInAppNotificationService, InAppNotificationService>();
+        builder.Services.AddScoped<IPushSubscriptionRepository, PushSubscriptionRepository>();
+        builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();
+        builder.Services.AddHttpClient<IPushSender, WebPushSender>().RemoveAllLoggers();
+        builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(
+            new PushOptions(settings.PublicUrl, settings.Vapid.PublicKey, settings.Vapid.PrivateKey)));
+
+        builder.Services.AddProblemDetails();
 
         builder.Services.AddControllers()
+            .ConfigureApiBehaviorOptions(options =>
+                options.InvalidModelStateResponseFactory = InvalidModelStateLogging.LoggingFirst(
+                    options.InvalidModelStateResponseFactory))
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -130,53 +169,15 @@ public class Program
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.EnableAnnotations();
-
-            options.MapType<DateOnly>(() => new OpenApiSchema
+        builder.Services.AddSignalR()
+            .AddJsonProtocol(options =>
             {
-                Type = "string",
-                Format = "date",
-                Example = new OpenApiString("2026-08-30")
+                options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.PayloadSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
+                options.PayloadSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
 
-            options.MapType<TimeOnly>(() => new OpenApiSchema
-            {
-                Type = "string",
-                Format = "time",
-                Example = new OpenApiString("16:20:00")
-            });
-
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "FateConnect API",
-                Version = "v1",
-                Description = "Car pooling and academic connection platform API."
-            });
-
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer 12345abcdef'",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                Scheme = "Bearer",
-                BearerFormat = "JWT",
-                In = ParameterLocation.Header
-            });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-                    },
-                    Array.Empty<string>()
-                }
-            });
-        });
+        builder.Services.AddOpenApiDocument();
 
         byte[] key = Encoding.UTF8.GetBytes(jwtOptions.Secret);
 
@@ -198,7 +199,19 @@ public class Program
                 };
                 options.Events = new JwtBearerEvents
                 {
-                    OnTokenValidated = RejectRevokedTokenAsync
+                    OnTokenValidated = TokenVersionCheck.RejectRevokedTokenAsync,
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -207,10 +220,11 @@ public class Program
                 .RequireAuthenticatedUser()
                 .Build());
 
-        string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? string.Empty;
-
         builder.Services.AddDbContext<FateConnectDbContext>(options =>
-            options.UseNpgsql(connectionString));
+            options.UseNpgsql(settings.DbConnection));
+
+        builder.Services.AddHealthChecks()
+            .AddDbContextCheck<FateConnectDbContext>();
 
         builder.Services.AddMassTransit(x =>
         {
@@ -220,16 +234,23 @@ public class Program
                 o.UseBusOutbox();
             });
 
-            x.AddConsumer<UserRegisteredEventConsumer>();
-            x.AddConsumer<PasswordResetRequestedEventConsumer>();
-            x.AddConsumer<AccountLockedEventConsumer>();
+            x.AddConsumer<UserRegisteredEventConsumer, AccountEmailConsumerDefinition<UserRegisteredEventConsumer>>();
+            x.AddConsumer<PasswordResetRequestedEventConsumer, AccountEmailConsumerDefinition<PasswordResetRequestedEventConsumer>>();
+            x.AddConsumer<AccountLockedEventConsumer, AccountEmailConsumerDefinition<AccountLockedEventConsumer>>();
+
+            x.AddConsumer<RideCreatedEventConsumer>();
+            x.AddConsumer<ReportReceivedEventConsumer>();
+            x.AddConsumer<ItemArchivedEventConsumer>();
+            x.AddConsumer<PublicationRemovedEventConsumer>();
+            x.AddConsumer<NotificationDispatchedEventConsumer>();
+            x.AddConsumer<NotificationDispatchedEventPushConsumer>();
 
             x.UsingRabbitMq(ConfigureRabbitMq);
         });
 
         builder.Services.AddResend(options =>
         {
-            options.ApiToken = resendApiKey;
+            options.ApiToken = settings.ResendApiKey;
         });
 
         WebApplication app = builder.Build();
@@ -240,18 +261,33 @@ public class Program
         }
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
+        app.UseStatusCodePages(context => TypedResults
+            .Problem(statusCode: context.HttpContext.Response.StatusCode)
+            .ExecuteAsync(context.HttpContext));
 
         app.UseForwardedHeaders();
 
         app.UseCors(corsPolicy);
 
         app.UseSwagger();
-        app.UseSwaggerUI();
 
         app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
+
+        app.MapApiReference();
+
+        app.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            ResultStatusCodes = { [HealthStatus.Degraded] = StatusCodes.Status503ServiceUnavailable },
+            ResponseWriter = HealthResponse.WriteAsync,
+        }).AllowAnonymous();
+
+        app.MapHub<NotificationHub>("/hubs/notifications", options =>
+        {
+            options.CloseOnAuthenticationExpiration = true;
+        });
 
         app.Run();
     }
@@ -273,7 +309,8 @@ public class Program
             h.Password(rabbitPass);
         });
 
-        cfg.UseMessageRetry(r => r.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5)));
+        cfg.UseMessageRetry(
+            r => r.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5)));
 
         cfg.ReceiveEndpoint("user-registered-event", e =>
         {
@@ -292,29 +329,41 @@ public class Program
             e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
             e.ConfigureConsumer<AccountLockedEventConsumer>(context);
         });
-    }
 
-    private static async Task RejectRevokedTokenAsync(TokenValidatedContext context)
-    {
-        string? carriedVersion = context.Principal?.FindFirstValue(TokenClaimNames.TokenVersion);
-        string? identifier = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        bool isVersionReadable = int.TryParse(carriedVersion, CultureInfo.InvariantCulture, out int tokenVersion);
-        bool isIdentifierReadable = int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId);
-        bool canCompareVersions = isVersionReadable && isIdentifierReadable;
-
-        if (!canCompareVersions)
+        cfg.ReceiveEndpoint("ride-created-event", e =>
         {
-            context.Fail("The token carries no readable version and cannot be checked against the current one.");
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<RideCreatedEventConsumer>(context);
+        });
 
-            return;
-        }
+        cfg.ReceiveEndpoint("report-received-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<ReportReceivedEventConsumer>(context);
+        });
 
-        IUserRepository users = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+        cfg.ReceiveEndpoint("item-archived-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<ItemArchivedEventConsumer>(context);
+        });
 
-        int? currentVersion = await users.GetTokenVersionAsync(userId);
+        cfg.ReceiveEndpoint("publication-removed-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<PublicationRemovedEventConsumer>(context);
+        });
 
-        if (currentVersion != tokenVersion)
-            context.Fail("The token version no longer matches the one the session carries.");
+        cfg.ReceiveEndpoint("notification-dispatched-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<NotificationDispatchedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("notification-push-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<NotificationDispatchedEventPushConsumer>(context);
+        });
     }
 }

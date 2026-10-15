@@ -6,6 +6,73 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-15
+
+### Added
+
+- Adiciona as notificações no aplicativo, que chegam na hora, para item arquivado por inatividade, denúncia recebida e carona ofertada para o seu bairro, que compara o nome do bairro e, quando o destino e o perfil a têm, a cidade (#590) [Backend]
+- Adiciona os endpoints de listagem paginada, contagem de não lidas e marcação de leitura (individual e em lote) para as notificações in-app (#590) [Backend]
+- Adiciona à campainha do topo o número de avisos não lidos, que sobe na hora em que um chega, sem recarregar, e um painel com os 3 não lidos mais recentes e a opção de marcar todos como lidos (#592) [Frontend]
+- Adiciona a central de notificações, no lugar da tela de área ainda não disponível, com os avisos paginados, o filtro por situação e por tipo e a opção de marcar um ou todos como lidos (#592) [Frontend]
+- Adiciona a ida ao destino de cada aviso: tocar nele o marca como lido e leva às denúncias enviadas, às caronas buscadas pelo destino ou aos seus itens arquivados; a carona já excluída é avisada, e a tela fica (#592) [Frontend]
+- Adiciona a rota de saúde da API, que responde sem login se ela alcança o banco e a fila, sem dizer mais nada (#595) [Backend]
+- Adiciona ao log da API o login recusado, com o motivo e sem o e-mail, a ação de administração com quem a fez, a troca de senha recusada, as mudanças de foto e a sessão encerrada recusada, cada linha com o identificador da requisição (#598) [Backend]
+- Adiciona o envio dos erros internos da API a um projeto próprio no Sentry, só com método, rota e identificador da requisição, sem usuário, IP nem conteúdo; sem a chave do projeto, nada é enviado (#598) [Backend]
+- Adiciona a entrega por push dos avisos da central (denúncia recebida, carona para o bairro e item arquivado) a cada aparelho que a pessoa inscrever, com as rotas da chave pública e do aparelho; o aparelho que o serviço do navegador diz não existir mais é apagado (#623) [Backend]
+- Adiciona os avisos por push no aparelho: a faixa da área logada e o interruptor Notificações pedem a permissão e inscrevem o aparelho, que se inscreve de novo sozinho a cada login; dispensada, a faixa não volta naquele aparelho (#625) [Frontend]
+- Adiciona a abertura do aviso por push: tocar nele leva ao mesmo destino da campainha e o marca como lido, com o app aberto ou fechado, e sem sessão passa antes pelo login (#625) [Frontend]
+- Adiciona ao contato de uma carona e de um item a lembrança de que o FateConnect só divulga o anúncio, que o encontro ou a devolução é combinado entre as pessoas e que um lugar movimentado é o mais seguro (#631) [Frontend]
+- Adiciona a exclusão, por quem administra, da carona ou do item de outra pessoa, com um dos cinco motivos dos termos de uso e o registro de quem excluiu, o quê e por quê; o item excluído some de todas as listas e não volta pelo Restaurar (#632) [Backend]
+- Adiciona ao cartão de carona e de item de outra pessoa, para quem administra, a lixeira que pede o motivo antes de excluir (#632) [Frontend]
+- Adiciona o aviso de conteúdo excluído, com o motivo, que chega à central de quem publicou mesmo com Notificações desligado, e por push só aos aparelhos de quem ligou (#632) [Frontend] [Backend]
+- Adiciona o aviso de versão nova dos termos de uso ou da política de privacidade: ao entrar, ou ao abrir o app já logado, um diálogo segura o uso até o aceite, diz qual documento mudou, leva ao PDF e oferece sair ou desativar a conta (#633) [Frontend]
+- Adiciona as rotas que dizem, por documento, se a pessoa aceitou a versão vigente e que gravam o aceite novo com IP e navegador, como no cadastro (#633) [Backend]
+
+### Changed
+
+- Passa a levar a aba aberta para a tela de sessão expirada assim que a sessão é encerrada em outro aparelho ou pela troca de senha, e o texto da tela passa a citar essas causas (#592) [Frontend]
+- Passa a declarar na política de privacidade por quanto tempo as notificações ficam guardadas e o uso do bairro e da cidade do perfil no aviso de carona, em nova versão do documento (#592) [Frontend]
+- Renomeia para `Bairro e cidade` o campo do Meu perfil que se chamava `Bairro`, porque ele guarda os dois, e a mensagem de limite de tamanho acompanha (#594) [Frontend] [Backend]
+- Passa a reprovar a publicação quando a rota de saúde não responde em 2 minutos, e a API passa a esperar a fila ficar pronta para subir, em vez de falhar a primeira conexão (#595) [Backend]
+- Passa a recusar a subida da API sem a conexão com o banco ou sem as configurações da sessão, dizendo qual faltou, em vez de subir com elas vazias (#595) [Backend]
+- Passa a registrar no log o método, a rota e o usuário de cada erro tratado, e os campos que a validação recusou, sem os valores (#598) [Backend]
+- Passa a apagar o log da API e da fila depois de 14 dias, em vez de guardá-lo até a próxima publicação recriar o contêiner (#603) [Backend]
+- Passa a declarar na política de privacidade os registros técnicos do servidor, o que cada um guarda, para quê e o prazo de 14 dias (#603) [Frontend]
+- Passa a declarar na política de privacidade os avisos por push: o que se guarda de cada aparelho, o serviço do navegador que os entrega, até quando ficam e como desligar, em nova versão do documento (#622) [Frontend]
+- Passa a responder a criação de denúncia com o endereço da denúncia criada, como caronas e achados e perdidos já respondiam (#602) [Backend]
+- Passa a publicar as denúncias em `/Reports`, no lugar de `/Denunciations`, e o aviso de denúncia recebida como `ReportReceived`; o caminho antigo deixa de responder, e as imagens já enviadas mudam de endereço sem se perder (#605) [Frontend] [Backend]
+- Passa a responder todo erro da API no formato `ProblemDetails`, com a mensagem em `detail` no lugar de `error`; `field`, `code` e `minutesRemaining` mantêm o nome, e as recusas por falta de login, por perfil e por rota inexistente, que vinham sem corpo, passam a trazer um (#609) [Frontend] [Backend]
+- Passa a descrever no documento da API cada rota, com resumo, as respostas que ela devolve, os campos e parâmetros, exemplos nos corpos e o que é obrigatório ou pode vir nulo, e a esteira reprova a rota nova que chegar sem essa descrição (#611) [Backend]
+- Troca a página de leitura da API, do Swagger UI pelo Scalar, em `/api/scalar/v1`; a página antiga deixa de responder, e o documento continua no mesmo endereço (#611) [Backend]
+- Passa a responder as mensagens de erro da API em inglês; nenhuma tela as mostra, porque cada uma escreve o próprio texto (#611) [Backend]
+- Passa a recusar a redefinição de senha de conta banida como conta banida mesmo quando o link já venceu ou foi usado, em vez de responder que o link não vale, como a confirmação de e-mail já fazia (#612) [Backend]
+- Passa a buscar caronas, achados e perdidos e denúncias por palavra, em qualquer ordem e pelo começo de cada uma, com plural e uma lista curta de sinônimos; pedaço no meio da palavra deixa de achar, e a gestão de usuários segue achando por trecho (#615) [Backend]
+- Passa a dizer, nos filtros de caronas e de achados e perdidos, que a busca aceita trechos da descrição, em vez de "parte" (#615) [Frontend]
+- Passa a pôr o botão dos cartões de achados e perdidos e de contas da gestão à direita da última linha do cartão no computador, e em largura cheia no celular, em vez de numa linha própria à esquerda (#621) [Frontend]
+- Troca o seletor de situação das denúncias, na gestão, por um botão com o próximo passo, iniciar a análise ou marcar como resolvida, e o descarte passa à lixeira no topo do cartão; os três continuam pedindo confirmação (#621) [Frontend]
+- Passa a mostrar em vermelho o botão de banir uma conta, como as outras ações destrutivas, e a confirmação ganha o ícone da ação (#621) [Frontend]
+- Passa a apagar todos os aparelhos inscritos no push quando a pessoa desliga as notificações (#623) [Backend]
+- Passa a recusar a subida da API sem o par de chaves do push, `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY`, dizendo qual faltou (#623) [Backend]
+- Passa a dizer nos termos de uso o que fica fora da responsabilidade da plataforma, nomeando acidente e crime entre usuários, o dever de devolver o objeto achado, os cuidados no encontro e os telefones de emergência, em nova versão do documento (#631) [Frontend]
+- Passa a dizer nos termos e na política que quem administra exclui conteúdo com o motivo notificado e que a mudança dos documentos pede novo aceite, e corrige o que os dois afirmavam sem o produto fazer, como as mensagens de novidades e quem lê a denúncia (#631) [Frontend]
+- Passa a declarar na política de privacidade o aviso de conteúdo excluído, que chega mesmo com Notificações desligado, e o registro da exclusão com o anúncio e o motivo (#632) [Frontend]
+- Passa a recusar no cadastro o aceite de uma versão dos termos de uso ou da política de privacidade que não seja a vigente (#633) [Backend]
+
+### Fixed
+
+- Corrige a entrada repetida do menu no histórico depois de entrar: voltar a partir dele pedia dois toques (#625) [Frontend]
+- Corrige a requisição que a pessoa abandona no meio, que era registrada como erro interno (#598) [Backend]
+- Corrige a ajuda do tipo de carona, que juntava Solidária e Igualitária num parágrafo só e, no celular, quebrava a explicação de Igualitária em duas linhas: agora cada tipo ocupa uma linha (#628) [Frontend]
+
+### Security
+
+- Para de gravar no log de acesso do servidor o token dos links de e-mail e o texto das buscas, e passa a gravar o IP com o fim zerado, inclusive nos pedidos que não chegam a nenhum dos sites (#603) [Backend]
+- Para de enviar ao monitoramento de erros do front o código e o e-mail dos links enviados por e-mail e o texto das buscas, que iam no fim dos endereços (#631) [Frontend]
+- Para de mostrar a carona e o item de conta desativada ou banida a quem abria o endereço direto, inclusive pela notificação; antes eles só saíam das listas (#631) [Backend]
+- Para de gravar no log de falhas do servidor o token de sessão que a conexão das notificações leva no endereço (#631) [Backend]
+- Passa a conferir o link de redefinição de senha por `POST /Auth/verify-reset-token`, com o código no corpo, em vez de na URL, que o log de falhas grava; o `GET` deixa de responder (#631) [Frontend] [Backend]
+- Passa a descartar o e-mail da conta que falha nas 5 tentativas, em vez de guardá-lo sem prazo na fila de erro com o nome, o e-mail e o código do link; quem não recebeu pede outro (#631) [Backend]
+
 ## [1.4.0] - 2026-10-12
 
 ### Added

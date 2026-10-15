@@ -39,6 +39,7 @@ O glossário decidido e as proibições de uma linha estão na rule `product-cop
 - **Aviso de envio que a tela não confirma** (a API responde igual para tudo) condiciona o fato no particípio: `Se a conta ainda não foi confirmada, um novo link foi enviado ao seu e-mail Fatec.` ⛔ Condicione só o que nenhuma outra resposta do mesmo fluxo revela: o pedido de redefinição responde `404` para e-mail sem conta, então a tela de link enviado afirma (`Para escolher a nova senha, abra o link enviado para {e-mail}.`).
 - **Tela que espera uma ação** tem por título a ação, com o verbo do e-mail que a pessoa vai abrir: `Confirme seu e-mail`, como o assunto, e não `Confira seu e-mail`, que só manda olhar.
 - **Tooltip** complementa, não repete; no botão só de ícone ele é o nome e repete o rótulo acessível. Até duas linhas.
+- **Link dentro de painel com título** não repete o nome do painel: `Conferir todas` dentro de `Notificações`, não `Conferir todas as notificações`.
 - **Nota ao lado de etiqueta** diz o que a etiqueta não diz; havendo só repetição, a nota não existe. Texto de reserva é onde a repetição nasce.
 - **Estado vazio:** status, o que apareceria ali e a saída. Nunca "Ops", nunca parecer erro.
 - **Verbos:** `Acesse`/`Selecione` (não `Clique`/`Toque`), `Insira` (não `Digite`), `Confira`/`Consulte` (não `Veja`); âncora diz para onde vai (nunca `Clique aqui`).

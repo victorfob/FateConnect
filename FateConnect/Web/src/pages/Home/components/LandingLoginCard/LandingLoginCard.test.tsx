@@ -15,6 +15,7 @@ import {
 import { server } from '@app/mocks/server';
 import { LandingSectionEnum, RoutePathEnum } from '@app/routes/paths';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { problemResponse } from '@app/test/utils/problemResponse';
 import { loginPrefillState, prefilledEmailOf } from '@app/utils/loginPrefill';
 
 import {
@@ -154,12 +155,7 @@ describe('LandingLoginCard', () => {
   it('should explain the missing confirmation and resend the link to the typed email', async () => {
     const resentBodies: unknown[] = [];
     server.use(
-      http.post(LOGIN_URL, () =>
-        HttpResponse.json(
-          { error: 'confirme o e-mail', code: 'EmailNotConfirmed' },
-          { status: FORBIDDEN },
-        ),
-      ),
+      http.post(LOGIN_URL, () => problemResponse(FORBIDDEN, { code: 'EmailNotConfirmed' })),
       http.post(RESEND_URL, async ({ request }) => {
         resentBodies.push(await request.json());
 
@@ -319,10 +315,7 @@ describe('LandingLoginCard', () => {
   it('should explain the locked account in a dialog, with the minutes the api returns', async () => {
     server.use(
       http.post(LOGIN_URL, () =>
-        HttpResponse.json(
-          { error: 'bloqueada', code: 'AccountLocked', minutesRemaining: 12 },
-          { status: TOO_MANY_REQUESTS },
-        ),
+        problemResponse(TOO_MANY_REQUESTS, { code: 'AccountLocked', minutesRemaining: 12 }),
       ),
     );
     renderCard();

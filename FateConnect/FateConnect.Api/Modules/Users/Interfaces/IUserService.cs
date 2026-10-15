@@ -1,10 +1,10 @@
-namespace FateConnect.Api.Modules.Users.Services;
+namespace FateConnect.Api.Modules.Users.Interfaces;
 
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
-using System.Threading.Tasks;
 
 public interface IUserService
 {
@@ -17,9 +17,9 @@ public interface IUserService
     Task DeactivateAccountAsync(int currentUserId);
     Task RemoveProfileImageAsync(int currentUserId);
 
-    Task<PagedResultDto<ReadUserSummaryDto>> GetAllUsersAsync(UserFilterDto filter);
-    Task<ReadUserDto?> GetUserByIdAsync(int id);
-    Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto);
+    Task<PagedResultDto<ReadUserSummaryDto>> GetAllAsync(UserFilterDto filter);
+    Task<ReadUserDto?> GetByIdAsync(int id);
+    Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto, int currentUserId);
     Task<ReadUserDto?> ChangeUserProfileAsync(int id, EnumProfileType newProfile, int currentUserId);
     Task<ReadUserDto?> ChangeUserStatusAsync(int id, EnumAccountStatus newStatus, int currentUserId);
 }

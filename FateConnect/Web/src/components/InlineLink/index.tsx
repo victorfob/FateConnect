@@ -9,12 +9,21 @@ export type InlineLinkProps = Readonly<{
   href?: string;
   /** Tela do próprio app. */
   to?: string;
+  /** Ação na própria tela, com cara de link no meio do texto. */
+  onClick?: VoidFunction;
 }>;
 
-export function InlineLink({ children, href, to }: InlineLinkProps) {
+export function InlineLink({ children, href, to, onClick }: InlineLinkProps) {
   if (to)
     return (
       <S.InlineLinkRoot component={RouterLink} to={to}>
+        {children}
+      </S.InlineLinkRoot>
+    );
+
+  if (onClick)
+    return (
+      <S.InlineLinkRoot component="button" type="button" onClick={onClick}>
         {children}
       </S.InlineLinkRoot>
     );

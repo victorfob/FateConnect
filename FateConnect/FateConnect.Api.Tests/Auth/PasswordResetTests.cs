@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FateConnect.Api.Modules.Auth.DTOs;
-using FateConnect.Api.Modules.Communications.Enums;
+using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Tests.Fixtures;
 
@@ -59,7 +59,7 @@ public class PasswordResetTests(ApiFactory factory) : IClassFixture<ApiFactory>
 
         Assert.StartsWith("https://fateconnect.test/redefinir-senha?", email.Link);
         Assert.Equal(HttpStatusCode.NoContent, (await factory.CreateClient()
-            .GetAsync($"/Auth/verify-reset-token?token={email.Token}")).StatusCode);
+            .PostAsJsonAsync("/Auth/verify-reset-token", new { token = email.Token })).StatusCode);
     }
 
     [Fact]
@@ -108,7 +108,8 @@ public class PasswordResetTests(ApiFactory factory) : IClassFixture<ApiFactory>
     [Fact]
     public async Task VerifyResetToken_WithATokenThatDoesNotExist_IsRejected()
     {
-        HttpResponseMessage response = await factory.CreateClient().GetAsync("/Auth/verify-reset-token?token=inexistente");
+        HttpResponseMessage response = await factory.CreateClient()
+            .PostAsJsonAsync("/Auth/verify-reset-token", new { token = "inexistente" });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -154,6 +155,20 @@ public class PasswordResetTests(ApiFactory factory) : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.BadRequest, (await ResetAsync(api, email.Token)).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await LoginAsync(api, fatecEmail, KnownPassword)).StatusCode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_OfABannedAccountWithAnExpiredLink_AnswersTheBanBeforeTheLink()
+    {
+        MovableTimeProvider clock = new(DateTimeOffset.UtcNow);
+        using ApiFactory api = new() { Clock = clock };
+        (int userId, string fatecEmail) = api.SeedUserWithPassword("Renato Faria Campos", KnownPassword);
+        SentEmail email = await RequestResetLinkAsync(api, fatecEmail);
+
+        api.SetAccountStatus(userId, EnumAccountStatus.Banned);
+        clock.Now += ResetLifetime + TimeSpan.FromMinutes(1);
+
+        Assert.Equal(HttpStatusCode.Forbidden, (await ResetAsync(api, email.Token)).StatusCode);
     }
 
     [Fact]

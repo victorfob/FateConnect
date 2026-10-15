@@ -11,8 +11,8 @@ namespace FateConnect.Api.Tests.Users;
 
 public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
 {
-    private const string TermsVersion = "2026-01-15";
-    private const string PrivacyVersion = "2026-02-20";
+    private static readonly string TermsVersion = CurrentLegalVersions.TermsOfUse;
+    private static readonly string PrivacyVersion = CurrentLegalVersions.PrivacyPolicy;
     private const string BrowserUserAgent =
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
     private const string ForwardedIpAddress = "203.0.113.47";
@@ -209,14 +209,35 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
         using IServiceScope scope = _factory.Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
-        DocumentAcceptance acceptance = context.DocumentAcceptances
+        DocumentAcceptance acceptance = await context.DocumentAcceptances
             .Include(record => record.User)
             .AsNoTracking()
-            .First(record => record.User.FatecEmail == fatecEmail);
+            .FirstAsync(record => record.User.FatecEmail == fatecEmail);
 
         Assert.Equal(fatecEmail, acceptance.User.FatecEmail);
         Assert.NotEqual(0, acceptance.UserId);
         Assert.NotEqual(0, acceptance.Id);
+    }
+
+    [Theory]
+    [InlineData(nameof(EnumDocumentType.TermsOfUse))]
+    [InlineData(nameof(EnumDocumentType.PrivacyPolicy))]
+    public async Task Signup_WithAVersionThatIsNotTheCurrentOne_IsRejectedWithoutCreatingTheAccount(string outdatedDocument)
+    {
+        string fatecEmail = UniqueEmail();
+        Dictionary<string, object> payload = SignupPayload(fatecEmail);
+        payload["acceptances"] = BothAcceptances()
+            .Select(acceptance => acceptance.Document == outdatedDocument ? acceptance with { Version = "2026-01-15" } : acceptance)
+            .ToArray();
+
+        HttpResponseMessage response = await SignUpAsync(payload);
+
+        using IServiceScope scope = _factory.Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("Version", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.False(await context.Users.AnyAsync(user => user.FatecEmail == fatecEmail));
     }
 
     [Fact]

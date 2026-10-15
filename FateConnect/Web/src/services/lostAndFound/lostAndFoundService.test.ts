@@ -3,10 +3,12 @@ import { http, HttpResponse } from 'msw';
 import { server } from '@app/mocks/server';
 
 import { apiClient } from '../httpClient';
+import { RemovalReasonEnum } from '../moderation/types';
 import {
   createLostItem,
   deleteLostItem,
   listLostItems,
+  removeLostItem,
   resolveLostItem,
   restoreLostItem,
   updateLostItem,
@@ -255,5 +257,23 @@ describe('lostAndFoundService', () => {
     await deleteLostItem(ITEM_ID);
 
     expect(deleted).toEqual([ITEM_ID]);
+  });
+
+  it('should remove the item, sending the reason', async () => {
+    const received: { itemId: string; body: unknown }[] = [];
+    server.use(
+      http.post<{ itemId: string }>(
+        `${LOST_AND_FOUND_URL}/:itemId/remove`,
+        async ({ params, request }) => {
+          received.push({ itemId: params.itemId, body: await request.json() });
+
+          return new HttpResponse(null, { status: NO_CONTENT });
+        },
+      ),
+    );
+
+    await removeLostItem(ITEM_ID, RemovalReasonEnum.PERSONAL_DATA);
+
+    expect(received).toEqual([{ itemId: ITEM_ID, body: { reason: 'PersonalData' } }]);
   });
 });

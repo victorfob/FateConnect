@@ -1,11 +1,12 @@
 using FateConnect.Api.Infrastructure.Database;
-using FateConnect.Api.Modules.Common.Services;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Repositories;
 using FateConnect.Api.Modules.LostAndFound.Services;
 using FateConnect.Api.Modules.Storage.Services;
 using FateConnect.Api.Tests.Fixtures;
+using MassTransit.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -38,6 +39,8 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
 
     private DateTime DaysAgo(int days) => _now.AddDays(-days);
 
+    private ITestHarness Harness => _factory.Services.GetRequiredService<ITestHarness>();
+
     private string StoredImage()
     {
         string relativePath = $"uploads/lostandfound/{Guid.NewGuid():N}.png";
@@ -60,6 +63,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
             new LostAndFoundRepository(context),
             new StorageService(new TemporaryWebRoot(_webRoot), NullLogger<StorageService>.Instance),
             new FixedTimeProvider(_now),
+            Harness.Bus,
             NullLogger<LostAndFoundRetentionService>.Instance);
 
         await service.SweepAsync();
@@ -82,7 +86,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
 
         LostAndFoundRecord record = await ReloadAsync(id);
 
-        Assert.Equal(EnumStatusLostAndFound.Open, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Open, record.Status);
         Assert.Null(record.DeletionReason);
         Assert.Null(record.StatusChangedAt);
     }
@@ -96,9 +100,25 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
 
         LostAndFoundRecord record = await ReloadAsync(id);
 
-        Assert.Equal(EnumStatusLostAndFound.Deleted, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Deleted, record.Status);
         Assert.Equal(EnumDeletionReason.Inactivity, record.DeletionReason);
         Assert.NotNull(record.StatusChangedAt);
+    }
+
+    [Fact]
+    public async Task Sweep_ArchivingForInactivity_PublishesOnlyTheArchivedRecordForItsOwner()
+    {
+        Guid archivedId = _factory.SeedLostAndFoundRecord(_reporterId, createdAt: DaysAgo(InactivityDays));
+        Guid keptId = _factory.SeedLostAndFoundRecord(_reporterId, createdAt: DaysAgo(InactivityDays - 1));
+
+        await SweepAsync();
+
+        ItemArchivedEvent archived = Harness.Published
+            .Select<ItemArchivedEvent>(published => published.Context.Message.RecordId == archivedId)
+            .Single().Context.Message;
+        Assert.Equal(_reporterId, archived.OwnerId);
+        Assert.Equal("Garrafa térmica azul", archived.ItemName);
+        Assert.False(Harness.Published.Select<ItemArchivedEvent>(published => published.Context.Message.RecordId == keptId).Any());
     }
 
     [Fact]
@@ -113,7 +133,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
 
         LostAndFoundRecord record = await ReloadAsync(id);
 
-        Assert.Equal(EnumStatusLostAndFound.Open, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Open, record.Status);
     }
 
     [Fact]
@@ -121,7 +141,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
     {
         Guid id = _factory.SeedLostAndFoundRecord(
             _reporterId,
-            EnumStatusLostAndFound.Resolved,
+            EnumLostAndFoundStatus.Resolved,
             createdAt: DaysAgo(InactivityDays * 2),
             statusChangedAt: DaysAgo(ImageRetentionDays - 1));
 
@@ -129,7 +149,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
 
         LostAndFoundRecord record = await ReloadAsync(id);
 
-        Assert.Equal(EnumStatusLostAndFound.Resolved, record.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Resolved, record.Status);
         Assert.Null(record.DeletionReason);
     }
 
@@ -139,7 +159,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
         string imageUrl = StoredImage();
         Guid id = _factory.SeedLostAndFoundRecord(
             _reporterId,
-            EnumStatusLostAndFound.Resolved,
+            EnumLostAndFoundStatus.Resolved,
             statusChangedAt: DaysAgo(ImageRetentionDays - 1),
             imageUrl: imageUrl);
 
@@ -152,10 +172,10 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
     }
 
     [Theory]
-    [InlineData(EnumStatusLostAndFound.Resolved)]
-    [InlineData(EnumStatusLostAndFound.Deleted)]
+    [InlineData(EnumLostAndFoundStatus.Resolved)]
+    [InlineData(EnumLostAndFoundStatus.Deleted)]
     public async Task Sweep_WithATerminalRecordAtTheImageLimit_ClearsTheImageFromDiskAndFromTheRecord(
-        EnumStatusLostAndFound status)
+        EnumLostAndFoundStatus status)
     {
         string imageUrl = StoredImage();
         Guid id = _factory.SeedLostAndFoundRecord(
@@ -179,7 +199,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
         string imageUrl = StoredImage();
         Guid id = _factory.SeedLostAndFoundRecord(
             _reporterId,
-            EnumStatusLostAndFound.Resolved,
+            EnumLostAndFoundStatus.Resolved,
             createdAt: DaysAgo(InactivityDays),
             updatedAt: DaysAgo(1),
             statusChangedAt: DaysAgo(ImageRetentionDays),
@@ -217,7 +237,7 @@ public sealed class LostAndFoundRetentionTests : IClassFixture<ApiFactory>, IDis
         string imageUrl = StoredImage();
         Guid id = _factory.SeedLostAndFoundRecord(
             _reporterId,
-            EnumStatusLostAndFound.Deleted,
+            EnumLostAndFoundStatus.Deleted,
             createdAt: DaysAgo(InactivityDays * 2),
             imageUrl: imageUrl);
 

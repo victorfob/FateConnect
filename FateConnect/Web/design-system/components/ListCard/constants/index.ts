@@ -7,3 +7,4 @@ export const HEADER_ATTRIBUTE = 'data-list-card-header';
 export const INFO_ROW_ATTRIBUTE = 'data-list-card-info-row';
 export const MEDIA_ATTRIBUTE = 'data-list-card-media';
 export const BODY_ATTRIBUTE = 'data-list-card-body';
+export const BOTTOM_ACTION_ATTRIBUTE = 'data-list-card-bottom-action';

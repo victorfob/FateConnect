@@ -11,6 +11,7 @@ import {
   type LostItem,
 } from '@app/services/lostAndFound/types';
 import { fireEvent, render, screen, userEvent, waitFor } from '@app/test/testing-library';
+import { problemResponse } from '@app/test/utils/problemResponse';
 import { toApiDate } from '@app/utils/apiDate';
 
 import { EDIT_MODE, LOST_ITEM_FORM_LABELS, REGISTER_MODE, STORED_PHOTO_ALT } from './constants';
@@ -279,9 +280,7 @@ describe('LostItemFormDialog', () => {
 
   it('should close and hand over to the contact notice when the api asks for a contact', async () => {
     server.use(
-      http.post(LOST_AND_FOUND_URL, () =>
-        HttpResponse.json({ error: 'sem contato', code: 'ContactRequired' }, { status: 403 }),
-      ),
+      http.post(LOST_AND_FOUND_URL, () => problemResponse(403, { code: 'ContactRequired' })),
     );
     renderComponent();
     await screen.findByRole('heading', { name: REGISTER_MODE.title });

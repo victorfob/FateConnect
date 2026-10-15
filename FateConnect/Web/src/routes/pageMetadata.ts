@@ -46,9 +46,10 @@ export const PAGE_METADATA: Record<RoutePathEnum, PageMetadata> = {
   [RoutePathEnum.RIDES]: { title: titleFor('Caronas') },
   [RoutePathEnum.PREFERENCES]: { title: titleFor('Preferências') },
   [RoutePathEnum.PROFILE]: { title: titleFor('Meu perfil') },
-  [RoutePathEnum.DENUNCIATIONS]: { title: titleFor('Denúncias') },
+  [RoutePathEnum.REPORTS]: { title: titleFor('Denúncias') },
   [RoutePathEnum.MANAGEMENT]: { title: titleFor('Gestão') },
   [RoutePathEnum.NOTIFICATIONS]: { title: titleFor('Notificações') },
+  [RoutePathEnum.OPEN_NOTIFICATION]: { title: titleFor('Abrir notificação') },
 };
 
 export function isKnownRoute(path: string): path is RoutePathEnum {

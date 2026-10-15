@@ -22,10 +22,7 @@ export function ManagementShell({ titleAction, children }: ManagementShellProps)
   const { selectedTab, selectTab } = useManagementTab();
 
   const handleUsersClick = useCallback(() => selectTab(ManagementTabEnum.USERS), [selectTab]);
-  const handleDenunciationsClick = useCallback(
-    () => selectTab(ManagementTabEnum.DENUNCIATIONS),
-    [selectTab],
-  );
+  const handleReportsClick = useCallback(() => selectTab(ManagementTabEnum.REPORTS), [selectTab]);
 
   const isUsersSelected = selectedTab === ManagementTabEnum.USERS;
 
@@ -43,10 +40,10 @@ export function ManagementShell({ titleAction, children }: ManagementShellProps)
             onClick={handleUsersClick}
           />
           <PageShell.Tab
-            label={C.DENUNCIATIONS_TAB_LABEL}
+            label={C.REPORTS_TAB_LABEL}
             icon={<SecurityIcon fontSize="small" />}
             selected={!isUsersSelected}
-            onClick={handleDenunciationsClick}
+            onClick={handleReportsClick}
           />
         </>
       }

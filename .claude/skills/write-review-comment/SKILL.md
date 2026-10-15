@@ -82,7 +82,7 @@ Aconteceu **três vezes no mesmo PR**, o #186, sempre pelo mesmo gesto meu:
 | O que eu pedi | O que caiu junto |
 | --- | --- |
 | enxugar o `UpdateRideDto` | `[EnumDataType]` — o `PUT` passou a aceitar `"rideType": 99` |
-| tirar o `Deconstruct` do `FilterRideDto` | `[StringLength(100)]` do filtro |
+| tirar o `Deconstruct` do `RideFilterDto` | `[StringLength(100)]` do filtro |
 | — (o DTO de criação, na mesma leva) | `MinimumLength = 3` do destino |
 
 **A forma:** nomeie a regra que a linha carrega e para onde ela vai. *"Tirar o `[Range]`, que a entidade já valida; o `[EnumDataType]` precisa ficar ou migrar para a entidade, porque nada mais checa o enum"* custa uma frase e não deixa buraco.

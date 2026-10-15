@@ -8,6 +8,9 @@ const TRANSFORM_ORIGIN: PopoverOrigin = { vertical: 'top', horizontal: 'right' }
 
 const HALF = 2;
 
+/** A folga que o `Popover` deixa entre o papel e a borda da janela. */
+const SCREEN_EDGE_GAP_PX = 16;
+
 export type AnchoredPopoverProps = Readonly<{
   anchorEl: HTMLElement | null;
   open: boolean;
@@ -32,7 +35,7 @@ export function AnchoredPopover({
   // deste, e um `ref` não avisaria ninguém — a seta ficaria no fallback.
   const [paper, setPaper] = useState<HTMLDivElement | null>(null);
 
-  const pointArrowAtTrigger = useCallback(() => {
+  const fitToTrigger = useCallback(() => {
     if (!paper?.offsetWidth || !anchorEl?.offsetWidth) return;
 
     const trigger = anchorEl.getBoundingClientRect();
@@ -49,6 +52,10 @@ export function AnchoredPopover({
     const fromRight = (panel.right - triggerCentre) / pageScale;
 
     paper.style.setProperty(S.ARROW_OFFSET_VARIABLE, `${paper.offsetWidth - fromRight}px`);
+    // O `Popover` posiciona o papel ao abrir e não de novo quando o conteúdo
+    // cresce depois (uma lista que carrega): sem teto, ele passaria do pé da tela.
+    const spaceBelowTop = window.innerHeight - panel.top / pageScale - SCREEN_EDGE_GAP_PX;
+    paper.style.setProperty(S.MAX_HEIGHT_VARIABLE, `${spaceBelowTop}px`);
   }, [anchorEl, paper]);
 
   // Efeito de **layout**, e antes do primeiro quadro: o `Popover` posiciona o
@@ -58,8 +65,8 @@ export function AnchoredPopover({
   useLayoutEffect(() => {
     if (!open || !paper) return;
 
-    pointArrowAtTrigger();
-  }, [open, paper, pointArrowAtTrigger]);
+    fitToTrigger();
+  }, [open, paper, fitToTrigger]);
 
   // De novo depois da pintura, porque o `Popover` reposiciona o papel num efeito
   // passivo — que roda **depois** do de layout acima. Reabrindo o painel numa
@@ -67,11 +74,11 @@ export function AnchoredPopover({
   useEffect(() => {
     if (!open || !paper) return;
 
-    pointArrowAtTrigger();
-    window.addEventListener('resize', pointArrowAtTrigger);
+    fitToTrigger();
+    window.addEventListener('resize', fitToTrigger);
 
-    return () => window.removeEventListener('resize', pointArrowAtTrigger);
-  }, [open, paper, pointArrowAtTrigger]);
+    return () => window.removeEventListener('resize', fitToTrigger);
+  }, [open, paper, fitToTrigger]);
 
   return (
     <S.PopoverSurface

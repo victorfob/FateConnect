@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using FateConnect.Api.Modules.Auth.DTOs;
-using FateConnect.Api.Modules.Communications.Enums;
+using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Tests.Fixtures;
 
@@ -145,6 +145,20 @@ public class EmailConfirmationTests(ApiFactory factory) : IClassFixture<ApiFacto
         HttpResponseMessage confirmation = await ConfirmAsync(factory, email.Token);
 
         Assert.Equal(HttpStatusCode.Forbidden, confirmation.StatusCode);
+    }
+
+    [Fact]
+    public async Task ConfirmEmail_OfABannedAccountWithAnExpiredLink_AnswersTheBanBeforeTheLink()
+    {
+        MovableTimeProvider clock = new(DateTimeOffset.UtcNow);
+        using ApiFactory api = new() { Clock = clock };
+        (int userId, string fatecEmail) = api.SeedUserWithPassword("Lívia Moraes Prado", KnownPassword, emailConfirmed: false);
+        SentEmail email = await RequestConfirmationLinkAsync(api, fatecEmail);
+
+        api.SetAccountStatus(userId, EnumAccountStatus.Banned);
+        clock.Now += ConfirmationLifetime + TimeSpan.FromMinutes(1);
+
+        Assert.Equal(HttpStatusCode.Forbidden, (await ConfirmAsync(api, email.Token)).StatusCode);
     }
 
     [Fact]

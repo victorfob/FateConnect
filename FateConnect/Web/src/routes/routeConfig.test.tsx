@@ -6,16 +6,16 @@ import {
   TRIGGER_LABEL,
 } from '@app/layouts/MainLayout/components/AccountMenu/constants';
 import { server } from '@app/mocks/server';
-import { DENUNCIATIONS_TITLE } from '@app/pages/Denunciations/constants';
 import { DESCRIPTION_TITLE } from '@app/pages/Home/components/LandingDescription/constants';
 import { LOST_AND_FOUND_TITLE } from '@app/pages/LostAndFound/constants';
 import { MANAGEMENT_TITLE } from '@app/pages/Management/constants';
 import { MENU_TITLE } from '@app/pages/Menu/constants';
+import { NOTIFICATIONS_TITLE } from '@app/pages/Notifications/constants';
 import { PREFERENCES_TITLE } from '@app/pages/Preferences/constants';
 import { PROFILE_TITLE } from '@app/pages/Profile/constants';
+import { REPORTS_TITLE } from '@app/pages/Reports/constants';
 import { RIDES_TITLE } from '@app/pages/Rides/constants';
 import { SIGNUP_TITLE } from '@app/pages/Signup/constants';
-import * as C from '@app/pages/Unavailable/constants';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { ProfileTypeEnum } from '@app/services/auth/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
@@ -34,15 +34,18 @@ function renderRoute(initialPath: string) {
 const NO_CONTENT = 204;
 
 describe('routeConfig', () => {
-  // Caronas, achados e perdidos, denúncias e a gestão listam assim que montam,
-  // e as preferências leem as escolhas de comunicação.
+  // Caronas, achados e perdidos, denúncias, notificações e a gestão listam assim
+  // que montam, e as preferências leem as escolhas de comunicação.
   beforeEach(() => {
     server.use(
       http.get('https://api.fateconnect.test/rides', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/lostandfound', () => HttpResponse.json([])),
-      http.get('https://api.fateconnect.test/denunciations', () => HttpResponse.json([])),
-      http.get('https://api.fateconnect.test/denunciations/mine', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/reports', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/reports/mine', () => HttpResponse.json([])),
       http.get('https://api.fateconnect.test/users', () => HttpResponse.json([])),
+      http.get('https://api.fateconnect.test/inappnotifications', () =>
+        HttpResponse.json({ items: [], page: 1, pageSize: 10, total: 0, totalPages: 0 }),
+      ),
       http.get('https://api.fateconnect.test/users/me/preferences', () =>
         HttpResponse.json({ receiveNotifications: false }),
       ),
@@ -71,23 +74,15 @@ describe('routeConfig', () => {
     [RoutePathEnum.LOST_AND_FOUND, LOST_AND_FOUND_TITLE],
     [RoutePathEnum.RIDES, RIDES_TITLE],
     [RoutePathEnum.PREFERENCES, PREFERENCES_TITLE],
-    [RoutePathEnum.DENUNCIATIONS, DENUNCIATIONS_TITLE],
+    [RoutePathEnum.REPORTS, REPORTS_TITLE],
     [RoutePathEnum.PROFILE, PROFILE_TITLE],
+    [RoutePathEnum.NOTIFICATIONS, NOTIFICATIONS_TITLE],
   ])('should resolve %s with a session', async (path, title) => {
     tokenStorage.save(tokenWithName('Maria da Silva'));
 
     renderRoute(path);
 
     await expectTitle(title);
-  });
-
-  it('should resolve the notifications with the screen that has no owner yet', async () => {
-    tokenStorage.save(tokenWithName('Maria da Silva'));
-
-    renderRoute(RoutePathEnum.NOTIFICATIONS);
-
-    await expectTitle(C.UNAVAILABLE_TITLE);
-    expect(screen.getByText(C.NOTIFICATIONS_DESCRIPTION)).toBeInTheDocument();
   });
 
   it.each([

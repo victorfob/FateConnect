@@ -2,15 +2,17 @@ namespace FateConnect.Api.Modules.Users.DTOs;
 
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
-using System.ComponentModel.DataAnnotations;
+using Swashbuckle.AspNetCore.Annotations;
 
 public record UserFilterDto : PagedFilterDto
 {
+    [SwaggerParameter("Text searched in the name, the institutional e-mail, the contact e-mail and the phone, " +
+        "ignoring case and accents.")]
     public string? SearchTerm { get; init; }
 
-    [EnumDataType(typeof(EnumAccountStatus), ErrorMessage = "Status da conta inválido")]
+    [SwaggerParameter("Only accounts in this status.")]
     public EnumAccountStatus? Status { get; init; }
 
-    [EnumDataType(typeof(EnumProfileType), ErrorMessage = "Tipo de perfil de acesso inválido")]
+    [SwaggerParameter("Only accounts with this profile.")]
     public EnumProfileType? ProfileType { get; init; }
 }

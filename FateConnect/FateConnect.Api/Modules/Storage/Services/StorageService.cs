@@ -1,8 +1,8 @@
 namespace FateConnect.Api.Modules.Storage.Services;
 
-using FateConnect.Api.Modules.Common.Enums;
-using FateConnect.Api.Modules.Common.Interfaces;
-using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.Storage.Enums;
+using FateConnect.Api.Modules.Storage.Interfaces;
+using FateConnect.Api.Modules.Storage.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -29,6 +29,8 @@ public partial class StorageService(IWebHostEnvironment env, ILogger<StorageServ
             PhysicalPathOf(storedPath),
             PhysicalPathOf(UploadsLocation.ThumbnailOf(storedPath)));
 
+        LogImageStored(logger, storedPath);
+
         return storedPath;
     }
 
@@ -41,6 +43,8 @@ public partial class StorageService(IWebHostEnvironment env, ILogger<StorageServ
 
         DeleteStoredFile(filePath, relativePath);
         DeleteStoredFile(filePath, UploadsLocation.ThumbnailOf(relativePath));
+
+        LogImageRemoved(logger, filePath);
 
         return Task.CompletedTask;
     }

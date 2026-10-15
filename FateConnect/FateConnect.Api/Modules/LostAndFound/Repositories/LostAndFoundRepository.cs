@@ -2,6 +2,7 @@ namespace FateConnect.Api.Modules.LostAndFound.Repositories;
 
 using System.Linq.Expressions;
 using FateConnect.Api.Infrastructure.Database;
+using FateConnect.Api.Modules.Common.Extensions;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Entities;
@@ -12,33 +13,19 @@ using Microsoft.EntityFrameworkCore;
 
 public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoundRepository
 {
-    public async Task<(IReadOnlyList<LostAndFoundRecord> Items, int Total)> GetAllAsync(FilterLostAndFoundDto filter, int? currentUserId = null)
+    public async Task<(
+        IReadOnlyList<LostAndFoundRecord> Items,
+        int Total)> GetAllAsync(LostAndFoundFilterDto filter, int? currentUserId = null)
     {
         IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
             .AsNoTracking()
             .Include(r => r.User)
-            .Where(IsReportedByAnActiveAccount());
+            .Where(IsVisible());
 
         if (currentUserId.HasValue)
             query = query.Where(r => r.UserId == currentUserId.Value);
 
-        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-        {
-            string escapedSearchTerm = filter.SearchTerm.SanitizeSearchTerm();
-
-            query = query.Where(r =>
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(r.Name),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                ) ||
-                EF.Functions.ILike(
-                    EF.Functions.Unaccent(r.Description ?? ""),
-                    "%" + EF.Functions.Unaccent(escapedSearchTerm) + "%",
-                    @"\"
-                )
-            );
-        }
+        query = query.WhereMatchesEveryWord(filter.SearchTerm);
 
         if (filter.LostAndFoundType.HasValue)
             query = query.Where(r => r.LostAndFoundType == filter.LostAndFoundType.Value);
@@ -46,49 +33,30 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         if (filter.Status.HasValue)
             query = query.Where(r => r.Status == filter.Status.Value);
 
-        DateOnly? rangeStart = filter.EffectiveDateFrom;
-        DateOnly? rangeEnd = filter.EffectiveDateTo;
+        query = query.WhereWithin(filter, OccurredWithin);
 
-        if (rangeStart.HasValue && rangeEnd.HasValue)
-            query = query.Where(OccurredWithin(rangeStart.Value, rangeEnd.Value));
-
-        int total = await query.CountAsync();
-
-        List<LostAndFoundRecord> items = await query
-            .OrderByDescending(r => r.CreatedAt)
-            .ThenBy(r => r.Id)
-            .Skip(filter.ItemsToSkip)
-            .Take(filter.EffectivePageSize)
-            .ToListAsync();
-
-        return (items, total);
+        return await query.ToPageAsync(filter, records => records.OrderByDescending(r => r.CreatedAt).ThenBy(r => r.Id));
     }
 
-    private static Expression<Func<LostAndFoundRecord, bool>> IsReportedByAnActiveAccount() =>
-        record => record.User.Status == EnumAccountStatus.Active;
+    private static Expression<Func<LostAndFoundRecord, bool>> IsVisible() =>
+        record => record.User.Status == EnumAccountStatus.Active
+            && record.DeletionReason != EnumDeletionReason.Administrator;
 
     private static Expression<Func<LostAndFoundRecord, bool>> OccurredWithin(DateOnly rangeStart, DateOnly rangeEnd) =>
         record => record.OccurredOn >= rangeStart && record.OccurredOn <= rangeEnd;
 
     public async Task<LostAndFoundRecord?> GetByIdAsync(Guid id, bool forChange = true)
     {
-        IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
-            .Include(r => r.User);
-
-        if (!forChange)
-            query = query.AsNoTracking();
-
-        return await query.FirstOrDefaultAsync(r => r.Id == id);
+        return await context.LostAndFoundRecords
+            .Include(r => r.User)
+            .AsTrackingWhen(forChange)
+            .Where(IsVisible())
+            .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<LostAndFoundRecord> AddAsync(LostAndFoundRecord lostAndFoundRecord)
     {
-        context.LostAndFoundRecords.Add(lostAndFoundRecord);
-        await context.SaveChangesAsync();
-
-        await context.Entry(lostAndFoundRecord).Reference(r => r.User).LoadAsync();
-
-        return lostAndFoundRecord;
+        return await context.AddAndLoadAsync(lostAndFoundRecord, r => r.User);
     }
 
     public async Task<IReadOnlyList<LostAndFoundRecord>> GetOpenRecordsUntouchedSinceAsync(DateTime untouchedSince)
@@ -106,12 +74,12 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
     }
 
     private static Expression<Func<LostAndFoundRecord, bool>> UntouchedWhileOpenSince(DateTime untouchedSince) =>
-        record => record.Status == EnumStatusLostAndFound.Open
+        record => record.Status == EnumLostAndFoundStatus.Open
             && (record.UpdatedAt ?? record.CreatedAt) <= untouchedSince;
 
     private static Expression<Func<LostAndFoundRecord, bool>> HoldsAnImageAndIsTerminalSince(DateTime terminalSince) =>
         record => record.ImageUrl != null
-            && (record.Status == EnumStatusLostAndFound.Resolved || record.Status == EnumStatusLostAndFound.Deleted)
+            && (record.Status == EnumLostAndFoundStatus.Resolved || record.Status == EnumLostAndFoundStatus.Deleted)
             && record.StatusChangedAt != null
             && record.StatusChangedAt <= terminalSince;
 

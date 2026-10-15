@@ -37,6 +37,7 @@ description: "Trabalho em paralelo com worktrees e subagentes. Use quando o pedi
   ```
 
   A densidade é o gatilho de ir olhar, não o veredito: compare com o mesmo arquivo na base (arquivo de decisão de cor é denso por convenção) e julgue cada comentário pelo teste da `comments.md`.
+- ⛔ **Pedido de limpeza ao agente nomeia as linhas dele.** "O arquivo ficou com comentário demais" vira reescrita dos blocos que a issue não toca. Antes de aceitar, confira que todo hunk do diff cai no escopo.
 - **Rode no app.** Gate verde não renderiza o componente dentro da aplicação; a conferência é a da skill `visual-validation` (fiação temporária numa tela real).
 - **O corte dos commits:** o agente agrupa por assunto e esquece a ordem de dependência, e nenhum gate roda em cada commit. A conferência está na skill `write-commit`.
 

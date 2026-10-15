@@ -18,6 +18,7 @@ Cada caso: o que o número responde, o que ele parece responder, e o controle.
 ## O computado congelado ou velho
 
 - Com o painel do navegador oculto a página não compõe quadros e a transição não avança: `getComputedStyle` devolve o estado anterior. Desligue antes de ler: `elemento.style.transition = 'none'`, leia, restaure.
+- A entrada do tooltip do MUI pode parar em `opacity: 0` e `scale(0.75)` até com o painel visível. As linhas se medem pelo topo de cada caractere, que a escala não embaralha; para a captura, uma folha temporária com `opacity: 1 !important; transform: none !important` no `.MuiTooltip-tooltip`, removida depois.
 - O sinal é o computado discordar da folha. Liste as regras que de fato casam: percorra `document.styleSheets` testando `elemento.matches(regra.selectorText)`. Regra sua ausente da lista não perdeu a disputa, ela nunca entrou (seletor de componente do Emotion, `styleOverrides` sem slot).
 - Depois de editar arquivo servido por HMR, só uma navegação de verdade garante a reavaliação (`location.reload()` não bastou). O valor lido tem de bater com o disco; discordando, a página está velha.
 
@@ -35,6 +36,8 @@ Cada caso: o que o número responde, o que ele parece responder, e o controle.
 - No Chrome sem janela, `elemento.focus()` por script não dá estado de foco: o rótulo flutuante não sobe, o painel que abre no foco não abre, e a captura mostra uma tela que ninguém vê. Clique por `Input.dispatchMouseEvent`, com `Emulation.setFocusEmulationEnabled` ligado.
 - Estado transitório (carregando, enviando) some antes da foto: o script de captura espera depois de navegar, e o stub que responde antes disso entrega a tela seguinte. Para esse caso, um token do stub que demora bem mais que a espera.
 - Stub que guarda estado (falha preparada, escolha salva) atende a resposta atrasada da captura anterior depois que o Chrome dela morreu, e ela gasta o que você preparou para a próxima: espere a resposta pendente antes de preparar o stub.
+- Espera fixa depois de navegar mede o esqueleto quando o dev server acabou de subir, porque ele compila sob demanda: espere, com prazo, um seletor que só existe com o conteúdo carregado.
+- Captura de página inteira (`captureBeyondViewport`) desenha a página parada no topo: o que é `sticky` no pé sai onde a primeira janela termina, no meio da imagem. Barra presa ao pé se captura com a janela rolada até o fim.
 - Tela logada: grave o `jwt_token` na raiz e só então navegue para a rota. Recarregar dentro do script que espera a promessa trava a captura para sempre.
 - Stub com o tipo pela metade muda o comportamento: campo ausente no registro faz o formulário nascer alterado (`isDirty`), e o salvar desabilitado parece quebrado. Antes de culpar o código, confira o stub contra o tipo do serviço (`services/**/types.ts`).
 
@@ -52,6 +55,20 @@ O rótulo encolhido do campo do MUI fica 9px acima da caixa (`translate(14px, -9
 - Largura útil = `getBoundingClientRect` do contêiner menos o `padding` computado. Texto por `measureText` num `canvas` com a fonte real, depois de `document.fonts.ready`.
 - ⛔ Fonte declarada não é fonte carregada: antes de dizer com qual fonte mediu, leia `[...document.fonts]`. Vazio é a fonte do sistema, seja qual for o `font-family` do tema, e a largura muda de aparelho para aparelho.
 - Meça no contêiner mais apertado que vai receber o texto, a 375px.
+- ⛔ Texto de tooltip se mede no tamanho do toque: aberto por toque o MUI usa 14px, recuo de 16px e teto próprio, e o `disableTouchListener` não desliga isso. O preset mobile do painel do navegador clica como mouse e mede os 11px; dispare `new TouchEvent('touchstart', { bubbles: true })` no alvo antes do clique.
 - Trocar fonte ou peso muda largura: remeça a 375px as larguras decididas por tamanho (e-mail e telefone lado a lado no rodapé).
 - A largura só decide quando separa as candidatas: se todas cabem ou nenhuma cabe, a escolha volta a ser por precisão.
 - Estourar custa diferente por lugar: título e `helperText` quebram linha (barato); o rodapé de diálogo empilha as ações e a fileira de informações do cartão desce um item (caro).
+
+## Captura no Chrome do dono
+
+- `zoom` da região inteira com `save_to_disk` e **sem `scale`**: o `scale` reduz também o arquivo salvo, e o `screenshot` comum sai em JPEG de densidade 1.
+- A janela do grupo não aceita `resize_window`. Para 375px, sobreponha à página um iframe de 375px da mesma rota (mesma origem, mesma sessão) e esconda a barra dele (`scrollbarWidth: 'none'` no documento do iframe): sem isso o layout mede 360px. O `zoom` da região sai em densidade 2.
+- Rolar até um cartão desconta o cabeçalho fixo, senão o topo do cartão fica embaixo dele. Para cortar o que não deve sair (foto com conteúdo de fora), encurte a região do `zoom`.
+- `hover` num canto vazio antes de capturar: o cursor da extensão sai na imagem.
+- Diálogo se abre por `click()` no botão e se fecha com `Escape`, sem confirmar nada. A aba é sua: feche-a no fim.
+- ⛔ Antes de medir ou capturar, procure `data-darkreader-mode` no `<html>`: com o Dark Reader ligado, as cores e os fundos medidos são os dele (`rgb(24, 26, 27)` no botão de texto), não os do tema. Peça ao dono para desligá-lo no site.
+- ⛔ Print que o dono tira da tela mostra o navegador inteiro (favoritos, perfil) e não vai para o PR sem ser lido: o repo é público. A evidência é o `zoom` da página, que corta o resto.
+- ⛔ Hml tem dado real: nome, e-mail e telefone de outras pessoas aparecem no contato e na gestão. A evidência recorta só o elemento que mudou. O `zoom` usa o quadro da última captura (o dobro dos pixels de CSS com `devicePixelRatio` 2): leia a posição do elemento antes, ou o recorte sai em branco.
+- Fechar a última aba do grupo desfaz o grupo e desconecta a extensão até o dono reabrir o painel. Para "fechar o app" num teste, abra outra aba no grupo antes de fechar a sua; `about:blank` o `navigate` recusa.
+

@@ -1,11 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using FateConnect.Api.Modules.Auth.Entities;
+using FateConnect.Api.Modules.Auth.Options;
 using FateConnect.Api.Modules.Auth.Services;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -41,7 +40,7 @@ public class TokenServiceTests
             Id = 7
         };
 
-        string token = new TokenService(Options.Create(options), NullLogger<TokenService>.Instance).GenerateJwtToken(testUser);
+        string token = new TokenService(Options.Create(options), TimeProvider.System).GenerateJwtToken(testUser);
 
         ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(
             token,
@@ -85,7 +84,7 @@ public class TokenServiceTests
             Id = 7
         };
 
-        string token = new TokenService(Options.Create(options), NullLogger<TokenService>.Instance).GenerateJwtToken(testUser);
+        string token = new TokenService(Options.Create(options), TimeProvider.System).GenerateJwtToken(testUser);
 
         Claim role = Assert.Single(
             new JwtSecurityTokenHandler().ReadJwtToken(token).Claims,

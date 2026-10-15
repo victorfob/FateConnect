@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Modules.Auth.Interfaces;
 
-using FateConnect.Api.Modules.Auth.DTOs;
 using System.Threading.Tasks;
+using FateConnect.Api.Modules.Auth.DTOs;
 
 public interface IAuthService
 {

@@ -18,6 +18,7 @@ import {
 import { PROFILE } from '@app/test/profile';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
+import { problemResponse } from '@app/test/utils/problemResponse';
 import { toApiDate, toDisplayDate } from '@app/utils/apiDate';
 
 import {
@@ -193,7 +194,9 @@ describe('RideFormDialog', () => {
       screen.getByRole('button', { name: new RegExp(RIDE_FORM_LABELS.rideType) }),
     );
 
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(RIDE_TYPE_HELP);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(RIDE_TYPE_HELP, {
+      normalizeWhitespace: false,
+    });
   });
 
   it('should edit the ride it gets, already filled in', async () => {
@@ -282,11 +285,7 @@ describe('RideFormDialog', () => {
   });
 
   it('should close and hand over to the contact notice when the api asks for a contact', async () => {
-    server.use(
-      http.post(RIDES_URL, () =>
-        HttpResponse.json({ error: 'sem contato', code: 'ContactRequired' }, { status: 403 }),
-      ),
-    );
+    server.use(http.post(RIDES_URL, () => problemResponse(403, { code: 'ContactRequired' })));
     renderComponent();
     await screen.findByRole('heading', { name: OFFER_MODE.title });
     await fillSingleRide();

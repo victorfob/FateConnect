@@ -7,7 +7,7 @@ Plataforma de caronas. Este repositório reúne o produto — front-end e API �
 ```
 FateConnect/
   Web/                    front-end em React + Vite       → FateConnect/Web/README.md
-  FateConnect.Api/        API .NET em módulos (Auth, Common, Denunciations, LostAndFound, Rides, Users)
+  FateConnect.Api/        API .NET em módulos (Auth, Common, Emails, InAppNotifications, LostAndFound, Reports, Rides, Storage, Users)
   FateConnect.Api.Tests/  suíte xUnit da API, pasta irmã e não filha
 .claude/                  contexto que um agente de código carrega ao trabalhar aqui
 .github/workflows/        validação de PR e criação da tag de release
@@ -82,6 +82,8 @@ São **dois projetos no Sonar**, um por lado: um `projectKey` não se divide ent
 Quem reprova por cobertura é o **quality gate do Sonar**, que mede o código novo do PR, somado ao limite do Vitest dentro do `test:ci`. Não há envio para o Code Quality do GitHub: ele exige repositório de organização em plano Team ou Enterprise Cloud, e este é de conta pessoal.
 
 A análise da `main` existe para dar ao Sonar a **linha de base** da branch principal, sobre a qual o código novo da própria `main` é medido. Análise de PR não depende dela: o código novo de um PR é o diff dele contra a base, que o Sonar tira do git. Ela declara a versão do `package.json` da raiz porque a definição de código novo do projeto é *previous_version*: sem versão declarada não há fronteira, nenhuma métrica de código novo é calculada, e o gate reprova por não ter o que avaliar.
+
+O **Dependabot** (`.github/dependabot.yml`) abre toda segunda-feira, contra a `develop`, um PR por ecossistema (front, API e actions) com as versões menores e de correção, e um PR por versão principal. Ele espera 7 dias depois da publicação de cada versão, a mesma idade mínima que o `.yarnrc.yml` cobra. O GitHub lê o arquivo na `main`, e os PRs de segurança miram sempre a `main`. Os PRs do Dependabot não recebem os segredos do Actions: o `SONAR_TOKEN` dele é um segredo do Dependabot, gravado à parte.
 
 ## Configuração do agente de código
 

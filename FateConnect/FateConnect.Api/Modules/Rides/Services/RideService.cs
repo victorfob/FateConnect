@@ -1,18 +1,25 @@
 namespace FateConnect.Api.Modules.Rides.Services;
 
 using FateConnect.Api.Modules.Common.DTOs;
+using FateConnect.Api.Modules.Common.Events;
 using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Rides.Interfaces;
+using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Extensions;
+using FateConnect.Api.Modules.Users.Interfaces;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 
 public partial class RideService(
     IRideRepository repository,
     IHolidayCalendar holidays,
     TimeProvider clock,
+    IPublishEndpoint publishEndpoint,
+    IPublicationModerationService moderation,
     ILogger<RideService> logger
 ) : IRideService
 {
@@ -20,15 +27,21 @@ public partial class RideService(
     {
         var ride = new Ride(
             dto.Destination,
-            dto.DepartureDate,
-            dto.DepartureTime,
+            new RideFirstDeparture(dto.DepartureDate, dto.DepartureTime),
             dto.RideType,
             dto.VehicleType,
             currentUserId,
+            clock.GetUtcNow().UtcDateTime,
             dto.Description
         );
 
         ride.ChangeRepetition(dto.Frequency, dto.RepeatUntil, holidays);
+
+        await publishEndpoint.Publish(new RideCreatedEvent(
+            RideId: ride.Id,
+            DriverId: currentUserId,
+            Destination: ride.Destination
+        ));
 
         await repository.AddAsync(ride);
 
@@ -37,7 +50,7 @@ public partial class RideService(
         return MapToReadDto(ride, currentUserId);
     }
 
-    public async Task<PagedResultDto<ReadRideDto>> GetAllAsync(FilterRideDto filter, int currentUserId)
+    public async Task<PagedResultDto<ReadRideDto>> GetAllAsync(RideFilterDto filter, int currentUserId)
     {
         int? userIdToFilter = filter.OnlyMine == true ? currentUserId : null;
 
@@ -45,13 +58,7 @@ public partial class RideService(
 
         LogRidesRetrieved(logger, rides.Count);
 
-        return new PagedResultDto<ReadRideDto>
-        {
-            Items = [.. rides.Select(ride => MapToReadDto(ride, currentUserId))],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total,
-        };
+        return filter.ToResult<ReadRideDto>([.. rides.Select(ride => MapToReadDto(ride, currentUserId))], total);
     }
 
     public async Task<ReadRideDto?> GetByIdAsync(Guid id, int currentUserId)
@@ -81,11 +88,14 @@ public partial class RideService(
 
         EnsureRideIsDrivenBy(ride, currentUserId);
 
+        DateTime now = clock.GetUtcNow().UtcDateTime;
+
         ride.UpdateBasicAttributes(
             dto.Destination,
             dto.RideType,
             dto.VehicleType,
-            dto.Description
+            dto.Description,
+            now
         );
 
         bool hasScheduleChanged = dto.DepartureDate.HasValue
@@ -96,17 +106,17 @@ public partial class RideService(
         if (hasScheduleChanged)
             ride.Reschedule(
                 new RideScheduleChange(dto.DepartureDate, dto.DepartureTime, dto.Frequency, dto.RepeatUntil),
-                DateTimeUtils.NowInProductTimeZone(clock),
+                now,
                 holidays);
 
-        await repository.UpdateAsync(ride);
+        await repository.SaveChangesAsync();
 
         LogRideUpdated(logger, id);
 
         return MapToReadDto(ride, currentUserId);
     }
 
-    public async Task<bool> DeleteAsync(Guid id, int currentUserId)
+    public async Task<bool> DeactivateAsync(Guid id, int currentUserId)
     {
         var ride = await repository.GetByIdAsync(id);
 
@@ -118,23 +128,40 @@ public partial class RideService(
 
         EnsureRideIsDrivenBy(ride, currentUserId);
 
-        ride.Deactivate();
+        ride.Deactivate(clock.GetUtcNow().UtcDateTime);
 
-        await repository.UpdateAsync(ride);
+        await repository.SaveChangesAsync();
 
         LogRideDeactivated(logger, id);
         return true;
     }
 
-    private void EnsureRideIsDrivenBy(Ride ride, int currentUserId)
+    public async Task<bool> RemoveAsync(Guid id, EnumRemovalReason reason, int administratorId)
     {
-        if (ride.IsDrivenBy(currentUserId))
-            return;
+        var ride = await repository.GetByIdAsync(id);
 
-        LogRideChangeRefused(logger, currentUserId, ride.Id);
+        if (ride is null)
+        {
+            LogRideNotFound(logger, id);
+            return false;
+        }
 
-        throw new RideNotDrivenByUserException();
+        ride.Deactivate(clock.GetUtcNow().UtcDateTime);
+
+        await moderation.RecordRemovalAsync(
+            administratorId,
+            new PublicationRemoval(EnumPublication.Ride, ride.Id, ride.DriverId, ride.Destination, reason));
+
+        await repository.SaveChangesAsync();
+
+        LogRideRemoved(logger, id, administratorId);
+        return true;
     }
+
+    private void EnsureRideIsDrivenBy(Ride ride, int currentUserId) =>
+        OwnershipGuard.EnsureOwnedBy<RideNotDrivenByUserException>(
+            ride.IsDrivenBy(currentUserId),
+            () => LogRideChangeRefused(logger, currentUserId, ride.Id));
 
     private ReadRideDto MapToReadDto(Ride ride, int currentUserId) =>
         new(

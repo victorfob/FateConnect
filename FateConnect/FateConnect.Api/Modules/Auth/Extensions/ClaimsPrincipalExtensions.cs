@@ -10,28 +10,18 @@ public static class ClaimsPrincipalExtensions
 {
     public static int GetUserId(this ClaimsPrincipal user)
     {
-        string? identifier = user.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        bool isValidUserId = int.TryParse(identifier, CultureInfo.InvariantCulture, out int userId);
-
-        if (!isValidUserId)
+        if (!user.TryGetUserId(out int userId))
             throw new UnidentifiedUserException();
 
         return userId;
     }
 
+    public static bool TryGetUserId(this ClaimsPrincipal user, out int userId) =>
+        int.TryParse(user.FindFirstValue(ClaimTypes.NameIdentifier), CultureInfo.InvariantCulture, out userId);
+
+    public static bool TryGetTokenVersion(this ClaimsPrincipal user, out int tokenVersion) =>
+        int.TryParse(user.FindFirstValue(TokenClaimNames.TokenVersion), CultureInfo.InvariantCulture, out tokenVersion);
+
     public static bool IsAdministrator(this ClaimsPrincipal user) =>
         user.IsInRole(nameof(EnumProfileType.Administrator));
-
-    public static int GetTokenVersion(this ClaimsPrincipal user)
-    {
-        string? version = user.FindFirstValue(TokenClaimNames.TokenVersion);
-
-        bool isValidVersion = int.TryParse(version, CultureInfo.InvariantCulture, out int tokenVersion);
-
-        if (!isValidVersion)
-            throw new UnidentifiedTokenException();
-
-        return tokenVersion;
-    }
 }

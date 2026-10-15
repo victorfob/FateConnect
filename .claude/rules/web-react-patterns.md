@@ -57,4 +57,5 @@ Um teste que conte `getAllByRole('alert')` protege contra o aviso em dobro.
 ## Rename em lote não sabe o que é nosso
 
 - ⛔ Substituição mecânica acerta chave de contrato de terceiro (a chave copia o provedor, como em `utils/whatsapp.ts`) e a nossa própria copy, e traduz a asserção do teste junto — a suíte fica verde. Aplique só em posição de identificador, ou decida uma a uma as ocorrências em string, regex e comentário.
+- Antes de aplicar o mapa, gere os nomes novos e procure cada um no código: o que já existe colide, e o que dobra a palavra se nomeia à mão (`DenunciationReporterContact` daria `ReportReporterContact`, e virou `ReporterContact`).
 - Depois, releia o diff procurando português com palavra inglesa no meio, e meça na aplicação as telas dos arquivos tocados, não só as que a issue previa.

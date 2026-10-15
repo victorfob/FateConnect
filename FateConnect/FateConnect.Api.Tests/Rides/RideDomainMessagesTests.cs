@@ -16,44 +16,50 @@ public class RideDomainMessagesTests
         EnumRideType rideType = EnumRideType.Solidarity,
         EnumVehicleType vehicleType = EnumVehicleType.Car,
         int driverId = 1) =>
-        new(destination, departureDate ?? FutureDate, DepartureTime, rideType, vehicleType, driverId);
+        new(
+            destination,
+            new RideFirstDeparture(departureDate ?? FutureDate, DepartureTime),
+            rideType,
+            vehicleType,
+            driverId,
+            DateTime.UtcNow);
 
     [Fact]
-    public void ARideInThePast_AnswersTheScheduleMessageInPortuguese()
+    public void ARideInThePast_AnswersTheScheduleMessage()
     {
         DateOnly pastDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
 
         InvalidDepartureScheduleException exception = Assert.Throws<InvalidDepartureScheduleException>(
             () => CreateRide(departureDate: pastDate));
 
-        Assert.Equal("A carona deve ser em data e hora futuras.", exception.Message);
+        Assert.Equal("The ride must depart at a future date and time.", exception.Message);
     }
 
     [Fact]
-    public void ARideWithAShortDestination_AnswersTheDestinationMessageInPortuguese()
+    public void ARideWithAShortDestination_AnswersTheDestinationMessage()
     {
         InvalidDestinationException exception = Assert.Throws<InvalidDestinationException>(
             () => CreateRide(destination: "AB"));
 
-        Assert.Equal("O destino deve ter entre 3 e 100 caracteres.", exception.Message);
+        Assert.Equal("The destination must have between 3 and 100 characters.", exception.Message);
     }
 
     [Fact]
-    public void ARideWithAnUndefinedType_AnswersTheTypeMessageInPortuguese()
+    public void ARideWithAnUndefinedType_AnswersTheTypeMessage()
     {
         InvalidRideTypeException exception = Assert.Throws<InvalidRideTypeException>(
             () => CreateRide(rideType: (EnumRideType)99));
 
-        Assert.Equal("Tipo de carona inválido.", exception.Message);
+        Assert.Equal("Invalid ride type.", exception.Message);
     }
 
     [Fact]
-    public void ARideWithAnUndefinedVehicle_AnswersTheVehicleMessageInPortuguese()
+    public void ARideWithAnUndefinedVehicle_AnswersTheVehicleMessage()
     {
         InvalidVehicleTypeException exception = Assert.Throws<InvalidVehicleTypeException>(
             () => CreateRide(vehicleType: (EnumVehicleType)99));
 
-        Assert.Equal("Veículo inválido.", exception.Message);
+        Assert.Equal("Invalid vehicle.", exception.Message);
     }
 
     [Fact]
@@ -62,29 +68,29 @@ public class RideDomainMessagesTests
         Ride ride = CreateRide(vehicleType: EnumVehicleType.Motorcycle);
 
         Assert.Throws<InvalidVehicleTypeException>(
-            () => ride.UpdateBasicAttributes(null, null, (EnumVehicleType)99, null));
+            () => ride.UpdateBasicAttributes(null, null, (EnumVehicleType)99, null, DateTime.UtcNow));
 
         Assert.Equal(EnumVehicleType.Motorcycle, ride.VehicleType);
     }
 
     [Fact]
-    public void ARideWithoutADriver_AnswersTheUserIdentifierMessageInPortuguese()
+    public void ARideWithoutADriver_AnswersTheUserIdentifierMessage()
     {
         InvalidUserIdentifierException exception = Assert.Throws<InvalidUserIdentifierException>(
             () => CreateRide(driverId: 0));
 
         Assert.Equal(
-            "Não foi possível processar a requisição. O identificador de usuário fornecido é inválido ou não existe.",
+            "The request could not be processed. The user identifier is invalid or does not exist.",
             exception.Message);
     }
 
     [Fact]
-    public void ARideOfferedByAnotherPerson_AnswersTheOwnershipMessageInPortuguese()
+    public void ARideOfferedByAnotherPerson_AnswersTheOwnershipMessage()
     {
         RideNotDrivenByUserException exception = new();
 
         Assert.Equal(
-            "Esta carona foi ofertada por outra pessoa. Só quem ofertou pode alterá-la.",
+            "This ride was offered by someone else. Only who offered it can change it.",
             exception.Message);
     }
 }

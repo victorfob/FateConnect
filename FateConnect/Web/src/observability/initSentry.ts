@@ -8,6 +8,7 @@ import {
 import { init, reactRouterBrowserTracingIntegration } from '@sentry/react';
 
 import { scheduleSessionReplay } from './loadSessionReplay';
+import { stripUrlQueries } from './stripUrlQueries';
 
 const TRACES_SAMPLE_RATE = 1;
 const REPLAY_SESSION_SAMPLE_RATE = 0.1;
@@ -50,7 +51,10 @@ export function initSentry(): void {
         createRoutesFromChildren,
         matchRoutes,
       }),
+      { name: 'StripUrlQueries', processEvent: stripUrlQueries },
     ],
+    beforeBreadcrumb: stripUrlQueries,
+    beforeSendSpan: stripUrlQueries,
     tracesSampleRate: TRACES_SAMPLE_RATE,
     tracePropagationTargets: tracePropagationTargets(),
     replaysSessionSampleRate: REPLAY_SESSION_SAMPLE_RATE,

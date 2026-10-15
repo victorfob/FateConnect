@@ -45,7 +45,7 @@ done
 
 Para cada `SEM entrada`, leia o título do PR. **Ausência legítima:** `docs`, `ci`, `chore`, refactor sem efeito externo, e componente de design system **sem consumidor** — o efeito visível dele sai no PR que o consome. **Ausência que é defeito:** qualquer `feat` ou `fix` de comportamento.
 
-⛔ **E procure o `(#?)` no arquivo.** O placeholder só vira número por `--amend` quando o PR abre, e o PR que esqueceu não avisa:
+⛔ **E procure o `(#?)` no arquivo.** O check `Changelog placeholder` reprova o PR que esquece, mas não alcança o que entrou antes dele nem o que foi mergeado com o check vermelho:
 
 ```bash
 grep -n '(#?)' CHANGELOG.md   # tem que responder vazio
@@ -153,7 +153,9 @@ E confira que a `develop` recebeu o back-merge: `git rev-list --count origin/dev
 
 ## PR de segurança do Dependabot
 
-Ele mira a `main` sem subir versão, então cai no `Version`, e no Sonar por não ter o `SONAR_TOKEN`; o job dele "falha" quando um pacote não resolve, mesmo abrindo PR com os outros. Feche o PR e faça `hotfix/X.Y.Z` a partir da `main`, com as correções num commit e o bump e o changelog noutro. Correção transitiva que cabe na faixa sai por `yarn up -R <pacote>`, sem `resolutions`. Os alertas fecham no merge na `main`.
+Os PRs de versão vão para a `develop` (`.github/dependabot.yml`); só o de segurança mira a `main`, e sem subir versão ele cai no `Version`. O job dele "falha" quando um pacote não resolve, mesmo abrindo PR com os outros. Feche o PR e faça `hotfix/X.Y.Z` a partir da `main`, com as correções num commit e o bump e o changelog noutro. Correção transitiva que cabe na faixa sai por `yarn up -R <pacote>`, sem `resolutions`.
+
+⚠️ O alerta não fecha no merge: fecha quando o Dependabot reavalia a `main`, e não há API que force. Confira com `gh api repos/<dono>/<repo>/dependabot/alerts/<n> --jq .state` antes de dizer que fechou.
 
 ## Armadilhas já pagas
 

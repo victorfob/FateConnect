@@ -1,14 +1,18 @@
 namespace FateConnect.Api.Modules.Users.Services;
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using FateConnect.Api.Modules.Auth.Constants;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Auth.Interfaces;
 using FateConnect.Api.Modules.Common.DTOs;
-using FateConnect.Api.Modules.Common.Enums;
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Common.Interfaces;
-using FateConnect.Api.Modules.Common.Services;
-using FateConnect.Api.Modules.Common.Utils;
+using FateConnect.Api.Modules.InAppNotifications.Interfaces;
+using FateConnect.Api.Modules.Storage.Enums;
+using FateConnect.Api.Modules.Storage.Interfaces;
+using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Storage.Utils;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
@@ -16,9 +20,6 @@ using FateConnect.Api.Modules.Users.Exceptions;
 using FateConnect.Api.Modules.Users.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using static BCrypt.Net.BCrypt;
 
 public partial class UserService(
@@ -27,8 +28,9 @@ public partial class UserService(
     TimeProvider timeProvider,
     IStorageService baseStorageService,
     IPublishEndpoint publishEndpoint,
+    IPushNotificationService pushNotificationService,
     ILogger<UserService> logger
-) : BaseFileService(baseStorageService), IUserService
+) : BaseFileService(baseStorageService, logger), IUserService
 {
 
     public async Task SignUpAsync(CreateUserDto dto, RequestOrigin origin)
@@ -51,7 +53,10 @@ public partial class UserService(
         ConfigurePreferences(newUser, dto);
         AddAcceptances(newUser, dto, origin, now);
 
-        string rawToken = newUser.IssueToken(EnumTokenType.EmailConfirmation, now, TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
+        string rawToken = newUser.IssueToken(
+            EnumTokenType.EmailConfirmation,
+            now,
+            TimeSpan.FromHours(AuthConstants.EmailConfirmationHours));
 
         await userRepository.InTransactionAsync(async () =>
         {
@@ -87,7 +92,7 @@ public partial class UserService(
                 acceptedAt: now,
                 ipAddress: origin.IpAddress,
                 userAgent: origin.UserAgent
-            ));
+            ), now);
         }
     }
 
@@ -136,25 +141,24 @@ public partial class UserService(
             dto.BirthDate ?? user.BirthDate,
             dto.Gender ?? user.Gender,
             newContact,
-            dto.Neighborhood ?? user.Neighborhood
+            dto.Neighborhood ?? user.Neighborhood,
+            timeProvider.GetUtcNow().UtcDateTime
         );
 
         string? replacedImageUrl = null;
-        string? storedImageUrl = null;
 
         if (dto.Image is not null)
-        {
             replacedImageUrl = user.ImageUrl;
-            storedImageUrl = await StorageService.UploadImageAsync(dto.Image, EnumStorageContainer.User);
-            user.AttachImage(storedImageUrl);
-        }
 
-        await PersistOrDropImageAsync(userRepository.SaveChangesAsync, storedImageUrl);
+        string? storedImageUrl = await StoreImageAsync(
+            dto.Image,
+            EnumStorageContainer.User,
+            imageUrl => user.AttachImage(imageUrl, timeProvider.GetUtcNow().UtcDateTime));
 
-        if (dto.Image is not null && !string.IsNullOrWhiteSpace(replacedImageUrl))
-        {
-            await StorageService.DeleteImageAsync(replacedImageUrl);
-        }
+        await SaveImageChangeAsync(userRepository.SaveChangesAsync, storedImageUrl, replacedImageUrl);
+
+        if (dto.Image is not null)
+            LogUserPhotoReplaced(logger, currentUserId);
 
         LogUserProfileUpdated(logger, currentUserId);
 
@@ -178,6 +182,10 @@ public partial class UserService(
         user.SetPreferences(newPreferences);
 
         await userRepository.SaveChangesAsync();
+        LogUserPreferencesUpdated(logger, currentUserId);
+
+        if (!newPreferences.ReceiveNotifications)
+            await pushNotificationService.RemoveAllAsync(currentUserId);
     }
 
     public async Task<TokenResponseDto?> ChangePasswordAsync(int currentUserId, ChangePasswordDto dto)
@@ -191,9 +199,12 @@ public partial class UserService(
         }
 
         if (!Verify(dto.CurrentPassword, user.Password))
+        {
+            LogPasswordChangeRefused(logger, currentUserId);
             throw new IncorrectCurrentPasswordException();
+        }
 
-        user.ChangePassword(HashPassword(dto.NewPassword));
+        user.ChangePassword(HashPassword(dto.NewPassword), timeProvider.GetUtcNow().UtcDateTime);
 
         await userRepository.SaveChangesAsync();
         LogUserPasswordChanged(logger, currentUserId);
@@ -219,12 +230,11 @@ public partial class UserService(
 
         string imageToDelete = user.ImageUrl;
 
-        user.RemoveImage();
+        user.RemoveImage(timeProvider.GetUtcNow().UtcDateTime);
 
-        await userRepository.SaveChangesAsync();
-        await StorageService.DeleteImageAsync(imageToDelete);
+        await SaveImageChangeAsync(userRepository.SaveChangesAsync, storedImageUrl: null, imageToDelete);
 
-        LogUserProfileUpdated(logger, currentUserId);
+        LogUserPhotoRemoved(logger, currentUserId);
     }
 
     public async Task DeactivateAccountAsync(int currentUserId)
@@ -237,13 +247,13 @@ public partial class UserService(
             return;
         }
 
-        user.Deactivate();
+        user.Deactivate(timeProvider.GetUtcNow().UtcDateTime);
 
         await userRepository.SaveChangesAsync();
         LogUserDeactivated(logger, currentUserId);
     }
 
-    public async Task<PagedResultDto<ReadUserSummaryDto>> GetAllUsersAsync(UserFilterDto filter)
+    public async Task<PagedResultDto<ReadUserSummaryDto>> GetAllAsync(UserFilterDto filter)
     {
         (IReadOnlyList<ReadUserSummaryDto> records, int total) = await userRepository.GetAllAsync(
             filter,
@@ -258,16 +268,10 @@ public partial class UserService(
             )
         );
 
-        return new PagedResultDto<ReadUserSummaryDto>
-        {
-            Items = [.. records],
-            Page = filter.EffectivePage,
-            PageSize = filter.EffectivePageSize,
-            Total = total
-        };
+        return filter.ToResult(records, total);
     }
 
-    public async Task<ReadUserDto?> GetUserByIdAsync(int id)
+    public async Task<ReadUserDto?> GetByIdAsync(int id)
     {
         var user = await userRepository.GetByIdAsync(id, asNoTracking: true);
 
@@ -280,7 +284,7 @@ public partial class UserService(
         return MapToReadDto(user);
     }
 
-    public async Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto)
+    public async Task<ReadUserDto?> UpdateUserByAdminAsync(int id, AdminUpdateUserDto dto, int currentUserId)
     {
         var user = await userRepository.GetByIdAsync(id);
 
@@ -304,11 +308,12 @@ public partial class UserService(
         user.UpdateByAdmin(
             dto.FullName ?? user.FullName,
             newFatecEmail,
-            newContact
+            newContact,
+            timeProvider.GetUtcNow().UtcDateTime
         );
 
         await userRepository.SaveChangesAsync();
-        LogUserUpdatedByAdmin(logger, id);
+        LogUserUpdatedByAdmin(logger, currentUserId, id);
 
         return MapToReadDto(user);
     }
@@ -331,10 +336,10 @@ public partial class UserService(
         switch (newProfile)
         {
             case EnumProfileType.Administrator:
-                user.PromoteToAdministrator();
+                user.PromoteToAdministrator(timeProvider.GetUtcNow().UtcDateTime);
                 break;
             case EnumProfileType.Operator:
-                user.DemoteToOperator();
+                user.DemoteToOperator(timeProvider.GetUtcNow().UtcDateTime);
                 break;
         }
 
@@ -344,7 +349,7 @@ public partial class UserService(
             RecordAdministrativeAction(currentUserId, id, ProfileChangeAction(user.ProfileType));
 
         await userRepository.SaveChangesAsync();
-        LogUserProfileTypeChangedByAdmin(logger, id, newProfile.ToString());
+        LogUserProfileTypeChangedByAdmin(logger, currentUserId, id, newProfile);
 
         return MapToReadDto(user);
     }
@@ -368,12 +373,12 @@ public partial class UserService(
         switch (newStatus)
         {
             case EnumAccountStatus.Banned:
-                user.Ban();
+                user.Ban(timeProvider.GetUtcNow().UtcDateTime);
                 action = EnumAdministrativeAction.Banned;
                 break;
 
             case EnumAccountStatus.Active when user.Status == EnumAccountStatus.Banned:
-                user.ReactivateFromBan();
+                user.ReactivateFromBan(timeProvider.GetUtcNow().UtcDateTime);
                 action = EnumAdministrativeAction.BanReverted;
                 break;
 
@@ -387,7 +392,7 @@ public partial class UserService(
             RecordAdministrativeAction(currentUserId, id, action);
 
         await userRepository.SaveChangesAsync();
-        LogUserStatusChangedByAdmin(logger, id, newStatus.ToString());
+        LogUserStatusChangedByAdmin(logger, currentUserId, id, newStatus);
 
         return MapToReadDto(user);
     }

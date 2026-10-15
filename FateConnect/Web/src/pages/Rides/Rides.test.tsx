@@ -15,9 +15,14 @@ import {
   CONTACT_REQUIRED_TITLE,
   REGISTER_LABEL,
 } from '@app/components/ContactRequiredDialog/constants';
+import { REMOVAL_DIALOG } from '@app/components/PublicationRemoval/constants';
+import { REMOVAL_REASON_OPTIONS } from '@app/components/PublicationRemoval/helpers';
 import { useLacksContact } from '@app/hooks/useLacksContact';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
+import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { ProfileTypeEnum } from '@app/services/auth/types';
+import { RemovalReasonEnum } from '@app/services/moderation/types';
 import {
   RideFrequencyEnum,
   RideShiftEnum,
@@ -27,11 +32,13 @@ import {
 } from '@app/services/rides/types';
 import type { UserContact } from '@app/services/types';
 import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { tokenWithName } from '@app/test/token';
 import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 import { PAGE_SIZE } from '@app/utils/searchParams';
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
+import { SAFETY_NOTICE } from './components/RideCard/RideDriverContact/constants';
 import {
   FILTER_LABELS,
   RIDE_OWNER_FILTER_OPTIONS,
@@ -459,6 +466,35 @@ describe('Rides', () => {
     expect(await screen.findByText(C.RIDE_LIST_MESSAGES.deleteFailed)).toBeInTheDocument();
   });
 
+  it('should let an administrator remove the ride of someone else with a reason', async () => {
+    tokenStorage.save(tokenWithName('Helena Prado', ProfileTypeEnum.ADMINISTRATOR));
+    let removedWith: unknown = null;
+    server.use(
+      http.get(RIDES_URL, ({ request }) =>
+        HttpResponse.json(pagedResponse(removedWith ? [] : [RIDE], new URL(request.url))),
+      ),
+      http.post(`${RIDES_URL}/:rideId/remove`, async ({ request }) => {
+        removedWith = await request.json();
+
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+    renderComponent();
+    await screen.findByText(RIDE.destination);
+
+    await userEvent.click(screen.getByRole('button', { name: REMOVAL_DIALOG.trigger }));
+    await screen.findByRole('dialog', { name: REMOVAL_DIALOG.title });
+    await pickOption(
+      REMOVAL_DIALOG.reasonLabel,
+      optionLabel(REMOVAL_REASON_OPTIONS, RemovalReasonEnum.MISLEADING),
+    );
+    await userEvent.click(screen.getByRole('button', { name: REMOVAL_DIALOG.confirmLabel }));
+
+    expect(await screen.findByText(C.RIDE_LIST_MESSAGES.deleteSucceeded)).toBeInTheDocument();
+    expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
+    expect(removedWith).toEqual({ reason: RemovalReasonEnum.MISLEADING });
+  });
+
   it('should show the contact of whoever offered the ride', async () => {
     listReturning([RIDE]);
     renderComponent();
@@ -469,6 +505,7 @@ describe('Rides', () => {
     const dialog = within(await screen.findByRole('dialog'));
     expect(dialog.getByText(DRIVER.name)).toBeInTheDocument();
     expect(dialog.getByRole('link', { name: sendEmailLabel(DRIVER_EMAIL) })).toBeInTheDocument();
+    expect(dialog.getByText(SAFETY_NOTICE)).toBeInTheDocument();
   });
 
   it('should open the conversation already mentioning the destination of the ride', async () => {

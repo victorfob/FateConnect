@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { HiddenField } from '@ds-root/components/HiddenField';
 
 import { ListCardActions } from './components/ListCardActions';
+import { ListCardBottomAction } from './components/ListCardBottomAction';
 import { ListCardDescription } from './components/ListCardDescription';
 
 export type { ListCardDescriptionLabels } from './components/ListCardDescription';
@@ -18,7 +19,10 @@ export type ListCardProps = Readonly<{
   ownLabel?: string;
   /** Coluna à esquerda do corpo — a foto do registro ou o lugar dela. */
   media?: ReactNode;
-  /** Conteúdo por composição: `ListCard.Header`, `ListCard.InfoRow`, `ListCard.Description`. */
+  /**
+   * Conteúdo por composição: `ListCard.Header`, `ListCard.InfoRow`, `ListCard.Description`
+   * e, por último, `ListCard.BottomAction`.
+   */
   children: ReactNode;
 }>;
 
@@ -45,5 +49,6 @@ ListCard.ActionButtons = S.ActionButtons;
 ListCard.InfoRow = ListCardInfoRow;
 ListCard.InfoItem = S.InfoItem;
 ListCard.Description = ListCardDescription;
+ListCard.BottomAction = ListCardBottomAction;
 
 export { ListCard };

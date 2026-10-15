@@ -13,6 +13,8 @@ export const BAN_ACTION: StatusAction = {
   dialogTitle: 'Banir conta',
   messagePrefix: 'Tem certeza que deseja banir ',
   messageSuffix: '? A pessoa deixa de entrar no FateConnect, e a sessão aberta é encerrada.',
+  destructive: true,
+  dialogIcon: BlockIcon,
 };
 
 export const REVERT_BAN_ACTION: StatusAction = {

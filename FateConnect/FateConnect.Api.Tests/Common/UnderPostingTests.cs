@@ -24,8 +24,8 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         ["contactEmail"] = ApiFactory.UniqueContactEmail(),
         ["acceptances"] = new[]
         {
-            new { document = "TermsOfUse", version = "2026-01-15" },
-            new { document = "PrivacyPolicy", version = "2026-02-20" },
+            new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse },
+            new { document = "PrivacyPolicy", version = CurrentLegalVersions.PrivacyPolicy },
         },
     };
 
@@ -67,6 +67,6 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         string body = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("O destino deve ter entre 3 e 100 caracteres.", body, StringComparison.Ordinal);
+        Assert.Contains("The destination must have between 3 and 100 characters.", body, StringComparison.Ordinal);
     }
 }

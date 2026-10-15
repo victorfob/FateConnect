@@ -30,7 +30,8 @@ public class AuthorizeProfileTests
                 () => new AuthorizeProfileAttribute((EnumProfileType)9));
 
         Assert.Equal(
-            "A hierarquia de acesso para o perfil '9' não foi configurada no AuthorizeProfileAttribute. Atualize o mapa de perfis permitidos.",
+            "The access hierarchy of the profile '9' is not configured in the AuthorizeProfileAttribute. " +
+                "Update the map of allowed profiles.",
             exception.Message);
     }
 

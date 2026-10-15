@@ -1,13 +1,19 @@
+import { REMOVAL_DIALOG } from '@app/components/PublicationRemoval/constants';
 import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
+import { RIDE_CARD_LABELS } from '@app/pages/Rides/constants';
+import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { ProfileTypeEnum } from '@app/services/auth/types';
 import {
   RideFrequencyEnum,
   RideTypeEnum,
   VehicleTypeEnum,
   type Ride,
 } from '@app/services/rides/types';
-import { render, screen } from '@app/test/testing-library';
+import { render, screen, userEvent } from '@app/test/testing-library';
+import { tokenWithName } from '@app/test/token';
 import { forgeOverflow, restoreContentHeight } from '@app/test/utils/contentHeight';
 
+import { REMOVAL_MESSAGE } from './RideAdminRemoval/constants';
 import { RideCard } from '.';
 
 const RIDE: Ride = {
@@ -70,5 +76,32 @@ describe('RideCard', () => {
     );
 
     expect(afterTheInfoRow()).toBeNull();
+  });
+
+  it('should offer the removal to an administrator on the ride of someone else', async () => {
+    tokenStorage.save(tokenWithName('Helena Prado', ProfileTypeEnum.ADMINISTRATOR));
+    renderComponent();
+
+    await userEvent.click(screen.getByRole('button', { name: REMOVAL_DIALOG.trigger }));
+
+    expect(await screen.findByRole('dialog', { name: REMOVAL_DIALOG.title })).toHaveTextContent(
+      `${REMOVAL_MESSAGE.prefix}${RIDE.destination}${REMOVAL_MESSAGE.suffix}`,
+    );
+  });
+
+  it('should keep only the own delete on the ride of an administrator', () => {
+    tokenStorage.save(tokenWithName('Helena Prado', ProfileTypeEnum.ADMINISTRATOR));
+    renderComponent({ ...RIDE, isOwner: true });
+
+    expect(screen.getAllByRole('button', { name: RIDE_CARD_LABELS.delete })).toHaveLength(1);
+    expect(screen.getByRole('button', { name: RIDE_CARD_LABELS.edit })).toBeInTheDocument();
+  });
+
+  it('should leave the removal out for whoever does not administer', () => {
+    tokenStorage.save(tokenWithName('Helena Prado', ProfileTypeEnum.OPERATOR));
+    renderComponent();
+
+    expect(screen.getByRole('article')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: REMOVAL_DIALOG.trigger })).not.toBeInTheDocument();
   });
 });

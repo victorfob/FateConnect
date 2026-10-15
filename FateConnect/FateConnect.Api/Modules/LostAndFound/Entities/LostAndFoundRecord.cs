@@ -15,7 +15,7 @@ public class LostAndFoundRecord
     public DateOnly OccurredOn { get; private set; }
     public string? Description { get; private set; }
     public string? ImageUrl { get; private set; }
-    public EnumStatusLostAndFound Status { get; private set; }
+    public EnumLostAndFoundStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
     public DateTime? StatusChangedAt { get; private set; }
@@ -31,11 +31,12 @@ public class LostAndFoundRecord
         string place,
         DateOnly occurredOn,
         string? description,
-        int userId)
+        int userId,
+        DateTime now)
     {
         ValidateName(name);
         ValidatePlace(place);
-        ValidateOccurredOn(occurredOn);
+        ValidateOccurredOn(occurredOn, now);
         ValidateType(lostAndFoundType);
         ValidateUser(userId);
 
@@ -46,8 +47,8 @@ public class LostAndFoundRecord
         Place = place.Trim();
         OccurredOn = occurredOn;
         Description = description.NormalizeOptionalText();
-        Status = EnumStatusLostAndFound.Open;
-        CreatedAt = DateTime.UtcNow;
+        Status = EnumLostAndFoundStatus.Open;
+        CreatedAt = now;
         UpdatedAt = null;
     }
 
@@ -57,7 +58,8 @@ public class LostAndFoundRecord
         string? place,
         DateOnly? occurredOn,
         string? description,
-        EnumStatusLostAndFound? status)
+        EnumLostAndFoundStatus? status,
+        DateTime now)
     {
         bool receivedAnyField = false;
 
@@ -84,7 +86,7 @@ public class LostAndFoundRecord
 
         if (occurredOn.HasValue)
         {
-            ValidateOccurredOn(occurredOn.Value);
+            ValidateOccurredOn(occurredOn.Value, now);
             OccurredOn = occurredOn.Value;
             receivedAnyField = true;
         }
@@ -98,49 +100,47 @@ public class LostAndFoundRecord
         if (status.HasValue)
         {
             ValidateStatus(status.Value);
-            ApplyStatus(status.Value);
+            ApplyStatus(status.Value, now);
             receivedAnyField = true;
         }
 
         if (receivedAnyField)
-            UpdatedAt = DateTime.UtcNow;
+            UpdatedAt = now;
     }
 
     public void AttachImage(string imageUrl) => ImageUrl = imageUrl.Trim();
 
     public void DetachImage() => ImageUrl = null;
 
-    public void MarkAsDeleted(EnumDeletionReason reason)
+    public void MarkAsDeleted(EnumDeletionReason reason, DateTime now)
     {
-        DateTime changedAt = DateTime.UtcNow;
-
-        Status = EnumStatusLostAndFound.Deleted;
+        Status = EnumLostAndFoundStatus.Deleted;
         DeletionReason = reason;
-        StatusChangedAt = changedAt;
-        UpdatedAt = changedAt;
+        StatusChangedAt = now;
+        UpdatedAt = now;
     }
 
     public bool IsReportedBy(int userId) => UserId == userId;
 
-    public bool IsDeleted => Status == EnumStatusLostAndFound.Deleted;
+    public bool IsDeleted => Status == EnumLostAndFoundStatus.Deleted;
 
-    private void ApplyStatus(EnumStatusLostAndFound status)
+    private void ApplyStatus(EnumLostAndFoundStatus status, DateTime now)
     {
-        if (status == EnumStatusLostAndFound.Deleted)
+        if (status == EnumLostAndFoundStatus.Deleted)
         {
-            MarkAsDeleted(EnumDeletionReason.User);
+            MarkAsDeleted(EnumDeletionReason.User, now);
             return;
         }
 
         Status = status;
         DeletionReason = null;
-        StatusChangedAt = StampFor(status);
+        StatusChangedAt = StampFor(status, now);
     }
 
-    private static DateTime? StampFor(EnumStatusLostAndFound status)
+    private static DateTime? StampFor(EnumLostAndFoundStatus status, DateTime now)
     {
-        if (status == EnumStatusLostAndFound.Resolved)
-            return DateTime.UtcNow;
+        if (status == EnumLostAndFoundStatus.Resolved)
+            return now;
 
         return null;
     }
@@ -157,7 +157,7 @@ public class LostAndFoundRecord
             throw new InvalidLostAndFoundTypeException();
     }
 
-    private static void ValidateStatus(EnumStatusLostAndFound status)
+    private static void ValidateStatus(EnumLostAndFoundStatus status)
     {
         if (!Enum.IsDefined(status))
             throw new InvalidLostAndFoundStatusException();
@@ -179,12 +179,12 @@ public class LostAndFoundRecord
             throw new InvalidLostAndFoundPlaceException();
     }
 
-    private static void ValidateOccurredOn(DateOnly date)
+    private static void ValidateOccurredOn(DateOnly date, DateTime now)
     {
         if (date == default)
             throw new MissingOccurrenceDateException();
 
-        DateOnly todayInProductTimeZone = DateOnly.FromDateTime(DateTimeUtils.NowInProductTimeZone());
+        DateOnly todayInProductTimeZone = DateOnly.FromDateTime(DateTimeUtils.InProductTimeZone(now));
 
         if (date > todayInProductTimeZone)
             throw new InvalidOccurrenceDateException();

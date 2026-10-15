@@ -11,6 +11,7 @@ paths:
 - ⛔ **Código novo sai com ≥90%**, acima do portão do Sonar de propósito: portão verde não é entrega.
 - Medir é `./scripts/coverage-changed.sh` (base padrão `origin/develop`), **com o trabalho commitado**: ele cruza o relatório com o diff commitado. Se a contagem não bate com os arquivos que você mexeu, a medida está errada. Rode antes de dizer que acabou.
 - Linha que não dá para cobrir se marca com `[ExcludeFromCodeCoverage]`; não se baixa o alvo. Cobertura baixa costuma acusar teste que falta.
+- O atributo no método não alcança as lambdas dentro dele: os `ReceiveEndpoint` do `ConfigureRabbitMq` contam como descobertos, e o `Program.cs` fica abaixo de 90% sem faltar teste. Confira as linhas antes de escrever teste para elas.
 
 ## Onde o teste mora
 
@@ -27,7 +28,7 @@ paths:
 ## Estático precisa de costura
 
 - Relógio via `TimeProvider`: o `MinimumAgeAttribute` o pede ao `ValidationContext`; no endpoint, a `ApiFactory.Clock` recebe um `FixedTimeProvider` ou um `MovableTimeProvider`, que anda entre duas requisições.
-- ⛔ Onde não há costura, não escreva o teste que depende do relógio: `Ride.ValidateDepartureDateTime` compara com `DateTime.UtcNow` direto.
+- A entidade recebe o `now` de quem a chama, e o service o lê do `TimeProvider`: nada fora dos testes lê `DateTime.UtcNow`, e o teste de unidade passa o instante que quiser.
 - A borda fica no teste de unidade com relógio fixo; o endpoint fica com um caso de folga larga, provando só a fiação. Data literal fixa envelhece calada.
 - ⛔ Data derivada do dia que o `RideRepetitionDates` escolheu (`day.AddDays(3)`) passa pela mesma guarda de feriado: sem ela o teste reprova só no dia em que a conta cai num feriado.
 
@@ -40,18 +41,21 @@ paths:
 - Teste que grava arquivo: `git status` depois da suíte. A `ApiFactory` já isola o webroot num temporário.
 - ⛔ A `ApiFactory` executa o `Program.Main`: variável de ambiente que ele passa a exigir entra no construtor dela, com valor falso, senão a suíte inteira cai na subida.
 - Harness do MassTransit em teste leva `SetTestTimeouts` com folga: a inatividade padrão (~1,2 s) estoura com a suíte em paralelo, e o teste falha só às vezes.
+- ⛔ **Vencida a inatividade, todo `Any` responde na hora com o que já chegou**, mesmo com `CancellationToken` próprio, e a fábrica é da classe: o teste que esperou um `false` derruba a espera do seguinte. Espera positiva repete a consulta até o prazo (`ApiFactory.WaitUntilAsync`); ausência se lê depois de uma mensagem que você sabe que chega.
 - ⛔ Cada `ApiFactory` tem banco e pool próprios, e o `Dispose` dela fecha o pool (`NpgsqlConnection.ClearPool`): sem isso as conexões ociosas passam das 100 do contêiner, e o CI cai em `53300` sempre nos mesmos testes.
 
 ## Suíte verde não prova que ela pega o defeito
 
 Quebre o código de propósito e confira que a suíte cai; restaure e confira com `git status`.
 
-- ⛔ Se a build da mutação falha, `dotnet test --no-build` roda a DLL anterior e tudo passa: confira o exit da build antes de ler o teste. Escreva `--verbosity quiet` por extenso: wrapper de shell que reescreve argumentos pode ficar com o `-v q`, e o build responde `Project file does not exist`.
+- ⛔ Mute só arquivo sem mudança pendente: `git checkout -- <arquivo>` volta ao último commit e leva junto o que você ainda não commitou nele. Commite antes de mutar.
+- ⛔ Se a build da mutação falha, `dotnet test --no-build` roda a DLL anterior e tudo passa: confira o exit da build antes de ler o teste. E compile o projeto de testes, não só o `.csproj` da API: a cópia da DLL que o teste carrega fica no `bin` dele e só se renova na build dele. Escreva `--verbosity quiet` por extenso: wrapper de shell que reescreve argumentos pode ficar com o `-v q`, e o build responde `Project file does not exist`.
 - Mute o corpo do predicado, não a chamada: tirar o `.Where(Predicado())` deixa o método sem uso, e o analisador reprova antes de qualquer teste. Ele reprova também a mutação óbvia (`if (false)`, ramo igual a outro do `switch`): mute com um valor plausível.
 - ⛔ Medindo memória: `Process.PeakWorkingSet64` responde 0 no macOS, e medir no processo que gerou a carga põe a carga no "antes". Separe em processos: um gera o arquivo, outro só o processa sob `/usr/bin/time -l`, e um terceiro só o lê (o controle).
 
 ## Fixture
 
+- Log que é o comportamento se prova pela `ApiFactory.LogMessages`/`LogRecords` (o `FakeLogger` da fábrica) ou por um `FakeLogger<T>` no teste de unidade, filtrando pelo id semeado: a fábrica é da classe e junta o log de todos os testes dela. `NullLogger` só onde o log não é o que se prova.
 - Foto em teste é imagem de verdade, porque a API decodifica o envio: `TestImages.Png()`, ou `TestImages.JpegTakenWithAPhone()` quando o teste é de rotação ou EXIF.
 - Nome e contato plausíveis (`"Mariana Alves Rocha"`), sem rótulo de papel no nome: quem diz o papel é a variável (`driverId`).
 - ⛔ O dado passa pelas validações da própria aplicação: o e-mail institucional é `@(aluno.)?cps.sp.gov.br` (`FatecEmailAttribute`). Fixture inválida quebra o próximo teste que validar, sem dizer por quê.

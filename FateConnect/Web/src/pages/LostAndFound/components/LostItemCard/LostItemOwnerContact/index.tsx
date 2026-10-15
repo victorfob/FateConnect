@@ -1,7 +1,7 @@
 import { ContactButton } from '@app/components/ContactButton';
 import type { LostItem } from '@app/services/lostAndFound/types';
 
-import { contactMessage } from './constants';
+import { contactMessage, SAFETY_NOTICE } from './constants';
 
 type LostItemOwnerContactProps = Readonly<{ item: LostItem }>;
 
@@ -9,5 +9,11 @@ type LostItemOwnerContactProps = Readonly<{ item: LostItem }>;
 export function LostItemOwnerContact({ item }: LostItemOwnerContactProps) {
   if (item.isOwner) return null;
 
-  return <ContactButton contact={item.contact} message={contactMessage(item.name)} />;
+  return (
+    <ContactButton
+      contact={item.contact}
+      message={contactMessage(item.name)}
+      safetyNotice={SAFETY_NOTICE}
+    />
+  );
 }

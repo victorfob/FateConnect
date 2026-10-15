@@ -77,7 +77,7 @@ grep -n -i "<o conceito, ou a natureza da mudança>" CHANGELOG.md
 
 ## 5. O commit do changelog é o último da branch
 
-⛔ Deixe o changelog no último commit, depois de todos os outros: é o que permite trocar o `(#?)` pelo número com `git commit --amend` assim que o PR abrir, sem um commit só para isso.
+⛔ Deixe o changelog no último commit, depois de todos os outros: é o que permite trocar o `(#?)` pelo número com `git commit --amend` assim que o PR abrir, sem um commit só para isso. O check `Changelog placeholder` (`check-api.yml`) reprova o PR enquanto o `(#?)` estiver lá.
 
 ## 6. Reler antes de entregar
 
