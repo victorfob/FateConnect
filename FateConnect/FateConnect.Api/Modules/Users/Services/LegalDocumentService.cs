@@ -30,7 +30,7 @@ public partial class LegalDocumentService(
             return null;
         }
 
-        return
+        List<ReadLegalDocumentDto> statusOfEachCurrentDocument =
         [
             .. versions.Current
                 .OrderBy(entry => entry.Key)
@@ -39,6 +39,8 @@ public partial class LegalDocumentService(
                     CurrentVersion: entry.Value,
                     AcceptedCurrentVersion: user.HasAccepted(entry.Key, entry.Value)))
         ];
+
+        return statusOfEachCurrentDocument;
     }
 
     public async Task<bool> AcceptAsync(int currentUserId, AcceptDocumentsDto dto, RequestOrigin origin)
