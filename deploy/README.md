@@ -359,7 +359,7 @@ endereços, onde viajam o token dos links de e-mail e o texto das buscas.
 | Log da API | journal do host | identificador do usuário e dos registros, método, rota, tipo de erro, login recusado e ação de administrador |
 | Log da fila | journal do host | o funcionamento do RabbitMQ |
 | Acesso do nginx | `/var/log/nginx/fateconnect-<ambiente>.access.log`, e `/var/log/nginx/access.log` para o que não é site (o servidor padrão e o redirecionamento para o HTTPS) | IP com o fim zerado, data, método, caminho sem a query, status, página de origem sem a query e navegador |
-| Erros do nginx | `/var/log/nginx/fateconnect-<ambiente>.error.log` e `/var/log/nginx/error.log` | a cada falha, o **IP inteiro**, o pedido **com a query** e a página de origem: o nginx não aceita formato próprio neste arquivo |
+| Erros do nginx | `/var/log/nginx/fateconnect-<ambiente>.error.log` e `/var/log/nginx/error.log` | a cada falha, o **IP inteiro**, o pedido **com a query** e a página de origem: o nginx não aceita formato próprio neste arquivo. A conexão das notificações (`/api/hubs/`), que leva o token de sessão na query, só grava o que for crítico |
 
 Quem apaga o que passa do prazo:
 
