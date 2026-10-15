@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 public class ValidationResponseFilter : IOperationFilter
@@ -24,13 +24,19 @@ public class ValidationResponseFilter : IOperationFilter
         OpenApiResponse response = new()
         {
             Description = "The request is invalid: a field failed validation, listed in `errors`, or a rule refused " +
-                "it, explained in `detail`."
-        };
-        response.Content[OpenApiDocumentSetup.ProblemMediaType] = new OpenApiMediaType
-        {
-            Schema = context.SchemaGenerator.GenerateSchema(typeof(ValidationProblemDetails), context.SchemaRepository)
+                "it, explained in `detail`.",
+            Content = new Dictionary<string, OpenApiMediaType>
+            {
+                [OpenApiDocumentSetup.ProblemMediaType] = new()
+                {
+                    Schema = context.SchemaGenerator.GenerateSchema(
+                        typeof(ValidationProblemDetails),
+                        context.SchemaRepository)
+                }
+            }
         };
 
+        operation.Responses ??= [];
         operation.Responses.TryAdd(
             StatusCodes.Status400BadRequest.ToString(CultureInfo.InvariantCulture),
             response);

@@ -6,7 +6,7 @@ using FateConnect.Api.Modules.Auth.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 public class AuthorizationResponsesFilter : IOperationFilter
@@ -18,14 +18,7 @@ public class AuthorizationResponsesFilter : IOperationFilter
         if (metadata.OfType<IAllowAnonymous>().Any())
             return;
 
-        OpenApiSecurityScheme bearer = new()
-        {
-            Reference = new OpenApiReference
-            {
-                Type = ReferenceType.SecurityScheme,
-                Id = OpenApiDocumentSetup.BearerScheme
-            }
-        };
+        OpenApiSecuritySchemeReference bearer = new(OpenApiDocumentSetup.BearerScheme, context.Document);
         operation.Security = [new OpenApiSecurityRequirement { [bearer] = [] }];
 
         AddProblem(
@@ -48,12 +41,19 @@ public class AuthorizationResponsesFilter : IOperationFilter
         int statusCode,
         string description)
     {
-        OpenApiResponse response = new() { Description = description };
-        response.Content[OpenApiDocumentSetup.ProblemMediaType] = new OpenApiMediaType
+        OpenApiResponse response = new()
         {
-            Schema = context.SchemaGenerator.GenerateSchema(typeof(ProblemDetails), context.SchemaRepository)
+            Description = description,
+            Content = new Dictionary<string, OpenApiMediaType>
+            {
+                [OpenApiDocumentSetup.ProblemMediaType] = new()
+                {
+                    Schema = context.SchemaGenerator.GenerateSchema(typeof(ProblemDetails), context.SchemaRepository)
+                }
+            }
         };
 
+        operation.Responses ??= [];
         operation.Responses.TryAdd(statusCode.ToString(CultureInfo.InvariantCulture), response);
     }
 }

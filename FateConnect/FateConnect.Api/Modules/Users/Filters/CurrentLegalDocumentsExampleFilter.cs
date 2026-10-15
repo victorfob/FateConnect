@@ -2,38 +2,37 @@ namespace FateConnect.Api.Modules.Users.Filters;
 
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Nodes;
 using FateConnect.Api.Modules.Users.Interfaces;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 public class CurrentLegalDocumentsExampleFilter(ILegalDocumentVersions versions) : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
         MemberInfo? member = context.MemberInfo;
 
-        if (member is null)
+        if (member is null || schema is not OpenApiSchema concrete)
             return;
 
         if (member.GetCustomAttribute<CurrentDocumentVersionExampleAttribute>() is { } versionExample)
-            schema.Example = new OpenApiString(versions.Current[versionExample.Document]);
+            concrete.Example = JsonValue.Create(versions.Current[versionExample.Document]);
 
         if (member.IsDefined(typeof(CurrentDocumentAcceptancesExampleAttribute)))
-            schema.Example = AcceptanceOfEveryCurrentDocument();
+            concrete.Example = AcceptanceOfEveryCurrentDocument();
     }
 
-    private OpenApiArray AcceptanceOfEveryCurrentDocument()
+    private JsonArray AcceptanceOfEveryCurrentDocument()
     {
-        OpenApiArray acceptances = [];
-        acceptances.AddRange(versions.Current
+        JsonNode?[] acceptances = [.. versions.Current
             .OrderBy(current => current.Key)
-            .Select(current => new OpenApiObject
+            .Select(current => new JsonObject
             {
-                ["document"] = new OpenApiString(current.Key.ToString()),
-                ["version"] = new OpenApiString(current.Value),
-            }));
+                ["document"] = current.Key.ToString(),
+                ["version"] = current.Value,
+            })];
 
-        return acceptances;
+        return new JsonArray(acceptances);
     }
 }

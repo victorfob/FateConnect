@@ -13,7 +13,7 @@ paths:
 - ⛔ **Credencial vai no corpo, nunca na query** (código de link, token): o log de falhas do nginx grava a query inteira. Conferir um código é `POST` com corpo (`/Auth/verify-reset-token`); o WebSocket do hub é a exceção que o navegador impõe.
 - ⛔ **O contrato de cada rota se lê no DTO e no Swagger, não se enumera em rule.** Vale para os campos do corpo e para os parâmetros de filtro (o DTO de filtro do módulo, mais o `DateRangeFilterDto` e o `PagedFilterDto`).
 - A query e a resposta não têm os mesmos nomes (a de caronas filtra por `DateFrom`/`DepartureShift` e devolve `DepartureDate`/`DepartureTime`): não presuma simetria.
-- O Swagger diz o que pode chegar nulo e o que vem sempre: o `nullable` sai do tipo do C#, e o `required` da resposta, dos parâmetros do record posicional (`PositionalRecordRequiredFilter`).
+- O Swagger diz o que pode chegar nulo e o que vem sempre: o `null` entre os tipos (ou no `anyOf`, quando o campo aponta outro schema) sai do tipo do C#, e o `required` da resposta, dos parâmetros do record posicional (`PositionalRecordRequiredFilter`).
 - ⚠️ **A API publica `/Rides`, `/Users`, `/Auth`, e os serviços do front chamam minúsculo.** O roteamento é case-insensitive e a divergência é deliberada: não "corrija" nenhum lado.
 - O nome de quem está logado sai do token (claim `unique_name`); se a sessão vale, quem diz é o `GET /Auth/session` (204 ou 401), não o `exp` lido no front.
 
