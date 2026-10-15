@@ -132,6 +132,9 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // A página e a API na mesma origem, como em produção: o XHR do jsdom aplica o
+    // CORS e descartaria toda resposta de mock sem `Access-Control-Allow-Origin`.
+    environmentOptions: { jsdom: { url: 'https://api.fateconnect.test' } },
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
     // O relatório de execução é o que o Sonar lê para saber quantos testes
