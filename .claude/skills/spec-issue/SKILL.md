@@ -124,7 +124,7 @@ Priorize o que trava decisão adiante: contrato e modelo de dados primeiro, depo
 
 ⛔ **Pacote recomendado se confere pelo que ele implementa e pelo que ele puxa**, não por alvo, data e licença. Leia no README ou nas strings da DLL o padrão que ele gera, contra o que os clientes exigem; e adicione-o numa branch de rascunho para comparar as transitivas com as versões que a API já usa (`dotnet list package --include-transitive`). O `WebPush` 1.0.13 só gerava a criptografia antiga, que o push da Apple recusa, e o fork que a gera puxou um `Microsoft.IdentityModel` mais novo que o da autenticação, o que quebrou a validação do token.
 
-⛔ **Passo que roda uma vez por ambiente não paga automação:** ponha na mesa a versão manual, escrita onde alguém relê (ex.: o `UPDATE` em `deploy/DATABASE.md`). Paga automação o que roda a cada deploy ou quebra calado quando esquecido.
+⛔ **Passo que roda uma vez por ambiente não paga automação:** ponha na mesa a versão manual. Paga automação o que roda a cada deploy ou quebra calado quando esquecido. O lugar do passo manual depende de quem o roda: o de toda instalação nova vai no documento (o `UPDATE` que promove o administrador, em `deploy/DATABASE.md`); o de transição, que só o ambiente já no ar roda, vai no corpo da issue e do PR, porque os documentos descrevem a primeira instalação.
 
 ### A resposta em texto livre é a que muda o desenho
 
