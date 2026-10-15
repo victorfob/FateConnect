@@ -65,10 +65,14 @@ public static class OpenApiDocumentSetup
             options.OperationFilter<AuthorizationResponsesFilter>();
             options.OperationFilter<ValidationResponseFilter>();
             options.OperationFilter<JsonContentTypesFilter>();
+            options.DocumentFilter<NullableReferenceFilter>();
         });
 
         return services;
     }
+
+    public static void UseOpenApiDocument(this WebApplication app) =>
+        app.UseSwagger(options => options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1);
 
     public static void MapApiReference(this WebApplication app)
     {
