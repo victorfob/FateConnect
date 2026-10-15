@@ -4,7 +4,7 @@ export enum DocumentTypeEnum {
   PRIVACY_POLICY = 'PrivacyPolicy',
 }
 
-export type SignupAcceptance = {
+export type DocumentAcceptance = {
   document: DocumentTypeEnum;
   /** A data do documento que a pessoa leu, não a de hoje. */
   version: string;
@@ -16,6 +16,6 @@ export type SignupRequest = {
   fullName: string;
   birthDate: string;
   gender: string;
-  acceptances: SignupAcceptance[];
+  acceptances: DocumentAcceptance[];
   receiveNotifications: boolean;
 };

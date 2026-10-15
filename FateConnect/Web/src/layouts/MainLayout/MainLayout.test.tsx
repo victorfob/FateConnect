@@ -1,7 +1,11 @@
 import { createMemoryRouter, RouterProvider } from 'react-router';
+import { http, HttpResponse } from 'msw';
 
+import { LEGAL_DOCUMENTS_TITLE } from '@app/components/LegalDocumentsDialog/constants';
+import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { DocumentTypeEnum } from '@app/services/signup/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
 
@@ -151,5 +155,23 @@ describe('MainLayout', () => {
       'aria-current',
       'page',
     );
+  });
+
+  it('should hold the shell behind the legal documents dialog while a new version waits', async () => {
+    tokenStorage.save(tokenWithName('Maria da Silva'));
+    server.use(
+      http.get('https://api.fateconnect.test/users/me/legal-documents', () =>
+        HttpResponse.json([
+          {
+            document: DocumentTypeEnum.PRIVACY_POLICY,
+            currentVersion: '2026-12-01',
+            acceptedCurrentVersion: false,
+          },
+        ]),
+      ),
+    );
+    renderLayout();
+
+    expect(await screen.findByRole('dialog', { name: LEGAL_DOCUMENTS_TITLE })).toBeInTheDocument();
   });
 });
