@@ -10,6 +10,7 @@ paths:
 # Contrato com a API
 
 - **A API fala inglês inteira** (caminho, query, corpo, resposta), e não há tradução na borda: o tipo do front vai direto na chamada.
+- ⛔ **Credencial vai no corpo, nunca na query** (código de link, token): o log de falhas do nginx grava a query inteira. Conferir um código é `POST` com corpo (`/Auth/verify-reset-token`); o WebSocket do hub é a exceção que o navegador impõe.
 - ⛔ **O contrato de cada rota se lê no DTO e no Swagger, não se enumera em rule.** Vale para os campos do corpo e para os parâmetros de filtro (o DTO de filtro do módulo, mais o `DateRangeFilterDto` e o `PagedFilterDto`).
 - A query e a resposta não têm os mesmos nomes (a de caronas filtra por `DateFrom`/`DepartureShift` e devolve `DepartureDate`/`DepartureTime`): não presuma simetria.
 - O Swagger diz o que pode chegar nulo e o que vem sempre: o `nullable` sai do tipo do C#, e o `required` da resposta, dos parâmetros do record posicional (`PositionalRecordRequiredFilter`).
