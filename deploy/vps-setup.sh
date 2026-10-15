@@ -3,14 +3,15 @@
 #
 #   sudo ./vps-setup.sh
 #
-# Faz sete coisas, todas conferíveis antes de executar:
+# Faz oito coisas, todas conferíveis antes de executar:
 #   1. instala PostgreSQL, nginx, certbot e fail2ban;
 #   2. instala o Docker;
 #   3. fecha a porta do banco para a internet com firewall;
 #   4. permite que os contêineres alcancem o Postgres do host;
 #   5. cria um banco e um usuário por ambiente;
 #   6. limita o journal do host a 14 dias, onde ficam os logs dos contêineres;
-#   7. instala o formato do log de acesso do nginx, com o IP mascarado e sem query.
+#   7. instala o formato do log de acesso do nginx, com o IP mascarado e sem query;
+#   8. agenda o backup de produção, que roda depois de configurado no .env.prod.
 #
 # Não desliga nenhum serviço que já estava na máquina.
 set -euo pipefail
@@ -25,18 +26,19 @@ PG_CONF_DIR=/etc/postgresql/17/main
 PG_HBA="$PG_CONF_DIR/pg_hba.conf"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
-echo "==> 1/7 Pacotes do host"
+echo "==> 1/8 Pacotes do host"
 apt-get update -qq
 # O git entra aqui e não antes por um motivo prático: sem ele não há como
 # clonar o repositório que contém este script, então ele chega por outro meio
 # e instala o próprio pré-requisito.
 # O rsync é como a pipeline entrega o front construído no runner.
 # O PostgreSQL é o 17 do Debian 13, e o caminho de PG_CONF_DIR depende disso.
+# O age e o rclone são do backup: um cifra, o outro envia ao bucket.
 apt-get install -y -qq git curl ca-certificates rsync \
-  postgresql nginx certbot python3-certbot-nginx fail2ban
+  postgresql nginx certbot python3-certbot-nginx fail2ban age rclone
 echo "    git $(git --version | awk '{print $3}'), $(psql --version), $(nginx -v 2>&1)"
 
-echo "==> 2/7 Docker"
+echo "==> 2/8 Docker"
 if command -v docker >/dev/null 2>&1; then
   echo "    já instalado: $(docker --version)"
 else
@@ -45,7 +47,7 @@ fi
 usermod -aG docker "$TARGET_USER"
 echo "    $TARGET_USER adicionado ao grupo docker (vale no próximo login)"
 
-echo "==> 3/7 Firewall"
+echo "==> 3/8 Firewall"
 # O banco escuta em todas as interfaces para os contêineres o alcançarem. Quem
 # impede o acesso de fora é o firewall — sem ele, a 5432 fica aberta na
 # internet, que é como bancos de teste são invadidos.
@@ -65,7 +67,7 @@ ufw allow from 172.16.0.0/12 to any port 5432 proto tcp comment 'Postgres para c
 ufw --force enable >/dev/null
 echo "    liberadas 22, 80 e 443; a 5432 só para os contêineres"
 
-echo "==> 4/7 Acesso dos contêineres ao Postgres"
+echo "==> 4/8 Acesso dos contêineres ao Postgres"
 cp -a "$PG_HBA" "$PG_HBA.bak-$TIMESTAMP"
 # As faixas privadas cobrem as redes que o Docker cria. A internet não chega
 # aqui porque o firewall barra antes.
@@ -82,7 +84,7 @@ sed -i "s/^#\?listen_addresses = .*/listen_addresses = '*'/" "$PG_CONF"
 systemctl restart postgresql
 echo "    pg_hba.conf e listen_addresses ajustados (backups com sufixo .bak-$TIMESTAMP)"
 
-echo "==> 5/7 Bancos dos dois ambientes"
+echo "==> 5/8 Bancos dos dois ambientes"
 for environment in hml prod; do
   database="fateconnect_$environment"
   username="fateconnect_$environment"
@@ -103,7 +105,7 @@ for environment in hml prod; do
   echo "    $database criado; senha em /root/password-$database.txt"
 done
 
-echo "==> 6/7 Prazo do journal"
+echo "==> 6/8 Prazo do journal"
 # O journal só apaga arquivo inteiro, e o padrão é um por mês: sem o MaxFileSec, o
 # prazo passaria de 14 dias. Vale para o host todo, não só para os contêineres.
 JOURNALD_CONF=/etc/systemd/journald.conf.d/fateconnect.conf
@@ -112,7 +114,7 @@ printf '[Journal]\nMaxRetentionSec=14day\nMaxFileSec=1day\n' > "$JOURNALD_CONF"
 systemctl restart systemd-journald
 echo "    $JOURNALD_CONF: o journal apaga o que passa de 14 dias"
 
-echo "==> 7/7 Formato do log de acesso do nginx"
+echo "==> 7/8 Formato do log de acesso do nginx"
 # Dois `access_log` no mesmo nível gravam os dois: o do nginx.conf, com IP e query
 # inteiros, vira comentário, e o do host-log.conf fica no lugar dele.
 NGINX_CONF=/etc/nginx/nginx.conf
@@ -124,6 +126,16 @@ fi
 nginx -t
 systemctl reload nginx
 echo "    /var/log/nginx/access.log com o IP mascarado e sem query"
+
+echo "==> 8/8 Agendamento do backup de produção"
+# A unidade aponta para o script deste checkout, onde quer que ele tenha sido clonado.
+BACKUP_SCRIPT="$(cd "$(dirname "$0")" && pwd)/backup.sh"
+sed "s|__BACKUP_SCRIPT__|$BACKUP_SCRIPT|" "$(dirname "$0")/systemd/fateconnect-backup.service" \
+  > /etc/systemd/system/fateconnect-backup.service
+install -m 644 "$(dirname "$0")/systemd/fateconnect-backup.timer" /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable --now fateconnect-backup.timer >/dev/null
+echo "    $(systemctl list-timers fateconnect-backup.timer --no-legend | awk '{print "próximo: " $1, $2, $3}')"
 
 echo
 echo "Pronto. Confira o firewall com:  sudo ufw status numbered"
