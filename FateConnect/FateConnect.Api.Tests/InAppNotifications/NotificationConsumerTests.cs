@@ -31,6 +31,7 @@ public class NotificationConsumerTests
         ServiceProvider provider = new ServiceCollection()
             .AddSingleton(OutOfService<IInAppNotificationRepository>())
             .AddSingleton(OutOfService<IInAppNotificationService>())
+            .AddSingleton(OutOfService<IPushNotificationService>())
             .AddSingleton(OutOfService<IHubContext<NotificationHub>>())
             .AddLogging()
             .AddMassTransitTestHarness(bus =>
@@ -40,6 +41,7 @@ public class NotificationConsumerTests
                 bus.AddConsumer<ReportReceivedEventConsumer>();
                 bus.AddConsumer<ItemArchivedEventConsumer>();
                 bus.AddConsumer<NotificationDispatchedEventConsumer>();
+                bus.AddConsumer<NotificationDispatchedEventPushConsumer>();
             })
             .BuildServiceProvider(true);
 

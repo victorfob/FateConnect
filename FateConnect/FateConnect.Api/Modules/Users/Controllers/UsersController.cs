@@ -102,8 +102,8 @@ public class UsersController(IUserService service) : ControllerBase
     [SwaggerOperation(
         OperationId = "UpdateMyPreferences",
         Summary = "Update my preferences",
-        Description = "Turns the in-app notifications on or off for the signed-in user; a field left out keeps " +
-            "its value.")]
+        Description = "Turns the notifications on or off for the signed-in user, in the app and by push; turning " +
+            "them off also removes every push device of the account. A field left out keeps its value.")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> UpdatePreferencesAsync([FromBody] UpdatePreferencesDto dto)
     {

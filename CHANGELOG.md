@@ -16,6 +16,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a rota de saúde da API, que responde sem login se ela alcança o banco e a fila, sem dizer mais nada (#595) [Backend]
 - Adiciona ao log da API o login recusado, com o motivo e sem o e-mail, a ação de administração com quem a fez, a troca de senha recusada, as mudanças de foto e a sessão encerrada recusada, cada linha com o identificador da requisição (#598) [Backend]
 - Adiciona o envio dos erros internos da API a um projeto próprio no Sentry, só com método, rota e identificador da requisição, sem usuário, IP nem conteúdo; sem a chave do projeto, nada é enviado (#598) [Backend]
+- Adiciona a entrega por push dos avisos da central (denúncia recebida, carona para o bairro e item arquivado) a cada aparelho que a pessoa inscrever, com as rotas da chave pública e do aparelho; o aparelho que o serviço do navegador diz não existir mais é apagado (#623) [Backend]
 
 ### Changed
 
@@ -40,6 +41,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a pôr o botão dos cartões de achados e perdidos e de contas da gestão à direita da última linha do cartão no computador, e em largura cheia no celular, em vez de numa linha própria à esquerda (#621) [Frontend]
 - Troca o seletor de situação das denúncias, na gestão, por um botão com o próximo passo, iniciar a análise ou marcar como resolvida, e o descarte passa à lixeira no topo do cartão; os três continuam pedindo confirmação (#621) [Frontend]
 - Passa a mostrar em vermelho o botão de banir uma conta, como as outras ações destrutivas, e a confirmação ganha o ícone da ação (#621) [Frontend]
+- Passa a apagar todos os aparelhos inscritos no push quando a pessoa desliga as notificações (#623) [Backend]
+- Passa a recusar a subida da API sem o par de chaves do push, `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY`, dizendo qual faltou (#623) [Backend]
 
 ### Fixed
 
