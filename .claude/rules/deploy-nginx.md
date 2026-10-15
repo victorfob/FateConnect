@@ -27,6 +27,7 @@ docker run -d --name prova -p 8091:8091 \
 ## ⛔ O template no repo não é o que está no ar
 
 - Nada instala o template: o `deploy.sh` publica o front, e o `install-site.sh` é passo manual. A configuração antiga segue respondendo 200.
+- ⛔ A VPS tem um checkout só, na `develop`, e o `install-site.sh prod` instala o template dela. Antes, compare o template da `main` com o da `develop` e com o instalado: o que ainda não saiu em release chega a produção junto.
 - "Está atualizado" não se mede; a diretiva, sim. Procure a linha esperada no arquivo **instalado**:
 
 ```bash
@@ -54,6 +55,7 @@ Homologação e produção instalam o mesmo template no mesmo nginx, e por isso 
 
 ## ⛔ O log de acesso não guarda a query
 
+- ⛔ O log de falhas não aceita formato e grava a query inteira, no pedido, no endereço repassado e na origem. `location` que recebe credencial na query declara `error_log <arquivo> crit` (o `/api/hubs/`, onde o WebSocket leva o token de sessão); a bancada prova com um mutante sem a linha.
 - O caminho sai do `$request_uri` cortado no `?`: depois do `try_files`, o `$uri` vira `/index.html`.
 - O `Referer` também sai sem a query, porque a página devolve o token dos links de e-mail no pedido seguinte.
 - Dois `access_log` no mesmo nível gravam os dois arquivos: o do `nginx.conf` fica comentado (`vps-setup.sh`).
