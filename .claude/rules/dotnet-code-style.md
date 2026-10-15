@@ -56,6 +56,8 @@ bool phoneIsTaken = phoneRepeatedInRequest || await _userRepository.ContactPhone
 
 Subir o `||` para a atribuição não gasta consulta: o curto-circuito é do operador.
 
+O `return` de uma expressão montada (coleção com LINQ, objeto com campo calculado) também ganha nome antes de sair: `statusOfEachCurrentDocument` no `LegalDocumentService.GetStatusAsync`. Variável, chamada simples e literal saem direto.
+
 ⛔ **Dentro de `IQueryable`, o nome é `Expression<Func<T, bool>>`**: variável `bool` no lambda não compila, e método `bool` comum quebra em runtime (`could not be translated`). Veja `HasAnUpcomingDeparture` no `RideRepository`. Nomeie o conceito inteiro, não as metades.
 
 ## Rename mecânico acerta o que você não pediu
