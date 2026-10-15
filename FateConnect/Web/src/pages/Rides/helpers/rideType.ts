@@ -36,7 +36,7 @@ export const RIDE_TYPE_OPTIONS: readonly { value: RideTypeEnum; label: string }[
 ];
 
 export const RIDE_TYPE_HELP =
-  'Solidária: a carona é gratuita. Igualitária: os participantes dividem os custos.';
+  'Solidária: a carona é gratuita.\nIgualitária: os participantes dividem os custos.';
 
 /**
  * Estreita o texto que o formulário guarda para o tipo da API. Usado como

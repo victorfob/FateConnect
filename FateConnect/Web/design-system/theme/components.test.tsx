@@ -1,5 +1,6 @@
 import Button, { type ButtonProps } from '@mui/material/Button';
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 
 import { render, screen } from '@app/test/testing-library';
 import { declarationsFor, sheetRules } from '@app/test/utils/styleSheetRules';
@@ -21,6 +22,8 @@ const ICON_SIZES: ReadonlyArray<[IconButtonProps['size'], string]> = [
 ];
 const SMALL_LABEL_SIZE = '0.875rem';
 const NO_PADDING = '0rem';
+const HELP_TEXT =
+  'Solidária: a carona é gratuita.\nIgualitária: os participantes dividem os custos.';
 
 function hoverDeclarationsFor(element: Element): string {
   return declarationsFor(sheetRules(), element, HOVER);
@@ -120,5 +123,20 @@ describe('button theme', () => {
     );
 
     expect(screen.getByRole('button', { name: ICON_LABEL })).toHaveStyle({ height: '36px' });
+  });
+});
+
+describe('tooltip theme', () => {
+  it('should break the help at each line and fit one option per line at the touch size', () => {
+    render(
+      <Tooltip title={HELP_TEXT} open>
+        <span>{ICON_LABEL}</span>
+      </Tooltip>,
+    );
+
+    expect(screen.getByRole('tooltip').firstElementChild).toHaveStyle({
+      whiteSpace: 'pre-line',
+      maxWidth: '320px',
+    });
   });
 });
