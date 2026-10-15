@@ -69,8 +69,9 @@ sudo ./vps-setup.sh
 Ele instala PostgreSQL 17, nginx, certbot, fail2ban e Docker, fecha a porta do
 banco para a internet com firewall, permite que os contêineres alcancem o
 PostgreSQL do host, cria um banco e um usuário por ambiente — gravando cada
-senha em `/root/password-<banco>.txt` — e limita o journal do host a 14 dias
-(seção [Registros do servidor](#registros-do-servidor)).
+senha em `/root/password-<banco>.txt` —, limita o journal do host a 14 dias
+(seção [Registros do servidor](#registros-do-servidor)) e agenda o backup de
+produção (seção [Backup de produção](#backup-de-produção)).
 
 ⚠️ **O PostgreSQL escuta em todas as interfaces de propósito**
 (`listen_addresses = '*'`): o contêiner chega pelo gateway do Docker, que não é
@@ -139,9 +140,8 @@ docker compose -p fateconnect-hml logs api | grep "<identificador>"
 Vazio, a API não envia nada. O ambiente e a versão do evento vêm do `deploy.sh`.
 
 ⚠️ **Sem envio, ninguém entra.** O login recusa a conta que não confirmou o
-e-mail, inclusive as que já existiam antes da confirmação, e a de quem administra.
-Preencha as variáveis e confira que um e-mail de teste chega **antes** de
-publicar a versão que passou a exigir a confirmação.
+e-mail, inclusive a de quem administra. Preencha as variáveis e confira que um
+e-mail de teste chega antes de abrir o cadastro.
 
 Nenhum desses arquivos é versionado — eles têm senha dentro, e o repositório é
 público.
@@ -269,8 +269,7 @@ O conteúdo de `~/.ssh/github-actions` (sem o `.pub`) vai no secret
 
 ### A identidade do servidor
 
-A pipeline não descobre mais a identidade da VPS a cada publicação: ela a lê do
-secret `DEPLOY_KNOWN_HOSTS`. Gere o conteúdo **na própria VPS**, lendo as chaves
+A pipeline lê a identidade da VPS do secret `DEPLOY_KNOWN_HOSTS`. Gere o conteúdo **na própria VPS**, lendo as chaves
 na fonte, e cole a saída inteira no secret:
 
 ```bash
@@ -279,10 +278,9 @@ for f in /etc/ssh/ssh_host_*_key.pub; do echo "<endereços> $(cut -d' ' -f1,2 "$
 
 ⛔ **Não gere com `ssh-keyscan`.** Ele abre uma conexão por tipo de chave, em
 paralelo, e o `MaxStartups` do sshd descarta conexão nova quando a fila de
-preauth está cheia — o estado normal de uma máquina exposta à internet. Medido
-em 08/09/2026: duas execuções seguidas devolveram conjuntos diferentes, e uma
-devolveu nada. Foi por isso que ele saiu do workflow, e é por isso que não serve
-nem para gerar o secret à mão. Ler `/etc/ssh` não usa rede e traz todas.
+preauth está cheia — o estado normal de uma máquina exposta à internet. Duas
+execuções seguidas devolvem conjuntos diferentes, e às vezes nada. Ler
+`/etc/ssh` não usa rede e traz todas.
 
 **`<endereços>` é uma lista separada por vírgula**, e é o detalhe que faz ou
 quebra: o ssh procura a chave pelo **nome que o cliente digitou**, então a
@@ -346,8 +344,8 @@ curl -s https://hml.fateconnect.com.br/api/health
 
 A pipeline confere essa rota depois de subir o contêiner e reprova a publicação
 se ela não responder 200 em 2 minutos. Na subida, a API espera o RabbitMQ ficar
-saudável (o `healthcheck` do compose roda `rabbitmq-diagnostics ping`) antes de
-começar.
+saudável (o `healthcheck` do compose roda `rabbitmq-diagnostics check_port_connectivity`,
+que só passa com a porta aceitando conexão) antes de começar.
 
 ## Registros do servidor
 
@@ -392,41 +390,6 @@ sudo journalctl -t fateconnect-prod-api-1 -f      # acompanhando
 docker compose -p fateconnect-prod logs api       # o mesmo conteúdo, pelo Docker
 ```
 
-### Uma vez por VPS
-
-O `vps-setup.sh` já faz o journal e o log de acesso do host numa máquina nova. Na
-que já estava no ar antes dele, os mesmos passos vão à mão, de dentro de `deploy/`,
-e **nesta ordem: primeiro o log do host, depois os sites**. O journal:
-
-```bash
-sudo mkdir -p /etc/systemd/journald.conf.d
-printf '[Journal]\nMaxRetentionSec=14day\nMaxFileSec=1day\n' \
-  | sudo tee /etc/systemd/journald.conf.d/fateconnect.conf
-sudo systemctl restart systemd-journald
-systemd-analyze cat-config systemd/journald.conf | grep -E '^Max(Retention|File)Sec='
-```
-
-O log do host, conferindo que não sobrou `access_log` ativo no `nginx.conf` (o
-número esperado é 0):
-
-```bash
-sudo install -m 644 nginx/host-log.conf /etc/nginx/conf.d/fateconnect-host-log.conf
-sudo sed -i.bak -E 's/^(\s*)(access_log\s)/\1# \2/' /etc/nginx/nginx.conf
-grep -cE '^\s*access_log\s' /etc/nginx/nginx.conf
-sudo nginx -t && sudo systemctl reload nginx
-```
-
-A próxima publicação de cada ambiente recria a API e a fila já escrevendo no
-journal; o log antigo, do driver `json-file`, sai junto com o contêiner.
-
-Só então os sites. O template não se instala sozinho: depois do merge, rode
-`sudo ./install-site.sh hml` e `sudo ./install-site.sh prod`, e confira a diretiva
-no arquivo instalado — o número esperado é 1 em cada:
-
-```bash
-sudo grep -cF 'access.log fateconnect_masked;' /etc/nginx/sites-available/fateconnect-{hml,prod}
-```
-
 ## Dia a dia
 
 | O que você quer | Comando |
@@ -436,17 +399,97 @@ sudo grep -cF 'access.log fateconnect_masked;' /etc/nginx/sites-available/fateco
 | Ver o que está de pé | `docker compose -p fateconnect-prod ps` |
 | Ler os logs | `docker compose -p fateconnect-prod logs -f`, ou `sudo journalctl -t fateconnect-prod-api-1` |
 | Ver a memória | `free -h` |
+| Fazer um backup agora | `sudo ./backup.sh` |
 
 Para olhar os dados de homologação pelo DBeaver — túnel SSH e campos de
 conexão —, veja [DATABASE.md](DATABASE.md).
 
-### Backup do banco
+### Backup de produção
+
+O `backup.sh` junta o banco `fateconnect_prod` e as fotos de produção numa cópia
+só, cifra e envia a um bucket do Backblaze B2. O agendamento que o
+`vps-setup.sh` instala o roda nos dias 1 e 16, às 03:00, e o bucket guarda as 6
+cópias mais recentes. A VPS só tem a chave pública: quem entrar nela ou no bucket
+não lê as cópias.
+
+Uma vez, para configurar:
+
+1. **O bucket.** No Backblaze B2, crie um bucket **privado**, sem Object Lock, e em
+   Lifecycle Settings marque **Keep only the last version of the file**. Depois,
+   uma chave de aplicação com leitura e escrita **só nesse bucket**. O painel mostra
+   a `applicationKey` uma vez só.
+2. **O par de chaves**, gerado na **sua máquina**, nunca na VPS (`brew install age`
+   no macOS):
+
+   ```bash
+   age-keygen -o fateconnect-backup.key
+   ```
+
+   O comando imprime a chave pública (`age1…`). O arquivo é a chave privada: guarde-o
+   em dois lugares seus, como o gerenciador de senhas e um arquivo offline. Perdê-lo é
+   perder todas as cópias.
+3. **O aviso de falha.** No projeto da **API** no Sentry, crie um monitor de
+   agendamento (Crons) chamado **`fateconnect-backup`**, com a agenda `0 3 1,16 * *`
+   no fuso `America/Sao_Paulo`, 60 minutos de margem, 30 de execução máxima e alerta
+   na primeira falha. O `backup.sh` monta o endereço de check-in a partir do
+   `SENTRY_DSN` da API, então o projeto e o nome precisam ser esses.
+
+   O monitor abre a issue, mas não avisa ninguém: a regra de alerta do projeto não
+   pega falha de agendamento. Na página dele, em Connected Alerts, crie um alerta
+   próprio (**New Alert**) que mande e-mail a quem mantém o projeto quando uma issue
+   é criada, resolvida ou volta, e confira com **Send Test Notification**.
+
+   O monitor só cobra a agenda depois do primeiro check-in, então não precisa ser
+   desligado antes da primeira cópia. ⛔ Monitor desligado descarta os check-ins que
+   recebe: nem a falha nem o sucesso ficam registrados, e nenhum alerta sai.
+4. **O `.env.prod`**, de dentro de `deploy/`. A chave pública e o nome do bucket vão
+   como texto (`BACKUP_AGE_RECIPIENT` e `BACKUP_B2_BUCKET`). O `keyID` e a
+   `applicationKey` entram por um `read` que não mostra o que se cola e tira o espaço
+   e a quebra de linha que o clipboard traz:
+
+   ```bash
+   for name in BACKUP_B2_KEY_ID BACKUP_B2_APPLICATION_KEY; do
+     read -rs -p "$name: " value; echo
+     value=$(printf %s "$value" | tr -d '[:space:]')
+     sed -i "/^$name=/d" .env.prod && printf '%s=%s\n' "$name" "$value" >> .env.prod
+   done; unset value
+   ```
+
+   ⚠️ O `.env.prod` é lido como shell: uma linha que não é variável, comentário nem
+   linha em branco vira comando, e o erro imprime o conteúdo dela. Confira que não
+   sobrou nenhuma (o número esperado é 0):
+
+   ```bash
+   grep -cvE '^([A-Za-z_][A-Za-z0-9_]*=|[[:space:]]*#|[[:space:]]*$)' .env.prod
+   ```
+
+5. **A primeira cópia**, à mão, conferindo depois a próxima data:
+
+   ```bash
+   sudo ./backup.sh
+   systemctl list-timers fateconnect-backup.timer
+   ```
+
+#### Restaurar
+
+A cópia se abre na **sua máquina**, onde está a chave privada. Baixe o arquivo
+pelo painel do B2 e decifre:
 
 ```bash
-sudo -u postgres pg_dump fateconnect_prod > backup-$(date +%F).sql
+age -d -i fateconnect-backup.key fateconnect-prod-AAAA-MM-DD.tar.age | tar -xf -
 ```
 
-Guarde o arquivo fora da VPS. Não há backup automático configurado.
+Saem dois arquivos, `database.dump` e `uploads.tar`. Envie os dois à VPS
+(`scp`) e, de dentro de `deploy/`, com a API parada para ninguém gravar no meio:
+
+```bash
+docker compose -p fateconnect-prod stop api
+sudo -u postgres pg_restore --clean --if-exists --no-owner --role=fateconnect_prod \
+  -d fateconnect_prod database.dump
+docker run --rm -i -v fateconnect-prod_api_uploads:/uploads alpine:3.20 tar -C /uploads -xf - < uploads.tar
+docker compose -p fateconnect-prod start api
+rm database.dump uploads.tar
+```
 
 ### Trocar de VPS
 
@@ -502,7 +545,3 @@ código do link: quem não recebeu pede outro link pela tela. Veja se a fila est
 
 **O deploy para dizendo que há alterações não commitadas.** Alguém editou algo
 direto na VPS. Veja com `git status` e descarte se não houver nada a salvar.
-
-## O que ainda não existe
-
-- **Backup do banco é manual.**

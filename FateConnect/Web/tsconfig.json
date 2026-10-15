@@ -25,7 +25,7 @@
       "@design-system/*": ["./design-system/*"],
       "@ds-root/*": ["./design-system/*"],
       "@app/*": ["./src/*"],
-      "@legal/*": ["./legal/*"]
+      "@legal/*": ["../legal/*"]
     }
   },
   "include": ["src", "design-system", "vitest.setup.ts", "vite.config.ts"]

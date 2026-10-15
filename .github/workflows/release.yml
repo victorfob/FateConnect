@@ -25,7 +25,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Create tag
         run: |
@@ -72,7 +72,7 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # Histórico completo: o job compara as duas branches, e um checkout
           # raso não tem os commits para contar.

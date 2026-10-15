@@ -18,4 +18,7 @@ public static class HttpContextExtensions
 
     public static string UserIdOrAnonymous(this HttpContext context) =>
         context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? AnonymousUser;
+
+    public static string? UserEmail(this HttpContext context) =>
+        context.User.FindFirstValue(ClaimTypes.Email);
 }

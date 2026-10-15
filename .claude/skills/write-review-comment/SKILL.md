@@ -24,7 +24,7 @@ Solução proposta: o que fazer.
 
 ⛔ **Só é `Problema:` o que está errado: defeito, contrato quebrado, código morto, incoerência dentro do PR.** O resto — ganho de desempenho, privacidade por desenho, nome que lê melhor, campo que falta no contrato — abre com `**Sugestão:**` e fecha dizendo que a escolha é de quem escreveu.
 
-⛔ Cobrado em 12/09/2026, na rodada do PR #391. Eu tinha redigido como `Problema:` uma refatoração que trocava garantia do compilador por dois `!` — real, mas sem nada quebrado hoje. A correção do Victor foi *"se esse não é um problema use um template de sugestão, colocar como problema faz parecer q é algo crítico"*.
+⛔ Cobrado em 12/09/2026, na rodada do PR #391. Eu tinha redigido como `Problema:` uma refatoração que trocava garantia do compilador por dois `!` — real, mas sem nada quebrado hoje. A correção do usuário foi *"se esse não é um problema use um template de sugestão, colocar como problema faz parecer q é algo crítico"*.
 
 **O custo de errar o registro não é de estilo.** Quem recebe doze threads abertos por `Problema:` não consegue separar o que derruba a aplicação do que melhora uma linha, e passa a ler todos com o mesmo peso — ou a descontar todos pelo mesmo fator.
 
@@ -34,7 +34,7 @@ Solução proposta: o que fazer.
 
 ⛔ **Nenhum comentário vai para o PR sem o texto ter sido mostrado e confirmado.** Um por vez: preview, confirmação, publicação, próximo — nunca uma leva inteira de uma vez.
 
-Pedido pelo Victor nas duas vezes em que esta skill foi invocada: *"só poste depois que confirmar explicitamente, quero ver o preview antes de confirmar"* e *"me mostrar o preview antes de cada um, quero confirmar um por vez"*. O motivo aparece na prática — comentário publicado é instrução endereçada a quem vai corrigir, e retirar um que já foi lido custa mais que mostrá-lo antes. Na rodada do #322, **dois** dos onze mudaram de conteúdo no preview e um terceiro deixou de existir.
+Pedido pelo usuário nas duas vezes em que esta skill foi invocada: *"só poste depois que confirmar explicitamente, quero ver o preview antes de confirmar"* e *"me mostrar o preview antes de cada um, quero confirmar um por vez"*. O motivo aparece na prática — comentário publicado é instrução endereçada a quem vai corrigir, e retirar um que já foi lido custa mais que mostrá-lo antes. Na rodada do #322, **dois** dos onze mudaram de conteúdo no preview e um terceiro deixou de existir.
 
 ## Onde ancorar
 
@@ -67,7 +67,7 @@ gh api --method POST repos/<dono>/<repo>/pulls/<n>/comments \
 
 ## Convenção nossa não se cobra no PR dos outros
 
-⛔ **O que vale entre mim e o Victor não vira exigência para quem só contribui.** Densidade de comentário, forma do JSDoc, ordem de import, nome de arquivo: são acordos da nossa dupla, escritos nas rules deste repo porque nos servem — não porque quem abre um PR aqui os assinou.
+⛔ **O que vale entre o agente e quem mantém o projeto não vira exigência para quem só contribui.** Densidade de comentário, forma do JSDoc, ordem de import, nome de arquivo: são acordos de quem mantém, escritos nas rules deste repo porque servem a eles — não porque quem abre um PR aqui os assinou.
 
 Cobrado no review do PR #186. Eu tinha redigido um apontamento pedindo a restauração de três comentários apagados, citando a `comments.md`; a resposta foi *"ele não gosta de comentários, não precisamos forçar ele a seguir um padrão nosso"*.
 

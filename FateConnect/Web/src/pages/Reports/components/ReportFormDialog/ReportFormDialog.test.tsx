@@ -59,7 +59,8 @@ async function fillTheForm() {
     screen.getByRole('combobox', { name: new RegExp(REPORT_FORM_LABELS.category) }),
   );
   await userEvent.click(await screen.findByRole('option', { name: CHOSEN_CATEGORY_LABEL }));
-  await userEvent.type(descriptionField(), TYPED_DESCRIPTION);
+  await userEvent.click(descriptionField());
+  await userEvent.paste(TYPED_DESCRIPTION);
 }
 
 describe('ReportFormDialog', () => {
@@ -89,7 +90,8 @@ describe('ReportFormDialog', () => {
   it('should hold the description to its limit and show how much of it is used', async () => {
     renderComponent();
 
-    await userEvent.type(descriptionField(), TYPED_DESCRIPTION);
+    await userEvent.click(descriptionField());
+    await userEvent.paste(TYPED_DESCRIPTION);
 
     expect(descriptionField()).toHaveAttribute('maxlength', '500');
     expect(screen.getByText('56/500', { ignore: '[role="status"]' })).toBeInTheDocument();

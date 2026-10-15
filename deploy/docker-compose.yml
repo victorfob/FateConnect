@@ -83,8 +83,10 @@ services:
     ports:
       - '127.0.0.1:${RABBITMQ_PORT}:5672'
       - '127.0.0.1:${RABBITMQ_UI_PORT}:15672'
+    # O `ping` responde quando o nó sobe, antes da porta 5672 aceitar conexão, e a
+    # API que espera o RabbitMQ saudável conectava cedo demais.
     healthcheck:
-      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'check_port_connectivity']
       interval: 10s
       timeout: 5s
       retries: 6

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.OpenApi;
 using FateConnect.Api.Modules.Users.Enums;
+using FateConnect.Api.Modules.Users.Filters;
 using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,7 +20,7 @@ public class DocumentAcceptanceDto : IValidatableObject
     [Required(ErrorMessage = "The version of the accepted document is required.")]
     [MaxLength(20)]
     [SwaggerSchema("Version of the accepted document; only the current one, as published, is accepted.")]
-    [SchemaExample("2026-10-14")]
+    [CurrentDocumentVersionExample(EnumDocumentType.TermsOfUse)]
     required public string Version { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

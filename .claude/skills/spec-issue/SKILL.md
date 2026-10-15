@@ -82,7 +82,7 @@ Blocos de **no máximo quatro perguntas** via `AskUserQuestion` — quatro é o 
 
 ⛔ **O usuário aprovar quantas issues nascem e como elas se penduram não responde o que vai dentro de cada uma.** Estrutura é uma decisão; alcance, contrato e invariante são outras — e ter a primeira na mão dá a sensação de que o que sobrou é redigir.
 
-⛔ Aconteceu em 12/09/2026, ao abrir as filhas da auditoria do Lighthouse. A lista e o desenho "pai com duas filhas" já estavam aprovados, e eu fui direto escrever os corpos; o Victor teve de lembrar da skill. A sabatina que veio depois mudou duas coisas **já escritas**: o alcance da miniatura de foto, e — pela resposta em texto livre — a correção das fotos de homologação, que deixou de ser conveniência e virou **pré-condição** do contrato, porque sem ela o campo chega nulo numa tela que não tem caminho de volta.
+⛔ Aconteceu em 12/09/2026, ao abrir as filhas da auditoria do Lighthouse. A lista e o desenho "pai com duas filhas" já estavam aprovados, e eu fui direto escrever os corpos; o usuário teve de lembrar da skill. A sabatina que veio depois mudou duas coisas **já escritas**: o alcance da miniatura de foto, e — pela resposta em texto livre — a correção das fotos de homologação, que deixou de ser conveniência e virou **pré-condição** do contrato, porque sem ela o campo chega nulo numa tela que não tem caminho de volta.
 
 ⚠️ E a leitura do passo 1 foi o que salvou o corpo de uma issue inteira: `gh issue list --state all --search` achou a **#160**, fechada, que já havia decidido e medido aquela cor. O defeito não era a decisão faltando — era uma sobrescrita de CSS passando por cima dela. Procurar issue fechada não serve só para achar duplicata: serve para achar a decisão que o código deixou de cumprir.
 
@@ -118,13 +118,13 @@ Priorize o que trava decisão adiante: contrato e modelo de dados primeiro, depo
 
 ⛔ **Antes de recomendar um mecanismo, procure no roteiro o que ele **também** vai ter de servir.** Um desenho que resolve o pedido de hoje e não alcança o item de três semanas adiante é uma recomendação errada — e o custo aparece com o código já escrito.
 
-⛔ Aconteceu na #290. Recomendei lista de revogados por `jti` para o encerramento de sessão, e o Victor escolheu. O que eu não pesei: a **#114** tem *"troca de senha exigindo a senha atual"* no escopo, e a lista de revogados **não consegue** invalidar ali — ela guarda os tokens já revogados, não os que estão vivos, então na troca de senha não há o que revogar. A saída correta era versão de sessão, que derruba todos incrementando uma coluna. A troca custou reescrever a branch inteira.
+⛔ Aconteceu na #290. Recomendei lista de revogados por `jti` para o encerramento de sessão, e o usuário escolheu. O que eu não pesei: a **#114** tem *"troca de senha exigindo a senha atual"* no escopo, e a lista de revogados **não consegue** invalidar ali — ela guarda os tokens já revogados, não os que estão vivos, então na troca de senha não há o que revogar. A saída correta era versão de sessão, que derruba todos incrementando uma coluna. A troca custou reescrever a branch inteira.
 
 **A conferência é uma busca:** `gh issue list --state open --search "<o conceito>"` e a leitura do escopo das que aparecerem. Vale sobretudo quando o mecanismo guarda ou invalida estado — sessão, permissão, cache —, porque é aí que um item futuro muda a resposta.
 
 ⛔ **Pacote recomendado se confere pelo que ele implementa e pelo que ele puxa**, não por alvo, data e licença. Leia no README ou nas strings da DLL o padrão que ele gera, contra o que os clientes exigem; e adicione-o numa branch de rascunho para comparar as transitivas com as versões que a API já usa (`dotnet list package --include-transitive`). O `WebPush` 1.0.13 só gerava a criptografia antiga, que o push da Apple recusa, e o fork que a gera puxou um `Microsoft.IdentityModel` mais novo que o da autenticação, o que quebrou a validação do token.
 
-⛔ **Passo que roda uma vez por ambiente não paga automação:** ponha na mesa a versão manual, escrita onde alguém relê (ex.: o `UPDATE` em `deploy/DATABASE.md`). Paga automação o que roda a cada deploy ou quebra calado quando esquecido.
+⛔ **Passo que roda uma vez por ambiente não paga automação:** ponha na mesa a versão manual. Paga automação o que roda a cada deploy ou quebra calado quando esquecido. O lugar do passo manual depende de quem o roda: o de toda instalação nova vai no documento (o `UPDATE` que promove o administrador, em `deploy/DATABASE.md`); o de transição, que só o ambiente já no ar roda, vai no corpo da issue e do PR, porque os documentos descrevem a primeira instalação.
 
 ### A resposta em texto livre é a que muda o desenho
 
@@ -158,7 +158,7 @@ Na dúvida entre as duas seções, é suposição: a decisão errada custa uma p
 
 O custo real de uma suposição não é ela estar errada: é **alguém ter que voltar nela**. Cada linha da tabela é uma conversa marcada para depois, e "depois" costuma ser no meio da implementação, com código já escrito em cima.
 
-⛔ Aconteceu na #184. Escrevi três suposições — projeto único no Sonar, análise dentro do job existente, chave do projeto sem nome — e o Victor respondeu *"não quero que fique suposições, vamos transformar elas em decisões"*. As três viraram um bloco de `AskUserQuestion` e foram decididas em uma rodada, com o motivo de cada uma registrado na tabela de decisões. A tabela de suposições sumiu do corpo.
+⛔ Aconteceu na #184. Escrevi três suposições — projeto único no Sonar, análise dentro do job existente, chave do projeto sem nome — e o usuário respondeu *"não quero que fique suposições, vamos transformar elas em decisões"*. As três viraram um bloco de `AskUserQuestion` e foram decididas em uma rodada, com o motivo de cada uma registrado na tabela de decisões. A tabela de suposições sumiu do corpo.
 
 **A regra prática:** montou a lista de suposições, releia procurando as que **cabem numa pergunta com duas opções concretas**. Essas não são suposições — são perguntas que você não fez.
 
@@ -168,7 +168,7 @@ O custo real de uma suposição não é ela estar errada: é **alguém ter que v
 
 **A varredura:** percorra a tabela de decisões linha a linha e aponte, para cada uma, a mensagem em que o usuário decidiu aquilo. Linha sem mensagem correspondente é sua — vira pergunta, não decisão.
 
-⛔ Aconteceu na #227. O corpo já estava escrito quando o Victor perguntou *"antes de escrever, mais alguma dúvida? Tire todas pra não restar suposições"*. A releitura achou **quatro** escolhas minhas passando por decisão, e ele inverteu **três**: caronas também mudava de verbo, os títulos da landing não eram nome de funcionalidade, e o placeholder ia para a forma que eu tinha descartado.
+⛔ Aconteceu na #227. O corpo já estava escrito quando o usuário perguntou *"antes de escrever, mais alguma dúvida? Tire todas pra não restar suposições"*. A releitura achou **quatro** escolhas minhas passando por decisão, e ele inverteu **três**: caronas também mudava de verbo, os títulos da landing não eram nome de funcionalidade, e o placeholder ia para a forma que eu tinha descartado.
 
 #### A resposta responde o que foi perguntado, não o vizinho parecido
 
@@ -215,7 +215,7 @@ Os `id` saem de `gh api graphql -f query='{repository(owner:"...",name:"..."){is
 gh project item-list 1 --owner <owner> --format json --limit 300
 ```
 
-⛔ **O `--limit` é obrigatório.** O padrão é **30**, e a resposta truncada não vem com aviso nenhum. Na #226 uma consulta com `--limit 100` num board de 112 itens não achou o card recém-criado; reportei que o board não tinha adotado a issue e o Victor moveu à mão o que já estava lá. Antes de concluir ausência, compare o total que voltou com o tamanho do board.
+⛔ **O `--limit` é obrigatório.** O padrão é **30**, e a resposta truncada não vem com aviso nenhum. Na #226 uma consulta com `--limit 100` num board de 112 itens não achou o card recém-criado; reportei que o board não tinha adotado a issue e o usuário moveu à mão o que já estava lá. Antes de concluir ausência, compare o total que voltou com o tamanho do board.
 
 ## 6. Varredura de fechamento
 

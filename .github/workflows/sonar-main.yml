@@ -28,12 +28,12 @@ jobs:
       run:
         working-directory: FateConnect/Web
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # Sem histórico completo o Sonar perde a noção de quem mudou o quê.
           fetch-depth: 0
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version-file: FateConnect/Web/.nvmrc
 
@@ -41,7 +41,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: FateConnect/Web/node_modules
           key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
@@ -70,7 +70,7 @@ jobs:
         run: echo "value=$(jq -r .version "$GITHUB_WORKSPACE/package.json")" >> "$GITHUB_OUTPUT"
 
       - name: Sonar
-        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
+        uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8.3.0
         with:
           projectBaseDir: FateConnect/Web
           args: -Dsonar.projectVersion=${{ steps.version.outputs.value }}
@@ -81,7 +81,7 @@ jobs:
     name: Analyze the API
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # Sem histórico completo o Sonar perde a noção de quem mudou o quê.
           fetch-depth: 0
@@ -112,7 +112,7 @@ jobs:
           /d:sonar.host.url=https://sonarcloud.io
           /d:sonar.token=$SONAR_TOKEN
           /d:sonar.qualitygate.wait=true
-          /d:sonar.exclusions=FateConnect/Web/**,LBD/**,ESII/**,ESIII/**
+          /d:sonar.exclusions=FateConnect/Web/**,FateConnect/legal/**,LBD/**,ESII/**,ESIII/**
           /d:sonar.cs.opencover.reportsPaths=coverage/**/coverage.opencover.xml
           /d:sonar.coverage.exclusions=**/Migrations/**,**/obj/**
           /d:sonar.cpd.exclusions=**/Migrations/**

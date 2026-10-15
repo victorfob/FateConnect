@@ -1,0 +1,10 @@
+[Unit]
+Description=Backup do FateConnect de produção nos dias 1 e 16
+
+[Timer]
+OnCalendar=*-*-01,16 03:00:00 America/Sao_Paulo
+# Com a VPS desligada na hora marcada, roda assim que ela voltar.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

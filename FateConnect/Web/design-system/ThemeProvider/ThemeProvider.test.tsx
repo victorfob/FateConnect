@@ -93,7 +93,7 @@ describe('ThemeProvider', () => {
     const element = screen.getByText('FateConnect');
 
     expect(element).toBeInTheDocument();
-    expect(getComputedStyle(element).fontSize).toBe('1.3rem');
+    expect(getComputedStyle(element).fontSize).toBe('20.8px');
   });
 
   it('should open in the mode chosen on the last visit, whatever the device is in', () => {
