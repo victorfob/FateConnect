@@ -36,7 +36,7 @@ jobs:
       SSH_OPTIONS: -i ~/.ssh/deploy_key -o BatchMode=yes -o ConnectTimeout=15 -o ConnectionAttempts=5
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v7
         with:

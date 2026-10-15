@@ -23,7 +23,7 @@ jobs:
     name: .NET API
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # Clone completo por causa do Sonar: sem histórico ele perde a noção
           # de código novo, que é o que o quality gate mede.
