@@ -4,8 +4,18 @@ import type { ProfileTypeEnum } from '@app/services/auth/types';
  * Token de mentira no formato que o front lê. Só o payload importa: nada aqui
  * valida assinatura, e a chave é a mesma que o backend escreve.
  */
-export function tokenWithName(name: string, profile?: ProfileTypeEnum, userId?: number): string {
-  const json = JSON.stringify({ unique_name: name, role: profile, nameid: userId?.toString() });
+export function tokenWithName(
+  name: string,
+  profile?: ProfileTypeEnum,
+  userId?: number,
+  email?: string,
+): string {
+  const json = JSON.stringify({
+    unique_name: name,
+    role: profile,
+    nameid: userId?.toString(),
+    email,
+  });
   const bytes = new TextEncoder().encode(json);
   const payload = btoa(String.fromCodePoint(...bytes))
     .replaceAll('+', '-')

@@ -1,4 +1,7 @@
-import { init } from '@sentry/react';
+import { init, setUser } from '@sentry/react';
+
+import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { tokenWithName } from '@app/test/token';
 
 import { initSentry } from './initSentry';
 
@@ -8,9 +11,11 @@ vi.mock('@sentry/react', () => ({
   reactRouterBrowserTracingIntegration: vi.fn(),
   replayIntegration: vi.fn(),
   getClient: vi.fn(),
+  setUser: vi.fn(),
 }));
 
 const mockInit = init as Mock;
+const mockSetUser = setUser as Mock;
 
 function initOptions() {
   const initCall = mockInit.mock.lastCall;
@@ -34,18 +39,49 @@ describe('initSentry', () => {
     expect(mockInit).not.toHaveBeenCalled();
   });
 
-  it('should not let request bodies or user data leave the browser', () => {
+  it('should send only the browser identification and the referring page', () => {
     vi.stubEnv('VITE_SENTRY_DSN', 'https://public@sentry.test/1');
 
     initSentry();
 
-    expect(mockInit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        dsn: 'https://public@sentry.test/1',
-        dataCollection: { userInfo: false, httpBodies: [] },
-        enableLogs: false,
-      }),
-    );
+    expect(initOptions()).toMatchObject({ dsn: 'https://public@sentry.test/1' });
+    expect(initOptions().dataCollection).toEqual({
+      userInfo: false,
+      cookies: false,
+      httpHeaders: { request: true, response: false },
+      httpBodies: [],
+      urlQueryParams: false,
+      graphQL: { document: false, variables: false },
+      genAI: { inputs: false, outputs: false },
+      databaseQueryData: false,
+      queues: false,
+      stackFrameVariables: false,
+    });
+  });
+
+  it('should identify the errors by the email of the logged account, and forget it on sign out', () => {
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@sentry.test/1');
+    tokenStorage.save(tokenWithName('Maria da Silva', undefined, 7, 'maria@fatec.sp.gov.br'));
+
+    initSentry();
+
+    expect(mockSetUser).toHaveBeenLastCalledWith({ email: 'maria@fatec.sp.gov.br' });
+
+    tokenStorage.clear();
+
+    expect(mockSetUser).toHaveBeenLastCalledWith(null);
+  });
+
+  it('should identify the account that signs in after the page opened', () => {
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@sentry.test/1');
+
+    initSentry();
+
+    expect(mockSetUser).toHaveBeenLastCalledWith(null);
+
+    tokenStorage.save(tokenWithName('Maria da Silva', undefined, 7, 'maria@fatec.sp.gov.br'));
+
+    expect(mockSetUser).toHaveBeenLastCalledWith({ email: 'maria@fatec.sp.gov.br' });
   });
 
   it('should drop the query of every url in events, breadcrumbs and spans', () => {
@@ -64,7 +100,12 @@ describe('initSentry', () => {
       request: { url: page },
     });
     expect(beforeBreadcrumb({ data: { to: link } })).toEqual({ data: { to: page } });
-    expect(beforeSendSpan({ description: `GET ${link}` })).toEqual({ description: `GET ${page}` });
+    expect(
+      beforeSendSpan({
+        name: `GET ${link}`,
+        attributes: { 'url.full': link, 'url.query': 'token=abc123' },
+      }),
+    ).toEqual({ name: `GET ${page}`, attributes: { 'url.full': page } });
   });
 
   it('should propagate the trace header only to our own apis', () => {
