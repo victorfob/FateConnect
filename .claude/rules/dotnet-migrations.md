@@ -60,6 +60,10 @@ dotnet ef migrations add _Drift && grep "migrationBuilder\." Infrastructure/Data
 
 ⛔ O gerador preenche a coluna `NOT NULL` nova das linhas existentes com o zero do tipo (`defaultValue: 0`), que num enum começado em 1 é valor inválido. Preencha com o valor de negócio, numa constante da própria migration (o enum do domínio muda depois, a migration não), e tire o padrão logo em seguida com `ALTER COLUMN ... DROP DEFAULT`, para o banco não aceitar inserção sem o campo.
 
+## Acerto só do banco que já existe
+
+⛔ Diferença que só o banco já no ar tem (padrão que uma migration antiga deixou, sequência com o nome velho) se acerta à mão, no passo de transição do PR, nunca em migration: migration é o que toda instalação nova aplica, e a de acerto não faria nada num banco vazio. A prova é o catálogo do banco antigo, depois do passo, igual ao de um banco novo.
+
 ## Duplicação
 
 `Up` e `Down` de rename são blocos espelhados, por isso `Migrations/` sai da duplicação e da cobertura por chaves próprias no `check-api.yml` e no `sonar-main.yml`. ⛔ Não funda as duas em `sonar.exclusions`: isso tira `Migrations/` da análise inteira.
