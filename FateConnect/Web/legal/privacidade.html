@@ -42,8 +42,8 @@
         Depois do cadastro, você pode acrescentar ao seu perfil o telefone e o e-mail para contato,
         o bairro e a cidade onde mora e uma foto. Todos são opcionais. O bairro, a cidade e a foto
         você pode tirar do perfil quando quiser. Se você recebe notificações, o bairro serve para
-        avisar de carona ofertada para ele, e a cidade evita o aviso de um bairro de mesmo nome em
-        outra cidade.
+        avisar de carona ofertada para ele. Quando o seu perfil e a carona informam a cidade, ela
+        evita o aviso de um bairro de mesmo nome em outra cidade.
       </p>
       <p>
         O telefone e o e-mail para contato são cadastrados juntos e, depois disso, podem ser
@@ -55,8 +55,8 @@
       <h3>2.3 Dados que você fornece ao usar</h3>
       <p>
         As caronas que você oferta, com destino, data, horário, recorrência, tipo, veículo e descrição; e os itens
-        que você cadastra em achados e perdidos, com nome, local, data do ocorrido, descrição e,
-        quando você a envia, uma foto. A foto do item você pode trocar ou tirar ao editá-lo.
+        que você cadastra em achados e perdidos, com nome, local, data do ocorrido, se foi perdido
+        ou encontrado, descrição e, quando você a envia, uma foto. A foto do item você pode trocar ou tirar ao editá-lo.
       </p>
       <p>
         As denúncias que você envia, com o motivo escolhido, a descrição do que aconteceu e, quando
@@ -102,7 +102,8 @@
         </li>
         <li>
           o registro de falhas, que só é escrito quando um pedido falha e guarda o endereço IP
-          completo e o endereço acessado por inteiro.
+          completo e o endereço acessado por inteiro. A conexão que entrega as notificações na
+          hora, que leva o token de sessão no endereço, não entra nele.
         </li>
       </ul>
       <p>
@@ -117,8 +118,10 @@
       <p>
         Para proteger a conta, contamos as senhas erradas seguidas: na terceira, o login fica
         bloqueado por 30 minutos. Os links que enviamos por e-mail, para confirmar o cadastro,
-        redefinir a senha ou desbloquear a conta, também são guardados só como resumo, e cada um
-        serve uma vez.
+        redefinir a senha ou desbloquear a conta, são guardados no banco de dados só como resumo, e
+        cada um serve uma vez. O link completo, que leva o seu e-mail institucional, só passa pela
+        fila de envio e pelo serviço de e-mail até chegar a você, e, se o envio falhar, a mensagem
+        é descartada.
       </p>
 
       <h3>2.6 Dados dos aparelhos que recebem notificações</h3>
@@ -126,7 +129,14 @@
         Se você recebe notificações e permite que um aparelho as mostre, guardamos, para aquele
         aparelho, o endereço de entrega que o navegador cria e duas chaves que ele gera para cifrar
         a notificação, com a data do registro. É o que faz a notificação chegar ao aparelho com o
-        aplicativo fechado. Esses dados seguem os prazos da seção 8.
+        aplicativo fechado. Se outra pessoa entrar na conta dela pelo mesmo navegador, o aparelho
+        passa a receber as notificações da conta dela. Esses dados seguem os prazos da seção 8.
+      </p>
+
+      <h3>2.7 Notificações</h3>
+      <p>
+        Guardamos as notificações da sua conta: o tipo, o texto, o anúncio ou a denúncia a que se
+        referem, a data e se e quando você as leu.
       </p>
     </section>
 
@@ -180,7 +190,7 @@
       </p>
       <p>
         <strong>A denúncia é a exceção: ela não fica visível para os demais usuários.</strong> Só
-        quem administra a plataforma lê o motivo, a descrição e a imagem anexada. Enviá-la como
+        você e quem administra a plataforma leem o motivo, a descrição e a imagem anexada. Enviá-la como
         sigilosa esconde de quem analisa o seu nome, a sua foto de perfil e os seus canais de
         contato; ela continua
         vinculada à sua conta no banco de dados, e o sigilo não a torna anônima.
@@ -194,15 +204,17 @@
       <p>
         Quem administra a plataforma vê os dados da sua conta, inclusive esses, para gerenciar as
         contas: corrigir o nome, o e-mail institucional e os contatos, dar ou retirar o acesso de
-        administração e aplicar o banimento previsto nos termos.
+        administração e aplicar o banimento previsto nos termos. Também pode excluir a carona ou o
+        item que viole os termos, e quem o publicou recebe uma notificação com o motivo.
       </p>
     </section>
 
     <section>
       <h2>5. Comunicações</h2>
       <p>
-        Se você optar por recebê-las no cadastro, podemos enviar mensagens sobre novidades e
-        atividades do aplicativo. Essa escolha pode ser alterada a qualquer momento, e recusá-la
+        Se você optar por recebê-las, no cadastro ou em Preferências, enviamos notificações sobre a
+        sua atividade na plataforma, como uma carona ofertada para o seu bairro. Não enviamos
+        novidades nem publicidade. Essa escolha pode ser alterada a qualquer momento, e recusá-la
         não impede o uso da plataforma.
       </p>
       <p>
@@ -215,10 +227,10 @@
         banida não recebe notificações.
       </p>
       <p>
-        Mensagens necessárias ao funcionamento, relativas à sua conta, à segurança ou a
-        alterações nestes documentos, são enviadas independentemente dessa escolha. É o caso da
-        confirmação do cadastro, da redefinição de senha e do aviso de bloqueio, que chegam ao seu
-        e-mail institucional.
+        Mensagens necessárias ao funcionamento, relativas à sua conta ou à segurança, são enviadas
+        independentemente dessa escolha. É o caso da confirmação do cadastro, da redefinição de
+        senha e do aviso de bloqueio, que chegam ao seu e-mail institucional. A alteração destes
+        documentos é avisada ao entrar na plataforma, como descrito na seção 11.
       </p>
     </section>
 
@@ -237,14 +249,18 @@
         <li>
           <strong>Serviço de monitoramento de erros (Sentry)</strong>, que recebe informações
           técnicas sobre falhas e desempenho. A plataforma está configurada para
-          <strong>não enviar dados de identificação do usuário nem o conteúdo das requisições</strong>.
+          <strong>não enviar dados de identificação do usuário nem o conteúdo das requisições</strong>,
+          e os endereços das páginas e das requisições vão sem a parte que segue o ponto de
+          interrogação, onde ficam o código e o e-mail dos links enviados por e-mail e o texto das
+          buscas.
           Uma parcela das sessões, e as sessões em que ocorre erro, são gravadas para diagnóstico,
           com <strong>todo o texto da tela mascarado e as imagens bloqueadas</strong>, de modo que
           o que se registra é a estrutura da interação, não o conteúdo.
         </li>
         <li>
-          <strong>Serviço de envio de e-mail (Resend)</strong>, que recebe o seu nome e o seu
-          e-mail institucional para entregar as mensagens da conta descritas na seção 5.
+          <strong>Serviço de envio de e-mail (Resend)</strong>, que recebe o seu nome, o seu
+          e-mail institucional e o link de cada mensagem para entregar as mensagens da conta
+          descritas na seção 5.
         </li>
         <li>
           <strong>Serviço de notificações do navegador</strong>, mantido pela empresa que faz o
@@ -255,6 +271,10 @@
           consegue lê-la.
         </li>
       </ul>
+      <p>
+        O telefone de um anúncio abre uma conversa no WhatsApp quando outro usuário o aciona. A
+        partir daí, a conversa segue as regras do WhatsApp, e não as desta política.
+      </p>
       <p>
         Podemos ainda compartilhar dados para cumprir ordem judicial ou requisição de autoridade
         competente.
@@ -269,8 +289,9 @@
       </p>
       <ul>
         <li>
-          o token que mantém você autenticado. O seu nome viaja dentro dele, e é de lá que a
-          interface o lê para exibir;
+          o token que mantém você autenticado. Ele leva o identificador da sua conta, o seu nome, o
+          seu e-mail institucional e o seu perfil de acesso, e é de lá que a interface lê o nome
+          para exibir;
         </li>
         <li>a sua preferência de tema claro ou escuro;</li>
         <li>
@@ -282,12 +303,17 @@
           recebê-las, descrito na seção 2.6;
         </li>
         <li>
-          a dispensa do aviso de ativar as notificações, para que ele não volte naquele aparelho.
+          a dispensa do aviso de ativar as notificações, para que ele não volte naquele aparelho;
+        </li>
+        <li>
+          a dispensa do aviso de cadastrar os contatos, com um trecho do token da sessão em que ele
+          foi dispensado, para que volte na próxima.
         </li>
       </ul>
       <p>
-        Ao sair da conta, o token é removido do navegador. O registro das notificações fica, e o
-        aparelho continua recebendo as notificações da sua conta, como descrito na seção 5.
+        Ao sair da conta, o token é removido do navegador. A dispensa dos avisos e o registro das
+        notificações ficam, e o aparelho continua recebendo as notificações da sua conta, como
+        descrito na seção 5.
       </p>
     </section>
 
@@ -330,13 +356,13 @@
           prazo do registro.
         </li>
         <li>
-          <strong>Registro de aceite:</strong> mantido mesmo após o encerramento da conta, porque
-          sua função é justamente demonstrar o que foi aceito e quando.
+          <strong>Registro de aceite:</strong> enquanto a conta existir, mesmo desativada ou
+          banida, porque sua função é justamente demonstrar o que foi aceito e quando.
         </li>
         <li>
           <strong>Ações de administração:</strong> quando quem administra a plataforma dá ou retira
           o acesso de administração de uma conta, a bane ou reverte o banimento, registramos quem
-          fez, sobre qual conta e quando. O registro é mantido mesmo após o encerramento da conta,
+          fez, sobre qual conta e quando. O registro é mantido mesmo que a conta deixe de existir,
           para que cada uma dessas ações tenha responsável.
         </li>
         <li>
@@ -346,7 +372,7 @@
         </li>
         <li>
           <strong>Contagem de senhas erradas:</strong> zera quando você entra, quando desbloqueia a
-          conta pelo link e quando os 30 minutos do bloqueio passam.
+          conta pelo link, quando redefine a senha e quando os 30 minutos do bloqueio passam.
         </li>
         <li>
           <strong>Dados técnicos de erro:</strong> pelo prazo de retenção do serviço de
@@ -406,8 +432,8 @@
       <h2>11. Alterações desta política</h2>
       <p>
         Esta política pode ser alterada. Cada versão é identificada pela data no topo do documento,
-        e o aceite manifestado no cadastro registra qual versão foi aceita. Alterações relevantes
-        são comunicadas pelos canais da plataforma.
+        e o aceite registra qual versão foi aceita. Quando uma alteração relevante é publicada, a
+        plataforma avisa ao entrar e pede o aceite da versão nova antes de seguir.
       </p>
     </section>
 

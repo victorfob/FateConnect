@@ -82,6 +82,24 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
     }
 
     [Theory]
+    [InlineData(EnumAccountStatus.SelfDeactivated)]
+    [InlineData(EnumAccountStatus.Banned)]
+    public async Task GetItemById_ReportedByAnAccountThatIsNoLongerActive_ReturnsNotFound(EnumAccountStatus status)
+    {
+        int viewerId = _factory.SeedUser("Heloísa Brandão Lima").Id;
+        int leavingReporterId = _factory.SeedUser("Igor Salgado Freitas").Id;
+        Guid itemId = await ReportAsync(_factory.CreateClientFor(leavingReporterId), ItemForm("Estojo azul"));
+        HttpClient viewer = _factory.CreateClientFor(viewerId);
+
+        HttpResponseMessage before = await viewer.GetAsync($"/LostAndFound/{itemId}");
+        _factory.SetAccountStatus(leavingReporterId, status);
+        HttpResponseMessage after = await viewer.GetAsync($"/LostAndFound/{itemId}");
+
+        Assert.Equal(HttpStatusCode.OK, before.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, after.StatusCode);
+    }
+
+    [Theory]
     [InlineData("Cachecol de lã cinza", "cachecol de la")]
     [InlineData("Cachecol de la cinza", "cachecol de lã")]
     public async Task GetItems_FilteredBySearchTerm_IgnoresAccentsAndCase(string name, string search)

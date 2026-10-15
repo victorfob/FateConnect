@@ -32,6 +32,7 @@ import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 import { PAGE_SIZE } from '@app/utils/searchParams';
 
 import { DELETE_DIALOG } from './components/RideCard/RideDeleteConfirmation/constants';
+import { SAFETY_NOTICE } from './components/RideCard/RideDriverContact/constants';
 import {
   FILTER_LABELS,
   RIDE_OWNER_FILTER_OPTIONS,
@@ -469,6 +470,7 @@ describe('Rides', () => {
     const dialog = within(await screen.findByRole('dialog'));
     expect(dialog.getByText(DRIVER.name)).toBeInTheDocument();
     expect(dialog.getByRole('link', { name: sendEmailLabel(DRIVER_EMAIL) })).toBeInTheDocument();
+    expect(dialog.getByText(SAFETY_NOTICE)).toBeInTheDocument();
   });
 
   it('should open the conversation already mentioning the destination of the ride', async () => {

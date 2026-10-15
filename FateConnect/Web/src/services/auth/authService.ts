@@ -62,7 +62,7 @@ export async function forgotPassword(fatecEmail: string): Promise<void> {
 }
 
 export async function verifyResetToken(token: string): Promise<void> {
-  await apiClient.get(`${AUTH_PATH}/verify-reset-token`, { params: { token } });
+  await apiClient.post(`${AUTH_PATH}/verify-reset-token`, { token });
 }
 
 export async function resetPassword(payload: ResetPasswordRequest): Promise<TokenResponse> {

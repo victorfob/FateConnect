@@ -59,7 +59,7 @@ public class PasswordResetTests(ApiFactory factory) : IClassFixture<ApiFactory>
 
         Assert.StartsWith("https://fateconnect.test/redefinir-senha?", email.Link);
         Assert.Equal(HttpStatusCode.NoContent, (await factory.CreateClient()
-            .GetAsync($"/Auth/verify-reset-token?token={email.Token}")).StatusCode);
+            .PostAsJsonAsync("/Auth/verify-reset-token", new { token = email.Token })).StatusCode);
     }
 
     [Fact]
@@ -108,7 +108,8 @@ public class PasswordResetTests(ApiFactory factory) : IClassFixture<ApiFactory>
     [Fact]
     public async Task VerifyResetToken_WithATokenThatDoesNotExist_IsRejected()
     {
-        HttpResponseMessage response = await factory.CreateClient().GetAsync("/Auth/verify-reset-token?token=inexistente");
+        HttpResponseMessage response = await factory.CreateClient()
+            .PostAsJsonAsync("/Auth/verify-reset-token", new { token = "inexistente" });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }

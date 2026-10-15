@@ -16,6 +16,7 @@ import { render, screen, userEvent, waitFor, within } from '@app/test/testing-li
 import { forgeOverflow, restoreContentHeight } from '@app/test/utils/contentHeight';
 
 import { photoAlt } from './constants';
+import { SAFETY_NOTICE } from './LostItemOwnerContact/constants';
 import { RESTORE_LABEL } from './LostItemStatusAction/constants';
 import { LostItemCard } from '.';
 
@@ -164,6 +165,7 @@ describe('LostItemCard', () => {
     expect(dialog.getByText(CONTACT.name)).toBeInTheDocument();
     expect(dialog.getByRole('link', { name: sendEmailLabel(CONTACT_EMAIL) })).toBeInTheDocument();
     expect(dialog.getByRole('link', { name: CONTACT_PHONE })).toBeInTheDocument();
+    expect(dialog.getByText(SAFETY_NOTICE)).toBeInTheDocument();
   });
 
   it('should take the contact from the item, not from a fixed one', async () => {
