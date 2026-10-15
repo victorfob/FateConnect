@@ -103,6 +103,7 @@ public class RideRepository(FateConnectDbContext context, TimeProvider clock) : 
         return await context.Rides
             .Include(r => r.Driver)
             .Include(r => r.Departures)
+            .Where(IsOfferedByAnActiveAccount())
             .FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
     }
 
