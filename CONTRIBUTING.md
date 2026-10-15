@@ -10,14 +10,79 @@ O **[README](README.md)** é a referência completa: estrutura das pastas, regra
 
 Issues são escritas em **pt-BR**: elas são documento de planejamento, não código.
 
-## Ambiente
+## Rodar o projeto na sua máquina
 
-O front vive em `FateConnect/Web` e usa a versão do Node declarada no `.nvmrc`, com o Yarn 4. Quem entrega o Yarn é o Corepack, na versão do `packageManager`; o Yarn 1 instalado na máquina recusa o projeto. Habilite uma vez:
+As ferramentas: Git, Docker, o SDK do .NET 8 e o [nvm](https://github.com/nvm-sh/nvm), que instala o Node da versão do `FateConnect/Web/.nvmrc`. O Yarn 4 vem pelo Corepack, que acompanha o Node; o Yarn 1 instalado na máquina recusa o projeto.
+
+O SDK precisa ser da faixa 8.0.400 ou mais nova, e o `global.json` recusa as anteriores: a análise de estilo, que reprova o build, muda de uma faixa para outra. O pacote do .NET que o Ubuntu traz é da faixa 8.0.100. O instalador da Microsoft traz a faixa certa:
 
 ```bash
-corepack enable
-cd FateConnect/Web && nvm use && yarn && yarn dev
+curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 8.0
+export DOTNET_ROOT="$HOME/.dotnet" PATH="$HOME/.dotnet:$PATH"   # e no perfil do seu shell
 ```
+
+### Banco e fila
+
+A API usa PostgreSQL e RabbitMQ, e os dois sobem em contêiner:
+
+```bash
+docker run -d --name fateconnect-db -e POSTGRES_PASSWORD=fateconnect -p 5432:5432 postgres:17
+docker run -d --name fateconnect-mq -p 5672:5672 rabbitmq:3-management
+```
+
+### API
+
+```bash
+cd FateConnect/FateConnect.Api
+cp .env.example .env
+```
+
+A API não sobe sem as variáveis abaixo, e o erro diz qual faltou. As outras do `.env` podem ficar vazias: a fila cai no `localhost` com o usuário padrão do RabbitMQ, e o CORS libera o front em `http://localhost:5173`.
+
+| Variável | Valor na sua máquina |
+| --- | --- |
+| `DB_CONNECTION` | `Host=localhost;Port=5432;Database=fateconnect;Username=postgres;Password=fateconnect` |
+| `JWT_SECRET` | a saída de `openssl rand -base64 32` |
+| `JWT_ISSUER`, `JWT_AUDIENCE` | qualquer texto, como `fateconnect` |
+| `PUBLIC_URL` | `http://localhost:5173`, o endereço do front, de onde partem os links dos e-mails |
+| `EMAIL_SENDER`, `RESEND_API_KEY` | o remetente e a chave do Resend; sem uma chave válida, qualquer texto serve e o e-mail não sai |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | o par das notificações por push; sem testar push, qualquer texto serve, e o par de verdade sai de `npx web-push generate-vapid-keys`, com o Node do front instalado |
+
+```bash
+dotnet run
+```
+
+A API responde em `http://localhost:5011`, com a referência das rotas em `/scalar/v1`. Na primeira subida ela cria o banco e as tabelas.
+
+### Front
+
+Em outro terminal:
+
+```bash
+cd FateConnect/Web
+nvm install && corepack enable && yarn
+cp .env.example .env.development
+```
+
+No `.env.development`, `VITE_API_URL=http://localhost:5011`. Depois:
+
+```bash
+yarn dev
+```
+
+O front abre em `http://localhost:5173`.
+
+### A primeira conta
+
+Crie a conta pela tela de cadastro. O login exige o e-mail confirmado, e sem o Resend o link não chega: confirme a conta no banco.
+
+```bash
+docker exec fateconnect-db psql -U postgres -d fateconnect -c "UPDATE \"Users\" SET \"IsEmailConfirmed\" = true WHERE \"FatecEmail\" = 'a-sua-conta@aluno.cps.sp.gov.br';"
+```
+
+A área de gestão pede o perfil de administrador, que se dá pelo banco: veja [Promover alguém a administrador](deploy/DATABASE.md#promover-alguém-a-administrador).
+
+### Hooks e testes
 
 Os hooks locais **não vêm habilitados no clone** — o repositório usa `core.hooksPath` em vez de um gerenciador de hooks, para não desligar os hooks do Git LFS. Habilite uma vez:
 

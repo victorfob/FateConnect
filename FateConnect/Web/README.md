@@ -16,9 +16,11 @@ O projeto **não roda em Node 20**: as ferramentas de teste exigem 22 ou superio
 ```bash
 nvm use
 yarn
-cp .env.example .env.development   # preencha os endereços do seu ambiente
+cp .env.example .env.development   # VITE_API_URL aponta para a API, http://localhost:5011 na sua máquina
 yarn dev
 ```
+
+Como subir a API, o banco e a fila está no [CONTRIBUTING](../../CONTRIBUTING.md#rodar-o-projeto-na-sua-máquina).
 
 Nenhum endereço de API é versionado — só o `.env.example`, com as chaves vazias.
 
