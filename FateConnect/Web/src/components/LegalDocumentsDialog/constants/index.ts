@@ -1,9 +1,9 @@
-import { PRIVACY_URL, TERMS_URL } from '@app/constants/legalDocuments';
+import { PRIVACY_LABEL, PRIVACY_URL, TERMS_LABEL, TERMS_URL } from '@app/constants/legalDocuments';
 
 export const LEGAL_DOCUMENTS_TITLE = 'Documentos atualizados';
 
-export const TERMS_LINK = { label: 'Termos de uso', url: TERMS_URL };
-export const PRIVACY_LINK = { label: 'Política de privacidade', url: PRIVACY_URL };
+export const TERMS_LINK = { label: TERMS_LABEL, url: TERMS_URL };
+export const PRIVACY_LINK = { label: PRIVACY_LABEL, url: PRIVACY_URL };
 
 export const CHANGED_MESSAGES = {
   termsOfUse: { prefix: 'Os ', suffix: ' mudaram. Para continuar, leia e aceite a nova versão.' },

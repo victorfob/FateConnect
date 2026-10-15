@@ -11,3 +11,7 @@ export const PRIVACY_VERSION: string = legalDocumentVersions.privacyPolicy;
 /** Arquivos servidos de `public/`, gerados por `legal/build-pdfs.sh`. */
 export const TERMS_URL = '/termos.pdf';
 export const PRIVACY_URL = '/privacidade.pdf';
+
+/** O nome de cada documento, o mesmo no rodapé, no cadastro e no aviso de versão nova. */
+export const TERMS_LABEL = 'Termos de uso';
+export const PRIVACY_LABEL = 'Política de privacidade';
