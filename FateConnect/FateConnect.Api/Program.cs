@@ -231,9 +231,9 @@ public class Program
                 o.UseBusOutbox();
             });
 
-            x.AddConsumer<UserRegisteredEventConsumer>();
-            x.AddConsumer<PasswordResetRequestedEventConsumer>();
-            x.AddConsumer<AccountLockedEventConsumer>();
+            x.AddConsumer<UserRegisteredEventConsumer, AccountEmailConsumerDefinition<UserRegisteredEventConsumer>>();
+            x.AddConsumer<PasswordResetRequestedEventConsumer, AccountEmailConsumerDefinition<PasswordResetRequestedEventConsumer>>();
+            x.AddConsumer<AccountLockedEventConsumer, AccountEmailConsumerDefinition<AccountLockedEventConsumer>>();
 
             x.AddConsumer<RideCreatedEventConsumer>();
             x.AddConsumer<ReportReceivedEventConsumer>();

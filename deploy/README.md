@@ -495,7 +495,8 @@ construir.
 
 **O e-mail de confirmação, de redefinição ou de desbloqueio não chega.** A
 mensagem fica guardada no banco até a fila aceitá-la, e a falha do envio aparece
-no log da API. Veja se a fila está de pé com
+no log da API. Depois de 5 tentativas a mensagem é descartada, porque leva o
+código do link: quem não recebeu pede outro link pela tela. Veja se a fila está de pé com
 `docker compose -p fateconnect-hml ps` e o motivo com
 `docker compose -p fateconnect-hml logs api`.
 
