@@ -12,7 +12,7 @@ using FateConnect.Api.Modules.Users.Interfaces;
 
 public sealed class LegalDocumentVersions : ILegalDocumentVersions
 {
-    public const string ResourceName = "FateConnect.Api.LegalDocumentVersions.json";
+    private const string ResourceName = "FateConnect.Api.LegalDocumentVersions.json";
 
     private static readonly JsonSerializerOptions FileReadOptions = new(JsonSerializerDefaults.Web);
 
