@@ -28,7 +28,7 @@ jobs:
       run:
         working-directory: FateConnect/Web
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # Sem histórico completo o Sonar perde a noção de quem mudou o quê.
           fetch-depth: 0
@@ -81,7 +81,7 @@ jobs:
     name: Analyze the API
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # Sem histórico completo o Sonar perde a noção de quem mudou o quê.
           fetch-depth: 0
