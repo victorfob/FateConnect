@@ -36,11 +36,7 @@ public sealed class WebPushSender(HttpClient httpClient, IOptions<PushOptions> o
         {
             return EnumPushDelivery.Gone;
         }
-        catch (WebPushException)
-        {
-            return EnumPushDelivery.Failed;
-        }
-        catch (HttpRequestException)
+        catch (Exception exception) when (exception is WebPushException or HttpRequestException)
         {
             return EnumPushDelivery.Failed;
         }
