@@ -1,16 +1,20 @@
 import { useCallback, useState, useSyncExternalStore } from 'react';
-import { Link as RouterLink, useMatch } from 'react-router';
-import { IconButton } from '@design-system';
-import { CloseIcon } from '@design-system/icons';
+import { useMatch } from 'react-router';
 
 import { REGISTER_CONTACTS_LABEL } from '@app/components/ContactRequiredDialog/constants';
+import { NoticeBanner } from '@app/components/NoticeBanner';
+import type { NoticeBannerAction } from '@app/components/NoticeBanner/@types';
 import { useLacksContact } from '@app/hooks/useLacksContact';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 
 import { contactBannerStorage } from './storage/contactBannerStorage';
 import * as C from './constants';
-import * as S from './styles';
+
+const REGISTER_CONTACTS_ACTION: NoticeBannerAction = {
+  label: REGISTER_CONTACTS_LABEL,
+  to: RoutePathEnum.PROFILE,
+};
 
 /** Avisa quem está sem contato, em toda tela logada; fechada, volta no próximo login. */
 export function ContactBanner() {
@@ -27,32 +31,11 @@ export function ContactBanner() {
   if (!lacksContact || dismissed) return null;
 
   return (
-    <S.Banner role="status">
-      <S.BannerContent>
-        <S.BannerText variant="caption" color="inherit">
-          {C.CONTACT_BANNER_TEXT}
-        </S.BannerText>
-
-        {!onProfile && (
-          <S.RegisterContactsLink
-            component={RouterLink}
-            to={RoutePathEnum.PROFILE}
-            color="inherit"
-            size="small"
-          >
-            {REGISTER_CONTACTS_LABEL}
-          </S.RegisterContactsLink>
-        )}
-      </S.BannerContent>
-
-      <IconButton
-        label={C.DISMISS_BANNER_LABEL}
-        color="inherit"
-        size="small"
-        onClick={handleDismiss}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </S.Banner>
+    <NoticeBanner
+      tone="warning"
+      text={C.CONTACT_BANNER_TEXT}
+      action={onProfile ? undefined : REGISTER_CONTACTS_ACTION}
+      onDismiss={handleDismiss}
+    />
   );
 }
