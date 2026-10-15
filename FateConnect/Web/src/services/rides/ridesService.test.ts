@@ -2,7 +2,8 @@ import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 
-import { createRide, deleteRide, getRide, listRides, updateRide } from './ridesService';
+import { RemovalReasonEnum } from '../moderation/types';
+import { createRide, deleteRide, getRide, listRides, removeRide, updateRide } from './ridesService';
 import {
   RideFrequencyEnum,
   RideShiftEnum,
@@ -156,6 +157,20 @@ describe('ridesService', () => {
     await deleteRide('7');
 
     expect(deletedId).toBe('7');
+  });
+
+  it('should remove a ride by id, sending the reason', async () => {
+    const received: { id: string; body: unknown }[] = [];
+    server.use(
+      http.post(`${RIDES_URL}/:id/remove`, async ({ params, request }) => {
+        received.push({ id: params.id as string, body: await request.json() });
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    await removeRide('7', RemovalReasonEnum.COMMERCIAL);
+
+    expect(received).toEqual([{ id: '7', body: { reason: 'Commercial' } }]);
   });
 
   it('should read one ride by id', async () => {

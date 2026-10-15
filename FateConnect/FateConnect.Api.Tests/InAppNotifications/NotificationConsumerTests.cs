@@ -7,6 +7,7 @@ using FateConnect.Api.Modules.InAppNotifications.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Events;
 using FateConnect.Api.Modules.InAppNotifications.Hubs;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
+using FateConnect.Api.Modules.Users.Enums;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.AspNetCore.SignalR;
@@ -40,6 +41,7 @@ public class NotificationConsumerTests
                 bus.AddConsumer<RideCreatedEventConsumer>();
                 bus.AddConsumer<ReportReceivedEventConsumer>();
                 bus.AddConsumer<ItemArchivedEventConsumer>();
+                bus.AddConsumer<PublicationRemovedEventConsumer>();
                 bus.AddConsumer<NotificationDispatchedEventConsumer>();
                 bus.AddConsumer<NotificationDispatchedEventPushConsumer>();
             })
@@ -56,6 +58,7 @@ public class NotificationConsumerTests
         new RideCreatedEvent(Guid.NewGuid(), 7, "Rua das Flores, Vila Hortência"),
         new ReportReceivedEvent(7, Guid.NewGuid(), EnumReportCategory.RecklessDriving),
         new ItemArchivedEvent(7, Guid.NewGuid(), "Garrafa térmica azul"),
+        new PublicationRemovedEvent(7, Guid.NewGuid(), EnumPublication.Ride, "Jardim Toledo", EnumRemovalReason.Commercial),
         new NotificationDispatchedEvent(
             new ReadInAppNotificationDto(3, EnumInAppNotificationType.ItemArchived, "Seu item foi arquivado.", null, false, DateTime.UtcNow),
             7),

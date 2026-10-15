@@ -4,5 +4,6 @@ public enum EnumInAppNotificationType
 {
     ReportReceived = 1,
     RideToNeighborhood = 2,
-    ItemArchived = 3
+    ItemArchived = 3,
+    PublicationRemoved = 4
 }

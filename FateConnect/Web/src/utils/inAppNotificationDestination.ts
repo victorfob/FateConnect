@@ -34,6 +34,7 @@ export async function notificationDestination({
 }: Pick<InAppNotification, 'type' | 'referenceId'>): Promise<string | null> {
   if (type === InAppNotificationTypeEnum.REPORT_RECEIVED) return RoutePathEnum.REPORTS;
   if (type === InAppNotificationTypeEnum.ITEM_ARCHIVED) return archivedItemsPath();
+  if (type === InAppNotificationTypeEnum.PUBLICATION_REMOVED) return RoutePathEnum.NOTIFICATIONS;
   if (!referenceId) return RoutePathEnum.RIDES;
 
   try {

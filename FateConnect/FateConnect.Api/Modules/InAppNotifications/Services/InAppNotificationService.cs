@@ -68,7 +68,8 @@ public partial class InAppNotificationService(
         string content,
         string referenceId)
     {
-        List<int> validUserIds = await repository.GetEligibleUserIdsAsync(userIds);
+        bool isAccountNotice = type == EnumInAppNotificationType.PublicationRemoved;
+        List<int> validUserIds = await repository.GetEligibleUserIdsAsync(userIds, ignoresPreference: isAccountNotice);
 
         if (validUserIds.Count == 0)
             return 0;

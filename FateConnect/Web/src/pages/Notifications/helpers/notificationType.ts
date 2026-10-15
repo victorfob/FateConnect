@@ -5,6 +5,7 @@ const TYPE_LABEL: Readonly<Record<InAppNotificationTypeEnum, string>> = {
   [InAppNotificationTypeEnum.RIDE_TO_NEIGHBORHOOD]: 'Caronas',
   [InAppNotificationTypeEnum.ITEM_ARCHIVED]: 'Achados e perdidos',
   [InAppNotificationTypeEnum.REPORT_RECEIVED]: 'Denúncias',
+  [InAppNotificationTypeEnum.PUBLICATION_REMOVED]: 'Exclusões',
 };
 
 /** O que vai para a URL: o rótulo em minúsculo e sem acento. */
@@ -12,6 +13,7 @@ const TYPE_SLUG: Readonly<Record<InAppNotificationTypeEnum, string>> = {
   [InAppNotificationTypeEnum.RIDE_TO_NEIGHBORHOOD]: 'caronas',
   [InAppNotificationTypeEnum.ITEM_ARCHIVED]: 'achados-perdidos',
   [InAppNotificationTypeEnum.REPORT_RECEIVED]: 'denuncias',
+  [InAppNotificationTypeEnum.PUBLICATION_REMOVED]: 'exclusoes',
 };
 
 const TYPE_VALUES: ReadonlySet<string> = new Set(Object.values(InAppNotificationTypeEnum));

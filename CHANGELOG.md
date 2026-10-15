@@ -20,6 +20,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona os avisos por push no aparelho: a faixa da área logada e o interruptor Notificações pedem a permissão e inscrevem o aparelho, que se inscreve de novo sozinho a cada login; dispensada, a faixa não volta naquele aparelho (#625) [Frontend]
 - Adiciona a abertura do aviso por push: tocar nele leva ao mesmo destino da campainha e o marca como lido, com o app aberto ou fechado, e sem sessão passa antes pelo login (#625) [Frontend]
 - Adiciona ao contato de uma carona e de um item a lembrança de que o FateConnect só divulga o anúncio, que o encontro ou a devolução é combinado entre as pessoas e que um lugar movimentado é o mais seguro (#631) [Frontend]
+- Adiciona a exclusão, por quem administra, da carona ou do item de outra pessoa, com um dos cinco motivos dos termos de uso e o registro de quem excluiu, o quê e por quê; o item excluído some de todas as listas e não volta pelo Restaurar (#632) [Backend]
+- Adiciona ao cartão de carona e de item de outra pessoa, para quem administra, a lixeira que pede o motivo antes de excluir (#632) [Frontend]
+- Adiciona o aviso de conteúdo excluído, com o motivo, que chega à central de quem publicou mesmo com Notificações desligado, e por push só aos aparelhos de quem ligou (#632) [Frontend] [Backend]
 
 ### Changed
 
@@ -48,6 +51,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a recusar a subida da API sem o par de chaves do push, `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY`, dizendo qual faltou (#623) [Backend]
 - Passa a dizer nos termos de uso o que fica fora da responsabilidade da plataforma, nomeando acidente e crime entre usuários, o dever de devolver o objeto achado, os cuidados no encontro e os telefones de emergência, em nova versão do documento (#631) [Frontend]
 - Passa a dizer nos termos e na política que quem administra exclui conteúdo com o motivo notificado e que a mudança dos documentos pede novo aceite, e corrige o que os dois afirmavam sem o produto fazer, como as mensagens de novidades e quem lê a denúncia (#631) [Frontend]
+- Passa a declarar na política de privacidade o aviso de conteúdo excluído, que chega mesmo com Notificações desligado, e o registro da exclusão com o anúncio e o motivo (#632) [Frontend]
 
 ### Fixed
 

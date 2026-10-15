@@ -3,6 +3,7 @@ import { ListCard } from '@design-system';
 import type { LostItem } from '@app/services/lostAndFound/types';
 
 import { LostItemOwnerContact } from '../LostItemOwnerContact';
+import { LostItemAdminRemoval } from './LostItemAdminRemoval';
 import { LostItemOwnerActions } from './LostItemOwnerActions';
 
 type LostItemActionsProps = Readonly<{
@@ -18,6 +19,8 @@ export function LostItemActions({ item, onEdit, onDelete }: LostItemActionsProps
       <LostItemOwnerContact item={item} />
 
       <LostItemOwnerActions item={item} onEdit={onEdit} onDelete={onDelete} />
+
+      <LostItemAdminRemoval item={item} />
     </ListCard.ActionButtons>
   );
 }
