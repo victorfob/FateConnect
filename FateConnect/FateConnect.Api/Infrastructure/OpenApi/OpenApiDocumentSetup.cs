@@ -1,11 +1,11 @@
 namespace FateConnect.Api.Infrastructure.OpenApi;
 
 using System;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
 public static class OpenApiDocumentSetup
@@ -30,16 +30,16 @@ public static class OpenApiDocumentSetup
 
             options.MapType<DateOnly>(() => new OpenApiSchema
             {
-                Type = "string",
+                Type = JsonSchemaType.String,
                 Format = "date",
-                Example = new OpenApiString("2026-08-30")
+                Example = JsonValue.Create("2026-08-30")
             });
 
             options.MapType<TimeOnly>(() => new OpenApiSchema
             {
-                Type = "string",
+                Type = JsonSchemaType.String,
                 Format = "time",
-                Example = new OpenApiString("16:20:00")
+                Example = JsonValue.Create("16:20:00")
             });
 
             options.SwaggerDoc(DocumentName, new OpenApiInfo
