@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { CONTACT_FIELD_LABELS, CONTACT_MESSAGES } from '@app/components/ContactFields/constants';
+import { DEACTIVATE } from '@app/components/DeactivateAccount/constants';
 import { PHOTO_FIELD_TEXTS, PHOTO_MESSAGES } from '@app/components/PhotoField/constants';
 import { SAVE_BAR_TEXTS } from '@app/components/SaveBar/constants';
 import { UNSAVED_CHANGES } from '@app/components/UnsavedChangesDialog/constants';
@@ -18,6 +19,7 @@ import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { PROFILE } from '@app/test/profile';
 import { act, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
+import { problemResponse } from '@app/test/utils/problemResponse';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 import { ADDRESS_OFF_AUTOCOMPLETE } from '@ds-root/components/Input/components/AutocompleteField/constants';
 
@@ -29,7 +31,6 @@ import {
   ACCOUNT_DATA_SUBSECTIONS,
   ACCOUNT_DATA_TITLE,
 } from './components/AccountDataCard/constants';
-import { DEACTIVATE } from './components/DeactivateAccount/constants';
 import { PASSWORD_LABELS } from './components/PasswordFields/constants';
 import {
   FATEC_EMAIL_HELP,
@@ -373,11 +374,7 @@ describe('Profile', () => {
   ])(
     'should point at the contact %s the api says is already taken, and keep the change pending',
     async (_, field, label) => {
-      server.use(
-        http.patch(PROFILE_URL, () =>
-          HttpResponse.json({ error: 'em uso', field, code: null }, { status: CONFLICT }),
-        ),
-      );
+      server.use(http.patch(PROFILE_URL, () => problemResponse(CONFLICT, { field })));
       await renderProfile({ ...PROFILE, phone: null, contactEmail: null });
 
       await userEvent.type(screen.getByLabelText(CONTACT_FIELD_LABELS.phone), '15991234567');
@@ -573,6 +570,14 @@ describe('Profile', () => {
 
     expect(screen.getByRole('button', { name: PHOTO_FIELD_TEXTS.pick })).toBeInTheDocument();
     expect(saveButton()).toBeDisabled();
+  });
+
+  it('should stretch the deactivation button across the card at any width', async () => {
+    await renderProfile();
+
+    const row = screen.getByRole('button', { name: DEACTIVATE.label }).parentElement;
+
+    expect(row).toHaveStyle({ flexDirection: 'column', alignItems: 'stretch' });
   });
 
   it('should deactivate the account after the confirmation, ending the session', async () => {

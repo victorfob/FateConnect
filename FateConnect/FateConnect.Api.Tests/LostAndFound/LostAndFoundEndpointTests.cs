@@ -4,8 +4,8 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.LostAndFound.Enums;
+using FateConnect.Api.Modules.Storage.Utils;
 using FateConnect.Api.Tests.Fixtures;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,7 +42,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         string? ThumbnailUrl,
         Contact Contact,
         bool IsOwner,
-        EnumStatusLostAndFound Status,
+        EnumLostAndFoundStatus Status,
         EnumDeletionReason? DeletionReason);
 
     private static MultipartFormDataContent NewItemForm(
@@ -91,7 +91,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         return (await response.Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!;
     }
 
-    private static MultipartFormDataContent StatusForm(EnumStatusLostAndFound status) =>
+    private static MultipartFormDataContent StatusForm(EnumLostAndFoundStatus status) =>
         new() { { new StringContent(status.ToString()), "Status" } };
 
     private async Task<(ReadItem Item, int ReporterId, int OtherUserId)> ReportItemAsync(string name)
@@ -133,7 +133,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
 
         Assert.Equal("Ana Beatriz Nogueira", item.Contact.Name);
         Assert.True(item.IsOwner);
-        Assert.Equal(EnumStatusLostAndFound.Open, item.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Open, item.Status);
         Assert.Null(item.DeletionReason);
     }
 
@@ -183,7 +183,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpClient client = _factory.CreateClientForNewUser("Carla Menezes Duarte");
 
         HttpResponseMessage response = await client.PatchAsync(
-            $"/LostAndFound/{AbsentItemId}", StatusForm(EnumStatusLostAndFound.Resolved));
+            $"/LostAndFound/{AbsentItemId}", StatusForm(EnumLostAndFoundStatus.Resolved));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -204,7 +204,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         (ReadItem item, _, int otherUserId) = await ReportItemAsync("Caderno de cálculo");
 
         HttpResponseMessage response = await _factory.CreateClientFor(otherUserId)
-            .PatchAsync($"/LostAndFound/{item.Id}", StatusForm(EnumStatusLostAndFound.Resolved));
+            .PatchAsync($"/LostAndFound/{item.Id}", StatusForm(EnumLostAndFoundStatus.Resolved));
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -227,7 +227,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpClient reporter = _factory.CreateClientFor(reporterId);
 
         HttpResponseMessage update = await reporter.PatchAsync(
-            $"/LostAndFound/{item.Id}", StatusForm(EnumStatusLostAndFound.Resolved));
+            $"/LostAndFound/{item.Id}", StatusForm(EnumLostAndFoundStatus.Resolved));
 
         HttpResponseMessage delete = await reporter.DeleteAsync($"/LostAndFound/{item.Id}");
 
@@ -244,7 +244,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         await reporter.DeleteAsync($"/LostAndFound/{item.Id}");
 
         ReadItem deleted = (await reporter.GetFromJsonAsync<ReadItem>($"/LostAndFound/{item.Id}", JsonOptions))!;
-        Assert.Equal(EnumStatusLostAndFound.Deleted, deleted.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Deleted, deleted.Status);
         Assert.Equal(EnumDeletionReason.User, deleted.DeletionReason);
     }
 
@@ -256,10 +256,10 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         await reporter.DeleteAsync($"/LostAndFound/{item.Id}");
 
         ReadItem restored = (await (await reporter.PatchAsync(
-            $"/LostAndFound/{item.Id}", StatusForm(EnumStatusLostAndFound.Open)))
+            $"/LostAndFound/{item.Id}", StatusForm(EnumLostAndFoundStatus.Open)))
             .Content.ReadFromJsonAsync<ReadItem>(JsonOptions))!;
 
-        Assert.Equal(EnumStatusLostAndFound.Open, restored.Status);
+        Assert.Equal(EnumLostAndFoundStatus.Open, restored.Status);
         Assert.Null(restored.DeletionReason);
     }
 
@@ -297,7 +297,7 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await client.PostAsync("/LostAndFound", NewItemForm(occurredOn: tomorrow));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("A data do ocorrido não pode ser no futuro.", await response.Content.ReadAsStringAsync());
+        Assert.Contains("The date it happened cannot be in the future.", await response.Content.ReadAsStringAsync());
     }
 
     [Fact]
@@ -548,7 +548,10 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await _factory.CreateClientFor(reporter.Id).PostAsync("/LostAndFound", form);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("Informe a data do ocorrido.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.Contains(
+            "The date it happened is required.",
+            await response.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -566,7 +569,10 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await _factory.CreateClientFor(reporter.Id).PostAsync("/LostAndFound", form);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("Informe se o item foi perdido ou achado.", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.Contains(
+            "Tell whether the item was lost or found.",
+            await response.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -609,6 +615,6 @@ public class LostAndFoundEndpointTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await client.PostAsync("/LostAndFound", form);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("Formato de imagem não suportado", await response.Content.ReadAsStringAsync());
+        Assert.Contains("Unsupported image format", await response.Content.ReadAsStringAsync());
     }
 }

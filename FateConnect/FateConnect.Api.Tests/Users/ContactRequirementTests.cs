@@ -29,7 +29,7 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         { new StringContent(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OccurredOn" },
     };
 
-    private static MultipartFormDataContent NewDenunciationForm(bool isAnonymous) => new()
+    private static MultipartFormDataContent NewReportForm(bool isAnonymous) => new()
     {
         { new StringContent("ImproperCharging"), "Category" },
         { new StringContent("O motorista cobrou valor acima do combinado na carona de ontem."), "Description" },
@@ -49,11 +49,11 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         return form;
     }
 
-    private static async Task<(string? Code, string? Error)> ErrorOf(HttpResponseMessage response)
+    private static async Task<(string? Code, string? Detail)> ProblemOf(HttpResponseMessage response)
     {
         using JsonDocument body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
-        return (body.RootElement.GetProperty("code").GetString(), body.RootElement.GetProperty("error").GetString());
+        return (body.RootElement.GetProperty("code").GetString(), body.RootElement.GetProperty("detail").GetString());
     }
 
     private static async Task<JsonElement> ProfileOf(HttpClient client) =>
@@ -66,10 +66,10 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
 
         HttpResponseMessage response = await client.PostAsJsonAsync("/Rides", NewRidePayload());
 
-        (string? code, string? error) = await ErrorOf(response);
+        (string? code, string? detail) = await ProblemOf(response);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
-        Assert.Equal("Para ofertar carona, cadastre telefone e e-mail para contato em Meu perfil.", error);
+        Assert.Equal("To offer a ride, add a contact phone and e-mail in My profile.", detail);
     }
 
     [Fact]
@@ -79,10 +79,10 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
 
         HttpResponseMessage response = await client.PostAsync("/LostAndFound", NewItemForm());
 
-        (string? code, string? error) = await ErrorOf(response);
+        (string? code, string? detail) = await ProblemOf(response);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
-        Assert.Equal("Para cadastrar um item, cadastre telefone e e-mail para contato em Meu perfil.", error);
+        Assert.Equal("To register an item, add a contact phone and e-mail in My profile.", detail);
     }
 
     [Fact]
@@ -98,42 +98,43 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
     }
 
     [Fact]
-    public async Task CreateDenunciation_WithoutSecrecyAndWithoutContact_IsForbiddenOfferingTheSecretOne()
+    public async Task CreateReport_WithoutSecrecyAndWithoutContact_IsForbiddenOfferingTheSecretOne()
     {
         HttpClient client = factory.CreateClientFor(factory.SeedUserWithoutContact("Otávio Lins Barreto"));
 
-        HttpResponseMessage response = await client.PostAsync("/Denunciations", NewDenunciationForm(isAnonymous: false));
+        HttpResponseMessage response = await client.PostAsync("/Reports", NewReportForm(isAnonymous: false));
 
-        (string? code, string? error) = await ErrorOf(response);
+        (string? code, string? detail) = await ProblemOf(response);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
         Assert.Equal(
-            "Para enviar uma denúncia sem sigilo, cadastre telefone e e-mail para contato em Meu perfil, ou marque a denúncia como sigilosa.",
-            error);
+            "To send an identified report, add a contact phone and e-mail in My profile, " +
+                "or mark the report as anonymous.",
+            detail);
     }
 
     [Fact]
-    public async Task CreateDenunciation_WithoutSecrecyAndWithContact_IsCreated()
+    public async Task CreateReport_WithoutSecrecyAndWithContact_IsCreated()
     {
         HttpClient client = factory.CreateClientForNewUser("Paula Siqueira Rios");
 
-        HttpResponseMessage response = await client.PostAsync("/Denunciations", NewDenunciationForm(isAnonymous: false));
+        HttpResponseMessage response = await client.PostAsync("/Reports", NewReportForm(isAnonymous: false));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]
-    public async Task WithoutContact_ListingAndTheSecretDenunciation_KeepWorking()
+    public async Task WithoutContact_ListingAndTheSecretReport_KeepWorking()
     {
         HttpClient client = factory.CreateClientFor(factory.SeedUserWithoutContact("Diego Nunes Peixoto"));
 
         HttpResponseMessage rides = await client.GetAsync("/Rides");
         HttpResponseMessage items = await client.GetAsync("/LostAndFound");
-        HttpResponseMessage denunciation = await client.PostAsync("/Denunciations", NewDenunciationForm(isAnonymous: true));
+        HttpResponseMessage report = await client.PostAsync("/Reports", NewReportForm(isAnonymous: true));
 
         Assert.Equal(HttpStatusCode.OK, rides.StatusCode);
         Assert.Equal(HttpStatusCode.OK, items.StatusCode);
-        Assert.Equal(HttpStatusCode.Created, denunciation.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, report.StatusCode);
     }
 
     [Fact]

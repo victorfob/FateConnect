@@ -1,6 +1,7 @@
 namespace FateConnect.Api.Modules.Common.DTOs;
 
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Swashbuckle.AspNetCore.Annotations;
 
 public record PagedFilterDto
 {
@@ -8,7 +9,9 @@ public record PagedFilterDto
     public const int DefaultPageSize = 10;
     public const int MaxPageSize = 50;
 
+    [SwaggerParameter("Page number, starting at 1. Absent or below 1 means the first page.")]
     public int? Page { get; init; }
+    [SwaggerParameter("Items per page. Absent or below 1 uses the default size, and above the maximum is capped.")]
     public int? PageSize { get; init; }
 
     [BindNever]
@@ -30,4 +33,13 @@ public record PagedFilterDto
             return Math.Min(requested, MaxPageSize);
         }
     }
+
+    public PagedResultDto<T> ToResult<T>(IReadOnlyList<T> items, int total) =>
+        new()
+        {
+            Items = items,
+            Page = EffectivePage,
+            PageSize = EffectivePageSize,
+            Total = total,
+        };
 }

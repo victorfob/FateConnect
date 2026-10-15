@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.Constants;
-using FateConnect.Api.Modules.Rides.DTOs;
-using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
 
@@ -19,23 +17,7 @@ public class ValidationMessagesTests
     }
 
     [Fact]
-    public void AnUndefinedRideType_IsRejectedInPortuguese()
-    {
-        List<ValidationResult> results = Validate(new FilterRideDto { RideType = (EnumRideType)99 });
-
-        Assert.Contains(results, result => result.ErrorMessage == "Tipo de carona inválido");
-    }
-
-    [Fact]
-    public void AnUndefinedVehicle_IsRejectedInPortuguese()
-    {
-        List<ValidationResult> results = Validate(new FilterRideDto { VehicleType = (EnumVehicleType)99 });
-
-        Assert.Contains(results, result => result.ErrorMessage == "Veículo inválido");
-    }
-
-    [Fact]
-    public void AnUndefinedGender_IsRejectedInPortuguese()
+    public void AnUndefinedGender_IsRejected()
     {
         List<ValidationResult> results = Validate(new CreateUserDto
         {
@@ -47,11 +29,11 @@ public class ValidationMessagesTests
             Acceptances = [],
         });
 
-        Assert.Contains(results, result => result.ErrorMessage == "Gênero inválido");
+        Assert.Contains(results, result => result.ErrorMessage == "Invalid gender.");
     }
 
     [Fact]
-    public void AnUnderageBirthDate_IsRejectedInPortuguese()
+    public void AnUnderageBirthDate_IsRejected()
     {
         List<ValidationResult> results = Validate(new CreateUserDto
         {
@@ -63,7 +45,7 @@ public class ValidationMessagesTests
             Acceptances = [],
         });
 
-        Assert.Contains(results, result => result.ErrorMessage == "É necessário ter pelo menos 18 anos");
+        Assert.Contains(results, result => result.ErrorMessage == "You must be at least 18 years old.");
     }
 
     [Fact]

@@ -2,12 +2,12 @@ namespace FateConnect.Api.Modules.Common.Utils;
 
 public static class EnvironmentUtils
 {
-    public static string Required(string name, string purpose)
+    public static string Required(string name, string purpose, Func<string, string?> lookup)
     {
-        string? value = Environment.GetEnvironmentVariable(name);
+        string? value = lookup(name);
 
         if (string.IsNullOrWhiteSpace(value))
-            throw new InvalidOperationException($"A variável de ambiente {name} é obrigatória {purpose}.");
+            throw new InvalidOperationException($"The environment variable {name} is required {purpose}.");
 
         return value;
     }

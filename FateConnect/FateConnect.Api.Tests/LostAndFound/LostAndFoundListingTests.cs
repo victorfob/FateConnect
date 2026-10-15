@@ -23,7 +23,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         _factory = factory;
     }
 
-    private sealed record ListedItem(Guid Id, string Name, string? Description, EnumStatusLostAndFound Status, bool IsOwner);
+    private sealed record ListedItem(Guid Id, string Name, string? Description, EnumLostAndFoundStatus Status, bool IsOwner);
 
     private sealed record PagedItems(IReadOnlyList<ListedItem> Items, int Page, int PageSize, int Total);
 
@@ -82,6 +82,24 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
     }
 
     [Theory]
+    [InlineData(EnumAccountStatus.SelfDeactivated)]
+    [InlineData(EnumAccountStatus.Banned)]
+    public async Task GetItemById_ReportedByAnAccountThatIsNoLongerActive_ReturnsNotFound(EnumAccountStatus status)
+    {
+        int viewerId = _factory.SeedUser("Heloísa Brandão Lima").Id;
+        int leavingReporterId = _factory.SeedUser("Igor Salgado Freitas").Id;
+        Guid itemId = await ReportAsync(_factory.CreateClientFor(leavingReporterId), ItemForm("Estojo azul"));
+        HttpClient viewer = _factory.CreateClientFor(viewerId);
+
+        HttpResponseMessage before = await viewer.GetAsync($"/LostAndFound/{itemId}");
+        _factory.SetAccountStatus(leavingReporterId, status);
+        HttpResponseMessage after = await viewer.GetAsync($"/LostAndFound/{itemId}");
+
+        Assert.Equal(HttpStatusCode.OK, before.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, after.StatusCode);
+    }
+
+    [Theory]
     [InlineData("Cachecol de lã cinza", "cachecol de la")]
     [InlineData("Cachecol de la cinza", "cachecol de lã")]
     public async Task GetItems_FilteredBySearchTerm_IgnoresAccentsAndCase(string name, string search)
@@ -92,6 +110,86 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
         PagedItems page = await ListAsync(client, $"?SearchTerm={Uri.EscapeDataString(search.ToUpperInvariant())}");
 
         Assert.Contains(page.Items, item => item.Id == id);
+    }
+
+    public static TheoryData<string, string> IrregularPlurals => new()
+    {
+        { "anel", "anéis" },
+        { "papel", "papéis" },
+        { "pastel", "pastéis" },
+        { "jornal", "jornais" },
+        { "farol", "faróis" },
+        { "automóvel", "automóveis" },
+        { "mão", "mãos" },
+        { "nuvem", "nuvens" },
+        { "cartão", "cartões" },
+        { "pão", "pães" },
+        { "jardim", "jardins" },
+    };
+
+    public static TheoryData<string, string> Synonyms => new()
+    {
+        { "Guarda-chuva preto", "sombrinha" },
+        { "Sombrinha azul", "guarda-chuva" },
+        { "Anéis de prata", "aliança" },
+        { "Celulares", "smartphone" },
+    };
+
+    private static string NewSubject() => $"marcador{Guid.NewGuid():N}";
+
+    [Theory]
+    [MemberData(nameof(WordSearchExamples.Rows), MemberType = typeof(WordSearchExamples))]
+    public async Task GetItems_FilteredBySearchTerm_FindsByWord(string name, string search, bool isFound)
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Daniela Prado Lima");
+        string subject = NewSubject();
+        Guid id = await ReportAsync(client, ItemForm($"{subject} {name}"));
+
+        PagedItems page = await ListAsync(client, $"?SearchTerm={Uri.EscapeDataString($"{subject} {search}")}");
+
+        Assert.Equal(isFound, page.Items.Any(item => item.Id == id));
+    }
+
+    [Theory]
+    [MemberData(nameof(IrregularPlurals))]
+    public async Task GetItems_FilteredBySearchTerm_FindsTheIrregularSingularAndPlural(string singular, string plural)
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Eduardo Ramos Teixeira");
+        string subject = NewSubject();
+        Guid singularId = await ReportAsync(client, ItemForm($"{subject} {singular}"));
+        Guid pluralId = await ReportAsync(client, ItemForm($"{subject} {plural}"));
+
+        PagedItems bySingular = await ListAsync(client, $"?SearchTerm={Uri.EscapeDataString($"{subject} {singular}")}");
+        PagedItems byPlural = await ListAsync(client, $"?SearchTerm={Uri.EscapeDataString($"{subject} {plural}")}");
+
+        Assert.Contains(bySingular.Items, item => item.Id == pluralId);
+        Assert.Contains(byPlural.Items, item => item.Id == singularId);
+    }
+
+    [Theory]
+    [MemberData(nameof(Synonyms))]
+    public async Task GetItems_FilteredBySearchTerm_FindsBySynonym(string name, string search)
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Fernanda Costa Ribeiro");
+        string subject = NewSubject();
+        Guid id = await ReportAsync(client, ItemForm($"{subject} {name}"));
+
+        PagedItems page = await ListAsync(client, $"?SearchTerm={Uri.EscapeDataString($"{subject} {search}")}");
+
+        Assert.Contains(page.Items, item => item.Id == id);
+    }
+
+    [Fact]
+    public async Task GetItems_SearchedOnlyByIgnoredWords_ListsEverything()
+    {
+        HttpClient client = _factory.CreateClientForNewUser("Gustavo Lima Pereira");
+        await ReportAsync(client, ItemForm("Garrafa térmica"));
+
+        PagedItems everything = await ListAsync(client, string.Empty);
+        PagedItems ignoredWords = await ListAsync(client, "?SearchTerm=de%20para");
+
+        Assert.True(everything.Total > 0);
+        Assert.Equal(everything.Total, ignoredWords.Total);
     }
 
     [Fact]
@@ -291,7 +389,7 @@ public class LostAndFoundListingTests : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains(
-            "anterior à data inicial",
+            "before the start date",
             await response.Content.ReadAsStringAsync(),
             StringComparison.Ordinal);
     }

@@ -11,7 +11,6 @@ import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-/** Convenções de estilo. Valem no código de produção e também nos `styles.ts`. */
 const styleConventions = [
   {
     selector: "JSXAttribute[name.name='sx']",
@@ -24,9 +23,7 @@ const styleConventions = [
       'Use `theme.space()` com o token de `spacingScale`. O `theme.spacing` é do MUI e sobrescrevê-lo encolhe os componentes dele (as gutters do Toolbar viraram 3px).',
   },
   {
-    // Constante nomeada passa no `no-magic-numbers` e ainda assim não é o token:
-    // aqui o valor tem de vir de `spacingScale`/`radiusScale`. Cobre as duas
-    // formas de chamada — a do tema e o helper livre do `theme/`.
+    // Constante nomeada passa no `no-magic-numbers` e ainda assim não é o token.
     selector:
       "CallExpression[callee.object.name='theme'][callee.property.name=/^(space|radius)$/] > Literal, " +
       'CallExpression[callee.name=/^(spacing|radius)$/] > Literal',
@@ -34,34 +31,26 @@ const styleConventions = [
       'Sem número cru em `theme.space()` e `theme.radius()`: use o token de `spacingScale`/`radiusScale` — inclusive `none` para zero.',
   },
   {
-    // `padding: 0` e `margin: 0` também são espaçamento: viram o token `none`,
-    // e não uma constante nomeada. A string com medida (`'3px'`, `'0 8px'`) é o
-    // mesmo número cru com aspas.
     selector: String.raw`Property[key.name=/^(gap|rowGap|columnGap|padding|padding[A-Z]\w*|margin|margin[A-Z]\w*)$/] > Literal[raw=/^['"]?-?[0-9]|[0-9]px/]`,
     message:
       'Espaçamento nunca é número cru nem medida em string: use `theme.space()` com o token de `spacingScale` — `none` para zero.',
   },
   {
-    // As telas têm duas visões e um limite, `md`; `header` é o da nav do topo.
-    // `xs`, `sm`, `lg` e `xl` seguem nos valores do MUI e não são do produto. A regra vale em todo lugar: o único ponto que
-    // precisa falar `sm` é o override do `MuiMenuItem`, que desfaz um
-    // `min-width:600px` do próprio MUI, e ali há um disable com o motivo.
+    // O único ponto que fala `sm` é o override do `MuiMenuItem`, que desfaz um
+    // `min-width` do próprio MUI, com um disable que diz o motivo.
     selector:
       "CallExpression[callee.object.property.name='breakpoints'] > Literal[value=/^(xs|sm|lg|xl)$/]",
     message:
       "Só existem duas visões: use `md` — `theme.breakpoints.down('md')` para mobile e `up('md')` para desktop. O cabeçalho usa `header`.",
   },
   {
-    // Unidade de viewport em medida é goteira fluida disfarçada, e se esconde numa
-    // constante longe da propriedade. Nem para altura de tela: `html, body, #root`
-    // já são 100%, e `minHeight: '100%'` preenche a janela sem o problema do `100vh`.
+    // Nem para altura de tela: `html, body, #root` já são 100%, e
+    // `minHeight: '100%'` preenche a janela sem o problema do `100vh`.
     selector: String.raw`Literal[value=/[0-9](\.[0-9]+)?v[wh]\b/]`,
     message:
       "Sem unidade de viewport em medida: use o token de `spacingScale` por `theme.space()`, com override em `theme.breakpoints.down('md')` quando mobile e desktop diferirem.",
   },
   {
-    // Consulta de largura escrita à mão cria limite paralelo, e dois limites
-    // discordam justamente na fronteira.
     selector: 'Literal[value=/@media[^)]*width/]',
     message: "Sem media query à mão: use `theme.breakpoints.down('md')` ou `up('md')`.",
   },
@@ -71,25 +60,20 @@ const styleConventions = [
       'Sem tag HTML crua: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
   },
   {
-    // O seletor acima só olha a chamada de `styled`; este pega a tag crua no JSX.
-    // Ficam de fora `<strong>`, que é ênfase no meio da frase, e `title`, `meta` e
-    // `link`, que o React 19 hasteia para o `<head>`, onde não há caixa a estilizar.
+    // Ficam de fora as tags de texto no meio da frase, e `title`, `meta` e `link`,
+    // que o React 19 leva para o `<head>`, onde não há caixa a estilizar.
     selector:
       'JSXOpeningElement > JSXIdentifier[name=/^[a-z]/]:not([name=/^(strong|em|b|i|u|s|small|sub|sup|abbr|code|kbd|mark|br|wbr|title|meta|link)$/])',
     message:
       'Sem tag HTML crua no JSX: use `styled(Stack)` quando for flex e `styled(Box)` no resto, com a semântica na prop `component`.',
   },
   {
-    // Os quatro nomes barrados são a diferença entre a união de cor do MUI e o
-    // que o produto usa: sobram `inherit`, `primary` e `secondary`. Estado colorido
-    // vem de `palette.statusTag` e `palette.notification`, e não desta prop.
     selector: "JSXAttribute[name.name='color'] > Literal[value=/^(error|success|info|warning)$/]",
     message:
       'A cor de ação é `secondary`. `error` fica reservado ao erro de verdade — validação de campo e mensagem —, e estado colorido vem de `palette.statusTag` ou `palette.notification`, não desta prop.',
   },
 ];
 
-/** Cor literal só pode existir nos tokens. */
 const literalColors = [
   {
     selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
@@ -102,9 +86,8 @@ const literalColors = [
 ];
 
 /**
- * Peças do `no-restricted-imports`. A regra não soma entre blocos: o último bloco
- * que casa com o arquivo substitui a lista inteira. Cada escopo abaixo monta a
- * sua lista completa a partir destas constantes.
+ * O `no-restricted-imports` não soma entre blocos: o último que casa com o arquivo
+ * substitui a lista, então cada escopo monta a sua inteira com estas peças.
  */
 const barrelOnlyPatterns = [
   {
@@ -113,7 +96,6 @@ const barrelOnlyPatterns = [
       'Importe pelo barrel: `@design-system`. Se o componente ainda não é exportado, adicione-o ao barrel.',
   },
   {
-    // `@design-system/icons` é o segundo barrel público; o resto continua interno.
     group: ['@design-system/*', '!@design-system/icons'],
     message:
       'Importe do barrel `@design-system` (ou `@design-system/icons`), nunca de um caminho interno dele.',
@@ -156,6 +138,10 @@ export default defineConfig([
   { ignores: ['dist', 'coverage'] },
   js.configs.recommended,
   {
+    files: ['public/sw.js'],
+    languageOptions: { globals: globals.serviceworker },
+  },
+  {
     // O recomendado do `@eslint/js` 10 liga estas três, e o do 9 não. Ficam aqui
     // até o projeto subir para o ESLint 10, quando voltam a vir dele.
     rules: {
@@ -165,12 +151,10 @@ export default defineConfig([
     },
   },
   ...tseslint.configs.recommended,
-  // As mesmas regras que o Sonar aplica no PR. Sem elas o gate local aprova
-  // código que a análise reprova depois, com o PR já aberto.
+  // As regras que o Sonar aplica no PR, para o gate local reprovar antes dele.
   sonarjs.configs.recommended,
   {
-    // A marcação de tarefa pendente é convenção daqui: o padrão exige a issue
-    // que a resolve ao lado, então ela é rastreio, não dívida esquecida.
+    // O TODO daqui leva a issue que o resolve: é rastreio, não dívida esquecida.
     rules: { 'sonarjs/todo-tag': 'off' },
   },
   {
@@ -180,33 +164,40 @@ export default defineConfig([
     rules: { 'sonarjs/function-return-type': 'off' },
   },
   {
-    // Senha de fixture não é segredo: ela existe para o formulário ter o que
-    // validar. Segredo de verdade não entra no repositório, versionado ou não.
+    // Senha de fixture não é segredo: existe para o formulário ter o que validar.
     files: ['**/*.test.{ts,tsx}'],
     rules: { 'sonarjs/no-hardcoded-passwords': 'off' },
   },
   {
+    // O Sonar acusa `await` dentro de laço no código da aplicação. No teste a
+    // sequência é o roteiro (cada clique espera o anterior), e o Sonar não analisa teste.
+    files: ['**/*.{js,ts,tsx}'],
+    ignores: ['**/*.test.{ts,tsx}'],
+    rules: { 'no-await-in-loop': 'error' },
+  },
+  {
     files: ['**/*.{js,ts,tsx}'],
     plugins: { unicorn },
-    // Só estas duas do `unicorn`, porque são as que o Sonar toma emprestadas
-    // (`S7758` e `S7781`). A configuração recomendada dele traria 745 violações
-    // de opinião de estilo que este repo contraria de propósito — nome de
-    // arquivo em PascalCase e `null` no contrato da API, entre outras.
+    // Só as duas que o Sonar toma emprestadas: a recomendada do `unicorn` contraria
+    // convenções daqui, como arquivo em PascalCase e `null` no contrato da API.
     rules: {
       'unicorn/prefer-code-point': 'error',
       'unicorn/prefer-string-replace-all': 'error',
     },
   },
   {
+    // Também tomada pelo Sonar: sem ela, a classe vazia só aparece no PR.
+    rules: { '@typescript-eslint/no-extraneous-class': 'error' },
+  },
+  {
     files: ['**/*.{js,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2022,
       globals: { ...globals.browser, ...globals.node },
-      // Informação de tipo: é o que permite ao lint enxergar `@deprecated`.
-      // `allowDefaultProject` cobre este próprio arquivo, que é `.js` e fica fora do
-      // `include` do tsconfig; sem isto o serviço de projeto o recusa.
+      // A informação de tipo alimenta o `no-deprecated`; o `allowDefaultProject`
+      // cobre os `.js` fora do `include` do tsconfig, que o serviço recusaria.
       parserOptions: {
-        projectService: { allowDefaultProject: ['eslint.config.js'] },
+        projectService: { allowDefaultProject: ['eslint.config.js', 'public/sw.js'] },
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -225,24 +216,15 @@ export default defineConfig([
       ...jsxA11y.flatConfigs.recommended.rules,
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
-      // API marcada como obsoleta não entra: quando ela sair, o build quebra.
       '@typescript-eslint/no-deprecated': 'error',
-      // Nenhum console solto no código: sobra de depuração vaza para produção.
       'no-console': 'error',
-      // A ordem dos imports é aplicada, não combinada — `yarn lint:fix` arruma.
-      // React no alto, o resto dos pacotes logo abaixo sem linha em branco,
-      // depois os aliases internos e por fim os relativos. `import type` fica
-      // no grupo do próprio módulo, ao lado do import de valor que o acompanha.
-      //
-      // `@design-system` fica fora do padrão interno de propósito: o design
-      // system mora fora de `src` e a aplicação o consome como biblioteca, então
-      // ele ordena junto dos pacotes. Devolvê-lo aqui o joga para o bloco dos
-      // aliases da aplicação.
+      // `@design-system` fica fora do `internalPattern` de propósito: a aplicação
+      // o consome como biblioteca, e ele ordena junto dos pacotes.
       'perfectionist/sort-imports': [
         'error',
         {
           newlinesBetween: 1,
-          internalPattern: ['^@app/', '^@ds-root/'],
+          internalPattern: ['^@app/', '^@ds-root/', '^@legal/'],
           customGroups: [
             {
               groupName: 'react',
@@ -252,8 +234,6 @@ export default defineConfig([
                 { elementNamePattern: '^react-router(/.+)?$' },
               ],
             },
-            // Namespace desce para o fim do seu bloco: primeiro o que a pasta
-            // exporta por nome, depois as constantes e por último o estilo.
             {
               groupName: 'parent-constants',
               modifiers: ['wildcard'],
@@ -302,31 +282,24 @@ export default defineConfig([
           ],
         },
       ],
-      // Um import por módulo: o tipo entra com o modificador inline no import de
-      // valor que já existe, em vez de abrir uma segunda declaração.
       'import-x/no-duplicates': ['error', { 'prefer-inline': true }],
-      // Dentro das chaves, os valores primeiro e os tipos no fim.
       'perfectionist/sort-named-imports': ['error', { groups: ['value-import', 'type-import'] }],
     },
   },
 
-  // O único console permitido: o relator de erro global, que existe justamente
-  // para o que escapa do React não desaparecer sem rastro. O teste dele entra na
-  // exceção porque precisa afirmar a chamada que verifica.
+  // O único console: o relator de erro global, para o que escapa do React deixar rastro.
   {
     files: ['src/utils/reportUncaughtErrors.ts', 'src/utils/reportUncaughtErrors.test.ts'],
     rules: { 'no-console': 'off' },
   },
 
-  // Convenções de estilo aplicadas, não apenas documentadas.
   // Testes ficam de fora: eles precisam citar as APIs que o código de produção evita.
   {
     files: ['src/**/*.{ts,tsx}', 'design-system/**/*.{ts,tsx}'],
     ignores: testFiles,
     rules: {
       'react-hooks/exhaustive-deps': 'error',
-      // Número solto no meio do código não diz o que mede. Vira constante nomeada.
-      // Tokens e tabelas de dados ficam de fora: são objetos (`detectObjects: false`).
+      // Tokens e tabelas de dados são objetos, e ficam de fora pelo `detectObjects`.
       '@typescript-eslint/no-magic-numbers': [
         'error',
         {
@@ -353,15 +326,13 @@ export default defineConfig([
       'design-system/**/GlobalStyles.tsx',
     ],
     rules: {
-      // ⛔ Somar, não substituir. `no-restricted-syntax` sobrescreve a lista
-      // inteira, e sem os seletores de convenção aqui eles deixavam de valer
-      // justamente nos `styles.ts` — o único lugar onde `styled(` é escrito.
+      // ⛔ O `no-restricted-syntax` substitui a lista do bloco anterior: sem as
+      // convenções aqui, elas deixariam de valer nos `styles.ts`.
       'no-restricted-syntax': ['error', ...styleConventions, ...literalColors],
     },
   },
 
-  // Imports restritos: do escopo mais largo ao mais estreito, cada bloco com a lista
-  // inteira. A aplicação fala com a UI por uma porta só: o barrel do design system.
+  // Imports restritos, do escopo mais largo ao mais estreito: o último bloco que casa vence.
   {
     files: ['src/**/*.{ts,tsx}'],
     rules: {
@@ -371,8 +342,7 @@ export default defineConfig([
       }),
     },
   },
-  // Dentro do design system o MUI é a fronteira, e ele não conhece a aplicação —
-  // é o que o mantém extraível.
+  // Dentro do design system o MUI é permitido: ele é a fronteira.
   {
     files: ['design-system/**/*.{ts,tsx}'],
     rules: {
@@ -392,8 +362,7 @@ export default defineConfig([
       }),
     },
   },
-  // O próprio test-utils e os testes de contexto precisam da biblioteca crua, e o
-  // teste cita as APIs que o código de produção evita. Fica só o helper do tema.
+  // Teste usa a biblioteca crua e cita o que a produção evita: fica só o helper do tema.
   {
     files: testFiles,
     rules: {

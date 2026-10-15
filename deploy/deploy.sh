@@ -84,6 +84,11 @@ if [[ ! -f "$WEB_ROOT/index.html" ]]; then
   exit 1
 fi
 
+# O Sentry da API marca cada erro com o ambiente e com a mesma versão que o front usa.
+export SENTRY_ENVIRONMENT="$ENVIRONMENT"
+SENTRY_RELEASE="v$(sed -n 's/^ *"version": *"\([^"]*\)".*/\1/p' ../package.json | head -1)"
+export SENTRY_RELEASE
+
 echo "==> Construindo a API de $ENVIRONMENT ($PUBLIC_URL)"
 docker compose -p "$PROJECT" --env-file "$ENV_FILE" build
 

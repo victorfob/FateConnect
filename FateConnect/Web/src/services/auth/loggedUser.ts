@@ -1,11 +1,10 @@
+import { base64UrlToBytes } from '@app/utils/base64Url';
+
 import { tokenStorage } from './tokenStorage';
 import { ProfileTypeEnum } from './types';
 
 /** O payload do JWT é a parte do meio, separada por ponto. */
 const PAYLOAD_INDEX = 1;
-const BASE64_BLOCK = 4;
-const ONLY_CHARACTER_INDEX = 0;
-const NUL_BYTE = 0;
 
 /**
  * `unique_name`, `role` e `nameid`, e não os nomes do `ClaimTypes`: o .NET
@@ -22,17 +21,8 @@ function decodePayload(token: string): unknown {
   const encoded = token.split('.')[PAYLOAD_INDEX];
   if (!encoded) return null;
 
-  const base64 = encoded.replaceAll('-', '+').replaceAll('_', '/');
-  const padding = (BASE64_BLOCK - (base64.length % BASE64_BLOCK)) % BASE64_BLOCK;
-
-  // `atob` devolve bytes, não texto: sem o `TextDecoder` um nome acentuado
-  // volta corrompido.
-  const bytes = Uint8Array.from(
-    atob(base64.padEnd(base64.length + padding, '=')),
-    (character) => character.codePointAt(ONLY_CHARACTER_INDEX) ?? NUL_BYTE,
-  );
-
-  return JSON.parse(new TextDecoder().decode(bytes));
+  // Sem o `TextDecoder` um nome acentuado volta corrompido.
+  return JSON.parse(new TextDecoder().decode(base64UrlToBytes(encoded)));
 }
 
 /** O payload já decodificado, antes de saber quais chaves ele traz. */

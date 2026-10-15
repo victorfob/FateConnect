@@ -28,7 +28,7 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     [MemberData(nameof(LostAndFoundRoutes))]
     [MemberData(nameof(UploadRoutes))]
     [MemberData(nameof(HolidayRoutes))]
-    [MemberData(nameof(DenunciationRoutes))]
+    [MemberData(nameof(ReportRoutes))]
     [MemberData(nameof(UserRoutes))]
     public async Task ProtectedEndpoints_WithoutToken_RespondUnauthorized(string method, string route)
     {
@@ -57,35 +57,35 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     public static TheoryData<string, string> UploadRoutes() => new()
     {
         { "GET", "/uploads/lostandfound/8a1b0f2e-0000-4000-8000-000000000000.png" },
-        { "GET", "/uploads/denunciation/8a1b0f2e-0000-4000-8000-000000000000.png" }
+        { "GET", "/uploads/report/8a1b0f2e-0000-4000-8000-000000000000.png" }
     };
 
-    public static TheoryData<string, string> DenunciationRoutes() => new()
+    public static TheoryData<string, string> ReportRoutes() => new()
     {
-        { "GET", "/Denunciations" },
-        { "GET", "/Denunciations/mine" },
-        { "GET", "/Denunciations/8a1b0f2e-0000-4000-8000-000000000000" },
-        { "GET", "/Denunciations/8a1b0f2e-0000-4000-8000-000000000000/image" },
-        { "POST", "/Denunciations" },
-        { "PATCH", "/Denunciations/8a1b0f2e-0000-4000-8000-000000000000/status" }
+        { "GET", "/Reports" },
+        { "GET", "/Reports/mine" },
+        { "GET", "/Reports/8a1b0f2e-0000-4000-8000-000000000000" },
+        { "GET", "/Reports/8a1b0f2e-0000-4000-8000-000000000000/image" },
+        { "POST", "/Reports" },
+        { "PATCH", "/Reports/8a1b0f2e-0000-4000-8000-000000000000/status" }
     };
 
     [Fact]
-    public async Task DenunciationEndpoints_WithAnAdministratorToken_ReachTheController()
+    public async Task ReportEndpoints_WithAnAdministratorToken_ReachTheController()
     {
         HttpClient client = _factory.CreateClientForNewAdministrator("Helena Braga Quintana");
 
-        HttpResponseMessage response = await client.GetAsync("/Denunciations");
+        HttpResponseMessage response = await client.GetAsync("/Reports");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
-    public async Task MyDenunciations_WithAnOperatorToken_ReachTheController()
+    public async Task MyReports_WithAnOperatorToken_ReachTheController()
     {
         HttpClient client = _factory.CreateClientForNewUser("Otávio Bastos Rodrigues");
 
-        HttpResponseMessage response = await client.GetAsync("/Denunciations/mine");
+        HttpResponseMessage response = await client.GetAsync("/Reports/mine");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -99,6 +99,8 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
         { "PATCH", "/Users/me/password" },
         { "DELETE", "/Users/me/image" },
         { "POST", "/Users/me/deactivate" },
+        { "GET", "/Users/me/legal-documents" },
+        { "POST", "/Users/me/legal-documents/acceptances" },
         { "GET", "/Users" },
         { "GET", "/Users/1" },
         { "PATCH", "/Users/1" },
@@ -153,18 +155,11 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     [InlineData("/Auth/resend-confirmation-email")]
     [InlineData("/Auth/forgot-password")]
     [InlineData("/Auth/reset-password")]
+    [InlineData("/Auth/verify-reset-token")]
     [InlineData("/Auth/unlock")]
     public async Task AnonymousEndpoints_WithoutToken_ReachTheController(string route)
     {
         HttpResponseMessage response = await _factory.CreateClient().PostAsJsonAsync(route, new { });
-
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task VerifyResetToken_WithoutToken_ReachesTheController()
-    {
-        HttpResponseMessage response = await _factory.CreateClient().GetAsync("/Auth/verify-reset-token");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }

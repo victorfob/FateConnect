@@ -46,7 +46,7 @@ public class UserTests
     {
         User user = NewUser("mariana.rocha@aluno.cps.sp.gov.br");
 
-        user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, user.Gender, contact: null, neighborhood: null);
+        user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, user.Gender, contact: null, neighborhood: null, DateTime.UtcNow);
 
         Assert.Equal("11999999999", user.Phone);
         Assert.Equal("mariana.contato@gmail.com", user.ContactEmail);
@@ -54,11 +54,22 @@ public class UserTests
     }
 
     [Fact]
+    public void UpdatePersonalData_WithANeighborhoodOverTheLimit_IsRefusedNamingTheField()
+    {
+        User user = NewUser("mariana.rocha@aluno.cps.sp.gov.br");
+
+        InvalidNeighborhoodException exception = Assert.Throws<InvalidNeighborhoodException>(() =>
+            user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, user.Gender, contact: null, neighborhood: new string('a', 101), DateTime.UtcNow));
+
+        Assert.Equal("The neighborhood and city must have at most 100 characters.", exception.Message);
+    }
+
+    [Fact]
     public void UpdateByAdmin_WithoutAContact_KeepsTheOneAlreadyRegistered()
     {
         User user = NewUser("mariana.rocha@aluno.cps.sp.gov.br");
 
-        user.UpdateByAdmin("Mariana Alves Rocha", user.FatecEmail, contact: null);
+        user.UpdateByAdmin("Mariana Alves Rocha", user.FatecEmail, contact: null, DateTime.UtcNow);
 
         Assert.Equal("11999999999", user.Phone);
         Assert.Equal("mariana.contato@gmail.com", user.ContactEmail);

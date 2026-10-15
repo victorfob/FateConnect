@@ -1,17 +1,24 @@
 namespace FateConnect.Api.Infrastructure.Middlewares;
 
+using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
+using FateConnect.Api.Infrastructure.Observability;
 using FateConnect.Api.Modules.Auth.Exceptions;
-using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Common.Exceptions;
-using FateConnect.Api.Modules.Denunciations.Exceptions;
+using FateConnect.Api.Modules.Reports.Exceptions;
+using FateConnect.Api.Modules.InAppNotifications.Exceptions;
 using FateConnect.Api.Modules.LostAndFound.Exceptions;
 using FateConnect.Api.Modules.Rides.Exceptions;
+using FateConnect.Api.Modules.Storage.Exceptions;
 using FateConnect.Api.Modules.Users.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 public partial class GlobalExceptionMiddleware(
     RequestDelegate next,
+    IErrorReporter errorReporter,
     ILogger<GlobalExceptionMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
@@ -19,6 +26,10 @@ public partial class GlobalExceptionMiddleware(
         try
         {
             await next(context);
+        }
+        catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+        {
+            LogRequestAborted(logger, context.Request.Method, context.RouteTemplate());
         }
         catch (Exception ex)
         {
@@ -29,14 +40,13 @@ public partial class GlobalExceptionMiddleware(
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var statusCode = HttpStatusCode.InternalServerError;
-        var errorMessage = "Algo deu errado. Tente novamente.";
+        var errorMessage = "Something went wrong. Try again.";
         string? conflictingField = null;
         string? errorCode = null;
         int? minutesRemaining = null;
 
         switch (exception)
         {
-            case UnidentifiedTokenException:
             case InvalidCredentialsException:
             case UnidentifiedUserException:
                 statusCode = HttpStatusCode.Unauthorized;
@@ -44,9 +54,7 @@ public partial class GlobalExceptionMiddleware(
                 break;
 
             case BannedAccountException:
-            case DenunciationNotReportedByUserException:
-            case LostAndFoundNotReportedByUserException:
-            case RideNotDrivenByUserException:
+            case NotOwnedByUserException:
                 statusCode = HttpStatusCode.Forbidden;
                 errorMessage = exception.Message;
                 break;
@@ -64,6 +72,7 @@ public partial class GlobalExceptionMiddleware(
                 break;
 
             case UserNotFoundException:
+            case InAppNotificationNotFoundException:
                 statusCode = HttpStatusCode.NotFound;
                 errorMessage = exception.Message;
                 break;
@@ -89,7 +98,7 @@ public partial class GlobalExceptionMiddleware(
             case UserDomainException:
             case AuthDomainException:
             case InvalidUserIdentifierException:
-            case DenunciationDomainException:
+            case ReportDomainException:
             case InvalidImageException:
             case LostAndFoundDomainException:
             case RideDomainException:
@@ -98,28 +107,38 @@ public partial class GlobalExceptionMiddleware(
                 break;
         }
 
+        string method = context.Request.Method;
+        string route = context.RouteTemplate();
+
         if (statusCode is HttpStatusCode.InternalServerError)
-            LogUnhandledError(logger, exception);
+        {
+            LogUnhandledError(logger, method, route, exception);
+            errorReporter.Report(exception, context);
+        }
         else
-            LogBusinessWarning(logger, (int)statusCode, exception.GetType().Name);
+        {
+            LogBusinessWarning(
+                logger,
+                (int)statusCode,
+                exception.GetType().Name,
+                method,
+                route,
+                context.UserIdOrAnonymous());
+        }
 
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)statusCode;
+        Dictionary<string, object?> extensions = [];
 
-        await context.Response.WriteAsJsonAsync(
-            new ErrorResponseDto
-            {
-                Error = errorMessage,
-                Field = conflictingField,
-                Code = errorCode,
-                MinutesRemaining = minutesRemaining
-            },
-            context.RequestAborted);
+        if (conflictingField is not null)
+            extensions["field"] = conflictingField;
+
+        if (errorCode is not null)
+            extensions["code"] = errorCode;
+
+        if (minutesRemaining is not null)
+            extensions["minutesRemaining"] = minutesRemaining;
+
+        await TypedResults
+            .Problem(detail: errorMessage, statusCode: (int)statusCode, extensions: extensions)
+            .ExecuteAsync(context);
     }
-
-    [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Unhandled internal server error occurred.")]
-    private static partial void LogUnhandledError(ILogger logger, Exception exception);
-
-    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "Handled error ({StatusCode}): {ExceptionType}")]
-    private static partial void LogBusinessWarning(ILogger logger, int statusCode, string exceptionType);
 }

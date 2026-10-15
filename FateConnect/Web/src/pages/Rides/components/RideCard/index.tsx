@@ -14,6 +14,7 @@ import { rideTypeDisplayLabel, rideTypeTone } from '@app/pages/Rides/helpers/rid
 import { vehicleTypeLabel } from '@app/pages/Rides/helpers/rideVehicle';
 import { VehicleTypeEnum, type Ride } from '@app/services/rides/types';
 
+import { RideAdminRemoval } from './RideAdminRemoval';
 import { RideDriverContact } from './RideDriverContact';
 import { RideOwnerActions } from './RideOwnerActions';
 
@@ -41,6 +42,8 @@ export function RideCard({ ride, onEdit, onDelete }: RideCardProps) {
             <RideDriverContact ride={ride} />
 
             <RideOwnerActions ride={ride} onEdit={onEdit} onDelete={onDelete} />
+
+            <RideAdminRemoval ride={ride} />
           </ListCard.ActionButtons>
         </ListCard.Actions>
       </ListCard.Header>

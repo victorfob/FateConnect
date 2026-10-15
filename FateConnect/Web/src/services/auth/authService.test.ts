@@ -100,18 +100,21 @@ describe('authService', () => {
     expect(body).toEqual({ fatecEmail: 'a@fatec.sp.gov.br' });
   });
 
-  it('should check the reset link token in the query', async () => {
-    let token: string | null = null;
+  it('should check the reset link token in the body, out of the url that logs keep', async () => {
+    let body: unknown = null;
+    let query = '';
     server.use(
-      http.get(VERIFY_RESET_TOKEN_URL, ({ request }) => {
-        token = new URL(request.url).searchParams.get('token');
+      http.post(VERIFY_RESET_TOKEN_URL, async ({ request }) => {
+        body = await request.json();
+        query = new URL(request.url).search;
         return new HttpResponse(null, { status: NO_CONTENT });
       }),
     );
 
     await verifyResetToken('token-do-link');
 
-    expect(token).toBe('token-do-link');
+    expect(body).toEqual({ token: 'token-do-link' });
+    expect(query).toBe('');
   });
 
   it('should reset the password and open the session it answers', async () => {

@@ -1,0 +1,30 @@
+namespace FateConnect.Api.Infrastructure.Validation;
+
+using System;
+using System.ComponentModel.DataAnnotations;
+using FateConnect.Api.Modules.Storage.Exceptions;
+using FateConnect.Api.Modules.Storage.Utils;
+using Microsoft.AspNetCore.Http;
+
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public class ValidImageAttribute : ValidationAttribute
+{
+    private const int NumberOfMegabytes = 5;
+    private const int MaxFileSizeInBytes = NumberOfMegabytes * 1024 * 1024;
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    {
+        if (value is not IFormFile image)
+            return ValidationResult.Success;
+
+        if (image.Length == 0)
+            return new ValidationResult("The image sent is empty or corrupted.");
+
+        if (image.Length > MaxFileSizeInBytes)
+            return new ValidationResult($"The image cannot be larger than {NumberOfMegabytes} MB.");
+
+        if (!ImageContentTypes.IsSupported(image.ContentType))
+            return new ValidationResult(new UnsupportedImageFormatException().Message);
+
+        return ValidationResult.Success;
+    }
+}

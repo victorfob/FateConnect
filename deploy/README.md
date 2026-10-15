@@ -68,8 +68,9 @@ sudo ./vps-setup.sh
 
 Ele instala PostgreSQL 17, nginx, certbot, fail2ban e Docker, fecha a porta do
 banco para a internet com firewall, permite que os contêineres alcancem o
-PostgreSQL do host, e cria um banco e um usuário por ambiente — gravando cada
-senha em `/root/password-<banco>.txt`.
+PostgreSQL do host, cria um banco e um usuário por ambiente — gravando cada
+senha em `/root/password-<banco>.txt` — e limita o journal do host a 14 dias
+(seção [Registros do servidor](#registros-do-servidor)).
 
 ⚠️ **O PostgreSQL escuta em todas as interfaces de propósito**
 (`listen_addresses = '*'`): o contêiner chega pelo gateway do Docker, que não é
@@ -91,6 +92,10 @@ e `/root/password-fateconnect_prod.txt`; gere os segredos de sessão com
 `openssl rand -base64 32`, **diferentes** em cada ambiente. Deixe `PUBLIC_URL`
 com `http://` por enquanto.
 
+**A API não sobe sem o banco** (`POSTGRES_DB`, `POSTGRES_USER` e
+`POSTGRES_PASSWORD`, que o compose junta na conexão) **nem sem a sessão**
+(`JWT_SECRET`, `JWT_ISSUER` e `JWT_AUDIENCE`): o log diz qual variável faltou.
+
 `SIXLABORS_LICENSE` recebe o conteúdo inteiro do arquivo `sixlabors.lic`, entre aspas
 simples: a API gera a miniatura das fotos com o ImageSharp, e o build da imagem reprova
 sem a licença. Ela entra como segredo do build: não aparece no log do deploy nem chega à
@@ -106,8 +111,32 @@ O envio de e-mail pede quatro variáveis, e **a API não sobe sem as três prime
 | `RESEND_API_KEY` | a chave do Resend daquele ambiente |
 | `RABBITMQ_USER`, `RABBITMQ_PASS` | o usuário da fila; troque o `guest` do exemplo por uma senha gerada com `openssl rand -base64 32` |
 
+Os avisos por push pedem o par de chaves VAPID do ambiente, e **a API não sobe sem ele**:
+
+| Variável | Conteúdo |
+| --- | --- |
+| `VAPID_PUBLIC_KEY` | a chave pública, que o navegador recebe para inscrever o aparelho |
+| `VAPID_PRIVATE_KEY` | a chave privada, segredo que assina cada envio |
+
+Gere um par por ambiente, uma vez só: trocar o par invalida os aparelhos já inscritos, que
+voltam a receber só quando a pessoa ligar "Receber notificações" de novo. O par sai do próprio
+pacote de envio (`ClosureOSS.WebPush`), com `VapidHelper.GenerateVapidKeys()`. Quem envia se identifica
+pelo `PUBLIC_URL`.
+
 As portas da fila seguem a faixa da API: `RABBITMQ_PORT` e `RABBITMQ_UI_PORT` em
 8102 e 8103 na homologação, 8202 e 8203 na produção.
+
+**Erros da API no Sentry (opcional).** `SENTRY_DSN` recebe o DSN de um projeto
+da API no Sentry, separado do projeto do front. Vai só erro 500, com o método, a
+rota e o identificador da requisição; usuário, IP, corpo e query string ficam de
+fora. Quem foi afetado se acha no log da API pelo mesmo identificador, que sai em
+toda linha da requisição (`RequestId`):
+
+```bash
+docker compose -p fateconnect-hml logs api | grep "<identificador>"
+```
+
+Vazio, a API não envia nada. O ambiente e a versão do evento vêm do `deploy.sh`.
 
 ⚠️ **Sem envio, ninguém entra.** O login recusa a conta que não confirmou o
 e-mail, inclusive as que já existiam antes da confirmação, e a de quem administra.
@@ -119,7 +148,8 @@ público.
 
 ## 5. Publicar
 
-Uma vez por ambiente, instale a configuração no nginx:
+Uma vez por ambiente, instale a configuração no nginx. O site usa o formato de log
+que o `vps-setup.sh` instalou, e o `install-site.sh` para sem ele:
 
 ```bash
 sudo ./install-site.sh hml
@@ -302,6 +332,101 @@ Rode `sudo ./install-site.sh <ambiente>`, uma vez por ambiente — é o único p
 manual de uma publicação. Ele reaplica o HTTPS sozinho quando já existe
 certificado para o domínio.
 
+## A rota de saúde
+
+`/api/health` responde sem token e diz só se a API está saudável: `Healthy`, com
+200, quando ela alcança o banco do ambiente e a fila. Com um dos dois fora, responde
+503 no formato de erro da API (`ProblemDetails`), com `health` valendo `Unhealthy`
+(banco fora) ou `Degraded` (fila fora ou reconectando). Não diz versão, host nem o
+erro: o motivo fica no log da API.
+
+```bash
+curl -s https://hml.fateconnect.com.br/api/health
+```
+
+A pipeline confere essa rota depois de subir o contêiner e reprova a publicação
+se ela não responder 200 em 2 minutos. Na subida, a API espera o RabbitMQ ficar
+saudável (o `healthcheck` do compose roda `rabbitmq-diagnostics ping`) antes de
+começar.
+
+## Registros do servidor
+
+Todo registro técnico dura **14 dias**. O log de acesso não guarda a query dos
+endereços, onde viajam o token dos links de e-mail e o texto das buscas.
+
+| Registro | Onde mora | O que guarda |
+| --- | --- | --- |
+| Log da API | journal do host | identificador do usuário e dos registros, método, rota, tipo de erro, login recusado e ação de administrador |
+| Log da fila | journal do host | o funcionamento do RabbitMQ |
+| Acesso do nginx | `/var/log/nginx/fateconnect-<ambiente>.access.log`, e `/var/log/nginx/access.log` para o que não é site (o servidor padrão e o redirecionamento para o HTTPS) | IP com o fim zerado, data, método, caminho sem a query, status, página de origem sem a query e navegador |
+| Erros do nginx | `/var/log/nginx/fateconnect-<ambiente>.error.log` e `/var/log/nginx/error.log` | a cada falha, o **IP inteiro**, o pedido **com a query** e a página de origem: o nginx não aceita formato próprio neste arquivo. A conexão das notificações (`/api/hubs/`), que leva o token de sessão na query, só grava o que for crítico |
+
+Quem apaga o que passa do prazo:
+
+- **journal**: `/etc/systemd/journald.conf.d/fateconnect.conf`, que o
+  `vps-setup.sh` cria, com `MaxRetentionSec=14day` e um arquivo por dia
+  (`MaxFileSec=1day`), porque o journal só apaga arquivo inteiro. Vale para o
+  journal do host todo, inclusive os logs do sistema.
+- **nginx**: o `logrotate` do Debian (`/etc/logrotate.d/nginx`), que gira os
+  arquivos por dia e guarda 14.
+
+O formato do log de acesso mora num lugar só, o `nginx/host-log.conf`, que o
+`vps-setup.sh` instala em `/etc/nginx/conf.d/`: os sites o usam pelo nome
+(`fateconnect_masked`), e o que não é site cai no `access_log` dele. Dois
+`access_log` no mesmo nível gravam os dois arquivos, e não um no lugar do outro:
+por isso o script também transforma em comentário o `access_log` do
+`/etc/nginx/nginx.conf`, que grava IP e query inteiros.
+
+O IP do log de acesso sai com o fim zerado — IPv4 até o terceiro bloco
+(`203.0.113.0`), IPv6 até o terceiro grupo (`2001:db8:85a3::`): ainda mostra de
+onde veio um abuso, sem identificar a pessoa.
+
+### Ler o log da API
+
+Os contêineres escrevem no journal com o próprio nome. A API é
+`fateconnect-<ambiente>-api-1`, e a fila, `fateconnect_rabbitmq_<porta da API>`:
+
+```bash
+sudo journalctl CONTAINER_NAME=fateconnect-prod-api-1 --since "1 hour ago"
+sudo journalctl -t fateconnect-prod-api-1 -f      # acompanhando
+docker compose -p fateconnect-prod logs api       # o mesmo conteúdo, pelo Docker
+```
+
+### Uma vez por VPS
+
+O `vps-setup.sh` já faz o journal e o log de acesso do host numa máquina nova. Na
+que já estava no ar antes dele, os mesmos passos vão à mão, de dentro de `deploy/`,
+e **nesta ordem: primeiro o log do host, depois os sites**. O journal:
+
+```bash
+sudo mkdir -p /etc/systemd/journald.conf.d
+printf '[Journal]\nMaxRetentionSec=14day\nMaxFileSec=1day\n' \
+  | sudo tee /etc/systemd/journald.conf.d/fateconnect.conf
+sudo systemctl restart systemd-journald
+systemd-analyze cat-config systemd/journald.conf | grep -E '^Max(Retention|File)Sec='
+```
+
+O log do host, conferindo que não sobrou `access_log` ativo no `nginx.conf` (o
+número esperado é 0):
+
+```bash
+sudo install -m 644 nginx/host-log.conf /etc/nginx/conf.d/fateconnect-host-log.conf
+sudo sed -i.bak -E 's/^(\s*)(access_log\s)/\1# \2/' /etc/nginx/nginx.conf
+grep -cE '^\s*access_log\s' /etc/nginx/nginx.conf
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+A próxima publicação de cada ambiente recria a API e a fila já escrevendo no
+journal; o log antigo, do driver `json-file`, sai junto com o contêiner.
+
+Só então os sites. O template não se instala sozinho: depois do merge, rode
+`sudo ./install-site.sh hml` e `sudo ./install-site.sh prod`, e confira a diretiva
+no arquivo instalado — o número esperado é 1 em cada:
+
+```bash
+sudo grep -cF 'access.log fateconnect_masked;' /etc/nginx/sites-available/fateconnect-{hml,prod}
+```
+
 ## Dia a dia
 
 | O que você quer | Comando |
@@ -309,7 +434,7 @@ certificado para o domínio.
 | Publicar a `develop` | `./build-front.sh hml && ./deploy.sh hml` |
 | Publicar uma release | `./build-front.sh prod && ./deploy.sh prod` |
 | Ver o que está de pé | `docker compose -p fateconnect-prod ps` |
-| Ler os logs | `docker compose -p fateconnect-prod logs -f` |
+| Ler os logs | `docker compose -p fateconnect-prod logs -f`, ou `sudo journalctl -t fateconnect-prod-api-1` |
 | Ver a memória | `free -h` |
 
 Para olhar os dados de homologação pelo DBeaver — túnel SSH e campos de
@@ -354,6 +479,11 @@ antiga, nesta ordem:
 **O site responde 502.** A API daquele ambiente está fora. Veja com
 `docker compose -p fateconnect-hml logs`.
 
+**A publicação reprova na rota de saúde com 503.** A API está de pé, mas não
+alcança o banco ou a fila. Veja qual com `docker compose -p fateconnect-hml ps`
+(a fila aparece `unhealthy`) e o motivo com
+`docker compose -p fateconnect-hml logs api`.
+
 **Um contêiner morre sozinho, sem erro claro.** Quase sempre é falta de
 memória: o kernel encerra o processo que mais consome. Confirme com
 `dmesg | grep -i "killed process"` e veja o que dá para liberar com `free -h`.
@@ -365,7 +495,8 @@ construir.
 
 **O e-mail de confirmação, de redefinição ou de desbloqueio não chega.** A
 mensagem fica guardada no banco até a fila aceitá-la, e a falha do envio aparece
-no log da API. Veja se a fila está de pé com
+no log da API. Depois de 5 tentativas a mensagem é descartada, porque leva o
+código do link: quem não recebeu pede outro link pela tela. Veja se a fila está de pé com
 `docker compose -p fateconnect-hml ps` e o motivo com
 `docker compose -p fateconnect-hml logs api`.
 

@@ -3,12 +3,18 @@ import { http, HttpResponse } from 'msw';
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
 import { SAVE_BAR_TEXTS } from '@app/components/SaveBar/constants';
 import { THEME_LABEL, THEME_OPTIONS, triggerLabel } from '@app/components/ThemeMenu/constants';
+import { PREFERENCES_MESSAGES } from '@app/constants/preferences';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import type { Preferences as StoredPreferences } from '@app/services/users/preferencesTypes';
 import { cleanup, screen, userEvent, waitFor } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
+import {
+  DEVICE_SUBSCRIPTION,
+  installPushBrowser,
+  removePushBrowser,
+} from '@app/test/utils/pushBrowser';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
 import {
@@ -167,7 +173,7 @@ describe('Preferences', () => {
 
     await userEvent.click(notificationsSwitch());
 
-    expect(await screen.findByText(C.PREFERENCES_MESSAGES.saveFailed)).toBeInTheDocument();
+    expect(await screen.findByText(PREFERENCES_MESSAGES.saveFailed)).toBeInTheDocument();
     expect(screen.getAllByRole('alert')).toHaveLength(1);
     expect(notificationsSwitch()).toBeChecked();
     expect(notificationsSwitch()).toBeEnabled();
@@ -179,12 +185,81 @@ describe('Preferences', () => {
 
     // O cliente tenta a requisição de novo antes de desistir.
     expect(
-      await screen.findByText(C.PREFERENCES_MESSAGES.loadFailed, undefined, {
+      await screen.findByText(PREFERENCES_MESSAGES.loadFailed, undefined, {
         timeout: RETRY_WINDOW_MS,
       }),
     ).toBeInTheDocument();
     expect(screen.getAllByRole('alert')).toHaveLength(1);
     expect(screen.getByText(THEME_LABEL)).toBeInTheDocument();
     expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+  });
+
+  describe('push on this device', () => {
+    const OFF: StoredPreferences = { receiveNotifications: false };
+
+    async function turnOn() {
+      const bodies = recordSavedBodies();
+      await renderPreferences(OFF);
+
+      await userEvent.click(notificationsSwitch());
+      await waitFor(() => expect(notificationsSwitch()).toBeEnabled());
+
+      return bodies;
+    }
+
+    afterEach(() => {
+      removePushBrowser();
+    });
+
+    it('should ask the permission when turning on, and subscribe this device once granted', async () => {
+      const browser = installPushBrowser({ permission: 'default', answer: 'granted' });
+
+      const bodies = await turnOn();
+
+      await waitFor(() => expect(browser.saved).toEqual([DEVICE_SUBSCRIPTION]));
+      expect(browser.requestPermission).toHaveBeenCalledOnce();
+      expect(bodies).toEqual([{ receiveNotifications: true }]);
+    });
+
+    it('should keep the notifications on, without subscribing, when the permission is denied', async () => {
+      const browser = installPushBrowser({ permission: 'default', answer: 'denied' });
+
+      const bodies = await turnOn();
+
+      expect(browser.requestPermission).toHaveBeenCalledOnce();
+      expect(bodies).toEqual([{ receiveNotifications: true }]);
+      expect(notificationsSwitch()).toBeChecked();
+      expect(browser.subscribe).not.toHaveBeenCalled();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('should subscribe without asking again on a device that already allowed', async () => {
+      const browser = installPushBrowser({ permission: 'granted' });
+
+      await turnOn();
+
+      await waitFor(() => expect(browser.saved).toEqual([DEVICE_SUBSCRIPTION]));
+      expect(browser.requestPermission).not.toHaveBeenCalled();
+    });
+
+    it('should only save the choice where the browser has no push', async () => {
+      // Sem rota para a inscrição no stub: um pedido a ela reprovaria o caso.
+      const bodies = await turnOn();
+
+      expect(bodies).toEqual([{ receiveNotifications: true }]);
+      expect(notificationsSwitch()).toBeChecked();
+    });
+
+    it('should not ask anything when turning off', async () => {
+      const browser = installPushBrowser({ permission: 'default' });
+      const bodies = recordSavedBodies();
+      await renderPreferences();
+
+      await userEvent.click(notificationsSwitch());
+      await waitFor(() => expect(notificationsSwitch()).toBeEnabled());
+
+      expect(bodies).toEqual([{ receiveNotifications: false }]);
+      expect(browser.requestPermission).not.toHaveBeenCalled();
+    });
   });
 });

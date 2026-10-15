@@ -5,6 +5,13 @@
 # host, uma cópia só para os dois ambientes. O banco é alcançado pelo host; o
 # front é servido pelo nginx do host.
 
+# O log vai para o journal do host, que o apaga depois de 14 dias (vps-setup.sh).
+# Sem o tag, a linha sai com o id do contêiner, que muda a cada deploy.
+x-logging: &journald
+  driver: journald
+  options:
+    tag: '{{.Name}}'
+
 services:
   api:
     build:
@@ -16,8 +23,11 @@ services:
       secrets:
         - sixlabors_license
     restart: unless-stopped
+    logging: *journald
+    # Sem esperar a fila ficar pronta, a API sobe antes dela e falha a primeira conexão.
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       DB_CONNECTION: Host=host.docker.internal;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
@@ -31,7 +41,16 @@ services:
       PUBLIC_URL: ${PUBLIC_URL}
       RESEND_API_KEY: ${RESEND_API_KEY}
       EMAIL_SENDER: ${EMAIL_SENDER}
+
+      # Avisos por push: o par de chaves VAPID do ambiente
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
       
+      # Erros da API no Sentry: sem DSN, desligado. Ambiente e versão vêm do deploy.sh.
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
+      SENTRY_RELEASE: ${SENTRY_RELEASE}
+
       # Configurações do RabbitMQ
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USER: ${RABBITMQ_USER}
@@ -57,12 +76,19 @@ services:
     image: rabbitmq:3-management
     container_name: fateconnect_rabbitmq_${API_PORT} # Nomeia pelo ambiente para evitar colisão entre hml/prod
     restart: unless-stopped
+    logging: *journald
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     ports:
       - '127.0.0.1:${RABBITMQ_PORT}:5672'
       - '127.0.0.1:${RABBITMQ_UI_PORT}:15672'
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
     mem_limit: 512m
 
 volumes:

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using FateConnect.Api.Tests.Fixtures;
 
@@ -39,7 +40,7 @@ public class FilterContractTests(ApiFactory factory) : IClassFixture<ApiFactory>
     [Theory]
     [InlineData("/Rides")]
     [InlineData("/LostAndFound")]
-    [InlineData("/Denunciations")]
+    [InlineData("/Reports")]
     public async Task ListEndpoints_PublishTheBoundFilterParameters(string path)
     {
         IReadOnlyList<string> names = await QueryParameterNamesAsync(path);
@@ -50,11 +51,38 @@ public class FilterContractTests(ApiFactory factory) : IClassFixture<ApiFactory>
     [Theory]
     [InlineData("/Rides")]
     [InlineData("/LostAndFound")]
-    [InlineData("/Denunciations")]
+    [InlineData("/Reports")]
     public async Task ListEndpoints_DoNotPublishTheDerivedFilterProperties(string path)
     {
         IReadOnlyList<string> names = await QueryParameterNamesAsync(path);
 
         Assert.All(DerivedParameters, parameter => Assert.DoesNotContain(parameter, names));
+    }
+
+    [Theory]
+    [InlineData("/Rides?RideType=99", "RideType")]
+    [InlineData("/Rides?DepartureShift=Dawn", "DepartureShift")]
+    [InlineData("/Users?Status=42", "Status")]
+    public async Task ListEndpoints_RefuseAnEnumValueOutsideTheSetBeforeValidation(string url, string field)
+    {
+        HttpClient client = _factory.CreateClientForNewAdministrator("Carla Mendes Lima");
+
+        HttpResponseMessage response = await client.GetAsync(url);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        using JsonDocument body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.True(body.RootElement.GetProperty("errors").TryGetProperty(field, out _));
+    }
+
+    [Theory]
+    [InlineData("/Rides?RideType=Solidarity")]
+    [InlineData("/Users?Status=Banned")]
+    public async Task ListEndpoints_AcceptAnEnumValueInsideTheSet(string url)
+    {
+        HttpClient client = _factory.CreateClientForNewAdministrator("Carla Mendes Lima");
+
+        HttpResponseMessage response = await client.GetAsync(url);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 }

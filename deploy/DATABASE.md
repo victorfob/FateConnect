@@ -140,3 +140,37 @@ cd ~/FateConnect/deploy && set -a && . ./.env.hml && set +a
 PGPASSWORD="$POSTGRES_PASSWORD" psql -h 127.0.0.1 -U "$POSTGRES_USER" \
   -d "$POSTGRES_DB" -c 'SELECT "ProfileType", count(*) FROM "Users" GROUP BY 1;'
 ```
+
+## Uma vez por ambiente: o módulo de denúncias passa a se chamar `Report`
+
+A publicação que leva o módulo `Report` renomeia a tabela `Denunciations` para
+`Reports` e reescreve o endereço das imagens de `uploads/denunciation/` para
+`uploads/report/`. A migration roda sozinha na subida da API. Os arquivos não se
+movem sozinhos: até o passo abaixo, as imagens das denúncias antigas não aparecem
+na tela. Rode-o **logo depois** da publicação, primeiro em homologação e, na
+release, em produção.
+
+As imagens vão para a pasta nova, juntando com as que já chegaram lá depois da
+subida:
+
+```bash
+docker exec fateconnect-hml-api-1 sh -c 'cd /app/wwwroot/uploads && test -d denunciation && cp -a denunciation/. report/ && rm -r denunciation'
+docker exec fateconnect-hml-api-1 sh -c 'ls /app/wwwroot/uploads'   # sem "denunciation"
+```
+
+O evento de denúncia recebida também troca de nome, e com ele a fila. Uma
+mensagem que estivesse no caminho na hora da publicação ficaria sem consumidor.
+O aviso dela à pessoa que denunciou se perderia, mas nada mais. Confira que as
+duas contagens dão zero e apague a fila antiga, que ficou sem uso:
+
+```bash
+docker exec fateconnect_rabbitmq_<porta da API> rabbitmqctl list_queues name messages | grep denunciation
+```
+
+```sql
+SELECT count(*) FROM "OutboxMessage" WHERE "MessageType" LIKE '%DenunciationReceivedEvent%';
+```
+
+```bash
+docker exec fateconnect_rabbitmq_<porta da API> rabbitmqctl delete_queue denunciation-received-event
+```

@@ -21,6 +21,7 @@ export type PagedSearchResult<TFilter, TItem> = Readonly<{
   totalPages: number;
   currentPage: number;
   isPending: boolean;
+  isError: boolean;
   applyFilters: (applied: TFilter) => void;
   changePage: (nextPage: number) => void;
 }>;
@@ -38,7 +39,7 @@ export function usePagedSearch<TFilter extends PageQuery, TItem>({
 }: PagedSearchInput<TFilter, TItem>): PagedSearchResult<TFilter, TItem> {
   const { value: filters, replace } = useSearchQuery(codec);
 
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError } = useQuery({
     queryKey: [queryKey, filters],
     queryFn: () => listFunction(filters),
     meta: { errorMessage },
@@ -67,5 +68,14 @@ export function usePagedSearch<TFilter extends PageQuery, TItem>({
     [filters, replace],
   );
 
-  return { filters, items, totalPages, currentPage, isPending, applyFilters, changePage };
+  return {
+    filters,
+    items,
+    totalPages,
+    currentPage,
+    isPending,
+    isError,
+    applyFilters,
+    changePage,
+  };
 }

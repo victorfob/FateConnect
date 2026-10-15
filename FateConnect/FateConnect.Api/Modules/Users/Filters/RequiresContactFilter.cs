@@ -6,11 +6,14 @@ using FateConnect.Api.Modules.Users.Exceptions;
 using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-public sealed class RequiresContactFilter(IUserRepository userRepository, EnumPublication publication) : IAsyncActionFilter
+public sealed class RequiresContactFilter(
+    IUserRepository userRepository,
+    EnumPublication publication) : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        bool contactIsWaived = context.ActionArguments.Values.OfType<IWaivesContact>().Any(request => request.WaivesContact);
+        bool contactIsWaived = context.ActionArguments.Values.OfType<IWaivesContact>().Any(
+            request => request.WaivesContact);
 
         if (contactIsWaived)
         {

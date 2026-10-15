@@ -1,3 +1,8 @@
 namespace FateConnect.Api.Modules.Users.DTOs;
 
-public record ReadUserPreferencesDto(bool ReceiveNotifications);
+using Swashbuckle.AspNetCore.Annotations;
+
+public record ReadUserPreferencesDto(
+    [property: SwaggerSchema("Whether the user receives in-app notifications.")]
+    bool ReceiveNotifications
+);

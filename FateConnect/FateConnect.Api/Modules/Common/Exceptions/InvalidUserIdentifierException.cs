@@ -3,4 +3,5 @@ namespace FateConnect.Api.Modules.Common.Exceptions;
 using System;
 
 public class InvalidUserIdentifierException()
-    : Exception("Não foi possível processar a requisição. O identificador de usuário fornecido é inválido ou não existe.");
+    : Exception(
+        "The request could not be processed. The user identifier is invalid or does not exist.");

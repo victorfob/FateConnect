@@ -2,6 +2,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
 import { REGISTER_CONTACTS_LABEL } from '@app/components/ContactRequiredDialog/constants';
+import { DISMISS_BANNER_LABEL } from '@app/components/NoticeBanner/constants';
 import { useProfile } from '@app/hooks/useProfile';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
@@ -81,9 +82,7 @@ describe('ContactBanner', () => {
 
     const banner = await screen.findByRole('status');
     expect(banner).toHaveTextContent(C.CONTACT_BANNER_TEXT);
-    expect(
-      within(banner).getByRole('button', { name: C.DISMISS_BANNER_LABEL }),
-    ).toBeInTheDocument();
+    expect(within(banner).getByRole('button', { name: DISMISS_BANNER_LABEL })).toBeInTheDocument();
     expect(
       within(banner).queryByRole('link', { name: REGISTER_CONTACTS_LABEL }),
     ).not.toBeInTheDocument();
@@ -111,7 +110,7 @@ describe('ContactBanner', () => {
     const { unmount } = renderBanner();
     await screen.findByText(C.CONTACT_BANNER_TEXT);
 
-    await userEvent.click(screen.getByRole('button', { name: C.DISMISS_BANNER_LABEL }));
+    await userEvent.click(screen.getByRole('button', { name: DISMISS_BANNER_LABEL }));
 
     expect(screen.queryByText(C.CONTACT_BANNER_TEXT)).not.toBeInTheDocument();
     unmount();

@@ -3,6 +3,7 @@ import { Outlet, Link as RouterLink, useLocation } from 'react-router';
 import { Button, Footer, Header, NavigationDrawer } from '@design-system';
 
 import { BrandLogo } from '@app/components/BrandLogo';
+import { LegalDocumentsDialog } from '@app/components/LegalDocumentsDialog';
 import { LegalFooterLinks } from '@app/components/LegalFooterLinks';
 import * as C from '@app/constants/appContact';
 import { useAppLinks } from '@app/hooks/useAppLinks';
@@ -14,6 +15,9 @@ import { ContactBanner } from './components/ContactBanner';
 import { DrawerNavigation } from './components/DrawerNavigation';
 import { DrawerSignOut } from './components/DrawerSignOut';
 import { NotificationsMenu } from './components/NotificationsMenu';
+import { PushActivationBanner } from './components/PushActivationBanner';
+import { useInAppNotificationHub } from './hooks/useInAppNotificationHub';
+import { usePushResubscription } from './hooks/usePushResubscription';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
@@ -21,6 +25,8 @@ export function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { pathname } = useLocation();
   const appLinks = useAppLinks();
+  useInAppNotificationHub();
+  usePushResubscription();
 
   const handleMenuClick = useCallback(() => setDrawerOpen(true), []);
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);
@@ -60,6 +66,8 @@ export function MainLayout() {
       </NavigationDrawer>
 
       <ContactBanner />
+      <PushActivationBanner />
+      <LegalDocumentsDialog />
 
       <ShellContent component="main">
         <Outlet />

@@ -18,6 +18,7 @@ import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { DocumentTypeEnum } from '@app/services/signup/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { problemResponse } from '@app/test/utils/problemResponse';
 
 import { SignupConflictFieldEnum } from './@types';
 import { CHECK_EMAIL_TITLE, checkEmailDescription } from './components/CheckEmailMessage/constants';
@@ -282,11 +283,7 @@ describe('Signup', () => {
 
   it('should point the conflict of the institutional email at its field', async () => {
     const field = SignupConflictFieldEnum.FATEC_EMAIL;
-    server.use(
-      http.post(SIGNUP_URL, () =>
-        HttpResponse.json({ error: 'já está em uso no sistema', field }, { status: 409 }),
-      ),
-    );
+    server.use(http.post(SIGNUP_URL, () => problemResponse(409, { field })));
     renderSignup();
     await fillRequiredFields();
 

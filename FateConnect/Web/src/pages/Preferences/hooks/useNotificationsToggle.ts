@@ -1,22 +1,32 @@
 import { useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
+import { PREFERENCES_MESSAGES } from '@app/constants/preferences';
 import { useNotification } from '@app/hooks/useNotification';
+import { usePushSubscription } from '@app/hooks/usePushSubscription';
+import { askForPushPermission } from '@app/services/inAppNotifications/pushDevice';
 import { updatePreferences } from '@app/services/users/preferencesService';
 import type { Preferences } from '@app/services/users/preferencesTypes';
-
-import { PREFERENCES_MESSAGES } from '../constants';
 
 type UseNotificationsToggleInput = Readonly<{
   preferences: Preferences;
   replacePreferences: (preferences: Preferences) => void;
 }>;
 
+const NO_PERMISSION_ASKED: Promise<null> = Promise.resolve(null);
+
+function permissionAsked(turningOn: boolean): Promise<NotificationPermission | null> {
+  if (!turningOn) return NO_PERMISSION_ASKED;
+
+  return askForPushPermission();
+}
+
 export function useNotificationsToggle({
   preferences,
   replacePreferences,
 }: UseNotificationsToggleInput) {
   const { notifyError } = useNotification();
+  const subscribeThisDevice = usePushSubscription();
 
   const mutation = useMutation({
     mutationFn: updatePreferences,
@@ -25,6 +35,8 @@ export function useNotificationsToggle({
 
   const toggle = useCallback(
     async (receiveNotifications: boolean) => {
+      // Primeiro, ainda dentro do toque: fora dele o Safari não abre o pedido.
+      const permission = permissionAsked(receiveNotifications);
       const chosen: Preferences = { receiveNotifications };
       replacePreferences(chosen);
 
@@ -33,9 +45,12 @@ export function useNotificationsToggle({
       } catch {
         replacePreferences(preferences);
         notifyError(PREFERENCES_MESSAGES.saveFailed);
+        return;
       }
+
+      if ((await permission) === 'granted') subscribeThisDevice();
     },
-    [mutation, notifyError, preferences, replacePreferences],
+    [mutation, notifyError, preferences, replacePreferences, subscribeThisDevice],
   );
 
   return { toggle, saving: mutation.isPending };

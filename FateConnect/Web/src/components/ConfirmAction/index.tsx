@@ -2,26 +2,31 @@ import { useCallback, useState, type ComponentProps, type ReactNode } from 'reac
 import { Button, Dialog, type ButtonProps, type FeedbackTone } from '@design-system';
 import { HelpOutlineOutlinedIcon } from '@design-system/icons';
 
+import { InlineLink } from '@app/components/InlineLink';
+
 import { CONFIRMATION } from './constants';
-import * as S from './styles';
 
 type DialogIcon = NonNullable<ComponentProps<typeof Dialog.Message>['icon']>;
 
-export type ConfirmActionProps = Readonly<{
-  label: string;
-  icon: ReactNode;
-  dialogTitle: string;
-  messagePrefix: string;
-  /** Fecha a frase depois do nome em destaque, para quem precisa dizer mais que o `?`. */
-  messageSuffix?: string;
-  subject: string;
-  confirmLabel: string;
-  /** Pinta o gatilho de vermelho, para a ação que desfaz algo que não volta pela tela. */
-  destructive?: boolean;
-  /** O ícone do diálogo quando a ação tem um símbolo próprio, no lugar do padrão do tom. */
-  dialogIcon?: DialogIcon;
-  onConfirm: VoidFunction;
-}>;
+export type ConfirmActionProps = Readonly<
+  {
+    label: string;
+    icon: ReactNode;
+    dialogTitle: string;
+    messagePrefix: string;
+    /** Fecha a frase depois do nome em destaque, para quem precisa dizer mais que o `?`. */
+    messageSuffix?: string;
+    subject: string;
+    confirmLabel: string;
+    /** Pinta o gatilho de vermelho, para a ação que desfaz algo que não volta pela tela. */
+    destructive?: boolean;
+    /** O ícone do diálogo quando a ação tem um símbolo próprio, no lugar do padrão do tom. */
+    dialogIcon?: DialogIcon;
+    /** O gatilho vira link no meio do texto, sem ícone, para a ação que não é a saída principal. */
+    asLink?: boolean;
+    onConfirm: VoidFunction;
+  } & Pick<ButtonProps, 'size'>
+>;
 
 function triggerVariant(destructive: boolean): ButtonProps['variant'] {
   if (destructive) return 'destructive';
@@ -57,7 +62,9 @@ function ConfirmAction({
   confirmLabel,
   destructive = false,
   dialogIcon,
+  asLink = false,
   onConfirm,
+  size,
 }: ConfirmActionProps) {
   const [confirming, setConfirming] = useState(false);
 
@@ -70,10 +77,14 @@ function ConfirmAction({
 
   return (
     <>
-      <Button type="button" variant={triggerVariant(destructive)} onClick={handleAsk}>
-        {icon}
-        {label}
-      </Button>
+      {asLink ? (
+        <InlineLink onClick={handleAsk}>{label}</InlineLink>
+      ) : (
+        <Button type="button" variant={triggerVariant(destructive)} size={size} onClick={handleAsk}>
+          {icon}
+          {label}
+        </Button>
+      )}
 
       <Dialog open={confirming} onClose={handleDismiss} title={dialogTitle}>
         <Dialog.Body>
@@ -99,7 +110,5 @@ function ConfirmAction({
     </>
   );
 }
-
-ConfirmAction.Row = S.ActionRow;
 
 export { ConfirmAction };

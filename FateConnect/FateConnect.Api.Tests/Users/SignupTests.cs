@@ -5,7 +5,7 @@ using System.Text.Json;
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.Events;
-using FateConnect.Api.Modules.Communications.Enums;
+using FateConnect.Api.Modules.Emails.Enums;
 using FateConnect.Api.Tests.Fixtures;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,8 +34,8 @@ public class SignupTests : IClassFixture<ApiFactory>
         gender = "Male",
         acceptances = new[]
         {
-            new { document = "TermsOfUse", version = "2026-01-15" },
-            new { document = "PrivacyPolicy", version = "2026-02-20" },
+            new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse },
+            new { document = "PrivacyPolicy", version = CurrentLegalVersions.PrivacyPolicy },
         },
     };
 
@@ -119,7 +119,7 @@ public class SignupTests : IClassFixture<ApiFactory>
             gender = "Male",
             phone = ApiFactory.UniquePhone(),
             contactEmail = ApiFactory.UniqueContactEmail(),
-            acceptances = new[] { new { document = "TermsOfUse", version = "2026-01-15" } },
+            acceptances = new[] { new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse } },
         });
 
         JsonElement profile = JsonDocument.Parse(await (await SignedInAfterConfirming(fatecEmail)).GetStringAsync("/Users/me")).RootElement;
@@ -175,8 +175,8 @@ public class SignupTests : IClassFixture<ApiFactory>
             addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
             acceptances = new[]
             {
-                new { document = "TermsOfUse", version = "2026-01-15" },
-                new { document = "PrivacyPolicy", version = "2026-02-20" },
+                new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse },
+                new { document = "PrivacyPolicy", version = CurrentLegalVersions.PrivacyPolicy },
             },
         });
 
@@ -199,8 +199,8 @@ public class SignupTests : IClassFixture<ApiFactory>
             gender = "Male",
             acceptances = new[]
             {
-                new { document = "TermsOfUse", version = "2026-01-15" },
-                new { document = "PrivacyPolicy", version = "2026-02-20" },
+                new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse },
+                new { document = "PrivacyPolicy", version = CurrentLegalVersions.PrivacyPolicy },
             },
         };
 
@@ -225,7 +225,7 @@ public class SignupTests : IClassFixture<ApiFactory>
             fullName = "Mariana Alves Rocha",
             birthDate = "2000-01-01T00:00:00Z",
             gender = "Male",
-            acceptances = new[] { new { document = "TermsOfUse", version = "2026-01-15" } },
+            acceptances = new[] { new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse } },
         };
 
         (HttpStatusCode status, string? field) = await SignupAnswerFor(payload);

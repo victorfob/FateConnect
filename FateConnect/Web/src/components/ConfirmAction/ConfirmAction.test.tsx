@@ -1,6 +1,6 @@
 import { PersonOffOutlinedIcon } from '@design-system/icons';
 
-import { render, screen, userEvent } from '@app/test/testing-library';
+import { render, screen, userEvent, within } from '@app/test/testing-library';
 
 import { CONFIRMATION } from './constants';
 import { ConfirmAction, type ConfirmActionProps } from '.';
@@ -94,5 +94,16 @@ describe('ConfirmAction', () => {
     await userEvent.click(screen.getByRole('button', { name: DEFAULT_PROPS.label }));
 
     expect(screen.getByRole('dialog')).toHaveTextContent('Garrafa azul como devolvido?');
+  });
+
+  it('should ask from a link in the text, without the icon, when it is not the main way out', async () => {
+    renderComponent({ ...DEFAULT_PROPS, icon: <PersonOffOutlinedIcon />, asLink: true });
+
+    const trigger = screen.getByRole('button', { name: DEFAULT_PROPS.label });
+    await userEvent.click(trigger);
+
+    expect(trigger).not.toHaveClass('MuiButton-root');
+    expect(within(trigger).queryByTestId('PersonOffOutlinedIcon')).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: DEFAULT_PROPS.dialogTitle })).toBeInTheDocument();
   });
 });

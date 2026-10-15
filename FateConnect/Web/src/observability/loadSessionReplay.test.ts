@@ -60,11 +60,30 @@ describe('scheduleSessionReplay', () => {
     scheduleSessionReplay();
 
     await vi.waitFor(() =>
-      expect(mockReplayIntegration).toHaveBeenCalledWith({
-        maskAllText: true,
-        blockAllMedia: true,
-      }),
+      expect(mockReplayIntegration).toHaveBeenCalledWith(
+        expect.objectContaining({ maskAllText: true, blockAllMedia: true }),
+      ),
     );
+  });
+
+  it('should record the pages without the query, where the email links carry the token', async () => {
+    stubReadyState('complete');
+
+    scheduleSessionReplay();
+
+    const [{ beforeAddRecordingEvent }] = await vi.waitFor(() => {
+      const replayCall = mockReplayIntegration.mock.lastCall;
+      if (!replayCall) throw new Error('replay not created yet');
+
+      return replayCall;
+    });
+    const recordingEvent = {
+      data: { href: 'https://fateconnect.test/redefinir-senha?token=abc123' },
+    };
+
+    expect(beforeAddRecordingEvent(recordingEvent)).toEqual({
+      data: { href: 'https://fateconnect.test/redefinir-senha' },
+    });
   });
 
   it('should stay inert without a client, so a build without dsn reports nothing', async () => {

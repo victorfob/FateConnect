@@ -51,8 +51,11 @@ jobs:
           relevant=$(printf '%s\n' "$changed" | grep -vE '\.md$' || true)
 
           # O padrão não leva barra ao final para alcançar também o projeto de
-          # teste, que mora em `FateConnect.Api.Tests`, ao lado e não dentro.
-          if printf '%s\n' "$relevant" | grep -qE '^(FateConnect/FateConnect\.Api|global\.json)'; then
+          # teste, que mora em `FateConnect.Api.Tests`, ao lado e não dentro. O
+          # `versions.json` mora no front e a API o embute: subir a data muda o que ela aceita.
+          # Sem pipe: o `grep -q` sai no primeiro achado e, com `pipefail`, o `printf`
+          # morto por Broken pipe derruba o `if` quando a lista é grande (PR de release).
+          if grep -qE '^(FateConnect/FateConnect\.Api|FateConnect/Web/legal/versions\.json$|global\.json)' <<< "$relevant"; then
             echo 'api=true' >> "$GITHUB_OUTPUT"
             echo 'A mudança alcança a API — validando.'
             exit 0
@@ -64,6 +67,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           IS_DRAFT: ${{ github.event.pull_request.draft }}
+
+      # Fora do recorte da API de propósito: vale para todo PR. O `(#?)` só vira
+      # número por `--amend` depois de o PR abrir, e esquecido ele chega à release.
+      - name: Changelog placeholder
+        if: github.event.pull_request.draft == false
+        run: |
+          if grep -nF '(#?)' CHANGELOG.md; then
+            echo '::error file=CHANGELOG.md::Troque o (#?) pelo número deste PR.'
+            exit 1
+          fi
 
       # Varre todo `.cs`, e não só o do diff: o que já está na base também não
       # pode ter comentário, e o mesmo script roda no `pre-commit`.
@@ -141,15 +154,29 @@ jobs:
       #
       # O formato é OpenCover porque o Sonar não lê Cobertura para C#, que é o
       # que o `dotnet test` produz por padrão.
+      #
+      # A suíte também grava o documento OpenAPI para o passo do Spectral: gerá-lo
+      # fora dela pediria um banco, porque o `Program` migra antes de o Swashbuckle
+      # ler as rotas.
       - name: Tests
         if: steps.changes.outputs.api == 'true'
         run: |
           dotnet test FateConnect/FateConnect.Api/FateConnect.Api.sln --no-build \
             --collect:"XPlat Code Coverage;Format=opencover" \
             --results-directory coverage
+        env:
+          OPENAPI_DOCUMENT_PATH: ${{ github.workspace }}/openapi.json
 
       - name: Sonar end
         if: steps.changes.outputs.api == 'true'
         run: dotnet sonarscanner end /d:sonar.token=$SONAR_TOKEN
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Depois do Sonar de propósito: reprovado aqui, o PR não perde a análise.
+      # As regras estão em `.spectral.yaml`, ao lado da API.
+      - name: OpenAPI lint
+        if: steps.changes.outputs.api == 'true'
+        run: >
+          docker run --rm -v "$PWD:/work" -w /work stoplight/spectral:6.15.0
+          lint openapi.json --ruleset FateConnect/FateConnect.Api/.spectral.yaml --fail-severity error

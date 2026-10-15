@@ -1,5 +1,5 @@
 ---
-description: Mudar ou instalar a configuração do nginx — provar antes da VPS, o template que não se instala sozinho, a precedência de location que rouba prefixo, o que o certbot faz com o nosso bloco, e o `install-site.sh` por `sudo`
+description: Mudar ou instalar a configuração do nginx — provar antes da VPS, o template que não se instala sozinho, a precedência de location que rouba prefixo, o formato de log do host sem IP inteiro nem query, o que o certbot faz com o nosso bloco, e o `install-site.sh` por `sudo`
 paths:
   - "deploy/nginx/**"
   - "deploy/install-site.sh"
@@ -27,6 +27,7 @@ docker run -d --name prova -p 8091:8091 \
 ## ⛔ O template no repo não é o que está no ar
 
 - Nada instala o template: o `deploy.sh` publica o front, e o `install-site.sh` é passo manual. A configuração antiga segue respondendo 200.
+- ⛔ A VPS tem um checkout só, na `develop`, e o `install-site.sh prod` instala o template dela. Antes, compare o template da `main` com o da `develop` e com o instalado: o que ainda não saiu em release chega a produção junto.
 - "Está atualizado" não se mede; a diretiva, sim. Procure a linha esperada no arquivo **instalado**:
 
 ```bash
@@ -48,6 +49,17 @@ ssh <host> 'curl -sk --http2 -o /dev/null -D - \
 
 Acrescentou um `location ~`? Todo `location /prefixo/` que precisa ganhar leva `^~`, e o mutante prova. O sintoma é o status seguir 200 e sumir um cabeçalho, ou o proxy ser ignorado.
 
+## ⛔ Dois sites, um nginx
+
+Homologação e produção instalam o mesmo template no mesmo nginx, e por isso o template não declara nada no contexto `http`. O formato de log mora no `nginx/host-log.conf` (`fateconnect_masked`), instalado uma vez por host **antes** dos sites, e o `install-site.sh` para sem ele. Diretiva de `http` nova vai para lá, com nome único: `log_format` repetido reprova o `nginx -t`, e `map` repetido passa calado, valendo o do último arquivo lido. A bancada carrega os dois sites juntos.
+
+## ⛔ O log de acesso não guarda a query
+
+- ⛔ O log de falhas não aceita formato e grava a query inteira, no pedido, no endereço repassado e na origem. `location` que recebe credencial na query declara `error_log <arquivo> crit` (o `/api/hubs/`, onde o WebSocket leva o token de sessão); a bancada prova com um mutante sem a linha.
+- O caminho sai do `$request_uri` cortado no `?`: depois do `try_files`, o `$uri` vira `/index.html`.
+- O `Referer` também sai sem a query, porque a página devolve o token dos links de e-mail no pedido seguinte.
+- Dois `access_log` no mesmo nível gravam os dois arquivos: o do `nginx.conf` fica comentado (`vps-setup.sh`).
+
 ## certbot e `install-site.sh`
 
 - O certbot altera o **nosso** bloco (tira o `listen 80`, põe o 443 e o certificado) e cria outro só para o redirecionamento: diretiva escrita no template acaba no servidor HTTPS.
@@ -61,3 +73,5 @@ Ele decide a posse da pasta do front por `SUDO_USER` (`chown -R "${SUDO_USER:-ro
 ```bash
 ls -ld /var/www/fateconnect /var/www/fateconnect/<ambiente>   # dono = o usuário do deploy
 ```
+
+Já dentro de um shell de root, o usuário vai explícito: `SUDO_USER=<usuário do deploy> ./install-site.sh <ambiente>`, com a mesma conferência.

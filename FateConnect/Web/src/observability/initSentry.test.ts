@@ -12,6 +12,13 @@ vi.mock('@sentry/react', () => ({
 
 const mockInit = init as Mock;
 
+function initOptions() {
+  const initCall = mockInit.mock.lastCall;
+  if (!initCall) throw new Error('init was not called');
+
+  return initCall[0];
+}
+
 describe('initSentry', () => {
   // Sem `unstubAllEnvs`: ele apagaria também os stubs de ambiente do
   // vitest.setup.ts, e as URLs das APIs desapareceriam no meio da suíte.
@@ -39,6 +46,25 @@ describe('initSentry', () => {
         enableLogs: false,
       }),
     );
+  });
+
+  it('should drop the query of every url in events, breadcrumbs and spans', () => {
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@sentry.test/1');
+    const link =
+      'https://fateconnect.test/desbloquear-conta?token=abc123&email=aluna%40fatec.sp.gov.br';
+    const page = 'https://fateconnect.test/desbloquear-conta';
+
+    initSentry();
+
+    const { integrations, beforeBreadcrumb, beforeSendSpan } = initOptions();
+    const stripUrlQueries = integrations.find(
+      (integration?: { name: string }) => integration?.name === 'StripUrlQueries',
+    );
+    expect(stripUrlQueries.processEvent({ request: { url: link } })).toEqual({
+      request: { url: page },
+    });
+    expect(beforeBreadcrumb({ data: { to: link } })).toEqual({ data: { to: page } });
+    expect(beforeSendSpan({ description: `GET ${link}` })).toEqual({ description: `GET ${page}` });
   });
 
   it('should propagate the trace header only to our own apis', () => {

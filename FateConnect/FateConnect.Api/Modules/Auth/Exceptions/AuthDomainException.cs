@@ -1,51 +1,51 @@
 namespace FateConnect.Api.Modules.Auth.Exceptions;
 
 using System;
-using FateConnect.Api.Modules.Common.Utils;
+using System.Globalization;
 
 public abstract class AuthDomainException(string message) : Exception(message);
 
 public class BannedAccountException()
-    : AuthDomainException("Esta conta foi banida da plataforma.");
+    : AuthDomainException("This account was banned from the platform.");
 
 public class DeactivatedAccountException()
-    : AuthDomainException("Esta conta está desativada. Reative-a para entrar.");
+    : AuthDomainException("This account is deactivated. Reactivate it to sign in.");
 
 public class InvalidCredentialsException()
-    : AuthDomainException("E-mail ou senha inválidos.");
+    : AuthDomainException("Invalid e-mail or password.");
 
 public class EmailNotConfirmedException()
-    : AuthDomainException("Para acessar o sistema, é necessário confirmar o seu e-mail através do link que enviamos.")
+    : AuthDomainException(
+        "Confirm your e-mail through the link we sent before signing in.")
 {
     public const string ErrorCode = "EmailNotConfirmed";
 }
 
 public class UnconfiguredProfileHierarchyException(string profileType)
-    : Exception($"A hierarquia de acesso para o perfil '{profileType}' não foi configurada no AuthorizeProfileAttribute. Atualize o mapa de perfis permitidos.");
-
-public class UnidentifiedTokenException()
-    : UnauthorizedAccessException("Sessão encerrada. Entre novamente para continuar.");
+    : Exception(
+        $"The access hierarchy of the profile '{profileType}' is not configured in the AuthorizeProfileAttribute. " +
+            "Update the map of allowed profiles.");
 
 public class UnidentifiedUserException()
-    : UnauthorizedAccessException("Sessão expirada. Entre novamente para continuar.");
+    : UnauthorizedAccessException("Session expired. Sign in again to continue.");
 
 public class InvalidConfirmationTokenException()
-    : AuthDomainException("O link de confirmação é inválido ou não foi encontrado.");
+    : AuthDomainException("The confirmation link is invalid or was not found.");
 
 public class EmailAlreadyConfirmedException()
-    : AuthDomainException("Este e-mail já foi confirmado anteriormente.");
+    : AuthDomainException("This e-mail is already confirmed.");
 
 public class ExpiredConfirmationTokenException()
-    : AuthDomainException("O link de confirmação expirou. Peça um novo.");
+    : AuthDomainException("The confirmation link expired. Ask for a new one.");
 
 public class InvalidPasswordResetTokenException()
-    : AuthDomainException("O link de redefinição de senha é inválido ou não foi encontrado.");
+    : AuthDomainException("The password reset link is invalid or was not found.");
 
 public class PasswordResetTokenConsumedException()
-    : AuthDomainException("Este link já foi utilizado para redefinir a senha.");
+    : AuthDomainException("This link was already used to reset the password.");
 
 public class ExpiredPasswordResetTokenException()
-    : AuthDomainException("O link de redefinição expirou. Peça um novo.");
+    : AuthDomainException("The password reset link expired. Ask for a new one.");
 
 public class AccountLockedException : AuthDomainException
 {
@@ -59,14 +59,20 @@ public class AccountLockedException : AuthDomainException
     }
 
     private static string BuildMessage(int minutes) =>
-        $"Por segurança, a conta foi bloqueada após várias tentativas de entrar com a senha incorreta. Para entrar, use o link enviado ao seu e-mail Fatec ou aguarde {QuantityUtils.Minutes(minutes)} e tente novamente.";
+        "For security, the account was locked after several sign-in attempts with a wrong password. " +
+            "To sign in, use the link sent to your Fatec e-mail " +
+            $"or wait {MinutesText(minutes)} and try again.";
+
+    private static string MinutesText(int minutes) =>
+        minutes == 1 ? "1 minute" : $"{minutes.ToString(CultureInfo.InvariantCulture)} minutes";
 }
 
 public class InvalidUnlockTokenException()
-    : AuthDomainException("O link de desbloqueio é inválido ou não foi encontrado.");
+    : AuthDomainException("The unlock link is invalid or was not found.");
 
 public class ExpiredUnlockTokenException()
-    : AuthDomainException("Este link expirou. O tempo de segurança já passou e você já pode fazer login normalmente com a sua senha.");
+    : AuthDomainException(
+        "This link expired. The security wait is over, and you can sign in with your password.");
 
 public class UserNotFoundException()
-    : AuthDomainException("Não há conta cadastrada com este e-mail.");
+    : AuthDomainException("There is no account with this e-mail.");
