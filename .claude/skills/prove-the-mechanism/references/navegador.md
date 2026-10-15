@@ -15,3 +15,13 @@ Sem `Cache-Control`, o navegador arbitra a validade em ~10% da idade do arquivo:
 ## Transição congelada
 
 Com o painel do navegador oculto a página não compõe quadros e `getComputedStyle` devolve o valor do estado anterior de uma transição. Ver a skill `visual-validation`, `references/measurement-pitfalls.md` §"O computado congelado ou velho".
+
+## Push de ponta a ponta
+
+Teste de unidade não prova a cifra, a assinatura VAPID, a entrega do serviço do navegador nem o `sw.js` mostrando o aviso. A bancada que prova:
+
+- API local com chaves VAPID descartáveis (P-256 do `openssl`, em base64url, num arquivo `600` lido pelo processo e nunca impresso), Postgres e RabbitMQ em contêiner, e o front apontado para ela. Contas fictícias criadas pela API, com o e-mail confirmado direto no banco.
+- O "Permitir" é da interface do Chrome: só o dono clica. Outra origem de loopback (`http://[::1]:<porta>`, na CORS da API) volta a ter a permissão zerada.
+- A entrega se lê em três pontos: o `201` do serviço no log da API, `registration.getNotifications()` na página (o aviso existe no Chrome) e a tela. Aviso que existe e não aparece é ajuste do sistema, nas duas entradas do Chrome em Notificações do macOS.
+- No computador o aviso só chega com o Chrome rodando, mesmo sem janela; encerrado, o serviço guarda até ele abrir. Isso não é o "app fechado" do critério, que vale no celular.
+

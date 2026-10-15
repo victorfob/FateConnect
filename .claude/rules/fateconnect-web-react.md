@@ -55,6 +55,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 
 - URL da API só de `import.meta.env.VITE_*`; caminho em minúsculo (`/rides`, `/lostandfound`), mesmo com o controlador em PascalCase.
 - ⛔ Função de serviço nomeia o endpoint, não o recorte que o servidor faz pelo token: `listReports`, não `listMyReports`. Nome com recorte só quando o parâmetro existe (`onlyMine`). Ao mudar contrato, releia quem o chama.
+- ⛔ O Sentry do front recebe a URL no evento, no rastro, no trecho e na gravação, e o `stripUrlQueries` (`src/observability/`) tira a query nos quatro ganchos. O `dataCollection.urlQueryParams` do SDK só vale no servidor. Integração nova do SDK passa pelo filtro.
 
 ## Gate
 

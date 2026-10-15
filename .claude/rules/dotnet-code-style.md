@@ -18,6 +18,7 @@ paths:
 ## O analisador roda no build
 
 - **Na API, achado do SonarAnalyzer é erro de build** (`TreatWarningsAsErrors`); no projeto de testes ele só avisa. Corrija; o improcedente se responde com `#pragma warning disable` + motivo, ou no corpo do PR.
+- ⛔ **O aviso do projeto de testes o Sonar do PR cobra igual.** Antes do push, zere os do arquivo novo (`dotnet build … | grep '<Arquivo>.*warning'`): corrigido depois da aprovação, o push a derruba.
 - ⛔ **S107 só a análise do PR acusa:** construtor ou método com mais de 7 parâmetros passa na build local. Conte antes de acrescentar; as saídas são um record (`UserContact`) ou um método chamado depois do construtor (`Ride.ChangeRepetition`).
 - `Program` não vira `static` para o S1118: o `WebApplicationFactory<Program>` precisa dele. O construtor privado resolve.
 - **A duplicação do Sonar conta identificador.** Módulo copiado do vizinho nomeia logs e parâmetros pelo domínio (`LogRideCreated`/`rideId`), não herda `LogRecordCreated`. O passo do Sonar roda depois dos testes: teste vermelho esconde o gate.
@@ -29,6 +30,7 @@ paths:
 
 - ⛔ **Com o bus outbox, o `Publish` vem antes do `SaveChanges` que o grava:** publicado depois do último `SaveChanges`, o evento nunca sai. Repositório cujo `AddAsync` já salva recebe o `Publish` antes da chamada (`RideService.CreateAsync`).
 - ⛔ **Entidade com `Id` de identidade não tem o `Id` antes de salvar:** o EF não o escreve na propriedade, e o evento sai com `0`. Salve, publique e salve de novo (`InAppNotificationService.NotifyAsync`).
+- ⛔ **Evento que leva código de link ou dado pessoal descarta a falha:** esgotadas as tentativas, o MassTransit guarda o corpo inteiro na fila `_error`, sem prazo. O `DiscardFaultedMessages()` mora numa `ConsumerDefinition` (`AccountEmailConsumerDefinition`), não no `UsingRabbitMq`, que o harness dos testes nunca executa. A prova é o `GetProbeResult` da `ApiFactory`: `discardFault` contra `moveFault` (`AccountEmailFaultTests`).
 
 ## Forma
 
@@ -88,3 +90,4 @@ O passo `OpenAPI lint` do `check-api.yml` roda o Spectral (`FateConnect.Api/.spe
 - ⛔ A API fala inglês inteira: mensagem de validação, de exceção e do middleware, `summary`/`description` e exemplo do Swagger, e template de `LoggerMessage`. Fica em pt-BR o que chega à pessoa por outro caminho, os e-mails (`Modules/Emails/Templates/`) e o texto das notificações (`NotificationContents`), e o comentário de qualquer arquivo (o `.spectral.yaml` inclusive; a `description` da regra, que sai na saída do Spectral, é inglês). O log registra o tipo da exceção: nunca interpole a mensagem nele.
 - Todo `LoggerMessage` declara `EventId`, contínuo dentro da classe: removido um log que ainda não saiu em release, renumere os seguintes. O usuário aparece como `User ID {UserId}` (`user ID` no meio da frase).
 - ⛔ Log carrega id, nunca e-mail, senha, token ou o texto que a pessoa digitou; sem id (e-mail sem conta), registra só o fato.
+- ⛔ O `HttpClient` registra a URL inteira de cada pedido em `Information`, o nível de hml e produção: cliente que chama URL que identifica pessoa ou aparelho (o do push) leva `RemoveAllLoggers()`, com teste que procura a URL no log e o par com um cliente sem o filtro.

@@ -49,7 +49,7 @@ paths:
 Quebre o código de propósito e confira que a suíte cai; restaure e confira com `git status`.
 
 - ⛔ Mute só arquivo sem mudança pendente: `git checkout -- <arquivo>` volta ao último commit e leva junto o que você ainda não commitou nele. Commite antes de mutar.
-- ⛔ Se a build da mutação falha, `dotnet test --no-build` roda a DLL anterior e tudo passa: confira o exit da build antes de ler o teste. Escreva `--verbosity quiet` por extenso: wrapper de shell que reescreve argumentos pode ficar com o `-v q`, e o build responde `Project file does not exist`.
+- ⛔ Se a build da mutação falha, `dotnet test --no-build` roda a DLL anterior e tudo passa: confira o exit da build antes de ler o teste. E compile o projeto de testes, não só o `.csproj` da API: a cópia da DLL que o teste carrega fica no `bin` dele e só se renova na build dele. Escreva `--verbosity quiet` por extenso: wrapper de shell que reescreve argumentos pode ficar com o `-v q`, e o build responde `Project file does not exist`.
 - Mute o corpo do predicado, não a chamada: tirar o `.Where(Predicado())` deixa o método sem uso, e o analisador reprova antes de qualquer teste. Ele reprova também a mutação óbvia (`if (false)`, ramo igual a outro do `switch`): mute com um valor plausível.
 - ⛔ Medindo memória: `Process.PeakWorkingSet64` responde 0 no macOS, e medir no processo que gerou a carga põe a carga no "antes". Separe em processos: um gera o arquivo, outro só o processa sob `/usr/bin/time -l`, e um terceiro só o lê (o controle).
 
