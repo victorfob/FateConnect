@@ -65,6 +65,16 @@ const ITEM_NOTICE: InAppNotification = {
   createdAt: '2026-10-10T09:00:00Z',
 };
 
+const REMOVAL_NOTICE: InAppNotification = {
+  id: 4,
+  type: InAppNotificationTypeEnum.PUBLICATION_REMOVED,
+  content:
+    'Sua carona para Jardim Toledo foi excluída por finalidade comercial ou de publicidade. Em caso de reincidência, a conta pode ser banida.',
+  referenceId: 'f3b8d1e6-2a49-4c7f-8d03-6e5a1c9b2f87',
+  isRead: true,
+  createdAt: '2026-10-09T09:00:00Z',
+};
+
 function listing(all: InAppNotification[], unreadCount: number, onRequest?: (url: URL) => void) {
   server.use(
     pagedListHandler(IN_APP_NOTIFICATIONS_URL, all, onRequest),
@@ -123,7 +133,7 @@ describe('Notifications', () => {
   });
 
   it('should list the notifications with the title of each type', async () => {
-    listing([REPORT_NOTICE, RIDE_NOTICE, ITEM_NOTICE], 2);
+    listing([REPORT_NOTICE, RIDE_NOTICE, ITEM_NOTICE, REMOVAL_NOTICE], 2);
     renderScreen();
 
     expect(await screen.findByText(REPORT_NOTICE.content)).toBeInTheDocument();

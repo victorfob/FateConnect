@@ -1,4 +1,5 @@
 import {
+  DeleteIcon,
   DirectionsCarIcon,
   SearchIcon,
   SecurityIcon,
@@ -16,12 +17,14 @@ export const IN_APP_NOTIFICATION_ICONS: Readonly<
   [InAppNotificationTypeEnum.REPORT_RECEIVED]: SecurityIcon,
   [InAppNotificationTypeEnum.RIDE_TO_NEIGHBORHOOD]: DirectionsCarIcon,
   [InAppNotificationTypeEnum.ITEM_ARCHIVED]: SearchIcon,
+  [InAppNotificationTypeEnum.PUBLICATION_REMOVED]: DeleteIcon,
 };
 
 export const IN_APP_NOTIFICATION_TITLES: Readonly<Record<InAppNotificationTypeEnum, string>> = {
   [InAppNotificationTypeEnum.REPORT_RECEIVED]: 'Denúncia recebida',
   [InAppNotificationTypeEnum.RIDE_TO_NEIGHBORHOOD]: 'Carona ofertada',
   [InAppNotificationTypeEnum.ITEM_ARCHIVED]: 'Item arquivado',
+  [InAppNotificationTypeEnum.PUBLICATION_REMOVED]: 'Conteúdo excluído',
 };
 
 export const IN_APP_NOTIFICATION_TEXTS = {

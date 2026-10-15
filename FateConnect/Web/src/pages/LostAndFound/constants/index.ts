@@ -25,4 +25,6 @@ export const LOST_ITEM_LIST_MESSAGES = {
   deleteFailed: 'Erro ao arquivar o item. Tente novamente.',
   restoreSucceeded: 'Item restaurado.',
   restoreFailed: 'Erro ao restaurar o item. Tente novamente.',
+  removeSucceeded: 'Item excluído.',
+  removeFailed: 'Erro ao excluir o item. Tente novamente.',
 };

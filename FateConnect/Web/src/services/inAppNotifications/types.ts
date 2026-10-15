@@ -5,6 +5,7 @@ export enum InAppNotificationTypeEnum {
   REPORT_RECEIVED = 'ReportReceived',
   RIDE_TO_NEIGHBORHOOD = 'RideToNeighborhood',
   ITEM_ARCHIVED = 'ItemArchived',
+  PUBLICATION_REMOVED = 'PublicationRemoved',
 }
 
 export type InAppNotification = {
