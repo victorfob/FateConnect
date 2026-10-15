@@ -52,8 +52,9 @@ MONITOR_URL="${SENTRY_DSN%%://*}://${dsn_rest%%/*}/api/${dsn_rest##*/}/cron/$MON
 # O aviso não derruba o backup: uma cópia que chegou ao bucket vale mais que o
 # registro de que ela chegou.
 checkin() {
-  curl -fsS -m 10 -o /dev/null "$MONITOR_URL?status=$1" \
-    || echo "aviso: o Sentry não recebeu o status $1" >&2
+  local status=$1
+  curl -fsS -m 10 -o /dev/null "$MONITOR_URL?status=$status" \
+    || echo "aviso: o Sentry não recebeu o status $status" >&2
 }
 
 WORK_DIR=$(mktemp -d)
