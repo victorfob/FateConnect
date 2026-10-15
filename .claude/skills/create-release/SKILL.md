@@ -138,15 +138,15 @@ Quando a branch de release levar correção junto — esteira, configuração �
 
 Branch `release/X.Y.Z` a partir da `develop`, PR **para a `main`** pela skill `pr-creator`.
 
-⛔ **Mudou a versão depois do PR aberto? A branch se renomeia, e o PR se refaz.** O nome dela não é efêmero: ele entra na mensagem do merge commit e fica na `main` para sempre — as seis últimas estão lá como `Merge pull request #401 from victorfob/release/0.10.0`. Uma `release/0.11.0` mergeada como 1.0.0 deixaria a mentira gravada no commit que **é** a release.
+⛔ **Mudou a versão depois do PR aberto? A branch se renomeia, e o PR se refaz.** O nome dela não é efêmero: ele entra na mensagem do merge commit e fica na `main` para sempre — as seis últimas estão lá como `Merge pull request #401 from <dono>/release/0.10.0`. Uma `release/0.11.0` mergeada como 1.0.0 deixaria a mentira gravada no commit que **é** a release.
 
-Aconteceu em 21/09/2026: a 0.11.0 virou 1.0.0 por decisão do Victor com o PR já aberto e o CI rodando. Custou fechar o PR apontando para o novo e apagar a branch remota — barato porque ninguém tinha revisado, e impossível de desfazer depois do merge.
+Aconteceu em 21/09/2026: a 0.11.0 virou 1.0.0 por decisão de quem mantém o projeto, com o PR já aberto e o CI rodando. Custou fechar o PR apontando para o novo e apagar a branch remota — barato porque ninguém tinha revisado, e impossível de desfazer depois do merge.
 
 Mudança feita na branch de release chega à `develop` pelo `back-merge` — é o caminho legítimo para o que é de escopo de release. Não é desculpa para levar feature junto.
 
 ⛔ **No PR da release, confira que os testes e o build do front e da API rodaram.** O check verde com os passos pulados não testou nada, e o PR da release, com centenas de arquivos, é onde o recorte de caminho tem mais chance de errar (receita na skill `prove-the-mechanism`, `references/ci-e-checks.md`).
 
-⛔ **Antes do merge, liste ao Victor os passos de transição que a release pede em produção.** Eles moram no corpo do PR e da issue que os criaram, não em `deploy/`, que descreve a primeira instalação:
+⛔ **Antes do merge, liste a quem publica os passos de transição que a release pede em produção.** Eles moram no corpo do PR e da issue que os criaram, não em `deploy/`, que descreve a primeira instalação:
 
 ```bash
 for n in <PRs desde a última tag>; do
@@ -164,7 +164,7 @@ gh run list --branch main --limit 1               # os três jobs?
 
 E confira que a `develop` recebeu o back-merge: `git rev-list --count origin/develop..origin/main` tem que ser **zero**. Publicação reprovada **pula** o back-merge, e aí esse número fica diferente de zero de propósito — não sincronize à mão: a correção entra na `main`, e o push dela refaz o workflow inteiro.
 
-Depois, com o Victor: os passos de transição listados antes do merge, e cada variável nova conferida no contêiner pelo tamanho, nunca pelo valor:
+Depois, com quem tem acesso ao servidor: os passos de transição listados antes do merge, e cada variável nova conferida no contêiner pelo tamanho, nunca pelo valor:
 
 ```bash
 ssh <host> 'docker exec <contêiner da API> printenv <VARIÁVEL> | tr -d "\n" | wc -c'
