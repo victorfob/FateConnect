@@ -41,7 +41,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: FateConnect/Web/node_modules
           key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
