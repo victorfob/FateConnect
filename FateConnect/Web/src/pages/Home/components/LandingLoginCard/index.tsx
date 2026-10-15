@@ -16,6 +16,7 @@ import { login } from '@app/services/auth/authService';
 import type { LoginRequest } from '@app/services/auth/types';
 import type { ApiError } from '@app/services/httpClient';
 import { loginPrefillState, prefilledEmailOf } from '@app/utils/loginPrefill';
+import { afterSignInPath } from '@app/utils/signInReturn';
 
 import { AccountLockedDialog } from './components/AccountLockedDialog';
 import { EmailNotConfirmedDialog } from './components/EmailNotConfirmedDialog';
@@ -100,8 +101,10 @@ export function LandingLoginCard() {
     mutationFn: login,
     // A mensagem depende do status; o aviso sai daqui, não do tratamento global.
     meta: { notifiesErrorItself: true },
+    // Substitui como o VisitorRoute, que também desvia ao ver o token: duas entradas
+    // no histórico fariam o voltar reabrir o aviso do push que trouxe a pessoa.
     onSuccess: () => {
-      void navigate(RoutePathEnum.MENU);
+      void navigate(afterSignInPath(state), { replace: true });
     },
     onError: (error: ApiError, credentials) => {
       if (error.status === CONFLICT) {

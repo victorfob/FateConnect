@@ -156,6 +156,10 @@ export default defineConfig([
   { ignores: ['dist', 'coverage'] },
   js.configs.recommended,
   {
+    files: ['public/sw.js'],
+    languageOptions: { globals: globals.serviceworker },
+  },
+  {
     // O recomendado do `@eslint/js` 10 liga estas três, e o do 9 não. Ficam aqui
     // até o projeto subir para o ESLint 10, quando voltam a vir dele.
     rules: {
@@ -198,15 +202,19 @@ export default defineConfig([
     },
   },
   {
+    // Também tomada pelo Sonar (`S2094`): sem ela, a classe vazia só aparece no PR.
+    rules: { '@typescript-eslint/no-extraneous-class': 'error' },
+  },
+  {
     files: ['**/*.{js,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2022,
       globals: { ...globals.browser, ...globals.node },
       // Informação de tipo: é o que permite ao lint enxergar `@deprecated`.
-      // `allowDefaultProject` cobre este próprio arquivo, que é `.js` e fica fora do
-      // `include` do tsconfig; sem isto o serviço de projeto o recusa.
+      // `allowDefaultProject` cobre os `.js` fora do `include` do tsconfig (este
+      // arquivo e o service worker); sem isto o serviço de projeto os recusa.
       parserOptions: {
-        projectService: { allowDefaultProject: ['eslint.config.js'] },
+        projectService: { allowDefaultProject: ['eslint.config.js', 'public/sw.js'] },
         tsconfigRootDir: import.meta.dirname,
       },
     },

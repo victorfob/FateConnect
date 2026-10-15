@@ -2,6 +2,7 @@ import { Outlet, ScrollRestoration } from 'react-router';
 
 import { PageMetadata } from '@app/components/PageMetadata';
 import { useHashScroll } from '@app/hooks/useHashScroll';
+import { usePushNotificationClicks } from '@app/hooks/usePushNotificationClicks';
 import { SessionProvider } from '@app/providers/SessionProvider';
 
 /**
@@ -10,6 +11,7 @@ import { SessionProvider } from '@app/providers/SessionProvider';
  */
 export function RootLayout() {
   useHashScroll();
+  usePushNotificationClicks();
 
   return (
     <>
