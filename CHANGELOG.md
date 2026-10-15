@@ -19,6 +19,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a entrega por push dos avisos da central (denúncia recebida, carona para o bairro e item arquivado) a cada aparelho que a pessoa inscrever, com as rotas da chave pública e do aparelho; o aparelho que o serviço do navegador diz não existir mais é apagado (#623) [Backend]
 - Adiciona os avisos por push no aparelho: a faixa da área logada e o interruptor Notificações pedem a permissão e inscrevem o aparelho, que se inscreve de novo sozinho a cada login; dispensada, a faixa não volta naquele aparelho (#625) [Frontend]
 - Adiciona a abertura do aviso por push: tocar nele leva ao mesmo destino da campainha e o marca como lido, com o app aberto ou fechado, e sem sessão passa antes pelo login (#625) [Frontend]
+- Adiciona ao contato de uma carona e de um item a lembrança de que o FateConnect só divulga o anúncio, que o encontro ou a devolução é combinado entre as pessoas e que um lugar movimentado é o mais seguro (#631) [Frontend]
 
 ### Changed
 
@@ -45,6 +46,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a mostrar em vermelho o botão de banir uma conta, como as outras ações destrutivas, e a confirmação ganha o ícone da ação (#621) [Frontend]
 - Passa a apagar todos os aparelhos inscritos no push quando a pessoa desliga as notificações (#623) [Backend]
 - Passa a recusar a subida da API sem o par de chaves do push, `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY`, dizendo qual faltou (#623) [Backend]
+- Passa a dizer nos termos de uso o que fica fora da responsabilidade da plataforma, nomeando acidente e crime entre usuários, o dever de devolver o objeto achado, os cuidados no encontro e os telefones de emergência, em nova versão do documento (#631) [Frontend]
+- Passa a dizer nos termos e na política que quem administra exclui conteúdo com o motivo notificado e que a mudança dos documentos pede novo aceite, e corrige o que os dois afirmavam sem o produto fazer, como as mensagens de novidades e quem lê a denúncia (#631) [Frontend]
 
 ### Fixed
 
@@ -55,6 +58,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Security
 
 - Para de gravar no log de acesso do servidor o token dos links de e-mail e o texto das buscas, e passa a gravar o IP com o fim zerado, inclusive nos pedidos que não chegam a nenhum dos sites (#603) [Backend]
+- Para de enviar ao monitoramento de erros do front o código e o e-mail dos links enviados por e-mail e o texto das buscas, que iam no fim dos endereços (#631) [Frontend]
+- Para de mostrar a carona e o item de conta desativada ou banida a quem abria o endereço direto, inclusive pela notificação; antes eles só saíam das listas (#631) [Backend]
+- Para de gravar no log de falhas do servidor o token de sessão que a conexão das notificações leva no endereço (#631) [Backend]
+- Passa a conferir o link de redefinição de senha por `POST /Auth/verify-reset-token`, com o código no corpo, em vez de na URL, que o log de falhas grava; o `GET` deixa de responder (#631) [Frontend] [Backend]
+- Passa a descartar o e-mail da conta que falha nas 5 tentativas, em vez de guardá-lo sem prazo na fila de erro com o nome, o e-mail e o código do link; quem não recebeu pede outro (#631) [Backend]
 
 ## [1.4.0] - 2026-10-12
 
