@@ -14,7 +14,9 @@ import { ContactBanner } from './components/ContactBanner';
 import { DrawerNavigation } from './components/DrawerNavigation';
 import { DrawerSignOut } from './components/DrawerSignOut';
 import { NotificationsMenu } from './components/NotificationsMenu';
+import { PushActivationBanner } from './components/PushActivationBanner';
 import { useInAppNotificationHub } from './hooks/useInAppNotificationHub';
+import { usePushResubscription } from './hooks/usePushResubscription';
 
 const MENU_BUTTON_LABEL = 'Abrir menu';
 
@@ -23,6 +25,7 @@ export function MainLayout() {
   const { pathname } = useLocation();
   const appLinks = useAppLinks();
   useInAppNotificationHub();
+  usePushResubscription();
 
   const handleMenuClick = useCallback(() => setDrawerOpen(true), []);
   const handleDrawerClose = useCallback(() => setDrawerOpen(false), []);
@@ -62,6 +65,7 @@ export function MainLayout() {
       </NavigationDrawer>
 
       <ContactBanner />
+      <PushActivationBanner />
 
       <ShellContent component="main">
         <Outlet />

@@ -17,6 +17,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona ao log da API o login recusado, com o motivo e sem o e-mail, a ação de administração com quem a fez, a troca de senha recusada, as mudanças de foto e a sessão encerrada recusada, cada linha com o identificador da requisição (#598) [Backend]
 - Adiciona o envio dos erros internos da API a um projeto próprio no Sentry, só com método, rota e identificador da requisição, sem usuário, IP nem conteúdo; sem a chave do projeto, nada é enviado (#598) [Backend]
 - Adiciona a entrega por push dos avisos da central (denúncia recebida, carona para o bairro e item arquivado) a cada aparelho que a pessoa inscrever, com as rotas da chave pública e do aparelho; o aparelho que o serviço do navegador diz não existir mais é apagado (#623) [Backend]
+- Adiciona os avisos por push no aparelho: a faixa da área logada e o interruptor Notificações pedem a permissão e inscrevem o aparelho, que se inscreve de novo sozinho a cada login; dispensada, a faixa não volta naquele aparelho (#625) [Frontend]
+- Adiciona a abertura do aviso por push: tocar nele leva ao mesmo destino da campainha e o marca como lido, com o app aberto ou fechado, e sem sessão passa antes pelo login (#625) [Frontend]
 
 ### Changed
 
@@ -46,6 +48,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Corrige a entrada repetida do menu no histórico depois de entrar: voltar a partir dele pedia dois toques (#625) [Frontend]
 - Corrige a requisição que a pessoa abandona no meio, que era registrada como erro interno (#598) [Backend]
 
 ### Security
