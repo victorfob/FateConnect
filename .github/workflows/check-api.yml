@@ -23,7 +23,7 @@ jobs:
     name: .NET API
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # Clone completo por causa do Sonar: sem histórico ele perde a noção
           # de código novo, que é o que o quality gate mede.
@@ -52,10 +52,10 @@ jobs:
 
           # O padrão não leva barra ao final para alcançar também o projeto de
           # teste, que mora em `FateConnect.Api.Tests`, ao lado e não dentro. O
-          # `versions.json` mora no front e a API o embute: subir a data muda o que ela aceita.
+          # `versions.json` é dividido com o front e a API o embute: subir a data muda o que ela aceita.
           # Sem pipe: o `grep -q` sai no primeiro achado e, com `pipefail`, o `printf`
           # morto por Broken pipe derruba o `if` quando a lista é grande (PR de release).
-          if grep -qE '^(FateConnect/FateConnect\.Api|FateConnect/Web/legal/versions\.json$|global\.json)' <<< "$relevant"; then
+          if grep -qE '^(FateConnect/FateConnect\.Api|FateConnect/legal/versions\.json$|global\.json)' <<< "$relevant"; then
             echo 'api=true' >> "$GITHUB_OUTPUT"
             echo 'A mudança alcança a API — validando.'
             exit 0
@@ -130,7 +130,7 @@ jobs:
           /d:sonar.host.url=https://sonarcloud.io
           /d:sonar.token=$SONAR_TOKEN
           /d:sonar.qualitygate.wait=true
-          /d:sonar.exclusions=FateConnect/Web/**,LBD/**,ESII/**,ESIII/**
+          /d:sonar.exclusions=FateConnect/Web/**,FateConnect/legal/**,LBD/**,ESII/**,ESIII/**
           /d:sonar.cs.opencover.reportsPaths=coverage/**/coverage.opencover.xml
           /d:sonar.coverage.exclusions=**/Migrations/**,**/obj/**
           /d:sonar.cpd.exclusions=**/Migrations/**

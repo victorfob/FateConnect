@@ -21,6 +21,13 @@ paths:
 - ⛔ `yarn test:ci` verde não prova a cobertura do seu arquivo: a média da base segura o global, e o Sonar mede código novo por PR. Antes do push, leia `LF`/`LH` e `BRF`/`BRH` de cada arquivo do diff em `coverage/lcov.info`. Os limites estão no `vite.config.ts`.
 - ⛔ Troca de rota ou de URL exige a suíte inteira: o stub velho vive no teste que você não abriu e reprova por console (`msw` sem handler + `vitest-fail-on-console`), não por asserção.
 
+## Tempo do teste
+
+- ⛔ No CI o teste roda umas três vezes mais devagar que aqui e oscila quase o dobro entre rodadas: passou de metade do limite, uma subida de dependência o estoura, e o seguinte reprova pelo `act` que sobrou.
+- Texto que só preenche campo vai por `userEvent.click` + `userEvent.paste`; `type` só quando a tecla é o assunto (sugestão a cada letra, máscara aos poucos).
+- Jornada por vários filtros troca o filtro pela URL (`act(() => router.navigate(…))`, roteador do `renderAtRoute`) quando a troca pela interface tem teste próprio.
+- Meça com `--reporter=verbose` antes de mudar; o que não cai (seletores do MUI) fica.
+
 ## jsdom
 
 - Geometria é zero: componente que mede `getBoundingClientRect`/`offsetWidth` sai pelo `if` de guarda. Forje com `vi.spyOn` e `Object.defineProperty`, desfeitos no `afterEach`.

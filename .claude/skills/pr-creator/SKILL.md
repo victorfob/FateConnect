@@ -44,6 +44,7 @@ Para mensagem de commit, use a skill `write-commit`. Depois do merge (fechar a i
 - `## Objetivo`: o propósito da branch.
 - `## Alterações`: as mudanças concretas do diff.
 - `## Issue`: `- #<n>` e, na linha seguinte, `Closes #<n>` (documenta a intenção; aqui ele não fecha, porque o PR mira a `develop`). Omita a seção só se a branch não tiver número.
+- `## Passo de transição`, quando hml e prod precisam de um passo à mão que uma instalação nova não precisa: o comando inteiro e a ordem em relação ao merge. É daqui que a skill `create-release` o lê; os documentos do repo descrevem só a primeira instalação.
 - `## Evidências`: reservada para as capturas do usuário.
 - ⛔ Depois de `## Evidências`, o corpo termina com a linha de atribuição, **uma vez só** (atualizando, ela já vem no publicado):
 

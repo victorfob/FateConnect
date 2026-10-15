@@ -32,7 +32,7 @@ jobs:
     outputs:
       web: ${{ steps.changes.outputs.web }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # É a API de arquivos, paginada, e não `gh pr diff`: aquele recusa PR com
       # mais de 300 arquivos (HTTP 406), e a release que trocou o front inteiro
@@ -60,7 +60,8 @@ jobs:
 
           # Sem pipe: o `grep -q` sai no primeiro achado e, com `pipefail`, o `printf`
           # morto por Broken pipe derruba o `if` quando a lista é grande (PR de release).
-          if grep -qE '^FateConnect/Web/' <<< "$relevant"; then
+          # O front lê a versão dos documentos legais da pasta deles, fora de `Web/`.
+          if grep -qE '^FateConnect/(Web|legal)/' <<< "$relevant"; then
             echo 'web=true' >> "$GITHUB_OUTPUT"
             echo 'A mudança alcança o front — validando.'
             exit 0
@@ -93,9 +94,9 @@ jobs:
       matrix:
         index: [1, 2]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version-file: FateConnect/Web/.nvmrc
 
@@ -106,7 +107,7 @@ jobs:
       # O pacote comprimido volta muito mais rápido que um `yarn install` a frio. O
       # prefixo solto deixa a árvore anterior ser restaurada quando o lockfile muda,
       # e aí o yarn reconcilia só a diferença.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: FateConnect/Web/node_modules
           key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
@@ -130,14 +131,14 @@ jobs:
             --coverage.thresholds.branches=0 \
             --coverage.thresholds.statements=0
 
-      # ⛔ `.vitest-reports` começa com ponto, e o upload ignora arquivo oculto
+      # ⛔ `.vitest` começa com ponto, e o upload ignora arquivo oculto
       # por padrão: sem a primeira linha ele sobe zero arquivo, e sem a segunda
       # avisa e segue verde — o job de fusão é que quebra, longe da causa.
       - name: Upload the shard report
         uses: actions/upload-artifact@v4
         with:
           name: blob-${{ matrix.index }}
-          path: FateConnect/Web/.vitest-reports
+          path: FateConnect/Web/.vitest/blob
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 1
@@ -152,16 +153,16 @@ jobs:
       run:
         working-directory: FateConnect/Web
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version-file: FateConnect/Web/.nvmrc
 
       - name: Enable Corepack
         run: corepack enable
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: FateConnect/Web/node_modules
           key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
@@ -214,14 +215,14 @@ jobs:
             fi
           done
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: needs.changes.outputs.web == 'true'
         with:
           # Clone completo por causa do Sonar: sem histórico ele perde a noção
           # de código novo, que é o que o quality gate mede.
           fetch-depth: 0
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         if: needs.changes.outputs.web == 'true'
         with:
           node-version-file: FateConnect/Web/.nvmrc
@@ -230,7 +231,7 @@ jobs:
         if: needs.changes.outputs.web == 'true'
         run: corepack enable
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         if: needs.changes.outputs.web == 'true'
         with:
           path: FateConnect/Web/node_modules
@@ -243,11 +244,11 @@ jobs:
 
       - name: Download the shard reports
         if: needs.changes.outputs.web == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: blob-*
           merge-multiple: true
-          path: FateConnect/Web/.vitest-reports
+          path: FateConnect/Web/.vitest/blob
 
       # Sem re-executar nada: a fusão reconstitui a cobertura da suíte inteira a
       # partir dos relatórios dos shards, e é aqui que os limites globais valem.
@@ -258,7 +259,7 @@ jobs:
           set -euo pipefail
           # Um blob por shard: conferir a contagem antes de fundir separa
           # "a suíte reprovou" de "os relatórios não chegaram".
-          encontrados=$(ls .vitest-reports/*.json 2>/dev/null | wc -l)
+          encontrados=$(ls .vitest/blob/*.json 2>/dev/null | wc -l)
           if [[ "$encontrados" -ne 2 ]]; then
             echo "Esperava 2 relatórios de shard, encontrei $encontrados." >&2
             exit 1
@@ -273,7 +274,7 @@ jobs:
       # `sonar-project.properties`; sem ele o scan publica e sai verde.
       - name: Sonar
         if: needs.changes.outputs.web == 'true'
-        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
+        uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8.3.0
         with:
           projectBaseDir: FateConnect/Web
         env:

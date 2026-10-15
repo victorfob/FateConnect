@@ -24,7 +24,7 @@ jobs:
     name: Version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # A busca é no remoto, não em `git tag -l`: o checkout traz um commit e
       # nenhuma tag, então a busca local aprovaria tudo em silêncio.

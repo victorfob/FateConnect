@@ -37,6 +37,13 @@ updates:
     groups:
       api-minor-and-patch:
         update-types: [minor, patch]
+    # O MassTransit 9 é produto comercial e exige licença. O health check do EF Core
+    # publica a 9 só para o .NET 9, e a 8 aceita o EF Core 9.
+    ignore:
+      - dependency-name: "MassTransit*"
+        versions: [">=9"]
+      - dependency-name: Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore
+        versions: [">=9"]
     commit-message:
       prefix: chore
 

@@ -76,6 +76,7 @@ A **memória** do projeto guarda o porquê e o que o erro custou, fora do reposi
 - **O que o lint, o typecheck ou o CI reprovam não vira rule** — o gate já pega. Fato de config volátil (threshold, estado de regra) também não: escreva o método ("leia o workflow X").
 - **Nada que não se possa verificar nem executar:** sem seleção de modelo, sem "para economizar tokens" como motivo escrito na rule, sem hedge ("se disponível"). Nomeie a ferramenta: `AskUserQuestion` para perguntar, `Grep`/`Glob`/`Read` para inspecionar.
 - Nada da máquina de quem escreve: caminho local, nome de usuário, wrapper de shell pessoal.
+- ⛔ Nenhum nome de pessoa: o harness serve a qualquer dev do projeto. Quem pede é "o usuário"; quem decide ou publica é "quem mantém o projeto".
 
 ## Rule descreve o estado atual
 

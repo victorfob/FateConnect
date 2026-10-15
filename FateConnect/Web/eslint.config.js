@@ -9,6 +9,7 @@ import sonarjs from 'eslint-plugin-sonarjs';
 import unicorn from 'eslint-plugin-unicorn';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
+import reactPackage from 'react/package.json' with { type: 'json' };
 import tseslint from 'typescript-eslint';
 
 const styleConventions = [
@@ -141,15 +142,6 @@ export default defineConfig([
     files: ['public/sw.js'],
     languageOptions: { globals: globals.serviceworker },
   },
-  {
-    // O recomendado do `@eslint/js` 10 liga estas três, e o do 9 não. Ficam aqui
-    // até o projeto subir para o ESLint 10, quando voltam a vir dele.
-    rules: {
-      'no-unassigned-vars': 'error',
-      'no-useless-assignment': 'error',
-      'preserve-caught-error': ['error', { requireCatchParameter: false }],
-    },
-  },
   ...tseslint.configs.recommended,
   // As regras que o Sonar aplica no PR, para o gate local reprovar antes dele.
   sonarjs.configs.recommended,
@@ -208,7 +200,8 @@ export default defineConfig([
       'import-x': importX,
       perfectionist,
     },
-    settings: { react: { version: 'detect' } },
+    // O `detect` do plugin chama uma API que o ESLint 10 removeu.
+    settings: { react: { version: reactPackage.version } },
     rules: {
       ...reactPlugin.configs.flat.recommended.rules,
       ...reactPlugin.configs.flat['jsx-runtime'].rules,

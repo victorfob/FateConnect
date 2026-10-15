@@ -38,9 +38,9 @@ NODE_VERSION=$(tr -d '[:space:]' < ../FateConnect/Web/.nvmrc)
 
 echo "==> Construindo o front de $ENVIRONMENT para $PUBLIC_URL (node $NODE_VERSION)"
 docker run --rm \
-  -v "$(cd .. && pwd)/FateConnect/Web:/app" \
+  -v "$(cd .. && pwd)/FateConnect:/src" \
   -v "$TARGET:/saida" \
-  -w /app \
+  -w /src/Web \
   -e "VITE_API_URL=$PUBLIC_URL/api" \
   -e "VITE_SENTRY_DSN=${VITE_SENTRY_DSN:-}" \
   "node:$NODE_VERSION-alpine" \

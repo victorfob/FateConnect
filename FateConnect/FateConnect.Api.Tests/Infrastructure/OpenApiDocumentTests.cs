@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text.Json;
+using FateConnect.Api.Modules.Users.Enums;
+using FateConnect.Api.Modules.Users.Services;
 using FateConnect.Api.Tests.Fixtures;
 
 namespace FateConnect.Api.Tests.Infrastructure;
@@ -176,5 +178,28 @@ public class OpenApiDocumentTests(ApiFactory factory) : IClassFixture<ApiFactory
         HttpResponseMessage response = await client.GetAsync("/swagger/index.html");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DocumentAcceptanceExamples_CarryTheCurrentVersionOfEachDocument()
+    {
+        using ApiFactory raisedFactory = new()
+        {
+            DocumentVersions = new LegalDocumentVersions(new Dictionary<EnumDocumentType, string>
+            {
+                [EnumDocumentType.TermsOfUse] = "2031-01-02",
+                [EnumDocumentType.PrivacyPolicy] = "2031-03-04",
+            }),
+        };
+        string json = await raisedFactory.CreateClient().GetStringAsync("/swagger/v1/swagger.json");
+        JsonElement schemas = JsonDocument.Parse(json).RootElement.GetProperty("components").GetProperty("schemas");
+        string expected = """[{"document":"TermsOfUse","version":"2031-01-02"},{"document":"PrivacyPolicy","version":"2031-03-04"}]""";
+
+        string Example(string schema, string property) =>
+            schemas.GetProperty(schema).GetProperty("properties").GetProperty(property).GetProperty("example").GetRawText();
+
+        Assert.Equal(expected, JsonSerializer.Serialize(JsonDocument.Parse(Example("CreateUserDto", "acceptances")).RootElement));
+        Assert.Equal(expected, JsonSerializer.Serialize(JsonDocument.Parse(Example("AcceptDocumentsDto", "acceptances")).RootElement));
+        Assert.Equal("\"2031-01-02\"", Example("DocumentAcceptanceDto", "version"));
     }
 }

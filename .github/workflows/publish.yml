@@ -36,9 +36,9 @@ jobs:
       SSH_OPTIONS: -i ~/.ssh/deploy_key -o BatchMode=yes -o ConnectTimeout=15 -o ConnectionAttempts=5
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version-file: FateConnect/Web/.nvmrc
 
@@ -46,7 +46,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: FateConnect/Web/node_modules
           key: node-modules-${{ hashFiles('FateConnect/Web/yarn.lock') }}
