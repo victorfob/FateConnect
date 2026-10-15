@@ -346,8 +346,8 @@ curl -s https://hml.fateconnect.com.br/api/health
 
 A pipeline confere essa rota depois de subir o contêiner e reprova a publicação
 se ela não responder 200 em 2 minutos. Na subida, a API espera o RabbitMQ ficar
-saudável (o `healthcheck` do compose roda `rabbitmq-diagnostics ping`) antes de
-começar.
+saudável (o `healthcheck` do compose roda `rabbitmq-diagnostics check_port_connectivity`,
+que só passa com a porta aceitando conexão) antes de começar.
 
 ## Registros do servidor
 
