@@ -2,7 +2,7 @@ namespace FateConnect.Api.Infrastructure.OpenApi;
 
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 public class ProblemDetailsSchemaFilter : ISchemaFilter
@@ -18,43 +18,42 @@ public class ProblemDetailsSchemaFilter : ISchemaFilter
         ["errors"] = "Fields refused by validation, each with its messages; only in validation refusals.",
     };
 
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (!typeof(ProblemDetails).IsAssignableFrom(context.Type))
+        if (!typeof(ProblemDetails).IsAssignableFrom(context.Type) || schema is not OpenApiSchema problem)
             return;
 
-        schema.Description = "Error response in the RFC 9457 format. When the error points at a request field, " +
+        problem.Description = "Error response in the RFC 9457 format. When the error points at a request field, " +
             "`field` names it; when the same status has more than one reason, `code` tells them apart; a locked " +
             "account also brings `minutesRemaining`.";
 
-        foreach ((string name, OpenApiSchema property) in schema.Properties)
+        problem.Properties ??= new Dictionary<string, IOpenApiSchema>();
+
+        foreach ((string name, IOpenApiSchema property) in problem.Properties)
         {
-            if (PropertyDescriptions.TryGetValue(name, out string? description))
-                property.Description = description;
+            if (PropertyDescriptions.TryGetValue(name, out string? description) && property is OpenApiSchema described)
+                described.Description = description;
         }
 
         if (context.Type != typeof(ProblemDetails))
             return;
 
-        schema.Properties["field"] = new OpenApiSchema
+        problem.Properties["field"] = new OpenApiSchema
         {
-            Type = "string",
-            Nullable = true,
+            Type = JsonSchemaType.String | JsonSchemaType.Null,
             Description = "Request field that caused the error, by its name in the request (`fatecEmail`, `phone`, " +
                 "`contactEmail`). Only when the error points at a field."
         };
-        schema.Properties["code"] = new OpenApiSchema
+        problem.Properties["code"] = new OpenApiSchema
         {
-            Type = "string",
-            Nullable = true,
+            Type = JsonSchemaType.String | JsonSchemaType.Null,
             Description = "Reason of the error when the same status has more than one: `ContactRequired`, " +
                 "`EmailNotConfirmed` or `AccountLocked`."
         };
-        schema.Properties["minutesRemaining"] = new OpenApiSchema
+        problem.Properties["minutesRemaining"] = new OpenApiSchema
         {
-            Type = "integer",
+            Type = JsonSchemaType.Integer | JsonSchemaType.Null,
             Format = "int32",
-            Nullable = true,
             Description = "Minutes until a locked account unlocks by itself. Only with the code `AccountLocked`."
         };
     }

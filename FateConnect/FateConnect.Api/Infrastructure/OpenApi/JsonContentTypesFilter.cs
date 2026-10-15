@@ -1,7 +1,7 @@
 namespace FateConnect.Api.Infrastructure.OpenApi;
 
 using System.Linq;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 public class JsonContentTypesFilter : IOperationFilter
@@ -10,23 +10,23 @@ public class JsonContentTypesFilter : IOperationFilter
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (operation.RequestBody?.Content.ContainsKey(JsonMediaType) == true)
+        if (operation.RequestBody?.Content?.ContainsKey(JsonMediaType) == true)
             KeepOnly(operation.RequestBody.Content, JsonMediaType);
 
-        foreach ((string statusCode, OpenApiResponse response) in operation.Responses)
+        foreach ((string statusCode, IOpenApiResponse response) in operation.Responses ?? [])
         {
             bool isError = statusCode.StartsWith('4') || statusCode.StartsWith('5');
 
             if (isError)
                 KeepOnly(response.Content, OpenApiDocumentSetup.ProblemMediaType);
-            else if (response.Content.ContainsKey(JsonMediaType))
+            else if (response.Content?.ContainsKey(JsonMediaType) == true)
                 KeepOnly(response.Content, JsonMediaType);
         }
     }
 
-    private static void KeepOnly(IDictionary<string, OpenApiMediaType> content, string mediaType)
+    private static void KeepOnly(IDictionary<string, OpenApiMediaType>? content, string mediaType)
     {
-        if (content.Count == 0)
+        if (content is null || content.Count == 0)
             return;
 
         OpenApiMediaType kept = content.TryGetValue(mediaType, out OpenApiMediaType? exact)

@@ -271,7 +271,7 @@ public class Program
 
         app.UseCors(corsPolicy);
 
-        app.UseSwagger();
+        app.UseOpenApiDocument();
 
         app.UseAuthentication();
         app.UseAuthorization();

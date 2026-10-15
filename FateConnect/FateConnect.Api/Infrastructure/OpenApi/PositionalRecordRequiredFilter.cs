@@ -3,16 +3,16 @@ namespace FateConnect.Api.Infrastructure.OpenApi;
 using System;
 using System.Linq;
 using System.Reflection;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 public class PositionalRecordRequiredFilter : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
         bool isRecord = context.Type.GetMethod("<Clone>$") is not null;
 
-        if (!isRecord || schema.Properties.Count == 0)
+        if (!isRecord || schema is not OpenApiSchema { Properties.Count: > 0 } record)
             return;
 
         ParameterInfo[]? primaryParameters = context.Type.GetConstructors()
@@ -28,11 +28,11 @@ public class PositionalRecordRequiredFilter : ISchemaFilter
         foreach (ParameterInfo parameter in primaryParameters)
         {
             bool alwaysPresent = nullability.Create(parameter).ReadState == NullabilityState.NotNull;
-            string? schemaName = schema.Properties.Keys.FirstOrDefault(name =>
+            string? schemaName = record.Properties.Keys.FirstOrDefault(name =>
                 string.Equals(name, parameter.Name, StringComparison.OrdinalIgnoreCase));
 
             if (alwaysPresent && schemaName is not null)
-                schema.Required.Add(schemaName);
+                (record.Required ??= new HashSet<string>()).Add(schemaName);
         }
     }
 }

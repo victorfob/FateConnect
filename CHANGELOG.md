@@ -6,6 +6,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Passa a publicar o documento da API em OpenAPI 3.1, no mesmo endereço; o campo que pode vir nulo declara o nulo entre os tipos aceitos, em vez da marca `nullable` (#681) [Backend]
+
 ## [1.6.0] - 2026-10-15
 
 ### Added
