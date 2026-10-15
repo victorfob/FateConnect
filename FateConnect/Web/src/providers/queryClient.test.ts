@@ -12,7 +12,7 @@ function clientWithNotifier() {
 
 async function failQuery(client: QueryClient, error: unknown, meta?: RequestErrorMeta) {
   await client
-    .fetchQuery({
+    .query({
       queryKey: [crypto.randomUUID()],
       queryFn: () => Promise.reject(error),
       retry: false,
