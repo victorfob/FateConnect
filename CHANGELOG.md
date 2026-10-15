@@ -50,6 +50,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Corrige a entrada repetida do menu no histórico depois de entrar: voltar a partir dele pedia dois toques (#625) [Frontend]
 - Corrige a requisição que a pessoa abandona no meio, que era registrada como erro interno (#598) [Backend]
+- Corrige a ajuda do tipo de carona, que juntava Solidária e Igualitária num parágrafo só e, no celular, quebrava a explicação de Igualitária em duas linhas: agora cada tipo ocupa uma linha (#628) [Frontend]
 
 ### Security
 
