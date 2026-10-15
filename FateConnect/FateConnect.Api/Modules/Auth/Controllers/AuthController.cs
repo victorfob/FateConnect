@@ -122,7 +122,7 @@ public class AuthController(IAuthService authService) : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("verify-reset-token")]
+    [HttpPost("verify-reset-token")]
     [AllowAnonymous]
     [SwaggerOperation(
         OperationId = "VerifyResetToken",
@@ -130,10 +130,9 @@ public class AuthController(IAuthService authService) : ControllerBase
         Description = "Answers 204 while the token can still reset the password, without using it.")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> VerifyResetToken(
-        [FromQuery, SwaggerParameter("Token received in the password reset link.", Required = true)] string token)
+    public async Task<IActionResult> VerifyResetToken([FromBody] VerifyResetTokenDto dto)
     {
-        await authService.VerifyResetTokenAsync(token);
+        await authService.VerifyResetTokenAsync(dto.Token);
         return NoContent();
     }
 

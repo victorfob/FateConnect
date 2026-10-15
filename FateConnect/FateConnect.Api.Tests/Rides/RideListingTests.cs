@@ -79,6 +79,26 @@ public class RideListingTests
         Assert.Equal(1, after.Total);
     }
 
+    [Theory]
+    [InlineData(EnumAccountStatus.SelfDeactivated)]
+    [InlineData(EnumAccountStatus.Banned)]
+    public async Task GetRideById_OfferedByAnAccountThatIsNoLongerActive_ReturnsNotFound(EnumAccountStatus status)
+    {
+        using ApiFactory factory = new();
+        DateOnly tomorrow = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        int viewerId = factory.SeedUser("Ana Beatriz Nogueira").Id;
+        int leavingDriverId = factory.SeedUser("Bruno Carvalho Souza").Id;
+        Guid rideId = factory.SeedRide(leavingDriverId, tomorrow, new TimeOnly(9, 30));
+        HttpClient viewer = factory.CreateClientFor(viewerId);
+
+        HttpResponseMessage before = await viewer.GetAsync($"/Rides/{rideId}");
+        factory.SetAccountStatus(leavingDriverId, status);
+        HttpResponseMessage after = await viewer.GetAsync($"/Rides/{rideId}");
+
+        Assert.Equal(HttpStatusCode.OK, before.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, after.StatusCode);
+    }
+
     [Fact]
     public async Task GetRides_WithoutPagingParameters_ReturnsTheFirstTenRides()
     {

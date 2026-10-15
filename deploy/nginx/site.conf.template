@@ -46,6 +46,10 @@ server {
 
         proxy_read_timeout 120s;
         proxy_send_timeout 120s;
+
+        # O token de sessão viaja na query do WebSocket, e o log de falhas grava a
+        # query inteira, sem formato próprio: aqui só o crítico chega a ele.
+        error_log /var/log/nginx/fateconnect-__ENVIRONMENT__.error.log crit;
     }
 
     # ⛔ `^~` para vencer a regex de extensão mais abaixo: no nginx, regex ganha

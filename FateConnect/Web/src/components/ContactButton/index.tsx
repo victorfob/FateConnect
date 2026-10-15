@@ -9,10 +9,15 @@ import { whatsappConversationUrl } from '@app/utils/whatsapp';
 
 import { ContactDetails } from './ContactDetails';
 import * as C from './constants';
+import * as S from './styles';
 
-type ContactButtonProps = Readonly<{ contact: UserContact; message: string }>;
+type ContactButtonProps = Readonly<{
+  contact: UserContact;
+  message: string;
+  safetyNotice?: string;
+}>;
 
-export function ContactButton({ contact, message }: ContactButtonProps) {
+export function ContactButton({ contact, message, safetyNotice }: ContactButtonProps) {
   const [showingContact, setShowingContact] = useState(false);
 
   const handleOpen = useCallback(() => setShowingContact(true), []);
@@ -48,6 +53,8 @@ export function ContactButton({ contact, message }: ContactButtonProps) {
             phone={displayPhone}
             phoneHref={phoneHref}
           />
+
+          {safetyNotice && <S.SafetyNotice variant="caption">{safetyNotice}</S.SafetyNotice>}
         </Dialog.Body>
       </Dialog>
     </>

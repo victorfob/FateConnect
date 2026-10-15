@@ -49,6 +49,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         return await context.LostAndFoundRecords
             .Include(r => r.User)
             .AsTrackingWhen(forChange)
+            .Where(IsReportedByAnActiveAccount())
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 

@@ -153,18 +153,11 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
     [InlineData("/Auth/resend-confirmation-email")]
     [InlineData("/Auth/forgot-password")]
     [InlineData("/Auth/reset-password")]
+    [InlineData("/Auth/verify-reset-token")]
     [InlineData("/Auth/unlock")]
     public async Task AnonymousEndpoints_WithoutToken_ReachTheController(string route)
     {
         HttpResponseMessage response = await _factory.CreateClient().PostAsJsonAsync(route, new { });
-
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task VerifyResetToken_WithoutToken_ReachesTheController()
-    {
-        HttpResponseMessage response = await _factory.CreateClient().GetAsync("/Auth/verify-reset-token");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }

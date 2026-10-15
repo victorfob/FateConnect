@@ -59,7 +59,7 @@ function linkSearch(token: string) {
 }
 
 function verifyAnswering(status: number) {
-  server.use(http.get(VERIFY_URL, () => new HttpResponse(null, { status })));
+  server.use(http.post(VERIFY_URL, () => new HttpResponse(null, { status })));
 }
 
 async function saveNewPassword(password = NEW_PASSWORD, confirmation = password) {
@@ -75,10 +75,10 @@ async function saveNewPassword(password = NEW_PASSWORD, confirmation = password)
 
 describe('ResetPassword', () => {
   it('should check the link once before showing the form', async () => {
-    const checkedTokens: (string | null)[] = [];
+    const checkedBodies: unknown[] = [];
     server.use(
-      http.get(VERIFY_URL, ({ request }) => {
-        checkedTokens.push(new URL(request.url).searchParams.get('token'));
+      http.post(VERIFY_URL, async ({ request }) => {
+        checkedBodies.push(await request.json());
 
         return new HttpResponse(null, { status: NO_CONTENT });
       }),
@@ -89,7 +89,7 @@ describe('ResetPassword', () => {
     expect(
       await screen.findByRole('heading', { name: FORM.NEW_PASSWORD_TITLE }),
     ).toBeInTheDocument();
-    expect(checkedTokens).toEqual(['token-que-vale']);
+    expect(checkedBodies).toEqual([{ token: 'token-que-vale' }]);
   });
 
   it('should save the new password, open the session and go to the menu', async () => {
@@ -176,7 +176,7 @@ describe('ResetPassword', () => {
   it('should treat a link without token as expired, without calling the api', async () => {
     let called = false;
     server.use(
-      http.get(VERIFY_URL, () => {
+      http.post(VERIFY_URL, () => {
         called = true;
 
         return new HttpResponse(null, { status: NO_CONTENT });
@@ -242,7 +242,7 @@ describe('ResetPassword', () => {
   it('should offer to try again when the check fails for another reason', async () => {
     let attempts = 0;
     server.use(
-      http.get(VERIFY_URL, () => {
+      http.post(VERIFY_URL, () => {
         attempts += 1;
         if (attempts === 1) return new HttpResponse(null, { status: SERVER_ERROR });
 

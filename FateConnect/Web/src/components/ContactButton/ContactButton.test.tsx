@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
@@ -22,6 +23,7 @@ const CONTACT: UserContact = {
 };
 
 const MESSAGE = 'Olá';
+const SAFETY_NOTICE = 'Prefira um lugar movimentado.';
 
 const THUMBNAIL_PATH = 'uploads/user/thumbnails/perfil.webp';
 const THUMBNAIL_URL = `https://api.fateconnect.test/${THUMBNAIL_PATH}`;
@@ -33,7 +35,7 @@ const INITIALS = 'MN';
 
 const CONTACT_WITH_PHOTO: UserContact = { ...CONTACT, thumbnailUrl: THUMBNAIL_PATH };
 
-const DEFAULT_PROPS = { contact: CONTACT, message: MESSAGE };
+const DEFAULT_PROPS: ComponentProps<typeof ContactButton> = { contact: CONTACT, message: MESSAGE };
 
 const renderComponent = (props = DEFAULT_PROPS) => render(<ContactButton {...props} />);
 
@@ -74,6 +76,18 @@ describe('ContactButton', () => {
     expect(phoneLink).toHaveAttribute('href', 'https://wa.me/5515900000000?text=Ol%C3%A1');
     // A máscara não pode vazar para o endereço: separador quebra a conversa.
     expect(phoneLink.getAttribute('href')).not.toMatch(/[()\s-]/);
+  });
+
+  it('should show the safety notice only to who passes one', async () => {
+    renderComponent({ ...DEFAULT_PROPS, safetyNotice: SAFETY_NOTICE });
+
+    expect((await openDialog()).getByText(SAFETY_NOTICE)).toBeInTheDocument();
+  });
+
+  it('should leave the safety notice out when none is passed', async () => {
+    renderComponent();
+
+    expect((await openDialog()).queryByText(SAFETY_NOTICE)).not.toBeInTheDocument();
   });
 
   it('should show a long name in full, without cutting it', async () => {
