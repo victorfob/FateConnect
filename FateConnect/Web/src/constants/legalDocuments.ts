@@ -8,7 +8,7 @@ import legalDocumentVersions from '@legal/versions.json';
 export const TERMS_VERSION: string = legalDocumentVersions.termsOfUse;
 export const PRIVACY_VERSION: string = legalDocumentVersions.privacyPolicy;
 
-/** Arquivos servidos de `public/`, gerados por `legal/build-pdfs.sh`. */
+/** Arquivos servidos de `public/`, gerados por `FateConnect/legal/build-pdfs.sh`. */
 export const TERMS_URL = '/termos.pdf';
 export const PRIVACY_URL = '/privacidade.pdf';
 

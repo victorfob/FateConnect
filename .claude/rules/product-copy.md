@@ -6,7 +6,7 @@ paths:
   - "FateConnect/Web/src/**/schema/**"
   - "FateConnect/Web/src/**/helpers/**"
   - "FateConnect/Web/src/routes/pageMetadata.ts"
-  - "FateConnect/Web/legal/**"
+  - "FateConnect/legal/**"
 ---
 
 # Copy de produto

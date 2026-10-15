@@ -52,6 +52,6 @@ O `| grep -q` sob `pipefail` com uma lista grande passou sempre no Mac e falhou 
 
 ## Artefato entre jobs
 
-- `actions/upload-artifact` nasce com `if-no-files-found: warn`: caminho errado sobe zero arquivo e o job fica verde, e quem quebra é o consumidor, longe da causa. Arquivo oculto (`.vitest-reports`) é ignorado sem `include-hidden-files: true`.
+- `actions/upload-artifact` nasce com `if-no-files-found: warn`: caminho errado sobe zero arquivo e o job fica verde, e quem quebra é o consumidor, longe da causa. Arquivo em pasta oculta (`.vitest/blob`) é ignorado sem `include-hidden-files: true`.
 - Passo que transporta leva as duas guardas: `if-no-files-found: error` de um lado, e do outro contar o que chegou (um relatório por shard) antes de usar.
 - Prova local não cobre o trajeto: localmente os dois passos leem o mesmo disco e o diretório sempre existe. Pergunte por onde o dado viaja e conte o que chegou.

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.OpenApi;
 using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Users.Enums;
+using FateConnect.Api.Modules.Users.Filters;
 using Swashbuckle.AspNetCore.Annotations;
 
 public class CreateUserDto
@@ -44,14 +45,7 @@ public class CreateUserDto
     [Required(ErrorMessage = "The document acceptances are required.")]
     [MinLength(1, ErrorMessage = "Accept at least one document.")]
     [SwaggerSchema("Legal documents accepted at sign-up, each with its current version.")]
-    [SchemaExample(
-        """
-        [
-          { "document": "TermsOfUse", "version": "2026-10-14" },
-          { "document": "PrivacyPolicy", "version": "2026-10-14" }
-        ]
-        """,
-        IsJson = true)]
+    [CurrentDocumentAcceptancesExample]
     required public List<DocumentAcceptanceDto> Acceptances { get; set; } =
     [];
 

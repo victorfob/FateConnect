@@ -8,7 +8,7 @@ describe('stripUrlQueries', () => {
     const event = {
       request: { url: LINK },
       breadcrumbs: [{ data: { from: '/redefinir-senha?token=abc123', to: '/entrar' } }],
-      spans: [{ description: `GET ${LINK}`, data: { 'http.query': '?token=abc123' } }],
+      spans: [{ description: `GET ${LINK}`, data: { from: '?token=abc123' } }],
     };
 
     expect(stripUrlQueries(event)).toEqual({
@@ -17,9 +17,29 @@ describe('stripUrlQueries', () => {
       spans: [
         {
           description: 'GET https://hml.fateconnect.test/confirmar-email',
-          data: { 'http.query': '' },
+          data: { from: '' },
         },
       ],
+    });
+  });
+
+  it('should drop the query a span keeps apart from the url, without the question mark', () => {
+    const span = {
+      name: `GET ${LINK}`,
+      attributes: {
+        'url.full': LINK,
+        'url.query': 'token=abc123&email=aluna%40fatec.sp.gov.br',
+        'http.query': '?token=abc123',
+        'http.request.method': 'GET',
+      },
+    };
+
+    expect(stripUrlQueries(span)).toEqual({
+      name: 'GET https://hml.fateconnect.test/confirmar-email',
+      attributes: {
+        'url.full': 'https://hml.fateconnect.test/confirmar-email',
+        'http.request.method': 'GET',
+      },
     });
   });
 

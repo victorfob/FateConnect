@@ -60,7 +60,8 @@ jobs:
 
           # Sem pipe: o `grep -q` sai no primeiro achado e, com `pipefail`, o `printf`
           # morto por Broken pipe derruba o `if` quando a lista é grande (PR de release).
-          if grep -qE '^FateConnect/Web/' <<< "$relevant"; then
+          # O front lê a versão dos documentos legais da pasta deles, fora de `Web/`.
+          if grep -qE '^FateConnect/(Web|legal)/' <<< "$relevant"; then
             echo 'web=true' >> "$GITHUB_OUTPUT"
             echo 'A mudança alcança o front — validando.'
             exit 0
@@ -130,14 +131,14 @@ jobs:
             --coverage.thresholds.branches=0 \
             --coverage.thresholds.statements=0
 
-      # ⛔ `.vitest-reports` começa com ponto, e o upload ignora arquivo oculto
+      # ⛔ `.vitest` começa com ponto, e o upload ignora arquivo oculto
       # por padrão: sem a primeira linha ele sobe zero arquivo, e sem a segunda
       # avisa e segue verde — o job de fusão é que quebra, longe da causa.
       - name: Upload the shard report
         uses: actions/upload-artifact@v4
         with:
           name: blob-${{ matrix.index }}
-          path: FateConnect/Web/.vitest-reports
+          path: FateConnect/Web/.vitest/blob
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 1
@@ -247,7 +248,7 @@ jobs:
         with:
           pattern: blob-*
           merge-multiple: true
-          path: FateConnect/Web/.vitest-reports
+          path: FateConnect/Web/.vitest/blob
 
       # Sem re-executar nada: a fusão reconstitui a cobertura da suíte inteira a
       # partir dos relatórios dos shards, e é aqui que os limites globais valem.
@@ -258,7 +259,7 @@ jobs:
           set -euo pipefail
           # Um blob por shard: conferir a contagem antes de fundir separa
           # "a suíte reprovou" de "os relatórios não chegaram".
-          encontrados=$(ls .vitest-reports/*.json 2>/dev/null | wc -l)
+          encontrados=$(ls .vitest/blob/*.json 2>/dev/null | wc -l)
           if [[ "$encontrados" -ne 2 ]]; then
             echo "Esperava 2 relatórios de shard, encontrei $encontrados." >&2
             exit 1

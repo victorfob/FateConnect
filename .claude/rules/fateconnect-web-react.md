@@ -13,7 +13,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 - ⛔ Antes de criar arquivo novo (teste, `styles.ts`, `constants/`, `schema/`), abra com `Read` um vizinho do mesmo tipo: o `Write` não carrega a rule com `paths` daquela área.
 - Texto que a pessoa lê, novo ou alterado, passa pela skill `ux-writing` antes do commit, com as candidatas ao dono — sem esperar pedido.
 - Mudança visual passa pela skill `visual-validation` antes de dizer que está pronta.
-- Campo novo em formulário, dado de pessoa que passa a persistir, integração com terceiro (inclui telemetria), dado novo visível a outros ou funcionalidade nova: releia `FateConnect/Web/legal/termos.html` e `privacidade.html` e conserte o que ficou falso ou faltando, no mesmo PR (`legal-documents.md`).
+- Campo novo em formulário, dado de pessoa que passa a persistir, integração com terceiro (inclui telemetria), dado novo visível a outros ou funcionalidade nova: releia `FateConnect/legal/termos.html` e `privacidade.html` e conserte o que ficou falso ou faltando, no mesmo PR (`legal-documents.md`).
 - Medir tamanho de pacote: skill `lighthouse-audit`, referência `bundle-size.md`.
 
 ## Consumo do design system
@@ -55,7 +55,7 @@ Fora da stack por decisão: SCSS, Tailwind, Nx, biblioteca de máscara e gerenci
 
 - URL da API só de `import.meta.env.VITE_*`; caminho em minúsculo (`/rides`, `/lostandfound`), mesmo com o controlador em PascalCase.
 - ⛔ Função de serviço nomeia o endpoint, não o recorte que o servidor faz pelo token: `listReports`, não `listMyReports`. Nome com recorte só quando o parâmetro existe (`onlyMine`). Ao mudar contrato, releia quem o chama.
-- ⛔ O Sentry do front recebe a URL no evento, no rastro, no trecho e na gravação, e o `stripUrlQueries` (`src/observability/`) tira a query nos quatro ganchos. O `dataCollection.urlQueryParams` do SDK só vale no servidor. Integração nova do SDK passa pelo filtro.
+- ⛔ O Sentry do front recebe a URL no evento, no rastro, no trecho e na gravação, e o `stripUrlQueries` (`src/observability/`) tira a query nos quatro ganchos, inclusive o `url.query` do trecho, que vem sem o `?`. O `dataCollection` declara cada tipo de dado, e a conta vai só pelo e-mail do token (`syncSentryUser`): dado novo ligado ali muda a política de privacidade. Integração nova do SDK passa pelo filtro.
 
 ## Gate
 
