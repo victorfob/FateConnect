@@ -3,8 +3,11 @@ import { http, HttpResponse } from 'msw';
 import { CONTACT_LABEL } from '@app/components/ContactButton/constants';
 import { sendEmailLabel } from '@app/components/ContactButton/ContactDetails/constants';
 import { VIEW_PHOTO_LABEL } from '@app/components/PhotoViewer/constants';
+import { REMOVAL_DIALOG } from '@app/components/PublicationRemoval/constants';
 import { DESCRIPTION_TOGGLE_LABELS } from '@app/constants/cardDescription';
 import { server } from '@app/mocks/server';
+import { tokenStorage } from '@app/services/auth/tokenStorage';
+import { ProfileTypeEnum } from '@app/services/auth/types';
 import {
   DeletionReasonEnum,
   LostItemKindEnum,
@@ -13,9 +16,12 @@ import {
 } from '@app/services/lostAndFound/types';
 import type { UserContact } from '@app/services/types';
 import { render, screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { tokenWithName } from '@app/test/token';
 import { forgeOverflow, restoreContentHeight } from '@app/test/utils/contentHeight';
 
 import { photoAlt } from './constants';
+import { LOST_ITEM_ACTION_LABELS } from './LostItemActions/constants';
+import { REMOVAL_MESSAGE } from './LostItemActions/LostItemAdminRemoval/constants';
 import { SAFETY_NOTICE } from './LostItemOwnerContact/constants';
 import { RESTORE_LABEL } from './LostItemStatusAction/constants';
 import { LostItemCard } from '.';
@@ -218,5 +224,34 @@ describe('LostItemCard', () => {
     renderComponent({ ...DELETED_ITEM, deletionReason: null });
 
     expect(textAfterTheDescription()).toBe(RESTORE_LABEL);
+  });
+
+  it('should offer the removal to an administrator on the item of someone else', async () => {
+    tokenStorage.save(tokenWithName('Helena Prado', ProfileTypeEnum.ADMINISTRATOR));
+    renderComponent();
+
+    await userEvent.click(screen.getByRole('button', { name: REMOVAL_DIALOG.trigger }));
+
+    expect(await screen.findByRole('dialog', { name: REMOVAL_DIALOG.title })).toHaveTextContent(
+      `${REMOVAL_MESSAGE.prefix}${LOST_ITEM.name}${REMOVAL_MESSAGE.suffix}`,
+    );
+  });
+
+  it('should leave the removal out of the own item of an administrator', () => {
+    tokenStorage.save(tokenWithName('Helena Prado', ProfileTypeEnum.ADMINISTRATOR));
+    renderComponent({ ...LOST_ITEM, isOwner: true });
+
+    expect(
+      screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: REMOVAL_DIALOG.trigger })).not.toBeInTheDocument();
+  });
+
+  it('should leave the removal out for whoever does not administer', () => {
+    tokenStorage.save(tokenWithName('Helena Prado', ProfileTypeEnum.OPERATOR));
+    renderComponent();
+
+    expect(screen.getByRole('button', { name: CONTACT_LABEL })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: REMOVAL_DIALOG.trigger })).not.toBeInTheDocument();
   });
 });

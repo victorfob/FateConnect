@@ -1,9 +1,11 @@
 namespace FateConnect.Api.Modules.Rides.Controllers;
 
+using FateConnect.Api.Modules.Auth.Attributes;
 using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Interfaces;
+using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Filters;
 using Microsoft.AspNetCore.Authorization;
@@ -98,6 +100,25 @@ public class RidesController(IRideService rideService) : ControllerBase
         var isDeactivated = await rideService.DeactivateAsync(id, User.GetUserId());
 
         if (!isDeactivated)
+            return NotFound();
+
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/remove")]
+    [AuthorizeProfile(EnumProfileType.Administrator)]
+    [SwaggerOperation(
+        OperationId = "RemoveRide",
+        Summary = "Remove someone's ride",
+        Description = "Removes from the lists a ride that broke the terms of use, recording the reason, and " +
+            "notifies the user who offered it, even with notifications turned off. Only administrators can do it.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RemoveAsync([SwaggerParameter("Ride ID.")] Guid id, RemovePublicationDto dto)
+    {
+        var isRemoved = await rideService.RemoveAsync(id, dto.Reason, User.GetUserId());
+
+        if (!isRemoved)
             return NotFound();
 
         return NoContent();

@@ -5,5 +5,7 @@ public enum EnumAdministrativeAction
     Promoted = 1,
     Demoted = 2,
     Banned = 3,
-    BanReverted = 4
+    BanReverted = 4,
+    RideRemoved = 5,
+    LostAndFoundItemRemoved = 6
 }

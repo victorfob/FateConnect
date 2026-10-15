@@ -7,7 +7,10 @@ using FateConnect.Api.Modules.Rides.DTOs;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Exceptions;
 using FateConnect.Api.Modules.Rides.Interfaces;
+using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Extensions;
+using FateConnect.Api.Modules.Users.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -16,6 +19,7 @@ public partial class RideService(
     IHolidayCalendar holidays,
     TimeProvider clock,
     IPublishEndpoint publishEndpoint,
+    IPublicationModerationService moderation,
     ILogger<RideService> logger
 ) : IRideService
 {
@@ -129,6 +133,28 @@ public partial class RideService(
         await repository.SaveChangesAsync();
 
         LogRideDeactivated(logger, id);
+        return true;
+    }
+
+    public async Task<bool> RemoveAsync(Guid id, EnumRemovalReason reason, int administratorId)
+    {
+        var ride = await repository.GetByIdAsync(id);
+
+        if (ride is null)
+        {
+            LogRideNotFound(logger, id);
+            return false;
+        }
+
+        ride.Deactivate(clock.GetUtcNow().UtcDateTime);
+
+        await moderation.RecordRemovalAsync(
+            administratorId,
+            new PublicationRemoval(EnumPublication.Ride, ride.Id, ride.DriverId, ride.Destination, reason));
+
+        await repository.SaveChangesAsync();
+
+        LogRideRemoved(logger, id, administratorId);
         return true;
     }
 

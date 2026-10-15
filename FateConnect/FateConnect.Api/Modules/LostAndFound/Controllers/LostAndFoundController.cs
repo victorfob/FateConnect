@@ -1,9 +1,11 @@
 namespace FateConnect.Api.Modules.LostAndFound.Controllers;
 
+using FateConnect.Api.Modules.Auth.Attributes;
 using FateConnect.Api.Modules.Auth.Extensions;
 using FateConnect.Api.Modules.Common.DTOs;
 using FateConnect.Api.Modules.LostAndFound.DTOs;
 using FateConnect.Api.Modules.LostAndFound.Interfaces;
+using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Filters;
 using Microsoft.AspNetCore.Authorization;
@@ -100,6 +102,28 @@ public class LostAndFoundController(ILostAndFoundService service) : ControllerBa
         bool deleted = await service.DeleteAsync(id, User.GetUserId());
 
         if (!deleted)
+            return NotFound();
+
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/remove")]
+    [AuthorizeProfile(EnumProfileType.Administrator)]
+    [SwaggerOperation(
+        OperationId = "RemoveLostAndFoundItem",
+        Summary = "Remove someone's lost and found item",
+        Description = "Removes from every list, the author's included, an item that broke the terms of use, " +
+            "recording the reason, and notifies the user who registered it, even with notifications turned off. " +
+            "The author cannot restore it. Only administrators can do it.")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> RemoveAsync(
+        [SwaggerParameter("Lost and found item ID.")] Guid id,
+        RemovePublicationDto dto)
+    {
+        bool removed = await service.RemoveAsync(id, dto.Reason, User.GetUserId());
+
+        if (!removed)
             return NotFound();
 
         return NoContent();

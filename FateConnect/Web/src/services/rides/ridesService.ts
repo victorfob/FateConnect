@@ -1,4 +1,5 @@
 import { apiClient } from '../httpClient';
+import type { RemovalReasonEnum } from '../moderation/types';
 import type { PagedResult } from '../types';
 import type { Ride, RideFilter, RideInput } from './types';
 
@@ -37,4 +38,8 @@ export async function updateRide(rideId: string, input: RideInput): Promise<Ride
 
 export async function deleteRide(rideId: string): Promise<void> {
   await apiClient.delete(`${RIDES_PATH}/${rideId}`);
+}
+
+export async function removeRide(rideId: string, reason: RemovalReasonEnum): Promise<void> {
+  await apiClient.post(`${RIDES_PATH}/${rideId}/remove`, { reason });
 }

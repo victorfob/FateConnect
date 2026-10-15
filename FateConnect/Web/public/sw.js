@@ -12,6 +12,7 @@ const TYPE_SLUGS = {
   RideToNeighborhood: 'caronas',
   ItemArchived: 'achados-perdidos',
   ReportReceived: 'denuncias',
+  PublicationRemoved: 'exclusoes',
 };
 
 function openNotificationUrl({ id, type, referenceId }) {

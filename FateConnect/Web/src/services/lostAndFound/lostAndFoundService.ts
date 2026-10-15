@@ -1,4 +1,5 @@
 import { apiClient } from '../httpClient';
+import type { RemovalReasonEnum } from '../moderation/types';
 import type { PagedResult } from '../types';
 import {
   LostItemStatusEnum,
@@ -72,4 +73,8 @@ export async function restoreLostItem(itemId: string): Promise<void> {
 /** Exclusão lógica: o servidor marca `Deleted` e registra o motivo. */
 export async function deleteLostItem(itemId: string): Promise<void> {
   await apiClient.delete(`${LOST_AND_FOUND_PATH}/${itemId}`);
+}
+
+export async function removeLostItem(itemId: string, reason: RemovalReasonEnum): Promise<void> {
+  await apiClient.post(`${LOST_AND_FOUND_PATH}/${itemId}/remove`, { reason });
 }
