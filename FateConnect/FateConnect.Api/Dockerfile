@@ -6,6 +6,8 @@ COPY FateConnect.Api/FateConnect.Api.csproj ./
 RUN dotnet restore
 
 COPY FateConnect.Api/ ./
+# A versão vigente de cada documento legal é a mesma que o front lê, e a API a embute no build.
+COPY Web/legal/versions.json /src/Web/legal/
 # Segredo, e não `ARG`: o valor do `ARG` sai impresso no log do build e fica
 # gravado no histórico da imagem.
 RUN --mount=type=secret,id=sixlabors_license \

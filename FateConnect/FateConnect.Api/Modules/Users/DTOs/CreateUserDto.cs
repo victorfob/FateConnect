@@ -43,12 +43,12 @@ public class CreateUserDto
 
     [Required(ErrorMessage = "The document acceptances are required.")]
     [MinLength(1, ErrorMessage = "Accept at least one document.")]
-    [SwaggerSchema("Legal documents accepted at sign-up, each with its version.")]
+    [SwaggerSchema("Legal documents accepted at sign-up, each with its current version.")]
     [SchemaExample(
         """
         [
-          { "document": "TermsOfUse", "version": "2026-08-27" },
-          { "document": "PrivacyPolicy", "version": "2026-10-08" }
+          { "document": "TermsOfUse", "version": "2026-10-14" },
+          { "document": "PrivacyPolicy", "version": "2026-10-14" }
         ]
         """,
         IsJson = true)]

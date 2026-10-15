@@ -66,3 +66,9 @@ public class InvalidUserStatusTransitionException()
 
 public class InvalidTokenException()
     : UserDomainException("The token is invalid or blank.");
+
+public class MissingLegalDocumentVersionException(EnumDocumentType document)
+    : InvalidOperationException($"The legal document versions file has no current version for {document}.");
+
+public class MissingLegalDocumentVersionsFileException(string resourceName)
+    : InvalidOperationException($"The legal document versions file '{resourceName}' is not embedded in the API.");

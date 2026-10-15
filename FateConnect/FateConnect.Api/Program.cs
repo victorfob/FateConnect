@@ -115,6 +115,7 @@ public class Program
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IPublicationModerationService, PublicationModerationService>();
+        builder.Services.AddSingleton<ILegalDocumentVersions>(LegalDocumentVersions.FromEmbeddedFile());
 
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
