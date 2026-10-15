@@ -12,7 +12,7 @@ paths:
 - **Código novo sai com ≥90% de cobertura**, medida por `./scripts/coverage-changed.sh` rodado **depois de commitar**; se a contagem de arquivos não bate com o que você mexeu, a medida está errada. O portão do Sonar é mais baixo de propósito (detalhe na `dotnet-testing`, que carrega ao abrir `FateConnect.Api.Tests/`).
 - **Mudou entidade ou configuração do EF:** a migration gerada pode dropar em vez de renomear; leia o `Up()` antes de tudo (a `dotnet-migrations` carrega ao abrir `Infrastructure/Database/`).
 - **Mensagem em `Modules/*/Exceptions/*.cs`** sai no `detail` do erro, em inglês, e nenhuma tela a mostra: a copy que a pessoa lê, cada tela escreve. Ao mudá-la, procure nos testes cada frase do texto antigo, não só o começo: `Assert.EndsWith` guarda o fim.
-- **Mudança em `Modules/*/Entities/**` que altera o dado coletado ou mostrado** reabre os termos e a política em `FateConnect/Web/legal/` (rule `legal-documents`).
+- **Mudança em `Modules/*/Entities/**` que altera o dado coletado ou mostrado** reabre os termos e a política em `FateConnect/legal/` (rule `legal-documents`).
 - ⛔ **C# não leva comentário** (fora do gerado pelo EF): o `./scripts/check-csharp-comments.sh` reprova no `pre-commit` e no `check-api`, e a explicação vai no nome, no PR ou na issue.
 
 ## O analisador roda no build
@@ -84,7 +84,7 @@ O passo `OpenAPI lint` do `check-api.yml` roda o Spectral (`FateConnect.Api/.spe
 - ⛔ Declarar um erro tira a dedução do 200: a operação com `ActionResult<T>` declara o 200 junto, com o tipo.
 - Propriedade leva `[SwaggerSchema]` (no DTO de query, `[SwaggerParameter]`), e a do corpo de requisição leva `[SchemaExample]`. ⛔ `[DefaultValue]` é o padrão que a API aplica, não exemplo: como exemplo, o documento diria que o e-mail padrão do login é o do exemplo.
 - ⛔ Propriedade que só o código lê se implementa explícita na interface (`IWaivesContact.WaivesContact`): o `[BindNever]` não a tira do formulário multipart no documento.
-- Descrição não repete o limite que o atributo de validação já publica no schema (`StringLength`, `MinLength`, `Range`), nem número de constante (tentativas de login, minutos de espera): a cópia envelhece quando o original muda.
+- Descrição e exemplo não repetem valor que tem fonte na aplicação: o limite que o atributo de validação já publica no schema (`StringLength`, `MinLength`, `Range`), o número de constante (tentativas de login, minutos de espera), a versão vigente dos documentos legais (o exemplo a lê pelo `CurrentLegalDocumentsExampleFilter`). A cópia envelhece quando o original muda; atributo só aceita constante, e o valor lido em execução vai por filtro de schema.
 
 ## Idioma
 

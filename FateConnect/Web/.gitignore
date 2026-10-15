@@ -1,6 +1,7 @@
 # Build
 /dist
 /coverage
+/.vitest
 
 # Node
 /node_modules

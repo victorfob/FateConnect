@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Security.Claims;
 using FateConnect.Api.Infrastructure.Observability;
 using Microsoft.AspNetCore.Http;
 using Sentry;
@@ -42,10 +43,25 @@ public class SentryReportingTests
         Assert.Same(thrown, Assert.Single(recorder.Captured).Exception);
         Assert.Equal("0HN7Q2:00000001", recorder.LastScope.Tags[SentryErrorReporter.RequestIdTag]);
         Assert.Equal("/Rides", recorder.LastScope.Tags[SentryErrorReporter.RouteTag]);
+        Assert.Null(recorder.LastScope.User.Email);
     }
 
     [Fact]
-    public void Scrub_KeepsTheMethodAndDropsEverythingThatCouldIdentifySomeone()
+    public void Report_IdentifiesTheEventByTheEmailOfTheAuthenticatedAccount()
+    {
+        IHub hub = DispatchProxy.Create<IHub, RecordingHub>();
+        RecordingHub recorder = (RecordingHub)hub;
+        Claim[] claims = [new(ClaimTypes.NameIdentifier, "42"), new(ClaimTypes.Email, "mariana.rocha@cps.sp.gov.br")];
+        DefaultHttpContext context = new() { User = new ClaimsPrincipal(new ClaimsIdentity(claims, "Bearer")) };
+
+        new SentryErrorReporter(hub).Report(new InvalidOperationException("banco fora"), context);
+
+        Assert.Equal("mariana.rocha@cps.sp.gov.br", recorder.LastScope.User.Email);
+        Assert.Null(recorder.LastScope.User.Id);
+    }
+
+    [Fact]
+    public void Scrub_KeepsTheMethodAndTheEmailAndDropsTheRest()
     {
         SentryEvent sentryEvent = new()
         {
@@ -57,7 +73,7 @@ public class SentryReportingTests
                 Cookies = "sessao=abc",
                 Data = "{\"password\":\"SenhaForte123!\"}",
             },
-            User = new SentryUser { Id = "42", IpAddress = "203.0.113.7" },
+            User = new SentryUser { Id = "42", IpAddress = "203.0.113.7", Email = "mariana.rocha@cps.sp.gov.br" },
         };
         sentryEvent.Request.Headers["Authorization"] = "Bearer token";
 
@@ -71,5 +87,6 @@ public class SentryReportingTests
         Assert.Empty(scrubbed.Request.Headers);
         Assert.Null(scrubbed.User.Id);
         Assert.Null(scrubbed.User.IpAddress);
+        Assert.Equal("mariana.rocha@cps.sp.gov.br", scrubbed.User.Email);
     }
 }

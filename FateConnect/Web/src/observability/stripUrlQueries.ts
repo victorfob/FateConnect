@@ -1,6 +1,8 @@
 const URL_STARTS: readonly string[] = ['http://', 'https://', '/'];
 const QUERY_MARK = '?';
 const WORD_SEPARATOR = ' ';
+/** O trecho guarda a query também solta, sem o `?` que a denuncia no texto. */
+const QUERY_ATTRIBUTES: ReadonlySet<string> = new Set(['url.query', 'http.query']);
 
 function withoutQuery(word: string): string {
   if (word.startsWith(QUERY_MARK)) return '';
@@ -20,7 +22,8 @@ function stripNode(node: unknown, visited: WeakSet<object>): void {
   visited.add(node);
 
   for (const [key, value] of Object.entries(node)) {
-    if (typeof value === 'string') Reflect.set(node, key, stripText(value));
+    if (QUERY_ATTRIBUTES.has(key)) Reflect.deleteProperty(node, key);
+    else if (typeof value === 'string') Reflect.set(node, key, stripText(value));
     else stripNode(value, visited);
   }
 }

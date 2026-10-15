@@ -15,6 +15,10 @@ public sealed class SentryErrorReporter(IHub hub) : IErrorReporter
         {
             scope.SetTag(RequestIdTag, context.TraceIdentifier);
             scope.SetTag(RouteTag, context.RouteTemplate());
+
+            string? email = context.UserEmail();
+            if (email is not null)
+                scope.User = new SentryUser { Email = email };
         });
     }
 }

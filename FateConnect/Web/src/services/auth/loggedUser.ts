@@ -7,13 +7,14 @@ import { ProfileTypeEnum } from './types';
 const PAYLOAD_INDEX = 1;
 
 /**
- * `unique_name`, `role` e `nameid`, e não os nomes do `ClaimTypes`: o .NET
- * traduz os nomes longos ao escrever o token, e ler o longo devolveria
+ * `unique_name`, `role`, `nameid` e `email`, e não os nomes do `ClaimTypes`: o
+ * .NET traduz os nomes longos ao escrever o token, e ler o longo devolveria
  * `undefined` sem erro nenhum.
  */
 const NAME_CLAIM = 'unique_name';
 const ROLE_CLAIM = 'role';
 const ID_CLAIM = 'nameid';
+const EMAIL_CLAIM = 'email';
 
 const DECIMAL = 10;
 
@@ -54,6 +55,10 @@ function readStringClaim(claim: string): string | null {
  */
 export function loggedUserName(): string | null {
   return readStringClaim(NAME_CLAIM);
+}
+
+export function loggedUserEmail(): string | null {
+  return readStringClaim(EMAIL_CLAIM);
 }
 
 export function loggedUserId(): number | null {
