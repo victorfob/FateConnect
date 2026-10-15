@@ -20,8 +20,8 @@ const ICON_SIZES: ReadonlyArray<[IconButtonProps['size'], string]> = [
   ['medium', '36px'],
   ['large', '40px'],
 ];
-const SMALL_LABEL_SIZE = '0.875rem';
-const NO_PADDING = '0rem';
+const SMALL_LABEL_SIZE = '14px';
+const NO_PADDING = '0px';
 const HELP_TEXT =
   'Solidária: a carona é gratuita.\nIgualitária: os participantes dividem os custos.';
 

@@ -272,10 +272,8 @@ describe('Reports', () => {
     await screen.findByRole('heading', { name: REPORT_FORM.title });
     await userEvent.click(screen.getByRole('combobox', { name: /Motivo/ }));
     await userEvent.click(await screen.findByRole('option', { name: 'Cadastro falso de item' }));
-    await userEvent.type(
-      screen.getByRole('textbox', { name: /Descrição/ }),
-      'O item cadastrado não existe e o anúncio é falso.',
-    );
+    await userEvent.click(screen.getByRole('textbox', { name: /Descrição/ }));
+    await userEvent.paste('O item cadastrado não existe e o anúncio é falso.');
     await userEvent.click(screen.getByRole('button', { name: REPORT_FORM.submitLabel }));
 
     await waitFor(() => expect(asked.length).toBeGreaterThan(askedBefore));
