@@ -432,8 +432,16 @@ Uma vez, para configurar:
    agendamento (Crons) chamado **`fateconnect-backup`**, com a agenda `0 3 1,16 * *`
    no fuso `America/Sao_Paulo`, 60 minutos de margem, 30 de execução máxima e alerta
    na primeira falha. O `backup.sh` monta o endereço de check-in a partir do
-   `SENTRY_DSN` da API, então o projeto e o nome precisam ser esses. O monitor só
-   cobra a agenda depois do primeiro check-in: até lá, desligá-lo não é preciso.
+   `SENTRY_DSN` da API, então o projeto e o nome precisam ser esses.
+
+   O monitor abre a issue, mas não avisa ninguém: a regra de alerta do projeto não
+   pega falha de agendamento. Na página dele, em Connected Alerts, crie um alerta
+   próprio (**New Alert**) que mande e-mail a quem mantém o projeto quando uma issue
+   é criada, resolvida ou volta, e confira com **Send Test Notification**.
+
+   O monitor só cobra a agenda depois do primeiro check-in, então não precisa ser
+   desligado antes da primeira cópia. ⛔ Monitor desligado descarta os check-ins que
+   recebe: nem a falha nem o sucesso ficam registrados, e nenhum alerta sai.
 4. **O `.env.prod`**, de dentro de `deploy/`. A chave pública e o nome do bucket vão
    como texto (`BACKUP_AGE_RECIPIENT` e `BACKUP_B2_BUCKET`). O `keyID` e a
    `applicationKey` entram por um `read` que não mostra o que se cola e tira o espaço
