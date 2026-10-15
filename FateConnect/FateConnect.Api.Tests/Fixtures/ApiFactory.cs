@@ -20,6 +20,7 @@ using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Enums;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
+using FateConnect.Api.Modules.Users.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -50,6 +51,8 @@ public class ApiFactory : WebApplicationFactory<Program>
     private static readonly TimeSpan HarnessInactivityTimeout = TimeSpan.FromSeconds(10);
 
     public TimeProvider? Clock { get; init; }
+
+    public ILegalDocumentVersions? DocumentVersions { get; init; }
 
     public RecordingEmailService Emails { get; } = new();
 
@@ -98,6 +101,12 @@ public class ApiFactory : WebApplicationFactory<Program>
             services.AddSingleton<IEmailService>(Emails);
             services.RemoveAll<IPushSender>();
             services.AddSingleton<IPushSender>(Pushes);
+
+            if (DocumentVersions is not null)
+            {
+                services.RemoveAll<ILegalDocumentVersions>();
+                services.AddSingleton(DocumentVersions);
+            }
 
             if (Clock is null)
                 return;
@@ -297,6 +306,28 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.SaveChanges();
 
         return (user.Id, user.FatecEmail);
+    }
+
+    public void SeedDocumentAcceptance(int userId, EnumDocumentType document, string version)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        context.DocumentAcceptances.Add(
+            new DocumentAcceptance(document, version, DateTime.UtcNow, "198.51.100.23", "Mozilla/5.0") { UserId = userId });
+        context.SaveChanges();
+    }
+
+    public IReadOnlyList<DocumentAcceptance> DocumentAcceptancesOf(int userId)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        return context.DocumentAcceptances
+            .AsNoTracking()
+            .Where(acceptance => acceptance.UserId == userId)
+            .OrderBy(acceptance => acceptance.Id)
+            .ToList();
     }
 
     public void SetAccountStatus(int userId, EnumAccountStatus status)

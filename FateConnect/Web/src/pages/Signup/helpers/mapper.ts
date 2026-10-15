@@ -1,7 +1,7 @@
 import { PRIVACY_VERSION, TERMS_VERSION } from '@app/constants/legalDocuments';
 import {
   DocumentTypeEnum,
-  type SignupAcceptance,
+  type DocumentAcceptance,
   type SignupRequest,
 } from '@app/services/signup/types';
 
@@ -20,7 +20,7 @@ function toApiBirthDateOrEmpty(value: string): string {
  * ⛔ A versão sai das constantes dos documentos, nunca da data de hoje: o
  * registro precisa apontar para o texto que a pessoa leu ao aceitar.
  */
-function acceptedDocuments(): SignupAcceptance[] {
+function acceptedDocuments(): DocumentAcceptance[] {
   return [
     { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
     { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },

@@ -23,6 +23,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Adiciona a exclusão, por quem administra, da carona ou do item de outra pessoa, com um dos cinco motivos dos termos de uso e o registro de quem excluiu, o quê e por quê; o item excluído some de todas as listas e não volta pelo Restaurar (#632) [Backend]
 - Adiciona ao cartão de carona e de item de outra pessoa, para quem administra, a lixeira que pede o motivo antes de excluir (#632) [Frontend]
 - Adiciona o aviso de conteúdo excluído, com o motivo, que chega à central de quem publicou mesmo com Notificações desligado, e por push só aos aparelhos de quem ligou (#632) [Frontend] [Backend]
+- Adiciona o aviso de versão nova dos termos de uso ou da política de privacidade: ao entrar, ou ao abrir o app já logado, um diálogo segura o uso até o aceite, diz qual documento mudou, leva ao PDF e oferece sair ou desativar a conta (#633) [Frontend]
+- Adiciona as rotas que dizem, por documento, se a pessoa aceitou a versão vigente e que gravam o aceite novo com IP e navegador, como no cadastro (#633) [Backend]
 
 ### Changed
 
@@ -52,6 +54,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Passa a dizer nos termos de uso o que fica fora da responsabilidade da plataforma, nomeando acidente e crime entre usuários, o dever de devolver o objeto achado, os cuidados no encontro e os telefones de emergência, em nova versão do documento (#631) [Frontend]
 - Passa a dizer nos termos e na política que quem administra exclui conteúdo com o motivo notificado e que a mudança dos documentos pede novo aceite, e corrige o que os dois afirmavam sem o produto fazer, como as mensagens de novidades e quem lê a denúncia (#631) [Frontend]
 - Passa a declarar na política de privacidade o aviso de conteúdo excluído, que chega mesmo com Notificações desligado, e o registro da exclusão com o anúncio e o motivo (#632) [Frontend]
+- Passa a recusar no cadastro o aceite de uma versão dos termos de uso ou da política de privacidade que não seja a vigente (#633) [Backend]
 
 ### Fixed
 

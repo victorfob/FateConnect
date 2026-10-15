@@ -2,6 +2,8 @@ import { useCallback, useState, type ComponentProps, type ReactNode } from 'reac
 import { Button, Dialog, type ButtonProps, type FeedbackTone } from '@design-system';
 import { HelpOutlineOutlinedIcon } from '@design-system/icons';
 
+import { InlineLink } from '@app/components/InlineLink';
+
 import { CONFIRMATION } from './constants';
 
 type DialogIcon = NonNullable<ComponentProps<typeof Dialog.Message>['icon']>;
@@ -20,6 +22,8 @@ export type ConfirmActionProps = Readonly<
     destructive?: boolean;
     /** O ícone do diálogo quando a ação tem um símbolo próprio, no lugar do padrão do tom. */
     dialogIcon?: DialogIcon;
+    /** O gatilho vira link no meio do texto, sem ícone, para a ação que não é a saída principal. */
+    asLink?: boolean;
     onConfirm: VoidFunction;
   } & Pick<ButtonProps, 'size'>
 >;
@@ -58,6 +62,7 @@ function ConfirmAction({
   confirmLabel,
   destructive = false,
   dialogIcon,
+  asLink = false,
   onConfirm,
   size,
 }: ConfirmActionProps) {
@@ -72,10 +77,14 @@ function ConfirmAction({
 
   return (
     <>
-      <Button type="button" variant={triggerVariant(destructive)} size={size} onClick={handleAsk}>
-        {icon}
-        {label}
-      </Button>
+      {asLink ? (
+        <InlineLink onClick={handleAsk}>{label}</InlineLink>
+      ) : (
+        <Button type="button" variant={triggerVariant(destructive)} size={size} onClick={handleAsk}>
+          {icon}
+          {label}
+        </Button>
+      )}
 
       <Dialog open={confirming} onClose={handleDismiss} title={dialogTitle}>
         <Dialog.Body>

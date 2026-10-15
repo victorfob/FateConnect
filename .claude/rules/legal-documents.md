@@ -1,5 +1,5 @@
 ---
-description: Termos de uso e política de privacidade — onde vivem, como auditar o texto contra o código, e a data de versão que sobe junto
+description: Termos de uso e política de privacidade — onde vivem, como auditar o texto contra o código, e a data de versão que sobe junto e pede novo aceite
 paths:
   - "FateConnect/Web/legal/**"
   - "FateConnect/Web/src/constants/legalDocuments.ts"
@@ -12,7 +12,7 @@ paths:
 | Fonte do texto | `FateConnect/Web/legal/termos.html` e `privacidade.html` |
 | O que a aplicação serve | `FateConnect/Web/public/termos.pdf` e `privacidade.pdf` |
 | Como o PDF nasce | `FateConnect/Web/legal/build-pdfs.sh` (Chrome headless) |
-| Data de versão | `FateConnect/Web/src/constants/legalDocuments.ts` |
+| Data de versão | `FateConnect/Web/legal/versions.json`, lida pelo front (`src/constants/legalDocuments.ts`) e embutida pela API no build |
 
 ⛔ Nunca edite o PDF: edite o HTML e rode o script.
 
@@ -36,8 +36,8 @@ Reler confirma o que você já acredita. Cada afirmação se confere contra uma 
 
 ## Mudou o texto? A versão sobe junto
 
-- ⛔ A constante de versão é o que o cadastro grava como texto aceito. Mudou o HTML: suba a data no `<header>`, no rodapé e na constante, e rode `build-pdfs.sh`.
-- Suba só a do documento que mudou (`PRIVACY_VERSION` ou `TERMS_VERSION`).
+- ⛔ A data do `versions.json` é o texto aceito: o cadastro a envia, a API recusa outra, e subi-la abre o diálogo de novo aceite para toda conta. Mudou o HTML: suba a data no `<header>`, no rodapé e no `versions.json`, e rode `build-pdfs.sh`.
+- Suba só a do documento que mudou (`termsOfUse` ou `privacyPolicy`).
 - Versão que ainda não está numa tag publicada pode receber texto sem mudar de data; a que já está, nunca.
 - Versão que sobe leva a limpeza do arquivo inteiro (travessão, régua de copy), não só das linhas que você tocou.
 - ⛔ O script regera os dois PDFs. Devolva com `git checkout --` só o PDF do documento que **não mudou nesta branch**: o do que mudou voltaria ao texto antigo.

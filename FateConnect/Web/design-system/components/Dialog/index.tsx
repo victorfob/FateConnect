@@ -20,7 +20,8 @@ export type DialogWidth = 'narrow' | 'standard';
 
 export type DialogProps = Readonly<{
   open: boolean;
-  onClose: VoidFunction;
+  /** Sem ele o diálogo não se dispensa: some o X, e `Esc` e o clique fora não fecham. */
+  onClose?: VoidFunction;
   title: string;
   /** `narrow` para o conteúdo curto, que num papel de 600px abriria com metade vazia. */
   width?: DialogWidth;
@@ -69,22 +70,26 @@ function Dialog({ open, onClose, title, width = 'standard', children }: DialogPr
             {title}
           </S.DialogTitleText>
 
-          <S.CloseButtonSlot>
-            <IconButton size="large" label={CLOSE_LABEL} onClick={onClose}>
-              <CloseIcon />
-            </IconButton>
-          </S.CloseButtonSlot>
+          {onClose && (
+            <S.CloseButtonSlot>
+              <IconButton size="large" label={CLOSE_LABEL} onClick={onClose}>
+                <CloseIcon />
+              </IconButton>
+            </S.CloseButtonSlot>
+          )}
         </S.TitleRow>
 
         {children}
 
-        <S.CloseFooterSlot data-close-footer>
-          <DialogFooter>
-            <Button type="button" variant="contained" color="primary" onClick={onClose}>
-              {CLOSE_LABEL}
-            </Button>
-          </DialogFooter>
-        </S.CloseFooterSlot>
+        {onClose && (
+          <S.CloseFooterSlot data-close-footer>
+            <DialogFooter>
+              <Button type="button" variant="contained" color="primary" onClick={onClose}>
+                {CLOSE_LABEL}
+              </Button>
+            </DialogFooter>
+          </S.CloseFooterSlot>
+        )}
       </S.DialogSurface>
     </MuiDialog>
   );

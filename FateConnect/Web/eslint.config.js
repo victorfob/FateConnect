@@ -250,7 +250,7 @@ export default defineConfig([
         'error',
         {
           newlinesBetween: 1,
-          internalPattern: ['^@app/', '^@ds-root/'],
+          internalPattern: ['^@app/', '^@ds-root/', '^@legal/'],
           customGroups: [
             {
               groupName: 'react',
