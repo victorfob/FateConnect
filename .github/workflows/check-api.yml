@@ -53,7 +53,9 @@ jobs:
           # O padrão não leva barra ao final para alcançar também o projeto de
           # teste, que mora em `FateConnect.Api.Tests`, ao lado e não dentro. O
           # `versions.json` mora no front e a API o embute: subir a data muda o que ela aceita.
-          if printf '%s\n' "$relevant" | grep -qE '^(FateConnect/FateConnect\.Api|FateConnect/Web/legal/versions\.json$|global\.json)'; then
+          # Sem pipe: o `grep -q` sai no primeiro achado e, com `pipefail`, o `printf`
+          # morto por Broken pipe derruba o `if` quando a lista é grande (PR de release).
+          if grep -qE '^(FateConnect/FateConnect\.Api|FateConnect/Web/legal/versions\.json$|global\.json)' <<< "$relevant"; then
             echo 'api=true' >> "$GITHUB_OUTPUT"
             echo 'A mudança alcança a API — validando.'
             exit 0
