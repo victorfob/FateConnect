@@ -108,12 +108,14 @@ async function chooseVehicle(vehicleType: VehicleTypeEnum) {
 
 async function retypeDestination(destination: string) {
   await userEvent.clear(destinationField());
-  await userEvent.type(destinationField(), destination);
+  await userEvent.paste(destination);
 }
 
 async function fillSingleRideWithoutVehicle() {
-  await userEvent.type(destinationField(), 'Terminal Santo Antônio');
-  await userEvent.type(departureField(), TYPED_DEPARTURE);
+  await userEvent.click(destinationField());
+  await userEvent.paste('Terminal Santo Antônio');
+  await userEvent.click(departureField());
+  await userEvent.paste(TYPED_DEPARTURE);
   await userEvent.click(
     screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.rideType) }),
   );
@@ -367,8 +369,10 @@ describe('RideFormDialog', () => {
     renderComponent();
     await screen.findByRole('heading', { name: OFFER_MODE.title });
 
-    await userEvent.type(destinationField(), 'Terminal Santo Antônio');
-    await userEvent.type(departureField(), TYPED_DEPARTURE);
+    await userEvent.click(destinationField());
+    await userEvent.paste('Terminal Santo Antônio');
+    await userEvent.click(departureField());
+    await userEvent.paste(TYPED_DEPARTURE);
     await userEvent.click(
       screen.getByRole('combobox', { name: new RegExp(RIDE_FORM_LABELS.rideType) }),
     );
@@ -407,7 +411,8 @@ describe('RideFormDialog', () => {
     await fillSingleRide();
 
     await chooseFrequency(RideFrequencyEnum.WEEKLY);
-    await userEvent.type(repeatUntilField(), format(addDays(OFFERED_AT, 7), 'ddMMyyyy'));
+    await userEvent.click(repeatUntilField());
+    await userEvent.paste(format(addDays(OFFERED_AT, 7), 'ddMMyyyy'));
     await chooseFrequency(RideFrequencyEnum.ONCE);
     await userEvent.click(screen.getByRole('button', { name: OFFER_MODE.submitLabel }));
 
@@ -422,7 +427,8 @@ describe('RideFormDialog', () => {
     renderComponent();
     await screen.findByRole('heading', { name: OFFER_MODE.title });
     await chooseFrequency(RideFrequencyEnum.WEEKLY);
-    await userEvent.type(repeatUntilField(), format(addDays(OFFERED_AT, 7), 'ddMMyyyy'));
+    await userEvent.click(repeatUntilField());
+    await userEvent.paste(format(addDays(OFFERED_AT, 7), 'ddMMyyyy'));
 
     await chooseFrequency(RideFrequencyEnum.ONCE);
     await chooseFrequency(RideFrequencyEnum.MONTHLY);
@@ -438,7 +444,8 @@ describe('RideFormDialog', () => {
     await fillSingleRide();
 
     await chooseFrequency(RideFrequencyEnum.WEEKLY);
-    await userEvent.type(repeatUntilField(), format(addDays(OFFERED_AT, 7), 'ddMMyyyy'));
+    await userEvent.click(repeatUntilField());
+    await userEvent.paste(format(addDays(OFFERED_AT, 7), 'ddMMyyyy'));
     await userEvent.click(screen.getByRole('button', { name: OFFER_MODE.submitLabel }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
@@ -458,7 +465,8 @@ describe('RideFormDialog', () => {
     holidaysAre([toApiDate(OFFERED_AT)]);
     renderComponent();
     await screen.findByRole('heading', { name: OFFER_MODE.title });
-    await userEvent.type(departureField(), TYPED_DEPARTURE);
+    await userEvent.click(departureField());
+    await userEvent.paste(TYPED_DEPARTURE);
 
     await userEvent.click(screen.getByRole('button', { name: DATE_TIME_PICKER_LABEL }));
 
@@ -502,7 +510,8 @@ describe('RideFormDialog', () => {
     await fillSingleRide();
 
     await chooseFrequency(RideFrequencyEnum.WEEKLY);
-    await userEvent.type(repeatUntilField(), format(addDays(OFFERED_AT, 7), 'ddMMyyyy'));
+    await userEvent.click(repeatUntilField());
+    await userEvent.paste(format(addDays(OFFERED_AT, 7), 'ddMMyyyy'));
     await waitFor(() =>
       expect(repeatUntilField()).toHaveValue(format(addDays(OFFERED_AT, 7), 'dd/MM/yyyy')),
     );

@@ -23,7 +23,7 @@ import {
   LostItemStatusEnum,
   type LostItem,
 } from '@app/services/lostAndFound/types';
-import { screen, userEvent, waitFor, within } from '@app/test/testing-library';
+import { act, screen, userEvent, waitFor, within } from '@app/test/testing-library';
 import { pagedListHandler, pagedResponse } from '@app/test/utils/pagedList';
 import { renderAtRoute } from '@app/test/utils/renderAtRoute';
 
@@ -43,6 +43,7 @@ import {
   LostItemOwnerFilterEnum,
 } from './components/LostItemFilter/constants';
 import { EDIT_MODE, REGISTER_MODE } from './components/LostItemFormDialog/constants';
+import { lostItemStatusSlug } from './helpers/lostItemStatus';
 import * as C from './constants';
 import { LostAndFound } from '.';
 
@@ -172,6 +173,12 @@ async function filterByStatus(chosenLabel: string) {
   await pickOption(FILTER_LABELS.status, chosenLabel);
   await userEvent.click(screen.getByRole('button', { name: FILTER_SUBMIT_LABEL }));
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+}
+
+async function showStatus(router: ReturnType<typeof renderAtRoute>, status: LostItemStatusEnum) {
+  await act(() =>
+    router.navigate(`${RoutePathEnum.LOST_AND_FOUND}?situacao=${lostItemStatusSlug(status)}`),
+  );
 }
 
 function renderComponent(search = '') {
@@ -431,7 +438,7 @@ describe('LostAndFound', () => {
 
   it('should walk the item from open to deleted, back to open and then to concluded', async () => {
     boardTracking(OWN_OPEN_ITEM);
-    renderComponent();
+    const router = renderComponent();
     await screen.findByText(LOST_ITEM.name);
 
     await userEvent.click(screen.getByRole('button', { name: LOST_ITEM_ACTION_LABELS.delete }));
@@ -439,7 +446,7 @@ describe('LostAndFound', () => {
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.deleteSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
 
-    await filterByStatus(STATUS_TAG_LABEL.deleted);
+    await showStatus(router, LostItemStatusEnum.DELETED);
 
     expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
     expect(card().getAllByText(STATUS_TAG_LABEL.deleted)).toHaveLength(1);
@@ -450,14 +457,14 @@ describe('LostAndFound', () => {
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.restoreSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
 
-    await filterByStatus(STATUS_TAG_LABEL.open);
+    await showStatus(router, LostItemStatusEnum.OPEN);
     await screen.findByText(LOST_ITEM.name);
     await confirmAction(RESOLVE_LABEL[LostItemKindEnum.LOST], RESOLVE_DIALOG.confirmLabel);
 
     expect(await screen.findByText(C.LOST_ITEM_LIST_MESSAGES.resolveSucceeded)).toBeInTheDocument();
     expect(await screen.findByText(C.EMPTY_LIST_MESSAGE)).toBeInTheDocument();
 
-    await filterByStatus(STATUS_TAG_LABEL.resolved);
+    await showStatus(router, LostItemStatusEnum.RESOLVED);
 
     expect(await screen.findByText(LOST_ITEM.name)).toBeInTheDocument();
     expect(card().getAllByText(STATUS_TAG_LABEL.resolved)).toHaveLength(1);
