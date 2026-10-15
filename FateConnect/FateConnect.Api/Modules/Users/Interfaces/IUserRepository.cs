@@ -13,7 +13,11 @@ public interface IUserRepository
 
     Task<User?> GetByEmailAsync(string email);
     Task<User?> GetByEmailWithTokensAsync(string email, EnumTokenType tokenType);
-    Task<User?> GetByIdAsync(int id, bool includePreferences = false, bool asNoTracking = false);
+    Task<User?> GetByIdAsync(
+        int id,
+        bool includePreferences = false,
+        bool asNoTracking = false,
+        bool includeDocumentAcceptances = false);
     Task<UserToken?> GetTokenAsync(string tokenHash);
     Task<UserPreferences?> GetPreferencesByUserIdAsync(int userId);
     Task<(IReadOnlyList<TResult> Items, int Total)> GetAllAsync<TResult>(
