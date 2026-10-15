@@ -17,6 +17,7 @@ export enum RoutePathEnum {
   REPORTS = '/denuncias',
   MANAGEMENT = '/gestao',
   NOTIFICATIONS = '/notificacoes',
+  OPEN_NOTIFICATION = '/notificacoes/abrir',
 }
 
 /** Fragmentos das seções da landing, usados na navegação por âncora. */

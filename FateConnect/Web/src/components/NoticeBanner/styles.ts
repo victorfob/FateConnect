@@ -1,23 +1,25 @@
 import type { ElementType } from 'react';
 import type { LinkProps } from 'react-router';
-import { Button, spacingScale, Stack, styled, Typography } from '@design-system';
+import { Button, spacingScale, Stack, styled, Typography, type FeedbackTone } from '@design-system';
 
 const { none, xxs, xs, sm, md } = spacingScale;
 
-type LinkedButtonProps = { component?: ElementType; to: LinkProps['to'] };
+type LinkedButtonProps = { component?: ElementType; to?: LinkProps['to'] };
 
-export const Banner = styled(Stack)(({ theme }) => ({
+export const Banner = styled(Stack, { shouldForwardProp: (prop) => prop !== 'tone' })<{
+  tone: FeedbackTone;
+}>(({ theme, tone }) => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: theme.space(sm),
   padding: theme.space(xs, md),
-  backgroundColor: theme.palette.notification.warning.surface,
-  color: theme.palette.notification.warning.content,
+  backgroundColor: theme.palette.feedback[tone].surface,
+  color: theme.palette.feedback[tone].content,
 
   [theme.breakpoints.down('md')]: { alignItems: 'flex-start' },
 }));
 
-/** No estreito o link desce para baixo da frase, que ganha a largura toda. */
+/** No estreito a ação desce para baixo da frase, que ganha a largura toda. */
 export const BannerContent = styled(Stack)(({ theme }) => ({
   flex: 1,
   minWidth: 0,
@@ -35,8 +37,8 @@ export const BannerContent = styled(Stack)(({ theme }) => ({
 
 export const BannerText = styled(Typography)({ minWidth: 0 });
 
-/** Empilhado sob a frase, o recuo do botão de texto desalinharia o link da margem dela. */
-export const RegisterContactsLink = styled(Button)<LinkedButtonProps>(({ theme }) => ({
+/** Empilhada sob a frase, o recuo do botão de texto desalinharia a ação da margem dela. */
+export const BannerAction = styled(Button)<LinkedButtonProps>(({ theme }) => ({
   flexShrink: 0,
 
   [theme.breakpoints.down('md')]: { paddingInline: theme.space(none), minWidth: 'auto' },

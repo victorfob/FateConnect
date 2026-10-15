@@ -3,6 +3,7 @@ import { Navigate, type RouteObject } from 'react-router';
 import { AdminRoute } from '@app/components/AdminRoute';
 import { AppRoute } from '@app/components/AppRoute';
 import { ErrorBoundary } from '@app/components/ErrorBoundary';
+import { SignInFirstRoute } from '@app/components/SignInFirstRoute';
 import { VisitorRoute } from '@app/components/VisitorRoute';
 import { GuestLayout } from '@app/layouts/GuestLayout';
 import { MainLayout } from '@app/layouts/MainLayout';
@@ -14,6 +15,7 @@ import { LostAndFound } from '@app/pages/LostAndFound';
 import { Management } from '@app/pages/Management';
 import { Menu } from '@app/pages/Menu';
 import { Notifications } from '@app/pages/Notifications';
+import { OpenNotification } from '@app/pages/OpenNotification';
 import { Preferences } from '@app/pages/Preferences';
 import { Profile } from '@app/pages/Profile';
 import { Reports } from '@app/pages/Reports';
@@ -66,6 +68,15 @@ export const routeConfig: RouteObject[] = [
               },
               { path: RoutePathEnum.NOTIFICATIONS, element: <Notifications /> },
             ],
+          },
+        ],
+      },
+      {
+        element: <SignInFirstRoute />,
+        children: [
+          {
+            element: <MainLayout />,
+            children: [{ path: RoutePathEnum.OPEN_NOTIFICATION, element: <OpenNotification /> }],
           },
         ],
       },

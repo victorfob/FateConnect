@@ -22,3 +22,6 @@ export interface InAppNotificationFilter extends PageQuery {
   isRead?: boolean;
   type?: InAppNotificationTypeEnum;
 }
+
+/** O que a API guarda de cada aparelho: o endereço do serviço de push e as chaves dele. */
+export type PushSubscriptionKeys = { endpoint: string; p256dh: string; auth: string };

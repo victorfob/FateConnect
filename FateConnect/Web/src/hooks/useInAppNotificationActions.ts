@@ -7,20 +7,12 @@ import {
   IN_APP_NOTIFICATIONS_QUERY_KEY,
 } from '@app/constants/inAppNotifications';
 import { useNotification } from '@app/hooks/useNotification';
-import { RoutePathEnum } from '@app/routes/paths';
-import { ApiError } from '@app/services/httpClient';
 import {
   markAllInAppNotificationsAsRead,
   markInAppNotificationAsRead,
 } from '@app/services/inAppNotifications/inAppNotificationsService';
-import {
-  InAppNotificationTypeEnum,
-  type InAppNotification,
-} from '@app/services/inAppNotifications/types';
-import { getRide } from '@app/services/rides/ridesService';
-import { archivedItemsPath, rideSearchPath } from '@app/utils/inAppNotificationDestination';
-
-const NOT_FOUND = 404;
+import type { InAppNotification } from '@app/services/inAppNotifications/types';
+import { notificationDestination } from '@app/utils/inAppNotificationDestination';
 
 type InAppNotificationActions = {
   openNotification: (notification: InAppNotification) => void;
@@ -51,23 +43,9 @@ export function useInAppNotificationActions(): InAppNotificationActions {
     meta: { errorMessage: IN_APP_NOTIFICATION_TEXTS.markAllFailed },
   });
 
-  // `null` é a carona que já não existe: a pessoa fica onde está.
+  // Sem destino, a carona já não existe: a pessoa fica onde está.
   const { mutate: goToDestination } = useMutation({
-    mutationFn: async ({ type, referenceId }: InAppNotification): Promise<string | null> => {
-      if (type === InAppNotificationTypeEnum.REPORT_RECEIVED) return RoutePathEnum.REPORTS;
-      if (type === InAppNotificationTypeEnum.ITEM_ARCHIVED) return archivedItemsPath();
-      if (!referenceId) return RoutePathEnum.RIDES;
-
-      try {
-        const ride = await getRide(referenceId);
-
-        return rideSearchPath(ride.destination);
-      } catch (error) {
-        if (error instanceof ApiError && error.status === NOT_FOUND) return null;
-
-        throw error;
-      }
-    },
+    mutationFn: notificationDestination,
     onSuccess: (path) => {
       if (path) {
         void navigate(path);
