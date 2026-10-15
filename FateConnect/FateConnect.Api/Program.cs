@@ -36,6 +36,7 @@ using FateConnect.Api.Modules.Rides.Repositories;
 using FateConnect.Api.Modules.Rides.Services;
 using FateConnect.Api.Modules.Storage.Interfaces;
 using FateConnect.Api.Modules.Storage.Services;
+using FateConnect.Api.Modules.Users.Filters;
 using FateConnect.Api.Modules.Users.Interfaces;
 using FateConnect.Api.Modules.Users.Repositories;
 using FateConnect.Api.Modules.Users.Services;
@@ -117,6 +118,7 @@ public class Program
         builder.Services.AddScoped<IPublicationModerationService, PublicationModerationService>();
         builder.Services.AddScoped<ILegalDocumentService, LegalDocumentService>();
         builder.Services.AddSingleton<ILegalDocumentVersions>(LegalDocumentVersions.FromEmbeddedFile());
+        builder.Services.ConfigureSwaggerGen(options => options.SchemaFilter<CurrentLegalDocumentsExampleFilter>());
 
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
