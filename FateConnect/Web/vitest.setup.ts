@@ -14,7 +14,7 @@ process.env.TZ = 'America/Sao_Paulo';
 // stub precisa acontecer antes de qualquer import de teste.
 vi.stubEnv('VITE_API_URL', 'https://api.fateconnect.test');
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterEach(() => {
   server.resetHandlers();
   window.localStorage.clear();
