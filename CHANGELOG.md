@@ -6,6 +6,15 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Passa a enviar ao monitoramento de erros do site e da API o e-mail institucional da conta autenticada; do navegador seguem também a identificação dele e a página de origem, sem o IP (#656) [Frontend] [Backend]
+- Passa a declarar na política de privacidade o e-mail, a identificação do navegador e a página de origem enviados ao monitoramento de erros, em nova versão do documento, que pede novo aceite (#656) [Frontend]
+
+### Fixed
+
+- Corrige a subida da API antes de a fila aceitar conexão, que deixava no monitoramento um erro de conexão a cada recriação da fila (#656) [Backend]
+
 ## [1.5.0] - 2026-10-15
 
 ### Added
