@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-15
+
 ### Added
 
 - Adiciona o backup automático de produção: nos dias 1 e 16, o banco e as fotos saem cifrados para fora do servidor, ficam as 6 cópias mais recentes, e o monitoramento alerta quando uma execução falha ou não acontece (#659) [Backend]
@@ -19,6 +21,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 
 - Corrige a subida da API antes de a fila aceitar conexão, que deixava no monitoramento um erro de conexão a cada recriação da fila (#656) [Backend]
+
+### Security
+
+- Atualiza as bibliotecas da API para as versões que corrigem falhas de segurança apontadas pelo Dependabot, na leitura de JSON e no cache em memória (#653) [Backend]
 
 ## [1.5.0] - 2026-10-15
 
