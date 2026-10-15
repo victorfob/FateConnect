@@ -9,6 +9,7 @@ FateConnect/
   Web/                    front-end em React + Vite       → FateConnect/Web/README.md
   FateConnect.Api/        API .NET em módulos (Auth, Common, Emails, InAppNotifications, LostAndFound, Reports, Rides, Storage, Users)
   FateConnect.Api.Tests/  suíte xUnit da API, pasta irmã e não filha
+  legal/                  termos de uso e política de privacidade, e a versão que o front e a API leem
 .claude/                  contexto que um agente de código carrega ao trabalhar aqui
 .github/workflows/        validação de PR e criação da tag de release
 .githooks/                hooks locais de lint, build e teste
@@ -32,7 +33,7 @@ package.json              a versão do projeto, e nada mais
 
 ## Como contribuir
 
-O caminho de quem vai propor uma mudança está em **[CONTRIBUTING.md](CONTRIBUTING.md)**; o que se espera de quem participa, no **[Código de Conduta](CODE_OF_CONDUCT.md)**. Vulnerabilidade **não** vai para issue pública — o canal está em **[SECURITY.md](SECURITY.md)**.
+Rodar o projeto na sua máquina, do clone ao front e à API de pé, e o caminho de quem vai propor uma mudança estão em **[CONTRIBUTING.md](CONTRIBUTING.md)**; o que se espera de quem participa, no **[Código de Conduta](CODE_OF_CONDUCT.md)**. Vulnerabilidade **não** vai para issue pública — o canal está em **[SECURITY.md](SECURITY.md)**.
 
 ## Fluxo de trabalho
 
@@ -69,7 +70,7 @@ A validação consulta as tags no **remoto**. Consultar localmente aprovaria qua
 
 Os checks de front e de API disparam em todo PR, e cada um decide se tem o que fazer olhando os arquivos alterados: PR que só mexe no back-end não paga a suíte de front, nem o contrário. Mudança só de documentação não roda suíte nenhuma: nenhum `.md` é importado pelo código, então não há o que validar. `React front (Web)` e `.NET API` são exigidos para mergear, e um check que não teve o que fazer reporta verde do mesmo jeito.
 
-A validação de versão tem workflow próprio porque a versão é do repositório, não de um lado dele. Como passo do check do front ela dependia do recorte daquele job, e PR para a `main` que não tocasse o front nem o `package.json` a pulava em silêncio — que é exatamente o bump esquecido que ela existe para pegar. Ela é a única que filtra pela branch de destino no próprio gatilho, porque é a única cuja condição é a branch: só aparece em PR para a `main`.
+A validação de versão tem workflow próprio porque a versão é do repositório, não de um lado dele. Como passo do check do front, ela dependeria do recorte daquele job, e PR para a `main` que não tocasse o front nem o `package.json` a pularia em silêncio — que é exatamente o bump esquecido que ela existe para pegar. Ela é a única que filtra pela branch de destino no próprio gatilho, porque é a única cuja condição é a branch: só aparece em PR para a `main`.
 
 Cada check é um workflow, e não um job dentro de um arquivo só, para que cada assunto tenha o seu. Cada um leva grupo de concorrência próprio: compartilhá-lo faria um cancelar o outro, já que execução nova na mesma branch cancela a anterior.
 
