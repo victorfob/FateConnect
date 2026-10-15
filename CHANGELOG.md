@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-15
+
 ### Added
 
 - Adiciona as notificações no aplicativo, que chegam na hora, para item arquivado por inatividade, denúncia recebida e carona ofertada para o seu bairro, que compara o nome do bairro e, quando o destino e o perfil a têm, a cidade (#590) [Backend]
