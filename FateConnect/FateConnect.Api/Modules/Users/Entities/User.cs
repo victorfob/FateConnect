@@ -189,6 +189,9 @@ public class User
         _documentAcceptances.Add(acceptance);
     }
 
+    public bool HasAccepted(EnumDocumentType document, string version) =>
+        _documentAcceptances.Exists(acceptance => acceptance.DocumentType == document && acceptance.Version == version);
+
     private void ReplaceContact(UserContact? contact)
     {
         if (contact is null)

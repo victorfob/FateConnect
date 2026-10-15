@@ -3,6 +3,7 @@ import { Outlet, Link as RouterLink, useLocation } from 'react-router';
 import { Button, Footer, Header, NavigationDrawer } from '@design-system';
 
 import { BrandLogo } from '@app/components/BrandLogo';
+import { LegalDocumentsDialog } from '@app/components/LegalDocumentsDialog';
 import { LegalFooterLinks } from '@app/components/LegalFooterLinks';
 import * as C from '@app/constants/appContact';
 import { useAppLinks } from '@app/hooks/useAppLinks';
@@ -66,6 +67,7 @@ export function MainLayout() {
 
       <ContactBanner />
       <PushActivationBanner />
+      <LegalDocumentsDialog />
 
       <ShellContent component="main">
         <Outlet />

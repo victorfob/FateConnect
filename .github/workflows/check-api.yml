@@ -51,8 +51,9 @@ jobs:
           relevant=$(printf '%s\n' "$changed" | grep -vE '\.md$' || true)
 
           # O padrão não leva barra ao final para alcançar também o projeto de
-          # teste, que mora em `FateConnect.Api.Tests`, ao lado e não dentro.
-          if printf '%s\n' "$relevant" | grep -qE '^(FateConnect/FateConnect\.Api|global\.json)'; then
+          # teste, que mora em `FateConnect.Api.Tests`, ao lado e não dentro. O
+          # `versions.json` mora no front e a API o embute: subir a data muda o que ela aceita.
+          if printf '%s\n' "$relevant" | grep -qE '^(FateConnect/FateConnect\.Api|FateConnect/Web/legal/versions\.json$|global\.json)'; then
             echo 'api=true' >> "$GITHUB_OUTPUT"
             echo 'A mudança alcança a API — validando.'
             exit 0

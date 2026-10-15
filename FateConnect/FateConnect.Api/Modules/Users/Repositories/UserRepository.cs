@@ -49,12 +49,19 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
             .FirstOrDefaultAsync(u => u.FatecEmail == normalizedEmail);
     }
 
-    public async Task<User?> GetByIdAsync(int id, bool includePreferences = false, bool asNoTracking = false)
+    public async Task<User?> GetByIdAsync(
+        int id,
+        bool includePreferences = false,
+        bool asNoTracking = false,
+        bool includeDocumentAcceptances = false)
     {
         IQueryable<User> query = context.Users.AsTrackingWhen(!asNoTracking);
 
         if (includePreferences)
             query = query.Include(u => u.Preferences);
+
+        if (includeDocumentAcceptances)
+            query = query.Include(u => u.DocumentAcceptances);
 
         return await query.FirstOrDefaultAsync(u => u.Id == id);
     }

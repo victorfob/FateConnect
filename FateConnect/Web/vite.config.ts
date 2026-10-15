@@ -127,6 +127,7 @@ export default defineConfig({
       // Uso interno do design system, para os arquivos fundos não subirem por `../`.
       '@ds-root': fileURLToPath(new URL('./design-system', import.meta.url)),
       '@app': fileURLToPath(new URL('./src', import.meta.url)),
+      '@legal': fileURLToPath(new URL('./legal', import.meta.url)),
     },
   },
   test: {

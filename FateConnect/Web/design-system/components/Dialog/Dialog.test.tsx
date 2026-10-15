@@ -121,6 +121,17 @@ describe('Dialog', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
+  it('should offer no way out besides its own content when it has nothing to close with', async () => {
+    renderComponent({ ...DEFAULT_PROPS, onClose: undefined });
+
+    await userEvent.keyboard('{Escape}');
+
+    expect(screen.getByRole('dialog', { name: DEFAULT_PROPS.title })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: CLOSE_LABEL, hidden: true }),
+    ).not.toBeInTheDocument();
+  });
+
   it('should split the footer between its buttons on the phone, with or without a form', () => {
     renderComponent({ ...DEFAULT_PROPS, children: submitFormWith({}) });
     expect(narrowDeclarationsFor(screen.getByRole('button', { name: 'Enviar' }))).toContain(

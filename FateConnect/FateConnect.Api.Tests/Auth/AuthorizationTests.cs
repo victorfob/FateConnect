@@ -99,6 +99,8 @@ public class AuthorizationTests : IClassFixture<ApiFactory>
         { "PATCH", "/Users/me/password" },
         { "DELETE", "/Users/me/image" },
         { "POST", "/Users/me/deactivate" },
+        { "GET", "/Users/me/legal-documents" },
+        { "POST", "/Users/me/legal-documents/acceptances" },
         { "GET", "/Users" },
         { "GET", "/Users/1" },
         { "PATCH", "/Users/1" },

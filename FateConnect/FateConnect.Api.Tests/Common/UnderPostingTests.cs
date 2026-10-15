@@ -24,8 +24,8 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         ["contactEmail"] = ApiFactory.UniqueContactEmail(),
         ["acceptances"] = new[]
         {
-            new { document = "TermsOfUse", version = "2026-01-15" },
-            new { document = "PrivacyPolicy", version = "2026-02-20" },
+            new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse },
+            new { document = "PrivacyPolicy", version = CurrentLegalVersions.PrivacyPolicy },
         },
     };
 
