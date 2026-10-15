@@ -20,7 +20,7 @@ public class AccountEmailFaultTests : IClassFixture<ApiFactory>
         _faultFilterByConsumer = FaultFilterByConsumer(factory.Services.GetRequiredService<IBusControl>());
     }
 
-    private static IReadOnlyDictionary<string, string> FaultFilterByConsumer(IBusControl bus)
+    private static Dictionary<string, string> FaultFilterByConsumer(IBusControl bus)
     {
         JsonNode probe = JsonNode.Parse(JsonSerializer.Serialize(bus.GetProbeResult().Results))!;
         JsonArray endpoints = probe["bus"]!["host"]!["receiveEndpoint"]!.AsArray();
