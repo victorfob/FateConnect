@@ -26,6 +26,9 @@ const SWITCH_HEIGHT_PX = 30;
 const SWITCH_TRACK_RADIUS_PX = 15;
 const SWITCH_THUMB_TRAVEL_PX = 18;
 
+/** Cabe uma linha de ajuda por opção no tamanho que o MUI usa no toque (14px); os 300px dele quebram. */
+const TOOLTIP_MAX_WIDTH_PX = 320;
+
 /**
  * A opção dos painéis de escolha (o do `select` e o das sugestões) tem 48px de
  * altura e recuo só na horizontal. O MUI declara os mesmos 48px e **desfaz** num
@@ -285,6 +288,18 @@ export const components: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({ backgroundColor: theme.palette.skeleton }),
       rectangular: { borderRadius: radius(radiusScale.sm) },
+    },
+  },
+  MuiTooltip: {
+    // O MUI só mantém o tooltip dentro da tela, colado à borda quando o alvo está na ponta.
+    defaultProps: {
+      slotProps: {
+        popper: { modifiers: [{ name: 'preventOverflow', options: { padding: xs } }] },
+      },
+    },
+    styleOverrides: {
+      // A ajuda que explica mais de uma opção traz uma por linha, separadas por `\n`.
+      tooltip: { maxWidth: `${TOOLTIP_MAX_WIDTH_PX}px`, whiteSpace: 'pre-line' },
     },
   },
   MuiAppBar: {

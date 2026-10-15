@@ -194,7 +194,9 @@ describe('RideFormDialog', () => {
       screen.getByRole('button', { name: new RegExp(RIDE_FORM_LABELS.rideType) }),
     );
 
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(RIDE_TYPE_HELP);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(RIDE_TYPE_HELP, {
+      normalizeWhitespace: false,
+    });
   });
 
   it('should edit the ride it gets, already filled in', async () => {
