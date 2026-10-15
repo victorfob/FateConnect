@@ -308,6 +308,12 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<DateTime>("PerformedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("PublicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("RemovalReason")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TargetId")
                         .HasColumnType("integer");
 

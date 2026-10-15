@@ -20,7 +20,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         IQueryable<LostAndFoundRecord> query = context.LostAndFoundRecords
             .AsNoTracking()
             .Include(r => r.User)
-            .Where(IsReportedByAnActiveAccount());
+            .Where(IsVisible());
 
         if (currentUserId.HasValue)
             query = query.Where(r => r.UserId == currentUserId.Value);
@@ -38,8 +38,9 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         return await query.ToPageAsync(filter, records => records.OrderByDescending(r => r.CreatedAt).ThenBy(r => r.Id));
     }
 
-    private static Expression<Func<LostAndFoundRecord, bool>> IsReportedByAnActiveAccount() =>
-        record => record.User.Status == EnumAccountStatus.Active;
+    private static Expression<Func<LostAndFoundRecord, bool>> IsVisible() =>
+        record => record.User.Status == EnumAccountStatus.Active
+            && record.DeletionReason != EnumDeletionReason.Administrator;
 
     private static Expression<Func<LostAndFoundRecord, bool>> OccurredWithin(DateOnly rangeStart, DateOnly rangeEnd) =>
         record => record.OccurredOn >= rangeStart && record.OccurredOn <= rangeEnd;
@@ -49,7 +50,7 @@ public class LostAndFoundRepository(FateConnectDbContext context) : ILostAndFoun
         return await context.LostAndFoundRecords
             .Include(r => r.User)
             .AsTrackingWhen(forChange)
-            .Where(IsReportedByAnActiveAccount())
+            .Where(IsVisible())
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 

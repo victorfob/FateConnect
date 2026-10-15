@@ -114,6 +114,7 @@ public class Program
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IPublicationModerationService, PublicationModerationService>();
 
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
@@ -238,6 +239,7 @@ public class Program
             x.AddConsumer<RideCreatedEventConsumer>();
             x.AddConsumer<ReportReceivedEventConsumer>();
             x.AddConsumer<ItemArchivedEventConsumer>();
+            x.AddConsumer<PublicationRemovedEventConsumer>();
             x.AddConsumer<NotificationDispatchedEventConsumer>();
             x.AddConsumer<NotificationDispatchedEventPushConsumer>();
 
@@ -342,6 +344,12 @@ public class Program
         {
             e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
             e.ConfigureConsumer<ItemArchivedEventConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("publication-removed-event", e =>
+        {
+            e.UseEntityFrameworkOutbox<FateConnectDbContext>(context);
+            e.ConfigureConsumer<PublicationRemovedEventConsumer>(context);
         });
 
         cfg.ReceiveEndpoint("notification-dispatched-event", e =>

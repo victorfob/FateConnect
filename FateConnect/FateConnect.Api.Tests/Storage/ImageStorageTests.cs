@@ -14,6 +14,8 @@ using FateConnect.Api.Modules.Storage.Enums;
 using FateConnect.Api.Modules.Storage.Exceptions;
 using FateConnect.Api.Modules.Storage.Services;
 using FateConnect.Api.Modules.Storage.Utils;
+using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Interfaces;
 using FateConnect.Api.Tests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +72,12 @@ public sealed class ImageStorageTests : IDisposable
             throw new NotSupportedException();
 
         public Task SaveChangesAsync() => throw new NotSupportedException();
+    }
+
+    private sealed class UnusedModeration : IPublicationModerationService
+    {
+        public Task RecordRemovalAsync(int administratorId, PublicationRemoval removal) =>
+            throw new NotSupportedException();
     }
 
     private sealed class RefusingReportRepository : IReportRepository
@@ -307,7 +315,12 @@ public sealed class ImageStorageTests : IDisposable
     public async Task CreateItem_WhenTheDatabaseRefusesIt_LeavesNoFileBehind()
     {
         StorageService storage = ServiceOn(_webRoot);
-        LostAndFoundService service = new(new RefusingRepository(), storage, TimeProvider.System, NullLogger<LostAndFoundService>.Instance);
+        LostAndFoundService service = new(
+            new RefusingRepository(),
+            storage,
+            TimeProvider.System,
+            new UnusedModeration(),
+            NullLogger<LostAndFoundService>.Instance);
 
         CreateLostAndFoundDto dto = new()
         {

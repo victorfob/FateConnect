@@ -33,4 +33,10 @@ public partial class RideService
         Level = LogLevel.Warning,
         Message = "User ID {UserId} tried to change ride {RideId}, offered by another user.")]
     private static partial void LogRideChangeRefused(ILogger logger, int userId, Guid rideId);
+
+    [LoggerMessage(
+        EventId = 9,
+        Level = LogLevel.Information,
+        Message = "Ride {RideId} removed by the administrator with user ID {UserId}.")]
+    private static partial void LogRideRemoved(ILogger logger, Guid rideId, int userId);
 }

@@ -10,20 +10,23 @@ using FateConnect.Api.Modules.InAppNotifications.DTOs;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using FateConnect.Api.Modules.InAppNotifications.Utils;
+using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.EntityFrameworkCore;
 
 public class InAppNotificationRepository(FateConnectDbContext context) : IInAppNotificationRepository
 {
-    public async Task<List<int>> GetEligibleUserIdsAsync(IEnumerable<int> userIds)
+    public async Task<List<int>> GetEligibleUserIdsAsync(IEnumerable<int> userIds, bool ignoresPreference)
     {
-        return await context.Users
+        IQueryable<User> query = context.Users
             .AsNoTracking()
             .Where(u => userIds.Contains(u.Id))
-            .Where(u => u.Status == EnumAccountStatus.Active)
-            .Where(u => u.Preferences.ReceiveNotifications)
-            .Select(u => u.Id)
-            .ToListAsync();
+            .Where(u => u.Status == EnumAccountStatus.Active);
+
+        if (!ignoresPreference)
+            query = query.Where(u => u.Preferences.ReceiveNotifications);
+
+        return await query.Select(u => u.Id).ToListAsync();
     }
 
     public async Task<List<int>> GetUserIdsInterestedInDestinationAsync(string destination, int driverId)

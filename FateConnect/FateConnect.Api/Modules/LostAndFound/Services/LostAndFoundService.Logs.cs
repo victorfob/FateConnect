@@ -45,4 +45,10 @@ public partial class LostAndFoundService
         Level = LogLevel.Warning,
         Message = "User ID {UserId} tried to change lost and found record {RecordId}, reported by another user.")]
     private static partial void LogRecordChangeRefused(ILogger logger, int userId, Guid recordId);
+
+    [LoggerMessage(
+        EventId = 9,
+        Level = LogLevel.Information,
+        Message = "Lost and found record {RecordId} removed by the administrator with user ID {UserId}.")]
+    private static partial void LogRecordRemoved(ILogger logger, Guid recordId, int userId);
 }

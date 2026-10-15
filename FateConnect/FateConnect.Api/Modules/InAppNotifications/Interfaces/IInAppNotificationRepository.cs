@@ -6,7 +6,7 @@ using FateConnect.Api.Modules.InAppNotifications.Entities;
 
 public interface IInAppNotificationRepository
 {
-    Task<List<int>> GetEligibleUserIdsAsync(IEnumerable<int> userIds);
+    Task<List<int>> GetEligibleUserIdsAsync(IEnumerable<int> userIds, bool ignoresPreference);
     Task<List<int>> GetUserIdsInterestedInDestinationAsync(string destination, int driverId);
     Task AddRangeAsync(IEnumerable<InAppNotification> notifications);
     Task<(

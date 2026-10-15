@@ -1,5 +1,6 @@
 using FateConnect.Api.Modules.Reports.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Constants;
+using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Tests.InAppNotifications;
 
@@ -44,5 +45,29 @@ public class NotificationContentsTests
         Assert.Equal(
             "Uma nova carona para Rua das Flores, Vila Hortência foi ofertada. Confira se ela serve para você.",
             NotificationContents.RideToDestination("Rua das Flores, Vila Hortência"));
+    }
+
+    [Theory]
+    [InlineData(EnumRemovalReason.Offensive, "conteúdo ofensivo ou discriminatório")]
+    [InlineData(EnumRemovalReason.Misleading, "informação falsa ou enganosa")]
+    [InlineData(EnumRemovalReason.ThirdPartyRights, "violação de direito de outra pessoa")]
+    [InlineData(EnumRemovalReason.Commercial, "finalidade comercial ou de publicidade")]
+    [InlineData(EnumRemovalReason.PersonalData, "exposição de dados de outra pessoa")]
+    [InlineData((EnumRemovalReason)0, "violação dos termos de uso")]
+    public void PublicationRemoved_OfARide_NamesTheDestinationTheReasonAndTheBan(EnumRemovalReason reason, string reasonName)
+    {
+        Assert.Equal(
+            $"Sua carona para Jardim Toledo foi excluída por {reasonName}. Em caso de reincidência, a conta pode ser banida.",
+            NotificationContents.PublicationRemoved(EnumPublication.Ride, "Jardim Toledo", reason));
+    }
+
+    [Fact]
+    public void PublicationRemoved_OfAnItem_NamesTheItem()
+    {
+        Assert.Equal(
+            "Seu item “Garrafa térmica azul” foi excluído por informação falsa ou enganosa. " +
+                "Em caso de reincidência, a conta pode ser banida.",
+            NotificationContents.PublicationRemoved(
+                EnumPublication.LostAndFoundItem, "Garrafa térmica azul", EnumRemovalReason.Misleading));
     }
 }

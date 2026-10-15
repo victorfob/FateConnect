@@ -11,13 +11,17 @@ using FateConnect.Api.Modules.Storage.Enums;
 using FateConnect.Api.Modules.Storage.Interfaces;
 using FateConnect.Api.Modules.Storage.Services;
 using FateConnect.Api.Modules.Storage.Utils;
+using FateConnect.Api.Modules.Users.Entities;
+using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Extensions;
+using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.Extensions.Logging;
 
 public partial class LostAndFoundService(
     ILostAndFoundRepository repository,
     IStorageService baseStorageService,
     TimeProvider clock,
+    IPublicationModerationService moderation,
     ILogger<LostAndFoundService> logger
 ) : BaseFileService(baseStorageService, logger), ILostAndFoundService
 {
@@ -140,6 +144,29 @@ public partial class LostAndFoundService(
         await repository.SaveChangesAsync();
 
         LogRecordDeleted(logger, id);
+
+        return true;
+    }
+
+    public async Task<bool> RemoveAsync(Guid id, EnumRemovalReason reason, int administratorId)
+    {
+        var record = await repository.GetByIdAsync(id);
+
+        if (record is null)
+        {
+            LogRecordNotFound(logger, id);
+            return false;
+        }
+
+        record.MarkAsDeleted(EnumDeletionReason.Administrator, clock.GetUtcNow().UtcDateTime);
+
+        await moderation.RecordRemovalAsync(
+            administratorId,
+            new PublicationRemoval(EnumPublication.LostAndFoundItem, record.Id, record.UserId, record.Name, reason));
+
+        await repository.SaveChangesAsync();
+
+        LogRecordRemoved(logger, id, administratorId);
 
         return true;
     }
