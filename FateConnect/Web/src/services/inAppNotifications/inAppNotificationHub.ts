@@ -45,12 +45,12 @@ export function createInAppNotificationHub(): HubConnection {
  * primeira tentativa, e a que vem depois de ela desistir, ficam por conta daqui.
  */
 export async function keepConnected(connection: HubConnection, signal: AbortSignal): Promise<void> {
-  while (!signal.aborted) {
-    try {
-      await connection.start();
-      return;
-    } catch {
-      await waitBeforeRetry(signal);
-    }
+  if (signal.aborted) return;
+
+  try {
+    await connection.start();
+  } catch {
+    await waitBeforeRetry(signal);
+    await keepConnected(connection, signal);
   }
 }
