@@ -65,6 +65,45 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.ToTable("InAppNotifications");
                 });
 
+            modelBuilder.Entity("FateConnect.Api.Modules.InAppNotifications.Entities.PushSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Auth")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<string>("P256dh")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Endpoint")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PushSubscriptions");
+                });
+
             modelBuilder.Entity("FateConnect.Api.Modules.LostAndFound.Entities.LostAndFoundRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -626,6 +665,15 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FateConnect.Api.Modules.InAppNotifications.Entities.PushSubscription", b =>
+                {
+                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.LostAndFound.Entities.LostAndFoundRecord", b =>

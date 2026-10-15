@@ -12,6 +12,7 @@ using FateConnect.Api.Modules.Reports.Entities;
 using FateConnect.Api.Modules.Reports.Enums;
 using FateConnect.Api.Modules.InAppNotifications.Entities;
 using FateConnect.Api.Modules.InAppNotifications.Enums;
+using FateConnect.Api.Modules.InAppNotifications.Interfaces;
 using FateConnect.Api.Modules.LostAndFound.Entities;
 using FateConnect.Api.Modules.LostAndFound.Enums;
 using FateConnect.Api.Modules.LostAndFound.Workers;
@@ -38,6 +39,8 @@ public class ApiFactory : WebApplicationFactory<Program>
 {
     public const string FakeSecret = "fake-test-secret-with-no-value-outside-this-suite";
 
+    public const string FakeVapidPublicKey = "chave-publica-falsa-desta-suite";
+
     private readonly string _databaseName = $"fateconnect-tests-{Guid.NewGuid()}";
 
     private readonly string _webRoot = Path.Combine(Path.GetTempPath(), $"fateconnect-webroot-{Guid.NewGuid():N}");
@@ -49,6 +52,8 @@ public class ApiFactory : WebApplicationFactory<Program>
     public TimeProvider? Clock { get; init; }
 
     public RecordingEmailService Emails { get; } = new();
+
+    public RecordingPushSender Pushes { get; } = new();
 
     public IReadOnlyList<FakeLogRecord> LogRecords => Services.GetRequiredService<FakeLogCollector>().GetSnapshot();
 
@@ -65,6 +70,8 @@ public class ApiFactory : WebApplicationFactory<Program>
         Environment.SetEnvironmentVariable("PUBLIC_URL", "https://fateconnect.test");
         Environment.SetEnvironmentVariable("EMAIL_SENDER", "nao-responda@fateconnect.test");
         Environment.SetEnvironmentVariable("RESEND_API_KEY", "re_chave_falsa_desta_suite");
+        Environment.SetEnvironmentVariable("VAPID_PUBLIC_KEY", FakeVapidPublicKey);
+        Environment.SetEnvironmentVariable("VAPID_PRIVATE_KEY", "chave-privada-falsa-desta-suite");
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -89,6 +96,8 @@ public class ApiFactory : WebApplicationFactory<Program>
             services.AddFakeLogging();
             services.RemoveAll<IEmailService>();
             services.AddSingleton<IEmailService>(Emails);
+            services.RemoveAll<IPushSender>();
+            services.AddSingleton<IPushSender>(Pushes);
 
             if (Clock is null)
                 return;
@@ -450,6 +459,27 @@ public class ApiFactory : WebApplicationFactory<Program>
         context.SaveChanges();
 
         return notification.Id;
+    }
+
+    public void SeedPushSubscription(int userId, string endpoint)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        context.PushSubscriptions.Add(new PushSubscription(userId, endpoint, "chave-p256dh", "segredo-auth", DateTime.UtcNow));
+        context.SaveChanges();
+    }
+
+    public IReadOnlyList<PushSubscription> PushSubscriptionsOf(int userId)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
+
+        return context.PushSubscriptions
+            .AsNoTracking()
+            .Where(subscription => subscription.UserId == userId)
+            .OrderBy(subscription => subscription.Id)
+            .ToList();
     }
 
     public IReadOnlyList<InAppNotification> NotificationsOf(int userId)

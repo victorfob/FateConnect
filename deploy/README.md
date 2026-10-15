@@ -111,6 +111,18 @@ O envio de e-mail pede quatro variáveis, e **a API não sobe sem as três prime
 | `RESEND_API_KEY` | a chave do Resend daquele ambiente |
 | `RABBITMQ_USER`, `RABBITMQ_PASS` | o usuário da fila; troque o `guest` do exemplo por uma senha gerada com `openssl rand -base64 32` |
 
+Os avisos por push pedem o par de chaves VAPID do ambiente, e **a API não sobe sem ele**:
+
+| Variável | Conteúdo |
+| --- | --- |
+| `VAPID_PUBLIC_KEY` | a chave pública, que o navegador recebe para inscrever o aparelho |
+| `VAPID_PRIVATE_KEY` | a chave privada, segredo que assina cada envio |
+
+Gere um par por ambiente, uma vez só: trocar o par invalida os aparelhos já inscritos, que
+voltam a receber só quando a pessoa ligar "Receber notificações" de novo. O par sai do próprio
+pacote de envio (`ClosureOSS.WebPush`), com `VapidHelper.GenerateVapidKeys()`. Quem envia se identifica
+pelo `PUBLIC_URL`.
+
 As portas da fila seguem a faixa da API: `RABBITMQ_PORT` e `RABBITMQ_UI_PORT` em
 8102 e 8103 na homologação, 8202 e 8203 na produção.
 

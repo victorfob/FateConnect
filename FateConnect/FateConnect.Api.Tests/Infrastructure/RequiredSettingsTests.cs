@@ -13,6 +13,8 @@ public class RequiredSettingsTests
         ["PUBLIC_URL"] = "https://fateconnect.test",
         ["EMAIL_SENDER"] = "nao-responda@fateconnect.test",
         ["RESEND_API_KEY"] = "re_chave_falsa",
+        ["VAPID_PUBLIC_KEY"] = "chave-publica-falsa",
+        ["VAPID_PRIVATE_KEY"] = "chave-privada-falsa",
     };
 
     private static Func<string, string?> LookupWithout(string? missing) =>
@@ -30,6 +32,7 @@ public class RequiredSettingsTests
         Assert.Equal("https://fateconnect.test", settings.PublicUrl);
         Assert.Equal("nao-responda@fateconnect.test", settings.EmailSender);
         Assert.Equal("re_chave_falsa", settings.ResendApiKey);
+        Assert.Equal(new VapidKeys("chave-publica-falsa", "chave-privada-falsa"), settings.Vapid);
     }
 
     [Theory]
@@ -40,6 +43,8 @@ public class RequiredSettingsTests
     [InlineData("PUBLIC_URL")]
     [InlineData("EMAIL_SENDER")]
     [InlineData("RESEND_API_KEY")]
+    [InlineData("VAPID_PUBLIC_KEY")]
+    [InlineData("VAPID_PRIVATE_KEY")]
     public void Read_WithoutARequiredVariable_RefusesToStartNamingIt(string missing)
     {
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
