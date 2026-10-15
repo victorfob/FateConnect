@@ -84,7 +84,7 @@ O passo `OpenAPI lint` do `check-api.yml` roda o Spectral (`FateConnect.Api/.spe
 - ⛔ Declarar um erro tira a dedução do 200: a operação com `ActionResult<T>` declara o 200 junto, com o tipo.
 - Propriedade leva `[SwaggerSchema]` (no DTO de query, `[SwaggerParameter]`), e a do corpo de requisição leva `[SchemaExample]`. ⛔ `[DefaultValue]` é o padrão que a API aplica, não exemplo: como exemplo, o documento diria que o e-mail padrão do login é o do exemplo.
 - ⛔ Propriedade que só o código lê se implementa explícita na interface (`IWaivesContact.WaivesContact`): o `[BindNever]` não a tira do formulário multipart no documento.
-- Descrição não repete o limite que o atributo de validação já publica no schema (`StringLength`, `MinLength`, `Range`), nem número de constante (tentativas de login, minutos de espera): a cópia envelhece quando o original muda.
+- Descrição e exemplo não repetem valor que tem fonte na aplicação: o limite que o atributo de validação já publica no schema (`StringLength`, `MinLength`, `Range`), o número de constante (tentativas de login, minutos de espera), a versão vigente dos documentos legais (o exemplo a lê pelo `CurrentLegalDocumentsExampleFilter`). A cópia envelhece quando o original muda; atributo só aceita constante, e o valor lido em execução vai por filtro de schema.
 
 ## Idioma
 
