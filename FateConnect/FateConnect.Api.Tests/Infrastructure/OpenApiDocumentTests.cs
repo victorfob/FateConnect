@@ -30,13 +30,23 @@ public class OpenApiDocumentTests(ApiFactory factory) : IClassFixture<ApiFactory
                 .EnumerateObject().Select(content => content.Name),
         ];
 
+    private static IReadOnlyList<string?> Types(JsonElement schema)
+    {
+        JsonElement type = schema.GetProperty("type");
+
+        if (type.ValueKind == JsonValueKind.String)
+            return [type.GetString()];
+
+        return [.. type.EnumerateArray().Select(name => name.GetString())];
+    }
+
     [Fact]
     public async Task Document_DescribesTheApiAndIsExportedWhenAsked()
     {
         string json = await factory.CreateClient().GetStringAsync("/swagger/v1/swagger.json");
 
         using JsonDocument document = JsonDocument.Parse(json);
-        Assert.StartsWith("3.", document.RootElement.GetProperty("openapi").GetString());
+        Assert.StartsWith("3.1.", document.RootElement.GetProperty("openapi").GetString());
         Assert.NotEmpty(document.RootElement.GetProperty("paths").EnumerateObject());
 
         string? exportPath = Environment.GetEnvironmentVariable(ExportPathVariable);
@@ -133,13 +143,35 @@ public class OpenApiDocumentTests(ApiFactory factory) : IClassFixture<ApiFactory
 
         IReadOnlyList<string?> required =
             [.. ride.GetProperty("required").EnumerateArray().Select(name => name.GetString())];
-        JsonElement description = ride.GetProperty("properties").GetProperty("description");
+        JsonElement properties = ride.GetProperty("properties");
 
         Assert.Contains("id", required);
         Assert.Contains("destination", required);
         Assert.DoesNotContain("description", required);
         Assert.DoesNotContain("repeatUntil", required);
-        Assert.True(description.GetProperty("nullable").GetBoolean());
+        Assert.Equal(["null", "string"], Types(properties.GetProperty("description")));
+        Assert.Equal(["string"], Types(properties.GetProperty("destination")));
+    }
+
+    [Fact]
+    public async Task NullableReferences_AcceptTheReferencedSchemaOrNull()
+    {
+        JsonElement schemas = (await DocumentAsync()).GetProperty("components").GetProperty("schemas");
+
+        JsonElement optionalRideType = schemas.GetProperty("UpdateRideDto").GetProperty("properties")
+            .GetProperty("rideType");
+        JsonElement requiredRideType = schemas.GetProperty("CreateRideDto").GetProperty("properties")
+            .GetProperty("rideType");
+        IReadOnlyList<JsonElement> alternatives = [.. optionalRideType.GetProperty("anyOf").EnumerateArray()];
+
+        Assert.Equal("#/components/schemas/EnumRideType", alternatives[0].GetProperty("$ref").GetString());
+        Assert.Equal(["null"], Types(alternatives[1]));
+        Assert.False(optionalRideType.TryGetProperty("type", out _));
+        Assert.False(optionalRideType.TryGetProperty("allOf", out _));
+        Assert.Equal(
+            "#/components/schemas/EnumRideType",
+            Assert.Single(requiredRideType.GetProperty("allOf").EnumerateArray()).GetProperty("$ref").GetString());
+        Assert.False(requiredRideType.TryGetProperty("anyOf", out _));
     }
 
     [Fact]
