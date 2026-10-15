@@ -1,7 +1,7 @@
 ---
 description: Termos de uso e política de privacidade — onde vivem, como auditar o texto contra o código, e a data de versão que sobe junto e pede novo aceite
 paths:
-  - "FateConnect/Web/legal/**"
+  - "FateConnect/legal/**"
   - "FateConnect/Web/src/constants/legalDocuments.ts"
 ---
 
@@ -9,10 +9,10 @@ paths:
 
 | | |
 | --- | --- |
-| Fonte do texto | `FateConnect/Web/legal/termos.html` e `privacidade.html` |
+| Fonte do texto | `FateConnect/legal/termos.html` e `privacidade.html` |
 | O que a aplicação serve | `FateConnect/Web/public/termos.pdf` e `privacidade.pdf` |
-| Como o PDF nasce | `FateConnect/Web/legal/build-pdfs.sh` (Chrome headless) |
-| Data de versão | `FateConnect/Web/legal/versions.json`, lida pelo front (`src/constants/legalDocuments.ts`) e embutida pela API no build |
+| Como o PDF nasce | `FateConnect/legal/build-pdfs.sh` (Chrome headless) |
+| Data de versão | `FateConnect/legal/versions.json`, lida pelo front (`src/constants/legalDocuments.ts`) e embutida pela API no build |
 
 ⛔ Nunca edite o PDF: edite o HTML e rode o script.
 

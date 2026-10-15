@@ -1,7 +1,7 @@
 *
 !.editorconfig
 !FateConnect.Api
-!Web/legal/versions.json
+!legal/versions.json
 FateConnect.Api/bin/
 FateConnect.Api/obj/
 FateConnect.Api/.env

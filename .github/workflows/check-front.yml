@@ -60,7 +60,8 @@ jobs:
 
           # Sem pipe: o `grep -q` sai no primeiro achado e, com `pipefail`, o `printf`
           # morto por Broken pipe derruba o `if` quando a lista é grande (PR de release).
-          if grep -qE '^FateConnect/Web/' <<< "$relevant"; then
+          # O front lê a versão dos documentos legais da pasta deles, fora de `Web/`.
+          if grep -qE '^FateConnect/(Web|legal)/' <<< "$relevant"; then
             echo 'web=true' >> "$GITHUB_OUTPUT"
             echo 'A mudança alcança o front — validando.'
             exit 0

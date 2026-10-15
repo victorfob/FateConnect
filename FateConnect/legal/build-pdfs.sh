@@ -5,7 +5,7 @@ set -euo pipefail
 
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 LEGAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-OUT_DIR="$LEGAL_DIR/../public"
+OUT_DIR="$LEGAL_DIR/../Web/public"
 
 if [ ! -x "$CHROME" ]; then
   echo "Chrome não encontrado em $CHROME" >&2
