@@ -21,7 +21,7 @@ describe('toSignupRequest', () => {
 
     expect(request.fullName).toBe('Maria Silva');
     expect(request.fatecEmail).toBe('maria.silva@aluno.cps.sp.gov.br');
-    expect(request.birthDate).toContain('1999-05-22');
+    expect(request.birthDate).toBe('1999-05-22');
     expect(request.gender).toBe(GenderValueEnum.FEMALE);
   });
 
@@ -30,14 +30,6 @@ describe('toSignupRequest', () => {
 
     expect(request).not.toHaveProperty('phone');
     expect(request).not.toHaveProperty('contactEmail');
-  });
-
-  // `toISOString()` sobre a data local move o instante e, a leste de
-  // Greenwich, o dia inteiro.
-  it('should send the birth date as midnight in utc', () => {
-    const request = toSignupRequest(FILLED);
-
-    expect(request.birthDate).toBe('1999-05-22T00:00:00Z');
   });
 
   it('should send an empty birth date when the typed one is not a date', () => {
@@ -78,7 +70,7 @@ describe('toSignupRequest', () => {
       fullName: 'Maria Silva',
       fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
       password: 'segredo123',
-      birthDate: '1999-05-22T00:00:00Z',
+      birthDate: '1999-05-22',
       gender: GenderValueEnum.FEMALE,
       acceptances: [
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },

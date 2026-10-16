@@ -25,7 +25,7 @@ public class MinimumAgeAttributeTests
     [Fact]
     public void IsValid_WithTheBirthDateOfWhoTurnsTheAgeToday_Succeeds()
     {
-        ValidationResult? result = Validate(Today.UtcDateTime.Date.AddYears(-MinimumAge));
+        ValidationResult? result = Validate(DateOnly.FromDateTime(Today.UtcDateTime).AddYears(-MinimumAge));
 
         Assert.Equal(ValidationResult.Success, result);
     }
@@ -33,7 +33,7 @@ public class MinimumAgeAttributeTests
     [Fact]
     public void IsValid_WithTheBirthDateOfWhoTurnedTheAgeYesterday_Succeeds()
     {
-        ValidationResult? result = Validate(Today.UtcDateTime.Date.AddYears(-MinimumAge).AddDays(-1));
+        ValidationResult? result = Validate(DateOnly.FromDateTime(Today.UtcDateTime).AddYears(-MinimumAge).AddDays(-1));
 
         Assert.Equal(ValidationResult.Success, result);
     }
@@ -41,7 +41,7 @@ public class MinimumAgeAttributeTests
     [Fact]
     public void IsValid_WithTheBirthDateOfWhoTurnsTheAgeTomorrow_Fails()
     {
-        ValidationResult? result = Validate(Today.UtcDateTime.Date.AddYears(-MinimumAge).AddDays(1));
+        ValidationResult? result = Validate(DateOnly.FromDateTime(Today.UtcDateTime).AddYears(-MinimumAge).AddDays(1));
 
         Assert.Equal("recusado", result?.ErrorMessage);
     }

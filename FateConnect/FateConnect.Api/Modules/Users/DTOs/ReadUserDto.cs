@@ -12,7 +12,7 @@ public record ReadUserDto(
     [property: SwaggerSchema("Full name.")]
     string FullName,
     [property: SwaggerSchema("Birth date.")]
-    DateTime BirthDate,
+    DateOnly BirthDate,
     [property: SwaggerSchema("Gender of the user.")]
     EnumGender Gender,
     [property: SwaggerSchema("Contact phone with area code, digits only, when registered.")]

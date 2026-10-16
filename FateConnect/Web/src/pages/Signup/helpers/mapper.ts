@@ -4,17 +4,9 @@ import {
   type DocumentAcceptance,
   type SignupRequest,
 } from '@app/services/signup/types';
+import { toApiDateText } from '@app/utils/apiDate';
 
 import type { SignupFormValues } from '../schema';
-import { parseBirthDate, toApiBirthDate } from './birthDate';
-
-/** O schema já garantiu a data; o vazio só existe para o tipo fechar. */
-function toApiBirthDateOrEmpty(value: string): string {
-  const parsed = parseBirthDate(value);
-  if (!parsed) return '';
-
-  return toApiBirthDate(parsed);
-}
 
 /**
  * ⛔ A versão sai das constantes dos documentos, nunca da data de hoje: o
@@ -32,7 +24,7 @@ export function toSignupRequest(values: SignupFormValues): SignupRequest {
     fullName: values.fullName,
     fatecEmail: values.fatecEmail,
     password: values.password,
-    birthDate: toApiBirthDateOrEmpty(values.birthDate),
+    birthDate: toApiDateText(values.birthDate),
     gender: values.gender,
     acceptances: acceptedDocuments(),
     receiveNotifications: values.acceptNotifications,
