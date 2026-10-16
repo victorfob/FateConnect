@@ -6,6 +6,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-10-16
+
+### Fixed
+
+- Corrige a data de nascimento do perfil, que aparecia um dia antes no fuso do Brasil e perdia mais um dia a cada vez que o perfil era salvo; a API passa a trocar a data sem hora, no formato `aaaa-mm-dd` (#686) [Frontend] [Backend]
+
 ## [1.7.0] - 2026-10-15
 
 ### Changed
