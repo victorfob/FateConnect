@@ -14,13 +14,13 @@ public sealed class MinimumAgeAttribute : ValidationAttribute
 
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        if (value is not DateTime birthDate)
+        if (value is not DateOnly birthDate)
             return ValidationResult.Success;
 
-        DateTime today = ClockFrom(validationContext).GetUtcNow().UtcDateTime.Date;
-        DateTime latestAccepted = today.AddYears(-_years);
+        DateOnly today = DateOnly.FromDateTime(ClockFrom(validationContext).GetUtcNow().UtcDateTime);
+        DateOnly latestAccepted = today.AddYears(-_years);
 
-        if (birthDate.Date <= latestAccepted)
+        if (birthDate <= latestAccepted)
             return ValidationResult.Success;
 
         return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));

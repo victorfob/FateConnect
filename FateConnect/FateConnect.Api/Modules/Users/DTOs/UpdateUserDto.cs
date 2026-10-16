@@ -17,8 +17,8 @@ public class UpdateUserDto
 
     [MinimumAge(18, ErrorMessage = "You must be at least 18 years old.")]
     [SwaggerSchema("Birth date; the user must be at least 18.")]
-    [SchemaExample("1999-05-14T00:00:00Z")]
-    public DateTime? BirthDate { get; set; }
+    [SchemaExample("1999-05-14")]
+    public DateOnly? BirthDate { get; set; }
 
     [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
     [SwaggerSchema("Gender of the user.")]

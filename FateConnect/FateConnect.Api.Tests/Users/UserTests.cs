@@ -11,7 +11,7 @@ public class UserTests
             fatecEmail,
             "HashFalso123",
             "Mariana Alves Rocha",
-            new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            new DateOnly(2000, 1, 1),
             EnumGender.Female,
             new UserContact("11999999999", "mariana.contato@gmail.com"),
             DateTime.UtcNow);

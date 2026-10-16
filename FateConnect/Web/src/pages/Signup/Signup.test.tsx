@@ -257,7 +257,7 @@ describe('Signup', () => {
       fatecEmail: VALID_SIGNUP.fatecEmail,
       password: VALID_SIGNUP.password,
       gender: 'Female',
-      birthDate: '1999-05-22T00:00:00Z',
+      birthDate: '1999-05-22',
       acceptances: [
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
         { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },

@@ -15,7 +15,7 @@ public class User
     public string FatecEmail { get; private set; } = string.Empty;
     public string Password { get; private set; } = string.Empty;
     public string FullName { get; private set; } = string.Empty;
-    public DateTime BirthDate { get; private set; }
+    public DateOnly BirthDate { get; private set; }
     public EnumGender Gender { get; private set; }
 
     public string? Phone { get; private set; }
@@ -49,7 +49,7 @@ public class User
         string fatecEmail,
         string passwordHash,
         string fullName,
-        DateTime birthDate,
+        DateOnly birthDate,
         EnumGender gender,
         UserContact? contact,
         DateTime createdAt)
@@ -78,7 +78,7 @@ public class User
 
     public void UpdatePersonalData(
         string fullName,
-        DateTime birthDate,
+        DateOnly birthDate,
         EnumGender gender,
         UserContact? contact,
         string? neighborhood,

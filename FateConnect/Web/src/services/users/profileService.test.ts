@@ -20,7 +20,7 @@ const NO_CONTENT = 204;
 
 const PROFILE_INPUT: ProfileInput = {
   fullName: 'Mariana Rocha',
-  birthDate: '2001-03-14T00:00:00Z',
+  birthDate: '2001-03-14',
   gender: 'Female',
   phone: '11987654321',
   contactEmail: 'mariana@example.com',
@@ -30,7 +30,7 @@ const PROFILE_INPUT: ProfileInput = {
 
 const SENT_FIELDS = {
   FullName: 'Mariana Rocha',
-  BirthDate: '2001-03-14T00:00:00Z',
+  BirthDate: '2001-03-14',
   Gender: 'Female',
   Phone: '11987654321',
   ContactEmail: 'mariana@example.com',

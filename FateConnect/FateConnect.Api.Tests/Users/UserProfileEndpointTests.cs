@@ -157,11 +157,23 @@ public class UserProfileEndpointTests(ApiFactory factory) : IClassFixture<ApiFac
     public async Task UpdateProfile_WithTheBirthDateOfAMinor_IsRefused()
     {
         SignedInUser person = await SignedInAsync("Elisa Moura Campos");
-        string minorBirthDate = DateTime.UtcNow.Date.AddYears(-UnderageYears).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        string minorBirthDate = DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-UnderageYears).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
         HttpResponseMessage response = await person.Client.PatchAsync("/Users/me", FormWith("BirthDate", minorBirthDate));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateProfile_WithABirthDate_AnswersTheSameDayWithoutTime()
+    {
+        SignedInUser person = await SignedInAsync("Renata Lopes Furtado");
+        await person.Client.PatchAsync("/Users/me", FormWith("BirthDate", "1999-05-22"));
+
+        HttpResponseMessage response = await person.Client.GetAsync("/Users/me");
+
+        using JsonDocument body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("1999-05-22", body.RootElement.GetProperty("birthDate").GetString());
     }
 
     [Fact]

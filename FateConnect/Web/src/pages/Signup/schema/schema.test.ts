@@ -2,9 +2,10 @@ import {
   FATEC_EMAIL_DOMAIN_MESSAGE,
   FATEC_EMAIL_LOCAL_PART_MESSAGE,
 } from '@app/constants/fatecEmail';
+import { toApiDate, toDisplayDate } from '@app/utils/apiDate';
 
 import { GenderValueEnum } from '../@types';
-import { formatBirthDate, latestBirthDate } from '../helpers/birthDate';
+import { latestBirthDate } from '../helpers/birthDate';
 import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from '.';
 
 const ONE_DAY_MS = 86_400_000;
@@ -112,8 +113,8 @@ describe('signupSchema', () => {
     const eighteenToday = latestBirthDate();
     const oneDayShort = new Date(eighteenToday.getTime() + ONE_DAY_MS);
 
-    expect(parse({ birthDate: formatBirthDate(eighteenToday) }).success).toBe(true);
-    expect(firstIssuePath(parse({ birthDate: formatBirthDate(oneDayShort) }))).toEqual([
+    expect(parse({ birthDate: toDisplayDate(toApiDate(eighteenToday)) }).success).toBe(true);
+    expect(firstIssuePath(parse({ birthDate: toDisplayDate(toApiDate(oneDayShort)) }))).toEqual([
       'birthDate',
     ]);
   });
