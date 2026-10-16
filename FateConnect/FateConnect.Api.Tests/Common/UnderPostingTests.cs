@@ -42,7 +42,7 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
     public async Task Signup_WithTheBirthDate_IsAccepted()
     {
         Dictionary<string, object> payload = BaseSignup();
-        payload["birthDate"] = "2000-01-01T00:00:00Z";
+        payload["birthDate"] = "2000-01-01";
 
         HttpResponseMessage response = await _factory.CreateClient()
             .PostAsJsonAsync("/Users/signup", payload);

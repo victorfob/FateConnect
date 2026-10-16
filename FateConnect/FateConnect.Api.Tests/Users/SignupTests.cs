@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -21,7 +22,7 @@ public class SignupTests : IClassFixture<ApiFactory>
     private const int UnderageYears = 10;
 
     private static string BirthDateForAge(int years) =>
-        DateTime.UtcNow.Date.AddYears(-years).ToString("yyyy-MM-dd'T'00:00:00'Z'");
+        DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-years).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
     private static string NewFatecEmail() => $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br";
 
@@ -30,7 +31,7 @@ public class SignupTests : IClassFixture<ApiFactory>
         fatecEmail = fatecEmail ?? NewFatecEmail(),
         password = "SenhaForte123!",
         fullName = "Mariana Alves Rocha",
-        birthDate = birthDate ?? "2000-01-01T00:00:00Z",
+        birthDate = birthDate ?? "2000-01-01",
         gender = "Male",
         acceptances = new[]
         {
@@ -115,7 +116,7 @@ public class SignupTests : IClassFixture<ApiFactory>
             fatecEmail,
             password = "SenhaForte123!",
             fullName = "Mariana Alves Rocha",
-            birthDate = "2000-01-01T00:00:00Z",
+            birthDate = "2000-01-01",
             gender = "Male",
             phone = ApiFactory.UniquePhone(),
             contactEmail = ApiFactory.UniqueContactEmail(),
@@ -170,7 +171,7 @@ public class SignupTests : IClassFixture<ApiFactory>
             password = "SenhaForte123!",
             fullName = "Mariana Alves Rocha",
             nickname = "Mari",
-            birthDate = "2000-01-01T00:00:00Z",
+            birthDate = "2000-01-01",
             gender = "Male",
             addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
             acceptances = new[]
@@ -195,7 +196,7 @@ public class SignupTests : IClassFixture<ApiFactory>
             fatecEmail = takenEmail,
             password = "SenhaForte123!",
             fullName = "Mariana Alves Rocha",
-            birthDate = "2000-01-01T00:00:00Z",
+            birthDate = "2000-01-01",
             gender = "Male",
             acceptances = new[]
             {
@@ -223,7 +224,7 @@ public class SignupTests : IClassFixture<ApiFactory>
             fatecEmail = takenEmail.ToUpperInvariant(),
             password = "SenhaForte123!",
             fullName = "Mariana Alves Rocha",
-            birthDate = "2000-01-01T00:00:00Z",
+            birthDate = "2000-01-01",
             gender = "Male",
             acceptances = new[] { new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse } },
         };

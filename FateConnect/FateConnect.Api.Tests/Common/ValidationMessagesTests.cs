@@ -24,7 +24,7 @@ public class ValidationMessagesTests
             FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
             Password = "SenhaForte123!",
             FullName = "Mariana Alves Rocha",
-            BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            BirthDate = new DateOnly(2000, 1, 1),
             Gender = (EnumGender)99,
             Acceptances = [],
         });
@@ -40,7 +40,7 @@ public class ValidationMessagesTests
             FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
             Password = "SenhaForte123!",
             FullName = "Mariana Alves Rocha",
-            BirthDate = DateTime.UtcNow.Date.AddYears(-10),
+            BirthDate = DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-10),
             Gender = EnumGender.Female,
             Acceptances = [],
         });
@@ -89,7 +89,7 @@ public class ValidationMessagesTests
             FatecEmail = "josé_silva@aluno.cps.sp.gov.br",
             Password = "SenhaForte123!",
             FullName = "José Alves Rocha",
-            BirthDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            BirthDate = new DateOnly(2000, 1, 1),
             Gender = EnumGender.Male,
             Acceptances = [],
         });

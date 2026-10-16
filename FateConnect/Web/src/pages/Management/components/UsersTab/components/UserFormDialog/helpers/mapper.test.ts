@@ -7,7 +7,7 @@ const USER: User = {
   id: 7,
   fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
   fullName: 'Maria da Silva',
-  birthDate: '2000-01-01T00:00:00',
+  birthDate: '2000-01-01',
   gender: 'Female',
   phone: null,
   contactEmail: null,

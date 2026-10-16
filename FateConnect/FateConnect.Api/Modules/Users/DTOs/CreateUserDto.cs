@@ -33,8 +33,8 @@ public class CreateUserDto
     [Required(ErrorMessage = "The birth date is required.")]
     [MinimumAge(18, ErrorMessage = "You must be at least 18 years old.")]
     [SwaggerSchema("Birth date; the user must be at least 18.")]
-    [SchemaExample("2000-01-01T00:00:00Z")]
-    required public DateTime BirthDate { get; set; }
+    [SchemaExample("2000-01-01")]
+    required public DateOnly BirthDate { get; set; }
 
     [Required]
     [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
