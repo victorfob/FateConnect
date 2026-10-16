@@ -162,7 +162,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             fatecEmail: "mariana.rocha@aluno.cps.sp.gov.br",
             passwordHash: "hash-sem-valor",
             fullName: "Mariana Rocha",
-            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            birthDate: new DateOnly(2000, 1, 1),
             gender: EnumGender.Female,
             contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
             createdAt: DateTime.UtcNow
@@ -226,7 +226,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             fatecEmail: $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
             passwordHash: "hash-sem-valor-fora-desta-suite",
             fullName: fullName,
-            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            birthDate: new DateOnly(2000, 1, 1),
             gender: EnumGender.Other,
             contact: new UserContact(phone, contactEmail),
             createdAt: DateTime.UtcNow
@@ -258,7 +258,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             fatecEmail: $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
             passwordHash: "hash-sem-valor-fora-desta-suite",
             fullName: fullName,
-            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            birthDate: new DateOnly(2000, 1, 1),
             gender: EnumGender.Other,
             contact: null,
             createdAt: DateTime.UtcNow
@@ -286,7 +286,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             fatecEmail: $"{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
             passwordHash: HashPassword(password),
             fullName: fullName,
-            birthDate: new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            birthDate: new DateOnly(2000, 1, 1),
             gender: EnumGender.Other,
             contact: new UserContact(UniquePhone(), UniqueContactEmail()),
             createdAt: DateTime.UtcNow

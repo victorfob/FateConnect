@@ -20,7 +20,7 @@ const USER: User = {
   id: USER_ID,
   fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
   fullName: 'Maria da Silva',
-  birthDate: '2000-01-01T00:00:00',
+  birthDate: '2000-01-01',
   gender: 'Female',
   phone: '15999998888',
   contactEmail: 'maria@exemplo.test',

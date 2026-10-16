@@ -88,7 +88,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     FatecEmail = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     Password = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     FullName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    BirthDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     Phone = table.Column<string>(type: "character varying(11)", maxLength: 11, nullable: true),
                     ContactEmail = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),

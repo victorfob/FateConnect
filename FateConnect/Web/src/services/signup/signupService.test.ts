@@ -13,7 +13,7 @@ const PAYLOAD: SignupRequest = {
   fatecEmail: 'aluno.teste@aluno.cps.sp.gov.br',
   password: 'segredo123',
   fullName: 'Fulano de Tal',
-  birthDate: '2000-01-01T00:00:00Z',
+  birthDate: '2000-01-01',
   gender: 'Female',
   acceptances: [{ document: DocumentTypeEnum.TERMS_OF_USE, version: '2026-01-15' }],
   receiveNotifications: false,
