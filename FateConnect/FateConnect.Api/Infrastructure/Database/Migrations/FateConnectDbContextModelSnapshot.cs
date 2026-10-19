@@ -189,7 +189,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<bool>("IsAnonymous")
+                    b.Property<bool>("IsConfidential")
                         .HasColumnType("boolean");
 
                     b.Property<NpgsqlTsVector>("SearchVector")

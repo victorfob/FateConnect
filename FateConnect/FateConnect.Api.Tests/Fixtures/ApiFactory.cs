@@ -442,12 +442,12 @@ public class ApiFactory : WebApplicationFactory<Program>
         DateOnly reportedOn,
         EnumReportCategory category = EnumReportCategory.ImproperCharging,
         EnumReportStatus status = EnumReportStatus.Open,
-        bool isAnonymous = false)
+        bool isConfidential = false)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
-        Report report = new(category, description, reporterId, isAnonymous, DateTime.UtcNow);
+        Report report = new(category, description, reporterId, isConfidential, DateTime.UtcNow);
 
         context.Reports.Add(report);
         context.Entry(report).Property(entity => entity.CreatedAt).CurrentValue =

@@ -33,7 +33,7 @@ const OPEN_REPORT: Report = {
     phone: '15999998888',
     thumbnailUrl: null,
   },
-  isAnonymous: false,
+  isConfidential: false,
   createdAt: '2026-09-15T12:00:00',
 };
 
@@ -42,7 +42,7 @@ const CONFIDENTIAL_REPORT: Report = {
   id: 'b4a2d1e3-6c4f-5b7d-8e92-1f3a6c2b4d05',
   status: ReportStatusEnum.RESOLVED,
   user: null,
-  isAnonymous: true,
+  isConfidential: true,
 };
 
 function advanceLabel(status: ReportStatusEnum): string {

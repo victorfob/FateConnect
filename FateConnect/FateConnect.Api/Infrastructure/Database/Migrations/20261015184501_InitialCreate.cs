@@ -261,7 +261,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    IsAnonymous = table.Column<bool>(type: "boolean", nullable: false),
+                    IsConfidential = table.Column<bool>(type: "boolean", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),

@@ -13,14 +13,14 @@ const CREATED = 201;
 const REPORT_INPUT: ReportInput = {
   category: ReportCategoryEnum.RECKLESS_DRIVING,
   description: 'A pessoa dirigiu acima da velocidade no trajeto inteiro.',
-  isAnonymous: false,
+  isConfidential: false,
   image: null,
 };
 
 const SENT_FIELDS = {
   Category: ReportCategoryEnum.RECKLESS_DRIVING,
   Description: 'A pessoa dirigiu acima da velocidade no trajeto inteiro.',
-  IsAnonymous: 'false',
+  IsConfidential: 'false',
 };
 
 const NEW_REPORT_ID = '0f0a6c2e-6d44-4a7f-9a0b-3f2c1e8d5a71';
@@ -61,9 +61,9 @@ describe('reportsService', () => {
       }),
     );
 
-    await createReport({ ...REPORT_INPUT, isAnonymous: true });
+    await createReport({ ...REPORT_INPUT, isConfidential: true });
 
-    expect(fields).toEqual({ ...SENT_FIELDS, IsAnonymous: 'true' });
+    expect(fields).toEqual({ ...SENT_FIELDS, IsConfidential: 'true' });
   });
 
   /**
