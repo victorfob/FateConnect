@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-10-19
+
 ### Changed
 
 - Renomeia para `isConfidential` o campo de denúncia sigilosa no contrato da API, que se chamava `isAnonymous` e dizia o contrário do que a denúncia faz; o envio e a resposta acompanham (#692) [Frontend] [Backend]
