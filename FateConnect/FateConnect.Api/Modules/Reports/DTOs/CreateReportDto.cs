@@ -6,6 +6,7 @@ using FateConnect.Api.Infrastructure.Validation;
 using FateConnect.Api.Modules.Reports.Enums;
 using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Swashbuckle.AspNetCore.Annotations;
 
 public record CreateReportDto : IWaivesContact
@@ -28,6 +29,7 @@ public record CreateReportDto : IWaivesContact
 
     [SwaggerSchema("`true` hides who sent the report from the administrators and waives the contact.")]
     [SchemaExample(false)]
+    [BindRequired]
     public required bool IsConfidential { get; init; }
 
     bool IWaivesContact.WaivesContact => IsConfidential;

@@ -328,6 +328,24 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task CreateReport_WithTheConfidentialityUnderItsOldName_IsRejectedNamingTheField()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Carla Menezes Dias");
+        using MultipartFormDataContent form = new()
+        {
+            { new StringContent(nameof(EnumReportCategory.ImproperCharging)), "Category" },
+            { new StringContent(ValidDescription), "Description" },
+            { new StringContent("true"), "IsAnonymous" },
+        };
+
+        HttpResponseMessage response = await reporter.PostAsync("/Reports", form);
+        string body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("IsConfidential", body, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task CreateReport_AsAdministrator_IsAcceptedBecauseTheProfileContainsTheOperator()
     {
         HttpClient moderation = _factory.CreateClientForNewAdministrator("Renata Villela Prado");
