@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using FateConnect.Api.Tests.Fixtures;
-using static FateConnect.Api.Tests.Rides.RideRepetitionDates;
+using static FateConnect.Api.Tests.Fixtures.RideDates;
 
 namespace FateConnect.Api.Tests.Rides;
 

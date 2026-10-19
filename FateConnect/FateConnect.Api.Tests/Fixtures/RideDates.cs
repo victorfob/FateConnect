@@ -2,9 +2,9 @@ using System.Globalization;
 using FateConnect.Api.Modules.Rides.Entities;
 using FateConnect.Api.Modules.Rides.Services;
 
-namespace FateConnect.Api.Tests.Rides;
+namespace FateConnect.Api.Tests.Fixtures;
 
-internal static class RideRepetitionDates
+internal static class RideDates
 {
     private const int DaysSearched = 400;
 
@@ -18,6 +18,8 @@ internal static class RideRepetitionDates
 
     public static DateOnly FirstDayFrom(int daysAhead, Func<DateOnly, bool> fits) =>
         Enumerable.Range(daysAhead, DaysSearched).Select(Today.AddDays).First(fits);
+
+    public static DateOnly DepartureDayFrom(int daysAhead) => FirstDayFrom(daysAhead, day => !IsHoliday(day));
 
     public static DateOnly WeeklyStartWithoutHolidays(int weeks) =>
         FirstDayFrom(7, day => Enumerable.Range(0, weeks).All(week => IsOrdinaryWeekday(day.AddDays(7 * week))));

@@ -30,7 +30,7 @@ paths:
 - Relógio via `TimeProvider`: o `MinimumAgeAttribute` o pede ao `ValidationContext`; no endpoint, a `ApiFactory.Clock` recebe um `FixedTimeProvider` ou um `MovableTimeProvider`, que anda entre duas requisições.
 - A entidade recebe o `now` de quem a chama, e o service o lê do `TimeProvider`: nada fora dos testes lê `DateTime.UtcNow`, e o teste de unidade passa o instante que quiser.
 - A borda fica no teste de unidade com relógio fixo; o endpoint fica com um caso de folga larga, provando só a fiação. Data literal fixa envelhece calada.
-- ⛔ Data derivada do dia que o `RideRepetitionDates` escolheu (`day.AddDays(3)`) passa pela mesma guarda de feriado: sem ela o teste reprova só no dia em que a conta cai num feriado.
+- ⛔ Data de carona que vai pela API sai do `RideDates` (`Fixtures/`, `DepartureDayFrom`), e a derivada do dia que ele escolheu (`day.AddDays(3)`) passa pela mesma guarda de feriado: sem ela o teste reprova só no dia em que a conta cai num feriado.
 
 ## A suíte roda contra PostgreSQL de verdade
 
