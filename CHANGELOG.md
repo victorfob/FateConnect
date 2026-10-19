@@ -6,6 +6,15 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Renomeia para `isConfidential` o campo de denúncia sigilosa no contrato da API, que se chamava `isAnonymous` e dizia o contrário do que a denúncia faz; o envio e a resposta acompanham (#692) [Frontend] [Backend]
+
+### Fixed
+
+- Corrige o envio de denúncia sem a escolha de sigilo, inclusive com o nome antigo do campo, que a API aceitava e gravava como identificada; agora ele é recusado (#692) [Backend]
+- Corrige o cadastro enviado duas vezes ao mesmo tempo com o mesmo e-mail institucional, que criava duas contas; a segunda recebe o aviso de e-mail já cadastrado, e o mesmo vale para a troca de e-mail feita pela administração (#692) [Backend]
+
 ## [1.7.1] - 2026-10-16
 
 ### Fixed
