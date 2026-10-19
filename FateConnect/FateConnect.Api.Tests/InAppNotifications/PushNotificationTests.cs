@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -34,7 +33,7 @@ public class PushNotificationTests : IClassFixture<ApiFactory>
     private static object NewRidePayload() => new
     {
         destination = Destination,
-        departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+        departureDate = RideDates.Iso(RideDates.DepartureDayFrom(7)),
         departureTime = "08:30:00",
         rideType = "Solidarity",
         vehicleType = "Car",

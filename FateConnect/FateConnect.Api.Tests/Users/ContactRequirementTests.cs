@@ -14,7 +14,7 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
     private static object NewRidePayload() => new
     {
         destination = "Sorocaba centro",
-        departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+        departureDate = RideDates.Iso(RideDates.DepartureDayFrom(7)),
         departureTime = "08:30:00",
         rideType = "Solidarity",
         vehicleType = "Car",
