@@ -67,7 +67,6 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
 
         return context.Users
             .Include(user => user.DocumentAcceptances)
-            .Include(user => user.Preferences)
             .AsNoTracking()
             .Single(user => user.FatecEmail == fatecEmail);
     }
@@ -161,7 +160,7 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
 
         User user = ReadUser(fatecEmail);
 
-        Assert.False(user.Preferences.ReceiveNotifications);
+        Assert.False(user.ReceiveNotifications);
     }
 
     [Fact]
@@ -177,8 +176,7 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
         User user = ReadUser(fatecEmail);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        Assert.Equal(user.Id, user.Preferences.UserId);
-        Assert.True(user.Preferences.ReceiveNotifications);
+        Assert.True(user.ReceiveNotifications);
     }
 
     [Fact]

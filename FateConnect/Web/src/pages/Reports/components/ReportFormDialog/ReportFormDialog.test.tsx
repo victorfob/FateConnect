@@ -131,7 +131,7 @@ describe('ReportFormDialog', () => {
     expect(fields).toEqual({
       Category: CHOSEN_CATEGORY,
       Description: TYPED_DESCRIPTION,
-      IsAnonymous: 'false',
+      IsConfidential: 'false',
     });
     expect(await screen.findByText(REPORT_FORM.succeeded)).toBeInTheDocument();
   });
@@ -153,7 +153,7 @@ describe('ReportFormDialog', () => {
     await userEvent.click(submitButton());
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(fields).toMatchObject({ IsAnonymous: 'true' });
+    expect(fields).toMatchObject({ IsConfidential: 'true' });
   });
 
   it('should lock the secrecy on for whoever has no contact, and say why in a single note', async () => {
@@ -187,7 +187,7 @@ describe('ReportFormDialog', () => {
     await userEvent.click(submitButton());
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(fields).toMatchObject({ IsAnonymous: 'true' });
+    expect(fields).toMatchObject({ IsConfidential: 'true' });
   });
 
   it('should leave the secrecy free and without the note for whoever has a contact', async () => {

@@ -15,8 +15,8 @@ public class ReportTests
         EnumReportCategory category = EnumReportCategory.ImproperCharging,
         string description = ValidDescription,
         int userId = 7,
-        bool isAnonymous = false) =>
-        new(category, description, userId, isAnonymous, DateTime.UtcNow);
+        bool isConfidential = false) =>
+        new(category, description, userId, isConfidential, DateTime.UtcNow);
 
     [Fact]
     public void Constructor_WithValidData_StartsOpenAndTrimsTheDescription()
@@ -31,11 +31,11 @@ public class ReportTests
     }
 
     [Fact]
-    public void Constructor_WithAnonymityRequested_KeepsTheReporterForAccountability()
+    public void Constructor_WithConfidentialityRequested_KeepsTheReporterForAccountability()
     {
-        Report report = CreateReport(userId: 7, isAnonymous: true);
+        Report report = CreateReport(userId: 7, isConfidential: true);
 
-        Assert.True(report.IsAnonymous);
+        Assert.True(report.IsConfidential);
         Assert.Equal(7, report.UserId);
     }
 

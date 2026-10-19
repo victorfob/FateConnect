@@ -236,7 +236,6 @@ public class ApiFactory : WebApplicationFactory<Program>
             user.AttachImage(imageUrl, DateTime.UtcNow);
 
         user.ConfirmEmail(DateTime.UtcNow);
-        user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
 
@@ -265,7 +264,6 @@ public class ApiFactory : WebApplicationFactory<Program>
         );
 
         user.ConfirmEmail(DateTime.UtcNow);
-        user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
         context.SaveChanges();
@@ -294,8 +292,6 @@ public class ApiFactory : WebApplicationFactory<Program>
 
         if (emailConfirmed)
             user.ConfirmEmail(DateTime.UtcNow);
-
-        user.SetPreferences(new UserPreferences(receiveNotifications: false));
 
         context.Users.Add(user);
 
@@ -442,12 +438,12 @@ public class ApiFactory : WebApplicationFactory<Program>
         DateOnly reportedOn,
         EnumReportCategory category = EnumReportCategory.ImproperCharging,
         EnumReportStatus status = EnumReportStatus.Open,
-        bool isAnonymous = false)
+        bool isConfidential = false)
     {
         using IServiceScope scope = Services.CreateScope();
         FateConnectDbContext context = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>();
 
-        Report report = new(category, description, reporterId, isAnonymous, DateTime.UtcNow);
+        Report report = new(category, description, reporterId, isConfidential, DateTime.UtcNow);
 
         context.Reports.Add(report);
         context.Entry(report).Property(entity => entity.CreatedAt).CurrentValue =
@@ -465,11 +461,9 @@ public class ApiFactory : WebApplicationFactory<Program>
 
         context.Users
             .Where(user => user.Id == userId)
-            .ExecuteUpdate(setters => setters.SetProperty(user => user.Neighborhood, neighborhood));
-
-        context.UserPreferences
-            .Where(preferences => preferences.UserId == userId)
-            .ExecuteUpdate(setters => setters.SetProperty(preferences => preferences.ReceiveNotifications, receiveNotifications));
+            .ExecuteUpdate(setters => setters
+                .SetProperty(user => user.Neighborhood, neighborhood)
+                .SetProperty(user => user.ReceiveNotifications, receiveNotifications));
     }
 
     public int SeedNotification(

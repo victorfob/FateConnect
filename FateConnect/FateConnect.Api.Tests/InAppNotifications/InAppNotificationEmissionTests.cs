@@ -34,19 +34,19 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
     private static object NewRidePayload(string destination) => new
     {
         destination,
-        departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+        departureDate = RideDates.Iso(RideDates.DepartureDayFrom(7)),
         departureTime = "08:30:00",
         rideType = "Solidarity",
         vehicleType = "Car",
         description = "Vaga para quem sai do campus.",
     };
 
-    private static MultipartFormDataContent NewReportForm(EnumReportCategory category, bool isAnonymous) =>
+    private static MultipartFormDataContent NewReportForm(EnumReportCategory category, bool isConfidential) =>
         new()
         {
             { new StringContent(category.ToString()), "Category" },
             { new StringContent("O motorista passou do limite de velocidade na rodovia."), "Description" },
-            { new StringContent(isAnonymous.ToString(CultureInfo.InvariantCulture)), "IsAnonymous" },
+            { new StringContent(isConfidential.ToString(CultureInfo.InvariantCulture)), "IsConfidential" },
         };
 
     private async Task<Guid> OfferRideAsync(int driverId, string destination)
@@ -60,11 +60,11 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         return (await response.Content.ReadFromJsonAsync<CreatedResource>(JsonOptions))!.Id;
     }
 
-    private async Task<Guid> ReportAsync(int reporterId, EnumReportCategory category, bool isAnonymous = false)
+    private async Task<Guid> ReportAsync(int reporterId, EnumReportCategory category, bool isConfidential = false)
     {
         HttpResponseMessage response = await _factory
             .CreateClientFor(reporterId)
-            .PostAsync("/Reports", NewReportForm(category, isAnonymous));
+            .PostAsync("/Reports", NewReportForm(category, isConfidential));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
@@ -169,7 +169,7 @@ public class InAppNotificationEmissionTests : IClassFixture<ApiFactory>
         int reporterId = _factory.SeedUser("Igor Mendes Batista").Id;
         _factory.PrepareForNotifications(reporterId);
 
-        Guid confidentialId = await ReportAsync(reporterId, EnumReportCategory.FakeProfile, isAnonymous: true);
+        Guid confidentialId = await ReportAsync(reporterId, EnumReportCategory.FakeProfile, isConfidential: true);
         Guid identifiedId = await ReportAsync(reporterId, EnumReportCategory.Spam);
         await WaitUntilConsumedAsync(identifiedId);
 

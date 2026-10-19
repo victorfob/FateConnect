@@ -20,7 +20,7 @@ using Swashbuckle.AspNetCore.Annotations;
 [ApiController]
 [Route("[controller]")]
 [Authorize]
-[SwaggerTag("Reports of misconduct sent to the administrators, anonymous or not, with an optional photo.")]
+[SwaggerTag("Reports of misconduct sent to the administrators, confidential or not, with an optional photo.")]
 public class ReportsController(IReportService service, IWebHostEnvironment environment) : ControllerBase
 {
     [HttpPost]
@@ -30,7 +30,7 @@ public class ReportsController(IReportService service, IWebHostEnvironment envir
         OperationId = "CreateReport",
         Summary = "Send a report",
         Description = "Sends a report with an optional photo. An identified report from a user without phone " +
-            "and contact e-mail answers 403 with the code `ContactRequired`; an anonymous one goes " +
+            "and contact e-mail answers 403 with the code `ContactRequired`; a confidential one goes " +
             "through.")]
     [ProducesResponseType(typeof(ReadReportDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]

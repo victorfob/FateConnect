@@ -57,7 +57,7 @@ public class ReportRepository(FateConnectDbContext context) : IReportRepository
 
     public async Task<Report> AddAsync(Report report)
     {
-        return await context.AddAndLoadAsync(report, d => d.User, loadsReference: !report.IsAnonymous);
+        return await context.AddAndLoadAsync(report, d => d.User, loadsReference: !report.IsConfidential);
     }
 
     public async Task SaveChangesAsync()

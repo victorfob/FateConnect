@@ -38,7 +38,7 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
         bool HasImage,
         EnumReportStatus Status,
         Contact? User,
-        bool IsAnonymous,
+        bool IsConfidential,
         DateTime CreatedAt);
 
     private sealed record PagedReports(
@@ -54,12 +54,12 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
     private static MultipartFormDataContent NewReportForm(
         EnumReportCategory category = EnumReportCategory.ImproperCharging,
         string description = ValidDescription,
-        bool isAnonymous = false) =>
+        bool isConfidential = false) =>
         new()
         {
             { new StringContent(category.ToString()), "Category" },
             { new StringContent(description), "Description" },
-            { new StringContent(isAnonymous.ToString(CultureInfo.InvariantCulture)), "IsAnonymous" },
+            { new StringContent(isConfidential.ToString(CultureInfo.InvariantCulture)), "IsConfidential" },
         };
 
     private static ByteArrayContent ImagePayload(byte shade)
@@ -112,18 +112,18 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
 
         Assert.Equal(EnumReportStatus.Open, created.Status);
         Assert.Equal(ValidDescription, created.Description);
-        Assert.False(created.IsAnonymous);
+        Assert.False(created.IsConfidential);
         Assert.Equal("Mariana Alves Rocha", created.User?.Name);
     }
 
     [Fact]
-    public async Task CreateReport_AskingForAnonymity_OmitsTheReporterContact()
+    public async Task CreateReport_AskingForConfidentiality_OmitsTheReporterContact()
     {
         HttpClient reporter = _factory.CreateClientForNewUser("Bruno Carvalho Souza");
 
-        ReadReport created = await ReportedBy(reporter, NewReportForm(isAnonymous: true));
+        ReadReport created = await ReportedBy(reporter, NewReportForm(isConfidential: true));
 
-        Assert.True(created.IsAnonymous);
+        Assert.True(created.IsConfidential);
         Assert.Null(created.User);
     }
 
@@ -246,16 +246,16 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task GetReport_OfAnAnonymousReport_HidesTheReporterFromModeration()
+    public async Task GetReport_OfAConfidentialReport_HidesTheReporterFromModeration()
     {
         HttpClient reporter = _factory.CreateClientForNewUser("Vera Lúcia Andrade");
         HttpClient moderation = _factory.CreateClientForNewAdministrator("Sérgio Tavares Mendes");
-        ReadReport created = await ReportedBy(reporter, NewReportForm(isAnonymous: true));
+        ReadReport created = await ReportedBy(reporter, NewReportForm(isConfidential: true));
 
         ReadReport reviewed = (await moderation
             .GetFromJsonAsync<ReadReport>($"/Reports/{created.Id}", JsonOptions))!;
 
-        Assert.True(reviewed.IsAnonymous);
+        Assert.True(reviewed.IsConfidential);
         Assert.Null(reviewed.User);
     }
 
@@ -269,7 +269,7 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
         ReadReport reviewed = (await moderation
             .GetFromJsonAsync<ReadReport>($"/Reports/{created.Id}", JsonOptions))!;
 
-        Assert.False(reviewed.IsAnonymous);
+        Assert.False(reviewed.IsConfidential);
         Assert.Equal("Aline Bezerra Dutra", reviewed.User?.Name);
     }
 
@@ -325,6 +325,24 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains("Description", body, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CreateReport_WithTheConfidentialityUnderItsOldName_IsRejectedNamingTheField()
+    {
+        HttpClient reporter = _factory.CreateClientForNewUser("Carla Menezes Dias");
+        using MultipartFormDataContent form = new()
+        {
+            { new StringContent(nameof(EnumReportCategory.ImproperCharging)), "Category" },
+            { new StringContent(ValidDescription), "Description" },
+            { new StringContent("true"), "IsAnonymous" },
+        };
+
+        HttpResponseMessage response = await reporter.PostAsync("/Reports", form);
+        string body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("IsConfidential", body, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -443,13 +461,13 @@ public class ReportEndpointTests : IClassFixture<ApiFactory>
 
         await ReportedBy(
             reporter,
-            NewReportForm(description: $"{ValidDescription} {subject}", isAnonymous: true));
+            NewReportForm(description: $"{ValidDescription} {subject}", isConfidential: true));
 
         PagedReports mine = (await reporter.GetFromJsonAsync<PagedReports>(
             $"/Reports/mine?searchTerm={subject}", JsonOptions))!;
 
         ReadReport listed = Assert.Single(mine.Items);
-        Assert.True(listed.IsAnonymous);
+        Assert.True(listed.IsConfidential);
         Assert.Null(listed.User);
     }
 

@@ -33,7 +33,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
     private static object NewRidePayload() => new
     {
         destination = "Sorocaba centro",
-        departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
+        departureDate = RideDates.Iso(RideDates.DepartureDayFrom(7)),
         departureTime = "08:30:00",
         rideType = "Solidarity",
         vehicleType = "Car",
@@ -55,7 +55,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
     public async Task UpdateRide_WithEveryField_ReplacesThem()
     {
         (ReadRide ride, HttpClient driver) = await OfferRideAsync();
-        DateOnly newDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(14));
+        DateOnly newDate = RideDates.DepartureDayFrom(14);
 
         HttpResponseMessage response = await driver.PatchAsJsonAsync($"/Rides/{ride.Id}", new
         {
@@ -100,7 +100,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await driver.PostAsJsonAsync("/Rides", new
         {
             destination = "Sorocaba centro",
-            departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
+            departureDate = RideDates.Iso(RideDates.DepartureDayFrom(7)),
             departureTime = "08:30:00",
             rideType = "Solidarity",
             vehicleType = "Motorcycle",
@@ -122,7 +122,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await driver.PostAsJsonAsync("/Rides", new
         {
             destination = "Sorocaba centro",
-            departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
+            departureDate = RideDates.Iso(RideDates.DepartureDayFrom(7)),
             departureTime = "08:30:00",
             rideType = "Solidarity",
             vehicleType,
@@ -169,7 +169,7 @@ public class RideUpdateTests : IClassFixture<ApiFactory>
         {
             availableSeats = 3,
             destination = "Sorocaba centro",
-            departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
+            departureDate = RideDates.Iso(RideDates.DepartureDayFrom(7)),
             departureTime = "08:30:00",
             rideType = "Solidarity",
             vehicleType = "Car",

@@ -7,9 +7,12 @@ using FateConnect.Api.Modules.Common.Utils;
 using FateConnect.Api.Modules.Users.DTOs;
 using FateConnect.Api.Modules.Users.Entities;
 using FateConnect.Api.Modules.Users.Enums;
+using FateConnect.Api.Modules.Users.Exceptions;
+using FateConnect.Api.Modules.Users.Infrastructure;
 using FateConnect.Api.Modules.Users.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql;
 
 public class UserRepository(FateConnectDbContext context, TimeProvider clock) : IUserRepository
 {
@@ -51,14 +54,10 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
 
     public async Task<User?> GetByIdAsync(
         int id,
-        bool includePreferences = false,
         bool asNoTracking = false,
         bool includeDocumentAcceptances = false)
     {
         IQueryable<User> query = context.Users.AsTrackingWhen(!asNoTracking);
-
-        if (includePreferences)
-            query = query.Include(u => u.Preferences);
 
         if (includeDocumentAcceptances)
             query = query.Include(u => u.DocumentAcceptances);
@@ -66,11 +65,11 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
         return await query.FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    public async Task<UserPreferences?> GetPreferencesByUserIdAsync(int userId)
+    public async Task<bool?> GetReceiveNotificationsAsync(int userId)
     {
         return await context.Users
             .Where(u => u.Id == userId)
-            .Select(u => u.Preferences)
+            .Select(u => (bool?)u.ReceiveNotifications)
             .FirstOrDefaultAsync();
     }
 
@@ -102,7 +101,7 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
     public async Task AddAsync(User user)
     {
         context.Users.Add(user);
-        await context.SaveChangesAsync();
+        await SaveChangesAsync();
     }
 
     public void AddAdministrativeAction(AdministrativeAction action)
@@ -112,8 +111,23 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
 
     public async Task SaveChangesAsync()
     {
-        await context.SaveChangesAsync();
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException exception) when (TakesAFatecEmailInUse(exception))
+        {
+            string fatecEmail = exception.Entries.Select(entry => entry.Entity).OfType<User>().First().FatecEmail;
+            throw new EmailAlreadyRegisteredException(fatecEmail);
+        }
     }
+
+    private static bool TakesAFatecEmailInUse(DbUpdateException exception) =>
+        exception.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation,
+            ConstraintName: UserConfiguration.FatecEmailIndex
+        };
 
     public async Task InTransactionAsync(Func<Task> work)
     {

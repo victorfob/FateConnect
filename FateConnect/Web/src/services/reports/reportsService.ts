@@ -14,7 +14,7 @@ function toFormData(input: ReportInput): FormData {
 
   body.append('Category', input.category);
   body.append('Description', input.description);
-  body.append('IsAnonymous', String(input.isAnonymous));
+  body.append('IsConfidential', String(input.isConfidential));
   if (input.image) body.append('Image', input.image);
 
   return body;
