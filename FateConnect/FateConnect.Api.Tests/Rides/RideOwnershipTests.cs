@@ -24,7 +24,7 @@ public class RideOwnershipTests : IClassFixture<ApiFactory>
     private static object NewRidePayload(string destination) => new
     {
         destination,
-        departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
+        departureDate = RideDates.Iso(RideDates.DepartureDayFrom(7)),
         departureTime = "08:30:00",
         rideType = "Solidarity",
         vehicleType = "Car",
