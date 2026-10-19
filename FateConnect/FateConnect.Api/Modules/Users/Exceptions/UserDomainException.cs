@@ -56,7 +56,7 @@ public class ContactRequiredException(EnumPublication publication)
         EnumPublication.Ride => "To offer a ride, add a contact phone and e-mail in My profile.",
         EnumPublication.LostAndFoundItem => "To register an item, add a contact phone and e-mail in My profile.",
         EnumPublication.IdentifiedReport => "To send an identified report, add a contact phone and e-mail in " +
-            "My profile, or mark the report as anonymous.",
+            "My profile, or mark the report as confidential.",
         _ => throw new ArgumentOutOfRangeException(nameof(publication), publication, null)
     };
 }

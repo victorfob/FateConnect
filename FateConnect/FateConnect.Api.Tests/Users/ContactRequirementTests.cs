@@ -29,11 +29,11 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
         { new StringContent(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)), "OccurredOn" },
     };
 
-    private static MultipartFormDataContent NewReportForm(bool isAnonymous) => new()
+    private static MultipartFormDataContent NewReportForm(bool isConfidential) => new()
     {
         { new StringContent("ImproperCharging"), "Category" },
         { new StringContent("O motorista cobrou valor acima do combinado na carona de ontem."), "Description" },
-        { new StringContent(isAnonymous.ToString(CultureInfo.InvariantCulture)), "IsAnonymous" },
+        { new StringContent(isConfidential.ToString(CultureInfo.InvariantCulture)), "IsConfidential" },
     };
 
     private static MultipartFormDataContent ContactForm(string? phone, string? contactEmail)
@@ -102,14 +102,14 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
     {
         HttpClient client = factory.CreateClientFor(factory.SeedUserWithoutContact("Otávio Lins Barreto"));
 
-        HttpResponseMessage response = await client.PostAsync("/Reports", NewReportForm(isAnonymous: false));
+        HttpResponseMessage response = await client.PostAsync("/Reports", NewReportForm(isConfidential: false));
 
         (string? code, string? detail) = await ProblemOf(response);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal(ContactRequiredException.ErrorCode, code);
         Assert.Equal(
             "To send an identified report, add a contact phone and e-mail in My profile, " +
-                "or mark the report as anonymous.",
+                "or mark the report as confidential.",
             detail);
     }
 
@@ -118,7 +118,7 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
     {
         HttpClient client = factory.CreateClientForNewUser("Paula Siqueira Rios");
 
-        HttpResponseMessage response = await client.PostAsync("/Reports", NewReportForm(isAnonymous: false));
+        HttpResponseMessage response = await client.PostAsync("/Reports", NewReportForm(isConfidential: false));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
@@ -130,7 +130,7 @@ public class ContactRequirementTests(ApiFactory factory) : IClassFixture<ApiFact
 
         HttpResponseMessage rides = await client.GetAsync("/Rides");
         HttpResponseMessage items = await client.GetAsync("/LostAndFound");
-        HttpResponseMessage report = await client.PostAsync("/Reports", NewReportForm(isAnonymous: true));
+        HttpResponseMessage report = await client.PostAsync("/Reports", NewReportForm(isConfidential: true));
 
         Assert.Equal(HttpStatusCode.OK, rides.StatusCode);
         Assert.Equal(HttpStatusCode.OK, items.StatusCode);

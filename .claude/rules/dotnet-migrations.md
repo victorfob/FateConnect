@@ -73,11 +73,11 @@ dotnet ef migrations add _Drift && grep "migrationBuilder\." Infrastructure/Data
 ⛔ Na tabela dependente, a chave primária é a própria chave estrangeira; vale para todo 1:1 do projeto.
 
 ```csharp
-builder.HasKey(p => p.UserId);
+builder.HasKey(dependent => dependent.UserId);
 
 builder.HasOne<User>()
-       .WithOne(u => u.Preferences)
-       .HasForeignKey<UserPreferences>(p => p.UserId)
+       .WithOne(u => u.Dependent)
+       .HasForeignKey<Dependent>(dependent => dependent.UserId)
        .OnDelete(DeleteBehavior.Cascade);
 ```
 

@@ -49,7 +49,7 @@ export function ReportCard({ report, headerActions, actions }: ReportCardProps) 
       </ListCard.Header>
 
       <ListCard.InfoRow>
-        {report.isAnonymous && (
+        {report.isConfidential && (
           <ListCard.InfoItem>
             <IncognitoIcon />
             <Typography variant="caption" color="inherit">

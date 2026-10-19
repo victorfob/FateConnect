@@ -192,7 +192,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<bool>("IsAnonymous")
+                    b.Property<bool>("IsConfidential")
                         .HasColumnType("boolean");
 
                     b.Property<NpgsqlTsVector>("SearchVector")
@@ -426,6 +426,9 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Property<int>("ProfileType")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("ReceiveNotifications")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -440,23 +443,14 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.HasIndex("ContactEmail")
                         .IsUnique();
 
+                    b.HasIndex("FatecEmail")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Users_FatecEmail");
+
                     b.HasIndex("Phone")
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.UserPreferences", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("ReceiveNotifications")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("UserPreferences");
                 });
 
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.UserToken", b =>
@@ -738,15 +732,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.UserPreferences", b =>
-                {
-                    b.HasOne("FateConnect.Api.Modules.Users.Entities.User", null)
-                        .WithOne("Preferences")
-                        .HasForeignKey("FateConnect.Api.Modules.Users.Entities.UserPreferences", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.UserToken", b =>
                 {
                     b.HasOne("FateConnect.Api.Modules.Users.Entities.User", "User")
@@ -778,9 +763,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
             modelBuilder.Entity("FateConnect.Api.Modules.Users.Entities.User", b =>
                 {
                     b.Navigation("DocumentAcceptances");
-
-                    b.Navigation("Preferences")
-                        .IsRequired();
 
                     b.Navigation("Tokens");
                 });

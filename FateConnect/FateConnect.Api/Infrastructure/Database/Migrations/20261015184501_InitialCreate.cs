@@ -101,7 +101,8 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     TokenVersion = table.Column<int>(type: "integer", nullable: false),
                     FailedLoginAttempts = table.Column<int>(type: "integer", nullable: false),
                     LockedUntil = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    IsEmailConfirmed = table.Column<bool>(type: "boolean", nullable: false)
+                    IsEmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    ReceiveNotifications = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -261,7 +262,7 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    IsAnonymous = table.Column<bool>(type: "boolean", nullable: false),
+                    IsConfidential = table.Column<bool>(type: "boolean", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
@@ -306,24 +307,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserPreferences",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    ReceiveNotifications = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserPreferences", x => x.UserId);
-                    table.ForeignKey(
-                        name: "FK_UserPreferences_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -471,6 +454,12 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_FatecEmail",
+                table: "Users",
+                column: "FatecEmail",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Phone",
                 table: "Users",
                 column: "Phone",
@@ -514,9 +503,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "RideDepartures");
-
-            migrationBuilder.DropTable(
-                name: "UserPreferences");
 
             migrationBuilder.DropTable(
                 name: "UserTokens");

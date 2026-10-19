@@ -14,7 +14,7 @@ public class Report
     public string? ImageUrl { get; private set; }
     public int UserId { get; private set; }
     public User User { get; private set; } = null!;
-    public bool IsAnonymous { get; private set; }
+    public bool IsConfidential { get; private set; }
     public EnumReportStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
@@ -25,7 +25,7 @@ public class Report
         EnumReportCategory category,
         string description,
         int userId,
-        bool isAnonymous,
+        bool isConfidential,
         DateTime now)
     {
         ValidateCategory(category);
@@ -36,7 +36,7 @@ public class Report
         UserId = userId;
         Category = category;
         Description = description.Trim();
-        IsAnonymous = isAnonymous;
+        IsConfidential = isConfidential;
         Status = EnumReportStatus.Open;
         CreatedAt = now;
         UpdatedAt = null;

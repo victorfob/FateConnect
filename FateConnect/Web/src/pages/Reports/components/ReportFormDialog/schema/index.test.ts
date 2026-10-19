@@ -10,7 +10,7 @@ const ONE_BYTE = 1;
 const VALID: ReportFormInput = {
   category: ReportCategoryEnum.RECKLESS_DRIVING,
   description: 'A pessoa dirigiu acima da velocidade no trajeto inteiro.',
-  isAnonymous: false,
+  isConfidential: false,
   image: null,
 };
 

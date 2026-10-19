@@ -50,11 +50,11 @@ export function ReportFormDialog({ open, onClose }: ReportFormDialogProps) {
   useEffect(() => {
     if (!open) return;
 
-    reset({ ...EMPTY_REPORT_FORM, isAnonymous: secrecyIsForced });
+    reset({ ...EMPTY_REPORT_FORM, isConfidential: secrecyIsForced });
   }, [open, reset, secrecyIsForced]);
 
   const handleSubmit = form.handleSubmit((values) =>
-    mutate({ ...values, isAnonymous: values.isAnonymous || secrecyIsForced }),
+    mutate({ ...values, isConfidential: values.isConfidential || secrecyIsForced }),
   );
 
   return (
