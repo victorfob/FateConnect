@@ -21,7 +21,7 @@ export function ReportFormFields({ secrecyIsForced }: ReportFormFieldsProps) {
     formState: { errors, disabled },
   } = useFormContext<ReportFormInput, unknown, ReportFormValues>();
   const image = useWatch({ control, name: 'image' });
-  const isAnonymous = useWatch({ control, name: 'isAnonymous' });
+  const isConfidential = useWatch({ control, name: 'isConfidential' });
   const description = useWatch({ control, name: 'description' });
 
   // Valida na escolha: o formato e o tamanho se sabem na hora, não no envio.
@@ -36,8 +36,8 @@ export function ReportFormFields({ secrecyIsForced }: ReportFormFieldsProps) {
         <S.ConfidentialToggle
           control={
             <Switch
-              {...register('isAnonymous')}
-              checked={isAnonymous}
+              {...register('isConfidential')}
+              checked={isConfidential}
               disabled={disabled || secrecyIsForced}
             />
           }
@@ -51,7 +51,7 @@ export function ReportFormFields({ secrecyIsForced }: ReportFormFieldsProps) {
         )}
 
         {/* Quem não pediu sigilo não precisa saber o que o sigilo implicaria. */}
-        {!secrecyIsForced && isAnonymous && (
+        {!secrecyIsForced && isConfidential && (
           <S.ConfidentialHint variant="caption">{C.CONFIDENTIAL_HINT}</S.ConfidentialHint>
         )}
       </S.ConfidentialGroup>

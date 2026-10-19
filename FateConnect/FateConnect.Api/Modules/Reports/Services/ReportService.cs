@@ -33,13 +33,13 @@ public partial class ReportService(
             dto.Category,
             dto.Description,
             currentUserId,
-            dto.IsAnonymous,
+            dto.IsConfidential,
             clock.GetUtcNow().UtcDateTime
         );
 
         string? storedImageUrl = await StoreImageAsync(dto.Image, EnumStorageContainer.Report, report.AttachImage);
 
-        if (!report.IsAnonymous)
+        if (!report.IsConfidential)
             await publishEndpoint.Publish(
                 new ReportReceivedEvent(currentUserId, report.Id, report.Category));
 
@@ -131,8 +131,8 @@ public partial class ReportService(
             ThumbnailUrl: ImageAddressOf(record, EnumStoredImageVariant.Thumbnail),
             HasImage: record.ImageUrl is not null,
             Status: record.Status,
-            User: record.IsAnonymous ? null : record.User?.ToContactDto(),
-            IsAnonymous: record.IsAnonymous,
+            User: record.IsConfidential ? null : record.User?.ToContactDto(),
+            IsConfidential: record.IsConfidential,
             CreatedAt: record.CreatedAt
         );
 

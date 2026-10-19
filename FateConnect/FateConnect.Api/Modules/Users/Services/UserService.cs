@@ -50,7 +50,7 @@ public partial class UserService(
             now
         );
 
-        ConfigurePreferences(newUser, dto);
+        newUser.ChooseNotifications(dto.ReceiveNotifications ?? false);
         AddAcceptances(newUser, dto, origin, now);
 
         string rawToken = newUser.IssueToken(
@@ -73,13 +73,6 @@ public partial class UserService(
         });
 
         LogUserCreated(logger, newUser.Id);
-    }
-
-    private static void ConfigurePreferences(User user, CreateUserDto dto)
-    {
-        var preferences = new UserPreferences(dto.ReceiveNotifications ?? false);
-
-        user.SetPreferences(preferences);
     }
 
     private static void AddAcceptances(User user, CreateUserDto dto, RequestOrigin origin, DateTime now)
@@ -112,15 +105,15 @@ public partial class UserService(
 
     public async Task<ReadUserPreferencesDto?> GetPreferencesAsync(int currentUserId)
     {
-        var preferences = await userRepository.GetPreferencesByUserIdAsync(currentUserId);
+        bool? receiveNotifications = await userRepository.GetReceiveNotificationsAsync(currentUserId);
 
-        if (preferences is null)
+        if (receiveNotifications is null)
         {
             LogUserNotFound(logger, currentUserId);
             return null;
         }
 
-        return new ReadUserPreferencesDto(preferences.ReceiveNotifications);
+        return new ReadUserPreferencesDto(receiveNotifications.Value);
     }
 
     public async Task<ReadUserDto?> UpdateProfileAsync(int currentUserId, UpdateUserDto dto)
@@ -167,7 +160,7 @@ public partial class UserService(
 
     public async Task UpdatePreferencesAsync(int currentUserId, UpdatePreferencesDto dto)
     {
-        var user = await userRepository.GetByIdAsync(currentUserId, includePreferences: true);
+        var user = await userRepository.GetByIdAsync(currentUserId);
 
         if (user is null)
         {
@@ -175,16 +168,12 @@ public partial class UserService(
             return;
         }
 
-        var newPreferences = new UserPreferences(
-            dto.ReceiveNotifications ?? user.Preferences.ReceiveNotifications
-        );
-
-        user.SetPreferences(newPreferences);
+        user.ChooseNotifications(dto.ReceiveNotifications ?? user.ReceiveNotifications);
 
         await userRepository.SaveChangesAsync();
         LogUserPreferencesUpdated(logger, currentUserId);
 
-        if (!newPreferences.ReceiveNotifications)
+        if (!user.ReceiveNotifications)
             await pushNotificationService.RemoveAllAsync(currentUserId);
     }
 

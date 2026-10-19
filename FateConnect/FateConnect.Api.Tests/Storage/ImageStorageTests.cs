@@ -352,7 +352,7 @@ public sealed class ImageStorageTests : IDisposable
         {
             Category = EnumReportCategory.ImproperCharging,
             Description = "O motorista cobrou valor acima do combinado na carona de ontem.",
-            IsAnonymous = false,
+            IsConfidential = false,
             Image = FileOf("image/png"),
         };
 

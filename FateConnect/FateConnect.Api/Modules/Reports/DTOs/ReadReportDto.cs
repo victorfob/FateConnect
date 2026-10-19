@@ -19,10 +19,10 @@ public record ReadReportDto(
     bool HasImage,
     [property: SwaggerSchema("Status of the report.")]
     EnumReportStatus Status,
-    [property: SwaggerSchema("Contact of who sent the report; absent when it is anonymous.")]
+    [property: SwaggerSchema("Contact of who sent the report; absent when it is confidential.")]
     UserContactDto? User,
     [property: SwaggerSchema("Whether who sent the report is hidden.")]
-    bool IsAnonymous,
+    bool IsConfidential,
     [property: SwaggerSchema("When the report was sent, in UTC.")]
     DateTime CreatedAt
 );

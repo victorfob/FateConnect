@@ -21,7 +21,7 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
         builder.Property(d => d.ImageUrl)
                .HasMaxLength(500);
 
-        builder.Property(d => d.IsAnonymous)
+        builder.Property(d => d.IsConfidential)
                .IsRequired();
 
         builder.Property(d => d.Status)

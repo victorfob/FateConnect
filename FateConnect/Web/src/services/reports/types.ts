@@ -29,7 +29,7 @@ export type Report = {
   status: ReportStatusEnum;
   /** Nulo quando a denúncia esconde de quem analisa o contato de quem a fez. */
   user: UserContact | null;
-  isAnonymous: boolean;
+  isConfidential: boolean;
   createdAt: string;
 };
 
@@ -49,6 +49,6 @@ export interface ReportFilter extends PageQuery {
 export type ReportInput = {
   category: ReportCategoryEnum;
   description: string;
-  isAnonymous: boolean;
+  isConfidential: boolean;
   image: File | null;
 };
