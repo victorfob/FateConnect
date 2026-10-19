@@ -58,7 +58,7 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         HttpResponseMessage response = await client.PostAsJsonAsync("/Rides", new
         {
             destination = "AB",
-            departureDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)).ToString("yyyy-MM-dd"),
+            departureDate = RideDates.Iso(RideDates.DepartureDayFrom(7)),
             departureTime = "08:30:00",
             rideType = "Solidarity",
             vehicleType = "Car",

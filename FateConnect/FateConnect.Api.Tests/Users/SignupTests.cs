@@ -236,6 +236,27 @@ public class SignupTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task Signup_OfTheSameLoginEmailAtTheSameTime_OpensOneAccountAndRejectsTheOthersNamingTheLoginEmail()
+    {
+        const int simultaneousSignups = 6;
+        string fatecEmail = NewFatecEmail();
+        object payload = SignupPayload(fatecEmail: fatecEmail);
+
+        (HttpStatusCode StatusCode, string? Field)[] answers = await Task.WhenAll(
+            Enumerable.Range(0, simultaneousSignups).Select(_ => SignupAnswerFor(payload)));
+
+        using IServiceScope scope = _factory.Services.CreateScope();
+        int accounts = scope.ServiceProvider.GetRequiredService<FateConnectDbContext>()
+            .Users.Count(user => user.FatecEmail == fatecEmail);
+
+        Assert.Equal(1, accounts);
+        Assert.Single(answers, answer => answer.StatusCode == HttpStatusCode.Created);
+        Assert.All(
+            answers.Where(answer => answer.StatusCode != HttpStatusCode.Created),
+            answer => Assert.Equal((HttpStatusCode.Conflict, "fatecEmail"), answer));
+    }
+
+    [Fact]
     public async Task Signup_ByWhoIsUnderage_IsRejected()
     {
         (HttpStatusCode statusCode, _) = await SignupAnswerFor(SignupPayload(BirthDateForAge(UnderageYears)));

@@ -12,7 +12,7 @@ const REPORT: Report = {
   thumbnailUrl: null,
   status: ReportStatusEnum.OPEN,
   user: null,
-  isAnonymous: true,
+  isConfidential: true,
   createdAt: '2026-09-30T14:20:00',
 };
 

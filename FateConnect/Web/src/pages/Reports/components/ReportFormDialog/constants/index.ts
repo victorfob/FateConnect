@@ -34,8 +34,7 @@ export const REPORT_FORM_LABELS = {
 /**
  * Sigilo não é anonimato: a identidade existe e o que a esconde é o controle de
  * acesso. O motivo do vínculo entra junto, porque limite sem porquê se lê como
- * arbitrário. ⛔ O campo do contrato continua `isAnonymous`, que é como a API o
- * nomeia.
+ * arbitrário.
  */
 export const CONFIDENTIAL_HINT =
   'A denúncia continua ligada à sua conta, o que permite apurar uso indevido do canal. Quem analisa não recebe os seus dados.';

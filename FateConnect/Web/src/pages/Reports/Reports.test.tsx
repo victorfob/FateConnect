@@ -47,7 +47,7 @@ const REPORT: Report = {
   thumbnailUrl: null,
   status: ReportStatusEnum.OPEN,
   user: null,
-  isAnonymous: false,
+  isConfidential: false,
   createdAt: '2026-09-10T13:00:00Z',
 };
 
@@ -126,7 +126,7 @@ describe('Reports', () => {
   });
 
   it('should mark the confidential one', async () => {
-    listing([reportWith({ isAnonymous: true })]);
+    listing([reportWith({ isConfidential: true })]);
     renderScreen();
 
     expect(await screen.findByText(REPORT_CARD_MARKERS.confidential)).toBeInTheDocument();
