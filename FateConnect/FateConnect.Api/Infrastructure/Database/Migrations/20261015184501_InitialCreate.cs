@@ -454,6 +454,12 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_FatecEmail",
+                table: "Users",
+                column: "FatecEmail",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Phone",
                 table: "Users",
                 column: "Phone",

@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
+    public const string FatecEmailIndex = "IX_Users_FatecEmail";
+
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(e => e.Id);
@@ -22,6 +24,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.FailedLoginAttempts).IsRequired();
         builder.Property(e => e.LockedUntil);
 
+        builder.HasIndex(e => e.FatecEmail).IsUnique().HasDatabaseName(FatecEmailIndex);
         builder.HasIndex(e => e.Phone).IsUnique();
         builder.HasIndex(e => e.ContactEmail).IsUnique();
 

@@ -440,6 +440,10 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     b.HasIndex("ContactEmail")
                         .IsUnique();
 
+                    b.HasIndex("FatecEmail")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Users_FatecEmail");
+
                     b.HasIndex("Phone")
                         .IsUnique();
 
