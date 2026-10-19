@@ -24,7 +24,7 @@ public class InAppNotificationRepository(FateConnectDbContext context) : IInAppN
             .Where(u => u.Status == EnumAccountStatus.Active);
 
         if (!ignoresPreference)
-            query = query.Where(u => u.Preferences.ReceiveNotifications);
+            query = query.Where(u => u.ReceiveNotifications);
 
         return await query.Select(u => u.Id).ToListAsync();
     }

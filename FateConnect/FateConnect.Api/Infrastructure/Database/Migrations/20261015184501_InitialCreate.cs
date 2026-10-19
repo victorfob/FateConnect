@@ -101,7 +101,8 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                     TokenVersion = table.Column<int>(type: "integer", nullable: false),
                     FailedLoginAttempts = table.Column<int>(type: "integer", nullable: false),
                     LockedUntil = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    IsEmailConfirmed = table.Column<bool>(type: "boolean", nullable: false)
+                    IsEmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    ReceiveNotifications = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -309,24 +310,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserPreferences",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    ReceiveNotifications = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserPreferences", x => x.UserId);
-                    table.ForeignKey(
-                        name: "FK_UserPreferences_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserTokens",
                 columns: table => new
                 {
@@ -514,9 +497,6 @@ namespace FateConnect.Api.Infrastructure.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "RideDepartures");
-
-            migrationBuilder.DropTable(
-                name: "UserPreferences");
 
             migrationBuilder.DropTable(
                 name: "UserTokens");

@@ -51,14 +51,10 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
 
     public async Task<User?> GetByIdAsync(
         int id,
-        bool includePreferences = false,
         bool asNoTracking = false,
         bool includeDocumentAcceptances = false)
     {
         IQueryable<User> query = context.Users.AsTrackingWhen(!asNoTracking);
-
-        if (includePreferences)
-            query = query.Include(u => u.Preferences);
 
         if (includeDocumentAcceptances)
             query = query.Include(u => u.DocumentAcceptances);
@@ -66,11 +62,11 @@ public class UserRepository(FateConnectDbContext context, TimeProvider clock) : 
         return await query.FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    public async Task<UserPreferences?> GetPreferencesByUserIdAsync(int userId)
+    public async Task<bool?> GetReceiveNotificationsAsync(int userId)
     {
         return await context.Users
             .Where(u => u.Id == userId)
-            .Select(u => u.Preferences)
+            .Select(u => (bool?)u.ReceiveNotifications)
             .FirstOrDefaultAsync();
     }
 

@@ -36,7 +36,7 @@ public class User
     private readonly List<UserToken> _tokens = [];
     public IReadOnlyCollection<UserToken> Tokens => _tokens.AsReadOnly();
 
-    public UserPreferences Preferences { get; private set; } = null!;
+    public bool ReceiveNotifications { get; private set; }
 
     public bool HasContact => Phone is not null && ContactEmail is not null;
 
@@ -177,11 +177,7 @@ public class User
         RegisterUpdate(now);
     }
 
-    public void SetPreferences(UserPreferences preferences)
-    {
-        ArgumentNullException.ThrowIfNull(preferences);
-        Preferences = preferences;
-    }
+    public void ChooseNotifications(bool receiveNotifications) => ReceiveNotifications = receiveNotifications;
 
     public void AddDocumentAcceptance(DocumentAcceptance acceptance, DateTime now)
     {
