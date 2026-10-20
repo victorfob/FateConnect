@@ -6,6 +6,13 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-10-19
+
+### Changed
+
+- Passa a citar nos termos de uso o canal de denúncias entre os fins da plataforma e a abrir com uma frase a lista de quem pode usar, em nova versão do documento, que pede novo aceite (#695) [Frontend]
+- Corrige a documentação do gate de cobertura da API, que cobra 90% no código novo como o do front, e do que a API envia ao Sentry, que inclui o e-mail de quem está logado (#695)
+
 ## [1.8.0] - 2026-10-19
 
 ### Changed
