@@ -42,7 +42,7 @@ Branch base é a **`develop`**, e o nome da branch sai da issue: `<tipo>/<númer
 
 Release sobe por `develop` → `release/x.y.z` → `main`, e a `main` volta para a `develop` sozinha depois do merge.
 
-Os hooks não vêm habilitados no clone, porque o repositório usa `core.hooksPath` em vez de instalar um gerenciador de hooks — o que reapontaria o caminho e desligaria os hooks do Git LFS:
+Os hooks não vêm habilitados no clone. Habilite uma vez:
 
 ```bash
 git config core.hooksPath .githooks
