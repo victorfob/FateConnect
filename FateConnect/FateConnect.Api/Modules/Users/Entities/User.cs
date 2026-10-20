@@ -16,7 +16,6 @@ public class User
     public string Password { get; private set; } = string.Empty;
     public string FullName { get; private set; } = string.Empty;
     public DateOnly BirthDate { get; private set; }
-    public EnumGender Gender { get; private set; }
 
     public string? Phone { get; private set; }
     public string? ContactEmail { get; private set; }
@@ -50,19 +49,16 @@ public class User
         string passwordHash,
         string fullName,
         DateOnly birthDate,
-        EnumGender gender,
         UserContact? contact,
         DateTime createdAt)
     {
         ValidateEmail(fatecEmail);
         ValidateFullName(fullName);
-        ValidateGender(gender);
 
         FatecEmail = fatecEmail.Trim().ToLowerInvariant();
         Password = passwordHash;
         FullName = fullName.Trim();
         BirthDate = birthDate;
-        Gender = gender;
 
         ReplaceContact(contact);
 
@@ -79,18 +75,15 @@ public class User
     public void UpdatePersonalData(
         string fullName,
         DateOnly birthDate,
-        EnumGender gender,
         UserContact? contact,
         string? neighborhood,
         DateTime now)
     {
         ValidateFullName(fullName);
-        ValidateGender(gender);
         ValidateNeighborhood(neighborhood);
 
         FullName = fullName.Trim();
         BirthDate = birthDate;
-        Gender = gender;
         ReplaceContact(contact);
         Neighborhood = neighborhood.NormalizeOptionalText();
 
@@ -231,12 +224,6 @@ public class User
 
         if (isInvalidLocalPart)
             throw new InvalidFatecEmailLocalPartException();
-    }
-
-    private static void ValidateGender(EnumGender gender)
-    {
-        if (!Enum.IsDefined(gender))
-            throw new InvalidGenderException();
     }
 
     private static void ValidateNeighborhood(string? neighborhood)

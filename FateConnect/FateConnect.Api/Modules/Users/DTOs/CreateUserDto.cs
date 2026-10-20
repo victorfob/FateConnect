@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.OpenApi;
 using FateConnect.Api.Infrastructure.Validation;
-using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Filters;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -35,12 +34,6 @@ public class CreateUserDto
     [SwaggerSchema("Birth date; the user must be at least 18.")]
     [SchemaExample("2000-01-01")]
     required public DateOnly BirthDate { get; set; }
-
-    [Required]
-    [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
-    [SwaggerSchema("Gender of the user.")]
-    [SchemaExample("Male")]
-    required public EnumGender Gender { get; set; }
 
     [Required(ErrorMessage = "The document acceptances are required.")]
     [MinLength(1, ErrorMessage = "Accept at least one document.")]

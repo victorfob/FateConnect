@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Modules.Auth.DTOs;
 using FateConnect.Api.Modules.Common.Constants;
 using FateConnect.Api.Modules.Users.DTOs;
-using FateConnect.Api.Modules.Users.Enums;
 
 namespace FateConnect.Api.Tests.Common;
 
@@ -17,22 +16,6 @@ public class ValidationMessagesTests
     }
 
     [Fact]
-    public void AnUndefinedGender_IsRejected()
-    {
-        List<ValidationResult> results = Validate(new CreateUserDto
-        {
-            FatecEmail = "mariana.rocha@aluno.cps.sp.gov.br",
-            Password = "SenhaForte123!",
-            FullName = "Mariana Alves Rocha",
-            BirthDate = new DateOnly(2000, 1, 1),
-            Gender = (EnumGender)99,
-            Acceptances = [],
-        });
-
-        Assert.Contains(results, result => result.ErrorMessage == "Invalid gender.");
-    }
-
-    [Fact]
     public void AnUnderageBirthDate_IsRejected()
     {
         List<ValidationResult> results = Validate(new CreateUserDto
@@ -41,7 +24,6 @@ public class ValidationMessagesTests
             Password = "SenhaForte123!",
             FullName = "Mariana Alves Rocha",
             BirthDate = DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-10),
-            Gender = EnumGender.Female,
             Acceptances = [],
         });
 
@@ -90,7 +72,6 @@ public class ValidationMessagesTests
             Password = "SenhaForte123!",
             FullName = "José Alves Rocha",
             BirthDate = new DateOnly(2000, 1, 1),
-            Gender = EnumGender.Male,
             Acceptances = [],
         });
 

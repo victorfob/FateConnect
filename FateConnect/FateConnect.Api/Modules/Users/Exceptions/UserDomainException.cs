@@ -19,9 +19,6 @@ public class InvalidFatecEmailLocalPartException()
 public class InvalidFatecEmailDomainException()
     : UserDomainException("The e-mail does not belong to a valid Fatec domain.");
 
-public class InvalidGenderException()
-    : UserDomainException("Invalid gender.");
-
 public class InvalidNeighborhoodException()
     : UserDomainException("The neighborhood and city must have at most 100 characters.");
 
