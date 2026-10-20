@@ -129,9 +129,10 @@ As portas da fila seguem a faixa da API: `RABBITMQ_PORT` e `RABBITMQ_UI_PORT` em
 
 **Erros da API no Sentry (opcional).** `SENTRY_DSN` recebe o DSN de um projeto
 da API no Sentry, separado do projeto do front. Vai só erro 500, com o método, a
-rota e o identificador da requisição; usuário, IP, corpo e query string ficam de
-fora. Quem foi afetado se acha no log da API pelo mesmo identificador, que sai em
-toda linha da requisição (`RequestId`):
+rota, o identificador da requisição e, se a pessoa estiver logada, o e-mail
+institucional dela; IP, cabeçalhos, corpo e o endereço com a query string ficam
+de fora. Sem login, quem foi afetado se acha no log da API pelo mesmo
+identificador, que sai em toda linha da requisição (`RequestId`):
 
 ```bash
 docker compose -p fateconnect-hml logs api | grep "<identificador>"
