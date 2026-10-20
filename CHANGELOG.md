@@ -6,6 +6,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.9.2] - 2026-10-20
+
+### Removed
+
+- Remove do repositório os documentos das disciplinas e o Git LFS: o clone deixa de baixar cerca de 100 MB e não pede mais o git-lfs (#700)
+
 ## [1.9.1] - 2026-10-20
 
 ### Fixed
