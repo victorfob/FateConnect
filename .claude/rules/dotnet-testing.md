@@ -1,5 +1,5 @@
 ---
-description: Teste na API .NET — os 90% de cobertura acima do portão e como medi-los, onde o teste mora, o par positivo, costura de relógio, a suíte contra PostgreSQL de verdade, mutação que prova o teste e fixture plausível
+description: Teste na API .NET — os 90% de cobertura que o portão cobra e como medi-los antes do push, onde o teste mora, o par positivo, costura de relógio, a suíte contra PostgreSQL de verdade, mutação que prova o teste e fixture plausível
 paths:
   - "FateConnect/FateConnect.Api.Tests/**"
 ---
@@ -8,7 +8,7 @@ paths:
 
 ## Cobertura de 90%
 
-- ⛔ **Código novo sai com ≥90%**, acima do portão do Sonar de propósito: portão verde não é entrega.
+- ⛔ **Código novo sai com ≥90%**, o mesmo número que o portão do Sonar cobra: meça antes do push, porque o portão só responde depois dele.
 - Medir é `./scripts/coverage-changed.sh` (base padrão `origin/develop`), **com o trabalho commitado**: ele cruza o relatório com o diff commitado. Se a contagem não bate com os arquivos que você mexeu, a medida está errada. Rode antes de dizer que acabou.
 - Linha que não dá para cobrir se marca com `[ExcludeFromCodeCoverage]`; não se baixa o alvo. Cobertura baixa costuma acusar teste que falta.
 - O atributo no método não alcança as lambdas dentro dele: os `ReceiveEndpoint` do `ConfigureRabbitMq` contam como descobertos, e o `Program.cs` fica abaixo de 90% sem faltar teste. Confira as linhas antes de escrever teste para elas.
