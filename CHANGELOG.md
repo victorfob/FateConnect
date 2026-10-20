@@ -6,6 +6,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.9.3] - 2026-10-20
+
+### Added
+
+- Adiciona o guia da API, com o que ela precisa para subir, onde ficam a referência das rotas e a verificação de saúde, como rodar os testes e onde mora cada coisa (#701)
+
 ## [1.9.2] - 2026-10-20
 
 ### Removed
