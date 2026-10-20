@@ -29,6 +29,24 @@ export function askForPushPermission(): Promise<NotificationPermission | null> {
   return Notification.requestPermission();
 }
 
+/**
+ * A permissão pode mudar sem o pedido devolver a resposta: o pedido discreto do
+ * Chrome no Android, liberado depois na barra, ou as configurações do site.
+ */
+export function watchPushPermission(
+  onChange: (permission: NotificationPermission | null) => void,
+  signal: AbortSignal,
+): void {
+  if (!isPushSupported() || !('permissions' in navigator)) return;
+
+  void navigator.permissions
+    .query({ name: 'notifications' })
+    .then((status) =>
+      status.addEventListener('change', () => onChange(pushPermission()), { signal }),
+    )
+    .catch(() => undefined);
+}
+
 async function deviceSubscription(registration: ServiceWorkerRegistration) {
   const existing = await registration.pushManager.getSubscription();
   if (existing) return existing;
