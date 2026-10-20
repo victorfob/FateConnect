@@ -6,6 +6,16 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.9.1] - 2026-10-20
+
+### Fixed
+
+- Corrige a saída da conta de quem tinha entrado de novo depois da tela de sessão expirada, sem recarregar a página: ela voltava a mostrar essa tela em vez de levar à página inicial (#698) [Frontend]
+- Corrige o aviso de ativar as notificações, que continuava na tela quando a permissão era dada fora do pedido, como no aviso discreto do navegador no celular; agora ele some e o aparelho passa a receber as notificações (#698) [Frontend]
+- Corrige o interruptor de Notificações em Preferências, que ficava ligado sem inscrever o aparelho quando a permissão era dada fora do pedido; agora a inscrição sai assim que a permissão chega (#698) [Frontend]
+
+## [1.9.0] - 2026-10-20
+
 ### Added
 
 - Adiciona ao cadastro a confirmação da senha, que precisa repetir a senha digitada para a conta ser criada (#697) [Frontend]
