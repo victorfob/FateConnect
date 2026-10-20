@@ -1,5 +1,4 @@
 using FateConnect.Api.Modules.Users.Entities;
-using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
 
 namespace FateConnect.Api.Tests.Users;
@@ -12,7 +11,6 @@ public class UserTests
             "HashFalso123",
             "Mariana Alves Rocha",
             new DateOnly(2000, 1, 1),
-            EnumGender.Female,
             new UserContact("11999999999", "mariana.contato@gmail.com"),
             DateTime.UtcNow);
 
@@ -46,7 +44,7 @@ public class UserTests
     {
         User user = NewUser("mariana.rocha@aluno.cps.sp.gov.br");
 
-        user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, user.Gender, contact: null, neighborhood: null, DateTime.UtcNow);
+        user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, contact: null, neighborhood: null, DateTime.UtcNow);
 
         Assert.Equal("11999999999", user.Phone);
         Assert.Equal("mariana.contato@gmail.com", user.ContactEmail);
@@ -59,7 +57,7 @@ public class UserTests
         User user = NewUser("mariana.rocha@aluno.cps.sp.gov.br");
 
         InvalidNeighborhoodException exception = Assert.Throws<InvalidNeighborhoodException>(() =>
-            user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, user.Gender, contact: null, neighborhood: new string('a', 101), DateTime.UtcNow));
+            user.UpdatePersonalData("Mariana Alves Rocha", user.BirthDate, contact: null, neighborhood: new string('a', 101), DateTime.UtcNow));
 
         Assert.Equal("The neighborhood and city must have at most 100 characters.", exception.Message);
     }

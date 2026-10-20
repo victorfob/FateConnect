@@ -32,7 +32,6 @@ public class SignupTests : IClassFixture<ApiFactory>
         password = "SenhaForte123!",
         fullName = "Mariana Alves Rocha",
         birthDate = birthDate ?? "2000-01-01",
-        gender = "Male",
         acceptances = new[]
         {
             new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse },
@@ -117,7 +116,6 @@ public class SignupTests : IClassFixture<ApiFactory>
             password = "SenhaForte123!",
             fullName = "Mariana Alves Rocha",
             birthDate = "2000-01-01",
-            gender = "Male",
             phone = ApiFactory.UniquePhone(),
             contactEmail = ApiFactory.UniqueContactEmail(),
             acceptances = new[] { new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse } },
@@ -172,7 +170,6 @@ public class SignupTests : IClassFixture<ApiFactory>
             fullName = "Mariana Alves Rocha",
             nickname = "Mari",
             birthDate = "2000-01-01",
-            gender = "Male",
             addresses = new[] { new { zipCode = "18040-430", street = "Rua Cesário Mota", streetNumber = "1", complement = "Casa", city = "Sorocaba", state = "SP" } },
             acceptances = new[]
             {
@@ -197,7 +194,6 @@ public class SignupTests : IClassFixture<ApiFactory>
             password = "SenhaForte123!",
             fullName = "Mariana Alves Rocha",
             birthDate = "2000-01-01",
-            gender = "Male",
             acceptances = new[]
             {
                 new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse },
@@ -225,7 +221,6 @@ public class SignupTests : IClassFixture<ApiFactory>
             password = "SenhaForte123!",
             fullName = "Mariana Alves Rocha",
             birthDate = "2000-01-01",
-            gender = "Male",
             acceptances = new[] { new { document = "TermsOfUse", version = CurrentLegalVersions.TermsOfUse } },
         };
 

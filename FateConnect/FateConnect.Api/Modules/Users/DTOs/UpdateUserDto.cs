@@ -4,7 +4,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using FateConnect.Api.Infrastructure.OpenApi;
 using FateConnect.Api.Infrastructure.Validation;
-using FateConnect.Api.Modules.Users.Enums;
 using Microsoft.AspNetCore.Http;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -19,11 +18,6 @@ public class UpdateUserDto
     [SwaggerSchema("Birth date; the user must be at least 18.")]
     [SchemaExample("1999-05-14")]
     public DateOnly? BirthDate { get; set; }
-
-    [EnumDataType(typeof(EnumGender), ErrorMessage = "Invalid gender.")]
-    [SwaggerSchema("Gender of the user.")]
-    [SchemaExample("Female")]
-    public EnumGender? Gender { get; set; }
 
     [MaxLength(11)]
     [SwaggerSchema("Contact phone with area code, digits only; saved together with the contact e-mail.")]
