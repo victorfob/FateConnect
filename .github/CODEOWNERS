@@ -1,15 +1,36 @@
+# Todo arquivo versionado casa com uma regra abaixo. Arquivo novo fora destas
+# pastas pede regra própria: não há regra geral.
+
+# Raiz do repositório
+
+/README.md @victorfob
+/CHANGELOG.md @victorfob
+/CONTRIBUTING.md @victorfob
+/CODE_OF_CONDUCT.md @victorfob
+/SECURITY.md @victorfob
+/LICENSE @victorfob
+/package.json @victorfob
+/.gitignore @victorfob
+/.gitattributes @victorfob
+
 # Configuração do agente de código
 
 .claude/ @victorfob
 
-# Integração contínua e configuração do repositório
+# Integração contínua, hooks e configuração do repositório
 
 .github/ @victorfob
+.githooks/ @victorfob
 scripts/ @victorfob
+.vscode/ @victorfob
 
 # Configuração de deploy
 
 deploy/ @victorfob
+
+# Documentos legais
+
+/FateConnect/legal/ @victorfob
 
 # Frontend
 
@@ -19,6 +40,9 @@ FateConnect/Web/ @victorfob
 
 FateConnect/FateConnect.Api/ @Lautones
 FateConnect/FateConnect.Api.Tests/ @Lautones
+/FateConnect/.editorconfig @Lautones
+/FateConnect/.dockerignore @Lautones
+/global.json @Lautones
 
 # Database
 
