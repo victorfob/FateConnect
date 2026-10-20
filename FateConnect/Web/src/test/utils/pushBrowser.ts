@@ -57,6 +57,13 @@ export function installPushBrowser({ permission, answer = permission }: PushBrow
     return Promise.resolve(answer);
   });
 
+  // O navegador avisa a página quando a permissão muda por fora do pedido.
+  const permissionStatus = new EventTarget();
+  const changePermission = (next: NotificationPermission) => {
+    current = next;
+    permissionStatus.dispatchEvent(new Event('change'));
+  };
+
   const fakeNotification = {
     get permission(): NotificationPermission {
       return current;
@@ -67,6 +74,10 @@ export function installPushBrowser({ permission, answer = permission }: PushBrow
   // O código só pergunta se o `PushManager` existe; quem inscreve é o `registration` acima.
   vi.stubGlobal('Notification', fakeNotification);
   vi.stubGlobal('PushManager', {});
+  Object.defineProperty(navigator, 'permissions', {
+    configurable: true,
+    value: { query: vi.fn().mockResolvedValue(permissionStatus) },
+  });
   Object.defineProperty(navigator, 'serviceWorker', {
     configurable: true,
     value: Object.assign(new EventTarget(), {
@@ -76,10 +87,16 @@ export function installPushBrowser({ permission, answer = permission }: PushBrow
     }),
   });
 
-  return { saved, requestPermission, subscribe: registration.pushManager.subscribe };
+  return {
+    saved,
+    requestPermission,
+    changePermission,
+    subscribe: registration.pushManager.subscribe,
+  };
 }
 
 export function removePushBrowser(): void {
   vi.unstubAllGlobals();
   Reflect.deleteProperty(navigator, 'serviceWorker');
+  Reflect.deleteProperty(navigator, 'permissions');
 }

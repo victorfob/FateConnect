@@ -1,9 +1,11 @@
+import { act } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { http, HttpResponse } from 'msw';
 
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { routeConfig } from '@app/routes/routeConfig';
+import { logout } from '@app/services/auth/authService';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
 import { render, screen, userEvent, waitFor } from '@app/test/testing-library';
 import { tokenWithName } from '@app/test/token';
@@ -13,7 +15,9 @@ import { SESSION_EXPIRED_TITLE } from '../SessionExpiredScreen/constants';
 const SESSION_URL = 'https://api.fateconnect.test/auth/session';
 const RIDES_URL = 'https://api.fateconnect.test/rides';
 const LOGIN_URL = 'https://api.fateconnect.test/auth/login';
+const LOGOUT_URL = 'https://api.fateconnect.test/auth/logout';
 const UNAUTHORIZED = 401;
+const NO_CONTENT = 204;
 
 function renderAt(path: string) {
   const router = createMemoryRouter(routeConfig, { initialEntries: [path] });
@@ -38,6 +42,25 @@ describe('AppRoute', () => {
     renderAt(RoutePathEnum.MENU);
 
     expect(await screen.findByRole('heading', { name: SESSION_EXPIRED_TITLE })).toBeInTheDocument();
+  });
+
+  it('should send whoever signs out to the landing page after signing in again past a refused session', async () => {
+    tokenStorage.save(tokenWithName('Maria da Silva'));
+    server.use(
+      http.get(SESSION_URL, () => new HttpResponse(null, { status: UNAUTHORIZED })),
+      http.post(LOGOUT_URL, () => new HttpResponse(null, { status: NO_CONTENT })),
+    );
+    const router = renderAt(RoutePathEnum.MENU);
+    await screen.findByRole('heading', { name: SESSION_EXPIRED_TITLE });
+
+    await act(async () => {
+      tokenStorage.save(tokenWithName('Maria da Silva'));
+      await router.navigate(RoutePathEnum.MENU);
+    });
+    act(() => logout());
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(RoutePathEnum.LANDING));
+    expect(screen.queryByRole('heading', { name: SESSION_EXPIRED_TITLE })).not.toBeInTheDocument();
   });
 
   it('should warn when the session expires while the screen is open', async () => {

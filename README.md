@@ -12,6 +12,7 @@ FateConnect/
   legal/                  termos de uso e política de privacidade, e a versão que o front e a API leem
 .claude/                  contexto que um agente de código carrega ao trabalhar aqui
 .github/workflows/        validação de PR e criação da tag de release
+.github/FUNDING.yml       link de apoio ao projeto (Buy Me a Coffee), no botão Sponsor do repositório
 .githooks/                hooks locais de lint, build e teste
 deploy/                   publicação em homologação e produção → deploy/README.md
 scripts/                  scripts de manutenção do repositório
