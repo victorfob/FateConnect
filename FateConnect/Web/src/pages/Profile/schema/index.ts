@@ -34,7 +34,7 @@ function checkPasswordChange(
 
 /** Os campos que o cadastro também pede seguem as mesmas regras dele. */
 export const profileSchema = signupSchema
-  .pick({ fullName: true, birthDate: true, gender: true })
+  .pick({ fullName: true, birthDate: true })
   .extend(contactFieldsSchema.shape)
   .extend({
     neighborhood: z

@@ -6,6 +6,15 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Adiciona ao cadastro a confirmação da senha, que precisa repetir a senha digitada para a conta ser criada (#697) [Frontend]
+
+### Removed
+
+- Remove o gênero da conta: o campo sai do contrato e do banco, e a requisição que ainda o mande é aceita com o valor descartado. A coluna é apagada, então o gênero já informado se perde (#697) [Backend]
+- Remove o gênero do cadastro e do Meu perfil; a política de privacidade deixa de citá-lo, e ela e os termos de uso passam a ter o título só com a inicial maiúscula, em nova versão dos dois documentos (#697) [Frontend]
+
 ## [1.8.1] - 2026-10-19
 
 ### Changed

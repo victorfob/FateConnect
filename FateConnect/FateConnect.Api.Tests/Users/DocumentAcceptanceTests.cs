@@ -39,7 +39,6 @@ public sealed class DocumentAcceptanceTests : IClassFixture<ApiFactory>
         ["password"] = "SenhaForte123!",
         ["fullName"] = "Mariana Alves Rocha",
         ["birthDate"] = "2000-01-01",
-        ["gender"] = "Female",
         ["phone"] = ApiFactory.UniquePhone(),
         ["contactEmail"] = ApiFactory.UniqueContactEmail(),
         ["acceptances"] = BothAcceptances(),

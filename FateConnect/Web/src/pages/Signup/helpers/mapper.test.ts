@@ -1,7 +1,6 @@
 import { PRIVACY_VERSION, TERMS_VERSION } from '@app/constants/legalDocuments';
 import { DocumentTypeEnum } from '@app/services/signup/types';
 
-import { GenderValueEnum } from '../@types';
 import { SIGNUP_DEFAULT_VALUES, type SignupFormValues } from '../schema';
 import { toSignupRequest } from './mapper';
 
@@ -10,8 +9,8 @@ const FILLED: SignupFormValues = {
   fullName: 'Maria Silva',
   fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
   password: 'segredo123',
+  passwordConfirmation: 'segredo123',
   birthDate: '22/05/1999',
-  gender: GenderValueEnum.FEMALE,
   acceptTerms: true,
 };
 
@@ -22,7 +21,6 @@ describe('toSignupRequest', () => {
     expect(request.fullName).toBe('Maria Silva');
     expect(request.fatecEmail).toBe('maria.silva@aluno.cps.sp.gov.br');
     expect(request.birthDate).toBe('1999-05-22');
-    expect(request.gender).toBe(GenderValueEnum.FEMALE);
   });
 
   it('should send no contact, which is left for the profile', () => {
@@ -71,7 +69,6 @@ describe('toSignupRequest', () => {
       fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
       password: 'segredo123',
       birthDate: '1999-05-22',
-      gender: GenderValueEnum.FEMALE,
       acceptances: [
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },
         { document: DocumentTypeEnum.PRIVACY_POLICY, version: PRIVACY_VERSION },

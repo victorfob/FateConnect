@@ -45,7 +45,6 @@ public partial class UserService(
             hashedPassword,
             dto.FullName,
             dto.BirthDate,
-            dto.Gender,
             contact: null,
             now
         );
@@ -132,7 +131,6 @@ public partial class UserService(
         user.UpdatePersonalData(
             dto.FullName ?? user.FullName,
             dto.BirthDate ?? user.BirthDate,
-            dto.Gender ?? user.Gender,
             newContact,
             dto.Neighborhood ?? user.Neighborhood,
             timeProvider.GetUtcNow().UtcDateTime
@@ -431,7 +429,6 @@ public partial class UserService(
             FatecEmail: record.FatecEmail,
             FullName: record.FullName,
             BirthDate: record.BirthDate,
-            Gender: record.Gender,
             Phone: record.Phone,
             ContactEmail: record.ContactEmail,
             Neighborhood: record.Neighborhood,

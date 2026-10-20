@@ -32,10 +32,17 @@ export const SIGNUP_MESSAGES = {
   birthDateRequired: 'Informe a data de nascimento',
   birthDateInvalid: 'Data inválida',
   birthDateUnderage: 'É necessário ter pelo menos 18 anos',
-  genderRequired: 'Selecione o gênero',
   passwordRequired: 'Informe a senha',
   passwordTooShort: 'Mínimo de 8 caracteres',
+  passwordConfirmationRequired: 'Confirme a senha',
+  passwordConfirmationMismatch: 'As senhas não são iguais',
   termsRequired: 'É necessário aceitar os termos de uso e política de privacidade para continuar.',
+};
+
+/** Confirmação diferente da senha marca o campo da confirmação, aqui e na nova senha. */
+export const PASSWORD_CONFIRMATION_MISMATCH = {
+  message: SIGNUP_MESSAGES.passwordConfirmationMismatch,
+  path: ['passwordConfirmation'],
 };
 
 /** Data real e não anterior ao piso do seletor. */
@@ -71,23 +78,31 @@ export const signupSchema = z.object({
     .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.birthDateRequired)
     .refine(isRealBirthDate, SIGNUP_MESSAGES.birthDateInvalid)
     .refine(isOldEnough, SIGNUP_MESSAGES.birthDateUnderage),
-  gender: z.string().min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.genderRequired),
   password: z
     .string()
     .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.passwordRequired)
     .min(MIN_PASSWORD_LENGTH, SIGNUP_MESSAGES.passwordTooShort),
+  passwordConfirmation: z
+    .string()
+    .min(REQUIRED_MIN_LENGTH, SIGNUP_MESSAGES.passwordConfirmationRequired),
   acceptTerms: z.boolean().refine((accepted) => accepted, SIGNUP_MESSAGES.termsRequired),
   acceptNotifications: z.boolean(),
 });
 
-export type SignupFormValues = z.infer<typeof signupSchema>;
+/** As outras telas reaproveitam campos do `signupSchema`, e o `.pick` recusa objeto com refinamento. */
+export const signupFormSchema = signupSchema.refine(
+  ({ password, passwordConfirmation }) => password === passwordConfirmation,
+  PASSWORD_CONFIRMATION_MISMATCH,
+);
+
+export type SignupFormValues = z.infer<typeof signupFormSchema>;
 
 export const SIGNUP_DEFAULT_VALUES: SignupFormValues = {
   fullName: '',
   fatecEmail: '',
   birthDate: '',
-  gender: '',
   password: '',
+  passwordConfirmation: '',
   acceptTerms: false,
   acceptNotifications: false,
 };

@@ -12,7 +12,6 @@ export type User = {
   fatecEmail: string;
   fullName: string;
   birthDate: string;
-  gender: string;
   phone: string | null;
   contactEmail: string | null;
   neighborhood: string | null;
