@@ -7,7 +7,6 @@ import {
   type ProfileFormInput,
   type ProfileFormValues,
 } from '@app/pages/Profile/schema';
-import { GENDER_SELECT_OPTIONS } from '@app/pages/Signup/components/AccountSection/constants';
 import { BirthDateField } from '@app/pages/Signup/components/BirthDateField';
 import { FIELD_LABELS } from '@app/pages/Signup/constants';
 import { MAX_LENGTH } from '@app/pages/Signup/schema';
@@ -25,32 +24,19 @@ export function PersonalDataFields({ fatecEmail }: PersonalDataFieldsProps) {
 
   return (
     <FormGrid>
-      <Input
-        {...register('fullName')}
-        label={FIELD_LABELS.fullName}
-        required
-        fullWidth
-        autoComplete="name"
-        maxLength={MAX_LENGTH.fullName}
-        error={errors.fullName?.message}
-      />
+      <FormGrid.Wide>
+        <Input
+          {...register('fullName')}
+          label={FIELD_LABELS.fullName}
+          required
+          fullWidth
+          autoComplete="name"
+          maxLength={MAX_LENGTH.fullName}
+          error={errors.fullName?.message}
+        />
+      </FormGrid.Wide>
 
       <BirthDateField />
-
-      <Controller
-        name="gender"
-        control={control}
-        render={({ field }) => (
-          <Input.Select
-            {...field}
-            label={FIELD_LABELS.gender}
-            options={GENDER_SELECT_OPTIONS}
-            autoComplete="sex"
-            required
-            error={errors.gender?.message}
-          />
-        )}
-      />
 
       <Controller
         name="neighborhood"

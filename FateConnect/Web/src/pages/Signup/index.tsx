@@ -16,7 +16,7 @@ import { CheckEmailMessage } from './components/CheckEmailMessage';
 import { ConsentSection } from './components/ConsentSection';
 import { conflictFieldOf } from './helpers/conflictField';
 import { toSignupRequest } from './helpers/mapper';
-import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from './schema';
+import { SIGNUP_DEFAULT_VALUES, signupFormSchema, type SignupFormValues } from './schema';
 import * as C from './constants';
 import * as S from './styles';
 
@@ -44,7 +44,7 @@ export function Signup() {
   });
 
   const form = useForm<SignupFormValues>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(signupFormSchema),
     defaultValues: SIGNUP_DEFAULT_VALUES,
     disabled: isPending,
   });

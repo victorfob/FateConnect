@@ -4,9 +4,8 @@ import {
 } from '@app/constants/fatecEmail';
 import { toApiDate, toDisplayDate } from '@app/utils/apiDate';
 
-import { GenderValueEnum } from '../@types';
 import { latestBirthDate } from '../helpers/birthDate';
-import { SIGNUP_DEFAULT_VALUES, signupSchema, type SignupFormValues } from '.';
+import { SIGNUP_DEFAULT_VALUES, SIGNUP_MESSAGES, signupFormSchema, type SignupFormValues } from '.';
 
 const ONE_DAY_MS = 86_400_000;
 const ONE_CHARACTER = 1;
@@ -23,13 +22,13 @@ const VALID: SignupFormValues = {
   fullName: 'Maria Silva',
   fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
   birthDate: '22/05/1999',
-  gender: GenderValueEnum.FEMALE,
   password: 'segredo123',
+  passwordConfirmation: 'segredo123',
   acceptTerms: true,
 };
 
 function parse(overrides: Partial<SignupFormValues> = {}) {
-  return signupSchema.safeParse({ ...VALID, ...overrides });
+  return signupFormSchema.safeParse({ ...VALID, ...overrides });
 }
 
 function firstIssuePath(result: ReturnType<typeof parse>) {
@@ -59,13 +58,21 @@ describe('signupSchema', () => {
     ['fullName', { fullName: '' }],
     ['fatecEmail', { fatecEmail: '' }],
     ['birthDate', { birthDate: '' }],
-    ['gender', { gender: '' }],
-    ['password', { password: '' }],
+    ['password', { password: '', passwordConfirmation: '' }],
+    ['passwordConfirmation', { passwordConfirmation: '' }],
   ])('should require %s', (field, overrides) => {
     const result = parse(overrides);
 
     expect(result.success).toBe(false);
     expect(firstIssuePath(result)).toEqual([field]);
+  });
+
+  it('should reject a confirmation that differs from the password, on the confirmation', () => {
+    const result = parse({ passwordConfirmation: 'segredo124' });
+
+    expect(result.success).toBe(false);
+    expect(firstIssuePath(result)).toEqual(['passwordConfirmation']);
+    expect(result.error?.issues[0]?.message).toBe(SIGNUP_MESSAGES.passwordConfirmationMismatch);
   });
 
   it('should accept an institutional email with the characters the api allows', () => {
@@ -96,8 +103,10 @@ describe('signupSchema', () => {
   });
 
   it('should reject a password below eight characters', () => {
-    expect(parse({ password: '1234567' }).success).toBe(false);
-    expect(parse({ password: '12345678' }).success).toBe(true);
+    const withPassword = (password: string) => parse({ password, passwordConfirmation: password });
+
+    expect(withPassword('1234567').success).toBe(false);
+    expect(withPassword('12345678').success).toBe(true);
   });
 
   it('should reject a date that does not exist in the calendar', () => {

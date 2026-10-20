@@ -12,7 +12,6 @@ import {
   TERMS_URL,
   TERMS_VERSION,
 } from '@app/constants/legalDocuments';
-import { SELECT_PLACEHOLDER } from '@app/constants/selectPlaceholder';
 import { server } from '@app/mocks/server';
 import { RoutePathEnum } from '@app/routes/paths';
 import { tokenStorage } from '@app/services/auth/tokenStorage';
@@ -55,16 +54,13 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText(/E-mail Fatec/), VALID_SIGNUP.fatecEmail);
   await userEvent.type(screen.getByLabelText(/Data de nascimento/), VALID_SIGNUP.birthDate);
   await userEvent.type(screen.getByLabelText(/^Senha/), VALID_SIGNUP.password);
-  await selectOption(C.FIELD_LABELS.gender, 'Feminino');
+  await userEvent.type(confirmationField(), VALID_SIGNUP.password);
 
   await userEvent.click(screen.getByRole('checkbox', { name: /Termos de uso/ }));
 }
 
-async function selectOption(fieldLabel: string, optionLabel: string) {
-  await userEvent.click(screen.getByRole('combobox', { name: new RegExp(fieldLabel) }));
-  await userEvent.click(
-    within(screen.getByRole('listbox')).getByRole('option', { name: optionLabel }),
-  );
+function confirmationField() {
+  return screen.getByLabelText(new RegExp(C.FIELD_LABELS.passwordConfirmation));
 }
 
 /** O rótulo do campo, para conferir se ele subiu ao receber valor de fora. */
@@ -85,8 +81,11 @@ describe('Signup', () => {
     expect(await screen.findByText(SIGNUP_MESSAGES.fullNameRequired)).toBeInTheDocument();
     expect(screen.getByText(SIGNUP_MESSAGES.fatecEmailRequired)).toBeInTheDocument();
     expect(screen.getByText(SIGNUP_MESSAGES.birthDateRequired)).toBeInTheDocument();
-    expect(screen.getByText(SIGNUP_MESSAGES.genderRequired)).toBeInTheDocument();
     expect(screen.getByText(SIGNUP_MESSAGES.passwordRequired)).toBeInTheDocument();
+    // A mensagem repete o rótulo do campo: a busca é pela descrição dele.
+    expect(confirmationField()).toHaveAccessibleDescription(
+      SIGNUP_MESSAGES.passwordConfirmationRequired,
+    );
     expect(screen.getByText(SIGNUP_MESSAGES.termsRequired)).toBeInTheDocument();
   });
 
@@ -99,6 +98,29 @@ describe('Signup', () => {
 
     expect(await screen.findByText(FATEC_EMAIL_DOMAIN_MESSAGE)).toBeInTheDocument();
     expect(screen.getByText(SIGNUP_MESSAGES.passwordTooShort)).toBeInTheDocument();
+  });
+
+  it('should reject a confirmation that differs from the password, without sending', async () => {
+    let sent = false;
+    server.use(
+      http.post(SIGNUP_URL, () => {
+        sent = true;
+        return new HttpResponse(null, { status: CREATED });
+      }),
+    );
+    renderSignup();
+    await fillRequiredFields();
+    await userEvent.type(confirmationField(), '4');
+
+    await submit();
+
+    expect(
+      await screen.findByText(SIGNUP_MESSAGES.passwordConfirmationMismatch),
+    ).toBeInTheDocument();
+    expect(confirmationField()).toHaveAccessibleDescription(
+      SIGNUP_MESSAGES.passwordConfirmationMismatch,
+    );
+    expect(sent).toBe(false);
   });
 
   // A API só aceita o domínio institucional; recusar aqui poupa uma requisição
@@ -174,7 +196,9 @@ describe('Signup', () => {
   it('should toggle the password visibility and show the current state in the icon', async () => {
     renderSignup();
     const password = screen.getByLabelText(/^Senha/);
-    const toggle = screen.getByRole('button', { name: PASSWORD_TOGGLE_LABEL });
+    const passwordControl = password.closest<HTMLElement>('.MuiFormControl-root');
+    if (!passwordControl) throw new Error('A senha renderizou fora de um campo do MUI.');
+    const toggle = within(passwordControl).getByRole('button', { name: PASSWORD_TOGGLE_LABEL });
 
     expect(password).toHaveAttribute('type', 'password');
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
@@ -215,15 +239,6 @@ describe('Signup', () => {
     expect(consent).not.toBeChecked();
   });
 
-  it('should offer the placeholder as the first option of a select', async () => {
-    renderSignup();
-
-    await userEvent.click(screen.getByRole('combobox', { name: /Gênero/ }));
-
-    const options = within(screen.getByRole('listbox')).getAllByRole('option');
-    expect(options[0]).toHaveTextContent(SELECT_PLACEHOLDER);
-  });
-
   it('should create the account and ask for the email confirmation, without a session', async () => {
     server.use(http.post(SIGNUP_URL, () => new HttpResponse(null, { status: CREATED })));
     const router = renderSignup();
@@ -256,7 +271,6 @@ describe('Signup', () => {
       fullName: VALID_SIGNUP.fullName,
       fatecEmail: VALID_SIGNUP.fatecEmail,
       password: VALID_SIGNUP.password,
-      gender: 'Female',
       birthDate: '1999-05-22',
       acceptances: [
         { document: DocumentTypeEnum.TERMS_OF_USE, version: TERMS_VERSION },

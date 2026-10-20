@@ -12,7 +12,6 @@ export function toProfileFormValues(profile: User): ProfileFormInput {
   return {
     fullName: profile.fullName,
     birthDate: toDisplayDate(profile.birthDate),
-    gender: profile.gender,
     phone: maskPhone(profile.phone ?? ''),
     contactEmail: profile.contactEmail ?? '',
     contactIsRequired: hasContact(profile),
@@ -28,7 +27,6 @@ export function toProfileInput(values: ProfileFormValues): ProfileInput {
   return {
     fullName: values.fullName,
     birthDate: toApiDateText(values.birthDate),
-    gender: values.gender,
     phone: onlyDigits(values.phone),
     contactEmail: values.contactEmail,
     neighborhood: values.neighborhood,
