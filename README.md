@@ -1,6 +1,6 @@
 # FateConnect
 
-Plataforma de caronas. Este repositório reúne o produto — front-end e API — e os documentos das disciplinas mantidos junto dele.
+Plataforma de caronas. Este repositório reúne o produto: front-end e API.
 
 ## Estrutura
 
@@ -16,7 +16,7 @@ FateConnect/
 .githooks/                hooks locais de lint, build e teste
 deploy/                   publicação em homologação e produção → deploy/README.md
 scripts/                  scripts de manutenção do repositório
-ESII/  ESIII/  LBD/       documentos das disciplinas, versionados por entrega
+docs/academico.md         links dos documentos do TG
 CHANGELOG.md              histórico de mudanças no formato Keep a Changelog
 CONTRIBUTING.md           como propor uma mudança
 CODE_OF_CONDUCT.md        o que se espera de quem participa
@@ -42,7 +42,7 @@ Branch base é a **`develop`**, e o nome da branch sai da issue: `<tipo>/<númer
 
 Release sobe por `develop` → `release/x.y.z` → `main`, e a `main` volta para a `develop` sozinha depois do merge.
 
-Os hooks não vêm habilitados no clone, porque o repositório usa `core.hooksPath` em vez de instalar um gerenciador de hooks — o que reapontaria o caminho e desligaria os hooks do Git LFS:
+Os hooks não vêm habilitados no clone. Habilite uma vez:
 
 ```bash
 git config core.hooksPath .githooks

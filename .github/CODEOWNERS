@@ -11,7 +11,6 @@
 /LICENSE @victorfob
 /package.json @victorfob
 /.gitignore @victorfob
-/.gitattributes @victorfob
 
 # Configuração do agente de código
 
@@ -28,9 +27,10 @@ scripts/ @victorfob
 
 deploy/ @victorfob
 
-# Documentos legais
+# Documentos legais e acadêmicos
 
 /FateConnect/legal/ @victorfob
+/docs/ @victorfob
 
 # Frontend
 
@@ -43,9 +43,3 @@ FateConnect/FateConnect.Api.Tests/ @Lautones
 /FateConnect/.editorconfig @Lautones
 /FateConnect/.dockerignore @Lautones
 /global.json @Lautones
-
-# Database
-
-LBD/ @pdorth
-ESII/ @pdorth
-ESIII/ @pdorth
