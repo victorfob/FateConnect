@@ -6,8 +6,8 @@ export const FIELD_LABELS = {
   fullName: 'Nome completo',
   fatecEmail: 'E-mail Fatec',
   birthDate: 'Data de nascimento',
-  gender: 'Gênero',
   password: 'Senha',
+  passwordConfirmation: 'Confirme a senha',
 };
 
 export const FIELD_PLACEHOLDERS = {

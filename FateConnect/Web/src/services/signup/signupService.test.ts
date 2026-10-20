@@ -14,7 +14,6 @@ const PAYLOAD: SignupRequest = {
   password: 'segredo123',
   fullName: 'Fulano de Tal',
   birthDate: '2000-01-01',
-  gender: 'Female',
   acceptances: [{ document: DocumentTypeEnum.TERMS_OF_USE, version: '2026-01-15' }],
   receiveNotifications: false,
 };

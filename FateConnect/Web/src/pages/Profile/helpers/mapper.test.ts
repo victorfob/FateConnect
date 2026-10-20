@@ -25,7 +25,6 @@ describe('toProfileInput', () => {
     expect(input).toEqual({
       fullName: PROFILE.fullName,
       birthDate: '2001-04-18',
-      gender: PROFILE.gender,
       phone: PROFILE.phone,
       contactEmail: PROFILE.contactEmail,
       neighborhood: PROFILE.neighborhood,

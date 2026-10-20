@@ -6,7 +6,6 @@ import { PASSWORD_MESSAGES, profileSchema, type ProfileFormInput } from '.';
 const VALID: ProfileFormInput = {
   fullName: 'Maria da Silva',
   birthDate: '18/04/2001',
-  gender: 'Female',
   phone: '(15) 99123-4567',
   contactEmail: 'maria.silva@gmail.com',
   contactIsRequired: true,

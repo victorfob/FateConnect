@@ -106,7 +106,6 @@ function fullUser(summary: UserSummary, profileType = ProfileTypeEnum.OPERATOR):
     fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
     fullName: summary.fullName,
     birthDate: '2000-01-01',
-    gender: 'Female',
     phone: summary.phone ?? '',
     contactEmail: summary.contactEmail,
     neighborhood: null,
