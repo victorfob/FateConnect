@@ -1,8 +1,0 @@
-Plugins do VS
-* Angular Language Service
-* C# Dev Kit
-* C#
-* ESLint
-* Prettier - Code formatter
-* vscode-icons
-* GitLens — Git supercharged
