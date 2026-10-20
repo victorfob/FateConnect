@@ -6,7 +6,6 @@ export const PROFILE: User = {
   fatecEmail: 'maria.silva@aluno.cps.sp.gov.br',
   fullName: 'Maria da Silva',
   birthDate: '2001-04-18',
-  gender: 'Female',
   phone: '15991234567',
   contactEmail: 'maria.silva@gmail.com',
   neighborhood: 'Jardim Vergueiro',

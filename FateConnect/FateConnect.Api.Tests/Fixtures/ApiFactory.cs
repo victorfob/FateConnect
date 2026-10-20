@@ -163,7 +163,6 @@ public class ApiFactory : WebApplicationFactory<Program>
             passwordHash: "hash-sem-valor",
             fullName: "Mariana Rocha",
             birthDate: new DateOnly(2000, 1, 1),
-            gender: EnumGender.Female,
             contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
             createdAt: DateTime.UtcNow
         )
@@ -227,7 +226,6 @@ public class ApiFactory : WebApplicationFactory<Program>
             passwordHash: "hash-sem-valor-fora-desta-suite",
             fullName: fullName,
             birthDate: new DateOnly(2000, 1, 1),
-            gender: EnumGender.Other,
             contact: new UserContact(phone, contactEmail),
             createdAt: DateTime.UtcNow
         );
@@ -258,7 +256,6 @@ public class ApiFactory : WebApplicationFactory<Program>
             passwordHash: "hash-sem-valor-fora-desta-suite",
             fullName: fullName,
             birthDate: new DateOnly(2000, 1, 1),
-            gender: EnumGender.Other,
             contact: null,
             createdAt: DateTime.UtcNow
         );
@@ -285,7 +282,6 @@ public class ApiFactory : WebApplicationFactory<Program>
             passwordHash: HashPassword(password),
             fullName: fullName,
             birthDate: new DateOnly(2000, 1, 1),
-            gender: EnumGender.Other,
             contact: new UserContact(UniquePhone(), UniqueContactEmail()),
             createdAt: DateTime.UtcNow
         );

@@ -19,7 +19,6 @@ public class UnderPostingTests : IClassFixture<ApiFactory>
         ["fatecEmail"] = $"sonda{Guid.NewGuid():N}@aluno.cps.sp.gov.br",
         ["password"] = "SenhaForte123!",
         ["fullName"] = "Mariana Alves Rocha",
-        ["gender"] = "Male",
         ["phone"] = ApiFactory.UniquePhone(),
         ["contactEmail"] = ApiFactory.UniqueContactEmail(),
         ["acceptances"] = new[]

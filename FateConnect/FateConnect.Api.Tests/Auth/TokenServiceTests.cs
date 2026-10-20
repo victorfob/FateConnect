@@ -32,7 +32,6 @@ public class TokenServiceTests
             passwordHash: "HashFalso123",
             fullName: "Mariana Alves Rocha",
             birthDate: new DateOnly(2000, 1, 1),
-            gender: EnumGender.Female,
             contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
             createdAt: DateTime.UtcNow
         )
@@ -76,7 +75,6 @@ public class TokenServiceTests
             passwordHash: "HashFalso123",
             fullName: "Mariana Alves Rocha",
             birthDate: new DateOnly(2000, 1, 1),
-            gender: EnumGender.Female,
             contact: new UserContact("11999999999", "mariana.contato@gmail.com"),
             createdAt: DateTime.UtcNow
         )

@@ -25,7 +25,6 @@ export function toSignupRequest(values: SignupFormValues): SignupRequest {
     fatecEmail: values.fatecEmail,
     password: values.password,
     birthDate: toApiDateText(values.birthDate),
-    gender: values.gender,
     acceptances: acceptedDocuments(),
     receiveNotifications: values.acceptNotifications,
   };

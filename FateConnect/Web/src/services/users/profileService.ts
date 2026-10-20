@@ -12,7 +12,6 @@ function toFormData(input: ProfileInput): FormData {
 
   body.append('FullName', input.fullName);
   body.append('BirthDate', input.birthDate);
-  body.append('Gender', input.gender);
   body.append('Phone', input.phone);
   body.append('ContactEmail', input.contactEmail);
   // Vazio apaga o bairro: a API distingue o vazio da ausência do campo.

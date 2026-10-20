@@ -1,6 +1,5 @@
 using FateConnect.Api.Infrastructure.Database;
 using FateConnect.Api.Modules.Users.Entities;
-using FateConnect.Api.Modules.Users.Enums;
 using FateConnect.Api.Modules.Users.Exceptions;
 using FateConnect.Api.Modules.Users.Repositories;
 using FateConnect.Api.Tests.Fixtures;
@@ -20,7 +19,6 @@ public class FatecEmailUniquenessTests : IClassFixture<ApiFactory>
         passwordHash: "hash-sem-valor-fora-desta-suite",
         fullName: "Mariana Alves Rocha",
         birthDate: new DateOnly(2000, 1, 1),
-        gender: EnumGender.Female,
         contact: null,
         createdAt: DateTime.UtcNow);
 
