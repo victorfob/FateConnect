@@ -20,6 +20,15 @@ export function SessionProvider({ children }: SessionProviderProps) {
     });
   }, [checked]);
 
+  // A recusa é do token do carregamento: sem esquecê-la, o Sair depois de entrar de novo abriria a tela de expirada.
+  useEffect(
+    () =>
+      tokenStorage.subscribe(() => {
+        if (tokenStorage.getToken()) setRefused(false);
+      }),
+    [],
+  );
+
   if (!checked) return null;
 
   return <SessionRefusedContext value={refused}>{children}</SessionRefusedContext>;
