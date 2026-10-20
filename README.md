@@ -1,6 +1,6 @@
 # FateConnect
 
-Plataforma de caronas. Este repositório reúne o produto — front-end e API — e os documentos das disciplinas mantidos junto dele.
+Plataforma de caronas. Este repositório reúne o produto: front-end e API.
 
 ## Estrutura
 
@@ -16,7 +16,7 @@ FateConnect/
 .githooks/                hooks locais de lint, build e teste
 deploy/                   publicação em homologação e produção → deploy/README.md
 scripts/                  scripts de manutenção do repositório
-ESII/  ESIII/  LBD/       documentos das disciplinas, versionados por entrega
+docs/academico.md         links dos documentos do TG
 CHANGELOG.md              histórico de mudanças no formato Keep a Changelog
 CONTRIBUTING.md           como propor uma mudança
 CODE_OF_CONDUCT.md        o que se espera de quem participa
