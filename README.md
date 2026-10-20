@@ -78,7 +78,7 @@ Os três jobs da release moram no mesmo workflow porque acontecem no mesmo event
 
 O job de back-merge do `release.yml` empurra **direto na `develop`**, sem PR: a ruleset da `develop` concede bypass a uma **deploy key** de escrita, que o workflow usa no checkout, e a da `main` não concede a ninguém — a release continua exigindo PR e review. Bypass para o app GitHub Actions resolveria sem chave nenhuma, mas ele exige repositório de organização: em conta pessoal a API recusa o ator. O caminho comum é fast-forward, porque a `develop` normalmente não andou desde o corte da release. Quando andou, o job faz o merge de verdade; se conflitar, ele para e reporta, porque escolher qual lado vale é decisão humana.
 
-São **dois projetos no Sonar**, um por lado: um `projectKey` não se divide entre dois scanners, porque o front usa a action genérica e C# exige o SonarScanner for .NET em volta do `dotnet build`. Os gates diferem numa linha — o do front cobra cobertura de código novo, o da API ainda não.
+São **dois projetos no Sonar**, um por lado: um `projectKey` não se divide entre dois scanners, porque o front usa a action genérica e C# exige o SonarScanner for .NET em volta do `dotnet build`. Os dois gates têm as mesmas condições, inclusive 90% de cobertura no código novo.
 
 Quem reprova por cobertura é o **quality gate do Sonar**, que mede o código novo do PR, somado ao limite do Vitest dentro do `test:ci`. Não há envio para o Code Quality do GitHub: ele exige repositório de organização em plano Team ou Enterprise Cloud, e este é de conta pessoal.
 
