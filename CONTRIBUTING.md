@@ -84,7 +84,7 @@ A área de gestão pede o perfil de administrador, que se dá pelo banco: veja [
 
 ### Hooks e testes
 
-Os hooks locais **não vêm habilitados no clone** — o repositório usa `core.hooksPath` em vez de um gerenciador de hooks, para não desligar os hooks do Git LFS. Habilite uma vez:
+Os hooks locais **não vêm habilitados no clone**. Habilite uma vez:
 
 ```bash
 git config core.hooksPath .githooks

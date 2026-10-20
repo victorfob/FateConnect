@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # Roda os gates locais sobre o que está preparado: lint-staged no front React e a
 # build da API .NET, que é quem carrega o SonarAnalyzer.
-# O repo usa core.hooksPath=.githooks (junto dos hooks do git-lfs), por isso não usamos husky:
-# instalar husky reaponta core.hooksPath para .husky e desliga os hooks de LFS.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
