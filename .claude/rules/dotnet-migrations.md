@@ -9,7 +9,7 @@ paths:
 
 ## Rodar o `dotnet ef`
 
-O `dotnet ef` sobe o `Program`, que recusa a subida sem as variáveis obrigatórias, e o erro chega disfarçado (`Unable to create a 'DbContext'`). Passe valores falsos de design na linha do comando, cada um por extenso: `DB_CONNECTION="Host=localhost;Database=d;Username=d;Password=d" JWT_SECRET=<32+ caracteres> JWT_ISSUER=d JWT_AUDIENCE=d PUBLIC_URL=http://localhost EMAIL_SENDER=d@example.com RESEND_API_KEY=d dotnet ef ...`. Vale para a sonda de drift abaixo.
+O `dotnet ef` sobe o `Program`, que recusa a subida sem as variáveis obrigatórias, e o erro chega disfarçado (`Unable to create a 'DbContext'`). Passe um valor falso de design na linha do comando para cada variável do `Infrastructure/Configuration/RequiredSettings.cs`, cada um por extenso: `DB_CONNECTION="Host=localhost;Database=d;Username=d;Password=d" JWT_SECRET=<32+ caracteres> JWT_ISSUER=d JWT_AUDIENCE=d PUBLIC_URL=http://localhost EMAIL_SENDER=d@example.com RESEND_API_KEY=d VAPID_PUBLIC_KEY=d VAPID_PRIVATE_KEY=d dotnet ef ...`. Variável nova no `RequiredSettings` entra nesta lista. Vale para a sonda de drift abaixo.
 
 ## `migrations add` não gera rename
 

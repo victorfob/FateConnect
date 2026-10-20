@@ -1,3 +1,4 @@
+import { act } from 'react';
 import { http, HttpResponse } from 'msw';
 
 import { BACK_TO_MENU_LABEL } from '@app/components/BackToMenu/constants';
@@ -219,6 +220,17 @@ describe('Preferences', () => {
       await waitFor(() => expect(browser.saved).toEqual([DEVICE_SUBSCRIPTION]));
       expect(browser.requestPermission).toHaveBeenCalledOnce();
       expect(bodies).toEqual([{ receiveNotifications: true }]);
+    });
+
+    it('should subscribe this device when the permission is granted outside the request', async () => {
+      const browser = installPushBrowser({ permission: 'default', answer: 'default' });
+
+      await turnOn();
+      expect(browser.subscribe).not.toHaveBeenCalled();
+      act(() => browser.changePermission('granted'));
+
+      await waitFor(() => expect(browser.saved).toEqual([DEVICE_SUBSCRIPTION]));
+      expect(notificationsSwitch()).toBeChecked();
     });
 
     it('should keep the notifications on, without subscribing, when the permission is denied', async () => {

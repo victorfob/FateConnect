@@ -1,3 +1,4 @@
+import { act } from 'react';
 import { http, HttpResponse } from 'msw';
 
 import { DISMISS_BANNER_LABEL } from '@app/components/NoticeBanner/constants';
@@ -51,6 +52,20 @@ describe('PushActivationBanner', () => {
 
     await waitFor(() => expect(browser.saved).toEqual([DEVICE_SUBSCRIPTION]));
     expect(browser.requestPermission).toHaveBeenCalledOnce();
+    expect(screen.queryByText(C.PUSH_BANNER_TEXT)).not.toBeInTheDocument();
+  });
+
+  it('should subscribe and leave when the permission is granted outside the request', async () => {
+    const browser = installPushBrowser({ permission: 'default', answer: 'default' });
+    servePreferences({ receiveNotifications: true });
+
+    render(<PushActivationBanner />);
+    await userEvent.click(await activateButton());
+    expect(screen.getByText(C.PUSH_BANNER_TEXT)).toBeInTheDocument();
+
+    act(() => browser.changePermission('granted'));
+
+    await waitFor(() => expect(browser.saved).toEqual([DEVICE_SUBSCRIPTION]));
     expect(screen.queryByText(C.PUSH_BANNER_TEXT)).not.toBeInTheDocument();
   });
 
