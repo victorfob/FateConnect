@@ -5,15 +5,17 @@ name: Check version
 #
 # `edited` está na lista porque trocar a base de um PR emite esse tipo, e não os
 # três padrão: sem ele, um PR reapontado da `develop` para a `main` nunca seria
-# validado.
+# validado. A edição de título ou corpo emite o mesmo tipo e não muda a versão.
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
     branches:
       - main
 
+# A edição que não troca a base ganha grupo próprio: no grupo do PR, ela
+# cancelaria a validação em curso e terminaria pulada, sem validar nada.
 concurrency:
-  group: check-version-${{ github.head_ref }}
+  group: check-version-${{ github.head_ref }}${{ github.event.action == 'edited' && !github.event.changes.base && format('-{0}', github.run_id) || '' }}
   cancel-in-progress: true
 
 permissions:
@@ -22,6 +24,8 @@ permissions:
 jobs:
   version:
     name: Version
+    # PR mergeado também emite `edited`, e a tag dele já existe: validar ali só reprova.
+    if: github.event.pull_request.state == 'open' && (github.event.action != 'edited' || github.event.changes.base)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
