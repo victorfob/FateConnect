@@ -2,4 +2,10 @@ blank_issues_enabled: true
 contact_links:
   - name: Vulnerabilidade de segurança
     url: https://github.com/victorfob/FateConnect/security/advisories/new
-    about: Não relate falha de segurança em issue pública — use o canal privado.
+    about: "Não relate falha de segurança em issue pública: use o canal privado."
+  - name: Dúvida sobre o FateConnect
+    url: https://github.com/victorfob/FateConnect/discussions/categories/q-a
+    about: Pergunte nas Discussões; issue é para defeito e funcionalidade.
+  - name: Ideia para o FateConnect
+    url: https://github.com/victorfob/FateConnect/discussions/categories/ideas
+    about: Converse sobre a ideia nas Discussões antes de abrir a issue.
