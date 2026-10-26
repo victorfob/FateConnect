@@ -6,6 +6,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.9.5] - 2026-10-26
+
+### Security
+
+- Atualiza uma dependência das ferramentas de build e de teste apontada pelo Dependabot para a versão que corrige três falhas de segurança; o site publicado não muda (#711)
+
 ## [1.9.4] - 2026-10-26
 
 ### Security
