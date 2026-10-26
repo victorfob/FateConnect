@@ -6,6 +6,12 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.9.4] - 2026-10-26
+
+### Security
+
+- Atualiza o Node usado para construir e publicar o site para a versão que corrige falhas de segurança, e uma dependência das ferramentas de build apontada pelo Dependabot; o site publicado não muda (#707)
+
 ## [1.9.3] - 2026-10-20
 
 ### Added
