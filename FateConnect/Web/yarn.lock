@@ -629,9 +629,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hookform/resolvers@npm:^5.9.1":
-  version: 5.9.1
-  resolution: "@hookform/resolvers@npm:5.9.1"
+"@hookform/resolvers@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@hookform/resolvers@npm:6.0.0"
   dependencies:
     "@standard-schema/utils": "npm:^0.3.0"
   peerDependencies:
@@ -643,11 +643,11 @@ __metadata:
     ajv-errors: ^3.0.0
     ajv-formats: ^2.1.1
     arktype: ^2.0.0
-    ata-validator: ^1.2.0
+    ata-validator: ^1.23.0
     class-transformer: ">=0.4.0"
     class-validator: ">=0.12.0"
     computed-types: ^1.0.0
-    effect: ^3.10.3
+    effect: ^4.0.0
     fluentvalidation-ts: ^3.0.0
     fp-ts: ^2.7.0
     io-ts: ^2.0.0
@@ -709,7 +709,7 @@ __metadata:
       optional: true
     zod:
       optional: true
-  checksum: 10c0/08d4e1455a072bea182468d878527e2e99c6d079fe56ffc5297e03a8219fe7544db092afcdf7a950e5421390d4dae3a21398c8ccd0b2c8639d0e0ff9e21410c2
+  checksum: 10c0/97ca7f437ae6ab810f9fa5189de3291a1a9542e5be5d89731a95db0a26a98554857f892c450065cbc033ee0b9327da61a044343dad9f135c405dbbd6e50b6543
   languageName: node
   linkType: hard
 
@@ -4010,7 +4010,7 @@ __metadata:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
     "@eslint/js": "npm:^10.0.1"
-    "@hookform/resolvers": "npm:^5.9.1"
+    "@hookform/resolvers": "npm:^6.0.0"
     "@microsoft/signalr": "npm:^10.0.11"
     "@mui/icons-material": "npm:^9.5.0"
     "@mui/material": "npm:^9.5.0"
