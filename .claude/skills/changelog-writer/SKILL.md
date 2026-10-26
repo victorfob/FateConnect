@@ -23,6 +23,7 @@ O diff diz o que foi tocado; a entrada diz o **efeito para quem usa**. Se o efei
 - ⛔ **Defeito que nasceu e morreu dentro do mesmo `Unreleased` não entra.** O corte é a release: atravessou uma versão publicada, entra; viveu entre dois merges da mesma seção, não.
 - Comportamento que ainda não saiu em release e muda de novo ajusta a entrada do `Unreleased`, sem criar outra: o intervalo de reenvio que passou a 3 minutos antes da release reescreveu as entradas que diziam "um por minuto".
 - **Não entra** o que não muda comportamento: refactor sem efeito externo, código morto, teste, lint, CI.
+- ⛔ **Dependência atualizada por alerta só entra se o pacote chega ao que roda.** No front, confira o campo `browser` do pacote pai e procure no bundle uma string exclusiva do pacote: o `follow-redirects` vive só no adaptador de Node do axios, e corrigi-lo não muda o site.
 
 Na dúvida: *o comportamento mudou?*, não *o usuário perceberia?*
 
