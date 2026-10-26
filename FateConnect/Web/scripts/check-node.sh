@@ -20,5 +20,5 @@ if [ "$active_major" -eq "$wanted_major" ] &&
   exit 0
 fi
 
-echo "Node $active ativo, e o projeto pede o $wanted do .nvmrc: rode 'nvm use' em FateConnect/Web." >&2
+echo "Node $active ativo, e o projeto pede o $wanted do .nvmrc: rode 'nvm install' em FateConnect/Web." >&2
 exit 1
