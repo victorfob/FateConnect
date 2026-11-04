@@ -6,6 +6,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.9.6] - 2026-11-04
+
 ### Changed
 
 - Passa a nomear na política de privacidade a professora orientadora do projeto como controladora dos dados, em nova versão do documento, que pede novo aceite (#717) [Frontend]
