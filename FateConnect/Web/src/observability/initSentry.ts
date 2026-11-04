@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import {
   createRoutesFromChildren,
   matchRoutes,
@@ -64,7 +63,6 @@ export function initSentry(): void {
     environment: environmentName(),
     integrations: [
       reactRouterBrowserTracingIntegration({
-        useEffect,
         useLocation,
         useNavigationType,
         createRoutesFromChildren,
