@@ -65,7 +65,7 @@ public class NotificationConsumerTests
     };
 
     [Theory]
-    [MemberData(nameof(EveryEvent))]
+    [MemberData(nameof(EveryEvent), DisableDiscoveryEnumeration = true)]
     public async Task Consume_WhenADependencyFails_FaultsTheMessage(object message)
     {
         ITestHarness harness = await StartedHarness();
