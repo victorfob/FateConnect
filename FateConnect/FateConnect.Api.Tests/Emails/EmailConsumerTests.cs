@@ -51,7 +51,7 @@ public class EmailConsumerTests
     };
 
     [Theory]
-    [MemberData(nameof(EveryEvent))]
+    [MemberData(nameof(EveryEvent), DisableDiscoveryEnumeration = true)]
     public async Task Consume_WhenTheSendFails_FaultsTheMessage(object message)
     {
         ITestHarness harness = await StartedHarness(new FailingEmailService());
